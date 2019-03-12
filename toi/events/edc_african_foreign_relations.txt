@@ -1,0 +1,2075 @@
+﻿add_namespace = EDC_afr
+
+# tribal war starts
+country_event = {
+	id = EDC_afr.1
+	title = EDC_afr.1.t
+	desc = EDC_afr.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = EDC_afr.1.a
+		#BROKEN
+		#trigger = {
+		#	any_neighbor_state = {
+		#		limit = {
+		#			is_owned_by = FROM
+		#			is_claimed_by = ROOT
+		#		}
+		#	}
+		#}
+		#ROOT ={ 
+			create_wargoal ={ ##try this first, then try dynamic border war if effect not wanted
+				type = take_state_focus
+				target = FROM
+				#generator = any_neighbor_state = {limit = {is_owned_by = FROM}}
+			}
+			declare_war_on = {
+				target = FROM
+				type = take_state_focus
+			}
+		#}
+	}
+}
+# ping event
+country_event = {
+	id = EDC_afr.2
+	title = EDC_afr.2.t
+	desc = EDC_afr.2.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		FROM = { country_event = { id = EDC_afr.1 hours = 6 } }
+	}
+}
+#### Industrial progress events
+country_event = {#1 industrial point
+	id = EDC_afr.3
+	title = EDC_afr.3.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = 1 }
+	}
+}
+country_event = { #0.5 industrial point
+	id = EDC_afr.4
+	title = EDC_afr.4.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = 0.5 }
+	}
+}
+country_event = { #5 industrial point
+	id = EDC_afr.5
+	title = EDC_afr.5.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = 5 }
+	}
+}
+country_event = { #10 industrial point
+	id = EDC_afr.6
+	title = EDC_afr.6.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = 10 }
+	}
+}
+country_event = { #-0.5 industrial point
+	id = EDC_afr.7
+	title = EDC_afr.7.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = -0.5 }
+	}
+}
+country_event = { #-1 industrial point
+	id = EDC_afr.8
+	title = EDC_afr.8.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = -1 }
+	}
+}
+country_event = { #-5 industrial point
+	id = EDC_afr.9
+	title = EDC_afr.9.t
+	desc = EDC_afr.3.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		add_to_variable = { ROOT.industrisation_progress = -5 }
+	}
+}
+country_event = {###natives want to buy cannons
+	id = EDC_afr.10
+	title = EDC_afr.10.t
+	desc = EDC_afr.10.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {#yes
+		name = EDC_afr.10.a
+		add_political_power = 15
+		FROM={
+			add_equipment_to_stockpile = {
+				type = cannon_equipment_0
+				amount = 20
+			}
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = small_increase
+			}
+		}
+	}
+	option = {#no
+		name = EDC_afr.10.b
+		FROM={
+			add_opinion_modifier = {
+				target = PREV
+				modifier = small_decrease
+			}
+		}
+	}
+}
+country_event = {###natives reached 100% industrialisation
+	id = EDC_afr.11
+	title = EDC_afr.11.t
+	desc = EDC_afr.11.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress > 99.9}
+		has_idea = afr_reforming_kingdom
+	}
+	mean_time_to_happen = {
+		days = 7
+	}
+	
+	option = {#yes industry ho
+		name = EDC_afr.11.a
+		trigger = {
+			has_stability > 0.4
+		}
+		custom_effect_tooltip = afr_become_industrialised
+		hidden_effect = {
+			clear_variable = ROOT.industrisation_progress
+			remove_ideas = afr_reforming_kingdom
+			add_ideas = industrializing
+			add_ideas = afr_post_tribal
+		}
+	}
+	option = {#our people will not let us continue to violate their ways
+		name = EDC_afr.11.b
+		trigger = {
+			has_stability < 0.4
+		}
+		custom_effect_tooltip = EDC_afr.m25ip
+		add_to_variable = { ROOT.industrisation_progress = -25 }
+		add_political_power = 10
+	}
+	option = {#we should return to	the old ways
+		name = EDC_afr.11.c
+		custom_effect_tooltip = EDC_afr.m50ip
+		add_to_variable = { ROOT.industrisation_progress = -50 }
+		add_stability = 0.0017
+		add_political_power = 20
+	}
+}
+
+country_event = {###natives reached 10 factories
+	id = EDC_afr.12
+	title = EDC_afr.12.t
+	desc = EDC_afr.12.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		num_of_factories > 9
+		NOT= {has_country_flag= af_t_10_fac}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.12.a
+		set_country_flag = af_t_10_fac
+		custom_effect_tooltip = EDC_afr.6.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.6 hours = 1 }
+		}	
+	}
+}
+country_event = {###populus is adgitated about change
+	id = EDC_afr.13
+	title = EDC_afr.13.t
+	desc = EDC_afr.13.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		check_variable = {ROOT.industrisation_progress > 20}
+		has_idea = afr_reforming_kingdom
+		AND = {
+			has_stability < 0.25
+			has_stability > 0.1
+		}
+	}
+	mean_time_to_happen = {
+		days = 1000
+	}
+	
+	option = {#we must continue
+		name = EDC_afr.13.a
+		custom_effect_tooltip = EDC_afr.4.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.4 hours = 1 } 
+		}
+		add_stability = -0.025
+	}
+	option = {#accept their demands
+		name = EDC_afr.13.b
+		set_country_flag = af_t_10_fac
+		custom_effect_tooltip = EDC_afr_m2ip
+		hidden_effect = {
+			country_event = { id = EDC_afr.8 hours = 1 }
+			country_event = { id = EDC_afr.8 hours = 1 }
+		}	
+		add_stability = 0.05
+	}
+}
+country_event = {###army is pissed about new weapons
+	id = EDC_afr.14
+	title = EDC_afr.14.t
+	desc = EDC_afr.14.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		check_variable = {ROOT.industrisation_progress > 25}
+		has_idea = afr_reforming_kingdom
+	}
+	mean_time_to_happen = {
+		days = 1000
+	}
+	
+	option = {#no
+		name = EDC_afr.14.a
+		add_manpower = -100
+		army_experience = -5
+	}
+	option = {#accept their demands
+		name = EDC_afr.14.b
+		set_country_flag = af_t_10_fac
+		custom_effect_tooltip = EDC_afr.9.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.9 hours = 1 }
+		}	
+		add_war_support = 0.05
+	}
+}
+country_event = {###send a colonisation proposal to you benafactor
+	id = EDC_afr.16
+	title = EDC_afr.16.t
+	desc = EDC_afr.16.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		check_variable = {ROOT.industrisation_progress > 25}
+		has_idea = afr_reforming_kingdom
+	}
+	mean_time_to_happen = {
+		days = 1000
+	}
+	
+	option = {#no
+		name = EDC_afr.16.a
+		add_manpower = -100
+		army_experience = -5
+	}
+	option = {#accept their demands
+		name = EDC_afr.16.b
+		set_country_flag = af_t_10_fac
+		custom_effect_tooltip = EDC_afr.9.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.9 hours = 1 }
+		}	
+		add_war_support = 0.05
+	}
+}
+country_event = { #add colonal power
+	id = EDC_afr.15
+	title = EDC_afr.15.t
+	desc = EDC_afr.15.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	immediate = {
+		set_country_flag = is_historical_colonial_power
+	}
+	
+	option = {
+		name = EDC_afr.15.a
+	}
+	option = {
+		name = EDC_afr.15.b
+		set_technology = {
+			tech_humanities_colonialism = 1
+			tech_humanities_imperialism = 1
+			tech_humanities_colonial_ambitions = 1
+		}
+	}
+}
+country_event = { #selecting a colonal "master"
+	id = EDC_afr.17
+	title = EDC_afr.17.t
+	desc = EDC_afr.17.desc
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = {
+		name = EDC_afr.17.a #ENG
+		trigger = {
+			ENG= {
+				has_idea = afr_colonial_power
+			}
+		}
+		ENG = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.b #FRA
+		trigger = {
+			FRA= {
+				has_idea = afr_colonial_power
+			}
+		}
+		FRA = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.g #GER
+		trigger = {
+			GER= {
+				has_idea = afr_colonial_power
+			}
+		}
+		GER = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.gb #GER
+		trigger = {
+			PRS= {
+				has_idea = afr_colonial_power
+			}
+		}
+		PRS = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next #minors
+		country_event = {id = EDC_afr.37}
+		trigger = {
+			is_ai = no
+			OR = {
+				BEL= {
+					has_idea = afr_colonial_power
+				}
+				POR= {
+					has_idea = afr_colonial_power
+				}
+				SPR= {
+					has_idea = afr_colonial_power
+				}
+			}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next2 #teritary
+		country_event = {id = EDC_afr.39}
+		trigger = {
+			is_ai = no
+			NOT = {
+				BEL= {
+					has_idea = afr_colonial_power
+				}
+				POR= {
+					has_idea = afr_colonial_power
+				}
+				SPR= {
+					has_idea = afr_colonial_power
+				}
+			}
+			OR = {
+				ITA= {
+					has_idea = afr_colonial_power
+				}
+				PIE= {
+					has_idea = afr_colonial_power
+				}
+				HOL= {
+					has_idea = afr_colonial_power
+				}
+				SWE= {
+					has_idea = afr_colonial_power
+				}
+			}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next3 #teritary
+		country_event = {id = EDC_afr.38}
+		trigger = {
+			is_ai = no
+			NOT = {
+				BEL= {
+					has_idea = afr_colonial_power
+				}
+				POR= {
+					has_idea = afr_colonial_power
+				}
+				SPR= {
+					has_idea = afr_colonial_power
+				}
+				ITA= {
+					has_idea = afr_colonial_power
+				}
+				PIE= {
+					has_idea = afr_colonial_power
+				}
+				HOL= {
+					has_idea = afr_colonial_power
+				}
+				SWE= {
+					has_idea = afr_colonial_power
+				}
+			}
+			OR = {
+				AUS= {
+					has_idea = afr_colonial_power
+				}
+				RUS= {
+					has_idea = afr_colonial_power
+				}
+			}
+		}
+	}
+	option = {## ai only
+		name = EDC_afr.17.d #BEL
+		trigger = {
+			BEL= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		BEL = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.e #POR
+		trigger = {
+			POR= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		POR = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.c #SPA
+		trigger = {
+			SPR= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		SPR = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.h #AUS
+		trigger = {
+			AUS= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		AUS = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.i #RUS
+		trigger = {
+			RUS= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		RUS = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.k #ITA
+		trigger = {
+			ITA= {
+				has_idea = afr_colonial_power
+				exists = yes
+			}
+			NOT = {
+				PIE = {
+					exists = yes
+				}
+			}
+			is_ai = yes
+		}
+		ITA = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.k #ITA
+		trigger = {
+			PIE= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		PIE = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.j #HOL
+		trigger = {
+			HOL= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		HOL = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.f #SWE
+		trigger = {
+			SWE= {
+				has_idea = afr_colonial_power
+			}
+			is_ai = yes
+		}
+		SWE = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+}
+country_event = { #selecting a colonal "master"
+	id = EDC_afr.37
+	title = EDC_afr.17.t
+	desc = EDC_afr.17.desc
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	option = {
+		name = EDC_afr.17.d #BEL
+		trigger = {
+			BEL= {
+				has_idea = afr_colonial_power
+			}
+		}
+		BEL = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.e #POR
+		trigger = {
+			POR= {
+				has_idea = afr_colonial_power
+			}
+		}
+		POR = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.c #SPA
+		trigger = {
+			SPR= {
+				has_idea = afr_colonial_power
+			}
+		}
+		SPR = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next #GER
+		country_event = {id = EDC_afr.39}
+	}
+}
+country_event = { #selecting a colonal "master"
+	id = EDC_afr.38
+	title = EDC_afr.17.t
+	desc = EDC_afr.17.desc
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = {
+		name = EDC_afr.17.h #AUS
+		trigger = {
+			AUS= {
+				has_idea = afr_colonial_power
+			}
+		}
+		AUS = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.i #RUS
+		trigger = {
+			RUS= {
+				has_idea = afr_colonial_power
+			}
+		}
+		RUS = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next #GER
+		country_event = {id = EDC_afr.17}
+	}
+}
+country_event = { #selecting a colonal "master"
+	id = EDC_afr.39
+	title = EDC_afr.17.t
+	desc = EDC_afr.17.desc
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = {
+		name = EDC_afr.17.k #ITA
+		trigger = {
+			ITA= {
+				has_idea = afr_colonial_power
+				exists = yes
+			}
+			NOT = {
+				PIE = {
+					exists = yes
+				}
+			}
+		}
+		ITA = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.k #ITA
+		trigger = {
+			PIE= {
+				has_idea = afr_colonial_power
+			}
+		}
+		PIE = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.j #HOL
+		trigger = {
+			HOL= {
+				has_idea = afr_colonial_power
+			}
+		}
+		HOL = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {
+		name = EDC_afr.17.f #SWE
+		trigger = {
+			SWE= {
+				has_idea = afr_colonial_power
+			}
+		}
+		SWE = {
+			country_event = {id = EDC_afr.18 days = 7}
+		}
+	}
+	option = {#next
+		name = EDC_afr.17.next #GER
+		country_event = {id = EDC_afr.38}
+	}
+}
+country_event = { #tribal nation asks for trade deal
+	id = EDC_afr.18
+	title = EDC_afr.18.t
+	desc = EDC_afr.18.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = { #yes
+		name = EDC_afr.18.a
+		add_opinion_modifier = {
+			target = FROM
+			modifier = afr_trade_with_a_colonal_power
+		}
+		set_country_flag = @FROM_colonial_deals
+		FROM = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = afr_trade_with_a_colonal_power
+			}
+			set_country_flag = in_colonal_sphere
+			every_owned_state ={
+				limit = {
+					is_in_colonial_region = yes
+				}
+				add_to_variable = { ROOT.colonisation_progress_@THIS = 1 }
+			}
+		}
+	}
+	option = { #no
+		name = EDC_afr.18.a
+	}
+}
+country_event = { #colonal power asks for fealty
+	id = EDC_afr.19
+	title = EDC_afr.19.t
+	desc = EDC_afr.19.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = { #yes
+		name = EDC_afr.19.a
+		set_country_flag = @FROM_colonial_deals
+		set_country_flag = in_colonal_sphere
+		FROM = {
+			puppet = ROOT
+		}
+		random_owned_state = {
+			limit ={
+				is_in_colonial_region = yes
+			}
+			random_country = {
+				limit ={
+					check_variable = {colonisation_progress_@PREV > 3}
+					is_colonial_nation = yes
+					NOT = {
+						tag = FROM#not the colonal power
+					}
+				}
+				country_event = {id = EDC_afr.20 days = 1}#any country with power in the area
+			}
+		}
+	}
+	option = { #no
+		name = EDC_afr.19.a
+		every_owned_state = {
+			limit ={
+				is_in_colonial_region = yes
+				FROM = {
+					check_variable = {colonisation_progress_@PREV > 4}
+				}
+			}
+			subtract_from_variable = { FROM.colonisation_progress_@THIS = 1 }
+		}
+		FROM = {
+			add_political_power = -25
+		}
+	}
+}
+country_event = { #a colonal power has dominace in a colonal state, shall we intervene?
+	id = EDC_afr.20
+	title = EDC_afr.20.t
+	desc = EDC_afr.20.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = { #we must contest this
+		name = EDC_afr.20.a
+		declare_war_on = {
+			target = FROM
+			type = puppet_wargoal_focus
+		}
+		FROM = {
+			OVERLORD = {
+				country_event = {id = EDC_afr.21 days = 1}#overlord gets ultimatium
+			}
+		}
+	}
+	option = { #we can't
+		name = EDC_afr.20.a
+		add_political_power = -15
+		add_to_variable = { colonial_power = -25 }
+	}
+}
+country_event = { #A colonal state is in dispute
+	id = EDC_afr.21
+	title = EDC_afr.21.t
+	desc = EDC_afr.21.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = { #back down
+		name = EDC_afr.21.a
+		white_peace = FROM
+		release_puppet = FROMFROM
+	}
+	option = { #no
+		name = EDC_afr.21.a
+		#the war continues
+	}
+}
+country_event = { #A african tribe asks to become a colony
+	id = EDC_afr.22
+	title = EDC_afr.22.t
+	desc = EDC_afr.22.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = no
+	
+	option = { #yes let us give them the administration in that region
+		name = EDC_afr.22.a
+		puppet = FROM
+		FROM = {
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_senegal = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_senegal = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_senegal = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_manuritania = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_manuritania = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_manuritania = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_mali = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_mali = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_mali = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_guinea = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_guinea = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_guinea = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_sierra_leone = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_sierra_leone = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_sierra_leone = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_nigeria = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_nigeria = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_nigeria = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_gabon = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_gabon = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_gabon = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_kongo = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_kongo = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_kongo = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_angola = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_angola = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_angola = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_african_horn = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_african_horn = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_african_horn = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_nambia = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_nambia = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_nambia = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_rhodesia = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_rhodesia = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_rhodesia = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_zanzabar = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_zanzabar = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_zanzabar = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_kenya = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_kenya = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_kenya = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_uganda = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_uganda = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_uganda = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_equatorial_africa = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_equatorial_africa = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_equatorial_africa = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_ivory_coast = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_ivory_coast = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_ivory_coast = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_ghana = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_ghana = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_ghana = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_niger = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_niger = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_niger = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_togo = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_togo = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_togo = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_benin = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_benin = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_benin = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			if={
+				limit = {
+					any_owned_state = {
+						is_capital = yes
+						is_in_burkina_faso = yes
+					}
+				}
+				every_state = {
+					limit ={
+						is_in_burkina_faso = yes
+						is_owned_by = ROOT
+					}
+					#add_claim_by = THIS
+					FROM = {set_state_owner = PREV}
+				}
+				every_state = {
+					limit ={
+						is_in_burkina_faso = yes
+					}
+					add_claim_by = THIS
+				}
+			}
+			set_country_flag = colonal_state
+		}
+		
+	}
+	option = { #no
+		name = EDC_afr.22.a
+		#the war continues
+		FROM = {set_country_flag = afr_colonial_request_rejected}
+	}
+}
+country_event = {##territorial disputes on tribal border
+	id = EDC_afr.23
+	title = EDC_afr.23.t
+	desc = EDC_afr.23.d
+	picture = GFX_report_event_chinese_army_training
+	hidden = yes
+	mean_time_to_happen = {
+		days = 720
+		modifier = {
+			factor = 1.25 # If true multiply 720 by 1.5 = 1080
+			OR = {
+				AND = {
+					OR = {
+					has_idea = AF_T_organized_tribal_nation
+					has_idea = AF_T_organized_tribal_nation_2
+					has_idea = AF_T_organized_tribal_nation_3
+					}
+					NOT = {has_completed_focus = AF_O_K_expansion_territory}
+				}
+				has_completed_focus = AF_T_claim_neighboring_lands
+			}
+		}
+		modifier = {
+			factor = 1.5 # If true multiply 200 by 0.4 = 40
+			AND = {
+				OR = {
+					has_idea = AF_T_unorganized_tribal_nation
+					has_idea = AF_T_unorganized_tribal_nation_2
+					has_idea = AF_T_unorganized_tribal_nation_3
+					has_idea = AF_T_unorganized_tribal_nation_4
+					has_idea = AF_T_unorganized_tribal_nation_5
+				}
+				NOT = {has_completed_focus = AF_T_claim_neighboring_lands}
+			}
+		}
+		modifier = {
+			factor = 0.65 # If true multiply 720 by 0.8 = 576
+			has_idea = AF_T_small_kingdom
+			has_idea = afr_large_kingdom
+		}
+	}
+	trigger = {
+		OR = {
+			AND = {
+				OR = {
+				has_idea = AF_T_unorganized_tribal_nation
+				has_idea = AF_T_unorganized_tribal_nation_2
+				has_idea = AF_T_unorganized_tribal_nation_3
+				has_idea = AF_T_unorganized_tribal_nation_4
+				has_idea = AF_T_unorganized_tribal_nation_5
+				}
+				has_completed_focus = AF_T_claim_neighboring_lands
+			}
+			AND = {
+				OR = {
+				has_idea = AF_T_organized_tribal_nation
+				has_idea = AF_T_organized_tribal_nation_2
+				has_idea = AF_T_organized_tribal_nation_3
+				}
+				OR = {
+					has_completed_focus = AF_O_K_expansion_territory
+					has_completed_focus = AF_T_claim_neighboring_lands
+				}
+			}
+			has_idea = AF_T_small_kingdom
+			has_idea = afr_large_kingdom
+		}
+		any_state ={
+			owner = {
+				OR = {
+					has_idea = AF_T_unorganized_tribal_nation
+					has_idea = AF_T_unorganized_tribal_nation_2
+					has_idea = AF_T_unorganized_tribal_nation_3
+					has_idea = AF_T_unorganized_tribal_nation_4
+					has_idea = AF_T_unorganized_tribal_nation_5
+					has_idea = AF_T_organized_tribal_nation
+					has_idea = AF_T_organized_tribal_nation_2
+					has_idea = AF_T_organized_tribal_nation_3
+					has_idea = AF_T_small_kingdom
+					has_idea = afr_large_kingdom
+				}
+				#owns_state = PREV
+				any_neighbor_country = {
+					tag = ROOT
+				}
+			}
+			NOT ={
+				is_claimed_by = ROOT
+			}
+			any_neighbor_state = {
+				is_fully_controlled_by = ROOT
+			}
+			#save_event_target_as = enemy_state
+		}
+	}
+	immediate={
+		hidden_effect = {
+		random_neighbor_country = {
+			limit = {
+				OR = {
+					has_idea = AF_T_unorganized_tribal_nation
+					has_idea = AF_T_organized_tribal_nation
+					has_idea = AF_T_organized_tribal_nation_2
+					has_idea = AF_T_organized_tribal_nation_3
+					has_idea = AF_T_small_kingdom
+					has_idea = afr_large_kingdom
+				}
+			}
+			country_event = {
+					id = EDC_afr.24
+					days = 1
+				}
+				#add_claim_by = ROOT
+			}
+		}
+	}
+}
+country_event = { #A tribal state is in dispute
+	id = EDC_afr.24
+	title = EDC_afr.24.t
+	desc = EDC_afr.24.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {
+		FROM = {
+			country_event = {
+				id = EDC_afr.25
+				days = 1
+			}
+		}
+	}
+}
+country_event = { #A border dispute
+	id = EDC_afr.25
+	title = EDC_afr.25.t
+	desc = EDC_afr.25.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	#hidden = yes
+	immediate={
+		hidden_effect={
+			FROM = {
+				random_owned_state ={
+					limit = {
+						NOT ={
+							is_claimed_by = ROOT
+						}
+						any_neighbor_state = {
+							is_fully_controlled_by = ROOT
+						}
+					}
+				save_event_target_as = contested_state
+				}
+			}
+		}
+	}
+	option = { # push the claim (this allows agaitate for war)
+		name = EDC_afr.25.a
+		event_target:contested_state={
+			add_claim_by = ROOT
+		}
+		custom_effect_tooltip = EDC_afr_allows_agaitate_war
+	}
+	option = { # offer to settle the claim - small tribes may submit to large tribes
+		name = EDC_afr.25.b
+		FROM = {
+			country_event = {
+				id = EDC_afr.26
+				days = 1
+			}
+		}
+	}
+	option = { # ignore it
+		name = EDC_afr.25.c
+		add_political_power = -15
+		FROM = {
+			add_political_power = 10
+		}
+	}
+}
+country_event = { #A tribal state is in dispute
+	id = EDC_afr.26
+	title = EDC_afr.26.t
+	desc = EDC_afr.26.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	#hidden = yes
+	option = { # flatly refuse to deal
+		name = EDC_afr.26.a
+		event_target:contested_state={
+			add_claim_by = ROOT
+		}
+	}
+	option = { # agree to settle it
+		name = EDC_afr.26.b
+	}
+	option = { # cave immediately
+		name = EDC_afr.26.c
+		trigger = {
+			OR = {
+				event_target:contested_state = {
+					is_capital = no
+				}
+				AND = {
+					FROM = {
+						has_idea = AF_T_small_kingdom
+					}
+					ROOT = {
+						OR = {
+							has_idea = AF_T_unorganized_tribal_nation
+							has_idea = AF_T_unorganized_tribal_nation_2
+							has_idea = AF_T_unorganized_tribal_nation_3
+							has_idea = AF_T_unorganized_tribal_nation_4
+							has_idea = AF_T_unorganized_tribal_nation_5
+						}
+					}
+				}
+				AND = {
+					FROM = {
+						has_idea = afr_large_kingdom
+					}
+					ROOT = {
+						OR = {
+							has_idea = AF_T_unorganized_tribal_nation
+							has_idea = AF_T_unorganized_tribal_nation_2
+							has_idea = AF_T_unorganized_tribal_nation_3
+							has_idea = AF_T_unorganized_tribal_nation_4
+							has_idea = AF_T_unorganized_tribal_nation_5
+							has_idea = AF_T_organized_tribal_nation
+							has_idea = AF_T_organized_tribal_nation_2
+							has_idea = AF_T_organized_tribal_nation_3
+						}
+					}
+				}
+			}
+		}
+		FROM = {
+			set_state_owner = event_target:contested_state
+		}
+		add_stability = -0.2
+	}
+}
+country_event = { #A rival tribe has a claim on a state
+	id = EDC_afr.27
+	title = EDC_afr.27.t
+	desc = EDC_afr.27.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	#hidden = yes
+	option = { # what
+		name = EDC_afr.27.a
+	}
+}
+country_event = {###natives reached 20 factories
+	id = EDC_afr.28
+	title = EDC_afr.28.t
+	desc = EDC_afr.28.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		num_of_factories > 19
+		NOT= {has_country_flag= af_t_20_fac}
+		has_country_flag = af_t_10_fac
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.28.a
+		set_country_flag = af_t_20_fac
+		custom_effect_tooltip = EDC_afr.6.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.6 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched factory_industry_1
+	id = EDC_afr.29
+	title = EDC_afr.29.t
+	desc = EDC_afr.29.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = factory_industry_1
+		NOT= {has_country_flag= af_t_factory_industry_1}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.29.a
+		set_country_flag = af_t_factory_industry_1
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched dry_puddling_process
+	id = EDC_afr.30
+	title = EDC_afr.30.t
+	desc = EDC_afr.30.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = dry_puddling_process
+		NOT= {has_country_flag= af_t_dry_puddling_process}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.30.a
+		set_country_flag = af_t_dry_puddling_process
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched early_dynamo_generator
+	id = EDC_afr.31
+	title = EDC_afr.31.t
+	desc = EDC_afr.31.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = early_dynamo_generator
+		NOT= {has_country_flag= af_t_early_dynamo_generator}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.31.a
+		set_country_flag = af_t_early_dynamo_generator
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched mechanical_production_1
+	id = EDC_afr.32
+	title = EDC_afr.32.t
+	desc = EDC_afr.32.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = mechanical_production_1
+		NOT= {has_country_flag= af_t_mechanical_production_1}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.32.a
+		set_country_flag = af_t_mechanical_production_1
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched Electrical Telegraph
+	id = EDC_afr.33
+	title = EDC_afr.33.t
+	desc = EDC_afr.33.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = electrical_telegraph
+		NOT= {has_country_flag= af_t_electrical_telegraph}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.33.a
+		set_country_flag = af_t_electrical_telegraph
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched Industrial Society
+	id = EDC_afr.34
+	title = EDC_afr.34.t
+	desc = EDC_afr.34.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		has_tech = tech_humanities_industrial_society
+		NOT= {has_country_flag= af_t_tech_humanities_industrial_society}
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.34.a
+		set_country_flag = af_t_tech_humanities_industrial_society
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives reached 30 factories
+	id = EDC_afr.35
+	title = EDC_afr.35.t
+	desc = EDC_afr.35.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		num_of_factories > 39
+		NOT= {has_country_flag= af_t_30_fac}
+		has_country_flag = af_t_20_fac
+		NOT = {has_idea = industrializing}
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.35.a
+		set_country_flag = af_t_30_fac
+		custom_effect_tooltip = EDC_afr.6.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.6 hours = 1 }
+		}	
+	}
+}
+country_event = {###natives researched industrial_fertilizers
+	id = EDC_afr.36
+	title = EDC_afr.36.t
+	desc = EDC_afr.36.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger = {
+		check_variable = {ROOT.industrisation_progress < 100}
+		has_idea = afr_reforming_kingdom
+		NOT= {has_country_flag= af_t_tech_industrial_fertilizers}
+		NOT = {has_idea = industrializing}
+		has_tech = industrial_fertilizers
+	}
+	mean_time_to_happen = {
+		days = 30
+	}
+	
+	option = {#ok
+		name = EDC_afr.36.a
+		set_country_flag = af_t_tech_industrial_fertilizers
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 }
+		}	
+	}
+}
+country_event = {###EGY-ETH war, EGY wins
+	id = EDC_afr.40
+	title = EDC_afr.40.t
+	desc = EDC_afr.40.d
+	picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		tag= EGY
+		has_war_with = ETH
+		surrender_progress < 0.10
+		ETH = {
+			surrender_progress > 0.20
+		}
+	}
+	mean_time_to_happen = {
+		days = 3
+	}
+	
+	option = {#take what we wanted
+		name = EDC_afr.40.a
+		white_peace = ETH
+		set_state_owner = 817
+		MED={
+			set_state_owner = 815
+		}
+	}
+	option = {#we will annex them
+		name = EDC_afr.40.b
+	}
+}
+country_event = {###A African Major offers us protection
+	id = EDC_afr.41
+	title = EDC_afr.41.t
+	desc = EDC_afr.41.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {#agree
+		name = EDC_afr.41.a
+		FROM = {
+			give_guarantee = ROOT
+		}
+	}
+	option = {#decline
+		name = EDC_afr.41.b
+	}
+}
+##########################################################################################################################################################
+#####	######	#####	#		#########	####	#		#####		#####	#####	#####		#		#####	######	#########	#####		#
+#		#		#	   # #		#	#	#	#	#	#		#			#		#	#	#		   # #		#		#			#		#		   # #
+#####	#		#	  #####		#	#	#	#####	#		####		###		#	#	#		  #####		###		#			#		#		  #####
+	#	#		#	 #	   #	#	#	#	#	#	#		#			#		#	#	#		 #	   #	#		#			#		#		 #	   #
+#####	######	#	#		#	#		#	####	#####	#####		#		#####	#		#		#	#		#		#########	#####	#		#
+##########################################################################################################################################################
+news_event = { #the scramble begins
+	id = EDC_afr.42
+	title = EDC_afr.42.t
+	desc = EDC_afr.42.d
+	picture = GFX_news_event_scramble_africa
+	
+	#is_triggered_only = yes
+	#hidden = no
+	major = yes
+	fire_only_once = yes
+	
+	immediate = {
+		set_global_flag = scramble_for_africa
+	}
+	trigger ={
+		tag = ENG
+		OR={
+			AND = {
+				any_country={
+					has_tech=tech_humanities_colonial_ambitions
+				}
+			}
+			date>1881.01.01
+			AND ={
+				any_country={
+					has_tech=early_vaccination
+					has_tech=standardized_gauge
+				}
+				date>1879.01.01
+			}
+		}
+	}
+	
+	option = {#all this effort over africa?
+		name = EDC_afr.42.a
+		trigger={
+			NOT={
+				OR = {
+					is_in_colonial_region = yes
+					has_idea = afr_post_tribal
+
+					tag = ENG
+					tag = FRA
+					tag = BEL
+					tag = SPA
+					tag = POR
+					PRS_trigger_formed_germany = yes
+					Country_formed_ITA = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = EDC_afr.42.b#We must exploit the continent before the other powers get to it
+		trigger={
+			OR  = {
+				tag = ENG
+				tag = FRA
+				tag = BEL
+				tag = SPA
+				tag = POR
+				PRS_trigger_formed_germany = yes
+				Country_formed_ITA = yes
+			}
+		}
+		set_country_flag = is_historical_colonial_power
+		if= {
+			limit = {
+				NOT = {
+					has_tech = tech_humanities_colonialism
+				}
+			}
+			set_technology = {
+				tech_humanities_colonialism = 1
+			}
+		}
+		if= {
+			limit = {
+				is_ai = yes
+				NOT = {
+					has_tech = tech_humanities_colonialism
+				}
+			}
+			set_technology = {
+				tech_humanities_colonialism = 1
+				tech_humanities_imperialism = 1
+				tech_humanities_colonial_ambitions = 1
+			}
+		}
+	}
+	option = {#The Hordes of Europe do decend apon us
+		name = EDC_afr.42.c
+		trigger={
+			is_in_colonial_region = yes
+			NOT = {
+				has_idea = afr_post_tribal
+			}
+		}
+	}
+	option = {#The Hordes of Europe do decend apon us, And we are Ready
+		name = EDC_afr.42.c2
+		trigger={
+			is_in_colonial_region = yes
+			has_idea = afr_post_tribal
+		}
+	}
+}

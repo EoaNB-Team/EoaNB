@@ -1,0 +1,720 @@
+on_actions = {
+
+	#DESIGNED FOR 1857 START DATE - EFFECTS APPLY TO ALL START DATES, REMOVE EVERYTHING BUT GENERIC CONTENT WHEN SECOND START DATE IS ADDED
+	#MAYBE HAVE THIS TRIGGER A SEPERATE HIDDEN STARTING EVENT WITH AN IF TRIGGER ASKING WHICH DATE IT IS
+	#PUTTING AN IF TRIGGER INTO THIS BRACKET DOESN'T WORK
+	on_startup = {
+		effect = {
+			SRS = { country_event = { days = 5 id = sepoy.1 } }
+			every_country = { country_event = { id = generic.4 } }
+			ENG = { country_event = { id = system.1 } } # 3% threat and init events
+			PRS = { country_event = { id = prussia.29 } }
+			USA = { country_event = { id = usa.0 days = 1 } }
+			TSH = { country_event = { id = shogunate_japan.0 days = 1 } }
+			OUD = { add_to_war = { targeted_alliance = SRS enemy = RAJ } }
+			GWA = { add_to_war = { targeted_alliance = SRS enemy = RAJ } }
+			HOL = { country_event = { id = holland_oog.1 } }
+            SER = { country_event = { id = SERmisc.5 days = 1 } }
+			set_global_flag = eoanb_flag_sepoy_rebellion_ongoing
+			set_global_flag = eoanb_flag_sow_ongoing
+		}
+	}
+	
+	# country 
+	on_new_term_election = {
+		random_events = {
+			100 = election.1 #Generic Elections
+		}
+	}
+
+	# Ace pilots
+	# country, FROM = ace
+	on_ace_promoted = {
+		random_events = {
+			100 = ace_promoted.1
+			5 = ace_promoted.2
+		}
+	}
+	
+	# country, FROM = ace, PREV = enemy ace 
+	# This event fires twice, once for each ace.
+	on_aces_killed_each_other = {
+		random_events = {
+			100 = aces_killed_each_other.1
+		}
+	}
+	
+	# country, FROM = our ace, 
+	# PREV = enemy ace, has killed FROM
+	on_ace_killed_by_ace = {
+		random_events = {
+			100 = ace_killed_by_ace.1
+		}
+	}
+
+	# country, FROM = our ace, 
+	# PREV = enemy ace, killed by FROM
+	on_ace_killed_other_ace = {
+		random_events = {
+			100 = ace_killed_other_ace.1
+		}
+	}
+
+	# country, FROM = ace
+	on_ace_killed = {
+		random_events = {
+			100 = ace_died.1
+		}
+	}
+
+	# During justifying wargoals
+	# triggered daily, so make sure there is a sink somewhere not firing events
+	# country, FROM = target nation
+	#on_justifying_wargoal_pulse = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#on_wargoal_expire = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#on_nuke_drop = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	# country random events
+	#on_bi_yearly_pulse = {
+	#	random_events =
+	#}
+
+	#on_five_year_pulse = {
+	#
+	#}
+
+	#on_border_war_lost = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	#on_leave_faction = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#FROM is the one that joins the faction
+	#on_create_faction = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#FROM is country getting invited.
+	#on_offer_join_faction = {
+	#	effect = {
+	#				
+	#	}
+	#}
+
+	#FROM is faction leader on join faction requests. THIS DOES NOT FIRE ON ADD_TO_FACTION EFFECT! USE ON_OFFER_JOIN_FACTION!
+	#on_join_faction = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#FROM is war target
+	#on_declare_war = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	# When a new faction is formed
+	#on_faction_formed = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	# ROOT is capitulated country, FROM is winner... Wrong, this is backwards according to testing.
+	on_peaceconference_ended = {
+		effect = {
+			if = {
+				limit = {
+					FROM = { tag = CSA }
+					ROOT = { tag = USA }
+					has_global_flag = ACWAmerican_Civil_War
+				}
+				USA = { country_event = { id = acw.7 } }
+				CSA = { country_event = { id = acw.7 } }
+			}
+			if = {
+				limit = {
+					ROOT = { tag = CSA }
+					FROM = { tag = USA }
+					has_global_flag = ACWAmerican_Civil_War
+					NOT = { USA = { has_country_flag = USA_Radical_Coup } }
+				}
+				USA = { country_event = { id = acw.8 } }
+				CSA = { country_event = { id = acw.8 } }
+			}
+			if = {
+				limit = {
+					ROOT = { tag = CSA }
+					FROM = { tag = USA }
+					has_global_flag = ACWAmerican_Civil_War
+					USA = { has_country_flag = USA_Radical_Coup }
+				}
+				USA = { country_event = { id = acw.57 } }
+				CSA = { country_event = { id = acw.57 } }
+			}
+			if = {
+				limit = {
+					FROM = { has_country_flag = containment_target } #containment target defeated
+					FROM = {
+						NOT = {
+							has_country_flag = containment_reperations
+						}
+					}
+				}
+				FROM = { set_country_flag = containment_reperations }
+				FROM = { country_event = { id = contain.1 days = 0 } }
+				ROOT = { clr_country_flag = containment_starter }
+			}
+			if = {
+				limit = {
+					ROOT = { has_country_flag = containment_target } #containment defeated
+					ROOT = { has_defensive_war = no }
+				}
+				ROOT = { set_country_flag = containment_target_won }
+				FROM = { clr_country_flag = containment_starter }
+				ROOT = { country_event = { id = contain.3 days = 0 } }
+				ROOT = { clr_country_flag = containment_target }
+			}
+			if = {
+				limit = {
+					tag = PAR
+					FROM = { tag = BRA }
+					PAR = { has_country_flag = Paraguayan_War }
+				}
+				ROOT = { white_peace = FROM }
+				PAR = { country_event = { id = par.16 } }
+			}
+			if = {
+				limit = {
+					tag = BRA
+					FROM = { tag = PAR }
+					PAR = { has_country_flag = Paraguayan_War }
+				}
+				ROOT = { white_peace = FROM }
+				PAR = { country_event = { id = par.15 } }
+			}
+			if = {
+				limit = {
+					tag = NEG
+					USA = { has_country_flag = USA_Radical_Coup }
+					CAL = { exists = no }
+					MHC = { exists = no }
+				}
+				ROOT = { drop_cosmetic_tag = yes }
+				CAL = { drop_cosmetic_tag = yes }
+				country_event = { id = acw.47 hours = 1 }
+				news_event = { id = acw_news.13 }
+				every_state = {
+					remove_core_of = MHC
+	                remove_core_of = CAL
+	                remove_core_of = NEG
+	            }
+			}
+			if = {
+				limit = {
+					tag = NEG
+					USA = { has_country_flag = USA_Radical_Coup }
+					CAL = { exists = yes }
+				}
+				declare_war_on = {
+					target = CAL
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					tag = NEG
+					USA = { has_country_flag = USA_Radical_Coup }
+					MHC = { exists = yes }
+				}
+				declare_war_on = {
+					target = MHC
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					tag = CAL
+					USA = { has_country_flag = USA_Radical_Coup }
+					NEG = { exists = no }
+					MHC = { exists = no }
+				}
+				ROOT = { drop_cosmetic_tag = yes }
+				NEG = { drop_cosmetic_tag = yes }
+				country_event = { id = acw.55 hours = 1 }
+				news_event = { id = acw_news.15 }
+				every_state = {
+					remove_core_of = MHC
+	                remove_core_of = CAL
+	                remove_core_of = NEG
+	            }
+			}
+			if = {
+				limit = {
+					tag = CAL
+					USA = { has_country_flag = USA_Radical_Coup }
+					NEG = { exists = yes }
+				}
+				declare_war_on = {
+					target = NEG
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					tag = CAL
+					USA = { has_country_flag = USA_Radical_Coup }
+					MHC = { exists = yes }
+				}
+				declare_war_on = {
+					target = MHC
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					tag = MHC
+					USA = { has_country_flag = USA_Radical_Coup }
+					NEG = { exists = no }
+					CAL = { exists = no }
+				}
+				CAL = { drop_cosmetic_tag = yes }
+				NEG = { drop_cosmetic_tag = yes }
+				country_event = { id = acw.56 hours = 1 }
+				news_event = { id = acw_news.16 }
+				every_state = {
+					remove_core_of = MHC
+	                remove_core_of = CAL
+	                remove_core_of = NEG
+	            }
+			}
+			if = {
+				limit = {
+					tag = MHC
+					USA = { has_country_flag = USA_Radical_Coup }
+					NEG = { exists = yes }
+				}
+				declare_war_on = {
+					target = NEG
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					tag = MHC
+					USA = { has_country_flag = USA_Radical_Coup }
+					CAL = { exists = yes }
+				}
+				declare_war_on = {
+					target = CAL
+					type = annex_everything
+				}
+			}
+			if = {
+				limit = {
+					FROM = {
+						tag = USA
+					}
+					OR = {
+						tag = CAL
+						tag = NEG
+						tag = MHC
+					}
+					USA = { has_country_flag = USA_Radical_Coup }
+				}
+				if = {
+					limit = {
+						NEG = { exists = yes }
+					}
+					NEG = {
+						annex_country = {
+							target = USA
+							transfer_troops = no
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						CAL = { exists = yes }
+					}
+					CAL = {
+						annex_country = {
+							target = USA
+							transfer_troops = no
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						MHC = { exists = yes }
+					}
+					MHC = {
+						annex_country = {
+							target = USA
+							transfer_troops = no
+						}
+					}
+				}
+			}
+		}
+	}
+
+	# ROOT is capitulated country, FROM is winner
+	on_capitulation = {
+		effect = {
+	        if = {
+                limit = {
+					FROM = { tag = RUS }
+				    ROOT = { tag = CIR }
+                }   
+                    FROM = { country_event = { id = caucasus.2 } }
+            }
+	        if = {
+                limit = {
+					FROM = { tag = RUS }
+					ROOT = { tag = CAU }
+                }   
+                FROM = { country_event = { id = caucasus.3 } }
+            }
+			if = {
+                limit = {
+					FROM = { tag = RAJ }
+					ROOT = { tag = SRS }
+                }   
+                FROM = { country_event = { id = britishindia.1 } }
+            }
+		}
+	}
+
+	# ROOT is previously capitulated country
+	#on_uncapitulation = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#on_government_change = {
+	#	effect = {			
+	#		
+	#	}
+	#}
+
+	#on_coup_succeeded = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	#ROOT is winner #FROM gets annexed - This will also fire on_annex
+	on_civil_war_end = {
+		effect = {
+			if = {
+				limit = {
+					ROOT = {
+						original_tag = USA
+						has_government = centrism
+						has_cosmetic_tag = USA_free_states_of_america
+					}
+					FROM = {
+						original_tag = USA
+						has_government = autocracy
+					}
+				}
+				every_state = {
+					remove_core_of = ROOT
+				}
+				drop_cosmetic_tag = yes
+				USA = {
+		            annex_country = {
+		                target = ROOT
+		                transfer_troops = yes
+		            }
+		            add_ideas = {
+	                    hos_is_leader
+	                    victorian_era
+	                    law_victorian_army
+	                    industrializing
+	                    non_monarchical_system
+	                    presidential_republic
+
+	                    civilian_economy
+	                    export_focus
+	                    two_percent
+	                    normal_taxes
+	                    cl_restricted
+	                    twelve_hour_work_day
+
+	                    stagnation_growth
+	                    border_control
+	                    volunteer_only
+	                    racial_laws
+	                    universal_male_suffrage
+
+	                    constitution_adopted
+	                    free_elections
+
+	                    privileged_education
+	                    state_religion
+	                    religion_protestant
+	                }
+		            set_politics = {
+		                ruling_party = centrism
+		            }
+		            create_country_leader = {
+	                    name = "Ulysses S. Grant"
+	                    desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+	                    picture = "Portrait_USA_Ulysses_grant.dds"
+	                    expire = "1947.1.1"
+	                    ideology = radical_liberal
+	                }
+		            add_ideas = {
+	                    hos_is_leader
+	                    victorian_era
+	                    law_victorian_army
+	                    industrializing
+	                    non_monarchical_system
+	                    presidential_republic
+
+	                    civilian_economy
+	                    export_focus
+	                    two_percent
+	                    normal_taxes
+	                    cl_restricted
+	                    twelve_hour_work_day
+
+	                    stagnation_growth
+	                    border_control
+	                    volunteer_only
+	                    racial_laws
+	                    universal_male_suffrage
+
+	                    constitution_adopted
+	                    free_elections
+
+	                    privileged_education
+	                    secular_state
+	                    religion_protestant
+	                }
+		            add_popularity = {
+		                ideology = centrism
+		                popularity = 0.6
+		            }
+		            add_popularity = {
+		                ideology = traditional_conservatism
+		                popularity = 0.4
+		            }
+		        }
+			}
+			if = {
+				limit = {
+					original_tag = TEX
+					has_government = traditional_conservatism
+					TEX = { has_country_flag = TEX_civil_war }
+				}
+				TEX = { clr_country_flag = TEX_civil_war }
+				ROOT = { drop_cosmetic_tag = yes }
+				TEX = { drop_cosmetic_tag = yes }
+				TEX = { remove_ideas = houston_revolt }
+				ROOT = { country_event = { id = acw.62 } }
+			}
+			if = {
+				limit = {
+					original_tag = TEX
+					has_government = centrism
+					TEX = { has_country_flag = TEX_civil_war }
+				}
+				TEX = { clr_country_flag = TEX_civil_war }
+				ROOT = { drop_cosmetic_tag = yes }
+				random_other_country = {
+	                limit = {
+	                    original_tag = TEX
+	                    has_government = traditional_conservatism
+	                }
+	                drop_cosmetic_tag = yes
+	            }
+	            TEX = { remove_ideas = houston_revolt }
+				ROOT = { country_event = { id = acw.61 } }
+			}
+		}
+	}
+
+	#used when puppeting in a peace conference
+	#ROOT = nation being puppeted, FROM = overlord
+	
+	#on_puppet = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	#used when puppeting through the occupied territories menu during peace time (or when releasing from non-core but owned territory, f.e. Britain releasing Egypt)
+	#ROOT = nation being released, FROM = overlord
+	
+	#on_release_as_puppet = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	#ROOT is winner #FROM gets annexed - For civil wars on_civil_war_end is also fired
+	#on_annex = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	#on_unit_leader_created = {
+	#	effect = {
+	#	}
+	#}
+
+	
+	#on_unit_leader_level_up = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	# From is owner country
+	#on_army_leader_daily = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	# From is owner country
+	#on_army_leader_won_combat = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	# From is owner country
+	#on_army_leader_lost_combat = {
+	#	effect = {
+	#		
+	#	}
+	#}
+	
+	#on_army_leader_promoted = {
+	#	effect = {
+	#		
+	#	}
+	#}
+
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					OR = {
+						FROM.FROM = { is_owned_by = USA }
+						FROM.FROM = { is_owned_by = CSA }
+						FROM.FROM = { is_owned_by = CAL }
+						FROM.FROM = { is_owned_by = NEG }
+						FROM.FROM = { is_owned_by = MHC }
+					}
+					has_global_flag = ACWAmerican_Civil_War
+				}
+		        random_list = {
+		        	25 = {
+		        		FROM.FROM = { remove_building = { type = infrastructure level = 1 } }
+		        	}
+		        	25 = {
+		        		FROM.FROM = { remove_building = { type = industrial_complex level = 1 } }
+		        	}
+		        	25 = {
+		        		FROM.FROM = { remove_building = { type = arms_factory level = 1 } }
+		        	}
+		        	25 = {
+		        		FROM.FROM = { remove_building = { type = arms_factory level = 1 } }
+		        		FROM.FROM = { remove_building = { type = industrial_complex level = 1 } }
+		        		FROM.FROM = { remove_building = { type = infrastructure level = 1 } }
+		        	}
+		        }
+		        FROM.FROM = { damage_building = { type = infrastructure damage = 0.9 } }
+		        FROM.FROM = { damage_building = { type = industrial_complex damage = 0.7 } }
+		        FROM.FROM = { damage_building = { type = arms_factory damage = 0.5 } }
+		        ROOT = { add_equipment_to_stockpile = { type = infantry_equipment amount = 500 } }
+		        ROOT = { add_equipment_to_stockpile = { type = uniform_equipment amount = 500 } }
+		        ROOT = { add_equipment_to_stockpile = { type = cavalry_equipment amount = 50 } }
+		        FROM = { add_stability = -0.05 }
+        		FROM = { add_war_support = -0.05 }
+			}
+			if = {
+				limit = {
+					OR = {
+						ROOT = { tag = CSA }
+						ROOT = { tag = MEX }
+						AND = {
+							ROOT = { tag = ENG }
+							CSA = { has_country_flag = CSA_UK_second_mexican_war }
+						}
+						AND = {
+							ROOT = { tag = CSA }
+							CSA = { has_country_flag = CSA_UK_second_mexican_war }
+						}
+						ROOT = { tag = FRA }
+					}
+					FROM.FROM = { is_owned_by = USA }
+					has_global_flag = ACW_second_mexican_war
+					USA = { surrender_progress > 0.2 }
+					CSA = { has_war_with = USA }
+				}
+				CSA = { country_event = { id = csa.31 } }
+			}
+			if = {
+				limit = {
+					FROM.FROM = { is_owned_by = CSA }
+					has_global_flag = ACW_second_mexican_war
+					CSA = { surrender_progress > 0.2 }
+					CSA = { has_war_with = USA }
+				}
+				USA = { country_event = { id = csa.31 } }
+			}
+		}
+	}
+	
+on_capitulation = {
+    effect = {
+        if = {
+            limit = {
+                TAG = DOM
+                FROM = { TAG = SPR }
+            }
+            SPR = {
+				transfer_state = 319 
+				set_global_flag = SPR_won_restoration
+			}
+			DOM = {
+				remove_ideas = DOM_restoration_war2
+				remove_ideas = DOM_restoration_war
+			}
+        }
+    }
+}
+	
+}
