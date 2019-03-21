@@ -35,13 +35,14 @@ scripted_gui = {
 		 
 		effects = {
 			influence_open_click = {
-			ROOT = {
                 set_temp_variable = { show = 1 }
                 subtract_from_temp_variable = { show = show_influence_actions }
                 set_variable = { show_influence_actions = show }
+				
+				set_variable = { political_power_spend_add_5_influence = 50  }
+				multiply_variable = { political_power_spend_add_5_influence = this.pp_scaling_influence }
 			}
-			}
-		    show_influencers_button_click = {
+		    show_influencers_button_click = { 
 			ROOT = {
                 set_temp_variable = { show_1 = 1 }
                 subtract_from_temp_variable = { show_1 = show_influencers }
@@ -111,11 +112,10 @@ scripted_gui = {
 		parent_window_token = selected_country_view_diplomacy  
 		
 		visible = {
-		    ROOT = {
 			    check_variable = {
 			        show_influence_actions > 0 
 			    }  			
-		    }
+		}
 		    THIS = {
 			    is_ai = yes
 			}
@@ -123,6 +123,7 @@ scripted_gui = {
 		 
 		effects = {
 		    add_influence_button_click = {
+			    subtract_from_variable = { political_power = political_power_spend_add_5_influence  }
 			    THIS = {
 			        remove_from_array = { influencer_array = influencer_var@ROOT }
 			        add_to_variable = { influencer_var@ROOT = 0.05 }
@@ -154,10 +155,51 @@ scripted_gui = {
                    	    max = 1 
 	                 	min = 0 
 	                }					
-				}
-				ROOT = { 
-				    subtract_from_variable = { influence_var = 0.05 }
-			    }
+                    for_loop_effect = {
+                        start = 0
+                        end = length_temp
+                        add = 1
+                        value = v
+                        break = b
+                        find_highest_in_array = {
+                        array = influencer_array
+                        value = influencer_array_highest_value
+                        index = influencer_array_highest_index
+                        }
+                        remove_from_array = {
+                            array = influencer_array
+                            index = influencer_array_highest_index
+                        }
+                        add_to_temp_array = { 
+                            array = influencer_array_temp 
+                            value = influencer_array_highest_value 
+                        }
+                        set_temp_variable = { tag_temp = influencer_tag_array^influencer_array_highest_index }
+                        remove_from_array = {
+                            array = influencer_tag_array
+                            index = influencer_array_highest_index
+                        }
+                        add_to_temp_array = { 
+                            array = influencer_tag_array_temp  
+                            value = tag_temp
+                        }
+                    }
+                    for_loop_effect = {
+                        start = 0
+                        end = length_temp
+                        add = 1
+                        value = v
+                        break = b
+                        add_to_array = { 
+                            array = influencer_array
+                            value = influencer_array_temp^v 
+                        }
+                        add_to_array = { 
+                            array = influencer_tag_array
+                            value = influencer_tag_array_temp^v 
+						}
+					}
+                }
 			}
 		    reset_influence_button_click = {
 			    THIS = {
@@ -171,29 +213,39 @@ scripted_gui = {
 				    add_to_variable = { influence_var = 0.05 }
 				}
 			}
+            make_sphere_button_click = {
+			    ROOT = {
+				    
+				}
+				THIS = {
+					set_variable = { influencer_status = 3 }
+				}
+			}
 		}
 		
 		triggers = {
 		    add_influence_button_click_enabled  = {
-			   ROOT = { 
-				    check_variable = { influence_var > 0.05 } 
-				}
+				check_variable = { political_power > political_power_spend_add_5_influence } 
 				OR = {
                     NOT = {
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 8		
-		                    compare = less_than_or_equals 
-			            }	
-				    }
-                    AND = {					
-                        check_variable = { root.score_array_position_var >  8 }						
-				        NOT = {		
+					    THIS = {
                             check_variable = { 
-		                   	    var = this.score_array_position_var
-                                value = 16 		
-		                   	    compare = less_than_or_equals 
-			                }					
+			                    var = score_array_position_var
+                                value = 8		
+		                        compare = less_than_or_equals 
+			                }	
+				        }
+					}
+                    AND = {					
+                        check_variable = { Root.score_array_position_var >  8 }						
+				        NOT = { 
+                            THIS = {						
+                                check_variable = { 
+		                     	    var = score_array_position_var
+                                    value = 16 		
+		                   	        compare = less_than_or_equals 
+			                    }
+                            }							
 				        }			
 				    }
 				}
