@@ -1,1 +1,437 @@
+scripted_diplomatic_actions = {
 
+	alliance_key = { # will be used in most localizations
+	
+		allowed = { #if action is valid
+		}
+		visible = { #if action is visible on gui
+		NOT = {
+			THIS = {
+				OR = {
+				    is_puppet = yes 
+					is_subject = yes 
+					check_variable = { THIS.id = FROM.id }
+		    	    is_in_array = {
+	                    array = THIS.allies_array
+	                    value = FROM.id 
+                    }
+				}
+		    }
+			FROM = {
+				OR = {
+				    is_puppet = yes 
+					is_subject = yes 
+					#check_variable = { THIS.id = FROM.id }
+		    	    is_in_array = {
+	                    array = THIS.allies_array
+	                    value = FROM.id 
+                    }
+				}
+		    }
+		}
+		}
+		selectable = { #if action is selectable on gui
+		}
+
+		requires_acceptance = yes # if true the action will require acceptance of target country
+		cost = 0 # pp cost, can be zero
+		command_power = 0 # cp cost, can be zero
+
+		#cost_string = loc_key # if you have a custom cost, use this loc to display it
+		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
+
+		icon = 1 # icon frame to use in notification
+
+      #for effects/triggers/variables, from is the sender and this is receiver
+
+		# runs when the action is sent
+		on_sent_effect = {
+		}
+
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			    add_to_array = { From.allies_array = THIS.id }
+			FROM = {
+				give_military_access = PREV.PREV  
+			}
+			THIS = {
+			    give_military_access = FROM 
+			}
+			    add_to_array = { This.allies_array = FROM.id }
+		}
+
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
+
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		#send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		# reset_send_effect = { # if action has a send scripted gui, this effect will be used for clearing the state of gui (will run when player opens the scripted gui by sending the action or when ai proposes action
+			# # clear action
+			# if = {
+				# limit = { 
+					# from = {
+						# is_ai = yes
+					# }
+				# }
+				# # initialize for ai
+			# }
+		# }
+		can_be_sent = { # send button will be disabled if no
+			always = yes
+		}
+		send_description = alliance_key_desc_send_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		# reset_receive_effect = {
+			# # clear action
+			# if = {
+				# limit = {  
+					# from = {
+						# is_ai = yes
+					# }
+				# }
+				# # change stuff for ai
+			# }
+		# }
+		can_be_accepted = { # accept button will be disabled if no
+			always = yes
+		}
+		request_description = alliance_key_desc_receive_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		accept_title = loc_key #can be overridden to customize accepted/rejected pop ups for the sender
+		accept_description = loc_key
+		reject_title = loc_key
+		reject_description = loc_key
+	
+		
+		# AI
+		# a list of ai_will_do entries that will be used to decide if AI should accept or reject a request
+		ai_acceptance = {
+			Base = { # name is used for loc
+				base = -20     
+			}
+			Puppet = {
+			       base = 0 
+				   modifier = {
+				    add = -1000 
+					
+					OR = {
+					    is_puppet = yes 
+						is_subject = yes 
+					}
+				    }
+				 
+			}
+            Relations = {
+                base = 0 
+				modifier = {
+				    add = THIS.opinion@FROM 
+				} 
+            }
+            "Strategic Considerations" = {
+                base = 0 
+				    modifier = {
+				        add = 15   
+                        check_variable = { from.score_array_position_var >  8 }		
+                        check_variable = { 
+			                var = from.score_array_position_var
+                            value = 16 		
+			                compare = less_than_or_equals 
+			            }	
+                        check_variable = { 
+			                var = this.score_array_position_var
+                            value = 16 		
+			                compare = greater_than   
+			            }
+                    }
+				    modifier = {
+				        add = 25  
+						AND = {
+                        check_variable = { 
+			                var = from.score_array_position_var
+                            value = 8		
+			                compare = less_than_or_equals 
+			            }
+                        check_variable = { 
+			                var = this.score_array_position_var
+                            value = 8		
+			                compare = greater_than   
+			            }
+						} 
+                    }	
+				    modifier = {
+				        add = -15    	
+                        check_variable = { 
+			                var = from.score_array_position_var
+                            value = 16 		
+			                compare = greater_than 
+			            }	
+                        check_variable = { 
+			                var = this.score_array_position_var
+                            value = 16 		
+			                compare = less_than_or_equals  
+			            }
+                    }
+				    modifier = {
+				        add = 10     	
+                        check_variable = { From.overall_score > This.overall_score }	
+                    }
+				    modifier = {
+				        add = -10      	
+                        check_variable = { From.overall_score < This.overall_score }	
+                    }	
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = pre_industrial_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = pre_industrial_era
+					    	}	
+						}
+                    }
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = victorian_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = victorian_era
+					    	}	
+						}
+                    }
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = machine_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = machine_era
+					    	}	
+						}
+                    }		
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = oil_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = oil_era
+					    	}	
+						}
+                    }			
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = aviation_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = aviation_era
+					    	}	
+						}
+                    }	
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = modern_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = modern_era
+					    	}	
+						}
+                    }	
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = atomic_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = atomic_era
+					    	}	
+						}
+                    }			
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = information_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = information_era
+					    	}	
+						}
+                    }			
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = digital_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = digital_era
+					    	}	
+						}
+                    }	
+				    modifier = {
+				        add = -15      	
+                        THIS = {
+						    has_idea = post_digital_era
+						}
+                        NOT = {						
+                            FROM = {
+			     			    has_idea = post_digital_era
+					    	}	
+						}
+                    }
+			        modifier = { 
+					    factor = 0     
+			            THIS = {
+				            OR = {
+				          	    is_puppet = yes
+				        		is_subject = yes 
+					        }
+				        }
+			        }					
+            }
+		}
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			modifier = { # name is used for loc
+				add = 100     
+			}
+		    modifier = {
+				add = -1000 
+					
+			    OR = {
+				    is_puppet = yes 
+				    is_subject = yes 
+				}
+		    }			
+		}
+	}
+	
+	alliance_break_key = { # will be used in most localizations
+	
+		allowed = { #if action is valid
+		}
+		visible = { #if action is visible on gui
+		    ΟR = {
+				NOT = {
+				    OR = {
+				        is_puppet = yes 
+				    	is_subject = yes 
+					}
+			    }
+				THIS = {
+		    	is_in_array = {
+	                array = THIS.allies_array
+	                value = PREV.PREV.id 
+                }
+				}
+			}			
+		}
+		selectable = { #if action is selectable on gui
+		}
+
+		requires_acceptance = yes # if true the action will require acceptance of target country
+		cost = 0 # pp cost, can be zero
+		command_power = 0 # cp cost, can be zero
+
+		#cost_string = loc_key # if you have a custom cost, use this loc to display it
+		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
+
+		icon = 1 # icon frame to use in notification
+
+      #for effects/triggers/variables, from is the sender and this is receiver
+
+		# runs when the action is sent
+		on_sent_effect = {
+		}
+
+		# runs when the action is properly sent and accepted
+		complete_effect = {
+			    remove_from_array = { From.allies_array = THIS.id }
+				diplomatic_relation = {
+                    country = THIS
+                    relation = military_access
+                    active = no
+                }
+			    remove_from_array = { This.allies_array = FROM.id }
+		}
+
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
+
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		#send_scripted_gui = send_scripted_gui_name # if specified, the diplomatic action will use this scripted gui before sending the request. the player (or ai) can make changes on that gui and store stuff as variable to customize action
+		# reset_send_effect = { # if action has a send scripted gui, this effect will be used for clearing the state of gui (will run when player opens the scripted gui by sending the action or when ai proposes action
+			# # clear action
+			# if = {
+				# limit = { 
+					# from = {
+						# is_ai = yes
+					# }
+				# }
+				# # initialize for ai
+			# }
+		# }
+		can_be_sent = { # send button will be disabled if no
+			always = yes
+		}
+		send_description = alliance_key_desc_send_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		# reset_receive_effect = {
+			# # clear action
+			# if = {
+				# limit = {  
+					# from = {
+						# is_ai = yes
+					# }
+				# }
+				# # change stuff for ai
+			# }
+		# }
+		can_be_accepted = { # accept button will be disabled if no
+			always = yes
+		}
+		request_description = alliance_key_desc_receive_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		accept_title = loc_key #can be overridden to customize accepted/rejected pop ups for the sender
+		accept_description = loc_key
+		reject_title = loc_key
+		reject_description = loc_key
+	
+		
+		# AI
+		# a list of ai_will_do entries that will be used to decide if AI should accept or reject a request
+		ai_acceptance = {
+		}
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {			
+		}
+	}
+}
