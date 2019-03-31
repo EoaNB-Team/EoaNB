@@ -5,30 +5,28 @@ scripted_diplomatic_actions = {
 		allowed = { #if action is valid
 		}
 		visible = { #if action is visible on gui
-		NOT = {
 			THIS = {
-				OR = {
-				    is_puppet = yes 
-					is_subject = yes 
-					check_variable = { THIS.id = FROM.id }
+				is_puppet = no  
+			    is_subject = no 
+				NOT = {
+			        check_variable = { THIS.id = FROM.id }
 		    	    is_in_array = {
 	                    array = THIS.allies_array
 	                    value = FROM.id 
                     }
+					has_war_with = FROM 
 				}
 		    }
 			FROM = {
-				OR = {
-				    is_puppet = yes 
-					is_subject = yes 
-					#check_variable = { THIS.id = FROM.id }
+				is_puppet = no 
+			    is_subject = no 
+				NOT = {
 		    	    is_in_array = {
 	                    array = THIS.allies_array
 	                    value = FROM.id 
-                    }
+                    } 
 				}
 		    }
-		}
 		}
 		selectable = { #if action is selectable on gui
 		}
@@ -51,12 +49,6 @@ scripted_diplomatic_actions = {
 		# runs when the action is properly sent and accepted
 		complete_effect = {
 			    add_to_array = { From.allies_array = THIS.id }
-			FROM = {
-				give_military_access = PREV.PREV  
-			}
-			THIS = {
-			    give_military_access = FROM 
-			}
 			    add_to_array = { This.allies_array = FROM.id }
 		}
 
@@ -81,12 +73,12 @@ scripted_diplomatic_actions = {
 		can_be_sent = { # send button will be disabled if no
 			always = yes
 		}
-		send_description = alliance_key_desc_send_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+		send_description = "Propose an alliance with this country in order to assure mutual protection during crisis and wars." # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 
 		# RECEIVE POPUP CUSTOMIZATION
 		# use diplomatic_action as context in scripted gui
-		receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		#receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
 		# reset_receive_effect = {
 			# # clear action
 			# if = {
@@ -101,7 +93,7 @@ scripted_diplomatic_actions = {
 		can_be_accepted = { # accept button will be disabled if no
 			always = yes
 		}
-		request_description = alliance_key_desc_receive_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+		request_description = "[?From.GetName] wants to ally with our country." # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 		
 		# PLAYER FEEDBACK ON ACCEPT/REJECT
@@ -311,9 +303,7 @@ scripted_diplomatic_actions = {
 
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			modifier = { # name is used for loc
-				add = 100     
-			}
+		    base = 0 
 		    modifier = {
 				add = -1000 
 					
@@ -330,30 +320,32 @@ scripted_diplomatic_actions = {
 		allowed = { #if action is valid
 		}
 		visible = { #if action is visible on gui
-		    ΟR = {
-				NOT = {
-				    OR = {
-				        is_puppet = yes 
-				    	is_subject = yes 
-					}
-			    }
-				THIS = {
+				is_puppet = no  
+				is_subject = no 
 		    	is_in_array = {
 	                array = THIS.allies_array
-	                value = PREV.PREV.id 
-                }
+	                value = FROM.id 
+                }		
+		    	is_in_array = {
+	                array = FROM.allies_array
+	                value = THIS.id 
+                }	
+				THIS = {
+				    NOT = {
+			            check_variable = { THIS.id = FROM.id }
+				    }
+					has_war = no 
 				}
-			}			
 		}
 		selectable = { #if action is selectable on gui
 		}
 
-		requires_acceptance = yes # if true the action will require acceptance of target country
+		requires_acceptance = no # if true the action will require acceptance of target country
 		cost = 0 # pp cost, can be zero
 		command_power = 0 # cp cost, can be zero
 
 		#cost_string = loc_key # if you have a custom cost, use this loc to display it
-		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
+		show_acceptance_on_action_button = no # set to no if acceptance shouldn't be displayed on the action button
 
 		icon = 1 # icon frame to use in notification
 
@@ -361,17 +353,14 @@ scripted_diplomatic_actions = {
 
 		# runs when the action is sent
 		on_sent_effect = {
+			remove_from_array = { From.allies_array = THIS.id }
+		    THIS = {
+			    remove_from_array = { allies_array = FROM.id }
+			}
 		}
 
 		# runs when the action is properly sent and accepted
-		complete_effect = {
-			    remove_from_array = { From.allies_array = THIS.id }
-				diplomatic_relation = {
-                    country = THIS
-                    relation = military_access
-                    active = no
-                }
-			    remove_from_array = { This.allies_array = FROM.id }
+		complete_effect = { 
 		}
 
 		# runs when the action is properly sent and rejected
@@ -395,12 +384,12 @@ scripted_diplomatic_actions = {
 		can_be_sent = { # send button will be disabled if no
 			always = yes
 		}
-		send_description = alliance_key_desc_send_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+		send_description = "Break our alliance with this country. This will negatively impact our relations." # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 
 		# RECEIVE POPUP CUSTOMIZATION
 		# use diplomatic_action as context in scripted gui
-		receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		#receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
 		# reset_receive_effect = {
 			# # clear action
 			# if = {
@@ -415,7 +404,129 @@ scripted_diplomatic_actions = {
 		can_be_accepted = { # accept button will be disabled if no
 			always = yes
 		}
-		request_description = alliance_key_desc_receive_popup # if there is no scripted gui, this desc will be used in send yes/no pop up
+		request_description = "[From.GetName] has cancelled their alliance with us. This only means they're planning something..." # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+		
+		# PLAYER FEEDBACK ON ACCEPT/REJECT
+		accept_title = loc_key #can be overridden to customize accepted/rejected pop ups for the sender
+		accept_description = loc_key
+		reject_title = loc_key
+		reject_description = loc_key
+	
+		
+		# AI
+		# a list of ai_will_do entries that will be used to decide if AI should accept or reject a request
+		ai_acceptance = {
+		}
+
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {			
+		}
+	}
+	
+	alliance_call_ally_key = { # will be used in most localizations
+	
+		allowed = { #if action is valid
+		}
+		visible = { #if action is visible on gui
+		        FROM = {
+				    has_war = yes
+				}
+				is_puppet = no  
+				is_subject = no 
+		    	is_in_array = {
+	                array = THIS.allies_array
+	                value = FROM.id 
+                }		
+		    	is_in_array = {
+	                array = FROM.allies_array
+	                value = THIS.id 
+                }	
+				THIS = {
+				    NOT = {
+			            check_variable = { THIS.id = FROM.id }
+						has_war_together_with = FROM
+				    }  
+				} 
+		}
+		selectable = { #if action is selectable on gui
+		}
+
+		requires_acceptance = yes # if true the action will require acceptance of target country
+		cost = 0 # pp cost, can be zero
+		command_power = 0 # cp cost, can be zero
+
+		#cost_string = loc_key # if you have a custom cost, use this loc to display it
+		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
+
+		icon = 1 # icon frame to use in notification
+
+      #for effects/triggers/variables, from is the sender and this is receiver
+
+		# runs when the action is sent
+		on_sent_effect = {
+		}
+
+		# runs when the action is properly sent and accepted
+		complete_effect = {	
+            FROM = {	
+			    every_enemy_country = {
+				    THIS = {
+				        declare_war_on = {
+                            target = PREV.PREV.PREV 
+                            type = annex_everything
+                        }
+				    }				
+                }   				
+	        }
+        }			
+
+		# runs when the action is properly sent and rejected
+		reject_effect = {
+		}
+
+		# SEND POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		 send_scripted_gui = call_allies_gui  
+		 reset_send_effect = { # if action has a send scripted gui, this effect will be used for clearing the state of gui (will run when player opens the scripted gui by sending the action or when ai proposes action
+			# # clear action
+			if = {
+				limit = { 
+					From = {
+						is_ai = no 
+					}
+				}
+				FROM = {
+                    set_temp_variable = { show_5 = 1 }
+                    subtract_from_temp_variable = { show_5 = show_enemies_button_2 }
+                    set_variable = { show_enemies_button_2 = show_5 }
+			    }
+			}
+		}
+		can_be_sent = { # send button will be disabled if no
+			always = yes
+		}
+		send_description = W # if there is no scripted gui, this desc will be used in send yes/no pop up
+
+
+		# RECEIVE POPUP CUSTOMIZATION
+		# use diplomatic_action as context in scripted gui
+		#receive_scripted_gui = receive_scripted_gui_name #if specified the receiver of the action will get this scripted gui instead of yes-no popup when they receive the propose
+		# reset_receive_effect = {
+			# # clear action
+			# if = {
+				# limit = {  
+					# from = {
+						# is_ai = yes
+					# }
+				# }
+				# # change stuff for ai
+			# }
+		# }
+		can_be_accepted = { # accept button will be disabled if no
+			always = yes
+		}
+		request_description = "Hello" # if there is no scripted gui, this desc will be used in send yes/no pop up
 
 		
 		# PLAYER FEEDBACK ON ACCEPT/REJECT
