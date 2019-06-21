@@ -16,7 +16,7 @@ NGame = {
 	DECISION_ALERT_TIMEOUT_DAYS = 30,				-- Days left when player will be alerted about timing out events or decisions
 	FUEL_RESOURCE = "oil",							-- resource that will give country fuel
 	MAX_EFFECT_ITERATION = 1000,					-- maximum allowed iteration for loop effects
-	MAX_SCRIPTED_LOC_RECURSION = 1000,				-- max recursion for scripted localizations
+	MAX_SCRIPTED_LOC_RECURSION = 30,				-- max recursion for scripted localizations
 },
 
 NDiplomacy = {
