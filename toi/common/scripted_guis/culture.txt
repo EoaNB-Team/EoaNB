@@ -11,15 +11,33 @@ scripted_gui = {
 		
  		properties = {
 			national_culture = { 
-			    image = "[GetSubcultureLogo]"
+			    image = "[national_culture_array^i.GetSubcultureLogo]"
 			} 
 		}
 		
         effects = {
 		    national_culture_click = {
+				    clear_array = national_culture_array_2
+			    	every_owned_state = { 
+				
+			     	    for_each_loop = {
+			     		    array = state_culture_array
+						    if = {
+							    limit = {
+								    NOT = {
+									    is_in_array = { PREV.national_culture_array_2 = v }
+									}
+								}
+                            add_to_array = { PREV.national_culture_array_2 = v }
+							}
+			    		}
+			        }
+               calculate_country_cultures = yes 
+				
                 set_temp_variable = { show = 1 }
                 subtract_from_temp_variable = { show = show_national_culture_list }
                 set_variable = { show_national_culture_list = show }		
+			
 			}
         }
 		
@@ -57,7 +75,7 @@ scripted_gui = {
 		
  		properties = {
 			national_religion = { 
-			    image = "[GetNationalReligion1Icon]"
+			    image = "[?national_religion_array^i.GetNationalReligion1Icon]"
 			} 
 		}
 		
@@ -92,7 +110,7 @@ scripted_gui = {
 		
  		properties = {
 		    culture_icons = {
-			    image = "[GetSubcultureLogo]"
+			    image = "[?ROOT.national_culture_array_2^i.GetSubcultureLogo]"
 			}
 		    culture_icons_status = {
 			    image = "[GetSubcultureStatus]"
@@ -103,7 +121,7 @@ scripted_gui = {
         }
 		dynamic_lists = {
 			show_gridculturelist = {
-				array = national_culture_array
+				array = national_culture_array_2
 				entry_container = show_entryculturelist
 			} 
 		}
@@ -125,10 +143,10 @@ scripted_gui = {
 		
  		properties = {
 			national_culture2 = { 
-			    image = "[GetSubcultureLogo]"
+			    image = "[?This.national_culture_array^i.GetSubcultureLogo]"
 			} 
 			national_religion2 = { 
-			    image = "[GetNationalReligion1Icon]"
+			    image = "[?This.national_religion_array^i.GetNationalReligion1Icon]"
 			} 
 		}
 		
@@ -174,19 +192,34 @@ scripted_gui = {
 		
  		properties = {
 			state_culture_maj = { 
-			    image = "[GetSubcultureLogo]"
+			    image = "[?state_culture_array^i.GetSubcultureLogo]"
 			} 
 			state_religion_maj = { 
-			    image = "[GetNationalReligion1Icon]"
+			    image = "[?state_religion_array^i.GetNationalReligion1Icon]"
 			} 
 		}
 		
         effects = {
-		    # national_culture_click = {
-                # set_temp_variable = { show = 1 }
-                # subtract_from_temp_variable = { show = show_national_culture_list }
-                # set_variable = { show_national_culture_list = show }		
-			# }
+		    state_culture_maj_click = {
+			    clear_array = state_culture_array_pop
+			    for_each_loop = {
+			     	array = state_culture_array_num 
+                    
+			    	set_temp_variable = {
+			    	    state_pop_temp = state_population_k
+				    }
+					multiply_temp_variable = { state_pop_temp = v }
+					add_to_array = { 
+					    array = state_culture_array_pop
+						#index = state_culture_array
+						value = state_pop_temp 
+					}
+			    }
+				
+                set_temp_variable = { show = 1 }
+                subtract_from_temp_variable = { show = show_state_culture_list }
+                set_variable = { show_state_culture_list = show }		
+			}
         }
 		
 		dynamic_lists = {
@@ -196,7 +229,7 @@ scripted_gui = {
 			} 
 			show_gridstatereligionmaj = {
 				array = state_religion_array
-				entry_container = show_entry_religion_state
+				entry_container = show_entry_religion_state  
 			} 
 		}
         triggers = {
@@ -214,14 +247,14 @@ scripted_gui = {
        context_type = selected_state_context
   
         visible = {  
+		    check_variable = {
+			    show_state_culture_list > 0 
+			}
 		}
 		
  		properties = {
 			culture_icons = { 
-			    image = "[GetSubcultureLogo]"
-			} 
-		    culture_icons_status = {
-			    image = "[This.GetSubcultureStatus]"
+			    image = "[?state_culture_array^i.GetSubcultureLogo]"
 			} 
 		}
 		
