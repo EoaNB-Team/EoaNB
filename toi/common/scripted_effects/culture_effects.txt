@@ -317,6 +317,7 @@ baltic_culture_setup = {
 	set_variable = { global.chinese = 107 }
 	set_variable = { global.korean = 108 }
 	set_variable = { global.brazilian = 109 }
+	set_variable = { global.jewish = 110 }
 	
 	add_to_array = { global.baltic_array = global.lithuanian }
 	add_to_array = { global.baltic_array = global.latvian }
@@ -330,6 +331,7 @@ baltic_culture_setup = {
 	add_to_array = { global.japanese_array = global.chinese }
 	add_to_array = { global.korean_array = global.korean }
 	add_to_array = { global.luso_american_array = global.brazilian }
+	add_to_array = { global.jewish_array = global.jewish }
 	
 }
 
@@ -388,47 +390,129 @@ countries_culture_religion_setup = {
 	}
 }
 
-calculate_country_cultures = {
-    clear_array = national_culture_array_2_num
-    resize_array = {
-        array = national_culture_array_2_num
-        value = 0
-        size = national_culture_array_2^i
+update_culture_pops = {
+    #Run at country scope
+    #Updates the population of each culture at the national level
+    clear_array = national_culture_array_2_population
+    for_each_loop = {
+        array = national_culture_array_2
+        add_to_array = { national_culture_array_2_population = 0 }
     }
     every_owned_state = {
         for_each_loop = {
             array = state_culture_array
-			value = v
             index = i
-            find_current_culture_in_country_cultures_array = yes
-            if = {
-                limit = {
-                    check_variable = { current_culture_index > -1 }
+            value = v
+            for_each_loop = {
+                array = PREV.national_culture_array_2
+                index = ii
+                value = vv
+                break = bb
+                if = {
+                    limit = {
+                        check_variable = { v = vv }
+                    }
+                    add_to_variable = { PREV.national_culture_array_2_population^ii = state_culture_array_pop^i }
+                    set_temp_variable = { bb = 1 }
                 }
-                add_to_variable = { PREV.national_culture_array_2_num^current_culture_index = state_culture_array_num^i }
-				log = "state_culture_array_num_value: [?state_culture_array_num^i]"
             }
-			print_variables = {
-    file = log_file
-    text = culture_variables
-    append = yes
-    print_global = no 
-}
         }
     }
 }
 
-find_current_culture_in_country_cultures_array = {
-    set_temp_variable = { current_culture_index = -1 }
+update_percentage_pop_culture = {
+   clear_array = national_culture_array_2_population_2 
     for_each_loop = {
-        array = PREV.national_culture_array_2
-        value = vv
+        array = national_culture_array_2_population 
         index = ii
-        if = {
-            limit = { check_variable = { vv = v } }
-            set_temp_variable = { current_culture_index = vv }
-            set_temp_variable = { break = 1 }
-			log = "current_culture_index_works: [?current_culture_index]"
+        value = vv
+		break = bb
+
+		set_temp_variable = { max_manpower_k_temp = ROOT.max_manpower_k }
+		
+		divide_temp_variable = { vv = max_manpower_k_temp }
+		
+		add_to_array = { national_culture_array_2_percentage = vv }
+		#set_temp_variable = { b = 1 }
+    }
+	set_temp_variable = { length_temp = national_culture_array_2_percentage^num }
+    for_loop_effect = {
+        start = 0
+        end = length_temp
+        add = 1
+        value = v
+        break = b
+		
+		
+        find_highest_in_array = {
+            array = national_culture_array_2_percentage
+            value = v
+            index = ii
         }
+        remove_from_array = {
+            array = national_culture_array_2_percentage
+            index = ii
+        }
+        add_to_temp_array = { 
+            array = national_culture_array_2_percentage_temp  
+            value = v
+        }
+        set_temp_variable = { national_culture_array_2_population_temp_var = national_culture_array_2_population^ii }
+		set_temp_variable = { national_culture_array_2_temp_var = national_culture_array_2^ii }
+        remove_from_array = {
+            array = national_culture_array_2_population
+            index = ii
+        }
+        remove_from_array = {
+            array = national_culture_array_2
+            index = ii
+        }
+        add_to_temp_array = { 
+            array = national_culture_array_2_population_temp  
+            value = national_culture_array_2_population_temp_var
+        }
+        add_to_temp_array = { 
+            array = national_culture_array_2_temp  
+            value = national_culture_array_2_temp_var
+        }
+    }
+    for_loop_effect = {
+        start = 0
+        end = length_temp
+        add = 1
+        value = v
+        break = b
+		
+        add_to_array = { 
+            array = national_culture_array_2_percentage
+            value = national_culture_array_2_percentage_temp^v
+        }
+        add_to_array = { 
+            array = national_culture_array_2_population
+            value = national_culture_array_2_population_temp^v 
+        }
+        add_to_array = { 
+            array = national_culture_array_2
+            value = national_culture_array_2_temp^v 
+        }
+    }
+    for_each_loop = {
+        array = national_culture_array_2_population 
+        index = i
+        value = v
+		break = b
+
+		if = {
+		    limit = {
+			    check_variable = { national_culture_array_2_population^i > 1000 }
+			}
+			add_to_array = {
+			    array = national_culture_array_2_population_2
+				index = i 
+				value = v
+			}
+			multiply_variable = { national_culture_array_2_population_2^i = 0.001 }
+		}
+		#set_temp_variable = { b = 1 }
     }
 }
