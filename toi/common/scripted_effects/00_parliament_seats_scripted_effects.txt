@@ -317,6 +317,26 @@ draw_seats = {
 	    size = 32
 	}
 
+	for_each_loop = { # RESET ALL SEAT GFX
+	    array = parl_seats_gfx
+	    value = parl_gfx_v
+	    index = parl_gfx_i
+
+	    set_temp_variable = { parl_seat_id_plus_one = parl_gfx_i }
+	    add_to_temp_variable = { parl_seat_id_plus_one = 1 }
+
+	    meta_effect = {
+			text = {
+				set_variable = { 
+					var = seat_[SEAT_ID]
+					value = -1
+				}
+			}
+			SEAT_ID = parl_seat_id_plus_one
+			IDEOLOGY_VALUE = parl_seat_ideology_id
+		}
+	}
+
 	for_each_loop = { # LOOP ON ALL SEAT GFX
 	    array = parl_seats_gfx
 	    value = parl_gfx_v
@@ -756,4 +776,37 @@ hold_vote = {
 			set_country_flag = eoanb_reform_vote_tie
 		}
 	}
+}
+
+compute_number_seats_tot = {
+	set_variable = { parl_tot_num_seats = 0 }
+
+	for_each_loop = {
+	    array = seats_count_array
+	    value = parl_v
+	    index = parl_i
+
+	    add_to_variable = { parl_tot_num_seats = seats_count_array^parl_i }
+	}
+
+	set_variable = { parl_num_seats_half = parl_tot_num_seats }
+	divide_variable = { parl_num_seats_half = 2 }
+	round_variable = parl_num_seats_half
+}
+
+compute_number_seats_approve_est = {
+	set_variable = { parl_est_num_seats = 0 }
+
+	for_each_loop = {
+	    array = seats_count_array
+	    value = parl_v
+	    index = parl_i
+
+	    set_temp_variable = { seat_est_w_approval = seats_count_array^parl_i }
+	    multiply_temp_variable = { seat_est_w_approval = parl_voting_approval_array^parl_i }
+
+	    add_to_variable = { parl_est_num_seats = seat_est_w_approval }
+	}
+
+	round_variable = parl_est_num_seats
 }
