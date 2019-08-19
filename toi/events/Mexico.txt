@@ -1,44 +1,380 @@
 ﻿add_namespace = mexico
 
-#Comonfort is replaced in 1857
+#Plan of Tacubaya
 country_event = {
 		id = mexico.1
 		title = mexico.1.t
 		desc= mexico.1.d
-		picture = GFX_report_event_election_vote
+		picture = GFX_report_event_plan_tacubaya
 		
 		fire_only_once = yes
 		
 		trigger = {
 			TAG = MEX
-			date > 1857.11.11
-			has_country_leader = { id = 1000 ruling_only = yes name = "Ignacio Comonfort" }
+			date > 1857.12.16
+			has_country_leader = { id = 18621 ruling_only = yes name = "Ignacio Comonfort" }
 		}
 		
 		option = {
 			name = mexico.1.a
+			add_stability = -0.02
+			hidden_effect = {
+				MEX = { country_event = { days = 2 id = mexico.2 } }
+			}
+		}
+}
+
+#Question if the president will join the plan
+country_event = {
+		id = mexico.2
+		title = mexico.2.t
+		desc= mexico.2.d
+		picture = GFX_report_event_constitution_of_1857
+		
+		fire_only_once = yes
+		
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico.2.a
+			add_stability = -0.05
+			hidden_effect = {
+				decrease_ps_by_one = yes
+				MEX = { country_event = { days = 5 id = mexico.3 } }
+			}
+		}
+}
+
+
+#imprisions political oponnents
+country_event = {
+		id = mexico.3
+		title = mexico.3.t
+		desc= mexico.3.d
+		picture = GFX_report_event_old_prison
+		
+		fire_only_once = yes
+		
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico.3.a
+			add_political_power = -50
+			hidden_effect = {
+				MEX = { country_event = { days = 5 id = mexico.4 } }
+			}
+		}
+}
+
+#Declairation of extraordinary powers
+country_event = {
+		id = mexico.4
+		title = mexico.4.t
+		desc= mexico.4.d
+		picture = GFX_report_event_ignacio_comonfort
+		
+		fire_only_once = yes
+		
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico.4.a
+			add_political_power = -10
+			add_stability = -0.10
+			hidden_effect = {
+				MEX = { country_event = { days = 13 id = mexico.5 } }
+			}
+		}
+}
+
+#Forced resignation
+country_event = {
+		id = mexico.5
+		title = mexico.5.t
+		desc= mexico.5.d
+		picture = GFX_report_event_felix_maria_zuloaga
+		
+		fire_only_once = yes
+		
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico.5.a
+			add_stability = -0.05
+			create_country_leader = {
+				name = "Benito Juárez"
+				desc = "POLITICS_TEMP_DESC"
+				picture = "Portrait_MEX_Benito_Juarez.dds"
+				expire = 1872.7.18
+				ideology = conserv_liberal
+				id = 18623
+			}
+			every_country_leader = {
+				limit = { has_id = 18621 }
+				retire_country_leader
+			}
 			set_politics = { ruling_party = traditional_conservatism elections_allowed = yes }
 			hidden_effect = {
-				MEX = { country_event = { days = 10 id = mexico.2 } }
+				MEX = { country_event = { days = 10 id = mexico.6 } }
 			}
 		}
 }
 
 #Mexican Civil War erupts
 country_event = {
-		id = mexico.2
-		title = mexico.2.t
-		desc = mexico.2.d
+		id = mexico.6
+		title = mexico.6.t
+		desc = mexico.6.d
 		picture = GFX_report_event_mex_civil_war
+		
+		fire_only_once = yes
+
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico.6.a
+			custom_effect_tooltip = MEX_1857_Civilwar
+			hidden_effect = {
+				start_civil_war = { 
+					ideology = centrism
+					size = 0.5
+					states = { 1124 477 478 479 480 485 1112 }
+					capital = 1124
+					keep_unit_leaders = {
+						18626 186211
+					}
+				}
+
+				random_other_country = {
+					limit = {
+						original_tag = MEX
+						has_government = centrism
+					}
+					save_event_target_as = mexican_liberals
+					load_oob = "Mex_civil_war_liberals"
+					country_event = { days = 2 id = mexico_gaa.3 }
+				}
+				MEX = {
+					every_unit_leader = {
+						LIMIT = {
+							OR = {
+								has_id = 18625 
+								has_id = 186210
+							}
+						}
+						set_nationality = event_target:mexican_liberals
+					}
+				}
+				load_oob = "Mex_civil_war_conservatives"
+				MEX = { country_event = { days = 2 id = mexico_gaa.2 } }
+				news_event = news.4
+			}
+		}
+		option = {
+			name = mexico.6.b
+			custom_effect_tooltip = MEX_1857_Civilwar
+			set_capital = 1124
+			set_politics = { ruling_party = centrism elections_allowed = yes }
+			hidden_effect = {
+				increase_ps_by_one = yes
+				start_civil_war = { 
+					ideology = traditional_conservatism
+					size = 0.50
+					capital = 277
+					states = { 277 474 475 476 481 482 483 484 1113 1114 1125 }
+					keep_unit_leaders = { 18625 186210 }
+				}
+				load_oob = "Mex_civil_war_liberals"
+				MEX = { country_event = { days = 2 id = mexico_gaa.3 } }
+
+				random_other_country = {
+					limit = {
+						original_tag = MEX
+						has_government = traditional_conservatism
+					}
+					save_event_target_as = mexican_conservatives
+					load_oob = "Mex_civil_war_conservatives"
+					country_event = { days = 2 id = mexico_gaa.2 }
+				}
+				MEX = {
+					every_unit_leader = {
+						LIMIT = {
+							OR = {
+								has_id = 18626 
+								has_id = 186211
+							}
+						}
+						set_nationality = event_target:mexican_conservatives
+					}
+				}
+				news_event = news.4
+			}
+		}
+}
+
+#Start of the plan de Navidad (happens for the next 3)
+country_event = {
+		id = mexico.7
+		title = mexico.7.t
+		desc= mexico.7.d
+		picture = GFX_report_event_plan_de_navidad
+		
+		fire_only_once = yes
+		
+		trigger = {
+			original_tag = MEX 
+			has_government = traditional_conservatism
+			date > 1858.12.23
+			has_civil_war = yes
+		}
+		
+		option = {
+			name = mexico.7.a
+			create_country_leader = {
+				name = "Manuel Robles Pezuela"
+				desc = "POLITICS_TEMP_DESC"
+				picture = "Portrait_MEX_Manuel_Robles_Pezuela.dds"
+				expire = 1862.3.23
+				ideology = conserv
+				id = 186212
+			}
+			every_country_leader = {
+				limit = { has_id = 18622 }
+				retire_country_leader
+			}
+		}
+}
+
+country_event = {
+		id = mexico.8
+		title = mexico.8.t
+		desc= mexico.8.d
+		picture = GFX_report_event_jose_mariano_salas
+		
+		fire_only_once = yes
+		
+		trigger = {
+			original_tag = MEX 
+			has_government = traditional_conservatism
+			date > 1859.1.20
+			has_civil_war = yes
+		}
+		
+		option = {
+			name = mexico.8.a
+			hidden_effect = {
+				country_event = { days = 12 id = mexico.9 }
+			}
+			create_country_leader = {
+				name = "Jóse Mariano Salas"
+				desc = "POLITICS_TEMP_DESC"
+				picture = "Portrait_MEX_Jose_Mariano_Salas.dds"
+				expire = 1867.12.24
+				ideology = conserv
+				id = 186213
+			}
+			every_country_leader = {
+				limit = { has_id = 186212 }
+				retire_country_leader
+			}
+		}
+}
+
+country_event = {
+		id = mexico.9
+		title = mexico.9.t
+		desc= mexico.9.d
+		picture = GFX_report_event_miguel_miramon
+		
+		fire_only_once = yes
 		
 		is_triggered_only = yes
 		
 		option = {
-			name = mexico.2.a
-			custom_effect_tooltip = MEX_1857_Civilwar
-			hidden_effect = {
-				start_civil_war = { ideology = centrism size = 0.3 }
-				news_event = news.4
+			name = mexico.9.a
+			create_country_leader = {
+				name = "Miguel Miramón"
+				desc = "POLITICS_TEMP_DESC"
+				picture = "Portrait_MEX_Miguel_Miramon.dds"
+				expire = 1867.6.19
+				ideology = conserv
+				id = 186214
 			}
+			every_country_leader = {
+				limit = { has_id = 186213 }
+				retire_country_leader
+			}
+			every_unit_leader = {
+				limit = { has_id = 18628 }
+				retire = yes
+			}
+		}
+}
+
+#Murder of Melchor Ocampo
+country_event = {
+		id = mexico.10
+		title = mexico.10.t
+		desc= mexico.10.d
+		picture = GFX_report_event_melchor_ocampo_execution
+		
+		fire_only_once = yes
+		
+		trigger = {
+			original_tag = MEX 
+			has_government = centrism
+			date > 1861.6.1
+			has_civil_war = yes
+		}
+
+		immediate = {	
+			hidden_effect = {	
+				country_event = { days = 12 id = mexico_gaa.6 }
+			}
+		}
+		
+		option = {
+			name = mexico.10.a
+			add_stability = -0.05
+			add_war_support = 0.05
+		}
+}
+
+#Benito Juarez moves the capital to Veracruz
+country_event = {
+		id = mexico.11
+		title = mexico.11.t
+		desc= mexico.11.d
+		picture = GFX_report_event_map_of_veracruz
+		
+		fire_only_once = yes
+		
+		trigger = {
+			original_tag = MEX 
+			has_government = centrism
+			date > 1858.5.2
+			has_civil_war = yes
+		}
+		
+		option = {
+			name = mexico.11.a
+			set_capital = 477
+		}
+}
+
+#The End of the Reform War
+country_event = {
+		id = mexico.12
+		title = mexico.12.t
+		desc= mexico.12.d
+		picture = GFX_report_event_reform_war_end
+		
+		fire_only_once = yes
+
+		is_triggered_only = yes	
+	
+		option = {
+			name = mexico.12.a
+			add_stability = 0.1
 		}
 }
