@@ -2,6 +2,40 @@ on_actions = {
 
 	on_startup = {
 		effect = {
+		    every_country = {
+			    every_owned_state = {
+			    for_each_loop = {
+			     	array = state_culture_array_num 
+                    
+			    	set_temp_variable = {
+			    	    state_pop_temp = state_population_k
+				    }
+					multiply_temp_variable = { state_pop_temp = v }
+					add_to_array = { 
+					    array = state_culture_array_pop
+						#index = state_culture_array
+						value = state_pop_temp 
+					}
+			    }	
+			    for_each_loop = {
+			     	array = state_religion_array_num 
+                    
+			    	set_temp_variable = {
+			    	    state_pop_temp = state_population_k
+				    }
+					multiply_temp_variable = { state_pop_temp = v }
+					add_to_array = { 
+					    array = state_religion_array_pop
+						#index = state_culture_array
+						value = state_pop_temp 
+					}
+			    }				
+				}
+		        update_percentage_pop_culture = yes 
+		        update_culture_pops = yes 
+		        update_percentage_pop_religion = yes 
+		        update_religion_pops = yes 			
+			}
 		    random_country = {
                 british_culture_setup = yes 
                 german_culture_setup = yes 		
@@ -1477,7 +1511,73 @@ ZIM = {
 ZUL = {
 	add_to_array = { national_religion_array = global.animist }
 }
-		}
 	}
 }
 
+on_daily = {
+    effect = {
+        if = {
+            limit = {
+                OR = {
+                    original_tag = USA
+                    AND = {
+                        has_country_flag = eoanb_debug_score_handler
+                        NOT = { 
+                            country_exists = USA
+                        }
+                    }
+                }
+            }
+        	add_to_variable = { global.time_counter2 = 1 }
+	        if = {
+	    	    limit = {
+	    		    check_variable = { global.time_counter2 = 30 }
+	    		}
+		    	set_variable = { global.time_counter2 = 0 }
+	        	every_country = {
+	        		every_owned_state = {
+					clear_array = state_culture_array_pop
+					clear_array = state_religion_array_pop
+	                for_each_loop = {
+	                	array = state_culture_array_num 
+                      
+	                	set_temp_variable = {
+	            	        state_pop_temp = state_population_k
+	    	            }
+	             	    multiply_temp_variable = { state_pop_temp = v }
+	            	    add_to_array = { 
+		                 	array = state_culture_array_pop
+		             	    #index = state_culture_array
+			                value = state_pop_temp 
+		                }
+		            }	
+		    	    for_each_loop = {
+		                array = state_religion_array_num 
+                     
+		                set_temp_variable = {
+		                	state_pop_temp = state_population_k
+		            	}
+		                multiply_temp_variable = { state_pop_temp = v }
+		                add_to_array = { 
+		    	            array = state_religion_array_pop
+		             	    #index = state_culture_array
+		    	            value = state_pop_temp 
+	    	         	}
+	    	        }
+	    		}  
+				clear_array = national_culture_array_2
+			    clear_array = national_culture_array_2_percentage
+				clear_array = national_culture_array_2_num
+				clear_array = national_religion_array_2
+			    clear_array = national_religion_array_2_percentage
+				clear_array = national_religion_array_2_num
+	    	    update_percentage_pop_culture = yes 
+	    	    update_culture_pops = yes 
+	     	    update_percentage_pop_religion = yes 
+	     	    update_religion_pops = yes 		
+				update_culture_unrest = yes 
+            }	
+	        }
+	    }
+	}
+}
