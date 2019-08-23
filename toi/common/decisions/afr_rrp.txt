@@ -3,41 +3,54 @@ afr_rrp_foreign_diplomacy = {
 afr_rrp_british_company_port = {
 
     available = {
+		has_stability > 0.60
 		country_exists = ENG
 		OR = { 
-			any_state = {
-				is_coastal = yes
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
 			}
-			PRS = { 
+			ENG = { 
 				is_neighbor_of = ROOT
 			}
-			AND = {
-				any_country = {
+			any_country = {
+				AND = {
 					is_subject_of = ENG
+					is_neighbor_of = ROOT
 				}
-				is_neighbor_of = ROOT
 			}
 		}
 		NOT = {
-			has_active_mission = my_mission
+			tag = ETH
 		}
-		
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		if = {
+			limit = {
+				ROOT = {
+					is_subject_of = OTO
+				}
+			}
+			OTO = {
+				has_completed_focus = OTO_bank_of_england_partnership
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
-	days_remove = 2
     visible = {
-		OR = { 
-			NOT = {
-				has_country_flag = afr_rrp_hamburg_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_french_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_german_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_bremen_company_port
-			}
+		NOT = {
+				tag = ETH
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
 		}
     }
 	
@@ -45,50 +58,223 @@ afr_rrp_british_company_port = {
 
     cost = 0
 	
-	 complete_effect = {
-		ENG = { country_event = { days = 1 id = afr_rrp.11 } }
-		set_country_flag = afr_rrp_british_company_port
-    }
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+		add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_3
+		
+		hidden_effect = {
+			ENG = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}
+			add_opinion_modifier = { target = ENG modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = ENG modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_3
+			}
+			give_military_access = ENG
+			set_country_flag = afr_rrp_british_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					NOT = {
+						has_idea = AF_T_idea_trading_nation_3
+					}
+				}
+				swap_ideas = { add_idea = AF_T_idea_trading_nation_3 remove_idea = AF_T_idea_trading_nation_2 }
+			}
+			
+		}
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { add_idea = export_focus remove_idea = limited_exports }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { add_idea = export_focus remove_idea = closed_economy }
+		}
+	}
+	
+	
 }
 
 afr_rrp_french_company_port = {
 
     available = {
+		has_stability > 0.60
 		country_exists = FRA
 		OR = { 
-			any_state = {
-				is_coastal = yes
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
 			}
-			PRS = { 
+			FRA = { 
 				is_neighbor_of = ROOT
 			}
-			AND = {
-				any_country = {
+			any_country = {
+				AND = {
 					is_subject_of = FRA
+					is_neighbor_of = ROOT
 				}
-				is_neighbor_of = ROOT
 			}
 		}
 		NOT = {
-			has_active_mission = my_mission
+			tag = ETH
 		}
-		
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		if = {
+			limit = {
+				ROOT = {
+					is_subject_of = OTO
+				}
+			}
+			OTO = {
+				has_completed_focus = OTO_banque_de_france_partnership
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
-	days_remove = 2
     visible = {
-		OR = { 
-			NOT = {
-				has_country_flag = afr_rrp_british_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_hamburg_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_german_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_bremen_company_port
-			}
+		NOT = {
+			tag = ETH
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
 		}
     }
 	
@@ -96,51 +282,481 @@ afr_rrp_french_company_port = {
 
     cost = 0
 	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
 	 complete_effect = {
-		FRA = { country_event = { days = 1 id = afr_rrp.11 } }
-		set_country_flag = afr_rrp_french_company_port
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_3
+		
+		hidden_effect = {
+			FRA = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}
+			add_opinion_modifier = { target = FRA modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = FRA modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_3
+			}
+			give_military_access = FRA
+			set_country_flag = afr_rrp_french_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation_2
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { has_idea = AF_T_idea_trading_nation_2 }
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				add_ideas = AF_T_idea_trading_nation_3
+			}
+		}
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { remove_idea = limited_exports add_idea = export_focus }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { remove_idea = closed_economy add_idea = export_focus }
+		}
     }
+}
+
+afr_rrp_portugal_company_port = {
+
+    available = {
+		has_stability > 0.60
+		country_exists = POR
+		OR = { 
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
+			}
+			POR = { 
+				is_neighbor_of = ROOT
+			}
+			any_country = {
+				AND = {
+					is_subject_of = POR
+					is_neighbor_of = ROOT
+				}
+			}
+		}
+		NOT = {
+			tag = ETH
+		}
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		NOT = {
+			ROOT = {
+				is_subject_of = OTO
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
+    }
+    visible = {
+		NOT = {
+			tag = ETH
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
+		}
+    }
+	
+	fire_only_once = yes
+
+    cost = 0
+	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+		
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_5
+		
+		hidden_effect = {
+			POR = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}	
+			add_opinion_modifier = { target = POR modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = POR modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_5
+			}
+			give_military_access = POR
+			set_country_flag = afr_rrp_portugal_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation_2
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { has_idea = AF_T_idea_trading_nation_2 }
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				add_ideas = AF_T_idea_trading_nation_3
+			}
+		}
+		
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { remove_idea = limited_exports add_idea = export_focus }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { remove_idea = closed_economy add_idea = export_focus }
+		}
+    }
+	
 }
 
 afr_rrp_prussian_company_port = {
 
     available = {
-		
+		has_stability > 0.60
 		country_exists = PRS
 		OR = { 
-			any_state = {
-				is_coastal = yes
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
 			}
 			PRS = { 
 				is_neighbor_of = ROOT
 			}
-			AND = {
-				any_country = {
+			any_country = {
+				AND = {
 					is_subject_of = PRS
+					is_neighbor_of = ROOT
 				}
-				is_neighbor_of = ROOT
 			}
 		}
 		NOT = {
-			has_active_mission = my_mission
+			tag = ETH
+		}
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		if = {
+			limit = {
+				ROOT = {
+					is_subject_of = OTO
+				}
+			}
+			OTO = {
+				has_completed_focus = OTO_deutsche_bank_partnership
+			}
+		}
+		PRS = {
+			has_completed_focus = PRS_focus_colonial_politics_branch
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
 		}
 		
     }
-	days_remove = 2
     visible = {
-		OR = { 
-			NOT = {
-				has_country_flag = afr_rrp_british_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_french_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_hamburg_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_bremen_company_port
-			}
+		NOT = {
+			tag = ETH
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
 		}
     }
 	
@@ -148,50 +764,247 @@ afr_rrp_prussian_company_port = {
 
     cost = 0
 	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
 	 complete_effect = {
-		PRS = { country_event = { days = 1 id = afr_rrp.11 } }
-		set_country_flag = afr_rrp_german_company_port
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_2
+		
+		hidden_effect = {
+			PRS = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}	
+			add_opinion_modifier = { target = PRS modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = PRS modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_2
+			}
+			give_military_access = PRS
+			set_country_flag = afr_rrp_german_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation_2
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { has_idea = AF_T_idea_trading_nation_2 }
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				add_ideas = AF_T_idea_trading_nation_3
+			}
+		}
+		
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { remove_idea = limited_exports add_idea = export_focus }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { remove_idea = closed_economy add_idea = export_focus }
+		}
     }
 }
 
 afr_rrp_bremen_company_port = {
 
     available = {
-		
+		has_stability > 0.60
 		country_exists = BRE
 		OR = { 
-			any_state = {
-				is_coastal = yes
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
 			}
-			PRS = { 
+			BRE = { 
 				is_neighbor_of = ROOT
 			}
-			AND = {
-				any_country = {
+			any_country = {
+				AND = {
 					is_subject_of = BRE
+					is_neighbor_of = ROOT
 				}
-				is_neighbor_of = ROOT
 			}
 		}
 		NOT = {
-			has_active_mission = my_mission
+			tag = ETH
+		}
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		if = {
+			limit = {
+				ROOT = {
+					is_subject_of = OTO
+				}
+			}
+			OTO = {
+				has_completed_focus = OTO_deutsche_bank_partnership
+			}
+		}
+		BRE = {
+			OR = {
+				has_completed_focus = generic_focus_naval_dockyards_2
+				has_completed_focus = generic_focus_fleet_infrastructure
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
 		}
     }
-	days_remove = 2
     visible = {
-		OR = { 
-			NOT = {
-				has_country_flag = afr_rrp_british_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_french_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_german_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_hamburg_company_port
-			}
+		NOT = {
+			tag = ETH
+		}
+
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
 		}
     }
 	
@@ -199,50 +1012,244 @@ afr_rrp_bremen_company_port = {
 
     cost = 0
 	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
 	 complete_effect = {
-		BRE = { country_event = { days = 1 id = afr_rrp.11 } }
-		set_country_flag = afr_rrp_bremen_company_port
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		
+		hidden_effect = {
+			BRE = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}	
+			add_opinion_modifier = { target = BRE modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = BRE modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_1
+			}
+			set_country_flag = afr_colonial_language
+			set_country_flag = afr_colonial_language_german
+			give_military_access = BRE
+			set_country_flag = afr_rrp_bremen_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation_2
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { has_idea = AF_T_idea_trading_nation_2 }
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				add_ideas = AF_T_idea_trading_nation_3
+			}
+		}
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { remove_idea = limited_exports add_idea = export_focus }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { remove_idea = closed_economy add_idea = export_focus }
+		}
     }
 }
 
 afr_rrp_hamburg_company_port = {
 
     available = {
+		has_stability > 0.60
 		country_exists = HAM
 		OR = { 
-			any_state = {
-				is_coastal = yes
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
 			}
 			HAM = { 
 				is_neighbor_of = ROOT
 			}
-			AND = {
-				any_country = {
+			any_country = {
+				AND = {
 					is_subject_of = HAM
+					is_neighbor_of = ROOT
 				}
-				is_neighbor_of = ROOT
 			}
 		}
 		NOT = {
-			has_active_mission = my_mission
+			tag = ETH
 		}
-		
+		if = {
+			limit = {
+				tag = SKT
+			}
+			NOT = {
+				has_country_flag = SKT_jihad_formed
+			}
+		}
+		if = {
+			limit = {
+				ROOT = {
+					is_subject_of = OTO
+				}
+			}
+			OTO = {
+				has_completed_focus = OTO_deutsche_bank_partnership
+			}
+		}
+		HAM = {
+			has_completed_focus = HAM_focus_professional_merchants	
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
-	days_remove = 2
     visible = {
-		OR = { 
-			NOT = {
-				has_country_flag = afr_rrp_british_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_french_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_german_company_port
-			}
-			NOT = {
-				has_country_flag = afr_rrp_hamburg_company_port
-			}
+		NOT = {
+			tag = ETH
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+			has_country_flag = afr_rrp_railway_infrastructure_construction_independant
 		}
     }
 	
@@ -250,9 +1257,590 @@ afr_rrp_hamburg_company_port = {
 
     cost = 0
 	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			add_offsite_building = { type = cotton_farm level = 1 }
+			
+	}
+	
 	 complete_effect = {
-		HAM = { country_event = { days = 1 id = afr_rrp.11 } }
-		set_country_flag = afr_rrp_hamburg_company_port
+		set_country_flag = afr_rrp_colonial_project_active
+		custom_effect_tooltip = afr_colonial_company_tooltip
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		
+		hidden_effect = {
+			HAM = { 
+				country_event = { days = 1 id = afr_rrp.11 } 
+				diplomatic_relation = {
+					country = ROOT
+					relation = docking_rights
+					active = yes
+				}
+			}
+			add_opinion_modifier = { target = HAM modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = HAM modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				add_ideas = AFR_Racial_Tension_1
+			}
+			give_military_access = HAM
+			set_country_flag = afr_rrp_hamburg_company_port
+			set_country_flag = afr_rrp_company_port
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						has_idea = AF_T_idea_trading_nation_2
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_3 }
+			}
+			if = {
+				limit = {
+					AND = {
+						NOT = { has_idea = AF_T_idea_trading_nation_2 }
+						NOT = { has_idea = AF_T_idea_trading_nation_3 }
+					}
+				}
+				add_ideas = AF_T_idea_trading_nation_3
+			}
+		}
+		custom_effect_tooltip = afr_rrp_workforce_migration
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = limited_exports
+				}
+			}
+			swap_ideas = { remove_idea = limited_exports add_idea = export_focus }
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_idea = closed_economy
+				}
+			}
+			swap_ideas = { remove_idea = closed_economy add_idea = export_focus }
+		}
+    }
+	
+}
+
+afr_rrp_weapon_contract = {
+
+    available = {
+		has_idea = afr_reforming_kingdom
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+				}
+			}
+			country_exists = ENG
+			ROOT = {
+				OR = { 
+					gives_military_access_to = ENG
+					is_subject_of = ENG
+				}
+			}
+		}
+		NOT = {
+			tag = ETH
+		}	
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+				}
+			}
+			country_exists = FRA
+			ROOT = {
+				OR = { 
+					gives_military_access_to = FRA
+					is_subject_of = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+				}
+			}
+			country_exists = POR
+			ROOT = {
+				OR = { 
+					gives_military_access_to = POR
+					is_subject_of = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+				}	
+			}
+			country_exists = PRS
+			ROOT = {
+				OR = { 
+					gives_military_access_to = PRS
+					is_subject_of = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+				}
+			}
+			country_exists = BRE
+			ROOT = {
+				OR = { 
+					gives_military_access_to = BRE
+					is_subject_of = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+				}
+			}
+			country_exists = HAM
+			ROOT = {
+				OR = { 
+					gives_military_access_to = HAM
+					is_subject_of = HAM
+				}
+			}
+		}
+		ROOT = { has_completed_focus = afr_Build_more_roads }
+    }
+
+    visible = {
+		NOT = {
+			tag = ETH
+		}
+		or = {
+			has_country_flag = afr_rrp_british_company_port
+			has_country_flag = afr_rrp_french_company_port
+			has_country_flag = afr_rrp_portugal_company_port
+			has_country_flag = afr_rrp_german_company_port
+			has_country_flag = afr_rrp_bremen_company_port
+			has_country_flag = afr_rrp_hamburg_company_port
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_weapon_contract_requested
+		}
+    }
+	
+	days_re_enable = 720
+	
+	fire_only_once = no
+
+    cost = 0
+	
+	 complete_effect = {
+		custom_effect_tooltip = afr_colonial_weapons_contract_tooltip
+		if = {
+			limit = {
+				has_country_flag = afr_rrp_british_company_port
+			}
+			hidden_effect = {
+				ENG = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_french_company_port
+			}
+			hidden_effect = {
+				FRA = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_portugal_company_port
+			}
+			hidden_effect = {
+				POR = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_german_company_port
+			}
+			hidden_effect = {
+				PRS = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_bremen_company_port
+			}
+			hidden_effect = {
+				BRE = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_hamburg_company_port
+			}
+			hidden_effect = {
+				HAM = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
+		}
+		set_country_flag = afr_rrp_colonial_weapon_contract_requested
+    }
+}
+
+afr_rrp_weapon_contract_active = {
+
+    available = {
+		always = no
+    }
+
+    visible = {
+		or = {
+			has_country_flag = afr_rrp_british_company_port
+			has_country_flag = afr_rrp_french_company_port
+			has_country_flag = afr_rrp_portugal_company_port
+			has_country_flag = afr_rrp_german_company_port
+			has_country_flag = afr_rrp_bremen_company_port
+			has_country_flag = afr_rrp_hamburg_company_port
+		}
+		has_country_flag = afr_rrp_colonial_weapon_contract_active
+    }
+	
+	fire_only_once = no
+
+    cost = 0
+	
+	days_remove = 1800
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_weapon_contract_active
+		}
+	}
+	
+	modifier = {
+		political_power_gain = -0.50
+		license_infantry_eq_production_speed_factor = 0.5
+	}
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+		if = {
+			limit = {
+				has_country_flag = afr_rrp_british_company_port
+			}
+			ENG = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_french_company_port
+			}
+			FRA = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_portugal_company_port
+			}
+			POR = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_german_company_port
+			}
+			PRS = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_bremen_company_port
+			}
+			BRE = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_hamburg_company_port
+			}
+			HAM = {	
+				create_production_license = {
+					target = ETH
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+		if = {
+			limit = {
+				ROOT = { has_country_flag = afr_rrp_colonial_weapon_contract_full_support }
+			}
+		}
+		ROOT = { country_event = { id = afr_rrp_weapon_contract.5 } }
     }
 }
 
@@ -261,142 +1849,534 @@ afr_rrp_hamburg_company_port = {
 afr_rrp_railway_line_1 = {
 
     available = {
-		has_country_flag = afr_rrp_british_company_port
-		country_exists = ENG
+		has_idea = afr_reforming_kingdom
+		NOT = {
+			tag = ETH
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+				}
+			}
+			country_exists = ENG
+			ROOT = {
+				OR = { 
+					gives_military_access_to = ENG
+					is_subject_of = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+				}
+			}
+			country_exists = FRA
+			ROOT = {
+				OR = { 
+					gives_military_access_to = FRA
+					is_subject_of = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+				}
+			}
+			country_exists = POR
+			ROOT = {
+				OR = { 
+					gives_military_access_to = POR
+					is_subject_of = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+				}	
+			}
+			country_exists = PRS
+			ROOT = {
+				OR = { 
+					gives_military_access_to = PRS
+					is_subject_of = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+				}
+			}
+			country_exists = BRE
+			ROOT = {
+				OR = { 
+					gives_military_access_to = BRE
+					is_subject_of = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+				}
+			}
+			country_exists = HAM
+			ROOT = {
+				OR = { 
+					gives_military_access_to = HAM
+					is_subject_of = HAM
+				}
+			}
+		}
 		ROOT = { has_completed_focus = afr_Build_more_roads }
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
 
     visible = {
-		has_country_flag = afr_rrp_british_company_port
-    }
-	
-	fire_only_once = yes
-
-    cost = 0
-	
-	 complete_effect = {
-		ROOT = { country_event = { days = 1 id = afr_rrp.1 } }
-		ENG = { country_event = { days = 1 id = afr_rrp.2 } }
-		set_country_flag = afr_rrp_railway_line_began
-    }
-}
-
-afr_rrp_railway_line_2 = {
-
-    available = {
-		has_country_flag = afr_rrp_french_company_port
-		country_exists = FRA
-		ROOT = { has_completed_focus = afr_Build_more_roads }
-    }
-
-    visible = {
+		NOT = {
+			tag = ETH
+		}
+		or = {
+			has_country_flag = afr_rrp_british_company_port
 			has_country_flag = afr_rrp_french_company_port
-    }
-	
-	fire_only_once = yes
-
-    cost = 0
-	
-	 complete_effect = {
-		ROOT = { country_event = { days = 1 id = afr_rrp.1 } }
-		FRA = { country_event = { days = 1 id = afr_rrp.2 } }
-		set_country_flag = afr_rrp_railway_line_began
-    }
-}
-
-afr_rrp_railway_line_3 = {
-
-    available = {
-		has_country_flag = afr_rrp_german_company_port
-		country_exists = PRS
-		ROOT = { has_completed_focus = afr_Build_more_roads }
-		
-    }
-
-    visible = {
+			has_country_flag = afr_rrp_portugal_company_port
 			has_country_flag = afr_rrp_german_company_port
-    }
-	
-	fire_only_once = yes
-
-    cost = 0
-	
-	 complete_effect = {
-		ROOT = { country_event = { days = 1 id = afr_rrp.1 } }
-		PRS = { country_event = { days = 1 id = afr_rrp.2 } }
-		set_country_flag = afr_rrp_railway_line_began
-    }
-}
-
-afr_rrp_railway_line_4 = {
-
-    available = {
-		has_country_flag = afr_rrp_bremen_company_port
-		country_exists = BRE
-		ROOT = { has_completed_focus = afr_Build_more_roads }
-    }
-
-    visible = {
 			has_country_flag = afr_rrp_bremen_company_port
+			has_country_flag = afr_rrp_hamburg_company_port
+		}
     }
 	
 	fire_only_once = yes
 
     cost = 0
 	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	
 	 complete_effect = {
 		ROOT = { country_event = { days = 1 id = afr_rrp.1 } }
-		BRE = { country_event = { days = 1 id = afr_rrp.2 } }
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_3
+		if = {
+			limit = {
+				has_country_flag = afr_rrp_british_company_port
+			}
+			ENG = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_french_company_port
+			}
+			FRA = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_portugal_company_port
+			}
+			POR = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_german_company_port
+			}
+			PRS = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_bremen_company_port
+			}
+			BRE = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_hamburg_company_port
+			}
+			HAM = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
 		set_country_flag = afr_rrp_railway_line_began
+		custom_effect_tooltip = afr_rrp_railway_line_began_tooltip
     }
 }
 
-afr_rrp_railway_line_5 = {
-
-    available = {
-		has_country_flag = afr_rrp_hamburg_company_port
-		country_exists = HAM
-		ROOT = { has_completed_focus = afr_Build_more_roads }
-    }
-
-    visible = {
-		has_country_flag = afr_rrp_hamburg_company_port
-    }
-	
-	fire_only_once = yes
-
-    cost = 0
-	
-	 complete_effect = {
-		ROOT = { country_event = { days = 1 id = afr_rrp.1 } }
-		HAM = { country_event = { days = 1 id = afr_rrp.2 } }
-		set_country_flag = afr_rrp_railway_line_began
-    }
-}
 
 afr_rrp_railway_infrastructure_construction = {
 
     available = {
+		has_idea = afr_reforming_kingdom
 		has_tech = iron_railways
+		NOT = {
+			tag = ETH
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+				}
+			}
+			country_exists = ENG
+			ROOT = {
+				OR = { 
+					gives_military_access_to = ENG
+					is_subject_of = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+				}
+			}
+			country_exists = FRA
+			ROOT = {
+				OR = { 
+					gives_military_access_to = FRA
+					is_subject_of = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+				}
+			}
+			country_exists = POR
+			ROOT = {
+				OR = { 
+					gives_military_access_to = POR
+					is_subject_of = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+				}	
+			}
+			country_exists = PRS
+			ROOT = {
+				OR = { 
+					gives_military_access_to = PRS
+					is_subject_of = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+				}
+			}
+			country_exists = BRE
+			ROOT = {
+				OR = { 
+					gives_military_access_to = BRE
+					is_subject_of = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+				}
+			}
+			country_exists = HAM
+			ROOT = {
+				OR = { 
+					gives_military_access_to = HAM
+					is_subject_of = HAM
+				}
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
 
     visible = {
+		NOT = {
+			tag = ETH
+		}
 		has_country_flag = afr_rrp_railway_line
+		NOT = {
+			has_country_flag =  afr_rrp_railway_infrastructure_construction_independant
+		}
     }
 	
 	fire_only_once = yes
 	
-	days_remove = 180
+	days_remove = 720
 
     cost = 0
 	
-	 remove_effect = {
-			country_event = { days = 1 id = afr_rrp.7 }
-			custom_effect_tooltip = EDC_afr.6.t
-			hidden_effect = {
-				country_event = { id = EDC_afr.6 hours = 1 } 
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
 			}
-			random_state = {
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+	}
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			ROOT = { country_event = { days = 1 id = afr_rrp.6 } }
+			custom_effect_tooltip = EDC_afr.6.t
+				if = {
+					limit = {
+					has_country_flag = afr_rrp_british_company_port
+				}
+					ENG = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = afr_rrp_french_company_port
+					}
+					FRA = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = afr_rrp_portugal_company_port
+					}
+					POR = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = afr_rrp_german_company_port
+					}
+					PRS = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = afr_rrp_bremen_company_port
+					}
+					BRE = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+				else_if = {
+					limit = {
+						has_country_flag = afr_rrp_hamburg_company_port
+					}
+					HAM = { country_event = { days = 7 id = afr_rrp.7 } }
+				}
+			random_owned_controlled_state = {
 				limit = {
 					free_building_slots = {
 						building = infrastructure
@@ -422,7 +2402,7 @@ afr_rrp_railway_infrastructure_construction = {
 					level = 1
 					instant_build = yes
 				}
-			
+				add_manpower = 250
 			}
 	}
 }
@@ -430,24 +2410,231 @@ afr_rrp_railway_infrastructure_construction = {
 afr_rrp_main_railway_route_construction = {
 
     available = {
+		has_idea = afr_reforming_kingdom
 		AND = {
 				has_tech = iron_railways
 				has_tech = steam_engine
 				has_tech = steam_locomotive
 		}
+		NOT = {
+			tag = ETH
+		}
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+				}
+			}
+			country_exists = ENG
+			ROOT = {
+				OR = { 
+					gives_military_access_to = ENG
+					is_subject_of = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+				}
+			}
+			country_exists = FRA
+			ROOT = {
+				OR = { 
+					gives_military_access_to = FRA
+					is_subject_of = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+				}
+			}
+			country_exists = POR
+			ROOT = {
+				OR = { 
+					gives_military_access_to = POR
+					is_subject_of = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+				}	
+			}
+			country_exists = PRS
+			ROOT = {
+				OR = { 
+					gives_military_access_to = PRS
+					is_subject_of = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+				}
+			}
+			country_exists = BRE
+			ROOT = {
+				OR = { 
+					gives_military_access_to = BRE
+					is_subject_of = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+				}
+			}
+			country_exists = HAM
+			ROOT = {
+				OR = { 
+					gives_military_access_to = HAM
+					is_subject_of = HAM
+				}
+			}
+		}
+		NOT = {
+			has_country_flag = afr_rrp_colonial_project_active
+		}
     }
 
     visible = {
+		NOT = {
+			tag = ETH
+		}
 		has_country_flag = afr_rrp_railway_infrastructure_construction
     }
 	
 	fire_only_once = yes
 	
 	days_remove = 360
+	
+	cancel_trigger = {
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_british_company_port
+					NOT = { 
+						is_subject_of = ENG
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = ENG
+				}
+			}
+		}
+				
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_french_company_port
+					NOT = { 
+						is_subject_of = FRA
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = FRA
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_portugal_company_port
+					NOT = { 
+						is_subject_of = POR
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = POR
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_german_company_port
+					NOT = { 
+						is_subject_of = PRS
+					}
+				}	
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = PRS
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_bremen_company_port
+					NOT = { 
+						is_subject_of = BRE
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = BRE
+				}
+			}
+		}
+			
+		if = {
+			limit = {
+				ROOT = {
+					has_country_flag = afr_rrp_hamburg_company_port
+					NOT = { 
+						is_subject_of = HAM
+					}
+				}
+			}
+			ROOT = {
+				NOT = { 
+					gives_military_access_to = HAM
+				}
+			}
+		}
+	}
 
     cost = 0
 	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+	}
+	
 	 remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
 			custom_effect_tooltip = EDC_afr_20ip
 			hidden_effect = {
 				country_event = { id = EDC_afr.6 hours = 1 }
@@ -458,5 +2645,213 @@ afr_rrp_main_railway_route_construction = {
     }
 }
 
+
+}
+
+afr_rrp_growing_regional_industry = {
+
+#An African Inspired Industrialization
+afr_rrp_railway_infrastructure_construction_independant_decision = {
+
+    available = {
+		NOT = {
+			TAG = ETH
+			TAG = ZUL
+		}
+		if = {
+			limit = {
+				NOT = {
+					TAG = ZUL
+				}
+			}
+			any_country = {
+				AND = {
+					has_country_flag = afr_rrp_non_colonial_industrialization
+					exists = yes
+				}
+					
+			}
+			
+			ROOT = {
+				is_subject = no
+				has_stability > 0.50
+				has_tech = iron_railways
+				NOT = {
+					has_country_flag = afr_rrp_company_port
+				}
+			}
+		}
+    }
+
+    visible = {
+		NOT = {
+			TAG = ETH
+			TAG = ZUL
+		}
+		NOT = {
+			has_country_flag = afr_rrp_company_port
+		}
+    }
+	
+	fire_only_once = yes
+	
+	days_remove = 720
+
+    cost = 0
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+		if = {
+			limit = {
+				NOT = {
+					has_idea = AF_T_idea_trading_nation_2
+				}
+			}
+			add_ideas =  AF_T_idea_trading_nation_2 
+		}
+	}
+	
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			clr_country_flag = afr_rrp_colonial_project_active
+			ROOT = { country_event = { days = 1 id = afr_rrp.6 } }
+			set_country_flag = afr_rrp_railway_infrastructure_construction_independant
+			custom_effect_tooltip = EDC_afr.6.t
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 0
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = infrastructure
+										size > 0
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+	}
+}
+
+afr_rrp_main_railway_route_construction_independant = {
+
+    available = {
+		has_idea = afr_reforming_kingdom
+		has_stability > 60
+		NOT = {
+			tag = ETH
+		}
+		AND = {
+				has_tech = iron_railways
+				has_tech = steam_engine
+				has_tech = steam_locomotive
+		}
+    }
+
+    visible = {
+		NOT = {
+			tag = ETH
+		}
+		has_country_flag = afr_rrp_railway_infrastructure_construction_independant
+    }
+	
+	fire_only_once = yes
+	
+	days_remove = 720
+
+    cost = 0
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+	}
+	
+	 remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+			clr_country_flag = afr_rrp_colonial_project_active
+			custom_effect_tooltip = EDC_afr_20ip
+			hidden_effect = {
+				country_event = { id = EDC_afr.6 hours = 1 }
+				country_event = { id = EDC_afr.6 hours = 1 } 
+			}
+			add_ideas = { AF_T_small_scale_railways }
+			set_country_flag = afr_rrp_main_railway_route
+    }
+}
+
+afr_rrp_factory_construction = {
+
+    available = {
+		has_idea = afr_reforming_kingdom
+		has_stability > 0.65
+		has_idea = AF_T_small_scale_railways
+		NOT = {
+			tag = ETH
+		}
+		OR = { 
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
+			}
+			any_neighbor_country = { 
+				NOT = {
+					has_idea = pre_industrial_era
+				}
+			}
+			AND = {
+				is_subject_of = any_country
+				OVERLORD = {
+					NOT = {
+						has_idea = pre_industrial_era
+					}
+				}
+			}
+		}
+    }
+
+    visible = {
+		NOT = {
+			tag = ETH
+		}
+		has_idea = afr_reforming_kingdom
+    }
+	
+	fire_only_once = yes
+	
+	days_remove = 180
+
+    cost = 0
+	
+	modifier = {
+		political_power_gain = -1
+		research_speed_factor = 0.4
+    }
+	
+	complete_effect = {
+		set_country_flag = afr_rrp_colonial_project_active
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+		set_country_flag = afr_rrp_factory_construction
+		custom_effect_tooltip = EDC_afr.5.t
+		hidden_effect = {
+			country_event = { id = EDC_afr.5 hours = 1 } 
+		}
+    }
+}
 
 }
