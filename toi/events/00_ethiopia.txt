@@ -1,5 +1,6 @@
 ﻿add_namespace = ethiopia
 add_namespace = ethiopia_egypt_relations
+add_namespace = ethiopian_border_conflict
 add_namespace = ethiopia_religion
 add_namespace = ethiopia_trade
 add_namespace = ethiopia_export
@@ -9,8 +10,9 @@ add_namespace = ethiopia_coalition_against_islam_insurgents
 add_namespace = ethiopia_first_railway
 add_namespace = ethiopia_main_railway
 add_namespace = ethiopia_company_coup
-add_namespace = ethiopian_border_conflict
 add_namespace = ethiopia_islamic_raid
+add_namespace = ethiopia_islamic_raid_defender
+add_namespace = ethiopia_initiate_islamic_raid
 
 
 
@@ -45,23 +47,133 @@ country_event = {
 	option = {#decline
 		name = ethiopia.1.b
 		ai_chance = { factor = 25 }
-		#Since ethiopia.2 is missing, this will crash. I commented it out for now.
-		#FROM = { country_event = { days = 1 id = ethiopia.2 } }
+		hidden_effect = {
+			ROOT = { add_ideas = hidden_idea_never_surrender }
+			ETH = { country_event = { days = 1 id = ethiopia.2 } }
+		}
 	}
 	
 }
 
-#Ethiopia Gives Military Access
+#Ethiopia declares war on minors after they refused integration
+country_event = {
+	id = ethiopia.2
+	title = ethiopia.2.t
+	desc = ethiopia.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia.2.a
+		ai_chance = {factor = 100 }
+		declare_war_on = { target = FROM type = annex_everything }
+		hidden_effect = {
+			set_country_flag = integration_war
+			if = {
+				limit = {
+					FROM = { TAG = ORO}
+				}
+				ORO = {
+					division_template = {
+						name = "Elite Tribal Infantry"
+						priority = 2
+						division_names_group = KRU_TRIBAL_INFANTRY_01
+						regiments = {
+							tribal_infantry = { x = 0 y = 0 }
+						
+							tribal_infantry = { x = 1 y = 0 }
+						}
+					}
+					set_division_template_lock = {
+						division_template = "Elite Tribal Infantry"
+						is_locked = yes
+					}
+				}
+			
+				271 = {
+					create_unit = {
+						division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
+						owner = ORO
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = { TAG = SID}
+				}
+				SID = {
+					division_template = {
+					name = "Elite Tribal Infantry"
+					priority = 2
+						division_names_group = KRU_TRIBAL_INFANTRY_01
+						regiments = {
+							tribal_infantry = { x = 0 y = 0 }
+						
+							tribal_infantry = { x = 1 y = 0 }
+						}
+					}
+					set_division_template_lock = {
+						division_template = "Elite Tribal Infantry"
+						is_locked = yes
+					}
+				}
+				820 = {
+					create_unit = {
+						division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
+						owner = SID
+					}
+				}
+			}
+		}
+	}
+}
+
+
+#Ethipia wins integration war against SID
 country_event = {
 	id = ethiopia.3
 	title = ethiopia.3.t
 	desc = ethiopia.3.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
-	is_triggered_only = yes
+	trigger = {
+		TAG = ETH
+		has_country_flag = integration_war
+		OR = {
+			SID = { surrender_progress > 0.3}
+			ORO = { surrender_progress > 0.3}
+		}
+	}
 	
 	option = {
 		name = ethiopia.3.a
+		if = {
+			limit = {
+				ETH = { has_war_with = SID}
+			}
+			ETH = { transfer_state = 820 }
+		}
+		else_if = {
+			limit = {	
+				ETH = {has_war_with = ORO}
+			}
+			ETH = { transfer_state = 271 }
+		}
+	}
+}
+		
+#Ethiopia Gives Military Access
+country_event = {
+	id = ethiopia.4
+	title = ethiopia.4.t
+	desc = ethiopia.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia.4.a
 		ai_chance = { factor = 100 }
 		ROOT = { give_military_access = ETH }
 		hidden_effect = {
@@ -73,9 +185,9 @@ country_event = {
 
 #Ethiopia Requests License Agreement
 country_event = {
-	id = ethiopia.4
-	title = Ethiopia_Requests_License_Agreement.4.t
-	desc = ethiopia.4.d
+	id = ethiopia.5
+	title = ethiopia.5.t
+	desc = ethiopia.5.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
 	is_triggered_only = yes
@@ -445,7 +557,7 @@ country_event = {
 				limit = {
 					country_exists = ALZ
 				}
-				ALZ = { country_event = { days = 7 id = ethiopia.13 } }
+				ALZ = { country_event = { days = 7 id = ethiopian_border_conflict.1 } }
 			}
 			EGY = { add_timed_idea = { idea = ETH_sudanese_islamic_unrest days = 270 } }
 			hidden_effect = {
@@ -474,6 +586,153 @@ country_event = {
 			}
 	}
 	
+}
+
+#Assist_Sudanese_Independance
+country_event = {
+	id = ethiopian_border_conflict.1
+	title = ethiopian_border_conflict.1.t
+	desc = ethiopian_border_conflict.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopian_border_conflict.1.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				AND = {
+					ALZ = {
+						has_opinion = {
+							target = EGY
+							value < 14
+						}
+					}
+					num_divisions > 0
+				}
+			}
+			hidden_effect = {
+				set_border_war_data = {
+					attacker = 833
+					defender = 549
+					combat_width = 40
+				}
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 833
+					num_provinces = 4
+					on_win = ethiopian_border_conflict.3
+					on_lose = ethiopian_border_conflict.2
+					on_cancel = ethiopian_border_conflict.4
+				}				
+				defender = {
+					state = 549
+					num_provinces = 4
+					on_win = ethiopian_border_conflict.2
+					on_lose = ethiopian_border_conflict.3
+					on_cancel = ethiopian_border_conflict.4
+				}
+			}
+		}
+		if = {
+			limit = {
+				AND = {
+					ALZ = {
+						has_opinion = {
+							target = EGY
+							value < 14
+						}
+					}
+					num_divisions > -1
+					num_divisions < 1
+				}
+			}
+			
+		}
+		
+		ETH = {
+			add_opinion_modifier = {
+				target = ALZ
+				modifier = medium_increase
+			}
+		}
+		
+	}
+	
+	option = {
+		name = ethiopia_egypt_relations.13.b
+		ai_chance = { factor = 0 }
+	}
+	
+}
+
+#ALZ wins: This will add core of Mahdist state with a moderate Islamic focus tree
+country_event = {
+	id = ethiopian_border_conflict.2
+	title = ethiopian_border_conflict.2.t
+	desc = ethiopian_border_conflict.2.desc
+	picture = GFX_report_event_japanese_transport_soldiers
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.2.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+		#549 = {
+		#			
+		#}
+	}
+}
+
+#ALZ loses
+country_event = {
+	id = ethiopian_border_conflict.3
+	title = ethiopian_border_conflict.3.t
+	desc = ethiopian_border_conflict.3.desc
+	picture = GFX_report_event_japanese_soldiers_03
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.3.b
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+	}
+}
+
+#stalemate
+country_event = {
+	id = ethiopian_border_conflict.4
+	title = ethiopian_border_conflict.4.t
+	desc = ethiopian_border_conflict.4.desc
+	picture = GFX_report_event_japanese_army_parade
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.4.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+	}
 }
 
 #Ethiopia chooses Protestant Denomination
@@ -644,14 +903,20 @@ country_event = {
 				tag = POR
 			}
 			add_ideas = ETH_portugese_ethiopian_shipyard_company_profits
-			ETH = { add_ideas = ETH_portugese_ethiopian_shipyard_company }
+			ETH = { 
+				add_ideas = ETH_portugese_ethiopian_shipyard_company 
+				give_military_access = POR
+			}
 		}
 		else_if = {
 			limit = {
 				tag = FRA
 			}
 			add_ideas = ETH_french_ethiopian_shipyard_company_profits
-			ETH = { add_ideas = ETH_french_ethiopian_shipyard_company }
+			ETH = { 
+				add_ideas = ETH_french_ethiopian_shipyard_company 
+				give_military_access = FRA
+			}
 		}
 		add_political_power = 100
 		ETH = { country_event = { days = 1 id = ethiopia_trade.4 } }
@@ -665,14 +930,20 @@ country_event = {
 				tag = POR
 			}
 			add_ideas = ETH_portugese_ethiopian_company_profits
-			ETH = { add_ideas = ETH_portugese_ethiopian_cotton_company }
+			ETH = { 
+				add_ideas = ETH_portugese_ethiopian_cotton_company
+				give_military_access = POR
+			}
 		}
 		else_if = {
 			limit = {
 				tag = FRA
 			}
 			add_ideas = ETH_french_ethiopian_company_profits
-			ETH = { add_ideas = ETH_french_ethiopian_cotton_company }
+			ETH = { 
+				add_ideas = ETH_french_ethiopian_cotton_company
+				give_military_access = FRA
+			}
 		}
 		add_political_power = 100
 		ETH = { country_event = { days = 1 id = ethiopia_trade.5 } }
@@ -686,14 +957,20 @@ country_event = {
 				tag = POR
 			}
 			add_ideas = ETH_portugese_ethiopian_company_profits
-			ETH = { add_ideas = ETH_portugese_ethiopian_logging_company }
+			ETH = { 
+				add_ideas = ETH_portugese_ethiopian_logging_company
+				give_military_access = POR
+			}
 		}
 		else_if = {
 			limit = {
 				tag = FRA
 			}
 			add_ideas = ETH_french_ethiopian_company_profits
-			ETH = { add_ideas = ETH_french_ethiopian_logging_company }
+			ETH = { 
+				add_ideas = ETH_french_ethiopian_logging_company
+				give_military_access = FRA
+			}
 		}
 		add_political_power = 100
 		ETH = { country_event = { days = 1 id = ethiopia_trade.6 } }
@@ -725,16 +1002,22 @@ country_event = {
 				tag = ENG
 			}
 			add_ideas = ETH_anglo_ethiopian_shipyard_company_profits
-			ETH = { add_ideas = ETH_anglo_ethiopian_shipyard_company }
+			ETH = { 
+				add_ideas = ETH_anglo_ethiopian_shipyard_company
+				give_military_access = ENG
+			}
 		}
 		else_if = {
 			limit = { 
 				tag = PRS
 			}
 			add_ideas = ETH_german_ethiopian_shipyard_company_profits
-			ETH = { add_ideas = ETH_german_ethiopian_shipyard_company }
+			ETH = { 
+				add_ideas = ETH_german_ethiopian_shipyard_company
+				give_military_access = PRS
+			}
 		}
-		ETH = { country_event = { days = 1 id = ethiopia_company_british.4 } }
+		ETH = { country_event = { days = 1 id = ethiopia_trade.4 } }
 	}
 	
 	option = {
@@ -745,16 +1028,22 @@ country_event = {
 				tag = ENG
 			}
 			add_ideas = ETH_anglo_ethiopian_company_profits
-			ETH = { add_ideas = ETH_anglo_ethiopian_cotton_company }
+			ETH = { 
+				add_ideas = ETH_anglo_ethiopian_cotton_company
+				give_military_access = ENG
+			}
 		}
 		else_if = {
 			limit = { 
 				tag = PRS
 			}
 			add_ideas = ETH_german_ethiopian_company_profits
-			ETH = { add_ideas = ETH_german_ethiopian_cotton_company }
+			ETH = { 
+				add_ideas = ETH_german_ethiopian_cotton_company
+				give_military_access = PRS
+			}
 		}
-		ETH = { country_event = { days = 1 id = ethiopia_company_british.5 } }
+		ETH = { country_event = { days = 1 id = ethiopia_trade.5 } }
 	}
 	
 	option = {
@@ -765,16 +1054,22 @@ country_event = {
 				tag = ENG
 			}
 			add_ideas = ETH_anglo_ethiopian_company_profits
-			ETH = { add_ideas = ETH_anglo_ethiopian_rubber_company }
+			ETH = { 
+				add_ideas = ETH_anglo_ethiopian_rubber_company
+				give_military_access = ENG
+			}
 		}
 		else_if = {
 			limit = { 
 				tag = PRS
 			}
 			add_ideas = ETH_german_ethiopian_company_profits
-			ETH = { add_ideas = ETH_german_ethiopian_rubber_company }
+			ETH = { 
+				add_ideas = ETH_german_ethiopian_rubber_company
+				give_military_access = PRS
+			}
 		}
-		ETH = { country_event = { days = 1 id = ethiopia_company_british.7 } }
+		ETH = { country_event = { days = 1 id = ethiopia_trade.7 } }
 	}
 	
 }
@@ -1360,7 +1655,7 @@ country_event = {
 	}
 	
 	option = {
-		name = ethiopia_coalition_against_islam_insurgents.5.a
+		name = ethiopia_coalition_against_islam_insurgents.5.b
 		ai_chance = { factor = 50 }
 		hidden_effect = {
 			ETH = { country_event = { days = 5 id = ethiopia_coalition_against_islam_insurgents.7 } }
@@ -1370,7 +1665,7 @@ country_event = {
 	}
 
 	option = {
-		name = Hopefully_This_Quiets_Down.95.b
+		name = ethiopia_coalition_against_islam.5.c
 		ai_chance = { factor = 25 }
 		hidden_effect = {
 			ETH = { country_event = { days = 5 id = ethiopia_coalition_against_islam_insurgents.8 } }
@@ -1883,7 +2178,7 @@ country_event = {
 	option = {
 		name = ethiopia_main_railway.4.a
 		ai_chance = { factor = 100 }
-		set_country_flag = ETH_british_railway_infrastructure_construction
+		set_country_flag = ETH_main_railway_infrastructure_construction
 	}
 }
 
@@ -1899,7 +2194,7 @@ country_event = {
 	option = {
 		name = ethiopia_main_railway.5.a
 		ai_chance = { factor = 50 }
-		set_country_flag = ETH_british_railway_infrastructure_construction
+		set_country_flag = ETH_main_railway_infrastructure_construction
 	}
 	
 	option = {
@@ -2186,42 +2481,98 @@ country_event = {
 							FROM = { has_government = centrism }
 						}
 						set_politics = {
-							ruling_party = centrism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 1
+								}
 
-                        set_popularities = {
-                            centrism = 1
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = centrism
+						}
 					}
 					if = {
 						limit = {
 							FROM = { has_government = traditional_conservatism }
 						}
 						set_politics = {
-							ruling_party = traditional_conservatism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 1
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 1
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = traditional_conservatism
+						}
 					}
 					
 					
@@ -2230,21 +2581,49 @@ country_event = {
 							FROM = { has_government = social_egalitarianism }
 						}
 						set_politics = {
-							ruling_party = social_egalitarianism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 1
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 1
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = social_egalitarianism
+						}
 					}
 					
 					if = {
@@ -2252,21 +2631,49 @@ country_event = {
 							FROM = { has_government = collectivist_socialism }
 						}
 						set_politics = {
-							ruling_party = collectivist_socialism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 1
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 1
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = collectivist_socialism
+						}
 					}
 					
 					if = {
@@ -2274,21 +2681,49 @@ country_event = {
 							FROM = { has_government = vanguard_communism }
 						}
 						set_politics = {
-							ruling_party = vanguard_communism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 1
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 1
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = vanguard_communism
+						}
 					}
 					
 					if = {
@@ -2296,21 +2731,49 @@ country_event = {
 							FROM = { has_government = autocracy }
 						}
 						set_politics = {
-							ruling_party = autocracy
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 1
-                            radical_democracy = 0
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 1
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = autocracy
+						}
 					}
 					
 					if = {
@@ -2318,21 +2781,49 @@ country_event = {
 							FROM = { has_government = radical_democracy }
 						}
 						set_politics = {
-							ruling_party = radical_democracy
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 1
-                            chauvinist_populism = 0
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 1
+								}
+							
+								chauvinist_populism = { 
+									popularity = 0
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = radical_democracy
+						}
 					}
 					
 					if = {
@@ -2340,21 +2831,49 @@ country_event = {
 							FROM = { has_government = chauvinist_populism }
 						}
 						set_politics = {
-							ruling_party = chauvinist_populism
-                    }
+							parties = {
+								centrism = { 
+									popularity = 0
+								}
 
-                        set_popularities = {
-                            centrism = 0
-                            traditional_conservatism = 0
-                            social_egalitarianism = 0
-                            collectivist_socialism = 0
-                            vanguard_communism = 0
-                            autocracy = 0
-                            radical_democracy = 0
-                            chauvinist_populism = 1
-                            anarchism = 0
-                            fundamentalism = 0
-                        }
+								traditional_conservatism = {
+									popularity = 0
+								}
+			
+								social_egalitarianism = {
+									popularity = 0
+								}
+		
+								collectivist_socialism = { 
+									popularity = 0
+								}
+						
+								vanguard_communism = { 
+									popularity = 0
+								}
+						
+								autocracy = { 
+									popularity = 0
+								}
+						
+								radical_democracy = { 
+									popularity = 0
+								}
+							
+								chauvinist_populism = { 
+									popularity = 1
+								}
+						
+								anarchism = { 
+									popularity = 0
+								}
+							
+								fundamentalism = { 
+									popularity = 0
+								}
+							}
+							ruling_party = chauvinist_populism
+						}
 					}
 					
 				}
@@ -2472,153 +2991,79 @@ country_event = {
 	}
 }
 
-#Assist_Sudanese_Independance
+#Initiate Islamic Raids
+
 country_event = {
-	id = ethiopian_border_conflict.1
-	title = ethiopian_border_conflict.1.t
-	desc = ethiopian_border_conflict.1.d
-	picture = GFX_report_event_soviet_finnish_pact
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = ethiopian_border_conflict.1.a
-		ai_chance = { factor = 100 }
-		if = {
-			limit = {
-				AND = {
-					ALZ = {
-						has_opinion = {
-							target = EGY
-							value < 14
-						}
-					}
-					num_divisions > 0
-				}
-			}
-			hidden_effect = {
-				set_border_war_data = {
-					attacker = 833
-					defender = 549
-					combat_width = 40
-				}
-			}
-			start_border_war = {
-				change_state_after_war = no
-				attacker = {
-					state = 833
-					num_provinces = 4
-					on_win = ethiopian_border_conflict.3
-					on_lose = ethiopian_border_conflict.2
-					on_cancel = ethiopian_border_conflict.4
-				}				
-				defender = {
-					state = 549
-					num_provinces = 4
-					on_win = ethiopian_border_conflict.2
-					on_lose = ethiopian_border_conflict.3
-					on_cancel = ethiopian_border_conflict.4
-				}
-			}
-		}
-		if = {
-			limit = {
-				AND = {
-					ALZ = {
-						has_opinion = {
-							target = EGY
-							value < 14
-						}
-					}
-					num_divisions > -1
-					num_divisions < 1
-				}
-			}
-			
-		}
-		
-		ETH = {
-			add_opinion_modifier = {
-				target = ALZ
-				modifier = medium_increase
-			}
-		}
-		
-	}
-	
-	option = {
-		name = ethiopia_egypt_relations.13.b
-		ai_chance = { factor = 0 }
-	}
-	
-}
-
-#ALZ wins: This will add core of Mahdist state with a moderate Islamic focus tree
-country_event = {
-	id = ethiopian_border_conflict.2
-	title = ethiopian_border_conflict.2.t
-	desc = ethiopian_border_conflict.2.desc
-	picture = GFX_report_event_japanese_transport_soldiers
-
-	is_triggered_only = yes
-
-	option = {
-		name = ethiopian_border_conflict.2.a
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
-		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
-		#549 = {
-		#			
-		#}
-	}
-}
-
-#ALZ loses
-country_event = {
-	id = ethiopian_border_conflict.3
-	title = ethiopian_border_conflict.3.t
-	desc = ethiopian_border_conflict.3.desc
-	picture = GFX_report_event_japanese_soldiers_03
-
-	is_triggered_only = yes
-
-	option = {
-		name = ethiopian_border_conflict.3.b
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
-		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
-	}
-}
-
-#stalemate
-country_event = {
-	id = ethiopian_border_conflict.4
-	title = ethiopian_border_conflict.4.t
-	desc = ethiopian_border_conflict.4.desc
+	id = ethiopia_initiate_islamic_raid.1
+	title = ethiopia_initiate_islamic_raid.1.t
+	desc = ethiopia_initiate_islamic_raid.1.d
 	picture = GFX_report_event_japanese_army_parade
 
 	is_triggered_only = yes
 
 	option = {
-		name = ethiopian_border_conflict.4.a
+		name = ethiopia_initiate_islamic_raid.1.a
 		ai_chance = { factor = 100 }
 		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = HRR
+								owns_state = 818
+							}
+						}
+					}
+				}
+				HRR = {
+
+				}
+			}
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = AWS
+								owns_state = 819
+							}
+						}
+					}
+				}
+				AWS = {
+	
+				}
+				
+			}
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = MED
+								owns_state = 550
+							}
+						}
+					}
+				}
+				MED = {
+	
+				}
+			}
 		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
+		
 	}
 }
-
 
 #Islamic Raids
 country_event = {
@@ -2650,9 +3095,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -2680,9 +3125,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -2711,9 +3156,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -2750,9 +3195,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 		if = {
@@ -2766,9 +3212,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 		if = {
@@ -2782,9 +3229,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 	}
@@ -2813,9 +3261,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 		if = {
@@ -2829,9 +3278,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 		if = {
@@ -2845,9 +3295,10 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 	}
@@ -2876,6 +3327,7 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
 			}
 		}
@@ -2890,6 +3342,7 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
 			}
 		}
@@ -2904,6 +3357,95 @@ country_event = {
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
+				}
+			}
+		}
+	}
+	
+}
+
+country_event = {
+	id = ethiopia_islamic_raid_defender.1
+	title = ethiopia_islamic_raid_defender.1.t
+	desc = ethiopia_islamic_raid_defender.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.1.a
+		ai_chance = { factor = 100 }
+		
+	}
+	
+}
+
+country_event = {
+	id = ethiopia_islamic_raid_defender.2
+	title = ethiopia_islamic_raid_defender.2.t
+	desc = ethiopia_islamic_raid_defender.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.2.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				hidden_effect = {
+				}
+			}
+		}
+	}
+	
+}
+
+country_event = {
+	id = ethiopia_islamic_raid_defender.3
+	title = ethiopia_islamic_raid_defender.3.t
+	desc = ethiopia_islamic_raid_defender.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.3.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				hidden_effect = {
+				}
+			}
+		}
+	}
+	
+}
+
+country_event = {
+	id = ethiopia_islamic_raid_defender.4
+	title = ethiopia_islamic_raid_defender.4.t
+	desc = ethiopia_islamic_raid_defender.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.4.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				hidden_effect = {
 				}
 			}
 		}
