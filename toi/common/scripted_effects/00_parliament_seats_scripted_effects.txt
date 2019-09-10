@@ -1,0 +1,812 @@
+parl_print_variables = {
+	print_variables = {
+	    file = parl_log_file
+	    append = no
+	    print_global = yes
+	}
+}
+
+set_initial_weights = {
+	resize_array = {
+	    array = parl_weights
+	    value = 1
+	    size = 9
+	}
+
+	resize_array = {
+	    array = parl_weights_normalized
+	    value = 0
+	    size = 9
+	}
+
+	set_variable = { parl_weights^0 = party_popularity@vanguard_communism }
+	set_variable = { parl_weights^1 = party_popularity@collectivist_socialism }
+	set_variable = { parl_weights^2 = party_popularity@social_egalitarianism }
+	set_variable = { parl_weights^3 = party_popularity@centrism }
+	set_variable = { parl_weights^4 = party_popularity@traditional_conservatism }
+	set_variable = { parl_weights^5 = party_popularity@radical_democracy }
+	set_variable = { parl_weights^6 = party_popularity@chauvinist_populism }
+	set_variable = { parl_weights^7 = party_popularity@autocracy }
+	set_variable = { parl_weights^8 = party_popularity@fundamentalism }
+
+	set_variable = {
+	    var = tot_parl_weight
+	    value = 0
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_variable = {
+		    var = tot_parl_weight
+		    value = parl_v
+		}
+	}
+
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+
+	    set_variable = { parl_weights_normalized^parl_i = parl_weights^parl_i }
+	    
+	    divide_variable = {
+		    var = parl_weights_normalized^parl_i
+		    value = tot_parl_weight
+		}
+	}
+}
+
+apply_coalition_modifier = {
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+	    
+	    if = {
+	    	limit = {
+	    		check_variable = { parl_coalitions^parl_i = 1 }
+	    	}
+
+	    	multiply_variable = { parl_weights_normalized^parl_i = 1.02 }
+	    }
+
+	    else = {
+	    	if = {
+		    	limit = {
+		    		check_variable = { parl_coalitions^parl_i = 2 }
+		    	}
+
+		    	multiply_variable = { parl_weights_normalized^parl_i = 0.98 }
+	    	}
+
+	    	else = {
+	    		if = {
+			    	limit = {
+			    		check_variable = { parl_coalitions^parl_i = 3 }
+			    	}
+
+			    	set_variable = { parl_weights_normalized^parl_i = 0 }
+		    	}
+
+		    	else = {
+		    		if = {
+				    	limit = {
+				    		check_variable = { parl_coalitions^parl_i = 4 }
+				    	}
+
+				    	multiply_variable = { parl_weights_normalized^parl_i = 0.25 }
+			    	}
+		    	}
+	    	}
+	    }
+	}
+}
+
+compute_weights = {
+	set_variable = {
+	    var = tot_parl_weight
+	    value = 0
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    set_variable = { parl_weights^parl_i = parl_weights_normalized^parl_i }
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_variable = {
+		    var = tot_parl_weight
+		    value = parl_v
+		}
+	}
+
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+
+	    set_variable = { parl_weights_normalized^parl_i = parl_weights^parl_i }
+	    
+	    divide_variable = {
+		    var = parl_weights_normalized^parl_i
+		    value = tot_parl_weight
+		}
+	}
+}
+
+compute_seats = {
+	resize_array = {
+	    array = seats_array
+	    value = -1
+	    size = 256
+	}
+
+	for_each_loop = {
+		array = seats_array
+		value = parl_seats_v
+		index = parl_seats_i
+
+		set_temp_variable = { parl_r = random }
+
+		set_temp_variable = { sum_of_the_parl_weights = 0 }
+
+		set_temp_variable = { parl_seat_flag = 0 }
+
+		for_each_loop = {
+		    array = parl_weights_normalized
+		    value = parl_v
+		    index = parl_i
+
+		    add_to_temp_variable = {
+			    var = sum_of_the_parl_weights
+			    value = parl_weights_normalized^parl_i
+			}
+		    
+		    if = {
+		    	limit = {
+		    		check_variable = { parl_r < sum_of_the_parl_weights }
+		    		check_variable = { parl_seat_flag = 0 }
+		    	}
+
+		    	set_temp_variable = { parl_seat_ideology = parl_i }
+		    	set_temp_variable = { parl_seat_flag = 1 }
+		    }
+		}
+
+		set_variable = { seats_array^parl_seats_i = parl_seat_ideology }
+	}
+
+	set_variable = { parl_van_com_seats_count = 0 }
+	set_variable = { parl_col_soc_seats_count = 0 }
+	set_variable = { parl_soc_ega_seats_count = 0 }
+	set_variable = { parl_cen_seats_count = 0 }
+	set_variable = { parl_tra_con_seats_count = 0 }
+	set_variable = { parl_rad_dem_seats_count = 0 }
+	set_variable = { parl_chauv_pop_seats_count = 0 }
+	set_variable = { parl_aut_seats_count = 0 }
+	set_variable = { parl_fun_seats_count = 0 }
+
+	for_each_loop = {
+		array = seats_array
+		value = parl_seats_v
+		index = parl_seats_i
+
+		resize_array = {
+		    array = seats_count_array
+		    value = 0
+		    size = 9
+		}
+
+		if = {
+		    limit = {
+		    	check_variable = { seats_array^parl_seats_i = 0 }
+		    }
+		    add_to_variable = {
+				var = seats_count_array^0
+				value = 1
+			}
+		}
+
+		else = {
+			if = {
+			    limit = {
+			    	check_variable = { seats_array^parl_seats_i = 1 }
+			    }
+			    add_to_variable = {
+					var = seats_count_array^1
+					value = 1
+				}
+			}
+
+			else = {
+				if = {
+				    limit = {
+				    	check_variable = { seats_array^parl_seats_i = 2 }
+				    }
+				    add_to_variable = {
+						var = seats_count_array^2
+						value = 1
+					}
+				}
+
+				else = {
+					if = {
+					    limit = {
+					    	check_variable = { seats_array^parl_seats_i = 3 }
+					    }
+					    add_to_variable = {
+							var = seats_count_array^3
+							value = 1
+						}
+					}
+
+					else = {
+						if = {
+						    limit = {
+						    	check_variable = { seats_array^parl_seats_i = 4 }
+						    }
+						    add_to_variable = {
+								var = seats_count_array^4
+								value = 1
+							}
+						}
+
+						else = {
+							if = {
+							    limit = {
+							    	check_variable = { seats_array^parl_seats_i = 5 }
+							    }
+							    add_to_variable = {
+									var = seats_count_array^5
+									value = 1
+								}
+							}
+
+							else = {
+								if = {
+								    limit = {
+								    	check_variable = { seats_array^parl_seats_i = 6 }
+								    }
+								    add_to_variable = {
+										var = seats_count_array^6
+										value = 1
+									}
+								}
+
+								else = {
+									if = {
+									    limit = {
+									    	check_variable = { seats_array^parl_seats_i = 7 }
+									    }
+									    add_to_variable = {
+											var = seats_count_array^7
+											value = 1
+										}
+									}
+
+									else = {
+									    add_to_variable = {
+											var = seats_count_array^8
+											value = 1
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+draw_seats = {
+	resize_array = {
+	    array = parl_seats_gfx
+	    value = -1
+	    size = 32
+	}
+
+	for_each_loop = { # RESET ALL SEAT GFX
+	    array = parl_seats_gfx
+	    value = parl_gfx_v
+	    index = parl_gfx_i
+
+	    set_temp_variable = { parl_seat_id_plus_one = parl_gfx_i }
+	    add_to_temp_variable = { parl_seat_id_plus_one = 1 }
+
+	    meta_effect = {
+			text = {
+				set_variable = { 
+					var = seat_[SEAT_ID]
+					value = -1
+				}
+			}
+			SEAT_ID = parl_seat_id_plus_one
+			IDEOLOGY_VALUE = parl_seat_ideology_id
+		}
+	}
+
+	for_each_loop = { # LOOP ON ALL SEAT GFX
+	    array = parl_seats_gfx
+	    value = parl_gfx_v
+	    index = parl_gfx_i
+
+	    set_temp_variable = { parl_seat_gfx_id = -1 }
+	    set_temp_variable = { parl_sum_seat_count = 0 }
+	    set_temp_variable = { parl_seat_gfx_flag = 0 }
+
+	    for_each_loop = { # LOOP ON EACH IDEOLOGY
+		    array = seats_count_array
+		    value = parl_v
+		    index = parl_i
+
+		    add_to_temp_variable = {
+			    var = parl_sum_seat_count
+			    value = seats_count_array^parl_i
+			}
+
+			set_temp_variable = { parl_seat_gfx_times_eight_id = parl_gfx_i } # Don't judge me, life is full of mistake patched over with duct tape
+			multiply_temp_variable = { parl_seat_gfx_times_eight_id = 8 }
+		    
+		    if = {
+		    	limit = {
+		    		check_variable = { parl_seat_gfx_times_eight_id < parl_sum_seat_count }
+		    		check_variable = { parl_seat_gfx_flag = 0 }
+		    	}
+
+		    	set_temp_variable = { parl_seat_ideology_id = parl_i }
+
+		    	add_to_temp_variable = { # I SAID DON'T JUDGE ME
+				    var = parl_seat_ideology_id
+				    value = 1
+				}
+
+				set_temp_variable = { parl_seat_id_plus_one = parl_gfx_i }
+
+		    	add_to_temp_variable = { 
+				    var = parl_seat_id_plus_one
+				    value = 1
+				}
+
+		    	meta_effect = {
+				    text = {
+				        set_variable = { 
+				          var = seat_[SEAT_ID]
+				          value = [IDEOLOGY_VALUE]
+				        }
+				    }
+				    SEAT_ID = parl_seat_id_plus_one
+				    IDEOLOGY_VALUE = parl_seat_ideology_id
+				}
+
+		    	set_temp_variable = { parl_seat_ideology = parl_i }
+		    	set_temp_variable = { parl_seat_gfx_flag = 1 }
+		    }
+		}
+	}
+}
+
+set_generic_party_issues = {
+	resize_array = {
+	    array = ideology_van_com_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_van_com_issues^0 = 4 }
+	set_variable = { ideology_van_com_issues^1 = 4 }
+	set_variable = { ideology_van_com_issues^2 = 4 }
+	set_variable = { ideology_van_com_issues^3 = 2 }
+
+	resize_array = {
+	    array = ideology_col_soc_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_col_soc_issues^0 = 4 }
+	set_variable = { ideology_col_soc_issues^1 = 4 }
+	set_variable = { ideology_col_soc_issues^2 = 4 }
+	set_variable = { ideology_col_soc_issues^3 = 3 }
+
+	resize_array = {
+	    array = ideology_soc_ega_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_soc_ega_issues^0 = 4 }
+	set_variable = { ideology_soc_ega_issues^1 = 2 }
+	set_variable = { ideology_soc_ega_issues^2 = 4 }
+	set_variable = { ideology_soc_ega_issues^3 = 4 }
+
+	resize_array = {
+	    array = ideology_cen_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_cen_issues^0 = 3 }
+	set_variable = { ideology_cen_issues^1 = 1 }
+	set_variable = { ideology_cen_issues^2 = 3 }
+	set_variable = { ideology_cen_issues^3 = 3 }
+
+	resize_array = {
+	    array = ideology_tra_con_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_tra_con_issues^0 = 2 }
+	set_variable = { ideology_tra_con_issues^1 = 2 }
+	set_variable = { ideology_tra_con_issues^2 = 3 }
+	set_variable = { ideology_tra_con_issues^3 = 2 }
+
+	resize_array = {
+	    array = ideology_rad_dem_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_rad_dem_issues^0 = 2 }
+	set_variable = { ideology_rad_dem_issues^1 = 3 }
+	set_variable = { ideology_rad_dem_issues^2 = 2 }
+	set_variable = { ideology_rad_dem_issues^3 = 1 }
+
+	resize_array = {
+	    array = ideology_chauv_pop_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_chauv_pop_issues^0 = 1 }
+	set_variable = { ideology_chauv_pop_issues^1 = 3 }
+	set_variable = { ideology_chauv_pop_issues^2 = 2 }
+	set_variable = { ideology_chauv_pop_issues^3 = 1 }
+
+	resize_array = {
+	    array = ideology_aut_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_aut_issues^0 = 1 }
+	set_variable = { ideology_aut_issues^1 = 3 }
+	set_variable = { ideology_aut_issues^2 = 1 }
+	set_variable = { ideology_aut_issues^3 = 2 }
+
+	resize_array = {
+	    array = ideology_fun_issues
+	    value = 0
+	    size = 4
+	}
+	set_variable = { ideology_fun_issues^0 = 1 }
+	set_variable = { ideology_fun_issues^1 = 3 }
+	set_variable = { ideology_fun_issues^2 = 1 }
+	set_variable = { ideology_fun_issues^3 = 3 }
+}
+
+reset_approval_arrays = {
+	resize_array = {
+	    array = parl_issue_approval_array
+	    value = 0
+	    size = 4
+	}
+}
+
+set_1_approval_highly_disagree = {
+	set_variable = { parl_issue_approval_array^0 = -0.4 }
+}
+set_1_approval_disagree = {
+	set_variable = { parl_issue_approval_array^0 = -0.2 }
+}
+set_1_approval_neutral = {
+	set_variable = { parl_issue_approval_array^0 = 0 }
+}
+set_1_approval_agree = {
+	set_variable = { parl_issue_approval_array^0 = 0.2 }
+}
+set_1_approval_highly_agree = {
+	set_variable = { parl_issue_approval_array^0 = 0.4 }
+}
+
+set_2_approval_highly_disagree = {
+	set_variable = { parl_issue_approval_array^1 = -0.4 }
+}
+set_2_approval_disagree = {
+	set_variable = { parl_issue_approval_array^1 = -0.2 }
+}
+set_2_approval_neutral = {
+	set_variable = { parl_issue_approval_array^1 = 0 }
+}
+set_2_approval_agree = {
+	set_variable = { parl_issue_approval_array^1 = 0.2 }
+}
+set_2_approval_highly_agree = {
+	set_variable = { parl_issue_approval_array^1 = 0.4 }
+}
+
+set_3_approval_highly_disagree = {
+	set_variable = { parl_issue_approval_array^2 = -0.4 }
+}
+set_3_approval_disagree = {
+	set_variable = { parl_issue_approval_array^2 = -0.2 }
+}
+set_3_approval_neutral = {
+	set_variable = { parl_issue_approval_array^2 = 0 }
+}
+set_3_approval_agree = {
+	set_variable = { parl_issue_approval_array^2 = 0.2 }
+}
+set_3_approval_highly_agree = {
+	set_variable = { parl_issue_approval_array^2 = 0.4 }
+}
+
+set_4_approval_highly_disagree = {
+	set_variable = { parl_issue_approval_array^3 = -0.4 }
+}
+set_4_approval_disagree = {
+	set_variable = { parl_issue_approval_array^3 = -0.2 }
+}
+set_4_approval_neutral = {
+	set_variable = { parl_issue_approval_array^3 = 0 }
+}
+set_4_approval_agree = {
+	set_variable = { parl_issue_approval_array^3 = 0.2 }
+}
+set_4_approval_highly_agree = {
+	set_variable = { parl_issue_approval_array^3 = 0.4 }
+}
+
+set_vote_cul = {
+	set_variable = { vote_issue_id = 0 }
+}
+set_vote_eco = {
+	set_variable = { vote_issue_id = 1 }
+}
+set_vote_dem = {
+	set_variable = { vote_issue_id = 2 }
+}
+set_vote_war = {
+	set_variable = { vote_issue_id = 3 }
+}
+
+compute_voting_approval = {
+	resize_array = {
+	    array = parl_voting_approval_array
+	    value = 0.5
+	    size = 9
+	}
+
+	for_each_loop = {
+	    array = parl_voting_approval_array
+	    value = parl_v
+	    index = parl_i
+	    
+	    set_variable = { parl_voting_approval_array^parl_i = 0.5 }
+	}
+
+	set_temp_variable = { comp_value = 0 }
+
+	# VAN_COM CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_van_com_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+
+	set_temp_variable = { comp_value = parl_voting_approval_array^0 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^0 = comp_value }
+
+
+
+	# COL_SOC CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_col_soc_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^1 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^1 = comp_value }
+
+
+
+	# SOC_EGA CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_soc_ega_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^2 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^2 = comp_value }
+
+
+
+	# CEN CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_cen_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^3 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^3 = comp_value }
+
+
+
+	# TRA_CON CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_tra_con_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^4 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^4 = comp_value }
+
+
+
+	# RAD_DEM CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_rad_dem_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^5 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^5 = comp_value }
+
+
+
+	# CHAUV_POP CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_chauv_pop_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^6 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^6 = comp_value }
+
+
+
+	# AUT CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_aut_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^7 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^7 = comp_value }
+
+
+
+	# FUN CALCULATIONS
+	set_temp_variable = { comp_value_cursor = ideology_fun_issues^vote_issue_id }
+	add_to_temp_variable = { comp_value_cursor = -1 }
+	
+	set_temp_variable = { comp_value = parl_voting_approval_array^8 }
+	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
+
+	set_temp_variable = { parl_r = random }
+	multiply_temp_variable = { parl_r = 0.2 }
+	add_to_temp_variable = { parl_r = -0.1 }
+
+	add_to_temp_variable = { comp_value = parl_r }
+	set_variable = { parl_voting_approval_array^8 = comp_value }
+}
+
+hold_vote = {
+	set_variable = { yay_votes = 0 }
+	set_variable = { nay_votes = 0 }
+
+	for_each_loop = {
+	    array = seats_array
+	    value = parl_v
+	    index = parl_i
+
+	    set_temp_variable = { parl_r = random }
+
+	    if = {
+	    	limit = {
+	    		check_variable = { parl_r < parl_voting_approval_array^seats_array^parl_i }
+	    	}
+	    	add_to_variable = { yay_votes = 1 }
+	    }
+	    
+	    else = {
+	    	add_to_variable = { nay_votes = 1 }
+	    }
+	}
+
+	if = {
+		limit = {
+			check_variable = { yay_votes > nay_votes }
+		}
+		set_country_flag = eoanb_reform_vote_success
+	}
+
+	else = {
+		if = {
+			limit = {
+				check_variable = { yay_votes < nay_votes }
+			}
+			set_country_flag = eoanb_reform_vote_failure
+		}
+
+		else = {
+			set_country_flag = eoanb_reform_vote_tie
+		}
+	}
+}
+
+compute_number_seats_tot = {
+	set_variable = { parl_tot_num_seats = 0 }
+
+	for_each_loop = {
+	    array = seats_count_array
+	    value = parl_v
+	    index = parl_i
+
+	    add_to_variable = { parl_tot_num_seats = seats_count_array^parl_i }
+	}
+
+	set_variable = { parl_num_seats_half = parl_tot_num_seats }
+	divide_variable = { parl_num_seats_half = 2 }
+	round_variable = parl_num_seats_half
+}
+
+compute_number_seats_approve_est = {
+	set_variable = { parl_est_num_seats = 0 }
+
+	for_each_loop = {
+	    array = seats_count_array
+	    value = parl_v
+	    index = parl_i
+
+	    set_temp_variable = { seat_est_w_approval = seats_count_array^parl_i }
+	    multiply_temp_variable = { seat_est_w_approval = parl_voting_approval_array^parl_i }
+
+	    add_to_variable = { parl_est_num_seats = seat_est_w_approval }
+	}
+
+	round_variable = parl_est_num_seats
+}
