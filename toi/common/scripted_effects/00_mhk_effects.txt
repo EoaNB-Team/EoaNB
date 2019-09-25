@@ -46,6 +46,58 @@ mhc_get_results_effects_collector = {
 	}
 }
 
+mhc_junta_collector = {
+	hidden_effect = {
+		if = {
+			limit = {
+				NOT = {
+					has_government = chauvinist_populism
+					has_civil_war = yes
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { mhc_army_power > 79 }
+					NOT = {
+						OR = {
+							has_country_flag = MHC_military_junta_army
+							has_country_flag = MHC_military_junta_airforce
+							has_country_flag = MHC_military_junta_navy
+						}
+					}
+				}
+				mhc_create_junta_army = yes
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_airforce_power > 79 }
+					NOT = {
+						OR = {
+							has_country_flag = MHC_military_junta_army
+							has_country_flag = MHC_military_junta_airforce
+							has_country_flag = MHC_military_junta_navy
+						}
+					}
+				}
+				#mhc_create_junta_airforce = yes
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_navy_power > 79 }
+					NOT = {
+						OR = {
+							has_country_flag = MHC_military_junta_army
+							has_country_flag = MHC_military_junta_airforce
+							has_country_flag = MHC_military_junta_navy
+						}
+					}
+				}
+				#mhc_create_junta_navy = yes
+			}
+		}
+	}
+}
+
 mhc_raise_power_army = {
 	hidden_effect = {
 		#ROOT = {
@@ -1294,6 +1346,81 @@ mhc_deactivate_idea = {
 					}
 				}
 			}
+		}
+	}
+}
+
+mhc_create_junta_army = {
+	hidden_effect = {
+		set_country_flag = MHC_military_junta_army
+		add_ideas = mhc_military_junta
+		
+		#news event
+		every_country = {
+			news_event = { id = mhc.10 }
+		}
+		
+		#military spending
+		if = {
+			limit = {
+				OR = {
+					has_idea = three_percent
+					has_idea = two_percent
+					has_idea = one_percent
+				}
+			}
+			#vote for five percent
+			set_variable = { 
+				var = temp_reform_id
+				value = 12.2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = five_percent
+			}
+			#vote for ten percent
+			set_variable = { 
+				var = temp_reform_id
+				value = 12.1
+			}
+		}
+		else_if = {
+			limit = {
+				OR = {
+					has_idea = free_trade
+					has_idea = export_focus
+				}
+			}
+			#vote for limited exports
+			set_variable = { 
+				var = temp_reform_id
+				value = 7.3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = limited_exports
+			}
+			#vote for limited exports
+			set_variable = { 
+				var = temp_reform_id
+				value = 7.4
+			}
+		}
+		else = {
+			set_country_flag = mhc_temp_non_vote_army
+		}
+		
+		#vote event
+		if = {
+			limit = {
+				has_country_flag = mhc_temp_non_vote_army
+			}
+			country_event = { id = mhc.13 days = 3 }
+		}
+		else = {
+			country_event = { id = mhc.11 days = 14 }
 		}
 	}
 }
