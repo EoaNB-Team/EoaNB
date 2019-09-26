@@ -1,7 +1,230 @@
 ﻿add_namespace = OTO_battleofgrahovac
 add_namespace = OTO_Succession
 add_namespace = OTO_general_death
+add_namespace = OTO_vassal_tribute
 
+#Tribute payment from the vassals
+country_event = {
+	id = OTO_vassal_tribute.1
+	title = OTO_vassal_tribute.1.t
+	desc = { 
+		text =  OTO_vassal_tribute.1.descEyalet
+		trigger = { 
+			has_autonomy_state = autonomy_eyalet
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.1.descKhedive
+		trigger = {
+			has_autonomy_state = autonomy_khedive
+		}
+	}
+	picture = GFX_event_test
+	
+	trigger = {
+		date > 1858.1.1
+		ROOT = {
+			AND = {
+				is_subject_of = OTO
+				OR = {
+					has_autonomy_state = autonomy_eyalet
+					has_autonomy_state = autonomy_khedive
+				}
+				NOT = {
+					has_idea = OTO_paid_tribute
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.1.a
+		trigger = {
+			has_autonomy_state = autonomy_eyalet
+		}
+		add_political_power = -50
+		hidden_effect = {
+			add_timed_idea = {
+				idea = OTO_paid_tribute
+				days = 365
+			}
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.2} }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.1.b
+		trigger = {
+			has_autonomy_state = autonomy_khedive
+		}
+		add_political_power = -25
+		hidden_effect = {
+			add_timed_idea = {
+				idea = OTO_paid_tribute
+				days = 365
+			}
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.2} }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.1.c
+		trigger = { 
+			NOT = { has_country_flag = OTO_loyalty_enforced}
+		}
+		hidden_effect = {
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.3} }
+		}
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.2
+	title = OTO_vassal_tribute.2.t
+	desc = { 
+		text =  OTO_vassal_tribute.2.descEyalet
+		trigger = { 
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.2.descKhedive
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+	}
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = { 
+		name = OTO_vassal_tribute.2.a
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+		add_political_power = 50
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.2.b
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+		add_political_power = 25
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.3
+	title = OTO_vassal_tribute.3.t
+	desc = { 
+		text =  OTO_vassal_tribute.3.descEyalet
+		trigger = { 
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.3.descKhedive
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+	}
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = { 
+		name = OTO_vassal_tribute.3.a
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+		ROOT = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_free
+			}
+			declare_war_on = {
+				target = FROM
+				type = puppet_wargoal_focus
+			}
+		}
+		hidden_effect = {
+			FROM = { set_country_flag = OTO_rebellious_vassal }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.3.b
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+		ROOT = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_free
+			}
+			declare_war_on = {
+				target = FROM
+				type = puppet_wargoal_focus
+			}
+		}
+		hidden_effect = {
+			FROM = { set_country_flag = OTO_rebellious_vassal }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.3.c
+	}
+}
+
+
+country_event = {
+	id = OTO_vassal_tribute.4
+	title = OTO_vassal_tribute.4.t
+	desc = OTO_vassal_tribute.4.d
+	picture = GFX_event_test
+	
+	trigger = {
+		ROOT = { 
+			AND = {
+				has_country_flag = OTO_rebellious_vassal
+				has_war_with = OTO
+				surrender_progress > 0.5
+			}
+		}
+	}
+	hidden = yes
+	
+	immediate = {
+		OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.5 } }
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.5
+	title = OTO_vassal_tribute.5.t
+	desc = OTO_vassal_tribute.5.d
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_vassal_tribute.5.a
+		OTO = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_eyalet
+			}
+		}
+		hidden_effect= {
+			FROM = { set_country_flag = OTO_loyalty_enforced }
+			FROM = { clr_country_flag = OTO_rebellious_vassal }
+		}
+	}
+}	
+			
+	
 #Death of Abdulmajid I and Abdulaziz Succesion
 country_event = {
 	id = OTO_Succession.1 
