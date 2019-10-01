@@ -115,7 +115,7 @@ country_event = {##OMA - ZAN Declares Independance
 		name = arab_events.5.a
 		trigger={
 			has_manpower > 10000
-			has_political_power > 50
+			PS_pol_positive_null = yes
 		}
 		declare_war_on = {
 			target = FROM
@@ -123,6 +123,7 @@ country_event = {##OMA - ZAN Declares Independance
 		}
 		hidden_effect = {
 			ZAN = {add_ideas = {ZAN_brothers_war}}
+			activate_mission = OMA_ZAN_Brothers_War
 		}
 		set_country_flag = OMA_brothers_war
 	}
@@ -238,6 +239,15 @@ country_event = {##ENG - OMA demands we hand over TCS
 				factor = 2
 				SRS = {exists = yes}
 			}
+			modifier = {
+				factor = 2
+				SRS = {
+					AND={
+						exists = yes 
+						has_war = no
+					}
+				}
+			}
         }
 		FROM={
 			set_autonomy = {
@@ -316,6 +326,7 @@ country_event = {##end of the OMA-ZAN war
 	
 	immediate = { ##ok
 		OMA={
+			increase_ps_by_two = yes
 			clr_country_flag = OMA_brothers_war
 			white_peace = ZAN
 			white_peace = MOM
@@ -662,6 +673,12 @@ country_event = {##OMA - Founding of somalia
 			target = SOM
 			autonomy_state = autonomy_colony
 		}
+		SOM={
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
+		}
 		
 	}
 	option = { ##consolidate under MAJ
@@ -681,6 +698,10 @@ country_event = {##OMA - Founding of somalia
 		}
 		MAJ={
 			set_cosmetic_tag = SOM_OMA_colony
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
 			if={
 				limit = {
 					NOT={
@@ -729,6 +750,10 @@ country_event = {##OMA - Founding of somalia
 		}
 		GLD={
 			set_cosmetic_tag = SOM_OMA_colony
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
 			if={
 				limit = {
 					NOT={
@@ -894,14 +919,14 @@ country_event = {##OMA - Finalise foreign policy
 		}
 	}
 	option = { ##remain a trading nation
-		name = arab_events.29.b
+		name = arab_events.29.c
 		ai_chance = { 
             factor = 5
         }
 		add_stability = 0.025
 	}
 	option = { ##cut ourselves off
-		name = arab_events.29.c
+		name = arab_events.29.e
 		ai_chance = { 
             factor = 5
         }
@@ -1310,5 +1335,253 @@ country_event = {##ADN - MAH has offered to submit
 	option = { ##great
 		name = arab_events.43.a
 		puppet = FROM
+	}
+}
+country_event = {##OMA - death of Thuwaini
+	id = arab_events.44
+	title = arab_events.44.t
+	desc = arab_events.44.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag=OMA
+		date>1866.04.01
+		date<1872.01.01
+	}
+	mean_time_to_happen={
+		days = 100
+	}
+	
+	immediate={
+		#retire_country_leader = yes
+		create_country_leader = {
+			name = "Salim bin Thuwaini"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_OMA_Salim_bin_Thuwaini.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+		complete_national_focus = oma_vic_death_of_thuwaini
+	}
+	
+	option = { ##long live Salim
+		name = arab_events.44.a
+		hidden_effect={
+			if={
+				limit={
+					OR={
+						has_idea = OMA_oman_muskat_divide
+						has_idea = OMA_oman_muskat_divide_2
+						has_idea = OMA_oman_muskat_divide_3
+						has_idea = OMA_oman_muskat_divide_4
+						has_idea = OMA_oman_muskat_divide_5
+						has_idea = OMA_increasing_oman_muskat_divide
+					}
+				}
+				country_event = {id = arab_events.45 days = 400 random = 200}
+			}
+			else={
+			
+			}
+		}
+	}
+}
+country_event = {##OMA - Imamate  of Oman Disputed
+	id = arab_events.45
+	title = arab_events.45.t
+	desc = arab_events.45.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	immediate={
+		hidden_effect={
+			797={
+				set_demilitarized_zone = yes
+			}
+			add_popularity = {
+				ideology = fundamentalism
+				popularity = 0.15
+			}
+		}	
+	}
+	
+	option = { ##Reconize Azzam
+		name = arab_events.45.a
+		random_list={
+			75={
+				custom_effect_tooltip = Azzan_marches_east
+				hidden_effect={
+					country_event = {id = arab_events.46 days = 60 random = 60}
+					set_country_flag=Azzan_marches_east
+				}
+			}
+			25={
+				custom_effect_tooltip = Azzan_accepts_deal
+				hidden_effect={
+					country_event = {id = arab_events.46 days = 60 random = 60}
+					set_country_flag=Azzan_accepts_deal
+				}
+			}
+		}
+	}
+	option = { ##fight for Salim
+		name = arab_events.45.b
+		country_event = {id = arab_events.47 days = 60 random = 60}
+		add_ideas={OMA_tribal_ibadhi_fanaticism}
+		add_manpower=-2000
+	}
+}
+country_event = {##OMA - Azzans reply
+	id = arab_events.46
+	title = arab_events.46.t
+	desc = {
+		trigger={
+			has_country_flag=Azzan_marches_east
+		}
+		text = arab_events.46.d
+	}
+	desc = {
+		trigger={
+			has_country_flag=Azzan_accepts_deal
+		}
+		text = arab_events.46.da
+	}
+	desc = {
+		trigger={
+			NOT={
+				has_country_flag=Azzan_marches_east
+				has_country_flag=Azzan_accepts_deal
+			}
+		}
+		text = arab_events.46.db
+	}
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##damn
+		name = arab_events.46.a
+		trigger={
+			has_country_flag=Azzan_marches_east
+		}
+		country_event={id=arab_events.47}
+	}
+	option = { ##great
+		name = arab_events.46.b
+		trigger={
+			has_country_flag=Azzan_accepts_deal
+		}
+	}
+}
+country_event = {##OMA - Azzan marches east WIP
+	id = arab_events.47
+	title = arab_events.47.t
+	desc = arab_events.47.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##great
+		name = arab_events.47.a
+		OMA_muscat_and_oman_divide_increase_3 = yes
+	}
+}
+
+country_event = {##OMA - foreign interests
+	id = arab_events.48
+	title = arab_events.48.t
+	desc = arab_events.48.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##woo Britian
+		name = arab_events.48.a
+		ENG={
+			country_event={id = arab_events.49}
+		}
+	}
+	option = { ##woo France
+		name = arab_events.48.b
+		FRA={
+			country_event={id = arab_events.49}
+		}
+		
+	}
+	option = { ##woo 
+		name = arab_events.48.c
+		
+	}
+}
+
+country_event = {##ENG/FRA - Omani Envoys
+	id = arab_events.49
+	title = arab_events.49.t
+	desc = {
+		text = arab_events.49.d
+		trigger={tag = ENG}
+	}
+	desc = {
+		text = arab_events.49.da
+		trigger={tag = FRA}
+	}
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##agree to assist for the offered deal
+		name = arab_events.49.a
+		
+	}
+	option = { ##agree to assist for more
+		name = arab_events.49.b
+		
+	}
+	option = { ##ignore them
+		name = arab_events.49.c
+		
+	}
+}
+
+country_event = {##OMA - expansion of the muscat garrison
+	id = arab_events.50
+	title = arab_events.50.t
+	desc = arab_events.50.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Spend a lot
+		name = arab_events.50.a
+		add_manpower=-1000
+		add_political_power=-25
+		294={
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 10760
+			}
+		}
+		
+	}
+	option = { ##Spend a bit
+		name = arab_events.50.b
+		add_manpower=-500
+		add_political_power=-10
+		294={
+			add_building_construction = {
+				type = bunker
+				level = 1
+				instant_build = yes
+				province = 10760
+			}
+		}
+	}
+	option = { ##Spend little 
+		name = arab_events.50.c
+		add_political_power=-5
+		
 	}
 }
