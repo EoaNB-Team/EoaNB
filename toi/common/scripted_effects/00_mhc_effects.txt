@@ -1591,6 +1591,7 @@ mhc_fill_generic_army_advisor = {
 				}
 			}
 			
+			clear_array = local_mhc_generic_army_advisors_array
 			generate_random_array_with_eight_random_numbers = yes
 			for_each_loop = {
 				array = temp_dyn_fill_array
@@ -1608,18 +1609,26 @@ mhc_fill_generic_army_advisor = {
 						###generic advisors have to be saved and read to show generic gfx icons
 						limit = {
 							NOT = {
-								has_variable = local_mhc_army_available_array^i
+								#has_variable = local_mhc_army_available_array^i
+								is_in_array = {
+									array = local_mhc_army_available_array
+									value = v
+								}
 							}
 						}
-						set_variable = { local_mhc_generic_army_advisors_start_at = i }
+						
+						add_to_array = {
+							array = local_mhc_generic_army_advisors_array
+							value = v
+						}
+						
 						#advisor
 						add_to_array = {
 							array = local_mhc_army_available_array
-							value = temp_current_index_counter
+							value = v
 						}
 						
 						#trait
-						generate_random_number_between_one_and_fifty = yes
 						if = {
 							limit = {
 								NOT = {
@@ -1632,10 +1641,25 @@ mhc_fill_generic_army_advisor = {
 								value = 0
 							}
 						}
-						
+						if = {
+							limit = {
+								NOT = {
+									has_variable = local_mhc_army_available_traits_array^v
+								}
+							}
+							resize_array = {
+								array = local_mhc_army_available_traits_array
+								size = v
+							}
+						}
+						remove_from_array = {
+							array = local_mhc_army_available_traits_array
+							index = v
+						}
+						generate_random_number_between_one_and_fifty = yes
 						add_to_array = {
 							array = local_mhc_army_available_traits_array
-							index = temp_current_index_counter
+							index = v
 							value = temp_generated_number_one_fifty
 						}
 					}
@@ -1646,4 +1670,13 @@ mhc_fill_generic_army_advisor = {
 			}
 		}   
 	}       
-}           
+}
+
+mhc_remove_all_army_advisors = {
+	hidden_effect = {
+		clear_array = local_mhc_army_available_traits_array
+		clear_array = local_mhc_army_available_array
+		clear_array = local_mhc_generic_army_advisors_array
+		clear_array = local_mhc_high_available_array
+	}
+}
