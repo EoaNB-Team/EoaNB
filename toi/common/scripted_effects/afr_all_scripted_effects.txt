@@ -1386,3 +1386,104 @@ OMA_muscat_and_oman_divide_increase_3={
 	}
 
 }
+
+afr_company_trust_minor_increase = {
+	add_to_variable = { FROM.company_trust = 1 }
+	clamp_variable = { 
+		var = FROM.company_trust
+		min = 0
+		max = 10
+	}
+}
+
+afr_company_broke_trust = {
+	if = {
+		limit = {
+			check_variable = {
+				var = THIS.company_trust
+				value = 5
+				compare = greater_than
+			}
+		}
+		add_opinion_modifier = {
+			target = FROM
+			modifier = large_decrease
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				var = THIS.company_trust
+				value = 2
+				compare = greater_than
+			}
+		}
+		add_opinion_modifier = {
+			target = FROM
+			modifier = medium_decrease
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = {
+				var = THIS.company_trust
+				value = 0
+				compare = greater_than_or_equals
+			}
+		}
+		add_opinion_modifier = {
+			target = FROM
+			modifier = small_decrease
+		}
+	}
+	set_variable = { THIS.company_trust = 0 }
+}
+
+afr_company_port_effect = {
+	set_country_flag = afr_rrp_colonial_project_active
+	custom_effect_tooltip = afr_colonial_effect_tooltip
+	custom_effect_tooltip = afr_colonial_company_tooltip
+	custom_effect_tooltip = afr_rrp_workforce_migration
+	if = {
+		limit = {
+			ROOT = {
+				has_idea = limited_exports
+			}
+		}
+		swap_ideas = { add_idea = export_focus remove_idea = limited_exports }
+	}
+	else_if = {
+		limit = {
+			ROOT = {
+				has_idea = closed_economy
+			}
+		}
+		swap_ideas = { add_idea = export_focus remove_idea = closed_economy }
+	}
+	hidden_effect = {
+		set_country_flag = afr_rrp_company_port
+		if = {
+			limit = {
+				has_idea = AF_T_idea_trading_nation
+			}
+			swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_3 }
+		}
+		else_if = {
+			limit = {
+				NOT = {
+					has_idea = AF_T_idea_trading_nation_3
+				}
+			}
+			swap_ideas = { add_idea = AF_T_idea_trading_nation_3 remove_idea = AF_T_idea_trading_nation_2 }
+		}
+		else_if = {
+			limit = {
+				AND = {
+					NOT = { has_idea = AF_T_idea_trading_nation_2 }
+					NOT = { has_idea = AF_T_idea_trading_nation_3 }
+				}
+			}
+			add_ideas = AF_T_idea_trading_nation_3
+		}		
+	}
+}
