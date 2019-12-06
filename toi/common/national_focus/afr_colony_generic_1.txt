@@ -362,6 +362,7 @@ focus_tree = {
 		mutually_exclusive = {  focus = afr_colony_generic_focus_gov_decentralized }
 		
 		completion_reward = {
+			add_war_support = 0.15
 			custom_effect_tooltip = afr_colonial_effect_tooltip
 			custom_effect_tooltip = AFR_Racial_Tension_plus_1
 			hidden_effect = {
@@ -408,7 +409,7 @@ focus_tree = {
 	}
 	
 	focus = {
-		id = afr_colony_generic_focus_clear_space_for_industry
+		id = afr_colony_generic_focus_encroach_tribal_lands
 		icon = GFX_focus_generic_provoke_border_clashes
 		x = 6
 		y = 6
@@ -420,6 +421,9 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_centralized_administration }
 		prerequisite = { focus = afr_colony_generic_focus_centralized_army }
 		completion_reward = {
+			random_owned_state = {
+				add_extra_state_shared_building_slots = 2
+			}
 			custom_effect_tooltip = afr_colonial_effect_tooltip
 			custom_effect_tooltip = AFR_Racial_Tension_plus_2
 			hidden_effect = {
@@ -432,7 +436,7 @@ focus_tree = {
 	
 	focus = {
 		id = afr_colony_generic_focus_centralized_army
-		icon = GFX_goal_focus_military_reforms
+		icon = GFX_focus_generic_little_entente
 		x = 7
 		y = 5
 		cost = 75
@@ -442,13 +446,32 @@ focus_tree = {
 		}
 		prerequisite = { focus = afr_colony_generic_focus_gov_centralized }
 		completion_reward = {
-			army_experience = 20
+			#hidden_effect = {
+				ROOT = {
+					division_template = {
+						name = "Colonial Elite Infantry"
+						priority = 2
+						division_names_group = AFR_COLONIAL_INFANTRY_01
+						regiments = {
+							infantry = { x = 0 y = 0 }
+							infantry = { x = 1 y = 0 }
+						}
+					}
+				}
+				random_owned_state ={
+					create_unit = {
+						division = "name = \"Colonial Elite Infantry\" division_template = \"Colonial Elite Infantry\" start_experience_factor = 3.0" 
+						owner = ROOT
+					}
+				}
+			#}
+			custom_effect_tooltip = afr_colony_generic_focus_centralized_army_tooltip
 		}
 	}
 	
 	focus = {
 		id = afr_colony_generic_focus_high_command_reform
-		icon = GFX_focus_generic_military_academy
+		icon = GFX_goal_focus_conscription
 		x = 7
 		y = 7
 		cost = 75
@@ -459,7 +482,7 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_centralized_army }
 		completion_reward = {
 			add_war_support = 0.05
-			army_experience = 5
+			army_experience = 20
 		}
 	}
 	
@@ -498,6 +521,11 @@ focus_tree = {
 		mutually_exclusive = {  focus = afr_colony_generic_focus_gov_centralized }
 		
 		completion_reward = {
+			add_popularity = {
+				ideology = radical_democracy
+				popularity = 0.07
+			}
+			add_war_support = -0.1
 			custom_effect_tooltip = afr_colonial_effect_tooltip
 			custom_effect_tooltip = AFR_Racial_Tension_minus_1
 			hidden_effect = {
@@ -521,8 +549,7 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_gov_decentralized }
 		
 		completion_reward = {
-			add_political_power = 200
-			add_war_support = 0.02
+			add_political_power = -100
 		}
 	}
 	
@@ -554,7 +581,7 @@ focus_tree = {
 	
 	focus = {
 		id = afr_colony_generic_focus_spread_military
-		icon = GFX_focus_generic_military_mission
+		icon = GFX_focus_generic_military_academy
 		x = 15
 		y = 5
 		cost = 120
@@ -565,7 +592,26 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_gov_decentralized }
 		
 		completion_reward = {
-			add_stability = 0.05
+			#hidden_effect = {
+				ROOT = {
+					division_template = {
+						name = "Native Integrated Infantry"
+						priority = 1
+						division_names_group = AFR_NATIVE_INFANTRY_01
+						regiments = {
+							tribal_infantry = { x = 1 y = 0 }
+							infantry = { x = 0 y = 0 }
+						}
+					}
+				}
+				random_owned_state ={
+					create_unit = {
+						division = "name = \"Native Integrated Infantry\" division_template = \"Native Integrated Infantry\" start_experience_factor = 3.0" 
+						owner = ROOT
+					}
+				}
+			#}
+			custom_effect_tooltip = afr_colony_generic_focus_spread_military_tooltip
 		}
 	}
 	
@@ -577,16 +623,39 @@ focus_tree = {
 		cost = 120
 		available_if_capitulated = no
 		ai_will_do = {
-			factor = 1
+			factor = 0.50
+		}
+		available = {
+			custom_trigger_tooltip={
+			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_1
+				check_variable = { detrimental_colonial_impact_value < 15 }
+			}
+			custom_trigger_tooltip={
+			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_2
+				NOT = { has_idea = tribal_slavery }				
+				NOT = { has_idea = usa_slavery_law }
+				NOT = { has_idea = slavery }
+			}
+				
 		}
 		prerequisite = { focus = afr_colony_generic_focus_decentralized_autonomy }
 		prerequisite = { focus = afr_colony_generic_focus_spread_military }
 		completion_reward = {
+			add_popularity = {
+				ideology = anarchism
+				popularity = 0.02
+			}
+			add_popularity = {
+				ideology = social_egalitarianism
+				popularity = 0.05
+			}
+			add_ideas = AFR_colonial_native_reservations
+			custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
 			custom_effect_tooltip = afr_colonial_effect_tooltip
-			custom_effect_tooltip = AFR_Racial_Tension_minus_1
+			custom_effect_tooltip = AFR_Racial_Tension_minus_3
 			hidden_effect = {
 				ROOT = {
-					country_event = {id = afr_rrp_racial_tension_decrease.1}
+					country_event = {id = afr_rrp_racial_tension_decrease.3}
 				}
 			}
 		}
@@ -594,7 +663,7 @@ focus_tree = {
 	
 	focus = {
 		id = afr_colony_generic_focus_native_integrated_command
-		icon = GFX_focus_generic_little_entente
+		icon = GFX_focus_RAJ_indian_gurkhas
 		x = 15
 		y = 7
 		cost = 120
@@ -605,7 +674,19 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_spread_military }
 		
 		completion_reward = {
-			
+			hidden_effect = {
+				create_corps_commander = {
+					name = "Tribal Warlord"
+					picture = "generic_leader_tribe_3.dds"
+					traits = { jungle_rat desert_fox adaptable commando skirmisher}
+					skill = 2
+					attack_skill = 2
+					defense_skill = 2
+					planning_skill = 1
+					logistics_skill = 4
+				}
+			}
+			custom_effect_tooltip = afr_colony_generic_focus_native_integrated_command_tooltip
 		}
 	}
 	
