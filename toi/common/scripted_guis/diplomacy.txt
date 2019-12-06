@@ -12,6 +12,7 @@ scripted_gui = {
 		effects = {	
 		    flag_frame_click = {  
 			    clear_variable = ppcostaddrival
+				clear_variable = ppcostaddrival1
 			    if = {
 				    limit = {
 					    check_variable = { This.id = Root.id }
@@ -39,7 +40,8 @@ scripted_gui = {
 								NOT = {
 								    OR = {
                                         check_variable = { This.id = Root.id } 
-										check_variable = { This.id = rival_country } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
 									}
 								}								
 							}
@@ -70,7 +72,8 @@ scripted_gui = {
 								NOT = {
 								    OR = {
                                         check_variable = { This.id = Root.id } 
-										check_variable = { This.id = rival_country } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
 									}
 								}							
 							}
@@ -102,7 +105,8 @@ scripted_gui = {
 								NOT = {
 								    OR = {
                                         check_variable = { This.id = Root.id } 
-										check_variable = { This.id = rival_country } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
 									}
 								}
                                 is_neighbor_of = ROOT 
@@ -129,7 +133,8 @@ scripted_gui = {
 								NOT = {
 								    OR = {
                                         check_variable = { This.id = Root.id } 
-										check_variable = { This.id = rival_country } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
 									}
 								}
                                 is_neighbor_of = ROOT 
@@ -144,8 +149,9 @@ scripted_gui = {
 					}					
 			    }
 		    }
-		    add_rival_button_click = {  
+		    add_rival_button_click = { 
 			    clear_variable = ppcostaddrival
+				clear_variable = ppcostaddrival1
 			    if = {
 				    limit = {
 					    check_variable = { This.id = Root.id }
@@ -171,7 +177,12 @@ scripted_gui = {
 			                        compare = less_than_or_equals 						
 						        }	
 								NOT = {
-                                check_variable = { This.id = Root.id } }								
+								    OR = {
+                                        check_variable = { This.id = Root.id } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}								
 							}
 							add_to_array = { Root.potential_rivals_array = This.id }
 							add_to_array = { 
@@ -198,7 +209,12 @@ scripted_gui = {
 			                        compare = less_than_or_equals  						
 						        }	
 								NOT = {
-                                check_variable = { This.id = Root.id } }							
+								    OR = {
+                                        check_variable = { This.id = Root.id } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}							
 							}
 							add_to_array = { Root.potential_rivals_array = This.id }
 							add_to_array = { 
@@ -219,14 +235,21 @@ scripted_gui = {
 					    }
 						every_country = {
 						    limit = {
+							    AND = {
                                 check_variable = { 
 			                        var = this.score_array_position_var
                                     value = 40		
 			                        compare = less_than_or_equals  						
 						        }	
 								NOT = {
-                                check_variable = { This.id = Root.id } }
+								    OR = {
+                                        check_variable = { This.id = Root.id } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
                                 is_neighbor_of = ROOT 
+								}
 							}
 							add_to_array = { Root.potential_rivals_array = This.id }
 							add_to_array = { 
@@ -247,7 +270,12 @@ scripted_gui = {
 					    every_country = {
 						    limit = {
 								NOT = {
-                                check_variable = { This.id = Root.id } }
+								    OR = {
+                                        check_variable = { This.id = Root.id } 
+										check_variable = { This.id = Root.rival_country } 
+										check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
                                 is_neighbor_of = ROOT 
 							}
 							add_to_array = { Root.potential_rivals_array = This.id }
@@ -259,7 +287,7 @@ scripted_gui = {
 						}
 					}					
 			    }
-		    }
+			}
 		}
 		
 		dynamic_lists = {
@@ -283,9 +311,7 @@ scripted_gui = {
 		}
 
 		ai_enabled = {
-		    NOT = {
-			    has_variable = rival_country
-			}
+		    always = no 
 		}	
 	}
 	
@@ -293,7 +319,7 @@ scripted_gui = {
         context_type = player_context
 		window_name = "rival_country3_gui" 
 		#parent_window_token = selected_country_view_info
-	    		ai_test_parent = "rival_country_gui"
+
 		visible = {
 		    check_variable = { show_rivals_button > 0 }
 		}
@@ -387,7 +413,7 @@ scripted_gui = {
 			      	NOT = {
 					    has_country_flag = eoanbdiplomacy_rival_cooldown
 				    }
-				    has_political_power > 100
+				    has_political_power > var:ppcostaddrival1 
 				}
 				var:potential_rivals_array^i = {
 				    NOT = {
@@ -395,13 +421,11 @@ scripted_gui = {
 						    has_non_aggression_pact_with = ROOT 
 						    is_in_faction_with = ROOT 
 						    has_guaranteed = ROOT 
-							gives_military_access_to = ROOT 
-							has_military_access_to = ROOT 
 							is_puppet_of = ROOT 
                             is_subject_of = ROOT 
- 							has_opinion = {
+						    has_opinion = {
                                 target = ROOT 
-                                value > 0 
+                                value > 9  
                             }
 						}
 					}
@@ -410,9 +434,7 @@ scripted_gui = {
 		}
 		
 		ai_enabled = {
-		    NOT = {
-			    has_variable = rival_country
-			}
+            always = no 
 		}	
 	}
 	
@@ -421,11 +443,312 @@ scripted_gui = {
 		window_name = "favoured_country_gui" 
 		parent_window_token = selected_country_view_info
 		
-		visible = {
-		    THIS = { has_variable = most_favoured_country }   
+		visible = {  
 		}
 		  
 		effects = {	
+		    flag_frame2_click = {  
+			    clear_variable = ppcostaddmostfavoured
+				clear_variable = ppcostaddmostfavoured1
+			    if = {
+				    limit = {
+					    check_variable = { This.id = Root.id }
+					}
+                    set_temp_variable = { show_button2 = 1 }
+                    subtract_from_temp_variable = { show_button2 = show_most_favoured_button }
+                    set_variable = { show_most_favoured_button = show_button2 }	
+					clear_array = Root.potential_most_favoured_array
+					clear_array = Root.potential_most_favoured_check_array
+					if = {
+					    limit = {
+                            check_variable = { 
+			                    var = this.score_array_position_var
+                                value = 8		
+			                    compare = less_than_or_equals 						
+						    }					           
+					    }
+						every_country = {
+						    limit = {
+							    OR = {
+                                    check_variable = { 
+			                            var = this.score_array_position_var
+                                        value = 8		
+			                            compare = less_than_or_equals 						
+						            }	
+									is_neighbor_of = ROOT 
+								}
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}								
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }
+					if = {
+					    limit = {
+                            check_variable = { this.score_array_position_var >  8 }		
+                            check_variable = { 
+			                var = this.score_array_position_var
+                            value = 16 		
+			                compare = less_than_or_equals 
+			                }					           
+					    }
+						every_country = {
+						    limit = {
+							    OR = {
+                                    check_variable = { 
+			                            var = this.score_array_position_var
+                                        value = 16		
+			                            compare = less_than_or_equals  						
+						            }	
+									is_neighbor_of = ROOT 
+								}
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}						
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }	
+					if = {
+					    limit = {
+                            check_variable = { this.score_array_position_var >  16 }		
+                            check_variable = { 
+		                       	var = this.score_array_position_var
+                                value = 40 		
+		                     	compare = less_than_or_equals 
+			                }				           
+					    }
+						every_country = {
+						    limit = {
+                                check_variable = { 
+			                        var = this.score_array_position_var
+                                    value = 40		
+			                        compare = less_than_or_equals  						
+						        }	
+								is_neighbor_of = ROOT 
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }
+                    if = {
+					    limit = {
+                            check_variable = { 
+			                    var = this.score_array_position_var
+                                value = 40		
+			                    compare = greater_than   						
+						    }						
+						}
+					    every_country = {
+						    limit = {
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
+                                is_neighbor_of = ROOT 
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+					}					
+			    }					
+		    }
+		   add_most_favoured_button_click = {  
+			    clear_variable = ppcostaddmostfavoured
+				clear_variable = ppcostaddmostfavoured1
+			    if = {
+				    limit = {
+					    check_variable = { This.id = Root.id }
+					}
+                    set_temp_variable = { show_button2 = 1 }
+                    subtract_from_temp_variable = { show_button2 = show_most_favoured_button }
+                    set_variable = { show_most_favoured_button = show_button2 }	
+					clear_array = Root.potential_most_favoured_array
+					clear_array = Root.potential_most_favoured_check_array
+					if = {
+					    limit = {
+                            check_variable = { 
+			                    var = this.score_array_position_var
+                                value = 8		
+			                    compare = less_than_or_equals 						
+						    }					           
+					    }
+						every_country = {
+						    limit = {
+							    OR = {
+                                    check_variable = { 
+			                            var = this.score_array_position_var
+                                        value = 8		
+			                            compare = less_than_or_equals 						
+						            }	
+									is_neighbor_of = ROOT 
+								}
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}								
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }
+					if = {
+					    limit = {
+                            check_variable = { this.score_array_position_var >  8 }		
+                            check_variable = { 
+			                var = this.score_array_position_var
+                            value = 16 		
+			                compare = less_than_or_equals 
+			                }					           
+					    }
+						every_country = {
+						    limit = {
+							    OR = {
+                                    check_variable = { 
+			                            var = this.score_array_position_var
+                                        value = 16		
+			                            compare = less_than_or_equals  						
+						            }	
+									is_neighbor_of = ROOT 
+								}
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}						
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }	
+					if = {
+					    limit = {
+                            check_variable = { this.score_array_position_var >  16 }		
+                            check_variable = { 
+		                       	var = this.score_array_position_var
+                                value = 40 		
+		                     	compare = less_than_or_equals 
+			                }				           
+					    }
+						every_country = {
+						    limit = {
+                                check_variable = { 
+			                        var = this.score_array_position_var
+                                    value = 40		
+			                        compare = less_than_or_equals  						
+						        }	
+								is_neighbor_of = ROOT 
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+                    }
+                    if = {
+					    limit = {
+                            check_variable = { 
+			                    var = this.score_array_position_var
+                                value = 40		
+			                    compare = greater_than   						
+						    }						
+						}
+					    every_country = {
+						    limit = {
+								NOT = {
+								    OR = {
+							    		is_puppet = yes
+							    		is_subject = yes 
+										check_variable = { This.id = Root.id } 
+							    		check_variable = { This.id = Root.rival_country } 
+							    		check_variable = { This.id = Root.most_favoured_country } 
+									}
+								}
+                                is_neighbor_of = ROOT 
+							}
+							add_to_array = { Root.potential_most_favoured_array = This.id }
+							add_to_array = { 
+							    array = Root.potential_most_favoured_check_array 
+								index = Root.potential_most_favoured_array
+								value = 0 
+							}
+						}
+					}					
+			    }
+		    }
 		}
 		
 		dynamic_lists = {
@@ -435,36 +758,147 @@ scripted_gui = {
 		}
 		
 		triggers = {
+		    add_most_favoured_button_visible = {
+			    NOT = {
+				    has_variable = most_favoured_country
+				}
+			}
+			flag2_visible = {
+			    has_variable = most_favoured_country
+			}
+			flag_frame2_visible = {
+			    has_variable = most_favoured_country
+			}
+		}
+		
+		ai_enabled = {
+            always = no 
 		}
 
 		ai_weights = {
 		}
 	}	
 	
-	favourite_country2_gui = { 
-        context_type = selected_country_context
-		window_name = "favoured_country2_gui" 
-		parent_window_token = selected_country_view_info
-		
+	favourite_country3_gui = { 
+        context_type = player_context
+		window_name = "favoured_country3_gui" 
+		#parent_window_token = selected_country_view_info
+
 		visible = {
-		    NOT = { THIS = { has_variable = most_favoured_country } }
+		    check_variable = { show_most_favoured_button > 0 }
 		}
-		  
-		effects = {	
+		      
+		effects = {	 
+		    flag_click = {
+			    clear_variable = ppcostaddmostfavoured
+				clear_variable = ppcostaddmostfavoured1
+				set_variable = { ppcostaddmostfavoured = -200 }
+				if = {
+				    limit = {
+					    var:potential_most_favoured_array^i = {
+						    any_owned_state = {
+							    OR = {
+							        is_claimed_by = ROOT.ROOT 
+									is_core_of = ROOT 
+								}
+							}
+						}
+					}
+					add_to_variable = { ppcostaddmostfavoured = 50 }
+				}
+				set_variable = { ppcostaddmostfavoured1 = ppcostaddmostfavoured }
+				multiply_variable = { ppcostaddmostfavoured1 = -1 }
+			    set_temp_variable = { index = i }
+                for_each_loop = {
+                    array = Root.potential_most_favoured_array
+					
+                    set_variable = { Root.potential_most_favoured_check_array^i = 0 }
+                } 
+			    set_variable = { Root.potential_most_favoured_check_array^index = 1 }
+			    #set_variable = { rival_country = v }
+			}
+			confirm_click = {
+			    add_political_power = var:ppcostaddmostfavoured
+                set_country_flag = eoanbdiplomacy_most_favoured_cooldown 
+					country_event = {
+					    id = eoanbdiplomacy.3  
+						days = 1825 
+					}
+				if = {
+				    limit = {
+					    has_variable = most_favoured_country
+					}
+                    meta_effect = {
+                        text = {
+                            remove_opinion_modifier = {
+                                target = [MOST_FAVOURED]
+                                modifier = most_favoured_country
+                            }
+                        }
+                        MOST_FAVOURED = "[?most_favoured_country.GetTag]"
+                    }
+				}
+				set_variable = { most_favoured_country =  Root.potential_most_favoured_array^i }
+                meta_effect = {
+                    text = {
+                        add_opinion_modifier = {
+                            target = [MOST_FAVOURED]
+                            modifier = most_favoured_country
+                        }
+                    }
+                    MOST_FAVOURED = "[?most_favoured_country.GetTag]"
+                }
+			}
+			close_button_click = {
+                    set_temp_variable = { show_button2 = 1 }
+                    subtract_from_temp_variable = { show_button2 = show_most_favoured_button }
+                    set_variable = { show_most_favoured_button = show_button2 }				
+			}
 		}
 		
 		dynamic_lists = {
+			show_grid = {
+				array = Root.potential_most_favoured_array
+				entry_container = show_entry_potential_most_favoured
+			} 
 		}
 		properties = {
-			
+			flag = { image = "[?Root.potential_most_favoured_array^i.GetFlag]" } 
 		}
 		
 		triggers = {
+		    confirm_visible = {
+			    var:potential_most_favoured_array^i  = {
+			        check_variable = { Root.potential_most_favoured_check_array^i = 1 }
+                }
+			}
+			confirm_click_enabled = {
+			    ROOT = {
+			      	NOT = {
+					    has_country_flag = eoanbdiplomacy_most_favoured_cooldown
+				    }
+				    has_political_power > var:ppcostaddmostfavoured1
+				}
+				var:potential_most_favoured_array^i = {
+					    OR = {
+						    has_non_aggression_pact_with = ROOT 
+						    is_in_faction_with = ROOT 
+						    has_guaranteed = ROOT 
+							is_puppet_of = ROOT 
+                            is_subject_of = ROOT 
+ 						    has_opinion = {
+                                target = ROOT 
+                                value > 9  
+                            }
+						}
+				}
+			}
 		}
-
-		ai_weights = {
-		}
-	}	
+		
+		ai_enabled = {
+		    always = no 
+		}	
+	}
 	
 	topbar_modded_tension = { 
         context_type = player_context 
@@ -488,6 +922,9 @@ scripted_gui = {
 
 		ai_weights = {
 		}
+		ai_enabled = {
+		    always = no 
+		}	
 	}	
 	
 	justify_wargoal_gui = { 
@@ -527,5 +964,8 @@ scripted_gui = {
 
 		ai_weights = {
 		}
+		ai_enabled = {
+		    always = no 
+		}	
 	}
 }
