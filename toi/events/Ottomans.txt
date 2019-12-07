@@ -1,4 +1,445 @@
 ﻿add_namespace = OTO_battleofgrahovac
+add_namespace = OTO_Succession
+add_namespace = OTO_general_death
+add_namespace = OTO_vassal_tribute
+add_namespace = OTO_events
+
+#Tribute payment from the vassals
+country_event = {
+	id = OTO_vassal_tribute.1
+	title = OTO_vassal_tribute.1.t
+	desc = OTO_vassal_tribute.1.d
+	picture = GFX_event_test
+	
+	trigger = {
+		date > 1858.1.1
+		ROOT = {
+			AND = {
+				is_subject_of = OTO
+				OR = {
+					has_autonomy_state = autonomy_eyalet
+					has_autonomy_state = autonomy_khedive
+				}
+				NOT = {
+					has_idea = OTO_paid_tribute
+				}
+			}
+		}
+	}
+	mean_time_to_happen = { days = 2 }
+	hidden = yes
+	
+	immediate = {
+		OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.2 } }
+		add_timed_idea = {
+			idea = OTO_paid_tribute
+			days = 365
+		}
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.2
+	title = OTO_vassal_tribute.2.t
+	desc = { 
+		text =  OTO_vassal_tribute.2.descEyalet
+		trigger = { 
+			AND = {
+				has_autonomy_state = autonomy_eyalet
+				NOT = {
+					has_country_flag = OTO_loyalty_enforced
+				}
+			}
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.2.descEyaletEnforced
+		trigger = { 
+			AND = {
+				has_autonomy_state = autonomy_eyalet
+				has_country_flag = OTO_loyalty_enforced
+			}
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.2.descKhedive
+		trigger = {
+			has_autonomy_state = autonomy_khedive
+		}
+	}
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_vassal_tribute.2.a
+		trigger = {
+			has_autonomy_state = autonomy_eyalet
+			NOT = {
+				has_country_flag = OTO_loyalty_enforced
+			}
+		}
+		ai_chance = {
+			factor = 50
+		}
+		add_political_power = -50
+		hidden_effect = {
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.3} }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.2.b
+		trigger = {
+			has_autonomy_state = autonomy_khedive
+		}
+		ai_chance = {
+			factor = 50 
+		}
+		add_political_power = -25
+		hidden_effect = {
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.3} }
+		}
+	}
+	 option = {
+		name = OTO_vassal_tribute.2.c
+		trigger = {
+			has_country_flag = OTO_loyalty_enforced
+		}
+		add_political_power = -100
+		hidden_effect = {
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.3} }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.2.d
+		trigger = { 
+			NOT = { has_country_flag = OTO_loyalty_enforced }
+		}
+		hidden_effect = {
+			OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.4} }
+		}
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.3
+	title = OTO_vassal_tribute.3.t
+	desc = { 
+		text =  OTO_vassal_tribute.3.descEyalet
+		trigger = { 
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.3.descKhedive
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+	}
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = { 
+		name = OTO_vassal_tribute.3.a
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_eyalet }
+			NOT = {
+				FROM = { has_country_flag = OTO_loyalty_enforced }
+			}
+		}
+		add_political_power = 50
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.3.b
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+		add_political_power = 25
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.3.c
+		trigger = {
+			FROM = { has_country_flag = OTO_loyalty_enforced}
+		}
+		add_political_power = 100
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.4
+	title = OTO_vassal_tribute.4.t
+	desc = { 
+		text =  OTO_vassal_tribute.4.descEyalet
+		trigger = { 
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+	}
+	desc = { 
+		text =  OTO_vassal_tribute.4.descKhedive
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+	}
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = { 
+		name = OTO_vassal_tribute.4.a
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_eyalet }
+		}
+		ROOT = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_free
+			}
+			declare_war_on = {
+				target = FROM
+				type = puppet_wargoal_focus
+			}
+			FROM = { add_ideas = hidden_idea_never_surrender }
+		}
+		hidden_effect = {
+			FROM = { set_country_flag = OTO_rebellious_vassal }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.4.b
+		trigger = {
+			FROM = { has_autonomy_state = autonomy_khedive }
+		}
+		ROOT = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_free
+			}
+			declare_war_on = {
+				target = FROM
+				type = puppet_wargoal_focus
+			}
+			FROM = { add_ideas = hidden_idea_never_surrender }
+		}
+		hidden_effect = {
+			FROM = { set_country_flag = OTO_rebellious_vassal }
+		}
+	}
+	
+	option = {
+		name = OTO_vassal_tribute.4.c
+	}
+}
+
+
+country_event = {
+	id = OTO_vassal_tribute.5
+	title = OTO_vassal_tribute.5.t
+	desc = OTO_vassal_tribute.5.d
+	picture = GFX_event_test
+	
+	trigger = {
+		ROOT = { 
+			AND = {
+				has_country_flag = OTO_rebellious_vassal
+				has_war_with = OTO
+				surrender_progress > 0.4
+			}
+		}
+	}
+	mean_time_to_happen = { days = 2 }
+	hidden = yes
+	
+	immediate = {
+		OTO = { country_event = { hours = 1 id = OTO_vassal_tribute.5 } }
+		every_country = {
+			if = {
+				limit = { has_war_together_with = ROOT }
+			}
+			white_peace = OTO
+		}
+		ROOT = { clr_country_flag = OTO_rebellious_vassal }
+		
+	}
+}
+
+country_event = {
+	id = OTO_vassal_tribute.6
+	title = OTO_vassal_tribute.6.t
+	desc = OTO_vassal_tribute.6.d
+	picture = GFX_event_test
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_vassal_tribute.6.a 
+		ROOT = { white_peace = FROM }
+		ROOT = { 
+			set_autonomy = {
+				target = FROM
+				autonomy_state = autonomy_eyalet
+			}
+		}
+		ROOT = { add_political_power = 100 }
+		hidden_effect= {
+			FROM = { set_country_flag = OTO_loyalty_enforced }
+			FROM = { add_political_power = -100 }
+		}
+	}
+}	
+			
+	
+#Death of Abdulmajid I and Abdulaziz Succesion
+country_event = {
+	id = OTO_Succession.1 
+	title = OTO_Succession.1.t
+	desc = OTO_Succession.1.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1861.6.25
+	}
+
+	option = {
+		name = OTO_Succession.1.a
+		ai_chance = { factor = 100 }
+		add_political_power = -15
+		kill_country_leader = yes
+		remove_unit_leader = 1876
+
+		create_country_leader = {
+			name = "Abdulaziz"
+			desc = "POLITICS_ABDULAZIZ_DESC"
+			picture = "Portrait_OTO_Abdulaziz_I.dds"
+			expire = "1876.5.30"
+			ideology = constit_monarch
+		}
+		create_field_marshal = {
+			name = "Abdulaziz"
+			  picture = "Portrait_OTO_Abdulaziz_I.dds"
+			  id = 1884
+			  traits = { }
+			  skill = 1
+			  attack_skill = 1
+			  defense_skill = 1
+			  planning_skill = 1
+			  logistics_skill = 1
+		}
+	}
+}
+
+#Death of General Omar Pasha
+country_event = {
+	id = OTO_general_death.1
+	title = OTO_general_death.1.t
+	desc = OTO_general_death.1.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1871.4.17
+	}
+	
+	hidden = yes
+	
+	immediate = {
+		remove_unit_leader = 1877
+	}
+}
+
+#Death of General Osman Pasha
+country_event = {
+	id = OTO_general_death.2
+	title = OTO_general_death.2.t
+	desc = OTO_general_death.2.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1900.4.5
+	}
+	
+	hidden = yes
+	
+	immediate = {
+		remove_unit_leader = 1878
+	}
+}
+
+#Death of General Selim Begu Mustafa
+country_event = {
+	id = OTO_general_death.3
+	title = OTO_general_death.3.t
+	desc = OTO_general_death.3.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1883.02.19
+	}
+	
+	hidden = yes
+	
+	immediate = {
+		remove_unit_leader = 1879
+	}
+}
+
+#Death of General İskender Pasha
+country_event = {
+	id = OTO_general_death.4
+	title = OTO_general_death.4.t
+	desc = OTO_general_death.4.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1861.6.1
+	}
+	
+	hidden = yes
+	
+	immediate = {
+		remove_unit_leader = 1881
+	}
+}
+		
+#Death of General Abdülkerim Nadir Pasha
+country_event = {
+	id = OTO_general_death.5
+	title = OTO_general_death.5.t
+	desc = OTO_general_death.5.d
+	picture = report_event_likfard
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = OTO
+		date > 1883.6.1
+	}
+	
+	hidden = yes
+	
+	immediate = {
+		remove_unit_leader = 1882
+	}
+}
 
 ##Montenegrin Resistance
 country_event = {
@@ -21,11 +462,19 @@ country_event = {
 		MNT = {
 			country_event = {days = 1 id = OTO_battleofgrahovac.2}
 		}
+		set_autonomy = {
+			target = MNT
+			autonomy_state = autonomy_free
+		}
 	}
 	
 	option = {
 		name = OTO_battleofgrahovac.1.b
 		ai_chance = { factor = 1}
+		set_autonomy = {
+			target = MNT
+			autonomy_state = autonomy_free
+		}
 	}
 }
 
@@ -70,7 +519,12 @@ country_event = {
 			TAG = OTO
 		}
 		ai_chance = { factor = 1}
-		OTO = { puppet = MNT }
+		OTO = { 
+			set_autonomy = {
+				target = MNT
+				autonomy_state = autonomy_eyalet
+			}
+		}
 	}
 	
 	option = {
@@ -143,7 +597,7 @@ country_event = {
 	desc = OTO_battleofgrahovac.5.desc
 	picture = GFX_event_test
 
-	fire_only_once = yes
+	is_triggered_only = yes
 
 	option = {
 		name = OTO_battleofgrahovac.5.a
@@ -159,6 +613,7 @@ country_event = {
 	picture = GFX_event_test
 	
 	fire_only_once = yes
+	is_triggered_only = yes
 	
 	option = {
 		name = OTO_battleofgrahovac.6.a
@@ -183,6 +638,120 @@ country_event = {
 	}
 }
 
+country_event = {#OTO - Religion question
+	id = OTO_events.1
+	title = OTO_events.1.t
+	desc = OTO_events.1.d
+	picture = GFX_event_test
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_events.1.a
+		ai_chance = { factor = 1}
+	}
 
+	option = {
+		name = OTO_events.1.b
+		ai_chance = { factor = 1}
+		
+	}
+}
 
+country_event = {#debt_question
+	id = OTO_events.2
+	title = OTO_events.2.t
+	desc = OTO_events.2.d
+	picture = GFX_event_test
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_events.2.a
+		ai_chance = { factor = 1}
+		unlock_national_focus = OTO_vic_save_money
+		swap_ideas={
+			add_idea = OTO_crimean_war_debt_save_1
+			remove_idea = OTO_crimean_war_debt
+		}
+	}
 
+	option = {
+		name = OTO_events.2.b
+		ai_chance = { factor = 1}
+		unlock_national_focus = OTO_vic_increase_spending
+		swap_ideas={
+			add_idea = OTO_crimean_war_debt_spend_1
+			remove_idea = OTO_crimean_war_debt
+		}
+		
+	}
+}
+
+country_event = {#OTO - question of the grand vizers pay
+	id = OTO_events.3
+	title = OTO_events.3.t
+	desc = OTO_events.3.d
+	picture = GFX_event_test
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {#increase
+		name = OTO_events.3.a
+		ai_chance = { factor = 1}
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = 0.05
+		}
+	}
+	
+	option = {#status Quo
+		name = OTO_events.3.b
+		ai_chance = { factor = 1}
+		add_stability = 0.02
+	}
+
+	option = {#reduce
+		name = OTO_events.3.c
+		ai_chance = { factor = 1}
+		add_popularity = {
+			ideology = centrism
+			popularity = 0.05
+		}
+		
+	}
+}
+
+country_event = {#OTO - Religion question
+	id = OTO_events.4
+	title = OTO_events.4.t
+	desc = OTO_events.4.d
+	picture = GFX_event_test
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = OTO_events.4.a
+		ai_chance = { factor = 1}
+		#has_country_leader 
+		create_country_leader = {
+			name = "Abdulmecid"
+			desc = "POLITICS_ABDULMECID_DESC"
+			picture = "gfx/leaders/OTO/Portrait_OTO_Abdulmecid.dds"
+			expire = "1861.6.1"
+			ideology = conserv_liberal
+			traits = {
+				
+			}
+		}
+		#set_country_leader_ideology = conserv_liberal
+		set_politics = {
+			ruling_party = centrism
+		}
+	}
+
+}

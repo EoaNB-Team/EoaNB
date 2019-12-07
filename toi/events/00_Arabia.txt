@@ -113,12 +113,17 @@ country_event = {##OMA - ZAN Declares Independance
 	
 	option = { ##Bring them to Heel
 		name = arab_events.5.a
+		trigger={
+			has_manpower > 10000
+			PS_pol_positive_null = yes
+		}
 		declare_war_on = {
 			target = FROM
 			type = annex_everything
 		}
 		hidden_effect = {
 			ZAN = {add_ideas = {ZAN_brothers_war}}
+			activate_mission = OMA_ZAN_Brothers_War
 		}
 		set_country_flag = OMA_brothers_war
 	}
@@ -234,6 +239,15 @@ country_event = {##ENG - OMA demands we hand over TCS
 				factor = 2
 				SRS = {exists = yes}
 			}
+			modifier = {
+				factor = 2
+				SRS = {
+					AND={
+						exists = yes 
+						has_war = no
+					}
+				}
+			}
         }
 		FROM={
 			set_autonomy = {
@@ -312,6 +326,7 @@ country_event = {##end of the OMA-ZAN war
 	
 	immediate = { ##ok
 		OMA={
+			increase_ps_by_two = yes
 			clr_country_flag = OMA_brothers_war
 			white_peace = ZAN
 			white_peace = MOM
@@ -658,6 +673,12 @@ country_event = {##OMA - Founding of somalia
 			target = SOM
 			autonomy_state = autonomy_colony
 		}
+		SOM={
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
+		}
 		
 	}
 	option = { ##consolidate under MAJ
@@ -677,6 +698,10 @@ country_event = {##OMA - Founding of somalia
 		}
 		MAJ={
 			set_cosmetic_tag = SOM_OMA_colony
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
 			if={
 				limit = {
 					NOT={
@@ -725,6 +750,10 @@ country_event = {##OMA - Founding of somalia
 		}
 		GLD={
 			set_cosmetic_tag = SOM_OMA_colony
+			set_political_party = {
+				ideology = autocracy
+				popularity = 100
+			}
 			if={
 				limit = {
 					NOT={
@@ -890,14 +919,14 @@ country_event = {##OMA - Finalise foreign policy
 		}
 	}
 	option = { ##remain a trading nation
-		name = arab_events.29.b
+		name = arab_events.29.c
 		ai_chance = { 
             factor = 5
         }
 		add_stability = 0.025
 	}
 	option = { ##cut ourselves off
-		name = arab_events.29.c
+		name = arab_events.29.e
 		ai_chance = { 
             factor = 5
         }
@@ -946,5 +975,1048 @@ country_event = {###ZAN - OMA tribute is due
             factor = 90
         }
 		OMA = {country_event = {id = arab_events.5}}
+	}
+}
+
+country_event = {##OMA demands annexation of MAH
+	id = arab_events.31
+	title = arab_events.31.t
+	desc = arab_events.31.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Accept
+		name = arab_events.31.a
+		ai_chance = { 
+            factor = 80
+        }
+		OMA={transfer_state = 1196}
+	}
+	option = { ##Decline
+		name = arab_events.31.b
+		ai_chance = { 
+            factor = 20
+        }
+		OMA={country_event = {id = arab_events.35}}
+	}
+}
+country_event = {##OMA intervention into MAH
+	id = arab_events.32
+	title = arab_events.32.t
+	desc = arab_events.32.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##use diplomatic means
+		name = arab_events.32.a
+		ai_chance = { 
+            factor = 80
+        }
+		add_political_power = -20
+		MAH = {country_event = {id = arab_events.31 days = 3}}
+	}
+	option = { ##use military means
+		name = arab_events.32.b
+		ai_chance = { 
+            factor = 20
+        }
+		start_border_war = {
+			change_state_after_war = no
+			attacker = {
+				state = 294
+				num_provinces = 1
+				on_win = arab_events.33
+				on_lose = arab_events.34
+			}
+					
+			defender = {
+				state = 1196
+				num_provinces = 1
+				on_win = arab_events.34
+				on_lose = arab_events.33
+			}
+		}
+		hidden_effect={
+			set_border_war_data = {
+				attacker = 294
+				defender = 1196
+				combat_width = 15
+			}
+		}
+		activate_mission = OMA_MAH_War
+	}
+}
+country_event = {##OMA wins vs MAH
+	id = arab_events.33
+	title = arab_events.33.t
+	desc = arab_events.33.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##great
+		name = arab_events.33.a
+		ai_chance = { 
+            factor = 80
+        }
+		OMA={
+			transfer_state = 1196
+			add_state_core = 1196
+		}
+	}
+}
+country_event = {##MAH wins vs OMA
+	id = arab_events.34
+	title = arab_events.34.t
+	desc = {
+		text = arab_events.34.d
+		trigger={tag = OMA}
+	}
+	desc = {
+		text = arab_events.34.da
+		trigger = {NOT ={tag = OMA}}
+	}
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	
+	option = { ##Accept
+		name = arab_events.34.a
+		trigger={tag = OMA}
+		add_stability = -0.05
+		add_political_power = -50
+		set_country_flag = OMA_lost_MAH_war
+	}
+	option = { ##Accept
+		name = arab_events.34.b
+		ai_chance = { 
+            factor = 80
+        }
+		trigger={
+			tag = MAH
+		}
+		ADN = {country_event = {id = arab_events.43 days = 3}}
+	}
+	option = { ##Accept
+		name = arab_events.34.c
+		ai_chance = { 
+            factor = 20
+        }
+		trigger={
+			tag = MAH
+		}
+	}
+}
+country_event = {##MAH refuses
+	id = arab_events.35
+	title = arab_events.35.t
+	desc = arab_events.35.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##invade
+		name = arab_events.35.b
+		ai_chance = { 
+            factor = 70
+        }
+		add_stability = -0.05
+		start_border_war = {
+			change_state_after_war = no
+			attacker = {
+				state = 294
+				num_provinces = 1
+				on_win = arab_events.33
+				on_lose = arab_events.34
+			}
+					
+			defender = {
+				state = 1196
+				num_provinces = 1
+				on_win = arab_events.34
+				on_lose = arab_events.33
+			}
+		}
+		set_border_war_data = {
+			attacker = 294
+			defender = 1196
+			combat_width = 15
+		}
+		activate_mission = OMA_MAH_War
+	}
+	option = { ##continue to work on MAH
+		name = arab_events.35.b
+		ai_chance = { 
+            factor = 30
+        }
+	}
+}
+country_event = {##MAH - Aden offer protection
+	id = arab_events.36
+	title = arab_events.36.t
+	desc = arab_events.36.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Accept
+		name = arab_events.36.a
+		ai_chance = {
+            factor = 100
+        }
+		ADN={
+			puppet = ROOT
+			country_event={id = arab_events.38}
+		}
+	}
+	option = { ##refuse
+		name = arab_events.36.b
+		ai_chance = {
+            factor = 0
+        }
+	}
+}
+country_event = {##ADN - expansion into Hadhramaut
+	id = arab_events.37
+	title = arab_events.37.t
+	desc = arab_events.37.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger={
+		date > 1862.01.01
+		date < 1870.01.01
+		MAH = {
+			exists = yes
+			is_subject = no
+		}
+		tag = ADN
+	}
+	mean_time_to_happen={
+		days = 60
+	}
+	
+	option = { ##agreed, send a delegation to MAH
+		name = arab_events.37.a
+		ai_chance = {
+            factor = 100
+        }
+		MAH = {
+			country_event={id = arab_events.36 days = 2}
+		}
+	}
+	option = { ##refuse
+		name = arab_events.37.b
+		ai_chance = {
+            factor = 0
+        }
+	}
+}
+country_event = {##ADN - MAH agrees
+	id = arab_events.38
+	title = arab_events.38.t
+	desc = arab_events.38.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##great
+		name = arab_events.38.a
+	}
+}
+country_event = {##ADN - establish control of Hadhramaut
+	id = arab_events.39
+	title = arab_events.39.t
+	desc = arab_events.39.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	#is_triggered_only = yes
+	trigger={
+		date > 1886.01.01
+		date < 1895.01.01
+		tag = ADN
+		OR={
+			MAH = {is_subject_of = ADN}
+		}
+	}
+	mean_time_to_happen={
+		days = 60
+	}
+	
+	option = { ##agreed, sign the deal
+		name = arab_events.39.a
+		ai_chance = {
+            factor = 100
+        }
+		annex_country = { target = MAH transfer_troops = yes }
+		hidden_effect ={country_event={id = arab_events.40 days = 720}}
+	}
+	option = { ##refuse
+		name = arab_events.39.b
+		ai_chance = {
+            factor = 0
+        }
+	}
+}
+country_event = {##ADN - finish control over Hadhramaut
+	id = arab_events.40
+	title = arab_events.40.t
+	desc = arab_events.40.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##send the envoys
+		name = arab_events.40.a
+		ai_chance = {
+            factor = 100
+        }
+		QUA={country_event={id = arab_events.41 days = 2}}
+		KAT={country_event={id = arab_events.41 days = 2}}
+	}
+	option = { ##refuse
+		name = arab_events.40.b
+		ai_chance = {
+            factor = 0
+        }
+	}
+}
+country_event = {##QUA/KAT - Aden offer integration
+	id = arab_events.41
+	title = arab_events.41.t
+	desc = arab_events.41.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Accept
+		name = arab_events.41.a
+		ai_chance = {
+            factor = 100
+        }
+		FROM={
+			annex_country = { target = ROOT transfer_troops = yes }
+			country_event={id = arab_events.42 days = 2}
+		}
+	}
+	option = { ##refuse
+		name = arab_events.41.b
+		ai_chance = {
+            factor = 0
+        }
+	}
+}
+country_event = {##ADN - QUA/KAT accept
+	id = arab_events.42
+	title = arab_events.42.t
+	desc = arab_events.42.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Accept
+		name = arab_events.42.a
+		ai_chance = {
+            factor = 100
+        }
+	}
+}
+country_event = {##ADN - MAH has offered to submit
+	id = arab_events.43
+	title = arab_events.43.t
+	desc = arab_events.43.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##great
+		name = arab_events.43.a
+		puppet = FROM
+	}
+}
+country_event = {##OMA - death of Thuwaini
+	id = arab_events.44
+	title = arab_events.44.t
+	desc = arab_events.44.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag=OMA
+		date>1866.04.01
+		date<1872.01.01
+	}
+	mean_time_to_happen={
+		days = 100
+	}
+	
+	immediate={
+		#retire_country_leader = yes
+		create_country_leader = {
+			name = "Salim bin Thuwaini"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_OMA_Salim_bin_Thuwaini.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+		complete_national_focus = oma_vic_death_of_thuwaini
+	}
+	
+	option = { ##long live Salim
+		name = arab_events.44.a
+		hidden_effect={
+			if={
+				limit={
+					OR={
+						has_idea = OMA_oman_muskat_divide
+						has_idea = OMA_oman_muskat_divide_2
+						has_idea = OMA_oman_muskat_divide_3
+						has_idea = OMA_oman_muskat_divide_4
+						has_idea = OMA_oman_muskat_divide_5
+						has_idea = OMA_increasing_oman_muskat_divide
+					}
+				}
+				country_event = {id = arab_events.45 days = 400 random = 200}
+			}
+			else={
+			
+			}
+		}
+	}
+}
+country_event = {##OMA - Imamate  of Oman Disputed
+	id = arab_events.45
+	title = arab_events.45.t
+	desc = arab_events.45.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	immediate={
+		hidden_effect={
+			797={
+				set_demilitarized_zone = yes
+			}
+			add_popularity = {
+				ideology = fundamentalism
+				popularity = 0.15
+			}
+		}	
+	}
+	
+	option = { ##Reconize Azzam
+		name = arab_events.45.a
+		random_list={
+			75={
+				custom_effect_tooltip = Azzan_marches_east
+				hidden_effect={
+					country_event = {id = arab_events.46 days = 60 random = 60}
+					set_country_flag=Azzan_marches_east
+				}
+			}
+			25={
+				custom_effect_tooltip = Azzan_accepts_deal
+				hidden_effect={
+					country_event = {id = arab_events.46 days = 60 random = 60}
+					set_country_flag=Azzan_accepts_deal
+				}
+			}
+		}
+	}
+	option = { ##fight for Salim
+		name = arab_events.45.b
+		country_event = {id = arab_events.47 days = 60 random = 60}
+		add_ideas={OMA_tribal_ibadhi_fanaticism}
+		add_manpower=-2000
+	}
+}
+country_event = {##OMA - Azzans reply
+	id = arab_events.46
+	title = arab_events.46.t
+	desc = {
+		trigger={
+			has_country_flag=Azzan_marches_east
+		}
+		text = arab_events.46.d
+	}
+	desc = {
+		trigger={
+			has_country_flag=Azzan_accepts_deal
+		}
+		text = arab_events.46.da
+	}
+	desc = {
+		trigger={
+			NOT={
+				has_country_flag=Azzan_marches_east
+				has_country_flag=Azzan_accepts_deal
+			}
+		}
+		text = arab_events.46.db
+	}
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##damn
+		name = arab_events.46.a
+		trigger={
+			has_country_flag=Azzan_marches_east
+		}
+		country_event={id=arab_events.47}
+	}
+	option = { ##great
+		name = arab_events.46.b
+		trigger={
+			has_country_flag=Azzan_accepts_deal
+		}
+	}
+}
+country_event = {##OMA - Azzan marches east WIP
+	id = arab_events.47
+	title = arab_events.47.t
+	desc = arab_events.47.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##great
+		name = arab_events.47.a
+		OMA_muscat_and_oman_divide_increase_3 = yes
+	}
+}
+
+country_event = {##OMA - foreign interests
+	id = arab_events.48
+	title = arab_events.48.t
+	desc = arab_events.48.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##woo Britian
+		name = arab_events.48.a
+		ENG={
+			country_event={id = arab_events.49}
+		}
+	}
+	option = { ##woo France
+		name = arab_events.48.b
+		FRA={
+			country_event={id = arab_events.49}
+		}
+		
+	}
+	option = { ##woo 
+		name = arab_events.48.c
+		
+	}
+}
+
+country_event = {##ENG/FRA - Omani Envoys
+	id = arab_events.49
+	title = arab_events.49.t
+	desc = {
+		text = arab_events.49.d
+		trigger={tag = ENG}
+	}
+	desc = {
+		text = arab_events.49.da
+		trigger={tag = FRA}
+	}
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##agree to assist for the offered deal
+		name = arab_events.49.a
+		
+	}
+	option = { ##agree to assist for more
+		name = arab_events.49.b
+		
+	}
+	option = { ##ignore them
+		name = arab_events.49.c
+		
+	}
+}
+
+country_event = {##OMA - expansion of the muscat garrison
+	id = arab_events.50
+	title = arab_events.50.t
+	desc = arab_events.50.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##Spend a lot
+		name = arab_events.50.a
+		add_manpower=-1000
+		add_political_power=-25
+		294={
+			add_building_construction = {
+				type = bunker
+				level = 2
+				instant_build = yes
+				province = 10760
+			}
+		}
+		
+	}
+	option = { ##Spend a bit
+		name = arab_events.50.b
+		add_manpower=-500
+		add_political_power=-10
+		294={
+			add_building_construction = {
+				type = bunker
+				level = 1
+				instant_build = yes
+				province = 10760
+			}
+		}
+	}
+	option = { ##Spend little 
+		name = arab_events.50.c
+		add_political_power=-5
+		
+	}
+}
+
+country_event = {##JSH - Battle of Mulayda begins
+	id = arab_events.51
+	title = arab_events.51.t
+	desc = arab_events.51.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = JSH
+		date>1891.01.20
+		NJD={exists = no}
+	}
+	mean_time_to_happen={
+		days = 5
+	}
+	
+	option = { ##attack
+		name = arab_events.51.a
+		start_border_war = {
+			change_state_after_war = yes
+			attacker = {
+				state = 292
+				num_provinces = 4
+				on_win = arab_events.52
+				on_lose = arab_events.53
+				on_cancel = arab_events.54
+			}
+						
+			defender = {
+				state = 916
+				num_provinces = 4
+				on_win = arab_events.53
+				on_lose = arab_events.52
+				on_cancel = arab_events.52
+			}
+		}
+		ai_chance = { 
+            factor = 60 
+            modifier = {
+                factor = 100
+                is_historical_focus_on = yes
+            }
+        }
+		
+	}
+	option = { ##back down
+		name = arab_events.51.b
+		add_political_power=-5
+		ai_chance = { 
+            factor = 60 
+            modifier = {
+                factor = 0
+                is_historical_focus_on = yes
+            }
+        }
+	}
+}
+country_event = {##NJD/JSH - rasids win
+	id = arab_events.52
+	title = arab_events.52.t
+	desc = arab_events.52.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##ok
+		name = arab_events.52.a
+	}
+}
+country_event = {##NJD/JSH - sauds win
+	id = arab_events.53
+	title = arab_events.53.t
+	desc = arab_events.53.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##ok
+		name = arab_events.53.a
+	}
+}
+country_event = {##NJD/JSH - should not happen, but here in case
+	id = arab_events.54
+	title = arab_events.54.t
+	desc = arab_events.54.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##ok
+		name = arab_events.54.a
+	}
+}
+###Nejd's musical chairs
+country_event = {##NJD - Abdallah ibn Faisal ibn Turki takes over
+	id = arab_events.55
+	title = arab_events.55.t
+	desc = arab_events.55.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1865.4.1
+		has_country_leader = {
+			name = "Faisal bin Turki bin Abdullah Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.55.a
+		create_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdallah_ibn_Faisal_ibn_Turki.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Saud bin Faisal bin Turki takes over
+	id = arab_events.56
+	title = arab_events.56.t
+	desc = arab_events.56.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1871.2.1
+		has_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.56.a
+		create_country_leader = {
+			name = "Saud bin Faisal bin Turki Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Saud_ibn_Faisal_ibn_Turki.dds"
+			expire = 1875.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Abdallah ibn Faisal ibn Turki takes over again
+	id = arab_events.57
+	title = arab_events.57.t
+	desc = arab_events.57.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1871.11.1
+		has_country_leader = {
+			name = "Saud bin Faisal bin Turki Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.57.a
+		create_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdallah_ibn_Faisal_ibn_Turki.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Saud bin Faisal bin Turki Al Saud takes over again
+	id = arab_events.58
+	title = arab_events.58.t
+	desc = arab_events.58.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1873.5.20
+		has_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.58.a
+		create_country_leader = {
+			name = "Saud bin Faisal bin Turki Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdallah_ibn_Faisal_ibn_Turki.dds"
+			expire = 1875.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Saud bin Faisal bin Turki Al Saud dies, Abdul Rahman bin Faisal takes over
+	id = arab_events.59
+	title = arab_events.59.t
+	desc = arab_events.59.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1875.1.1
+		has_country_leader = {
+			name = "Saud bin Faisal bin Turki Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.59.a
+		create_country_leader = {
+			name = "Abdul Rahman bin Faisal Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdul_Rahman_Abdallah_ibn_Faisal.dds"
+			expire = 1928.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Abdallah ibn Faisal ibn Turki takes over yet again
+	id = arab_events.60
+	title = arab_events.60.t
+	desc = arab_events.60.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1876.1.1
+		has_country_leader = {
+			name = "Abdul Rahman bin Faisal Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.60.a
+		create_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdallah_ibn_Faisal_ibn_Turki.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - Abdul Rahman bin Faisal strikes back
+	id = arab_events.61
+	title = arab_events.61.t
+	desc = arab_events.61.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1889.1.1
+		has_country_leader = {
+			name = "Abdallah ibn Faisal ibn Turki Al Saud"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.61.a
+		create_country_leader = {
+			name = "Abdul Rahman bin Faisal Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Abdul_Rahman_Abdallah_ibn_Faisal.dds"
+			expire = 1928.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##NJD - resurgence of Al Saud
+	id = arab_events.62
+	title = arab_events.62.t
+	desc = arab_events.62.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = NJD
+		date>1902.1.13
+		NOT={
+			owns_state = 916
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.62.a
+		transfer_state = 916
+		add_manpower = 10000
+		create_country_leader = {
+			name = "Abdulaziz 'Ibn Saud' Al Saud"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_NJD_Ibn_Saud.dds"
+			expire = 1953.11.9
+			ideology = despotism
+		}
+		drop_cosmetic_tag = yes
+		JSH={country_event={id=arab_events.63}}
+	}
+}
+country_event = {##JSH - sauds retake Riyadh
+	id = arab_events.63
+	title = arab_events.63.t
+	desc = arab_events.63.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = { ##ok
+		name = arab_events.63.a
+	}
+}
+###jabal Shammar's musical chairs
+country_event = {##JSH - Mutʿib I bin ʿAbdullah takes over
+	id = arab_events.64
+	title = arab_events.64.t
+	desc = arab_events.64.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = JSH
+		date>1868.3.15
+		has_country_leader = {
+			name = "Talal bin 'Abdullah"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.64.a
+		create_country_leader = {
+			name = "Mutʿib I bin ʿAbdullah"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_JSH_Mut_ib_I_bin_Abdullah.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##JSH - Bandar ben Talal al-Rachid takes over
+	id = arab_events.65
+	title = arab_events.65.t
+	desc = arab_events.65.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = JSH
+		date>1869.2.14
+		has_country_leader = {
+			name = "Mutʿib I bin ʿAbdullah"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.65.a
+		create_country_leader = {
+			name = "Bandar ben Talal al-Rachid"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_JSH_Bandar_ben_Talal_al-Rachid.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##JSH - Muhammad I bin 'Abdullah takes over
+	id = arab_events.66
+	title = arab_events.66.t
+	desc = arab_events.66.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = JSH
+		date>1869.10.2
+		has_country_leader = {
+			name = "Bandar ben Talal al-Rachid"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.66.a
+		create_country_leader = {
+			name = "Muhammad I bin 'Abdullah"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_JSH_Muhammad_I_bin_Abdullah.dds"
+			expire = 1900.1.1
+			ideology = despotism
+		}
+	}
+}
+country_event = {##JSH - ʿAbd al-ʿAzīz bin Mutʿib takes over
+	id = arab_events.67
+	title = arab_events.67.t
+	desc = arab_events.67.d
+	#picture = GFX_report_event_chinese_army_training
+	
+	fire_only_once = yes
+	trigger={
+		tag = JSH
+		date>1897.6.8
+		has_country_leader = {
+			name = "Muhammad I bin 'Abdullah"
+			ruling_only = yes
+		}
+	}
+	
+	option = { ##ok
+		name = arab_events.67.a
+		create_country_leader = {
+			name = "ʿAbd al-ʿAzīz bin Mutʿib"
+			desc = "POLITICS_TEMP_DESC"
+			picture = "Portrait_JSH_Abd_al-Aziz_bin_Mut_ib.dds"
+			expire = 1920.1.1
+			ideology = despotism
+		}
 	}
 }

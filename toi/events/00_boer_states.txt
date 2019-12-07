@@ -2615,3 +2615,290 @@ country_event = { #our british policy
 		
 	}
 }
+
+
+country_event = { #SAF -  annex TRV
+	id = boer_states.93
+	title = boer_states.93.t
+	desc = boer_states.93.d
+	
+	fire_only_once = yes
+	
+	trigger ={
+		date > 1877.06.01
+		tag = SAF
+		has_country_leader = {
+			name = "Henry Bartle Frere"
+			ruling_only = yes
+		}
+	}
+	option = {
+		name = boer_states.93.a #send the annexation order
+		ai_chance = { factor = 70 }
+		TRV={country_event ={id = boer_states.94}}
+	}
+	option = {
+		name = boer_states.93.b #no, the zulu are more important
+		ai_chance = { factor = 30 }
+		
+	}
+}
+country_event = { #TRV - SAF has declared us under british dominion
+	id = boer_states.94
+	title = boer_states.94.t
+	desc = boer_states.94.d
+	
+	is_triggered_only=yes
+	option = {
+		name = boer_states.94.a #agree - for now
+		ai_chance = { factor = 100 }
+		set_country_flag = TRV_de-jure_british_control
+		set_cosmetic_tag = TRV_ENG_dominated
+		FROM ={give_guarantee = ROOT}
+		create_country_leader = {
+			name = "Transvaal Provisional Government"
+			picture = "Portrait_TRV_interregnum.dds"
+			ideology = conserv
+		}
+	}
+	option = {
+		name = boer_states.94.b #refuse - early boer war
+		ai_chance = { factor = 0 }
+		SAF={country_event = {id = boer_states.97}}
+		set_country_flag = TRV_early_boer_war
+	}
+}
+country_event = { # TRV - Thomas Burgers is elected president
+	id = boer_states.95
+	title = boer_states.95.t
+	desc = boer_states.95.d
+		
+	fire_only_once = yes
+		
+	trigger = {
+		TAG = TRV
+		date > 1872.7.1
+	}
+		
+	option = { # 
+		name = boer_states.95.a
+		create_country_leader = {
+			name = "Thomas François Burgers"
+			picture = "Portrait_TRV_Thomas_François_Burgers.dds"
+			ideology = conserv
+		}
+	}
+}
+country_event = { # TRV - Zulu are defeated, time to fight for independance
+	id = boer_states.96
+	title = boer_states.96.t
+	desc = boer_states.96.d
+		
+	fire_only_once = yes
+		
+	trigger = {
+		TAG = TRV
+		date > 1880.1.1
+		ZUL={
+			OR={
+				exists = no
+				is_subject_of = ENG
+			}
+		}
+		has_country_flag = TRV_de-jure_british_control
+	}
+		
+	option = { # Independance
+		name = boer_states.96.a
+		drop_cosmetic_tag = TRV_ENG_dominated
+		SAF={country_event ={id = boer_states.97}}
+		create_country_leader = {
+			name = "Triumvirate"
+			picture = "Portrait_TRV_interregnum.dds"
+			ideology = conserv
+		}
+	}
+}
+country_event = { # SAF - Transvaal declares independance
+	id = boer_states.97
+	title = boer_states.97.t
+	desc = boer_states.97.d
+		
+	is_triggered_only = yes
+		
+	option = { # take them back
+		name = boer_states.97.a
+		
+		declare_war_on = {
+			target = TRV
+			type = puppet_wargoal_focus
+		}
+		NAT={
+			add_to_war = { 
+				targeted_alliance = ROOT 
+				enemy = TRV
+			}
+		}
+		TRV={country_event ={id = boer_states.98}}
+	}
+	option = { # Let them go
+		name = boer_states.97.a
+		
+		TRV = {clr_country_flag = TRV_de-jure_british_control}
+	}
+}
+country_event = { # TRV - ENG has decided to fight
+	id = boer_states.98
+	title = boer_states.98.t
+	desc = boer_states.98.d
+		
+	is_triggered_only = yes
+		
+	option = { # Let us fight
+		name = boer_states.98.a
+		add_manpower = 1000
+		add_ideas={
+			TRV_boer_milita
+		}
+		if={
+			limit={
+				OFS={
+					OR={
+						has_war_with = SAF
+						has_war_with = NAT
+					}
+				}
+			}
+			OFS={
+				add_ideas={
+					TRV_boer_milita
+				}
+			}
+		}
+	}
+}
+country_event = { # TRV - ENG cannot hold us
+	id = boer_states.99
+	title = boer_states.99.t
+	desc = boer_states.99.d
+	fire_only_once=yes
+	trigger={
+		tag = TRV
+		has_country_flag = TRV_de-jure_british_control
+		has_war_with = SAF
+		date > 1881.05.01
+	}
+		
+	#is_triggered_only = yes
+	option = { # we have won
+		name = boer_states.99.a
+		white_peace = SAF
+		white_peace = NAT
+		if={
+			limit={
+				OFS={
+					has_war_with = SAF
+				}
+				white_peace = SAF
+				white_peace = NAT
+			}
+		}
+		clr_country_flag = TRV_de-jure_british_control
+		remove_ideas={
+			TRV_boer_milita
+		}
+		if={
+			limit={
+				OFS={
+					has_idea= TRV_boer_milita
+				}
+			}
+			OFS={
+				remove_ideas={
+					TRV_boer_milita
+				}
+			}
+		}
+	}
+}
+country_event = { # Dreams of a South african federation
+	id = boer_states.100
+	title = boer_states.100.t
+	desc = boer_states.100.d
+	fire_only_once=yes
+	trigger={
+		tag = SAF
+		date > 1908.04.01
+		TRV={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		OFS={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		NAT={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		SOT={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		GQW={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		GQE={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		ZUL={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		STL={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+		GOS={
+			OR={
+				exists = no
+				is_puppet_of = ENG
+				is_puppet_of = SAF
+			}
+		}
+	}
+		
+	#is_triggered_only = yes
+		
+	option = { # we have won
+		name = boer_states.100.a
+
+	}
+}
+

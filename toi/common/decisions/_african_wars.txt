@@ -51,143 +51,6 @@ tribal_decisions_eoanb = {
 }
 unidustrialized_warfare = {
 #allows tribals to goto war for a limited gain(hopefully)
-	agatate_for_war_against_tribal_neighbor = {
-
-		icon = generic_prepare_civil_war
-
-		available = {
-			#NOT = { has_country_flag = agataing_for_war }
-			NOT = { has_idea = disarmed_nation }
-			has_war_support > 0.4
-			has_stability > 0.25
-			#OR = {
-			#	has_idea = AF_T_unorganized_tribal_nation
-			#	has_idea = AF_T_unorganized_tribal_nation_2
-			#	has_idea = AF_T_unorganized_tribal_nation_3
-			#	has_idea = AF_T_unorganized_tribal_nation_4
-			#	has_idea = AF_T_unorganized_tribal_nation_5
-			#	has_idea = AF_T_organized_tribal_nation
-			#	has_idea = AF_T_small_kingdom
-			#}
-			#FROM = {
-			#	OR = {
-			#		has_offensive_war = yes 
-			#		is_justifying_wargoal_against = ROOT
-			#		#ROOT = {has_core = FROM}
-			#		has_opinion = {
-			#			tag = ROOT
-			#			value < 10
-			#		}
-			#	}
-			#}
-			NOT = { has_non_aggression_pact_with = FROM }
-			any_state = {
-				is_owned_and_controlled_by = FROM
-				OR = {
-					is_claimed_by = ROOT
-					is_core_of = ROOT
-				}
-				any_neighbor_state = {
-					is_fully_controlled_by = ROOT
-				}
-			}
-		}
-
-		visible = {
-			NOT = { has_war_with = FROM }
-			FROM = {
-				OR = {
-					has_idea = AF_T_unorganized_tribal_nation
-					has_idea = AF_T_unorganized_tribal_nation_2
-					has_idea = AF_T_unorganized_tribal_nation_3
-					has_idea = AF_T_unorganized_tribal_nation_4
-					has_idea = AF_T_unorganized_tribal_nation_5
-					has_idea = AF_T_organized_tribal_nation
-					has_idea = AF_T_organized_tribal_nation_2
-					has_idea = AF_T_organized_tribal_nation_3
-					has_idea = AF_T_small_kingdom
-					has_idea = afr_large_kingdom
-				}
-				NOT = {
-					is_subject_of = ROOT
-					is_in_faction_with = ROOT
-				}
-			}
-			NOT = {
-				is_subject_of = FROM
-			}
-			has_war = no
-			#OR = {
-				#any_state = {
-				#	is_owned_and_controlled_by = FROM
-				#}
-			#}
-		}
-
-		target_trigger = {
-			FROM = {
-				is_neighbor_of = ROOT
-			}
-		}
-
-		days_remove = 90
-		days_re_enable = 360
-
-		cost = 100
-		fire_only_once = no
-		custom_cost_trigger = {
-
-			command_power > 99
-
-		}
-		custom_cost_text = command_power_more_than_99
-
-		modifier = {
-			#war_support_weekly = 0.01
-			political_power_gain = -0.2
-		}
-
-		cancel_trigger = {
-			OR = {
-				is_in_faction_with = FROM
-				has_war_with = FROM
-			}
-		}
-		complete_effect = {
-			set_country_flag = agataing_for_war
-			add_command_power = -100
-		}
-		remove_effect = {
-			clr_country_flag = agataing_for_war
-			#start_border_war ={
-			FROM = { country_event = { id = EDC_afr.2 hours = 6 } }
-		}
-		ai_will_do = {
-			factor = 20
-			modifier = {
-				factor = 2
-				has_war_support > 0.6
-			}
-			modifier = {
-				factor = 2
-				has_completed_focus = afr_wes_government_reforms_3
-			}
-			modifier = {
-				factor = 0
-				strength_ratio = {
-					tag = FROM
-					ratio < 0.75
-				}
-			}
-			modifier = {
-				factor = 10
-				strength_ratio = {
-					tag = FROM
-					ratio > 1.5
-				}
-			}
-		}
-	}
 }
 political_actions = {
 
@@ -337,5 +200,287 @@ foreign_politics={
 		}
 	}
 
+	#Mission to invade Mahra
+	OMA_MAH_War = {
+		icon = generic_political_actions
+		
+		available = {
+			always = no
+		}
+		
+		activation = {
+			always = no
+		}
 
+		selectable_mission = no
+		days_mission_timeout = 30
+		is_good = no
+		fire_only_once = yes
+		
+		cancel_trigger = {
+			OR = {
+				NOT = {
+					country_exists = MAH
+				}
+				MAH = { is_subject = yes }
+			}
+		}
+		
+		remove_effect = {
+		
+		}
+		
+		complete_effect = {
+			
+		}
+		
+		timeout_effect = {
+			finalize_border_war = {
+				defender_win = yes
+				attacker = 294
+				defender = 1196
+			}
+		}
+	}
+	#brothers sa'id war
+	OMA_ZAN_Brothers_War = {
+		icon = generic_political_actions
+		
+		available = {
+			always = no
+		}
+		
+		activation = {
+			always = no
+		}
+
+		selectable_mission = no
+		days_mission_timeout = 210
+		is_good = no
+		fire_only_once = yes
+		
+		cancel_trigger = {
+			has_war = no
+		}
+		
+		remove_effect = {
+		
+		}
+		
+		complete_effect = {
+			
+		}
+		
+		timeout_effect = {
+			OMA={
+				increase_ps_by_one = yes
+				clr_country_flag = OMA_brothers_war
+				white_peace = ZAN
+				white_peace = MOM
+				ZAN={
+					remove_ideas = {ZAN_brothers_war}
+				}
+			}
+		}
+	}
+	
+}
+afr_rrp_african_expeditions={
+
+	OMA_african_expition = {
+		target_trigger = {
+			FROM = {
+				exists = yes
+				afr_is_tribal = yes
+				NOT ={
+					is_puppet = yes
+				}
+				any_neighbor_country={
+					OVERLORD={
+						tag = OMA
+					}
+				}
+				any_owned_state={
+					OR={
+						AND={
+							OR={
+								ROOT={tag = MOM}
+								ROOT={tag = OMA}
+							}
+							is_in_kenya = yes
+						}
+						AND={
+							OR={
+								ROOT={tag = ZAN}
+								ROOT={tag = OMA}
+							}
+							is_in_zanzabar = yes
+						}
+					}
+					OR={
+						is_claimed_by = MOM
+						is_claimed_by = ZAN
+					}
+				}
+			}
+		}
+		highlight_states = { #the size of this is entirely paradoxes fault
+			#Kenya
+			if={
+				limit ={
+					FROM ={tag = MMA}
+				}
+				state = 911
+			}
+			else_if={
+				limit ={
+					FROM ={tag = OGD}
+				}
+				state = 912
+			}
+			else_if={
+				limit ={
+					FROM ={tag = RDL}
+				}
+				state = 914
+			}
+			else_if={
+				limit ={
+					FROM ={tag = KKY}
+				}
+				state = 547
+			}
+			else_if={
+				limit ={
+					FROM ={tag = BOR}
+				}
+				state = 913
+			}
+			else_if={
+				limit ={
+					FROM ={tag = TKN}
+				}
+				state = 915
+			}
+			else_if={
+				limit ={
+					FROM ={tag = LUO}
+				}
+				state = 910
+			}
+			else_if={
+				limit ={
+					FROM ={tag = MAA}
+					OR={
+						ROOT={tag = MOM}
+						ROOT={tag = OMA}
+					}
+				}
+				state = 906
+			}
+			#Tanzinia
+			else_if={
+				limit ={
+					FROM ={tag = MAA}
+					ROOT={tag = ZAN}
+				}
+				state = 905
+			}
+			else_if={
+				limit ={
+					FROM ={tag = NYW}
+				}
+				state = 546
+			}
+			else_if={
+				limit ={
+					FROM ={tag = UJJ}
+				}
+				state = 908
+			}
+			else_if={
+				limit ={
+					FROM ={tag = KND}
+				}
+				state = 929
+			}
+			else_if={
+				limit ={
+					FROM ={tag = SUK}
+				}
+				state = 907
+			}
+			else_if={
+				limit ={
+					FROM ={tag = KRG}
+				}
+				state = 896
+			}
+			else_if={
+				limit ={
+					FROM ={tag = LGR}
+				}
+				state = 904
+			}
+			else_if={
+				limit ={
+					FROM ={tag = WSG}
+				}
+				state = 269
+			}
+			else={
+				state = 906
+			}
+			#is_in_kenya = yes
+		}
+		#cost = 10
+		fire_only_once = yes
+		days_remove = 60
+		available ={
+			has_manpower > 999
+			custom_trigger_tooltip ={
+				tooltip = OMA_already_expedition
+				NOT={
+					OR={
+						OMA={has_country_flag = OMA_colonision_to_@FROM}
+						ZAN={has_country_flag = OMA_colonision_to_@FROM}
+						MOM={has_country_flag = OMA_colonision_to_@FROM}
+					}
+				}
+			}
+			OR={
+				NOT={FROM={tag = MAA}}
+				AND={
+					OMA={has_completed_focus= oma_vic_KEN_expeditions}
+					OMA={has_completed_focus= oma_vic_ZAN_expansion}
+				}
+			}
+		}
+		complete_effect = {
+			add_manpower = -1000
+			set_country_flag = OMA_colonision_to_@FROM
+		}
+		remove_effect={
+			add_manpower = 1000
+			clr_country_flag = OMA_colonision_to_@FROM
+				FROM={
+					every_owned_state={
+						limit = {
+							is_claimed_by = ZAN
+						}
+						ZAN={transfer_state = PREV}
+					}
+				}
+				FROM={
+					every_owned_state={
+						limit = {
+							is_claimed_by = MOM
+						}
+						MOM={transfer_state = PREV}
+					}
+				}
+		}
+	}
+	
+	
 }

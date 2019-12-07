@@ -1,6 +1,6 @@
 ﻿add_namespace = afr_EGY_vic
 
-#EGY expands their army
+#OTO - EGY expands their army
 country_event = {
 	id = afr_EGY_vic.1
 	title = afr_EGY_vic.1.t
@@ -12,10 +12,10 @@ country_event = {
 	option = { #reign them in
 		name = afr_EGY_vic.1.a
 		ai_chance = { factor = 75 }
-		add_political_power = -150
 		trigger = {
 			has_political_power > 149
 		}
+		add_political_power = -150
 		FROM = {
 			country_event = {
 				id = afr_EGY_vic.2
@@ -47,7 +47,7 @@ country_event = {
 	}
 }
 
-#EGY expands their army
+#EGY - EGY expands their army
 country_event = {
 	id = afr_EGY_vic.2
 	title = afr_EGY_vic.2.t
@@ -756,5 +756,215 @@ country_event = { #EGY - Ahmed accident avoided
 	
 	option = {#a most fortuitus event
 		name = afr_EGY_vic.19.a
+	}
+}
+news_event = {# Grand Opening of the Suez
+	id = afr_EGY_vic.20
+	title = afr_EGY_vic.20.t
+	#desc = afr_EGY_vic.20.desc 
+	picture = GFX_news_event_suez_canal
+	desc = {
+		text = afr_EGY_vic.20.2.desc#Egypt constructs the canal with less than 10% help from france
+		trigger = {
+			NOT={
+				has_variable = ENG.suez_investment
+			}
+			check_variable = { FRA.suez_investment < 20 }
+		}
+	}
+	desc = {
+		text = afr_EGY_vic.20.1.desc#historical, Egypt and france share the construction, still majorly egypt
+		trigger = {
+			check_variable = { FRA.suez_investment > 20 }
+			NOT= {has_variable = ENG.suez_investment}
+		}
+	}
+	desc = {
+		text = afr_EGY_vic.20.3.desc#France pulls in britian
+		trigger = {
+			has_variable = ENG.suez_investment
+		}
+	}
+
+	is_triggered_only = yes ##
+	major = yes
+
+	option = {##The Gateway to the East
+		name = afr_EGY_vic.20.a
+		trigger = {
+			OR={
+				tag=EGY
+				tag=FRA
+				has_country_flag = suez_constructor
+			}
+		}
+		if={
+			limit={
+				NOT={tag = EGY}
+				has_country_flag = suez_constructor
+				check_variable = { suez_investment > 20 }
+			}
+			eoanb_add_10_prestige_score = yes
+		}
+		if={
+			limit={
+				tag = EGY
+			}
+			eoanb_add_10_prestige_score = yes
+		}
+		if={#contributed less than 20% but more than 4%
+			limit={
+				NOT={tag = EGY}
+				has_country_flag = suez_constructor
+				check_variable = { suez_investment < 20 }
+				check_variable = { suez_investment > 3 }
+			}
+			eoanb_add_5_prestige_score = yes
+		}
+		if={#contributed less than 4%
+			limit={
+				NOT={tag = EGY}
+				has_country_flag = suez_constructor
+				check_variable = { suez_investment < 4 }
+			}
+			eoanb_add_2_prestige_score = yes
+		}
+	}
+	option = {##Impressive
+		name = afr_EGY_vic.20.b
+		trigger = {
+			NOT={
+				tag=EGY
+				tag=ENG
+				tag=FRA
+				tag=OMA
+				tag=YEM
+				tag=ADN
+				tag=MED
+			}
+			NOT={has_country_flag = suez_constructor}
+		}
+	}
+	option = {##Less Irrelevant Now
+		name = afr_EGY_vic.20.c
+		trigger = {
+			tag=OMA
+			tag=YEM
+			tag=ADN
+			tag=MED
+		}
+		add_timed_idea = {idea = eoanb_random_event_22_idea days = 120}
+	}
+}
+
+country_event = { #ENG - a plan to stop EGY using forced labour on the suez
+	id = afr_EGY_vic.21
+	title = afr_EGY_vic.21.t
+	desc = afr_EGY_vic.21.d 
+	
+	is_triggered_only = yes
+	
+	immediate={
+		set_country_flag = EGY_corvee_suez
+	}
+	
+	option = {#pressure the Egyptian government
+		name = afr_EGY_vic.21.a
+	}
+	option = {#Incite the Egyptian Bedouins to revolt
+		name = afr_EGY_vic.21.b
+	}
+}
+
+country_event = { #FRA - formation of Compagnie Universelle du Canal Maritime de Suez
+	id = afr_EGY_vic.22
+	title = afr_EGY_vic.22.t
+	desc = afr_EGY_vic.22.d 
+	
+	is_triggered_only = yes
+	#trigger={
+	#	NOT={has_country_flag = suez_constructor}
+	#	date > 1858.12.15
+	#	date < 1870.01.01
+	#}
+	#fire_only_once = yes
+	
+	immediate={
+		hidden_effect={
+			EGY={country_event={id=afr_EGY_vic.23}}#suez construction begins
+			every_country={
+				limit ={
+					is_great_power = yes
+					capital_scope = {is_on_continent = europe}
+					NOT = {tag=FRA}
+				}
+				country_event={id=afr_EGY_vic.24}
+			}
+			#ENG={country_event={id=afr_EGY_vic.24}}#sale of suez shares
+			#AUS={country_event={id=afr_EGY_vic.24}}#sale of suez shares
+			#RUS={country_event={id=afr_EGY_vic.24}}#sale of suez shares
+			set_country_flag = suez_constructor
+			EGY={set_country_flag = suez_constructor}
+		}
+	}
+	
+	option = {#Let us begin
+		name = afr_EGY_vic.22.a
+		custom_effect_tooltip=EGY_insvest_suez
+	}
+}
+country_event = { #EGY - Suez Construction Started
+	id = afr_EGY_vic.23
+	title = afr_EGY_vic.23.t
+	desc = afr_EGY_vic.23.d 
+	
+	is_triggered_only = yes
+	
+	option = {#let us begin
+		name = afr_EGY_vic.23.a
+	}
+}
+country_event = { # FRA Offer to invest in the suez project
+	id = afr_EGY_vic.24
+	title = afr_EGY_vic.24.t
+	desc = afr_EGY_vic.24.d 
+	
+	is_triggered_only = yes
+	
+	option = {#yes
+		name = afr_EGY_vic.24.a
+		custom_effect_tooltip=EGY_insvest_suez
+		add_to_array = { EGY.suezInvestors = THIS.id }
+		hidden_effect={
+			set_country_flag = suez_constructor
+			set_variable = { suez_investment = 0 }
+		}
+		ai_chance = { 
+			factor = 30
+			modifier = {
+				factor = 0.5
+				TAG = ENG
+			}
+			modifier = {
+				factor = 0.2
+				OR={
+					TAG = AUS
+					TAG = RUS
+				}
+			}
+			modifier = {
+				factor = 0.1
+				OR={
+					TAG = PRS
+					TAG = SPA
+					TAG = SWE
+					TAG = OTO
+				}
+			}
+		}
+	}
+	option = {#no
+		name = afr_EGY_vic.24.a
+		ai_chance = { factor = 70 }
 	}
 }
