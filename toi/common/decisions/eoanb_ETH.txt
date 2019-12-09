@@ -1061,399 +1061,235 @@ ETH_Company = {
 
 
 
-	ETH_shipyard_company = {
+#	ETH_shipyard_company = {
+#
+#		ai_will_do = { factor = 1 }
+#		available = {
+#			always = no
+#		}
+#
+#		visible = {
+#			always = no
+#		}
+#		
+#		
+#		
+#		fire_only_once = yes
+#
+#		cost = 0
+#		
+#		complete_effect = {
+#			hidden_effect = { set_country_flag = ETH_foreign_company }
+#		}
+#		
+#		days_remove = 120
+#		
+#		cancel_trigger = {
+#			NOT = {
+#				afr_has_company_port_trigger = yes
+#			}
+#		}
+#		
+#		remove_effect = {
+#			random_owned_controlled_state = {
+#					limit = {
+#						is_coastal = yes
+#						free_building_slots = { 
+#							building = dockyard
+#							size > 0 
+#							include_locked = yes 
+#						}
+#					}
+#					add_extra_state_shared_building_slots = 1
+#					add_building_construction = {
+#						type = dockyard
+#						level = 1
+#						instant_build = yes
+#					}
+#			}
+#			set_country_flag = ETH_company_established
+#			custom_effect_tooltip = afr_colonial_effect_tooltip
+#			custom_effect_tooltip = AFR_Racial_Tension_plus_1
+#			
+#			hidden_effect = {
+#				ROOT = {
+#					country_event = {id = afr_rrp_racial_tension_increase.1}
+#				}
+#			}
+#			activate_mission = ETH_shipyard_export_quota
+#		}
+#	}
+#	
+#	ETH_shipyard_export_quota = {
+#
+#		ai_will_do = { factor = 1 }
+#		available = {
+#			has_resources_amount = {
+#				resource = oil
+#				amount > 11
+#				state = 815
+#			}
+#		}
+#		
+#		activation = {
+#			always = no
+#		}
+#		
+#		selectable_mission = yes
+#		days_mission_timeout = 360
+#		fire_only_once = yes		
+#		
+#		cancel_trigger = {
+#			OR = {
+#				hidden_trigger = {
+#					has_country_flag = ETH_Coup_Started
+#				}
+#				NOT = {
+#					afr_has_company_port_trigger = yes
+#				}
+#			}
+#		}
+#		
+#		days_remove = ETH_fullfilled_quota?0
+#		remove_effect = {
+#			hidden_effect = {
+#				activate_mission = ETH_shipyard_export_quota
+#			}
+#		}
+#		
+#		complete_effect = {
+#			hidden_effect = {
+#				var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_export.1 } }
+#				set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_shipyard_export_quota }
+#			}
+#		}
+#			
+#		timeout_effect = {
+#			
+#		}
+#	}
+#
+	ETH_establish_export_company = {
 
-		ai_will_do = { factor = 1 }
-		available = {
-			always = no
-		}
+	available = {
+		always = no
+	}
 
-		visible = {
-			always = no
-		}
+	visible = {
+		always = no
 		
-		
-		
-		fire_only_once = yes
+	}
+	
+	fire_only_once = yes
 
-		cost = 0
-		
-		complete_effect = {
-			hidden_effect = { set_country_flag = ETH_foreign_company }
+	cost = 0
+	
+	complete_effect = {
+		hidden_effect = { 
+			set_country_flag = eth_foreign_company
+			set_variable = { num_export_industries_used = 0 }
 		}
-		
-		days_remove = 120
-		
-		cancel_trigger = {
-			NOT = {
-				afr_has_company_port_trigger = yes
-			}
+	}
+	
+	days_remove = 120
+	
+	cancel_trigger = {
+		NOT = { 
+			afr_has_company_port_trigger = yes
 		}
-		
-		remove_effect = {
-			random_owned_controlled_state = {
+	}
+	
+	remove_effect = {
+		meta_effect = {
+			text = {
+				random_owned_controlled_state = {
 					limit = {
-						is_coastal = yes
-						free_building_slots = { 
-							building = dockyard
-							size > 0 
-							include_locked = yes 
+						free_building_slots = {
+							building = [afr_company_trade_good_meta]
+							size > 0
+							include_locked = yes
+						}
+						OR = {
+							is_in_home_area = yes
+							NOT = {
+								owner = {
+									any_owned_state = {
+										free_building_slots = {
+											building = [afr_company_trade_good_meta]
+											size > 0
+											include_locked = yes
+										}
+										is_in_home_area = yes
+									}
+								}
+							}
 						}
 					}
 					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
-						type = dockyard
+						type = [afr_company_trade_good_meta]
 						level = 1
 						instant_build = yes
 					}
-			}
-			set_country_flag = ETH_company_established
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			custom_effect_tooltip = AFR_Racial_Tension_plus_1
-			
-			hidden_effect = {
-				ROOT = {
-					country_event = {id = afr_rrp_racial_tension_increase.1}
 				}
 			}
-			activate_mission = ETH_shipyard_export_quota
+			afr_company_trade_good_meta = "[THIS.afr_company_trade_good_loc]"
 		}
+		set_country_flag = eth_company_established
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		
+		hidden_effect = {
+			country_event = {id = afr_rrp_racial_tension_increase.1}
+			country_event = { days = 3 id = afr_colonial_company.5 }
+		}
+		activate_mission = ETH_export_quota
+	}
+}
+
+ETH_export_quota = {
+
+	available = {
+		check_variable = { num_of_export_industries > num_export_industries_used }
+	}
+
+	activation = {
+		always = no	
 	}
 	
-	ETH_shipyard_export_quota = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			has_resources_amount = {
-				resource = oil
-				amount > 11
-				state = 815
+	selectable_mission = yes
+	days_mission_timeout = 1830
+	fire_only_once = yes		
+	
+	cancel_trigger = {
+		OR = {
+			hidden_trigger = {
+				has_country_flag = ETH_Coup_Started
 			}
-		}
-		
-		activation = {
-			always = no
-		}
-		
-		selectable_mission = yes
-		days_mission_timeout = 360
-		fire_only_once = yes		
-		
-		cancel_trigger = {
-			OR = {
-				hidden_trigger = {
-					has_country_flag = ETH_Coup_Started
-				}
-				NOT = {
-					afr_has_company_port_trigger = yes
-				}
-			}
-		}
-		
-		days_remove = ETH_fullfilled_quota?0
-		remove_effect = {
-			hidden_effect = {
-				activate_mission = ETH_shipyard_export_quota
-			}
-		}
-		
-		complete_effect = {
-			hidden_effect = {
-				var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_export.1 } }
-				set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_shipyard_export_quota }
-			}
-		}
-			
-		timeout_effect = {
-			
-		}
-	}
-
-	ETH_cotton_plantation = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			always = no
-		}
-
-		visible = {
-			always = no
-			
-		}
-		
-		fire_only_once = yes
-
-		cost = 0
-		
-		complete_effect = {
-			hidden_effect = { set_country_flag = ETH_foreign_company }
-		}
-		
-		days_remove = 120
-		
-		cancel_trigger = {
-			NOT = {
+			NOT = { 
 				afr_has_company_port_trigger = yes
 			}
 		}
-		
-		remove_effect = {
-			add_resource = { 
-						type = cotton
-						amount = 12 
-						state = 815
-			}
-			set_country_flag = ETH_company_established
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			custom_effect_tooltip = AFR_Racial_Tension_plus_1
-			
-			hidden_effect = {
-				ROOT = {
-					country_event = {id = afr_rrp_racial_tension_increase.1}
-				}
-			}
-			activate_mission = ETH_cotton_export_quota
+	}
+	
+	days_remove = ETH_fullfilled_quota?0
+	remove_effect = {
+		hidden_effect = {
+			activate_mission = ETH_export_quota
 		}
 	}
 	
-	ETH_cotton_export_quota = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			has_resources_amount = {
-				resource = cotton
-				amount > 11
-				state = 815
-			}
-		}
-
-		activation = {
-			always = no	
-		}
+	complete_effect = {
 		
-		selectable_mission = yes
-		days_mission_timeout = 360
-		fire_only_once = yes		
-		
-		cancel_trigger = {
-			OR = {
-				hidden_trigger = {
-					has_country_flag = ETH_Coup_Started
-				}
-				NOT = {
-					afr_has_company_port_trigger = yes
-				}
-			}
-		}
-		
-		days_remove = ETH_fullfilled_quota?0
-		remove_effect = {
-			hidden_effect = {
-				activate_mission = ETH_cotton_export_quota
-			}
-		}
-		
-		complete_effect = {
-			
-			var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_export.3 } }
-			set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_cotton_export_quota }
-		}
-		
-		timeout_effect = {
-		
-		}
+		var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_trade.6 } }
+		set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_export_quota }
+		add_to_variable = { num_export_industries_used = 1 }
 	}
 	
-	ETH_logging_plantation = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			always = no
-		}
-
-		visible = {
-			always = no
-			
-		}
-		
-		fire_only_once = yes
-
-		cost = 0
-		
-		complete_effect = {
-			hidden_effect = { set_country_flag = ETH_foreign_company }
-		}
-		
-		days_remove = 120
-		
-		cancel_trigger = {
-			NOT = {
-				afr_has_company_port_trigger = yes
-			}
-		}
-		
-		 remove_effect = {
-			add_resource = { 
-						type = wood
-						amount = 12 
-						state = 815
-			}
-			set_country_flag = ETH_company_established
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			custom_effect_tooltip = AFR_Racial_Tension_plus_1
-			
-			hidden_effect = {
-				ROOT = {
-					country_event = {id = afr_rrp_racial_tension_increase.1}
-				}
-			}
-			activate_mission = ETH_lumber_export_quota
-		}
-	}
+	timeout_effect = {
 	
-	ETH_lumber_export_quota = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			has_resources_amount = {
-				resource = wood
-				amount > 11
-				state = 815
-			}
-		}
-
-		activation = {
-			always = no
-		}
-		
-		selectable_mission = yes
-		days_mission_timeout = 360
-		fire_only_once = yes		
-		
-		cancel_trigger = {
-			OR = {
-				hidden_trigger = {
-					has_country_flag = ETH_Coup_Started
-				}
-				NOT = {
-					afr_has_company_port_trigger = yes
-				}
-			}
-		}
-		
-		days_remove = ETH_fullfilled_quota?0
-		remove_effect = {
-			hidden_effect = {
-				activate_mission = ETH_lumber_export_quota
-			}
-		}
-		
-		complete_effect = {
-			
-			var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_export.5 } }
-			set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_lumber_export_quota }
-		}
-		
-		timeout_effect = {
-		
-		}
 	}
-	
-	ETH_rubber_plantation = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			always = no
-		}
-
-		visible = {
-			always = no
-			
-		}
-
-		fire_only_once = yes
-
-		cost = 0
-		
-		complete_effect = {
-			hidden_effect = { set_country_flag = ETH_foreign_company }
-		}
-		
-		days_remove = 120
-		
-		cancel_trigger = {
-			NOT = {
-				afr_has_company_port_trigger = yes
-			}
-		}
-		
-		 remove_effect = {
-			add_resource = { 
-						type = rubber 
-						amount = 12 
-						state = 815
-			}
-			set_country_flag = ETH_company_established
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			custom_effect_tooltip = AFR_Racial_Tension_plus_1
-			
-			hidden_effect = {
-				ROOT = {
-					country_event = {id = afr_rrp_racial_tension_increase.1}
-				}
-			}
-			activate_mission = ETH_rubber_export_quota
-		}
-	}
-
-	ETH_rubber_export_quota = {
-
-		ai_will_do = { factor = 1 }
-		available = {
-			has_resources_amount = {
-				resource = rubber
-				amount > 11
-				state = 815
-			}
-		}
-
-		activation = {
-			always = no
-		}
-		
-		selectable_mission = yes
-		days_mission_timeout = 360
-		fire_only_once = yes		
-		
-		cancel_trigger = {
-			OR = {
-				hidden_trigger = {
-					has_country_flag = ETH_Coup_Started
-				}
-				NOT = {
-					afr_has_company_port_trigger = yes
-				}
-			}
-		}
-		
-		days_remove = ETH_fullfilled_quota?0
-		remove_effect = {
-			hidden_effect = {
-				activate_mission = ETH_rubber_export_quota
-			}
-		}
-		
-		complete_effect = {
-			
-			var:ROOT.company_country_var = { country_event = { days = 1 id = ethiopia_export.7 } }
-			set_variable = { ETH_fullfilled_quota = days_mission_timeout@ETH_rubber_export_quota }
-		}
-		
-		timeout_effect = {
-		
-		}
-		
-	}
+}
 
 
 
