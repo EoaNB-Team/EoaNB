@@ -1591,7 +1591,7 @@ mhc_fill_generic_army_advisor = {
 				}
 			}
 			
-			clear_array = local_mhc_generic_army_advisors_array
+			#clear_array = local_mhc_generic_army_advisors_array
 			generate_random_array_with_eight_random_numbers = yes
 			for_each_loop = {
 				array = temp_dyn_fill_array
@@ -1693,6 +1693,162 @@ mhc_add_army_advisor = {
 			array = local_mhc_army_available_traits_array
 			index = temp_advisor_frame
 			value = temp_advisor_trait
+		}
+	}
+}
+
+mhc_remove_army_advisor = {
+	hidden_effect = {
+		#remove advisor from the high officer array
+		if = {
+			limit = {
+				has_variable = local_mhc_high_available_array^0
+				is_in_array = {
+					array = local_mhc_high_available_array
+					value = temp_advisor_frame
+				}
+			}
+			remove_from_array = {
+				array = local_mhc_high_available_array
+				value = temp_advisor_frame
+			}
+		}
+	
+		#remove custom advisor if present
+		for_each_loop = {
+			array = local_mhc_army_available_array
+			
+			if = {
+				limit = {
+					check_variable = { v = temp_advisor_frame }
+				}
+				remove_from_array = {
+					array = local_mhc_army_available_array
+					index = i
+				}
+			}
+		}
+		
+		#remove generic advisor if present
+		if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_generic_army_advisors_array
+					value = temp_advisor_frame
+				}
+			}
+			for_each_loop = {
+				array = local_mhc_generic_army_advisors_array
+				
+				if = {
+					limit = {
+						check_variable = { v = temp_advisor_frame }
+					}
+					remove_from_array = {
+						array = local_mhc_generic_army_advisors_array
+						index = i
+					}
+				}
+			}
+		}
+		
+		#remove trait of advisor if present
+		if = {
+			limit = {
+				has_variable = local_mhc_army_available_traits_array^temp_advisor_frame
+			}
+			set_temp_variable = { temp_advisor_frame_incr = temp_advisor_frame }
+			add_to_temp_variable = { temp_advisor_frame_incr = 1 }
+			if = {
+				limit = {
+					has_variable = local_mhc_army_available_traits_array^temp_advisor_frame_incr
+				}
+				remove_from_array = {
+					array = local_mhc_army_available_traits_array
+					index = temp_advisor_frame
+				}
+				add_to_array = {
+					array = local_mhc_army_available_traits_array
+					value = 0
+					index = temp_advisor_frame
+				}
+			}
+			else = {
+				remove_from_array = {
+					array = local_mhc_army_available_traits_array
+					index = temp_advisor_frame
+				}
+			}	
+		}
+		
+		#refill missing advisors
+		if = {
+			limit = {
+				NOT = {
+					has_variable = local_mhc_army_available_array^7
+				}
+			}
+			mhc_fill_generic_army_advisor = yes
+		}
+	}
+}
+
+mhc_remove_generic_army_advisors = {
+	hidden_effect = {
+		if = {
+			limit = {
+				has_variable = local_mhc_generic_army_advisors_array^0
+			}
+			for_each_loop = {
+				array = local_mhc_generic_army_advisors_array
+				
+				remove_from_array = {
+					array = local_mhc_army_available_array
+					value = v
+				}
+				
+				if = {
+					limit = {
+						has_variable = local_mhc_high_available_array^0
+						is_in_array = {
+							array = local_mhc_high_available_array
+							value = v
+						}
+					}
+					remove_from_array = {
+						array = local_mhc_high_available_array
+						index = v
+					}
+				}
+				
+				if = {
+					limit = {
+						has_variable = local_mhc_army_available_traits_array^v
+					}
+					set_temp_variable = { temp_advisor_frame_incr = v }
+					add_to_temp_variable = { temp_advisor_frame_incr = 1 }
+					if = {
+						limit = {
+							has_variable = local_mhc_army_available_traits_array^temp_advisor_frame_incr
+						}
+						remove_from_array = {
+							array = local_mhc_army_available_traits_array
+							index = v
+						}
+						add_to_array = {
+							array = local_mhc_army_available_traits_array
+							value = 0
+							index = v
+						}
+					}
+					else = {
+						remove_from_array = {
+							array = local_mhc_army_available_traits_array
+							index = v
+						}
+					}	
+				}
+			}
 		}
 	}
 }
