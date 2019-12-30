@@ -2020,7 +2020,7 @@ mhc_remove_all_army_advisors = {
 }
 
 ###AI STUFF###
-mhc_ai_army_initiate_collector = {
+mhc_ai_army_initiate_assign = {
 	hidden_effect = {
 		while_loop_effect = {
 			limit = {
@@ -2034,6 +2034,206 @@ mhc_ai_army_initiate_collector = {
 				}
 			}
 			mhc_ai_army_assign = yes
+		}
+	}
+}
+
+mhc_ai_army_initiate_activate = {
+	hidden_effect = {
+		if = {
+			limit = {
+				alliance_strength_ratio > 0.7
+			}
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							check_variable = { mhc_sec_power > 36 }
+							check_variable = { mhc_chief_power > 36 }
+						}
+					}
+				}
+				while_loop_effect = {
+					limit = {
+						OR = {
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 1
+								}
+							}
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 2
+								}
+							}
+						}
+					}
+					mhc_ai_army_activate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_sec_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 1
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 1 }
+					mhc_deactivate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_chief_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 2
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 2 }
+					mhc_deactivate = yes
+				}
+			}
+			mhc_ai_normalize_activations = yes
+		}
+		else_if = {
+			limit = {
+				alliance_strength_ratio > 0.4
+			}
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							check_variable = { mhc_vchief_power > 36 }
+							check_variable = { mhc_quart_power > 36 }
+						}
+					}
+				}
+				while_loop_effect = {
+					limit = {
+						OR = {
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 3
+								}
+							}
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 4
+								}
+							}
+						}
+					}
+					mhc_ai_army_activate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_vchief_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 3
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 3 }
+					mhc_deactivate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_quart_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 4
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 4 }
+					mhc_deactivate = yes
+				}
+			}
+			mhc_ai_normalize_activations = yes
+		}
+		else_if = {
+			limit = {
+				alliance_strength_ratio < 0.41
+			}
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							check_variable = { mhc_pchief_power > 36 }
+							check_variable = { mhc_ins_power > 36 }
+						}
+					}
+				}
+				while_loop_effect = {
+					limit = {
+						OR = {
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 5
+								}
+							}
+							NOT = {
+								is_in_array = {
+									array = local_mhc_active
+									value = 6
+								}
+							}
+						}
+					}
+					mhc_ai_army_activate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_pchief_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 5
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 5 }
+					mhc_deactivate = yes
+				}
+			}
+			else_if = {
+				limit = {
+					check_variable = { mhc_ins_power > 36 }
+				}
+				if = {
+					limit = {
+						is_in_array = {
+							array = local_mhc_active
+							value = 6
+						}
+					}
+					set_temp_variable = { mhc_deactivate_target = 6 }
+					mhc_deactivate = yes
+				}
+			}
+			mhc_ai_normalize_activations = yes
 		}
 	}
 }
@@ -2143,10 +2343,17 @@ mhc_ai_army_assign_generate_random_index_loop_high = {
 		while_loop_effect = {
 			limit = {
 				OR = {
-					NOT = {
-						is_in_array = {
-							array = local_mhc_high_available_array
-							value = local_mhc_army_available_array^temp_generated_index_zero_seven
+					if = {
+						limit = {
+							NOT = {
+								check_variable = { local_mhc_high_available_array^num < 2 }
+							}
+						}
+						NOT = {
+							is_in_array = {
+								array = local_mhc_high_available_array
+								value = local_mhc_army_available_array^temp_generated_index_zero_seven
+							}
 						}
 					}
 					check_variable = { mhc_sec_value = local_mhc_army_available_array^temp_generated_index_zero_seven }
@@ -2251,7 +2458,7 @@ mhc_ai_army_activate = {
 	hidden_effect = {
 		if = {
 			limit = {
-				mhc_advisors_advisors_disnormalized = yes
+				mhc_army_advisors_disnormalized = yes
 			}
 			mhc_ai_normalize_activations = yes
 		}
@@ -2332,6 +2539,77 @@ mhc_ai_army_activate = {
 			set_temp_variable = { mhc_activate_target = 6 }
 			mhc_activate = yes
 			add_political_power = -100
+		}
+	}
+}
+
+mhc_ai_army_deactivate = {
+	hidden_effect = {
+		if = {
+			limit = {
+				mhc_army_advisors_disnormalized = yes
+			}
+			mhc_ai_normalize_activations = yes
+		}
+		if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 6
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 6 }
+			mhc_deactivate = yes
+		}
+		else_if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 5
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 5 }
+			mhc_deactivate = yes
+		}
+		else_if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 4
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 4 }
+			mhc_deactivate = yes
+		}
+		else_if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 3
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 3 }
+			mhc_deactivate = yes
+		}
+		else_if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 2
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 2 }
+			mhc_deactivate = yes
+		}
+		else_if = {
+			limit = {
+				is_in_array = {
+					array = local_mhc_active
+					value = 1
+				}
+			}
+			set_temp_variable = { mhc_deactivate_target = 1 }
+			mhc_deactivate = yes
 		}
 	}
 }
