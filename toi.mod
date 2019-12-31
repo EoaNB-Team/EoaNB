@@ -1,4 +1,4 @@
-﻿name="End of a New Beginning"
+name="End of a New Beginning"
 path="mod/toi/"
 tags={
 	"Alternative History"
@@ -30,5 +30,5 @@ replace_path = "history/countries"
 replace_path = "history/states"
 replace_path = "map/supplyareas"
 
-supported_version="1.7.x"
+supported_version="1.8.x"
 picture="toi.jpg"
