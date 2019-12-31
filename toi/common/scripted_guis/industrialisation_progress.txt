@@ -1034,4 +1034,283 @@ scripted_gui = {
 			} 
 		}
 	}
+	nuclear_missile_tab = {
+		window_name = "nmissle_container"
+		
+		context_type = country_context
+	    ai_enabled={
+			always = no
+		}
+ 
+		visible = {
+			has_country_flag = NMC_opened
+		}
+		properties = {
+			nmissle_target_country = { image = "[GET_CURRENT_MISSILE_TARGETED_NATION]"}
+			missile_target_owner_flag = { image = "[?zmissile_targeted_states_country_array^i.GetFlag]" }
+			missile_current_target_country = { image = "[?zmissile_current_nuke_target.GetFlag]" }
+			deployment_nukes_2 = { image = "[MISSILE_GET_CURRENT_NUKE_COUNT]" }
+			deployment_nukes_1 = { image = "[MISSILE_GET_CURRENT_STORED_MISSILE_COUNT]" }
+		}
+        effects = {
+			launch_strike_click={#the big red button
+				add_to_array = { 
+					zmissile_targeted_states_array = "NA" 
+				}
+				add_to_array = { 
+					zmissile_targeted_states_country_array = "NA" 
+				}
+				for_each_loop = {#nuke relevant states
+					array = zmissile_targeted_states_array
+					every_state={
+						limit={
+							state = v
+						}
+						if={
+							limit ={
+								owner = {tag = ROOT.zmissile_current_nuke_target}
+							}
+							ROOT={
+								launch_nuke = {
+									state = v
+									controller = ROOT.zmissile_current_nuke_target
+									use_nuke = no
+								}
+								remove_from_array = {
+									array = zmissile_targeted_states_country_array
+									index = i
+								}
+								remove_from_array = {
+									array = zmissile_targeted_states_array
+									index = i
+								}
+								add_to_array = { 
+									index = i
+									zmissile_targeted_states_array = "NA" 
+								}
+								add_to_array = { 
+									zmissile_targeted_states_country_array = "NA" 
+									index = i
+								}
+							}
+						}
+					}
+				}
+				if={#clean up
+					limit={
+						all_of = {
+							array = zmissile_targeted_states_array
+							
+							check_variable={v = "NA"}
+						}
+					}
+					clear_array = zmissile_targeted_states_array
+					clear_array = zmissile_targeted_states_country_array
+				}
+				else={
+					for_each_loop = {
+						array = zmissile_targeted_states_array
+						if={
+							limit={
+								check_variable = {v="NA"}
+							}
+							remove_from_array = {
+								array = zmissile_targeted_states_array
+								value = "NA"
+							}
+							remove_from_array = {
+								array = zmissile_targeted_states_country_array
+								value = "NA"
+							}
+						}
+					}
+				}
+				#unassign nuked target
+				set_variable = { ROOT.zmissile_current_nuke_target=0 }
+			}
+			missile_build_missile_click={
+				#subtract_from_variable={ROOT.num_equipment@icbm_3 = 1}
+				add_equipment_to_stockpile = {
+					type = icbm_equipment
+					amount = -1
+					producer = ROOT
+				}
+				add_nuclear_bombs = -1
+				add_to_variable = { num_prepared_nuclear_missiles = 1}
+			}
+			launch_pad_switch_cover_open_click={
+				clr_country_flag = launch_ready
+			}
+			launch_pad_switch_cover_click={
+				set_country_flag = launch_ready
+			}
+			nmissle_container_escape_click={
+				clr_country_flag = NMC_opened
+			}
+			nmissle_target_country_click={
+				set_variable = {zmissile_current_nuke_target = zmissile_targeted_states_country_array^i}
+			}
+			nmissle_targeted_list_remove_click={
+				remove_from_array={ 
+					array = zmissile_targeted_states_array
+					index = i
+				}
+				remove_from_array={ 
+					array = zmissile_targeted_states_country_array
+					index = i
+				}
+				add_to_variable = { num_prepared_nuclear_missiles = 1}
+			}
+			nmissle_targeted_list_move_up_click={
+				if={
+					limit={
+						check_variable={ i > 0}
+					}
+					set_temp_variable = { temp1 = i }
+					subtract_from_temp_variable = { temp1 = 1 }
+					set_temp_variable = { temp3 = zmissile_targeted_states_country_array^i}
+					remove_from_array = {
+						array = zmissile_targeted_states_country_array
+						index = i
+					}
+					add_to_array = {
+						array = zmissile_targeted_states_country_array
+						value = temp3
+						index = temp1
+					}
+					set_temp_variable = { temp3 = zmissile_targeted_states_array^i}
+					remove_from_array = {
+						array = zmissile_targeted_states_array
+						index = i
+					}
+					add_to_array = {
+						array = zmissile_targeted_states_array
+						value = temp3
+						index = temp1
+					}
+				}
+			}
+			nmissle_targeted_list_move_down_click={
+				if={
+					limit={
+						set_temp_variable = { temp1 = zmissile_targeted_states_array^num }
+						subtract_from_temp_variable = { temp1 = 1 }
+						check_variable = {i < temp1}
+					}
+					set_temp_variable = { temp1 = i }
+					add_to_temp_variable = { temp1 = 1 }
+					set_temp_variable = { temp3 = zmissile_targeted_states_country_array^i}
+					remove_from_array = {
+						array = zmissile_targeted_states_country_array
+						index = i
+					}
+					add_to_array = {
+						array = zmissile_targeted_states_country_array
+						value = temp3
+						index = temp1
+					}
+					set_temp_variable = { temp3 = zmissile_targeted_states_array^i}
+					remove_from_array = {
+						array = zmissile_targeted_states_array
+						index = i
+					}
+					add_to_array = {
+						array = zmissile_targeted_states_array
+						value = temp3
+						index = temp1
+					}
+				}
+			}
+        }
+        triggers = {
+			launch_strike_click_enabled={
+				has_country_flag = launch_ready
+			}
+			launch_pad_switch_cover_open_visible={
+				has_country_flag = launch_ready
+			}
+			launch_pad_switch_cover_visible={
+				NOT = {has_country_flag = launch_ready}
+			}
+			nmissle_targeted_list_move_down_visable={
+				check_variable = {
+					var = i
+					value = zmissile_targeted_states_array^num
+					compare = less_than
+				}
+			}
+			nmissle_targeted_list_move_up_visable={
+				check_variable = {i > 0}
+			}
+			missile_build_missile_click_enabled={
+				has_equipment = {
+					icbm_equipment > 0
+				}
+				num_of_nukes > 0
+			}
+        }
+		dynamic_lists = {
+			nmissle_targeted_list = {
+				array = zmissile_targeted_states_array
+				entry_container = nmissle_targeted_list_container
+			}
+		}
+	}
+	nuclear_missile_targeting = {
+       window_name = "nuclear_missile_targeting_container"
+ 
+       context_type = selected_state_context
+	   parent_window_token = selected_state_view 
+		
+		 ai_enabled={
+			always = no
+		}
+		visible = {
+			ROOT={has_country_flag = NMC_opened}
+		}
+ 
+        effects = {
+			target_state_with_missle_click={
+				if={
+					limit={
+						ROOT={
+							NOT={
+								is_in_array = {
+									array = zmissile_targeted_states_array
+									value = PREV
+								}
+							}
+						}
+					}
+					ROOT={
+						add_to_array = { 
+							zmissile_targeted_states_array = PREV 
+						}
+					}
+					OWNER={
+						ROOT={
+							add_to_array = { 
+								zmissile_targeted_states_country_array = PREV 
+							}
+						}
+					}
+					ROOT = {subtract_from_variable = { num_prepared_nuclear_missiles = 1}}
+				}
+			}
+        }
+        triggers = {
+			target_state_with_missle_click_enabled = {
+				NOT={owner = {tag = ROOT}}
+				ROOT={check_variable = { num_prepared_nuclear_missiles > 0}}
+				NOT={
+					is_in_array = {
+						array = ROOT.zmissile_targeted_states_array
+						value = THIS
+					}
+				}
+			}
+        }
+	}
+
+
 }
