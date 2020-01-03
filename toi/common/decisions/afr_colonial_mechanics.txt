@@ -1,0 +1,631 @@
+afr_transatlantic_slave_ban_decisions = {
+
+
+	AFR_interstate_slave_trade_consumer = {
+
+		available = {
+			NOT = {
+				has_idea = tribal_slavery
+			}
+			ROOT = {
+				OR = {
+					AND = {
+						any_owned_state = { is_coastal = yes }
+						any_country = {
+							AND = {
+								has_idea = AFR_illegal_transatlantic
+								any_owned_state = { is_coastal = yes }
+							}
+						}	
+					}
+					any_neighbor_country = {
+						OR = {
+							has_idea = AFR_illegal_transatlantic
+							has_country_flag = AFR_interstate_supplier
+						} 
+					}
+				}
+			}
+		}
+
+		visible = {
+			OR = {	
+				has_idea = slavery
+				has_idea = usa_slavery_law
+				has_idea = tribal_slavery
+			}
+			has_idea = AFR_transatlantic_consumer
+		}
+		
+		fire_only_once = yes
+		
+		ai_will_do = {
+			factor = 1
+		}
+
+		cost = 100
+		
+		complete_effect = {
+			remove_ideas = AFR_transatlantic_consumer
+		}
+	}
+
+	AFR_accept_bribes_for_slave_smuggling = {
+
+		available = {
+			NOT = {
+				has_idea = tribal_slavery
+			}
+			ROOT = {
+				any_owned_state = { is_coastal = yes }
+			}
+			has_stability > 0.55
+		}
+
+		visible = {
+			OR = {	
+				has_idea = slavery
+				has_idea = usa_slavery_law
+				has_idea = tribal_slavery
+			}
+			OR = {
+				has_country_flag = AFR_interstate_supplier
+				has_idea = AFR_illegal_transatlantic
+			}
+			NOT = {
+				OR = {
+					TAG = SNG
+					TAG = GBS
+					TAG = SKT
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		
+		ai_will_do = {
+			factor = 1
+		}
+
+		cost = 0
+		
+		complete_effect = {
+			ENG = {
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = AFR_illegal_transatlantic
+				}
+			}
+			add_political_power = 25
+			clr_country_flag = AFR_interstate_supplier
+			add_ideas = AFR_illegal_transatlantic
+		}
+	}
+	
+	AFR_interstate_slave_trade_supplier = {
+
+		available = {
+			NOT = {
+				has_idea = tribal_slavery
+			}
+			has_stability > 0.40
+		}
+
+		visible = {
+			OR = {
+				has_idea = tribal_slavery
+				has_idea = slavery
+			}
+			has_idea = AFR_transatlantic_supplier
+			NOT = { TAG = SKT }
+		}
+		
+		fire_only_once = yes
+		
+		ai_will_do = {
+			factor = 1
+		}
+
+		cost = 0
+		
+		complete_effect = {
+			remove_ideas = AFR_transatlantic_supplier
+			set_country_flag = AFR_interstate_supplier
+		}
+	}
+
+	AFR_modernize_slavery = {
+
+		available = {
+			has_idea = tribal_slavery
+			has_stability > 0.25
+		}
+
+		visible = {
+			has_idea = tribal_slavery
+			OR = {
+				has_idea = AFR_transatlantic_supplier
+				has_idea = AFR_illegal_transatlantic
+			}
+		}
+		
+		fire_only_once = yes
+		
+		ai_will_do = {
+			factor = 1
+		}
+
+		cost = 100
+		
+		complete_effect = {
+			add_political_power = -100
+			swap_ideas = {
+				remove_idea = tribal_slavery
+				add_idea = slavery
+			}
+		}
+	}
+
+}
+
+
+afr_colony_generic_colonial_investments_decisions = {
+	# ----------------------------------
+	#Modern Resource Production Decisions
+	# ----------------------------------
+	afr_colony_generic_regional_resources_completed = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_has_fabric_industry
+			has_country_flag = afr_colony_has_logging_industry
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_resources
+				has_completed_focus = LIB_colony_generic_regional_resources
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_colony_generic_regional_resources_completed
+		}
+	}
+	
+	afr_colony_generic_regional_resources_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			always = no
+		}
+
+		visible = {
+			always = no
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 360
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		remove_effect = {
+			random_owned_state={
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+				add_resource = {
+					type = iron
+					amount = 5
+				}
+			}
+			set_country_flag = afr_colony_generic_regional_resources_decision_flag
+		}
+	}
+	
+	afr_colony_construct_fabric_industry = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_generic_regional_resources_decision_flag 
+			has_country_flag = afr_colony_generic_regional_industry_decision_flag
+			NOT = { has_country_flag = afr_colony_construction_in_progress }
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_resources
+				has_completed_focus = LIB_colony_generic_regional_industry
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			set_country_flag = afr_colony_construction_in_progress
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = fabric_weavery
+						size > 0
+						include_locked = yes
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = fabric_weavery
+										size > 0
+										include_locked = yes
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = fabric_weavery
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_colony_has_fabric_industry
+			clr_country_flag = afr_colony_construction_in_progress
+		}
+	}
+	
+	afr_colony_establish_logging_industry = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_generic_regional_resources_decision_flag 
+			NOT = { has_country_flag = afr_colony_construction_in_progress }
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_resources
+				has_completed_focus = afr_colony_generic_regional_industry
+				has_completed_focus = LIB_colony_generic_regional_resources
+				has_completed_focus = LIB_colony_generic_regional_industry
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			set_country_flag = afr_colony_construction_in_progress
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = logging_camp
+						size > 0
+						include_locked = yes
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = logging_camp
+										size > 0
+										include_locked = yes
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_colony_has_logging_industry
+			clr_country_flag = afr_colony_construction_in_progress
+		}
+	}
+	
+	# ---------------------------------- 
+	# Modern Factories Decisions
+	# ----------------------------------
+	afr_colony_generic_regional_industry_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			always = no
+		}
+
+		visible = {
+			always = no
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 540
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		remove_effect = {
+			set_country_flag = afr_colony_generic_regional_industry_decision_flag
+		}
+	}
+	
+	afr_colony_generic_regional_industry_completed = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_has_civilian_industry
+			has_country_flag = afr_colony_has_military_industry
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_industry
+				has_completed_focus = LIB_colony_generic_regional_industry
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_colony_generic_regional_industry_completed
+		}
+	}
+	
+	afr_colony_construct_civ_factory = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_has_fabric_industry
+			has_country_flag = afr_colony_has_logging_industry
+			NOT = { has_country_flag = afr_colony_construction_in_progress }
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_industry
+				has_completed_focus = LIB_colony_generic_regional_industry
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			set_country_flag = afr_colony_construction_in_progress
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = industrial_complex
+						size > 0
+						include_locked = yes
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = industrial_complex
+										size > 0
+										include_locked = yes
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_colony_has_civilian_industry
+			clr_country_flag = afr_colony_construction_in_progress
+		}
+	}
+	
+	afr_colony_construct_mil_factory = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_has_fabric_industry
+			has_country_flag = afr_colony_has_logging_industry
+			NOT = { has_country_flag = afr_colony_construction_in_progress }
+		}
+
+		visible = {
+			OR = {
+				has_completed_focus = afr_colony_generic_regional_industry
+				has_completed_focus = LIB_colony_generic_regional_industry
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			set_country_flag = afr_colony_construction_in_progress
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = arms_factory
+						size > 0
+						include_locked = yes
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = arms_factory
+										size > 0
+										include_locked = yes
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_colony_has_military_industry
+			clr_country_flag = afr_colony_construction_in_progress
+		}
+	}
+	
+	# ----------------------------------
+	# Modern Cities Decisions
+	# ----------------------------------
+	afr_colony_generic_regional_infrastructure = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_colony_generic_regional_infrastructure_decision_flag
+		}
+
+		visible = {
+			Or = {
+				has_completed_focus = afr_colony_generic_regional_infrastructure
+				has_completed_focus = LIB_colony_generic_regional_infrastructure
+			}
+			
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_colony_generic_regional_infrastructure_completed
+			
+		}
+	}
+	
+    afr_colony_generic_regional_infrastructure_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			always = no
+		}
+
+		visible = {
+			always = no
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 900
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					free_building_slots = {
+						building = infrastructure
+						size > 0
+					}
+					OR = {
+						is_in_home_area = yes
+						NOT = {
+							owner = {
+								any_owned_state = {
+									free_building_slots = {
+										building = infrastructure
+										size > 0
+									}
+									is_in_home_area = yes
+								}
+							}
+						}
+					}
+				}
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_colony_generic_regional_infrastructure_decision_flag
+			custom_effect_tooltip = afr_colony_generic_regional_infrastructure_tooltip
+		}
+	}
+	
+	
+
+}

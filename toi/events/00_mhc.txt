@@ -1,0 +1,418 @@
+﻿add_namespace = mhc
+
+#Military Junta Created - Army
+news_event = {
+	id = mhc.10
+	title = mhc.10.t
+	desc = mhc.10.d
+	
+	picture = GFX_MHC_news_picture_junta_army
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.a
+		
+		trigger = {
+			tag = FROM
+		}
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.b
+		
+		trigger = {
+			NOT = {
+				tag = FROM
+			}
+		}
+	}
+}
+
+#vote
+country_event = {
+  id = mhc.11
+  title = pmhc.11.t
+  desc = mhc.11.d
+  picture = GFX_report_event_generic_parliament
+
+  is_triggered_only = yes
+
+  immediate = {
+    set_variable = { 
+		var = current_reform_id
+		value = temp_reform_id
+	}
+	clear_variable = temp_reform_id
+
+    reset_approval_arrays = yes ################## Resets all of the approvals
+    set_1_approval_highly_agree = yes #########|==> Sets the approval for all of the issues 
+    set_2_approval_highly_agree = yes ################|    (highly_disagree, disagree, neutral, agree, highly_agree)
+    set_3_approval_highly_agree = yes #################|
+    set_4_approval_highly_agree = yes ############|    The Issues are detailed at the bottom of this document
+
+	set_deterministic_vote = yes
+    set_vote_eco = yes ########################### Sets the Issue type for this vote (cul, eco, dem, war)
+    compute_voting_approval = yes ################ Calculates the approvals
+
+    compute_number_seats_tot = yes ############### Calculates the total number of seats in the current Parliament
+    compute_number_seats_approve_est = yes ####### Estimates the number of seats that will vote yes for the vote
+  }
+
+  option = {
+    name = mhc.11.a
+    country_event = {
+      id = mhc.12 ########## Sets the custom result event for your custom law
+      days = 3 ################################## Usually, a vote takes 30 days. You can go lower, but the timed mission won't be able to show the right amount of time. It's not a big deal because this fires the event by itself, and because the decision does nothing in the case of a custom vote.
+    }
+  }
+}
+
+#result
+country_event = {
+  id = mhc.12
+  title = mhc.12.t
+  desc = mhc.12.d
+  picture = GFX_report_event_generic_parliament
+
+  is_triggered_only = yes
+
+  immediate = {
+    hidden_effect = {
+      hold_vote = yes ############################## Do all the calcultations for the vote, and outputs a flag (eoanb_reform_vote_success, eoanb_reform_vote_failure, eoanb_reform_vote_tie)
+	  
+	  country_event = { id = mhc.14 days = 10 } 
+    }
+  }
+
+  option = { # It's a success !
+    name = mhc.12.a
+    trigger = {
+      has_country_flag = eoanb_reform_vote_success
+    }
+    clr_country_flag = eoanb_reform_vote_success
+    enact_voted_reform = yes
+
+    set_variable = { 
+      var = current_reform_id
+      value = 0
+    }
+  }
+}
+
+#Military Junta - non vote penalty
+country_event = {
+	id = mhc.13
+	title = mhc.13.t
+	desc = mhc.13.d
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			clr_country_flag = mhc_temp_non_vote_army
+			country_event = { id = mhc.14 days = 90 }
+		}
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.13.a
+		
+		add_political_power = -250
+	}
+}
+
+#Military Junta - End
+country_event = {
+	id = mhc.14
+	title = mhc.14.t
+	desc = mhc.14.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.14.a
+		
+		hidden_effect = {
+			clr_country_flag = MHC_military_junta_army
+			mhc_junta_enable_parliament_decisions = yes
+		}
+		
+		remove_ideas = mhc_military_junta_idea_army
+		add_timed_idea = {
+			idea = mhc_military_junta_idea_army_after_effects
+			days = 180
+		}
+	}
+}
+
+#Army generic setup
+country_event = {
+	id = mhc.99
+	title = mhc.99.t
+	desc = mhc.99.d
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		mhc_fill_generic_army_advisor = yes
+		
+		#AI that has war by the start of the game
+		if = {
+			limit = {
+				has_country_flag = mhc_ai_war_by_startup
+			}
+			if = {
+				limit = {
+					is_ai = yes
+				}
+				set_country_flag = mhc_ai_is_active
+				mhc_ai_army_initiate_assign = yes
+				mhc_ai_army_initiate_activate = yes
+			}
+			clr_country_flag = mhc_ai_war_by_startup
+		}
+	}
+	
+	option = {
+		name = mhc.99.a
+	}
+}
+
+###DEBUG###
+country_event = {
+	id = mhc.0
+	title = mhc.0.t
+	desc = mhc.0.d
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.0.a
+		
+		###ADVISOR SETUP###
+		#Value is reference to frame of minister
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 1
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 2
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 3
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 4
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 5
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 6
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 7
+		}
+		
+		###TRAITS SETUP###
+		#Index is reference to minister
+		#Value is reference to trait
+		add_to_array = { # position 0 is null value
+			array = local_mhc_army_available_traits_array
+			index = 0
+			value = 0
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 1
+			value = 5
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 2
+			value = 44
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 3
+			value = 41
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 4
+			value = 1
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 5
+			value = 51
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 6
+			value = 26
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 7
+			value = 24
+		}
+		
+		#navy and airforce receive new arrays, numbers continue from 7 (in this case)
+		
+		###ALLOWED ADVISORS IN HIGH POSITIONS SETUP###
+		#Value is reference to minister
+		add_to_array = {
+			array = local_mhc_high_available_array
+			value = 1
+		}
+		add_to_array = {
+			array = local_mhc_high_available_array
+			value = 5
+		}
+		add_to_array = {
+			array = local_mhc_high_available_array
+			value = 7
+		}
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.1.b
+		
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = mhc_military_has_no_structure
+				}
+			}
+			mhc_raise_power_collector = yes
+			mhc_lower_power_collector = yes
+			mhc_get_results_collector = yes
+			mhc_get_results_effects_collector = yes
+			
+			#mhc_junta_collector = yes
+		}
+	}
+	
+	option = {
+		name = mhc.1.c
+		
+		###ADVISOR SETUP###
+		#Value is reference to frame of minister
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 1
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 2
+		}
+		add_to_array = {
+			array = local_mhc_army_available_array
+			value = 3
+		}
+		
+		###TRAITS SETUP###
+		#Index is reference to minister
+		#Value is reference to trait
+		add_to_array = { # position 0 is null value
+			array = local_mhc_army_available_traits_array
+			index = 0
+			value = 0
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 1
+			value = 5
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 1
+			value = 24
+		}
+		add_to_array = {
+			array = local_mhc_army_available_traits_array
+			index = 1
+			value = 15
+		}
+		
+		#mhc_junta_collector = yes
+		#mhc_create_junta_army = yes
+	}
+	
+	option = {
+		name = mhc.1.e
+		
+		#mhc_fill_generic_army_advisor = yes
+		
+		#set_temp_variable = { temp_advisor_frame = 14 }
+		#mhc_remove_army_advisor = yes
+		
+		mhc_ai_army_initiate_activate = yes
+		
+		print_variables = {
+			file = log_file
+			text = header_text
+			append = no
+			print_global = no
+		}
+	}
+	
+	option = {
+		name = mhc.1.d
+		
+		#mhc_remove_all_army_advisors = yes
+		
+		#mhc_remove_generic_army_advisors = yes
+		
+		#generate_random_array_with_eight_random_numbers = yes
+		
+		add_to_variable = {
+			var = mhc_sec_power
+			value = 47
+		}
+		
+		#mhc_ai_army_assign = yes
+		
+		#mhc_ai_army_activate = yes
+		
+		#FRA = { 
+		#	declare_war_on = {
+		#		target = PIE
+		#		type = annex_everything
+		#	}
+		#}
+		
+		#FRA = {
+		#	white_peace = {
+		#		tag = PRM
+		#		message = EXAMPLE
+		#	}
+		#}
+		
+		print_variables = {
+			file = log_file
+			text = header_text
+			append = no
+			print_global = no
+		}
+	}
+}

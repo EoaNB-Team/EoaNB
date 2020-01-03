@@ -1,32 +1,867 @@
 ﻿add_namespace = afr_rrp
+add_namespace = afr_rrp_weapon_contract
+add_namespace = afr_rrp_racial_tension_increase
+add_namespace = afr_rrp_racial_tension_decrease
+add_namespace = afr_colonial_company
+
+#Colonial company ressource event
+country_event = {
+	id = afr_colonial_company.1
+	title = afr_colonial_company.1.t
+	desc = afr_colonial_company.1.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = cotton.1.c
+		ai_chance = { factor = 33 }
+		add_political_power = 100
+		FROM = { country_event = { days = 1 id = afr_colonial_company.2 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 1 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+		}
+	}
+	
+	option = {
+		name = logging.1.c
+		ai_chance = { factor = 33 }
+		FROM = { country_event = { days = 1 id = afr_colonial_company.3 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 2 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+		}
+	}
+	
+	option = {
+		name = rubber.1.b
+		ai_chance = { factor = 33 }
+		FROM = { country_event = { days = 1 id = afr_colonial_company.4 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 3 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+		}
+	}
+	
+}
+
+
+
+#A cotton company
+country_event = {
+	id = afr_colonial_company.2
+	title = afr_colonial_company.2.t
+	desc = afr_colonial_company.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_colonial_company.2.a
+		ai_chance = { factor = 100 }
+		activate_decision = afr_establish_export_company
+	}
+}
+
+#A logging company
+country_event = {
+	id = afr_colonial_company.3
+	title = afr_colonial_company.3.t
+	desc = afr_colonial_company.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_colonial_company.3.a
+		ai_chance = { factor = 100 }
+		activate_decision = afr_establish_export_company
+	}
+}
+
+#A rubber company
+country_event = {
+	id = afr_colonial_company.4
+	title = afr_colonial_company.4.t
+	desc = afr_colonial_company.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_colonial_company.4.a
+		ai_chance = { factor = 100 }
+		activate_decision = afr_establish_export_company
+	}
+}
+
+#Update number of factories for export
+country_event = {
+	id = afr_colonial_company.5
+	title = afr_colonial_company.5
+	desc = afr_colonial_company.5.desc
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	hidden = yes
+	
+	immediate = {
+		
+		if = {
+			limit = {
+				OR = {
+					ROOT = { has_active_mission = ETH_export_quota }
+					ROOT = { has_active_mission = afr_export_quota }
+				}
+			}
+			set_variable = { ROOT.num_of_export_industries = 0 }
+			meta_effect = {
+				text = {
+					every_owned_state = {
+						add_to_variable = { ROOT.num_of_export_industries = building_level@[afr_company_trade_good_meta]}
+					}
+					ROOT = { country_event = { days = 360 id = afr_colonial_company.5 } }
+				}
+				afr_company_trade_good_meta = "[ROOT.afr_company_trade_good_loc]"
+			}
+		}
+	}
+}
+
+
+#Company increases exports
+country_event = {
+	id = afr_colonial_company.6
+	title = afr_colonial_company.6.t
+	desc = afr_colonial_company.6.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_colonial_company.6.a
+		ai_chance = { factor = 100 }
+		FROM = { country_event = { days = 1 id = afr_colonial_company.7 } }
+		
+	}
+	
+}
+
+country_event = {
+	id = afr_colonial_company.7
+	title = afr_colonial_company.7.t
+	desc = afr_colonial_company.7.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_colonial_company.7.a
+		ai_chance = { factor = 100 }
+		ROOT = {
+			custom_effect_tooltip = EDC_afr.3.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.3 hours = 1 } 
+			}
+		}
+	}
+	
+}
+
+#Weapons Contract Request
+country_event = {
+	id = afr_rrp_weapon_contract.1
+	title = afr_rrp_weapon_contract.1.t
+	desc = afr_rrp_weapon_contract.1.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.1.a
+		ai_chance = { factor = 100 }
+		FROM = {
+				add_relation_modifier = {
+					target = ROOT
+					modifier = ROM_license_german_equipment
+				}
+		}
+		afr_company_trust_minor_increase = yes
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_2
+		custom_effect_tooltip = afr_colonial_weapons_contract_master_sends_weapons_tooltip
+		custom_effect_tooltip = afr_detrimental_colonial_impact
+		hidden_effect = {
+			FROM = { country_event = { days = 1 id = afr_rrp_weapon_contract.2 } }
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp_weapon_contract.1.b
+		ai_chance = { factor = 0 }
+		FROM = {
+				add_relation_modifier = {
+					target = ROOT
+					modifier = ROM_license_german_equipment
+				}
+		}
+		afr_company_trust_minor_increase = yes
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		custom_effect_tooltip = afr_colonial_weapons_contract_master_tooltip
+		custom_effect_tooltip = afr_detrimental_colonial_impact
+		hidden_effect = {
+			FROM = { country_event = { days = 1 id = afr_rrp_weapon_contract.3 } }
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp_weapon_contract.1.c
+		ai_chance = { factor = 0 }
+		hidden_effect = {
+			FROM = { country_event = { days = 1 id = afr_rrp_weapon_contract.4 } }
+		}
+		
+	}
+	
+}
+
+#Contract Full Support
+country_event = {
+	id = afr_rrp_weapon_contract.2
+	title = afr_rrp_weapon_contract.2.t
+	desc = afr_rrp_weapon_contract.2.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.2.a
+		ai_chance = { factor = 100 }
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_2
+		ROOT = {
+			add_offsite_building = { type = arms_factory level = 1 }
+			set_country_flag = afr_rrp_colonial_weapon_contract_full_support
+			set_country_flag = afr_rrp_colonial_weapon_contract_active
+		}
+		hidden_effect = {
+			ROOT = { 
+				activate_decision = afr_rrp_weapon_contract_active 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.2 }
+			}
+		}
+	}
+	
+}
+
+#Contract Assist
+country_event = {
+	id = afr_rrp_weapon_contract.3
+	title = afr_rrp_weapon_contract.3.t
+	desc = afr_rrp_weapon_contract.3.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.3.a
+		ai_chance = { factor = 100 }
+		set_country_flag = afr_rrp_colonial_weapon_contract_active
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		hidden_effect = {
+			ROOT = { 
+				activate_decision = afr_rrp_weapon_contract_active 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.1 }
+			}
+		}
+	}
+	
+}
+
+#Contract Rejected
+country_event = {
+	id = afr_rrp_weapon_contract.4
+	title = afr_rrp_weapon_contract.4.t
+	desc = afr_rrp_weapon_contract.4.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.4.a
+		ai_chance = { factor = 100 }
+		clr_country_flag = afr_rrp_colonial_weapon_contract_requested
+		afr_company_broke_trust = yes
+	}
+	
+}
+
+#Contract Expired
+country_event = {
+	id = afr_rrp_weapon_contract.5
+	title = afr_rrp_weapon_contract.5.t
+	desc = afr_rrp_weapon_contract.5.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	#Request
+	option = {
+		name = afr_rrp_weapon_contract.5.a
+		ai_chance = { factor = 100 }
+		add_offsite_building = { type = arms_factory level = -1 } 
+		if = {
+			limit = {
+				has_country_flag = afr_rrp_british_company_port
+			}
+			hidden_effect = {
+				ENG = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_french_company_port
+			}
+			hidden_effect = {
+				FRA = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_portugal_company_port
+			}
+			hidden_effect = {
+				POR = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_german_company_port
+			}
+			hidden_effect = {
+				PRS = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_bremen_company_port
+			}
+			hidden_effect = {
+				BRE = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_hamburg_company_port
+			}
+			hidden_effect = {
+				HAM = { country_event = { days = 7 id = afr_rrp_weapon_contract.6 } }
+			}
+		}
+		
+	}
+	
+	#End
+	option = {
+		name = afr_rrp_weapon_contract.5.b
+		ai_chance = { factor = 100 }
+		clr_country_flag = afr_rrp_colonial_weapon_contract_full_support
+		clr_country_flag = afr_rrp_colonial_weapon_contract_requested
+		clr_country_flag = afr_rrp_colonial_weapon_contract_active
+		hidden_effect = {
+			add_offsite_building = { type = arms_factory level = -1 }
+		}
+		
+	}
+	
+}
+
+country_event = {
+	id = afr_rrp_weapon_contract.6
+	title = afr_rrp_weapon_contract.6.t
+	desc = afr_rrp_weapon_contract.6.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.6.a
+		ai_chance = { factor = 10 }
+		FROM = {
+				add_relation_modifier = {
+					target = ROOT
+					modifier = ROM_license_german_equipment
+				}
+		}
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_3
+		custom_effect_tooltip = afr_colonial_weapons_contract_master_sends_weapons_tooltip
+		custom_effect_tooltip = afr_detrimental_colonial_impact
+		afr_company_trust_minor_increase = yes
+		hidden_effect = {
+			FROM = { country_event = { id = afr_rrp_weapon_contract.7 } }
+			ROOT = {	
+				create_production_license = {
+					target = FROM
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp_weapon_contract.6.b
+		ai_chance = { factor = 40 }
+		FROM = {
+				add_relation_modifier = {
+					target = ROOT
+					modifier = ROM_license_german_equipment
+				}
+		}
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		custom_effect_tooltip = afr_colonial_weapons_contract_master_tooltip
+		custom_effect_tooltip = afr_detrimental_colonial_impact
+		afr_company_trust_minor_increase = yes
+		hidden_effect = {
+			FROM = { country_event = { id = afr_rrp_weapon_contract.8 } }
+			ROOT = {	
+				create_production_license = {
+					target = FROM
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp_weapon_contract.6.c
+		ai_chance = { factor = 50 }
+		hidden_effect = {
+			FROM = { country_event = { days = 1 id = afr_rrp_weapon_contract.9 } }
+		}
+		
+	}
+	
+}
+
+#Contract Full Support
+country_event = {
+	id = afr_rrp_weapon_contract.7
+	title = afr_rrp_weapon_contract.7.t
+	desc = afr_rrp_weapon_contract.7.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.7.a
+		ai_chance = { factor = 100 }
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_2
+		ROOT = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = afr_rrp_colonial_weapon_contract_full_support }
+				}
+				add_offsite_building = { type = arms_factory level = 1 }
+			}
+			
+			set_country_flag = afr_rrp_colonial_weapon_contract_full_support
+			set_country_flag = afr_rrp_colonial_weapon_contract_active
+		}
+		hidden_effect = {
+			ROOT = { 
+				activate_decision = afr_rrp_weapon_contract_active 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.2 }
+			}
+		}
+	}
+	
+}
+
+#Contract Assist
+country_event = {
+	id = afr_rrp_weapon_contract.8
+	title = afr_rrp_weapon_contract.8.t
+	desc = afr_rrp_weapon_contract.8.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.8.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			if = {
+				limit = {
+					has_country_flag = afr_rrp_colonial_weapon_contract_full_support
+				}
+				add_offsite_building = { type = arms_factory level = -1 }
+			}
+		}
+		clr_country_flag = afr_rrp_colonial_weapon_contract_full_support
+		set_country_flag = afr_rrp_colonial_weapon_contract_active
+		custom_effect_tooltip = afr_colonial_effect_tooltip
+		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		hidden_effect = {
+			ROOT = { 
+				activate_decision = afr_rrp_weapon_contract_active
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.1 }
+			}
+		}
+	}
+	
+}
+
+#Contract Rejected
+country_event = {
+	id = afr_rrp_weapon_contract.9
+	title = afr_rrp_weapon_contract.9.t
+	desc = afr_rrp_weapon_contract.9.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp_weapon_contract.9.a
+		ai_chance = { factor = 100 }
+		afr_company_broke_trust = yes
+		hidden_effect = {
+			if = {
+				limit = {
+					has_country_flag = afr_rrp_colonial_weapon_contract_full_support
+				}
+				add_offsite_building = { type = arms_factory level = -1 }
+			}
+		}
+		clr_country_flag = afr_rrp_colonial_weapon_contract_full_support
+		clr_country_flag = afr_rrp_colonial_weapon_contract_requested
+		clr_country_flag = afr_rrp_colonial_weapon_contract_active
+	}
+	
+}
+
+#Railway_Construction_1_Info
+country_event = {
+	id = afr_rrp.1
+	title = afr_rrp.1.t
+	desc = afr_rrp.1.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.1.a
+		ai_chance = { factor = 100 }
+		
+		
+	}
+	
+}
+
+ #Railway_Construction_1
+country_event = {
+	id = afr_rrp.2
+	title = afr_rrp.2.t
+	desc = afr_rrp.2.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.2.a
+		ai_chance = { factor = 30 }
+		FROM = { country_event = { days = 1 id = afr_rrp.3 } }
+		FROM = { activate_decision = afr_rrp_railway_infrastructure_construction }
+		FROM = {
+		custom_effect_tooltip = EDC_afr.3.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.3 hours = 1 } 
+			}
+			add_tech_bonus = { 
+				bonus = 1
+				uses = 1 
+				technology = iron_railways
+			}
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_2
+			custom_effect_tooltip = AFR_Racial_Tension_2_desc
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp.2.b
+		ai_chance = { factor = 70 }
+		FROM = { country_event = { days = 1 id = afr_rrp.4 } }
+		FROM = {
+		
+		custom_effect_tooltip = EDC_afr.3.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.3 hours = 1 } 
+			}
+			add_tech_bonus = { 
+				bonus = 1
+				uses = 1
+				technology = iron_railways
+			}
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_1
+			custom_effect_tooltip = AFR_Racial_Tension_1_desc
+		}
+	}
+	
+	option = {
+		name = afr_rrp.2.c
+		ai_chance = { factor = 0 }
+		FROM = { country_event = { days = 1 id = afr_rrp.5 } }
+	}
+	
+}
+
+#Railway_Infrastructure_Construction_1_Full_Yes
+country_event = {
+	id = afr_rrp.3
+	title = afr_rrp.3.t
+	desc = afr_rrp.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.3.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			ROOT = { 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.2 }
+			}
+		}
+	}
+	
+}
+
+#Railway_Infrastructure_Construction_1_Yes
+country_event = {
+	id = afr_rrp.4
+	title = afr_rrp.4.t
+	desc = afr_rrp.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.4.a
+		ai_chance = { factor = 100 }
+		set_country_flag = afr_rrp_railway_line
+		hidden_effect = {
+			ROOT = { 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.1 }
+			}
+		}
+	}
+}
+
+#Railway_Infrastructure_Construction_1_No
+country_event = {
+	id = afr_rrp.5
+	title = afr_rrp.5.t
+	desc = afr_rrp.5.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.5.a
+		ai_chance = { factor = 10 }
+		set_country_flag = afr_rrp_railway_line
+	}
+	
+	option = {
+		name = afr_rrp.5.b
+		ai_chance = { factor = 90 }
+	}
+}
+
+
+#Main_Railway_Route_Construction_2_Info
+country_event = {
+	id = afr_rrp.6
+	title = afr_rrp.6.t
+	desc = afr_rrp.6.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.6.a
+		ai_chance = { factor = 100 }
+		FROM = { country_event = { days = 1 id = afr_rrp.7 } }
+		
+	}
+	
+}
+
+#Main_Railway_Route_Construction_2
+country_event = {
+	id = afr_rrp.7
+	title = afr_rrp.7.t
+	desc = afr_rrp.7.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.7.a
+		ai_chance = { factor = 60 }
+		FROM = { country_event = { days = 1 id = afr_rrp.8 } }
+		FROM = { activate_decision = afr_rrp_main_railway_route_construction }
+		FROM = { 
+			add_tech_bonus = { 
+				bonus = 1
+				uses = 2
+				technology = steam_engine
+				technology = steam_locomotive
+			}
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_2
+			custom_effect_tooltip = AFR_Racial_Tension_2_desc
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp.7.b
+		ai_chance = { factor = 40 }
+		FROM = { country_event = { days = 1 id = afr_rrp.9 } }
+		FROM = { 
+			add_tech_bonus = { 
+				bonus = 1
+				uses = 2
+				technology = steam_engine
+				technology = steam_locomotive
+			}
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_1
+			custom_effect_tooltip = AFR_Racial_Tension_1_desc
+		}
+	}
+	
+	option = {
+		name = afr_rrp.7.c
+		ai_chance = { factor = 0 }
+		FROM = { country_event = { days = 1 id = afr_rrp.10 } }
+	}
+	
+}
+
+#Main_Railway_Route_Construction_2_Full_Yes
+country_event = {
+	id = afr_rrp.8
+	title = afr_rrp.8.t
+	desc = afr_rrp.8.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.8.a
+		ai_chance = { factor = 100 }
+		
+
+	}
+	
+}
+
+#Main_Railway_Route_Construction_Construction_2_Yes
+country_event = {
+	id = afr_rrp.9
+	title = afr_rrp.9.t
+	desc = afr_rrp.9.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.9.a
+		ai_chance = { factor = 100 }
+		set_country_flag = afr_rrp_railway_infrastructure_construction
+		hidden_effect = {
+			ROOT = { 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.2 }
+			}
+		}
+	}
+}
+
+#Main_Railway_Route_Construction_Construction_2_No
+country_event = {
+	id = afr_rrp.10
+	title = afr_rrp.10.t
+	desc = afr_rrp.10.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.10.a
+		ai_chance = { factor = 50 }
+		set_country_flag = afr_rrp_railway_infrastructure_construction
+		hidden_effect = {
+			ROOT = { 
+				country_event = { hours = 1 id = afr_rrp_racial_tension_increase.1 }
+			}
+		}
+	}
+	
+	option = {
+		name = Cancle_the_project.10.b
+		ai_chance = { factor = 50 }
+	}
+}
 
 #Open Merchant Trade
 country_event = {
 	id = afr_rrp.11
-	title = African_Trade_Partner_Established.11.t
+	title = afr_rrp.11.t
 	desc = afr_rrp.11.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = Will_this_lead_to_potential_colonies.11.a
+		name = afr_rrp.11.a
 		ai_chance = { factor = 100 }
 		add_opinion_modifier = { target = FROM modifier = eoanb_om_africa_trade_focus }
 		reverse_add_opinion_modifier = { target = FROM modifier = eoanb_om_africa_trade_focus }
+		hidden_effect = {
+		}
 	}
 }
 
 country_event = {
 	id = afr_rrp.12
-	title = African_Merchant_Partner_Wishes_To_Purchase_Design.12.t
+	title = afr_rrp.12.t
 	desc = afr_rrp.12.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = Approve_The_Sale.12.a
+		name = afr_rrp.12.a
 		ai_chance = { factor = 100 }
 		FROM = {
 			create_production_license = {
@@ -37,13 +872,12 @@ country_event = {
 				cost_factor = 0
 			}
 			hidden_effect = {
-				
 			}
 		}
 	}
 	
 	option = {
-		name = Decline.12.a
+		name = afr_rrp.12.a
 		ai_chance = { factor = 0 }
 			hidden_effect = {
 			
@@ -55,24 +889,171 @@ country_event = {
 #Open ACS Affiliate 
 country_event = {
 	id = afr_rrp.13
-	title = ACS_Affiliate_Established.13.t
+	title = afr_rrp.13.t
 	desc = afr_rrp.13.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = Will_this_lead_to_potential_colonies.13.a
+		name = afr_rrp.13.a
 		ai_chance = { factor = 100 }
 		add_opinion_modifier = { target = FROM modifier = eoanb_om_africa_trade_focus }
 		reverse_add_opinion_modifier = { target = FROM modifier = eoanb_om_africa_trade_focus }
 	}
 }
 
+#ACS_Railway_Construction_1
+country_event = {
+	id = afr_rrp.14
+	title = afr_rrp.14.t
+	desc = afr_rrp.14.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.14.a
+		ai_chance = { factor = 100 }
+		FROM = { country_event = { days = 1 id = afr_rrp.15 } }
+		FROM = { activate_decision = afr_rrp_railway_infrastructure_construction }
+		FROM = {
+		custom_effect_tooltip = EDC_afr.3.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.3 hours = 1 } 
+			}
+			add_tech_bonus = { 
+				bonus = 1
+				uses = 1 
+				technology = iron_railways
+			}
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp.14.c
+		ai_chance = { factor = 0 }
+		FROM = { country_event = { days = 1 id = afr_rrp.16 } }
+	}
+	
+}
+
+#Railway_Infrastructure_Construction_1_Full_Yes
+country_event = {
+	id = afr_rrp.15
+	title = afr_rrp.15.t
+	desc = afr_rrp.15.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.15.a
+		ai_chance = { factor = 100 }
+		
+
+	}
+	
+}
+
+#Railway_Infrastructure_Construction_1_No
+country_event = {
+	id = afr_rrp.16
+	title = afr_rrp.16.t
+	desc = afr_rrp.16.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.16.a
+		ai_chance = { factor = 10 }
+		set_country_flag = afr_rrp_railway_line
+	}
+	
+	option = {
+		name = afr_rrp.16.b
+		ai_chance = { factor = 90 }
+	}
+}
+
+
+#Main_Railway_Route_Construction_2
+country_event = {
+	id = afr_rrp.17
+	title = afr_rrp.17.t
+	desc = afr_rrp.17.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.17.a
+		ai_chance = { factor = 100 }
+		FROM = { country_event = { days = 1 id = afr_rrp.18 } }
+		FROM = { activate_decision = afr_rrp_main_railway_route_construction }
+		FROM = { 
+			add_tech_bonus = { 
+					bonus = 1
+					uses = 2
+					technology = steam_engine
+					technology = steam_locomotive
+				}
+		}
+		
+	}
+	
+	option = {
+		name = afr_rrp.17.c
+		ai_chance = { factor = 0 }
+		FROM = { country_event = { days = 1 id = afr_rrp.19 } }
+	}
+	
+}
+
+#Main_Railway_Route_Construction_2_Full_Yes
+country_event = {
+	id = afr_rrp.18
+	title = afr_rrp.18.t
+	desc = afr_rrp.18.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.18.a
+		ai_chance = { factor = 100 }
+		
+
+	}
+	
+}
+
+#Main_Railway_Route_Construction_Construction_2_No
+country_event = {
+	id = afr_rrp.19
+	title = afr_rrp.19.t
+	desc = afr_rrp.10.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_rrp.19.a
+		ai_chance = { factor = 50 }
+		set_country_flag = afr_rrp_railway_infrastructure_construction
+	}
+	
+	option = {
+		name = afr_rrp.19.b
+		ai_chance = { factor = 50 }
+	}
+}
 #Adopt American Ways
 country_event = {
 	id = afr_rrp.20
-	title = Our_First_Elections.20.t
+	title = afr_rrp.20.t
 	desc = afr_rrp.1.d
 	picture = GFX_report_event_merchant_ship_01
 	
@@ -119,7 +1100,7 @@ country_event = {
 #Election!
 country_event = {
 	id = afr_rrp.21
-	title = Election_Day.21.t
+	title = afr_rrp.21.t
 	desc = afr_rrp.22.d
 	picture = GFX_report_event_merchant_ship_01
 	
@@ -139,7 +1120,7 @@ country_event = {
 #Join Confederation!
 country_event = {
 	id = afr_rrp.22
-	title = Affiliate_Wishes_To_Join_Confederation.22.t
+	title = afr_rrp.22.t
 	desc = afr_rrp.22.d
 	picture = GFX_report_event_merchant_ship_01
 	
@@ -153,10 +1134,25 @@ country_event = {
 		}
 		FROM = { country_event={id = afr_rrp.24} } 
 		LIB = {
-			set_autonomy = {
-				target = FROM
-				autonomy_state = autonomy_dominion
-				freedom_level = 0.3
+			if = {
+				limit = {
+					has_dlc = "Death or Dishonor" 
+				}
+				set_autonomy = {
+					target = FROM
+					autonomy_state = autonomy_dominion
+					freedom_level = 0.3
+				}
+			}
+			if = {
+				limit = { 
+					NOT = { has_dlc = "Death or Dishonor" }
+				}
+				set_autonomy = {
+					target = FROM
+					autonomy_state = autonomy_puppet
+					freedom_level = 0.3
+				}
 			}
 		}
 		hidden_effect = {
@@ -242,14 +1238,14 @@ country_event = {
 #Found Confederation!
 country_event = {
 	id = afr_rrp.23
-	title = Affiliate_Wishes_To_Become_A_Colony.23.t
+	title = afr_rrp.23.t
 	desc = afr_rrp.23.d
 	picture = GFX_report_event_merchant_ship_01
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = Create_the_american_colonization_confederation.23.a
+		name = afr_rrp.23.a
 		ai_chance = { factor = 100 }
 		LIB = {
 			add_political_power = 15
@@ -257,10 +1253,25 @@ country_event = {
 		}
 		FROM = { country_event={id = afr_rrp.24} } 
 		LIB = {
-			set_autonomy = {
-				target = FROM
-				autonomy_state = autonomy_dominion
-				freedom_level = 0.3
+			if = {
+				limit = {
+					has_dlc = "Death or Dishonor" 
+				}
+				set_autonomy = {
+					target = FROM
+					autonomy_state = autonomy_dominion
+					freedom_level = 0.3
+				}
+			}
+			if = {
+				limit = { 
+					NOT = { has_dlc = "Death or Dishonor" }
+				}
+				set_autonomy = {
+					target = FROM
+					autonomy_state = autonomy_puppet
+					freedom_level = 0.3
+				}
 			}
 		}
 		hidden_effect = {
@@ -346,7 +1357,7 @@ country_event = {
 #YES!
 country_event = {
 	id = afr_rrp.24
-	title = Accepted.24.t
+	title = afr_rrp.24.t
 	desc = afr_rrp.24.d
 	picture = GFX_report_event_merchant_ship_01
 	
@@ -366,7 +1377,7 @@ country_event = {
 #NO!
 country_event = {
 	id = afr_rrp.25
-	title = Declined.25.t
+	title = afr_rrp.25.t
 	desc = afr_rrp.25.d
 	picture = GFX_report_event_merchant_ship_01
 	

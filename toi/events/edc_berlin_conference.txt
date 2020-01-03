@@ -654,6 +654,9 @@ country_event = {
 			country_event = { id = EDC_berlin_con.8 hours = 40 }
 			set_country_flag = berlin_conferance_voter
 			set_variable = {GER.afr_total_bc_attendance = 3}
+			add_to_array = { GER.berlin_conferance_voters = THIS.id }
+			add_to_array = { GER.berlin_conferance_voters = POR.id }
+			add_to_array = { GER.berlin_conferance_voters = ENG.id }
 			afr_send_event_to_voting_nations = yes
 			capital_scope = {save_global_event_target_as = afr_berlin_conference_host}
 		}
@@ -695,11 +698,26 @@ country_event = {
 			add_to_variable = {GER.afr_total_bc_attendance = 1}
 		}
 		set_country_flag = berlin_conferance_voter	
+		add_to_array = { GER.berlin_conferance_voters = THIS.id }
 		ai_chance = {
 			factor = 70
 			modifier = {
 				add = 100
 				is_historical_focus_on = yes
+				OR={
+					tag = PRS
+					tag = GER
+					tag = BEL
+					tag = FRA
+					tag = ENG
+					tag = SPR
+					tag = RUS
+					tag = HOL
+					tag = ITA
+					tag = AUS
+					tag = SWE
+					tag = POR
+				}
 			}	
 		}
 	}
@@ -726,6 +744,9 @@ country_event = {
 			set_country_flag = berlin_conferance_voter
 			set_country_flag = berlin_conferance_host
 			set_variable = {GER.afr_total_bc_attendance = 3}#germany will still be the ping target
+			add_to_array = { GER.berlin_conferance_voters = THIS.id }
+			add_to_array = { GER.berlin_conferance_voters = POR.id }
+			add_to_array = { GER.berlin_conferance_voters = ENG.id }
 			afr_send_event_to_voting_nations = yes
 			capital_scope = {save_global_event_target_as = afr_berlin_conference_host}
 		}
@@ -953,25 +974,14 @@ country_event = {# start of the colony voting- first ping event
 	hidden = yes
 
 	immediate = {
+		afr_ber_prepare_vote_vars =yes
 		add_to_variable = {GER.current_region_conferance_vote = 1}
-		set_variable = {GER.fra_conferance_vote = 0}
-		set_variable = {GER.eng_conferance_vote = 0}
-		set_variable = {GER.hol_conferance_vote = 0}
-		set_variable = {GER.bel_conferance_vote = 0}
-		set_variable = {GER.ger_conferance_vote = 0}
-		set_variable = {GER.ita_conferance_vote = 0}
-		set_variable = {GER.spa_conferance_vote = 0}
-		set_variable = {GER.por_conferance_vote = 0}
-		set_variable = {GER.den_conferance_vote = 0}
-		set_variable = {GER.swe_conferance_vote = 0}
-		set_variable = {GER.rus_conferance_vote = 0}
-		set_variable = {GER.hab_conferance_vote = 0}
 		every_country = {
 			if = {
 				limit ={
 					has_country_flag = berlin_conferance_voter
 				}
-				country_event = { id = EDC_berlin_con.2 hours = 24 } # ping to voting
+				set_country_flag = berlin_conferance_voting
 			}
 		}
 	}
@@ -989,26 +999,17 @@ country_event = {# assign cores - last ping event
 	#hidden = yes
 	trigger = {
 		has_country_flag = berlin_conferance_host
-		check_variable = {var = GER.afr_number_of_votes_in_the_conference var = GER.afr_total_bc_attendance compare = greater_than_or_equals}
+		check_variable = {var = GER.afr_number_of_votes_in_the_conference var = GER.berlin_conferance_voters^num compare = greater_than_or_equals}
 		any_country = {
 			has_country_flag = berlin_conferance_voter
 		}
 	}
 	immediate = {##ok
 		#hidden_effect={
-			FRA={afr_ber_assign_extra_votes_for_owned_states = yes }
-			ENG={afr_ber_assign_extra_votes_for_owned_states = yes }
-			POR={afr_ber_assign_extra_votes_for_owned_states = yes }
-			SPR={afr_ber_assign_extra_votes_for_owned_states = yes }
-			HOL={afr_ber_assign_extra_votes_for_owned_states = yes }
-			BEL={afr_ber_assign_extra_votes_for_owned_states = yes }
-			PRS={afr_ber_assign_extra_votes_for_owned_states = yes }
-			ITA={afr_ber_assign_extra_votes_for_owned_states = yes }
-			PIE={afr_ber_assign_extra_votes_for_owned_states = yes }
-			RUS={afr_ber_assign_extra_votes_for_owned_states = yes }
-			AUS={afr_ber_assign_extra_votes_for_owned_states = yes }
-			DEN={afr_ber_assign_extra_votes_for_owned_states = yes }
-			SWE={afr_ber_assign_extra_votes_for_owned_states = yes }
+			for_each_scope_loop = {
+				array = GER.berlin_conferance_voters
+				afr_ber_assign_extra_votes_for_owned_states = yes
+			}
 			afr_ber_check_votes = yes
 			every_country = {
 				#if = {
@@ -1020,8 +1021,14 @@ country_event = {# assign cores - last ping event
 				#}
 			}		
 			event_target:afr_colonial_nation = {
+				if={
+					limit={
+						OVERLORD={tag = event_target:afr_ber_reigion_winner}
+					}
 				afr_ber_assign_cores_to_winner = yes
+				}
 			}
+			clear_global_event_target = afr_colonial_nation
 			event_target:afr_ber_reigion_winner = {
 				if = {
 					limit = {
@@ -1037,9 +1044,10 @@ country_event = {# assign cores - last ping event
 				country_event = { id = EDC_berlin_con.20 hours = 1 }
 			}
 			set_variable ={GER.afr_number_of_votes_in_the_conference=0}
+			afr_ber_prepare_vote_vars =yes
 			if = {
 				limit = {
-					check_variable = {GER.current_region_conferance_vote < 22}
+					check_variable = {GER.current_region_conferance_vote < 23}
 				}
 				country_event = { id = EDC_berlin_con.15 hours = 1 }
 			}
@@ -1052,7 +1060,8 @@ country_event = {# assign cores - last ping event
 						}
 						clr_country_flag = berlin_conferance_voter
 					}
-				clr_country_flag = berlin_conferance_host
+				#clr_country_flag = berlin_conferance_host
+				afr_ber_clr_vote_vars =yes
 			}
 		#}
 	}

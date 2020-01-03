@@ -61,7 +61,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_bavarianarmy
+			add_timed_idea = {
+				idea = BAV_bavarianarmy
+				days = 730
+			}
 		}
 	}
  
@@ -95,7 +98,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -117,7 +120,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -201,6 +204,7 @@ focus_tree = {
 
 		completion_reward = {
 			add_political_power = 100
+			custom_effect_tooltip = BAV_customeffect_concert_or_middle
 			
 			hidden_effect = {
 				news_event = { id = bavariafocus.36 days = 3 }
@@ -232,7 +236,11 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_wantsmiddlepower
+			add_timed_idea = {
+				idea = BAV_wantsmiddlepower
+				days = 1460
+			}
+			custom_effect_tooltip = BAV_customeffect_concert_or_middle
 			
 			hidden_effect = {
 				news_event = { id = bavariafocus.37 days = 3 }
@@ -247,7 +255,13 @@ focus_tree = {
 	focus = { 
 		id = BAV_triaspolitik 
 		icon = GFX_focus_generic_treaty 
-		ai_will_do = { factor = 20}
+		ai_will_do = {
+			factor = 40
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
 		x = 19
 		y = 1 
 		mutually_exclusive = { }
@@ -256,7 +270,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = {
+				has_country_flag = bavaria_maximilian_ii_is_dead
+				has_idea = BAV_member_trias
+			}
 		}
 		
 		completion_reward = {
@@ -284,7 +301,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -308,7 +325,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -329,7 +346,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -350,7 +367,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -372,7 +389,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -420,16 +437,49 @@ focus_tree = {
 			BAV = { 
 				controls_state = 54
 				controls_state = 53
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_infra
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			54 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
-			53 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
-			
+			#54 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
+			#53 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
 			hidden_effect = {
+				set_variable = {
+					var = infra_total_bonus
+					value = 0
+				}
+
+				#getting the total number of infra inside our country into a infra_total_bonus variable
+				every_owned_state = {
+					add_to_variable = {
+						var = PREV.infra_total_bonus
+						value = infrastructure_level
+					}
+				}
+
+				#adding the desired number of infra we want the bonus to apply to, in this case the bonus will apply for the next 5 infra
+				add_to_variable = {
+					var = PREV.infra_total_bonus
+					value = 2
+				}
+
+				#adding of the idea with the construction modifier itself
+				add_ideas = {
+					BAV_boost_infra
+				}
+				
 				country_event = { id = bavariafocus.38 days = 3 }
 			}
+			custom_effect_tooltip = BAV_customeffect_infra_bonus_two
 		}
 	}
  
@@ -448,12 +498,33 @@ focus_tree = {
 		available = { 
 			BAV = { 
 				controls_state = 52
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_civs
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			52 = { add_extra_state_shared_building_slots = 1  }
-			52 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			#52 = { add_extra_state_shared_building_slots = 1  }
+			#52 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_civs_counter
+					value = BAV.num_of_civilian_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_civs_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_civs
+			}
+			custom_effect_tooltip = BAV_customeffect_civ_bonus
 		}
 	}
  
@@ -472,7 +543,8 @@ focus_tree = {
 		available = { 
 			BAV = { 
 				controls_state = 54
-			} 
+				
+			}
 		}
 		
 		completion_reward = {
@@ -498,12 +570,34 @@ focus_tree = {
 		available = { 
 			BAV = { 
 				controls_state = 52
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_mils
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			52 = { add_extra_state_shared_building_slots = 1  }
-			52 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			#52 = { add_extra_state_shared_building_slots = 1  }
+			#52 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_mils_counter
+					value = BAV.num_of_military_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_mils_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_mils
+			}
+			custom_effect_tooltip = BAV_customeffect_mil_bonus
 		}
 	}
  
@@ -529,7 +623,10 @@ focus_tree = {
 		available_if_capitulated = no  
 		
 		completion_reward = {
-			add_ideas = BAV_learnedfromthefrench
+			add_timed_idea = {
+				idea = BAV_learnedfromthefrench
+				days = 1095
+			}
 		}
 	}
  
@@ -598,7 +695,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -619,7 +716,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { has_country_flag = "Maximilian II is Dead" }
+			NOT = { has_country_flag = bavaria_maximilian_ii_is_dead }
 		}
 		
 		completion_reward = {
@@ -670,16 +767,50 @@ focus_tree = {
 			BAV = { 
 				controls_state = 54
 				controls_state = 53
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_infra
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			54 = { add_building_construction = { type = infrastructure level = 2 instant_build = yes } }
-			53 = { add_building_construction = { type = infrastructure level = 2 instant_build = yes } }
+			#54 = { add_building_construction = { type = infrastructure level = 2 instant_build = yes } }
+			#53 = { add_building_construction = { type = infrastructure level = 2 instant_build = yes } }
 			
 			hidden_effect = {
+				set_variable = {
+					var = infra_total_bonus
+					value = 0
+				}
+
+				#getting the total number of infra inside our country into a infra_total_bonus variable
+				every_owned_state = {
+					add_to_variable = {
+						var = PREV.infra_total_bonus
+						value = infrastructure_level
+					}
+				}
+
+				#adding the desired number of infra we want the bonus to apply to, in this case the bonus will apply for the next 5 infra
+				add_to_variable = {
+					var = PREV.infra_total_bonus
+					value = 4
+				}
+
+				#adding of the idea with the construction modifier itself
+				add_ideas = {
+					BAV_boost_infra
+				}
+				
 				country_event = { id = bavariafocus.39 days = 3 }
 			}
+			custom_effect_tooltip = BAV_customeffect_infra_bonus_four
 		}
 	}
  
@@ -699,11 +830,31 @@ focus_tree = {
 			BAV = { 
 				controls_state = 42
 			}
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_civs
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			42 = { add_extra_state_shared_building_slots = 1  }
-			42 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			#42 = { add_extra_state_shared_building_slots = 1  }
+			#42 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_civs_counter
+					value = BAV.num_of_civilian_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_civs_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_civs
+			}
+			custom_effect_tooltip = BAV_customeffect_civ_bonus
 		}
 	}
  
@@ -748,12 +899,34 @@ focus_tree = {
 		available = { 
 			BAV = { 
 				controls_state = 54
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_mils
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			54 = { add_extra_state_shared_building_slots = 1  }
-			54 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			#54 = { add_extra_state_shared_building_slots = 1  }
+			#54 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_mils_counter
+					value = BAV.num_of_military_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_mils_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_mils
+			}
+			custom_effect_tooltip = BAV_customeffect_mil_bonus
 		}
 	}
  
@@ -770,9 +943,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			swap_ideas = {
-				remove_idea = BAV_unexperiencedgen
-				add_idea = BAV_trainedgen
+			remove_ideas = BAV_unexperiencedgen
+			add_timed_idea = {
+				idea = BAV_trainedgen
+				days = 730
 			}
 		}
 	}
@@ -898,15 +1072,36 @@ focus_tree = {
 		cost = 70
 		available_if_capitulated = no
 		
-		available = { 
+		available = {
 			BAV = { 
 				controls_state = 53
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_civs
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			53 = { add_extra_state_shared_building_slots = 1  }
-			53 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			#53 = { add_extra_state_shared_building_slots = 1  }
+			#53 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_civs_counter
+					value = BAV.num_of_civilian_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_civs_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_civs
+			}
+			custom_effect_tooltip = BAV_customeffect_civ_bonus
 		}
 	}
 	
@@ -1046,7 +1241,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_pride
+			add_timed_idea = {
+				idea = BAV_pride
+				days = 100
+			}
 			hidden_effect = {
 				country_event = { id = bavariafocus.35 days = 3 }
 			}
@@ -1068,12 +1266,34 @@ focus_tree = {
 		available = { 
 			BAV = { 
 				controls_state = 53
-			} 
+			}
+			
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_civ_bonus
+				hidden_trigger = {
+					NOT = {
+						has_idea = BAV_boost_mils
+					}
+				}
+			}
 		}
 		
 		completion_reward = {
-			53 = { add_extra_state_shared_building_slots = 1  }
-			53 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			#53 = { add_extra_state_shared_building_slots = 1  }
+			#53 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+			
+			hidden_effect = {
+				set_variable = {
+					var = bav_boost_mils_counter
+					value = BAV.num_of_military_factories
+				}
+				#add_to_variable = {
+				#	var = bav_boost_mils_counter
+				#	value = 1
+				#}
+				add_ideas = BAV_boost_mils
+			}
+			custom_effect_tooltip = BAV_customeffect_mil_bonus
 		}
 	}
  
@@ -1141,7 +1361,10 @@ focus_tree = {
 		available_if_capitulated = no
 
 		completion_reward = {
-			add_ideas = BAV_armyfirst
+			add_timed_idea = { 
+				idea = BAV_armyfirst
+				days = 365
+			}
 		}		
 	}
  
@@ -1166,7 +1389,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Maximilian II is Dead"
+			has_country_flag = bavaria_maximilian_ii_is_dead
 		}
 		
 		completion_reward = {
@@ -1209,7 +1432,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Maximilian II is Dead"
+			has_country_flag = bavaria_maximilian_ii_is_dead
 		}
 		
 		completion_reward = {
@@ -1233,7 +1456,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_karlslessons
+			add_timed_idea = { 
+				idea = BAV_karlslessons
+				days = 365
+			}
 		}
 	}
  
@@ -1267,7 +1493,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_landtagconvinced
+			add_timed_idea = {
+				idea = BAV_landtagconvinced
+				days = 730
+			}
 			if = {
 				limit = {
 					NOT = {
@@ -1321,7 +1550,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Legacy of Maximilian II"
+			has_country_flag = bavaria_legacy_of_maximilian_ii
 		}
 		
 		completion_reward = {
@@ -1354,7 +1583,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "The New Bavarian King"
+			has_country_flag = bavaria_new_king
 		}
 		
 		completion_reward = {
@@ -1497,17 +1726,17 @@ focus_tree = {
 				if = {
 					limit = {
 						AND = {
-							has_country_flag = "Austria sees Bavaria as a possible ally"
-							has_country_flag = "Austria sees Bavaria as an ally"
+							has_country_flag = bavaria_AUS_sees_possibly_ally
+							has_country_flag = bavaria_AUS_sees_ally
 						}
 					}
 					country_event = { id = bavariafocus.23 days = 3 }
 				}
 				else_if = {
 					limit = {
-						has_country_flag = "Austria sees Bavaria as a possible ally"
+						has_country_flag = bavaria_AUS_sees_possibly_ally
 						NOT = {
-							has_country_flag = "Austria sees Bavaria as an ally"
+							has_country_flag = bavaria_AUS_sees_ally
 						}
 					}
 					country_event = { id = bavariafocus.24 days = 3 }
@@ -1515,23 +1744,23 @@ focus_tree = {
 				else_if = {
 					limit = {
 						AND = {
-							has_country_flag = "Prussia accepts Bavaria's support"
-							has_country_flag = "Prussia accepts Bavaria's wish for unity"
+							has_country_flag = bavaria_PRS_accepts_support
+							has_country_flag = bavaria_PRS_accepts_wish_for_unity
 						}
 					}
 					country_event = { id = bavariafocus.25 days = 3 }
 				}
 				else_if = {
 					limit = {
-						has_country_flag = "Prussia accepts Bavaria's support"
+						has_country_flag = bavaria_PRS_accepts_support
 						NOT = {
-							has_country_flag = "Prussia accepts Bavaria's wish for unity"
+							has_country_flag = bavaria_PRS_accepts_wish_for_unity
 						}
 					}
 					country_event = { id = bavariafocus.26 days = 3 }
 				}
 				else = {
-					set_country_flag = "MCC neutral"
+					set_country_flag = bavaria_mcc_neutral
 					country_event = { id = bavariafocus.27 days = 3 }
 				}
 			}
@@ -1551,7 +1780,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "The Military Commission is over"
+			has_country_flag = bavaria_military_commission_over
 		}
 		
 		completion_reward = {
@@ -1634,7 +1863,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_war_support = 0.2
+			add_war_support = 0.1
 		}
 	}
  
@@ -2065,7 +2294,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Bavaria sides with Prussia"
+			has_country_flag = bavaria_sides_with_prussia
 		}
 		
 		completion_reward = {
@@ -2101,7 +2330,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Bavaria sides with Austria"
+			has_country_flag = bavaria_sides_with_austria
 		}
 		
 		completion_reward = {
@@ -2136,7 +2365,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_centrismrise3
+			add_timed_idea = {
+				idea = BAV_centrismrise3
+				days = 730
+			}
 		}
 	}
  
@@ -2200,7 +2432,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "Take Over of the Government"
+			has_country_flag = bavaria_take_over_government
 		}
 		
 		completion_reward = {
@@ -2236,7 +2468,7 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			has_country_flag = "The Only Way is Revolution"
+			has_country_flag = bavaria_the_only_way_is_revolution
 		}
 		
 		completion_reward = {
@@ -2272,7 +2504,13 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		available = {
-			NOT = { is_in_faction = yes }
+			NOT = {
+				is_in_faction = yes
+			}
+			custom_trigger_tooltip = {
+				tooltip = BAV_customtrigger_trias_exists
+				has_idea = BAV_member_trias
+			}
 		}
 		
 		completion_reward = {
@@ -2290,6 +2528,7 @@ focus_tree = {
 				limit = {
 					has_idea = BAV_foreign_accepted_trias
 					has_idea = BAV_sueddeutscher_zollverein
+					has_idea = BAV_member_trias
 					is_in_faction = no
 					is_puppet = no
 					NOT = { has_war_with = BAV }
@@ -2591,7 +2830,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_visionaries
+			add_timed_idea = {
+				idea = BAV_visionaries
+				days = 730
+			}
 		}
 	}
  
@@ -2680,7 +2922,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_socegalrise5
+			add_timed_idea = {
+				idea = BAV_socegalrise5
+				days = 730
+			}
 		}
 	}
  
@@ -2754,7 +2999,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_socreforms
+			add_timed_idea = {
+				idea = BAV_socreforms
+				days = 730
+			}
 			add_stability = 0.1
 		}
 	}
@@ -2778,7 +3026,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_socreforms2
+			add_timed_idea = {
+				idea = BAV_socreforms2
+				days = 730
+			}
 			
 			if = {
 				limit = {
@@ -2819,7 +3070,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_socreforms3
+			add_timed_idea = {
+				idea = BAV_socreforms3
+				days = 730
+			}
 			
 			if = {
 				limit = {
@@ -2864,7 +3118,10 @@ focus_tree = {
 		
 		completion_reward = {
 			add_political_power = 50
-			add_ideas = BAV_socegalrise4
+			add_timed_idea = {
+				idea = BAV_socegalrise4
+				days = 365
+			}
 		}
 	}
  
@@ -2881,7 +3138,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_visionaries2
+			add_timed_idea = {
+				idea = BAV_visionaries2
+				days = 730
+			}
 		}
 	}
  
@@ -2907,7 +3167,10 @@ focus_tree = {
 		available_if_capitulated = no
 		
 		completion_reward = {
-			add_ideas = BAV_socegalrise3
+			add_timed_idea = {
+				idea = BAV_socegalrise3
+				days = 730
+			}
 		}
 	}
  

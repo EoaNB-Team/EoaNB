@@ -1,3 +1,4 @@
+
 NDefines = {
 
 NGame = {
@@ -22,10 +23,10 @@ NGame = {
 NDiplomacy = {
 	DIPLOMACY_REQUEST_EXPIRY_DAYS = 30,
 	BASE_SURRENDER_LEVEL = 1.0,						-- Surrender when level reached. valid 0-1
-	MAX_TRUST_VALUE = 100,							-- Max trust value cap.
-	MIN_TRUST_VALUE = -100,							-- Min trust value cap.
-	MAX_OPINION_VALUE = 100,						-- Max opinion value cap.
-	MIN_OPINION_VALUE = -100,						-- Min opinion value cap.
+	MAX_TRUST_VALUE = 80,							-- Max trust value cap.
+	MIN_TRUST_VALUE = -80,							-- Min trust value cap.
+	MAX_OPINION_VALUE = 200,						-- Max opinion value cap.
+	MIN_OPINION_VALUE = -200,						-- Min opinion value cap.
 	BASE_TRUCE_PERIOD = 30,							-- Base truce period in days.
 	TRUCE_PERIOD_AFTER_KICKING_FROM_FACTION = 30,				-- Truce period after kicking someone from faction in days.
 	NUM_DAYS_TO_ENABLE_KICKING_NEW_MEMBERS_OF_FACTION = 90,			-- Number of days before being able to kick a new member of faction 
@@ -38,17 +39,17 @@ NDiplomacy = {
 	BASE_PEACE_TAKE_UNCONTROLLED_STATE_FACTOR = 10.0, -- Base factor for taking state you do not control
 	BASE_PEACE_TAKE_FACTION_CONTROLLED_STATE_FACTOR = 0.5, -- Base factor for taking state you do not control, but someone in faction does
 	BASE_PEACE_FORCE_GOVERNMENT_COST = 100, 		-- Base cost for forcing a country to change government.
-	BASE_IMPROVE_RELATION_COST = 10,                -- Political power cost to initiate relation improvement
+	BASE_IMPROVE_RELATION_COST = 25,                -- Political power cost to initiate relation improvement
 	BASE_IMPROVE_RELATION_SAME_IDEOLOGY_GROUP_MAINTAIN_COST = 0.2, -- Political power cost each update when boosting relations with nation of same ideology
 	BASE_IMPROVE_RELATION_DIFFERENT_IDEOLOGY_GROUP_MAINTAIN_COST = 0.4,    -- Political power cost each update when boosting relations with nation of different ideology
 	BASE_SEND_ATTACHE_COST = 100,					-- Political power cost to send attache
 	BASE_SEND_ATTACHE_CP_COST = 50.0,				-- Command Power sent attache usage cost
-	BASE_GENERATE_WARGOAL_DAILY_PP = 0.2,	-- Daily pp cost for generation of wargoals
+	BASE_GENERATE_WARGOAL_DAILY_PP = 0.4,	-- Daily pp cost for generation of wargoals
 	WARGOAL_VERSUS_MAJOR_AT_WAR_REDUCTION = -0.75, 	-- reduction of pp cost for wargoal vs major at war.
 	WARGOAL_WORLD_TENSION_REDUCTION = -0.5,			-- Reduction of pp cost for wargoal at 100% world tension, scales linearly
 	WARGOAL_JUSTIFY_TENSION_FROM_PRODUCTION = 15.0,	-- Base value scaled by production capacity of country compared to biggest country
 	MIN_WARGOAL_JUSTIFY_COST = 2.0,					-- It always takes atleast 10 days to justify a wargoal
-	WARGOAL_PER_JUSTIFY_AND_WAR_COST_FACTOR = 1.5,	-- Cost factor per nation at war with or justifying against
+	WARGOAL_PER_JUSTIFY_AND_WAR_COST_FACTOR = 1.75,	-- Cost factor per nation at war with or justifying against
 	BASE_BOOST_PARTY_POPULARITY_DAILY_PP = 0.25, 	-- Daily pp cost for boost party popularity
 	BASE_BOOST_PARTY_POPULARITY_DAILY_DRIFT = 0.1, 	-- Daily amount of popularity that will be added by the activity.
 	BASE_STAGE_COUP_DAILY_PP = 0.5,					-- Daily pp cost for staging a coup
@@ -59,20 +60,20 @@ NDiplomacy = {
 	NAP_BREAK_FORCE_BALANCE_1 = 2.0,              	-- 2-1 brigades along the border required to break NAP
 	NAP_BREAK_FORCE_BALANCE_2 = 1.0,              	-- 1-1 brigades along the border required to break NAP
 	NAP_BREAK_FORCE_BALANCE_3 = 0.5,              	-- 1-2 brigades along the border required to break NAP
-	VERY_GOOD_OPINION = 50,							-- Threshold for a country that has a very good opinion of you.
-	VERY_BAD_OPINION = -50,							-- Threshold for a country that has a very bad opinion of you.
-	DIPLOMACY_HOURS_BETWEEN_REQUESTS = 24,			-- How long a country must wait before sending a new diplomatic request.
+	VERY_GOOD_OPINION = 75,							-- Threshold for a country that has a very good opinion of you.
+	VERY_BAD_OPINION = -75,							-- Threshold for a country that has a very bad opinion of you.
+	DIPLOMACY_HOURS_BETWEEN_REQUESTS = 48,			-- How long a country must wait before sending a new diplomatic request.
 	TROOP_FEAR = 1, 								-- Impact on troops on borders when deciding how willing a nation is to trade
 	FLEET_FEAR = 1,									-- Impact on troops on borders when deciding how willing a nation is to trade
 	IC_TO_EQUIPMENT_COUP_RATIO = 0.1,				-- Ratio for calculating cost of staging coup
 	VOLUNTEERS_PER_TARGET_PROVINCE = 0.05,			-- Each province owned by the target country contributes this amount of volunteers to the limit.
 	VOLUNTEERS_PER_COUNTRY_ARMY = 0.05,				-- Each army unit owned by the source country contributes this amount of volunteers to the limit.
 	VOLUNTEERS_RETURN_EQUIPMENT = 0.95,				-- Returning volunteers keep this much equipment
-	VOLUNTEERS_TRANSFER_SPEED = 15,					-- days to transfer a unit to another nation
-	VOLUNTEERS_DIVISIONS_REQUIRED = 20,				-- This many divisons are required for the country to be able to send volunteers.
-	TENSION_STATE_VALUE = 4,						-- Tension value gained by annexing one state
-	TENSION_CIVIL_WAR_IMPACT = 0.1,					-- civil war multiplier on tension.
-	TENSION_NO_CB_WAR = 2.5,							-- Amount of tension generated by a no-CB wargoal
+	VOLUNTEERS_TRANSFER_SPEED = 14,					-- days to transfer a unit to another nation
+	VOLUNTEERS_DIVISIONS_REQUIRED = 30,				-- This many divisons are required for the country to be able to send volunteers.
+	TENSION_STATE_VALUE = 0,						-- Tension value gained by annexing one state
+	TENSION_CIVIL_WAR_IMPACT = 0,					-- civil war multiplier on tension.
+	TENSION_NO_CB_WAR = 0,							-- Amount of tension generated by a no-CB wargoal
 	TENSION_CB_WAR = 0,								-- Amount of tension generated by a war with a CB
 	TENSION_ANNEX_NO_CLAIM = 4,						-- Amount of tension generated by annexing a state you don't have claims on
 	TENSION_ANNEX_CLAIM = 1,						-- Amount of tension generated by annexing a state you DO have claims on
@@ -84,14 +85,14 @@ NDiplomacy = {
 	TENSION_TIME_SCALE_START_DATE = "1857.5.10.24",	-- Starting at this date, the tension values will be scaled down (will be equal to 1 before that)
 	TENSION_TIME_SCALE_MONTHLY_FACTOR = -0.005,		-- Timed tension scale will be modified by this amount starting with TENSION_TIME_SCALE_START_DATE
 	TENSION_TIME_SCALE_MIN = 0.25,					-- Timed tension scale won't decrease under this value
-	TENSION_GUARANTEE = -3,
-	TENSION_FACTION_JOIN = 0.5,
-	TENSION_JOIN_ATTACKER = 1,						-- scale of the amount of tension added when country joins attacker side
-	TENSION_PEACE_FACTOR = 0.25,					-- scale of the amount of tension (from war declaration) reduced when peace is completed.
-	TENSION_LIBERATE = -1.25,							-- Amount of tension generated by liberating a country. 
+	TENSION_GUARANTEE = 0,
+	TENSION_FACTION_JOIN = 0,
+	TENSION_JOIN_ATTACKER = 0,						-- scale of the amount of tension added when country joins attacker side
+	TENSION_PEACE_FACTOR = 0,					-- scale of the amount of tension (from war declaration) reduced when peace is completed.
+	TENSION_LIBERATE = 0,							-- Amount of tension generated by liberating a country. 
 	TENSION_CAPITULATE = 0,						-- Scale of the amount of tension created by a countries capitulation.
-	GUARANTEE_COST = 25,							-- Scale with the number of already guaranteed countries.
-	REVOKE_GUARANTEE_COST = 25,
+	GUARANTEE_COST = 50,							-- Scale with the number of already guaranteed countries.
+	REVOKE_GUARANTEE_COST = 50,
 	MP_NUM_WINNERS_FOR_PEACE_PAUSE = 0,				-- Number of human players as winners needed for peace conference to pause and open for everyone in multiplayer, needs to fullfill MP_NUM_LOSERS_FOR_PEACE_PAUSE as well.
 	MP_NUM_LOSERS_FOR_PEACE_PAUSE = 0,				-- Number of human players as losers needed for peace conference to pause and open for everyone in multiplayer, needs to fullfill MP_NUM_WINNERS_FOR_PEACE_PAUSE as well.
 	BASE_CONDITIONAL_PEACE_WARESCORE_RATIO = 0.5, 	-- Warscore ratio needed for the losing side to able to surrender.
@@ -104,7 +105,7 @@ NDiplomacy = {
 	MONTHLY_LEASED_IC_DECAY = 35,					-- How much of leased equipment is being "forgot" each month
 	OPINION_PER_VOLUNTEER = 3,						-- Opinion bonus per one sent volunteer division
 	MAX_OPINION_FROM_VOLUNTEERS = 30,				-- Opinion bonus per one sent volunteer division
-	OPINION_FOR_DEMO_FROM_WT_GENERATION = -2.0,		-- How much less do democracies like us if we generate world tension
+	OPINION_FOR_DEMO_FROM_WT_GENERATION = 0,		-- How much less do democracies like us if we generate world tension
 	NOT_READY_FOR_WAR_BASE = -50,					-- AI should be unwilling to enter accept a call to war if not ready for war against the relevant enemies.
 	FRONT_IS_DANGEROUS = -100,						-- AI should be unwilling to enter accept a call to war if front is too dangerous.
 	NOT_READY_FOR_WAR_VAL_PER_DAY_SINCE_CALL = 1,	-- Value modifying the not ready base over time.
@@ -249,7 +250,7 @@ NCountry = {
 	MIN_FOCUSES_FOR_CONTINUOUS = 10,				-- Focuses needed to unlock continuous focuses
 	AUTONOMOUS_TOTAL_SCORE = 4000,					-- Total score for autonomous scale
 	AUTONOMOUS_SPILLOVER = 0.025,					-- Total score that can be saved to reach next level
-	CIVIL_WAR_INVOLVEMENT_MIN_TENSION = 0.5,		-- base value of world tension to involve other sides to the civil war
+	CIVIL_WAR_INVOLVEMENT_MIN_TENSION = 0.0,		-- base value of world tension to involve other sides to the civil war
 	UNCAPITULATE_LEVEL = 0.1,                       -- if we reclaim this much and our capital we reset capitulate status
 	BASE_SURRENDER_LIMIT = 0.8,						-- Base level of occupation required for country surrender
 	MIN_SURRENDER_LIMIT = 0.1,						-- Minimum non-forced surrender limit. valid 0-1
@@ -289,7 +290,7 @@ NCountry = {
 	ATTACHE_XP_SHARE = 0.2,							-- Country received xp from attaches
 	SPECIAL_FORCES_CAP_BASE = 0.00,					-- Max ammount of special forces battalions is total number of non-special forces battalions multiplied by this and modified by a country modifier
 	SPECIAL_FORCES_CAP_MIN = 0,					-- You can have a minimum of this many special forces battalions, regardless of the number of non-special forces battalions you have, this can also be modified by a country modifier
-	DAYS_OF_WAR_BEFORE_SURRENDER = 7,				-- Number of days a war has to have existed before anyone can surrender in it
+	DAYS_OF_WAR_BEFORE_SURRENDER = 10,				-- Number of days a war has to have existed before anyone can surrender in it
 	
 	FUEL_LEASE_CONVOY_RATIO = 0.0005,				-- num convoys needed per fuel land lease 
 	
@@ -338,7 +339,7 @@ NCountry = {
 },
 
 NProduction = {
-	MAX_EQUIPMENT_RESOURCES_NEED = 3, 	-- Max number of different strategic resources an equipment can be dependent on.
+	MAX_EQUIPMENT_RESOURCES_NEED = 6, 	-- Max number of different strategic resources an equipment can be dependent on.
 	MAX_CIV_FACTORIES_PER_LINE = 15,	-- Max number of factories that can be assigned a single production line.
 	DEFAULT_MAX_NAV_FACTORIES_PER_LINE = 10,
 	CONVOY_MAX_NAV_FACTORIES_PER_LINE = 15,
@@ -1037,6 +1038,7 @@ NNavy = {
 	CONVOY_EFFICIENCY_REGAIN_BASE_SPEED = 0.04,						-- How much efficiency regains every day.
 	CONVOY_EFFICIENCY_MIN_VALUE = 0.05,								-- To avoid complete 0% efficiency, set the lower limit.
 	ANTI_AIR_TARGETTING_TO_CHANCE = 0.2,							-- Balancing value to convert averaged equipment stats (anti_air_targetting and naval_strike_agility) to probability chances of airplane being hit by navies AA.
+	CONVOY_ROUTE_SIZE_CONVOY_SCALE = 0.5,                           -- scales impact of convoy route size (0 to turn off)
 	ANTI_AIR_ATTACK_TO_AMOUNT = 0.01,								-- Balancing value to convert equipment stat anti_air_attack to the random % value of airplanes being hit.
 	CONVOY_SINKING_SPILLOVER = 0.5,                 				-- Damaged convoys roll for if they sink in the end of combat by accumulating the damage. This scales that chance. 
 	UNIT_EXPERIENCE_PER_COMBAT_HOUR = 10,
@@ -1422,6 +1424,7 @@ NNavy = {
 	
 	MISSION_EFFICIENCY_POW_FACTOR									= 1.7,		-- mission efficiencies will be powered up by this to further penalize low efficiencies
 	
+	NAVAL_COMBAT_SUB_DETECTION_FACTOR                               = 1.0,      -- balance value for sub detection in combat by ships
 	SUBMARINE_HIDE_TIMEOUT 											= 20,		-- Amount of in-game-hours that takes the submarine (with position unrevealed), to hide.
 	SUBMARINE_REVEALED_TIMEOUT 										= 16,		-- Amount of in-game-hours that makes the submarine visible if it is on the defender side.
 	SUBMARINE_REVEAL_BASE_CHANCE 									= 12,		-- Base factor for submarine detection. It's modified by the difference of a spotter's submarines detection vs submarine visibility. Use this variable for game balancing. setting this too low will cause bad spotting issues.
@@ -1503,14 +1506,14 @@ NAI = {
 	DIPLOMATIC_ACTION_GOOD_BAD_RATIO_THRESHOLD = 1,
 	BASE_RELUCTANCE = 20, 						-- Base reluctance applied to all diplomatic offers
 	DIPLOMATIC_ACTION_RANDOM_FACTOR = 0.5, 		-- How much of the AI diplomatic action scoring is randomly determined (1.0 = half random, 2.0 = 2/3rd random, etc)
-	DIPLOMATIC_ACTION_PROPOSE_SCORE = 50, 		-- AI must score a diplomatic action at least this highly to propose it themselves
-	DILPOMATIC_ACTION_DECLARE_WAR_WARGOAL_BASE = 50, -- Base diplomatic action score bonus to go to war per wargoal
+	DIPLOMATIC_ACTION_PROPOSE_SCORE = 35, 		-- AI must score a diplomatic action at least this highly to propose it themselves
+	DILPOMATIC_ACTION_DECLARE_WAR_WARGOAL_BASE = -50, -- Base diplomatic action score bonus to go to war per wargoal
 	DIPLOMATIC_ACTION_BREAK_SCORE = -10, 		-- AI must score a diplomatic action less than this to break it off	
 	DIPLOMACY_CREATE_FACTION_FACTOR = 0.75,		-- Factor for AI desire to create a new faction. Val < 1.0 makes it less likely to create than to join.
 	DIPLOMACY_FACTION_WRONG_IDEOLOGY_PENALTY = 60, -- AI penalty for diplomatic faction acitons between nations of different ideologies
 	DIPLOMACY_FACTION_SAME_IDEOLOGY_MAJOR = 10, -- AI bonus acceptance when being asked about faction is a major of the same ideology
 	DIPLOMACY_FACTION_NEUTRALITY_PENALTY = 50,	-- Neutral nations have a separate penalty, not wanting to get involved at all, rather than caring much about the difference in ideology
-	DIPLOMACY_FACTION_GLOBAL_TENSION_FACTOR = 0.2,-- How much the AI takes global tension into account when considering faction actions
+	DIPLOMACY_FACTION_GLOBAL_TENSION_FACTOR = 0.0,-- How much the AI takes global tension into account when considering faction actions
 	DIPLOMACY_FACTION_WAR_RELUCTANCE = -50,		-- Penalty to desire to enter a faction with a country that we are not fighting wars together with.
 	DIPLOMACY_FACTION_TAKE_OVER_RELUCTANCE_VERSUS_HUMAN = 2.0,	-- Multiplier penalty for how much stronger than a human faction member an AI country must be to choose to assume faction leadership.
 	DIPLOMACY_SCARED_MINOR_EXTRA_RELUCTANCE = -50, -- extra reluctance to join stuff as scared minor
@@ -1693,7 +1696,7 @@ NAI = {
 	COMMUNISTS_ANTAGONIZE_DEMOCRACIES = 10,
 	COMMUNISTS_ANTAGONIZE_COMMUNISTS = -10,
 
-	TENSION_MIN_FOR_GUARANTEE_VS_MINOR = 10, -- for non faction people AI will not consider you worth guaranteeing below this
+	TENSION_MIN_FOR_GUARANTEE_VS_MINOR = 0, -- for non faction people AI will not consider you worth guaranteeing below this
 	
 	NUM_AI_MESSAGES = 10,				-- Set to whatever category has the highest number of messages
 
@@ -1844,7 +1847,7 @@ NAI = {
 	FALLBACK_LOSING_FACTOR = 1.0,						-- The lower this number, the longer the AI will hold the line before sending them to the fallback line
 	PRODUCTION_MAX_PROGRESS_TO_SWITCH_NAVAL = 0.1,		-- AI will not replace ships being built by newer types if progress is above this
 	STATE_CONTROL_FOR_AREA_DEFENSE = 0.4,				-- To avoid AI sending area defense to area with very little foothold
-	FORCE_FACTOR_AGAINST_EXTRA_MINOR = 0.15,			-- AI considers generating wargoals against minors below this % of force compared to themselves to get at a bigger enemy.
+	FORCE_FACTOR_AGAINST_EXTRA_MINOR = 0.25,			-- AI considers generating wargoals against minors below this % of force compared to themselves to get at a bigger enemy.
 	MAX_EXTRA_WARGOAL_GENERATION = 2,					-- AI may want to generate wargoals against weak minors to get at larger enemy, but never more that this at any given time.
 	NAVAL_MISSION_DISTANCE_BASE = 3500,					-- Base value when AI is evaluating distance score to places
 	NAVAL_MISSION_INVASION_BASE = 1000,					-- Base score for region with naval invasion (modified dynamically by prioritizing orders)
@@ -2216,6 +2219,3 @@ NFocus = {
 	MAX_SAVED_FOCUS_PROGRESS = 10,				-- This much progress can be saved while not having a focus selected
 	},
 }
-
-
-
