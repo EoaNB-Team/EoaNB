@@ -1,5 +1,6 @@
 ﻿add_namespace = ethiopia
 add_namespace = ethiopia_egypt_relations
+add_namespace = ethiopian_border_conflict
 add_namespace = ethiopia_religion
 add_namespace = ethiopia_trade
 add_namespace = ethiopia_export
@@ -9,10 +10,12 @@ add_namespace = ethiopia_coalition_against_islam_insurgents
 add_namespace = ethiopia_first_railway
 add_namespace = ethiopia_main_railway
 add_namespace = ethiopia_company_coup
-add_namespace = ethiopian_border_conflict
 add_namespace = ethiopia_islamic_raid
-
-
+add_namespace = ethiopia_islamic_raid_defender
+add_namespace = ethiopia_initiate_islamic_raid
+add_namespace = ethiopian_slave_king_raid
+add_namespace = ETH_raid_damage
+add_namespace = ETH_north_oromo
 
 #Ethiopia offers integration
 country_event = {
@@ -45,43 +48,143 @@ country_event = {
 	option = {#decline
 		name = ethiopia.1.b
 		ai_chance = { factor = 25 }
-		#Since ethiopia.2 is missing, this will crash. I commented it out for now.
-		#FROM = { country_event = { days = 1 id = ethiopia.2 } }
+		hidden_effect = {
+			ROOT = { add_ideas = hidden_idea_never_surrender }
+			ETH = { country_event = { days = 1 id = ethiopia.2 } }
+		}
 	}
 	
 }
 
-#Ethiopia Gives Military Access
+#Ethiopia declares war on minors after they refused integration
+country_event = {
+	id = ethiopia.2
+	title = ethiopia.2.t
+	desc = ethiopia.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia.2.a
+		ai_chance = {factor = 100 }
+		declare_war_on = { target = FROM type = annex_everything }
+		hidden_effect = {
+			set_country_flag = integration_war
+			if = {
+				limit = {
+					FROM = { TAG = ORO}
+				}
+				ORO = {
+					division_template = {
+						name = "Elite Tribal Infantry"
+						priority = 2
+						division_names_group = KRU_TRIBAL_INFANTRY_01
+						regiments = {
+							tribal_infantry = { x = 0 y = 0 }
+						
+							tribal_infantry = { x = 1 y = 0 }
+						}
+					}
+					set_division_template_lock = {
+						division_template = "Elite Tribal Infantry"
+						is_locked = yes
+					}
+				}
+			
+				271 = {
+					create_unit = {
+						division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
+						owner = ORO
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					FROM = { TAG = SID}
+				}
+				SID = {
+					division_template = {
+					name = "Elite Tribal Infantry"
+					priority = 2
+						division_names_group = KRU_TRIBAL_INFANTRY_01
+						regiments = {
+							tribal_infantry = { x = 0 y = 0 }
+						
+							tribal_infantry = { x = 1 y = 0 }
+						}
+					}
+					set_division_template_lock = {
+						division_template = "Elite Tribal Infantry"
+						is_locked = yes
+					}
+				}
+				820 = {
+					create_unit = {
+						division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
+						owner = SID
+					}
+				}
+			}
+		}
+	}
+}
+
+
+#Ethipia wins integration war against SID
 country_event = {
 	id = ethiopia.3
 	title = ethiopia.3.t
 	desc = ethiopia.3.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
-	is_triggered_only = yes
+	fire_only_once = yes
+	trigger = {
+		TAG = ETH
+		has_country_flag = integration_war
+		SID = { surrender_progress > 0.3}
+	}
 	
 	option = {
 		name = ethiopia.3.a
-		ai_chance = { factor = 100 }
-		ROOT = { give_military_access = ETH }
-		hidden_effect = {
-			set_country_flag = ETH_Military_Access
-		}
+		ETH = { transfer_state = 820 }
+		clr_country_flag = integration_war
+	}
+}
+
+
+#Ethipia wins integration war against ORO
+country_event = {
+	id = ethiopia.4
+	title = ethiopia.4.t
+	desc = ethiopia.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	fire_only_once = yes
+	trigger = {
+		TAG = ETH
+		has_country_flag = integration_war
+		ORO = { surrender_progress > 0.3}
 	}
 	
+	option = {
+		name = ethiopia.4.a
+		ETH = { transfer_state = 271 }
+		clr_country_flag = integration_war
+	}
 }
 
 #Ethiopia Requests License Agreement
 country_event = {
-	id = ethiopia.4
-	title = Ethiopia_Requests_License_Agreement.4.t
-	desc = ethiopia.4.d
+	id = ethiopia.5
+	title = ethiopia.5.t
+	desc = ethiopia.5.d
 	picture = GFX_report_event_soviet_finnish_pact
 	
 	is_triggered_only = yes
 	
 	option = {
-		name = ethiopia.4.a
+		name = ethiopia.5.a
 		ai_chance = { factor = 60 }
 		FROM = {
 				add_popularity = {
@@ -98,7 +201,7 @@ country_event = {
 	}
 	
 	option = {
-		name = ethiopia.4.b
+		name = ethiopia.5.b
 		ai_chance = { factor = 40 }
 	}
 	
@@ -186,6 +289,8 @@ country_event = {
 		hidden_effect = {
 			clr_country_flag = ETH_EGY_Rivalry
 			ETH = { clr_country_flag = ETH_EGY_Rivalry }
+			ETH = { clear_variable = rival_country }
+			EGY = { clear_variable = rival_country }
 			set_country_flag = ETH_EGY_Ties
 			ETH = { set_country_flag = ETH_EGY_Ties }
 		}
@@ -199,6 +304,8 @@ country_event = {
 		hidden_effect = {
 			set_country_flag = ETH_EGY_Rivalry
 			ETH = { set_country_flag = ETH_EGY_Rivalry }
+			ETH = { set_variable = { rival_country = EGY.id } }
+			EGY = { set_variable = { rival_country = ETH.id } }
 			clr_country_flag = ETH_EGY_Ties
 			ETH = { clr_country_flag = ETH_EGY_Ties }
 		}
@@ -254,6 +361,8 @@ country_event = {
 		hidden_effect = {
 			clr_country_flag = ETH_EGY_Rivalry
 			ETH = { clr_country_flag = ETH_EGY_Rivalry }
+			ETH = { clear_variable = rival_country }
+			EGY = { clear_variable = rival_country }
 		}
 		
 	}
@@ -278,7 +387,18 @@ country_event = {
 	option = {
 		name = ethiopia_egypt_relations.8.a
 		ai_chance = { factor = 100 }
-
+		HRR = {
+			remove_ideas = ETH_idea_rally_with_egypt 
+			clear_variable = rival_country
+		}
+		MED = {
+			remove_ideas = ETH_idea_rally_with_egypt 
+			clear_variable = rival_country
+		}
+		AWS = {
+			remove_ideas = ETH_idea_rally_with_egypt 
+			clear_variable = rival_country
+		}
 	}
 	
 }
@@ -445,7 +565,7 @@ country_event = {
 				limit = {
 					country_exists = ALZ
 				}
-				ALZ = { country_event = { days = 7 id = ethiopia.13 } }
+				ALZ = { country_event = { days = 7 id = ethiopian_border_conflict.1 } }
 			}
 			EGY = { add_timed_idea = { idea = ETH_sudanese_islamic_unrest days = 270 } }
 			hidden_effect = {
@@ -474,6 +594,218 @@ country_event = {
 			}
 	}
 	
+}
+
+#Assist_Sudanese_Independance
+country_event = {
+	id = ethiopian_border_conflict.1
+	title = ethiopian_border_conflict.1.t
+	desc = ethiopian_border_conflict.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopian_border_conflict.1.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				AND = {
+					ALZ = {
+						has_opinion = {
+							target = EGY
+							value < 14
+						}
+					}
+					num_divisions > 0
+				}
+			}
+			hidden_effect = {
+				set_border_war_data = {
+					attacker = 833
+					defender = 549
+					combat_width = 40
+				}
+			}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 833
+					num_provinces = 4
+					on_win = ethiopian_border_conflict.3
+					on_lose = ethiopian_border_conflict.2
+					on_cancel = ethiopian_border_conflict.4
+				}				
+				defender = {
+					state = 549
+					num_provinces = 4
+					on_win = ethiopian_border_conflict.2
+					on_lose = ethiopian_border_conflict.3
+					on_cancel = ethiopian_border_conflict.4
+				}
+			}
+			if = {
+				limit = {
+					ETH = {
+						AND = {
+							has_country_flag = ETH_EGY_Rivalry
+							has_completed_focus = ETH_friends_with_al_zubayr
+						}
+					}
+				}
+				ETH = { country_event = {id = ethiopian_slave_king_raid.1} }
+			}
+			
+			
+		}
+		if = {
+			limit = {
+				AND = {
+					ALZ = {
+						has_opinion = {
+							target = EGY
+							value < 14
+						}
+					}
+					num_divisions > -1
+					num_divisions < 1
+				}
+			}
+			
+		}
+		
+		ETH = {
+			add_opinion_modifier = {
+				target = ALZ
+				modifier = medium_increase
+			}
+		}
+		
+	}
+	
+	option = {
+		name = ethiopia_egypt_relations.13.b
+		ai_chance = { factor = 0 }
+	}
+	
+}
+
+#ALZ Slave King's Raid is Started
+country_event = {
+	id = ethiopian_slave_king_raid.1
+	title = ethiopian_slave_king_raid.1.t
+	desc = ethiopian_slave_king_raid.1.desc
+	picture = GFX_report_event_japanese_transport_soldiers
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_slave_king_raid.1.a
+		ai_chance = { factor = 25 }
+		ETH = { complete_national_focus = ETH_enemy_of_my_enemy }
+		#ETH = { country_event = { days = 7 id = ethiopian_slave_king_raid.2 } }
+	}
+	
+	option = {
+		name = ethiopian_slave_king_raid.1.b
+		ai_chance = { factor = 75 }
+	}
+}
+
+#ALZ Sudanese Independance Movement
+country_event = {
+	id = ethiopian_slave_king_raid.2
+	title = ethiopian_slave_king_raid.2.t
+	desc = ethiopian_slave_king_raid.2.desc
+	picture = GFX_report_event_japanese_transport_soldiers
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_slave_king_raid.2.a
+		ai_chance = { factor = 25 }
+		ETH = { complete_national_focus = ETH_sudanese_independance_movment }
+	}
+	
+	option = {
+		name = ethiopian_slave_king_raid.2.b
+		ai_chance = { factor = 75 }
+	}
+}
+
+#ALZ wins: This will add core of Mahdist state with a moderate Islamic focus tree
+country_event = {
+	id = ethiopian_border_conflict.2
+	title = ethiopian_border_conflict.2.t
+	desc = ethiopian_border_conflict.2.desc
+	picture = GFX_report_event_japanese_transport_soldiers
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.2.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+			remove_ideas = ETH_the_generals_plan_1
+			remove_ideas = ETH_the_generals_plan_2
+			remove_ideas = ETH_the_generals_plan_3
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+		#549 = {
+		#			
+		#}
+	}
+}
+
+#ALZ loses
+country_event = {
+	id = ethiopian_border_conflict.3
+	title = ethiopian_border_conflict.3.t
+	desc = ethiopian_border_conflict.3.desc
+	picture = GFX_report_event_japanese_soldiers_03
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.3.b
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+			remove_ideas = ETH_the_generals_plan_1
+			remove_ideas = ETH_the_generals_plan_2
+			remove_ideas = ETH_the_generals_plan_3
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+	}
+}
+
+#stalemate
+country_event = {
+	id = ethiopian_border_conflict.4
+	title = ethiopian_border_conflict.4.t
+	desc = ethiopian_border_conflict.4.desc
+	picture = GFX_report_event_japanese_army_parade
+
+	is_triggered_only = yes
+
+	option = {
+		name = ethiopian_border_conflict.4.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			remove_ideas = ETH_generals_inspire
+			remove_ideas = ETH_the_generals_plan_1
+			remove_ideas = ETH_the_generals_plan_2
+			remove_ideas = ETH_the_generals_plan_3
+		}
+		delete_unit_template_and_units = {
+			division_template = "Elite Infantry"
+		}
+	}
 }
 
 #Ethiopia chooses Protestant Denomination
@@ -543,6 +875,269 @@ country_event = {
 		add_ideas = religion_sunni
 	}
 
+}
+	
+
+
+#Ethiopia opens merchant ports
+country_event = {
+	id = ethiopia_trade.1
+	title = ethiopia_trade.1.t
+	desc = ethiopia_trade.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.1.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = GRE
+				}
+				set_country_flag = ETH_GRE_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = BRE
+				}
+				set_country_flag = ETH_BRE_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = HAM
+				}
+				set_country_flag = ETH_HAM_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = POR
+				}
+				set_country_flag = ETH_POR_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = ITA
+				}
+				set_country_flag = ETH_ITA_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = FRA
+				}
+				set_country_flag = ETH_FRA_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = ENG
+				}
+				set_country_flag = ETH_ENG_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = RUS
+				}
+				set_country_flag = ETH_RUS_Merchants
+			}
+			else_if = {
+				limit = {
+					tag = PRS
+				}
+				set_country_flag = ETH_PRS_Merchants
+			}
+		}
+	}
+}	
+
+
+#Colonial company ressource event
+country_event = {
+	id = ethiopia_trade.2
+	title = ethiopia_trade.2.t
+	desc = ethiopia_trade.2.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = cotton.2.c
+		ai_chance = { factor = 33 }
+		add_political_power = 100
+		FROM = { country_event = { days = 1 id = ethiopia_trade.3 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 1 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+			FROM = { give_military_access = ROOT }
+		}
+	}
+	
+	option = {
+		name = logging.2.c
+		ai_chance = { factor = 33 }
+		FROM = { country_event = { days = 1 id = ethiopia_trade.4 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 2 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+			FROM = { give_military_access = ROOT }
+		}
+	}
+	
+	option = {
+		name = rubber.2.b
+		ai_chance = { factor = 33 }
+		FROM = { country_event = { days = 1 id = ethiopia_trade.5 } }
+		hidden_effect = {
+			set_variable = { FROM.afr_company_trade_good = 3 }
+			set_variable = { FROM.company_country_var = ROOT.id }
+			FROM = { give_military_access = ROOT }
+		}
+	}
+	
+}
+
+#A shipyard company
+#country_event = {
+#	id = ethiopia_trade.4
+#	title = ethiopia_trade.4.t
+#	desc = ethiopia_trade.4.d
+#	picture = GFX_report_event_soviet_finnish_pact
+#	
+#	is_triggered_only = yes
+#	
+#	option = {
+#		name = ethiopia_trade.4.a
+#		ai_chance = { factor = 100 }
+#		activate_decision = ETH_shipyard_company
+#		ETH_company_military_access = yes
+#	}
+#	
+#}
+
+#A cotton company
+country_event = {
+	id = ethiopia_trade.3
+	title = ethiopia_trade.3.t
+	desc = ethiopia_trade.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.3.a
+		ai_chance = { factor = 100 }
+		activate_decision = ETH_establish_export_company
+	}
+}
+
+#A logging company
+country_event = {
+	id = ethiopia_trade.4
+	title = ethiopia_trade.4.t
+	desc = ethiopia_trade.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.4.a
+		ai_chance = { factor = 100 }
+		activate_decision = ETH_establish_export_company
+		
+	}
+}
+
+#A rubber company
+country_event = {
+	id = ethiopia_trade.5
+	title = ethiopia_trade.5.t
+	desc = ethiopia_trade.5.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.5.a
+		ai_chance = { factor = 100 }
+		activate_decision = ETH_establish_export_company
+	}
+}
+
+#Ethiopia Exports Ships
+#country_event = {
+#	id = ethiopia_export.1
+#	title = ethiopia_export.1.t
+#	desc = ethiopia_export.1.d
+#	picture = GFX_report_event_merchant_ship_01
+#	
+#	is_triggered_only = yes
+#	
+#	option = {
+#		name = ethiopia_export.1.a
+#		ai_chance = { factor = 100 }
+#		ETH = { country_event = { days = 1 id = ethiopia_export.2 } }
+#		
+#	}
+#	
+#}
+#country_event = {
+#	id = ethiopia_export.2
+#	title = ethiopia_export.2.t
+#	desc = ethiopia_export.2.d
+#	picture = GFX_report_event_soviet_finnish_pact
+#	
+#	is_triggered_only = yes
+#	
+#	option = {
+#		name = ethiopia_export.2.a
+#		ai_chance = { factor = 100 }
+#		ETH = {
+#		custom_effect_tooltip = EDC_afr.3.t
+#			hidden_effect = {
+#				country_event = { id = EDC_afr.3 hours = 1 } 
+#			}
+#		}
+#	}
+#	
+#}
+
+#Company increases exports
+country_event = {
+	id = ethiopia_trade.6
+	title = ethiopia_trade.6.t
+	desc = ethiopia_trade.6.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.6.a
+		ai_chance = { factor = 100 }
+		FROM = { country_event = { days = 1 id = ethiopia_trade.7 } }
+		
+	}
+	
+}
+
+country_event = {
+	id = ethiopia_trade.7
+	title = ethiopia_trade.7.t
+	desc = ethiopia_trade.7.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_trade.7.a
+		ai_chance = { factor = 100 }
+		ROOT = {
+			custom_effect_tooltip = EDC_afr.3.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.3 hours = 1 } 
+			}
+		}
+	}
+	
 }
 
 #Proclaim_Coalition_Against_Islam
@@ -696,6 +1291,20 @@ country_event = {
 		name = ethiopia_coalition_against_islam.1.a
 		ai_chance = { factor = 100 }
 		set_country_flag = coalition_against_islam
+		HRR = {
+			remove_ideas = ETH_idea_rally_with_egypt
+			clear_variable = rival_country
+		}
+		
+		AWS = {
+			remove_ideas = ETH_idea_rally_with_egypt
+			clear_variable = rival_country
+		}
+		
+		MED = {
+			remove_ideas = ETH_idea_rally_with_egypt 
+			clear_variable = rival_country
+		}
 
 	}
 	
@@ -869,9 +1478,7 @@ country_event = {
 
 	}
 }
-
 #Proclaim_Coalition_Against_Islam
-#Clergy Insurgents
 country_event = {
 	id = ethiopia_coalition_against_islam_insurgents.5
 	title = ethiopia_coalition_against_islam_insurgents.5.t
@@ -891,7 +1498,7 @@ country_event = {
 	}
 	
 	option = {
-		name = ethiopia_coalition_against_islam_insurgents.5.a
+		name = ethiopia_coalition_against_islam_insurgents.5.b
 		ai_chance = { factor = 50 }
 		hidden_effect = {
 			ETH = { country_event = { days = 5 id = ethiopia_coalition_against_islam_insurgents.7 } }
@@ -901,7 +1508,7 @@ country_event = {
 	}
 
 	option = {
-		name = Hopefully_This_Quiets_Down.95.b
+		name = ethiopia_coalition_against_islam_insurgents.5.c
 		ai_chance = { factor = 25 }
 		hidden_effect = {
 			ETH = { country_event = { days = 5 id = ethiopia_coalition_against_islam_insurgents.8 } }
@@ -965,6 +1572,12 @@ country_event = {
 		ETH = { country_event = { days = 30 id = ethiopia_coalition_against_islam_insurgents.11 } }
 				
 	}
+
+	option = {
+		name = ethiopia_coalition_against_islam_chances.1.b
+		ai_chance = { factor = 50 }			
+		ETH = { country_event = { days = 1 id = ethiopia_coalition_against_islam.2 } }
+	}
 }
 
 #Proclaim_Coalition_Against_Islam
@@ -1025,7 +1638,297 @@ country_event = {
 	option = {
 		name = ethiopia_coalition_against_islam_insurgents.11.a
 		ai_chance = { factor = 100 }
-
+		ROOT = { country_event = { days = 1 id = ethiopia_company_coup.11 } }
+		hidden_effect = {
+					if = {
+						limit = {
+							ROOT = { 
+								has_idea = ETH_idea_alienated_parish_clergy
+							}
+						}
+						#ROOT = { country_event = { days = 1 id = ethiopia_company_coup.7 } }
+					}
+					if = {
+						limit = {
+							ROOT = { 
+								has_idea = ETH_idea_furious_parish_clergy
+							}
+						}
+						#ROOT = { country_event = { days = 1 id = ethiopia_company_coup.8 } }
+					}
+		}
+		ROOT = { 
+			set_capital = 815	
+			set_country_flag = is_trading_company
+			if = {
+				limit = {
+					ROOT = { 
+						has_country_flag = ETH_ENG_Coup_Forming
+					}
+				}
+				set_cosmetic_tag = ETH_British_Trade_Company
+				815 = {
+					set_state_name = "New Manchester"
+				}
+			}		
+			if = {
+				limit = {
+					ROOT = { 
+						has_country_flag = ETH_POR_Coup_Forming
+					}
+				}
+				set_cosmetic_tag = ETH_Portugal_Trade_Company
+				815 = {
+					set_state_name = "Novo Beja"
+				}
+				
+			}	
+			if = {
+				limit = {
+					ROOT = { 
+						has_country_flag = ETH_GER_Coup_Forming
+					}
+				}
+				set_cosmetic_tag = ETH_German_Trade_Company 
+				815 = {
+					set_state_name = "Neu Bernburg"
+				}
+			}	
+			if = {
+				limit = {
+					ROOT = { 
+						has_country_flag = ETH_FRA_Coup_Forming
+					}
+					
+				}
+				set_cosmetic_tag = ETH_French_Trade_Company
+				815 = {
+					set_state_name = "New Troyes"
+				}
+			}	
+			
+		}
+		if = {
+				limit = {
+					ROOT = { 
+							NOT = { 
+								has_country_flag = ETH_corporate_coup_support
+							}
+					}
+				}
+					
+					
+					start_civil_war = {
+						ruling_party = chauvinist_populism
+						ideology = autocracy
+						size = 1
+						only_own_territory = no
+						capital = 816
+						states = { 
+							816 817
+						}
+						keep_unit_leaders = {
+							
+						}
+					}
+			}
+		if = {
+				limit = {
+					ROOT = { 
+							has_country_flag = ETH_corporate_coup_support
+					}
+				}
+					
+					start_civil_war = {
+						ruling_party = chauvinist_populism
+						ideology = autocracy
+						size = 1
+						only_own_territory = no
+						capital = 816
+						states = { 
+							816 817
+						}
+						keep_unit_leaders = {
+							
+						}
+					}
+					
+		}
+		
+		ROOT = {
+			hidden_effect = {
+				remove_ideas = ETH_idea_tewodros_social_reforms
+				if = {
+					limit = {
+						FROM = { has_government = centrism }
+					}
+					
+					set_popularities = {
+						centrism = 100
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = centrism
+					}
+				}
+				if = {
+					limit = {
+						FROM = { has_government = traditional_conservatism }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 100
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = traditional_conservatism
+					}
+				}
+				
+				
+				if = {
+					limit = {
+						FROM = { has_government = social_egalitarianism }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 100
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = social_egalitarianism
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM = { has_government = collectivist_socialism }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 100
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = collectivist_socialism
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM = { has_government = vanguard_communism }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 100
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = vanguard_communism
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM = { has_government = autocracy }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 100
+						radical_democracy = 0
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = autocracy
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM = { has_government = radical_democracy }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 100
+						chauvinist_populism = 0
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = radical_democracy
+					}
+				}
+				
+				if = {
+					limit = {
+						FROM = { has_government = chauvinist_populism }
+					}
+					set_popularities = {
+						centrism = 0
+						traditional_conservatism = 0
+						social_egalitarianism = 0
+						collectivist_socialism = 0
+						vanguard_communism = 0
+						autocracy = 0
+						radical_democracy = 0
+						chauvinist_populism = 100
+						anarchism = 0
+						fundamentalism = 0
+					}
+					set_politics = {
+						ruling_party = chauvinist_populism
+					}
+				}
+			}
+		}
+					
 	}
 }
 
@@ -1064,153 +1967,79 @@ country_event = {
 	}
 }
 
-#Assist_Sudanese_Independance
+#Initiate Islamic Raids
+
 country_event = {
-	id = ethiopian_border_conflict.1
-	title = ethiopian_border_conflict.1.t
-	desc = ethiopian_border_conflict.1.d
-	picture = GFX_report_event_soviet_finnish_pact
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = ethiopian_border_conflict.1.a
-		ai_chance = { factor = 100 }
-		if = {
-			limit = {
-				AND = {
-					ALZ = {
-						has_opinion = {
-							target = EGY
-							value < 14
-						}
-					}
-					num_divisions > 0
-				}
-			}
-			hidden_effect = {
-				set_border_war_data = {
-					attacker = 833
-					defender = 549
-					combat_width = 40
-				}
-			}
-			start_border_war = {
-				change_state_after_war = no
-				attacker = {
-					state = 833
-					num_provinces = 4
-					on_win = ethiopian_border_conflict.3
-					on_lose = ethiopian_border_conflict.2
-					on_cancel = ethiopian_border_conflict.4
-				}				
-				defender = {
-					state = 549
-					num_provinces = 4
-					on_win = ethiopian_border_conflict.2
-					on_lose = ethiopian_border_conflict.3
-					on_cancel = ethiopian_border_conflict.4
-				}
-			}
-		}
-		if = {
-			limit = {
-				AND = {
-					ALZ = {
-						has_opinion = {
-							target = EGY
-							value < 14
-						}
-					}
-					num_divisions > -1
-					num_divisions < 1
-				}
-			}
-			
-		}
-		
-		ETH = {
-			add_opinion_modifier = {
-				target = ALZ
-				modifier = medium_increase
-			}
-		}
-		
-	}
-	
-	option = {
-		name = ethiopia_egypt_relations.13.b
-		ai_chance = { factor = 0 }
-	}
-	
-}
-
-#ALZ wins: This will add core of Mahdist state with a moderate Islamic focus tree
-country_event = {
-	id = ethiopian_border_conflict.2
-	title = ethiopian_border_conflict.2.t
-	desc = ethiopian_border_conflict.2.desc
-	picture = GFX_report_event_japanese_transport_soldiers
-
-	is_triggered_only = yes
-
-	option = {
-		name = ethiopian_border_conflict.2.a
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
-		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
-		#549 = {
-		#			
-		#}
-	}
-}
-
-#ALZ loses
-country_event = {
-	id = ethiopian_border_conflict.3
-	title = ethiopian_border_conflict.3.t
-	desc = ethiopian_border_conflict.3.desc
-	picture = GFX_report_event_japanese_soldiers_03
-
-	is_triggered_only = yes
-
-	option = {
-		name = ethiopian_border_conflict.3.b
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
-		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
-	}
-}
-
-#stalemate
-country_event = {
-	id = ethiopian_border_conflict.4
-	title = ethiopian_border_conflict.4.t
-	desc = ethiopian_border_conflict.4.desc
+	id = ethiopia_initiate_islamic_raid.1
+	title = ethiopia_initiate_islamic_raid.1.t
+	desc = ethiopia_initiate_islamic_raid.1.d
 	picture = GFX_report_event_japanese_army_parade
 
 	is_triggered_only = yes
 
 	option = {
-		name = ethiopian_border_conflict.4.a
+		name = ethiopia_initiate_islamic_raid.1.a
 		ai_chance = { factor = 100 }
 		hidden_effect = {
-			remove_ideas = ETH_generals_inspire
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = HRR
+								owns_state = 818
+							}
+						}
+					}
+				}
+				HRR = {
+
+				}
+			}
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = AWS
+								owns_state = 819
+							}
+						}
+					}
+				}
+				AWS = {
+	
+				}
+				
+			}
+			if = {
+				limit = {
+					AND = {
+						ETH = {
+							owns_state = 816
+						}
+						any_neighbor_country ={
+							AND = {
+								tag = MED
+								owns_state = 550
+							}
+						}
+					}
+				}
+				MED = {
+	
+				}
+			}
 		}
-		delete_unit_template_and_units = {
-			division_template = "Elite Infantry"
-		}
+		
 	}
 }
-
 
 #Islamic Raids
 country_event = {
@@ -1242,9 +2071,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -1272,9 +2101,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -1303,9 +2132,9 @@ country_event = {
 					defender = {
 						state = 816
 						num_provinces = 6
-						on_win = ethiopia_islamic_raid.2
-						on_lose = ethiopia_islamic_raid.3
-						on_cancel = ethiopia_islamic_raid.4
+						on_win = ethiopia_islamic_raid_defender.2
+						on_lose = ethiopia_islamic_raid_defender.3
+						on_cancel = ethiopia_islamic_raid_defender.4
 					}
 				}
 				set_border_war_data = {
@@ -1336,15 +2165,22 @@ country_event = {
 				tag = HRR
 			}
 			HRR = {
+				army_experience = 5
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_rifle_0
+					amount = 50
+					producer = ETH
+				}
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 		if = {
@@ -1352,15 +2188,22 @@ country_event = {
 				tag = AWS
 			}
 			AWS = {
+				army_experience = 5
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_rifle_0
+					amount = 50
+					producer = ETH
+				}
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 		if = {
@@ -1368,15 +2211,22 @@ country_event = {
 				tag = MED
 			}
 			MED = {
+				army_experience = 5
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_rifle_0
+					amount = 50
+					producer = ETH
+				}
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -500}
+				#custom_effect_tooltip= EDC_remove_500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -500}
 			}
 		}
 	}
@@ -1399,15 +2249,17 @@ country_event = {
 				tag = HRR
 			}
 			HRR = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 		if = {
@@ -1415,15 +2267,17 @@ country_event = {
 				tag = AWS
 			}
 			AWS = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 		if = {
@@ -1431,15 +2285,17 @@ country_event = {
 				tag = MED
 			}
 			MED = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
-				custom_effect_tooltip= EDC_remove_1500_to_tribal_army
-				add_to_variable = {Tribal_army_num = -1500}
+				#custom_effect_tooltip= EDC_remove_1500_to_tribal_army
+				#add_to_variable = {Tribal_army_num = -1500}
 			}
 		}
 	}
@@ -1462,12 +2318,14 @@ country_event = {
 				tag = HRR
 			}
 			HRR = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
 			}
 		}
@@ -1476,12 +2334,14 @@ country_event = {
 				tag = AWS
 			}
 			AWS = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
 			}
 		}
@@ -1490,15 +2350,226 @@ country_event = {
 				tag = MED
 			}
 			MED = {
+				army_experience = 1
 				hidden_effect = {
 					delete_unit_template_and_units = {
 						division_template = "Elite Tribal Infantry"
 					}
 					remove_ideas = ETH_generals_inspire
 					clr_country_flag = raiding_neighbour
+					set_country_flag = ETH_border_war_ended
 				}
 			}
 		}
 	}
 	
 }
+#Announce
+country_event = {
+	id = ethiopia_islamic_raid_defender.1
+	title = ethiopia_islamic_raid_defender.1.t
+	desc = ethiopia_islamic_raid_defender.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.1.a
+		ai_chance = { factor = 100 }
+		set_country_flag = ETH_caliphate_raid
+	}
+	
+}
+#Win
+country_event = {
+	id = ethiopia_islamic_raid_defender.2
+	title = ethiopia_islamic_raid_defender.2.t
+	desc = ethiopia_islamic_raid_defender.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.2.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				army_experience = 5
+				add_stability = 0.01
+				hidden_effect = {
+					clr_country_flag = ETH_caliphate_raid
+				}
+				
+			}
+		}
+	}
+	
+}
+#Lose
+country_event = {
+	id = ethiopia_islamic_raid_defender.3
+	title = ethiopia_islamic_raid_defender.3.t
+	desc = ethiopia_islamic_raid_defender.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.3.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				army_experience = 1
+				add_stability = -0.01
+				hidden_effect = {
+					clr_country_flag = ETH_caliphate_raid
+				}
+			}
+		}
+	}
+	
+}
+#Stalemate
+country_event = {
+	id = ethiopia_islamic_raid_defender.4
+	title = ethiopia_islamic_raid_defender.4.t
+	desc = ethiopia_islamic_raid_defender.4.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ethiopia_islamic_raid_defender.4.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = {
+				tag = ETH
+			}
+			ETH = {
+				army_experience = 1
+				hidden_effect = {
+					clr_country_flag = ETH_caliphate_raid
+				}
+			}
+		}
+	}
+	
+}
+
+country_event = {
+	id = ETH_raid_damage.1
+	title = ETH_raid_damage.1.t
+	desc = ETH_raid_damage.1.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ETH_raid_damage.1.a
+		ai_chance = { factor = 100 }
+		816 = {
+			damage_building = {
+				type = infrastructure
+				damage = 0.10
+			}
+		}
+		
+	}
+	
+}
+
+country_event = {
+	id = ETH_raid_damage.2
+	title = ETH_raid_damage.2.t
+	desc = ETH_raid_damage.2.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ETH_raid_damage.2.a
+		ai_chance = { factor = 100 }
+		816 = {
+			damage_building = {
+				type = infrastructure
+				damage = 0.20
+			}
+		}
+	}
+	
+}
+
+country_event = {
+	id = ETH_raid_damage.3
+	title = ETH_raid_damage.3.t
+	desc = ETH_raid_damage.3.d
+	picture = GFX_report_event_soviet_finnish_pact
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ETH_raid_damage.3.a
+		ai_chance = { factor = 100 }
+		816 = {
+			damage_building = {
+				type = infrastructure
+				damage = 0.30
+			}
+		}
+	}
+	
+}
+
+
+#Oromo damage
+country_event = {
+	id = ETH_north_oromo.1
+	title = ETH_north_oromo.1.t
+	desc = ETH_north_oromo.1.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ETH_north_oromo.1.a
+		random_owned_state = {
+			limit = {
+				is_fully_controlled_by = ROOT
+				infrastructure >0
+			}
+			damage_building = {
+				type = infrastructure
+				damage = 0.6
+			}
+		}
+	}
+}
+
+country_event = {
+	id = ETH_north_oromo.2
+	title = ETH_north_oromo.2.t
+	desc = ETH_north_oromo.2.d
+	picture = GFX_report_event_merchant_ship_01
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = ETH_north_oromo.2.a
+		random_owned_state = {
+			limit = {
+				is_fully_controlled_by = ROOT
+				cotton_farm >0
+			}
+			damage_building = {
+				type = cotton_farm
+				damage = 0.6
+			}
+		}
+	}
+}	

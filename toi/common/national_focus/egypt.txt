@@ -18,8 +18,34 @@ focus_tree = {
 		ai_will_do = {
 			factor = 1
 		}
+		available={
+			NOT={has_country_flag = EGY_backed_down_mil}
+		}
+		cancel = {
+			has_country_flag = EGY_backed_down_mil
+		}
 		mutually_exclusive = {
 			focus = EGY_vic_army_innovations
+		}
+		select_effect = {
+			if = {
+				limit = {
+					OVERLORD = {
+						tag = OTO
+					}
+					NOT = {
+						has_completed_focus = EGY_vic_request_firman_stab_succ
+					}
+				}
+				hidden_effect = {
+					OTO = {
+						country_event = {
+							id = afr_EGY_vic.1
+							days = 70
+						}
+					}
+				}
+			}
 		}
 		completion_reward = {
 			if = {
@@ -31,25 +57,8 @@ focus_tree = {
 					add_idea = limited_conscription
 				}
 			}
-			if = {
-				limit = {
-					OVERLORD = {
-						tag = OTO
-					}
-					NOT = {
-						has_completed_focus = EGY_vic_request_firman_stab_succ
-					}
-				}
-				custom_effect_tooltip = EGY_Otto_may_disaprove
-				hidden_effect = {
-					OTO = {
-						country_event = {
-							id = afr_EGY_vic.1
-							days = 7
-						}
-					}
-				}
-			}
+			custom_effect_tooltip = EGY_Otto_may_disaprove
+			
 		}
 	}
 	focus = {
@@ -426,6 +435,9 @@ focus_tree = {
 					modifier = small_decrease
 				}
 			}
+			set_variable = { rival_country = ETH.id }
+			ETH = { set_variable = { rival_country = EGY.id } }
+			custom_effect_tooltip=EGY_rivals_ETH
 			hidden_effect = {
 				clr_country_flag = ETH_EGY_Ties
 				ETH = { clr_country_flag = ETH_EGY_Ties }
@@ -440,6 +452,7 @@ focus_tree = {
 		cost = 70
 		available = { 
 			has_country_flag = ETH_EGY_Rivalry 
+			check_variable = { rival_country = ETH.id }
 		}		
 		prerequisite = {
 			focus = EGY_vic_rally_the_men_against_ETH
@@ -543,7 +556,7 @@ focus_tree = {
 		icon = GFX_goal_generic_political_pressure
 		cost = 70
 		available = { 
-			has_country_flag = ETH_EGY_Ties 
+			NOT = {has_country_flag = ETH_EGY_Rivalry}
 		}		
 		prerequisite = {
 			focus = EGY_vic_rally_the_men_with_ETH
@@ -566,9 +579,9 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_ETH_investments
 		icon = GFX_goal_generic_political_pressure
-		cost = 70
+		cost = 140
 		available = { 
-			has_country_flag = ETH_EGY_Ties 
+			has_country_flag = ETH_EGY_alliance 
 		}		
 		prerequisite = {
 			focus = EGY_vic_send_envoy_to_ETH
@@ -606,7 +619,7 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_prepare_to_annex_south_sudan
 		icon = GFX_focus_Colonial_Troops
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_plan_military_campaigns
 		}
@@ -715,6 +728,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			add_stability = 0.125
+			increase_ps_by_one = yes
 		}
 	}
 	focus = {
@@ -804,6 +818,66 @@ focus_tree = {
 		}
 	}
 	focus = {
+		id = EGY_vic_administration_restructuring
+		icon = GFX_goal_focus_reform_government
+		cost = 140
+		prerequisite = {
+			focus = EGY_vic_reforms_of_ahmad
+		}
+		x = 14
+		y = 6
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			add_stability = 0.05
+		}
+	}
+	focus = {
+		id = EGY_vic_reform_the_working_day
+		icon = GFX_goal_focus_industrial_revolution
+		cost = 140
+		prerequisite = {
+			focus = EGY_vic_reforms_of_ahmad
+		}
+		x = 16
+		y = 6
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			swap_ideas={
+				add_idea=fourteen_hour_work_day
+				remove_idea=unlimited_work_day
+			}
+		}
+	}
+	focus = {
+		id = EGY_vic_a_government_for_egyptians
+		icon = GFX_goal_focus_government_icon
+		cost = 70
+		prerequisite = {
+			focus = EGY_vic_reform_the_working_day
+		}
+		prerequisite = {
+			focus = EGY_vic_administration_restructuring
+		}
+		prerequisite = {
+			focus = EGY_vic_expand_our_schooling_system
+		}
+		x = 14
+		y = 7
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+			add_ideas={EGY_government_for_egyptians}
+		}
+	}
+	focus = {
 		id = EGY_vic_the_said_reforms
 		icon = GFX_goal_generic_political_pressure
 		cost = 140
@@ -868,6 +942,19 @@ focus_tree = {
 			has_stability > 0.40
 		}
 		completion_reward = {
+			if = {
+				limit = {
+					ETH = {
+						has_completed_focus = ETH_our_neighbors
+					}
+				}
+				ALZ = {
+					add_opinion_modifier = {
+						target = EGY
+						modifier = large_increase
+					}
+				}	
+			}
 			remove_ideas = {
 				egy_sudan_slave_raids
 			}
@@ -900,6 +987,8 @@ focus_tree = {
 		cost = 140
 		prerequisite = {
 			focus = EGY_vic_promulgate_the_saidiyah
+		}
+		prerequisite = {
 			focus = EGY_vic_enforce_the_ban
 		}
 		x = 14
@@ -978,34 +1067,16 @@ focus_tree = {
 					remove_idea =pre_industrial_era
 				}
 			}
-		}
-	}
-	focus = {
-		id = EGY_vic_OTO_chains
-		icon = GFX_goal_egypt_otto_chains
-		cost = 140
-		allow_branch = {
-			OVERLORD = {tag= OTO}
-		}
-		x = 7
-		y = 0
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-			
+			set_country_flag = afr_rrp_non_colonial_industrialization
+			custom_effect_tooltip = afr_rrp_inspiration_to_africa
 		}
 	}
 	focus = {
 		id = EGY_vic_glorify_muhammed_ali
 		icon = GFX_goal_generic_political_pressure
 		cost = 140
-		prerequisite = {
-			focus = EGY_vic_OTO_chains
-		}
-		x = 6
-		y = 1
+		x = 7
+		y = 0
 		mutually_exclusive = {
 			focus = EGY_vic_accept_OTO
 		}
@@ -1035,10 +1106,10 @@ focus_tree = {
 		icon = GFX_goal_egy_submit_to_oto
 		cost = 140
 		prerequisite = {
-			focus = EGY_vic_OTO_chains
+			focus = EGY_vic_glorify_muhammed_ali
 		}
 		mutually_exclusive = {
-			focus = EGY_vic_glorify_muhammed_ali
+			focus = EGY_vic_request_more_automony
 		}
 		x = 8
 		y = 1
@@ -1070,8 +1141,11 @@ focus_tree = {
 		prerequisite = {
 			focus = EGY_vic_glorify_muhammed_ali
 		}
+		mutually_exclusive = {
+			focus = EGY_vic_accept_OTO
+		}
 		x = 6
-		y = 2
+		y = 1
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
@@ -1099,8 +1173,14 @@ focus_tree = {
 		prerequisite = {
 			focus = EGY_vic_accept_OTO
 		}
+		prerequisite = {
+			focus = EGY_vic_request_firman_stab_succ
+		}
+		available = {
+			date > 1867.1.1
+		}
 		x = 8
-		y = 2
+		y = 3
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
@@ -1124,13 +1204,16 @@ focus_tree = {
 	}
 	focus = {
 		id = EGY_vic_bring_gov_into_line_with_OTO
-		icon = GFX_goal_egy_submit_to_oto
+		icon = GFX_goal_egypt_otto_chains
 		cost = 70
 		prerequisite = {
 			focus = EGY_vic_a_loyal_state
 		}
+		available = {
+			date > 1873.1.1
+		}
 		x = 8
-		y = 3
+		y = 4
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
@@ -1139,9 +1222,10 @@ focus_tree = {
 			OTO = {
 				set_autonomy = {
 					target = ROOT
-					autonomy_state = autonomy_puppet
+					autonomy_state = autonomy_eyalet
 				}
 			}
+			add_stability = 0.075
 		}
 	}
 	focus = {
@@ -1150,9 +1234,10 @@ focus_tree = {
 		cost = 70
 		prerequisite = {
 			focus = EGY_vic_request_more_automony
+			focus = EGY_vic_accept_OTO
 		}
-		x = 6
-		y = 3
+		x = 7
+		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
@@ -1170,7 +1255,7 @@ focus_tree = {
 					remove_idea = weak_heir
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
 					has_idea = no_heir
 				}
@@ -1178,6 +1263,9 @@ focus_tree = {
 					add_idea = has_heir
 					remove_idea = no_heir
 				}
+			}
+			else={
+				increase_ps_by_one = yes
 			}
 		}
 	}
@@ -1188,8 +1276,11 @@ focus_tree = {
 		prerequisite = {
 			focus = EGY_vic_request_firman_stab_succ
 		}
+		prerequisite = {
+			focus = EGY_vic_request_more_automony
+		}
 		x = 6
-		y = 4
+		y = 3
 		available = {
 			date > 1867.1.1
 		}
@@ -1224,7 +1315,7 @@ focus_tree = {
 			date > 1873.1.1
 		}
 		x = 6
-		y = 5
+		y = 4
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
@@ -1279,13 +1370,15 @@ focus_tree = {
 					remove_idea = pre_industrial_era
 				}
 			}
+			set_country_flag = afr_rrp_non_colonial_industrialization
+			custom_effect_tooltip = afr_rrp_inspiration_to_africa
 		}
 	}
 	focus = {
 		id = EGY_vic_egyptian_industry
 		icon = GFX_goal_generic_construct_civ_factory
-		cost = 70
-		x = 23
+		cost = 210
+		x = 21
 		y = 0
 		available = {
 			OR={
@@ -1333,11 +1426,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_develop_local_infrastucture
 		icon = GFX_goal_generic_construct_infrastructure
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 19
+		x = 17
 		y = 1
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1374,11 +1467,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_start_construction_of_a_main_rail_line
 		icon = GFX_goal_focus_railroad_development
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_develop_local_infrastucture
 		}
-		x = 19
+		x = 17
 		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1428,11 +1521,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_expand_the_rail_network
 		icon = GFX_goal_focus_war_gauges
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_start_construction_of_a_main_rail_line
 		}
-		x = 19
+		x = 17
 		y = 3
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1480,7 +1573,7 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_local_branches
 		icon = GFX_goal_focus_railroad_development
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_expand_the_rail_network
 		}
@@ -1518,11 +1611,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_expand_the_cotton_industry
 		icon = GFX_goal_anschluss
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 21
+		x = 19
 		y = 1
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1554,10 +1647,9 @@ focus_tree = {
 						}
 					}
 				}
-				add_building_construction = {
-					type = cotton_farm
-					level = 1
-					instant_build = yes
+				add_resource = {
+					type = cotton
+					amount = 8
 				}
 			}
 		}
@@ -1565,11 +1657,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_increase_cotton_investments
 		icon = GFX_goal_anschluss
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 21
+		x = 19
 		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1584,7 +1676,7 @@ focus_tree = {
 				limit = {
 					free_building_slots = {
 						building = cotton_farm
-						size > 1
+						size > 0
 					}
 					OR = {
 						is_in_home_area = yes
@@ -1593,7 +1685,7 @@ focus_tree = {
 								any_owned_state = {
 									free_building_slots = {
 										building = cotton_farm
-										size > 1
+										size > 0
 									}
 									is_in_home_area = yes
 								}
@@ -1601,10 +1693,9 @@ focus_tree = {
 						}
 					}
 				}
-				add_building_construction = {
-					type = cotton_farm
-					level = 2
-					instant_build = yes
+				add_resource = {
+					type = cotton
+					amount = 12
 				}
 			}
 		}
@@ -1612,11 +1703,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_found_fabric_mills
 		icon = GFX_goal_focus_textile
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_increase_cotton_investments
 		}
-		x = 21
+		x = 19
 		y = 3
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1639,11 +1730,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_encourage_industry_investments
 		icon = GFX_goal_generic_construct_civ_factory
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 23
+		x = 21
 		y = 1
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1689,20 +1780,20 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_increase_industry_investments
 		icon = GFX_goal_generic_construct_civ_factory
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_encourage_industry_investments
 		}
-		x = 23
+		x = 21
 		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
 		completion_reward = {
-			custom_effect_tooltip = EGY_afr_increase_debt_1
+			custom_effect_tooltip = EGY_afr_increase_debt_2
 			hidden_effect = {
-				add_to_variable = {var = debt_level value = 1}
+				add_to_variable = {var = debt_level value = 2}
 			}
 			random_owned_controlled_state = {
 				limit = {
@@ -1769,11 +1860,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_major_industry_investments
 		icon = GFX_goal_generic_construct_civ_factory
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_increase_industry_investments
 		}
-		x = 23
+		x = 21
 		y = 3
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1879,11 +1970,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_telegraph_investment
 		icon = GFX_goal_focus_telegraph_lines
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 25
+		x = 23
 		y = 1
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1930,11 +2021,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_telegraph_expansion
 		icon = GFX_goal_focus_telegraph_lines
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_telegraph_investment
 		}
-		x = 25
+		x = 23
 		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1954,11 +2045,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_alexandrian_breakwaters
 		icon = GFX_goal_generic_political_pressure
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_egyptian_industry
 		}
-		x = 27
+		x = 25
 		y = 1
 		available = {
 			owns_state = 447
@@ -1980,11 +2071,11 @@ focus_tree = {
 	focus = {
 		id = EGY_vic_suez_harbour_expansion
 		icon = GFX_goal_generic_political_pressure
-		cost = 70
+		cost = 140
 		prerequisite = {
 			focus = EGY_vic_alexandrian_breakwaters
 		}
-		x = 27
+		x = 25
 		y = 2
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1992,6 +2083,7 @@ focus_tree = {
 		}
 		available = {
 			owns_state = 749
+			has_global_flag = SUEZ_CANAL_BUILT
 		}
 		completion_reward = {
 			custom_effect_tooltip = EGY_afr_increase_debt_1
@@ -2003,6 +2095,12 @@ focus_tree = {
 					type = naval_base
 					level = 2
 					province = 12049
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					province = 4073
 					instant_build = yes
 				}
 			}
