@@ -1693,15 +1693,15 @@ mhc_add_opg = {
 	}
 }
 
-mhc_add_supc = {
+mhc_add_wic = {
 	hidden_effect = {
 		ROOT = {
 			if = {
 				limit = {
-					has_variable = mhc_supc_value
+					has_variable = mhc_wic_value
 				}
 				add_political_power = -50
-				set_variable = { mhc_supc_power = 1 }
+				set_variable = { mhc_wic_power = 1 }
 				mhc_get_results_effects_collector = yes
 			}
 			if = {
@@ -1714,16 +1714,16 @@ mhc_add_supc = {
 			if = {
 				limit = {
 					NOT = {
-						has_variable = mhc_supc_value
+						has_variable = mhc_wic_value
 					}
 				}
-				set_variable = { mhc_supc_value = mhc_add_supc_target }
+				set_variable = { mhc_wic_value = mhc_add_wic_target }
 			}
 			else = {
-				mhc_clear_supc = yes
-				set_variable = { mhc_supc_value = mhc_add_supc_target }
+				mhc_clear_wic = yes
+				set_variable = { mhc_wic_value = mhc_add_wic_target }
 			}
-			set_variable = { mhc_supc_power = 1 }
+			set_variable = { mhc_wic_power = 1 }
 		}
 	}
 }
@@ -2854,10 +2854,9 @@ mhc_fill_generic_airforce_advisor = {
 							}
 						}
 						generate_random_number_between_one_and_fifty = yes
-						#change this, addition value
 						add_to_temp_variable = {
 							var = temp_generated_number_one_fifty
-							value = 50
+							value = 47
 						}
 						add_to_array = {
 							array = local_mhc_airforce_available_traits_array
@@ -3046,7 +3045,7 @@ mhc_remove_airforce_advisor = {
 			limit = {
 				check_variable = { mhc_ach_value = temp_advisor_frame }
 			}
-			mhc_ach_chief = yes
+			mhc_clear_ach = yes
 		}
 		else_if = {
 			limit = {
@@ -3347,7 +3346,7 @@ mhc_remove_generic_airforce_advisors = {
 					limit = {
 						check_variable = { mhc_ach_value = v }
 					}
-					mhc_ach_chief = yes
+					mhc_clear_ach = yes
 				}
 				else_if = {
 					limit = {
@@ -3619,9 +3618,14 @@ mhc_ai_army_initiate_assign = {
 			}
 			mhc_ai_army_assign = yes
 		}
+	}
+}
+
+mhc_ai_airforce_initiate_assign = {
+	hidden_effect = {
 		while_loop_effect = {
 			limit = {
-				#change this, airforce trigger
+				mhc_airforce_tab_enabled = yes
 				OR = {
 					check_variable = { mhc_afc_value = 0 }
 					check_variable = { mhc_ach_value = 0 }
@@ -3639,174 +3643,179 @@ mhc_ai_airforce_initiate_activate = {
 	hidden_effect = {
 		if = {
 			limit = {
-				alliance_strength_ratio > 0.7
+				mhc_airforce_tab_enabled = yes
 			}
 			if = {
 				limit = {
-					NOT = {
-						check_variable = { mhc_afc_power > 35 }
-					}
-				}
-				while_loop_effect = {
-					limit = {
-						OR = {
-							NOT = {
-								is_in_array = {
-									array = local_mhc_active
-									value = 7
-								}
-							}
-						}
-					}
-					mhc_ai_airforce_activate = yes
-				}
-			}
-			else_if = {
-				limit = {
-					check_variable = { mhc_afc_power > 46 }
+					alliance_strength_ratio > 0.7
 				}
 				if = {
 					limit = {
-						is_in_array = {
-							array = local_mhc_active
-							value = 7
+						NOT = {
+							check_variable = { mhc_afc_power > 35 }
 						}
 					}
-					set_temp_variable = { mhc_deactivate_target = 7 }
-					mhc_deactivate = yes
-				}
-			}
-			mhc_ai_normalize_activations = yes
-		}
-		else_if = {
-			limit = {
-				alliance_strength_ratio > 0.4
-			}
-			if = {
-				limit = {
-					NOT = {
-						OR = {
-							check_variable = { mhc_ach_power > 35 }
-							check_variable = { mhc_opg_power > 35 }
-						}
-					}
-				}
-				while_loop_effect = {
-					limit = {
-						OR = {
-							NOT = {
-								is_in_array = {
-									array = local_mhc_active
-									value = 8
-								}
-							}
-							NOT = {
-								is_in_array = {
-									array = local_mhc_active
-									value = 9
+					while_loop_effect = {
+						limit = {
+							OR = {
+								NOT = {
+									is_in_array = {
+										array = local_mhc_active
+										value = 7
+									}
 								}
 							}
 						}
+						mhc_ai_airforce_activate = yes
 					}
-					mhc_ai_airforce_activate = yes
 				}
-			}
-			else_if = {
-				limit = {
-					check_variable = { mhc_ach_power > 46 }
-				}
-				if = {
+				else_if = {
 					limit = {
-						is_in_array = {
-							array = local_mhc_active
-							value = 8
-						}
+						check_variable = { mhc_afc_power > 46 }
 					}
-					set_temp_variable = { mhc_deactivate_target = 8 }
-					mhc_deactivate = yes
-				}
-			}
-			else_if = {
-				limit = {
-					check_variable = { mhc_opg_power > 46 }
-				}
-				if = {
-					limit = {
-						is_in_array = {
-							array = local_mhc_active
-							value = 9
-						}
-					}
-					set_temp_variable = { mhc_deactivate_target = 9 }
-					mhc_deactivate = yes
-				}
-			}
-			mhc_ai_normalize_activations = yes
-		}
-		else_if = {
-			limit = {
-				alliance_strength_ratio < 0.41
-			}
-			if = {
-				limit = {
-					NOT = {
-						OR = {
-							check_variable = { mhc_wic_power > 35 }
-							check_variable = { mhc_supc_power > 35 }
-						}
-					}
-				}
-				while_loop_effect = {
-					limit = {
-						OR = {
-							NOT = {
-								is_in_array = {
-									array = local_mhc_active
-									value = 10
-								}
+					if = {
+						limit = {
+							is_in_array = {
+								array = local_mhc_active
+								value = 7
 							}
-							NOT = {
-								is_in_array = {
-									array = local_mhc_active
-									value = 11
-								}
+						}
+						set_temp_variable = { mhc_deactivate_target = 7 }
+						mhc_deactivate = yes
+					}
+				}
+				mhc_ai_normalize_activations = yes
+			}
+			else_if = {
+				limit = {
+					alliance_strength_ratio > 0.4
+				}
+				if = {
+					limit = {
+						NOT = {
+							OR = {
+								check_variable = { mhc_ach_power > 35 }
+								check_variable = { mhc_opg_power > 35 }
 							}
 						}
 					}
-					mhc_ai_airforce_activate = yes
+					while_loop_effect = {
+						limit = {
+							OR = {
+								NOT = {
+									is_in_array = {
+										array = local_mhc_active
+										value = 8
+									}
+								}
+								NOT = {
+									is_in_array = {
+										array = local_mhc_active
+										value = 9
+									}
+								}
+							}
+						}
+						mhc_ai_airforce_activate = yes
+					}
 				}
+				else_if = {
+					limit = {
+						check_variable = { mhc_ach_power > 46 }
+					}
+					if = {
+						limit = {
+							is_in_array = {
+								array = local_mhc_active
+								value = 8
+							}
+						}
+						set_temp_variable = { mhc_deactivate_target = 8 }
+						mhc_deactivate = yes
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { mhc_opg_power > 46 }
+					}
+					if = {
+						limit = {
+							is_in_array = {
+								array = local_mhc_active
+								value = 9
+							}
+						}
+						set_temp_variable = { mhc_deactivate_target = 9 }
+						mhc_deactivate = yes
+					}
+				}
+				mhc_ai_normalize_activations = yes
 			}
 			else_if = {
 				limit = {
-					check_variable = { mhc_wic_power > 46 }
+					alliance_strength_ratio < 0.41
 				}
 				if = {
 					limit = {
-						is_in_array = {
-							array = local_mhc_active
-							value = 10
+						NOT = {
+							OR = {
+								check_variable = { mhc_wic_power > 35 }
+								check_variable = { mhc_supc_power > 35 }
+							}
 						}
 					}
-					set_temp_variable = { mhc_deactivate_target = 10 }
-					mhc_deactivate = yes
+					while_loop_effect = {
+						limit = {
+							OR = {
+								NOT = {
+									is_in_array = {
+										array = local_mhc_active
+										value = 10
+									}
+								}
+								NOT = {
+									is_in_array = {
+										array = local_mhc_active
+										value = 11
+									}
+								}
+							}
+						}
+						mhc_ai_airforce_activate = yes
+					}
 				}
-			}
-			else_if = {
-				limit = {
-					check_variable = { mhc_supc_power > 46 }
-				}
-				if = {
+				else_if = {
 					limit = {
-						is_in_array = {
-							array = local_mhc_active
-							value = 11
-						}
+						check_variable = { mhc_wic_power > 46 }
 					}
-					set_temp_variable = { mhc_deactivate_target = 11 }
-					mhc_deactivate = yes
+					if = {
+						limit = {
+							is_in_array = {
+								array = local_mhc_active
+								value = 10
+							}
+						}
+						set_temp_variable = { mhc_deactivate_target = 10 }
+						mhc_deactivate = yes
+					}
 				}
+				else_if = {
+					limit = {
+						check_variable = { mhc_supc_power > 46 }
+					}
+					if = {
+						limit = {
+							is_in_array = {
+								array = local_mhc_active
+								value = 11
+							}
+						}
+						set_temp_variable = { mhc_deactivate_target = 11 }
+						mhc_deactivate = yes
+					}
+				}
+				mhc_ai_normalize_activations = yes
 			}
-			mhc_ai_normalize_activations = yes
 		}
 	}
 }
