@@ -174,7 +174,84 @@ scripted_gui = {
 			colonisation_stage_4_bg_click = {
 				add_to_variable = { ROOT.colonisation_progress_@THIS = 1 }
 				ROOT={add_political_power = -10}
-				if = {
+				if={
+					limit={
+						NOT=[
+							any_country = {
+								AND={
+									is_colonial_nation = yes
+									NOT={tag = ROOT}
+									has_variable = colonisation_progress_@PREV
+								}
+							}
+						}
+					}
+					if={
+						limit={
+							NOT={is_claimed_by = ROOT}
+							any_country={
+								is_puppet_of = ROOT
+								OR={
+									FROM = {NOT={is_core_of = PREV}}
+									FROM = {NOT={is_claimed_by = PREV}}
+								}
+							}
+						}
+						add_to_variable = {ROOT.colonial_power = 40}
+					}
+					random_neighbor_state={
+							limit={
+								owner={
+									is_puppet_of = ROOT
+								}
+							}
+							owner={
+								save_event_target_as = colonial_puppet
+							}
+						}
+					if={
+						limit={
+							any_neighbor_state = {		
+								is_controlled_by = event_target:colonial_puppet
+									#save_event_target_as = colonial_puppet
+							}
+							NOT={
+								is_claimed_by = ROOT
+							}
+						}
+						event_target:colonial_puppet={
+							set_state_owner = PREV
+							transfer_state = PREV
+						}
+					}
+					else_if={
+						limit={
+							any_country={
+								is_puppet_of = ROOT
+								FROM={
+									OR={
+										is_claimed_by = PREV
+										is_core_of = PREV
+									}
+								}
+							}
+						}
+						random_country={
+							limit={
+								is_puppet_of = ROOT
+							}
+							set_state_owner = PREV
+							transfer_state = PREV
+						}
+					}
+					else={
+						ROOT = {
+							set_state_owner = PREV
+							transfer_state = PREV
+						}
+					}
+				}
+				else_if = {
 					limit = {
 						NOT = {owner = {is_guaranteed_by = ROOT}}
 						AND = {
