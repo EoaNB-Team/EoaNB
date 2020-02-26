@@ -27,13 +27,22 @@ country_event = {
 		RYU = { clr_country_flag = RYU_Civil_War }
 		RYU = { country_event = { id = RYU_sho_coup_victory.1 } }
 		SAT = { country_event = { id = RYU_sho_coup_victory.2 } }
-		ENG = { country_event = { id = RYU_sho_coup_victory.5 } }
-		USA = { country_event = { id = RYU_sho_coup_victory.5 } }
-		FRA = { country_event = { id = RYU_sho_coup_victory.5 } }
+		if = {
+			limit = { RYU = { has_country_flag = RYU_ENG_support } }
+			ENG = { country_event = { id = RYU_sho_coup_victory.5 } }
+			ENG = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
+		}
+		if = {
+			limit = { RYU = { has_country_flag = RYU_USA_support } }
+			USA = { country_event = { id = RYU_sho_coup_victory.5 } }
+			USA = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
+		}
+		if = {
+			limit = { RYU = { has_country_flag = RYU_FRA_support } }
+			FRA = { country_event = { id = RYU_sho_coup_victory.5 } }
+			FRA = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
+		}
 		
-		ENG = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
-		USA = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
-		FRA = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
 		RYU = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
 		SAT = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
 		TSH = { news_event = { id = RYU_sho_coup_victory.6 days = 5 } }
@@ -59,9 +68,19 @@ country_event = {
 		RYU = { clr_country_flag = RYU_Civil_War }
 		RYU = { country_event = { id = RYU_sho_coup_defeat.1 } }
 		SAT = { country_event = { id = RYU_sho_coup_defeat.2 } }
-		ENG = { country_event = { id = RYU_sho_coup_defeat.5 } }
-		USA = { country_event = { id = RYU_sho_coup_defeat.5 } }
-		FRA = { country_event = { id = RYU_sho_coup_defeat.5 } }
+		if = {
+			limit = { RYU = { has_country_flag = RYU_ENG_support } }
+			ENG = { country_event = { id = RYU_sho_coup_defeat.5 } }
+		}
+		if = {
+			limit = { RYU = { has_country_flag = RYU_USA_support } }
+			USA = { country_event = { id = RYU_sho_coup_defeat.5 } }
+		}
+		if = {
+			limit = { RYU = { has_country_flag = RYU_FRA_support } }
+			FRA = { country_event = { id = RYU_sho_coup_defeat.5 } }
+		}
+		
 	}
 }
 
@@ -445,9 +464,11 @@ country_event = {
 	is_triggered_only = yes
 	
 	immediate = {
-		RYU = {
-			set_technology = {
-				tech_infantry_colonial_marines = 1
+		hidden_effect = {
+			RYU = {
+				set_technology = {
+					tech_infantry_colonial_marines = 1
+				}
 			}
 		}
 	}
@@ -936,11 +957,18 @@ news_event = {
 			TAG = RYU
 		}
 		hidden_effect = { RYU = { add_to_array = { national_religion_array = global.protestant } } }
+		
 		swap_ideas = {
-			remove_idea = religion_shinto
-			add_idea = religion_protestant
+			remove_idea = border_control
+			add_idea = open_borders
 		}
 		hidden_effect = { 
+			add_ideas = RYU_ryukyu_treaty
+			swap_ideas = {
+				remove_idea = religion_shinto
+				add_idea = religion_protestant
+			}
+			RYU = { country_event = { id = RYU_sho_coup_aftermath.1 days = 1080 } }
 			remove_ideas = RYU_major_maritime_commerce_hub
 			add_ideas = RYU_major_maritime_commerce_hub_independance
 			remove_opinion_modifier = { target = SAT modifier = RYU_satsuma_vassal }
@@ -969,7 +997,6 @@ news_event = {
 			TAG = CHI
 		}
 		RYU = { country_event = { id = RYU_sho_coup_victory.7 days = 3 } }
-		RYU = { country_event = { id = RYU_sho_coup_aftermath.1 days = 1080 } }
 	}
 	option = {
 		name = RYU_sho_coup_victory.6.c 
@@ -997,8 +1024,18 @@ news_event = {
 		ai_chance = { factor = 100 }
 		trigger = {
 			OR = {
-				TAG = USA
-				TAG = FRA
+				AND = {
+					TAG = ENG
+					RYU = { has_country_flag = RYU_ENG_support }
+				}
+				AND = {
+					TAG = USA
+					RYU = { has_country_flag = RYU_USA_support }
+				}
+				AND = {
+					TAG = FRA
+					RYU = { has_country_flag = RYU_FRA_support }
+				}
 			}
 		}
 		add_political_power = 150
@@ -1043,6 +1080,27 @@ news_event = {
 			NOT = { TAG = FRA }
 		}
 	}
+	
+	option = {
+		name = RYU_sho_coup_victory.6.g
+		ai_chance = { factor = 100 }
+		trigger = {
+			OR = {
+				AND = {
+					TAG = ENG
+					RYU = { NOT = { has_country_flag = RYU_ENG_support } }
+				}
+				AND = {
+					TAG = USA
+					RYU = { NOT = { has_country_flag = RYU_USA_support } }
+				}
+				AND = {
+					TAG = FRA
+					RYU = { NOT = { has_country_flag = RYU_FRA_support } }
+				}
+			}
+		}
+	}
 }
 
 country_event = {
@@ -1058,9 +1116,10 @@ country_event = {
 		ai_chance = { factor = 100 }
 		hidden_effect = { add_ideas = Oceania_qing_tributary }
 		set_variable = { most_favoured_country = CHI.id }
-		hidden_effect = { add_ideas = Oceania_xiang_ling }
+		hidden_effect = { add_ideas = RYU_zhang_zhi }
 		custom_effect_tooltip = available_political_advisor
-		show_ideas_tooltip = Oceania_xiang_ling
+		show_ideas_tooltip = RYU_zhang_zhi
+		set_country_flag = RYU_chinese_advisor
 	}
 }
 
@@ -1079,6 +1138,10 @@ country_event = {
 			add_idea=slavery_all_but_name
 			remove_idea=slavery
 		}
+		hidden_effect = { add_ideas = RYU_thomas_williamson }
+		custom_effect_tooltip = available_political_advisor
+		show_ideas_tooltip = RYU_thomas_williamson
+		set_country_flag = RYU_british_advisor
 	}
 }
 
@@ -1093,7 +1156,10 @@ country_event = {
 	option = {
 		name = RYU_sho_coup_victory.9.a 
 		ai_chance = { factor = 100 }
-		
+		hidden_effect = { add_ideas = RYU_matthew_calbraith_perry }
+		custom_effect_tooltip = available_political_advisor
+		show_ideas_tooltip = RYU_matthew_calbraith_perry
+		set_country_flag = RYU_usa_advisor
 	}
 }
 
@@ -1108,7 +1174,10 @@ country_event = {
 	option = {
 		name = RYU_sho_coup_victory.10.a 
 		ai_chance = { factor = 100 }
-		
+		hidden_effect = { add_ideas = RYU_francis_rousseau }
+		custom_effect_tooltip = available_political_advisor
+		show_ideas_tooltip = RYU_francis_rousseau
+		set_country_flag = RYU_french_advisor
 	}
 }
 
