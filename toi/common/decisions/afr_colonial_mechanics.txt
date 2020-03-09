@@ -1,5 +1,141 @@
 afr_transatlantic_slave_ban_decisions = {
+	
+	GDC_sell_slaves_for_guns = {
+		icon = generic_prepare_civil_war
+		
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AFR_has_slavery_tooltip
+				OR = {	
+					has_idea = slavery
+					has_idea = usa_slavery_law
+					has_idea = tribal_slavery
+				}
+			}
+			has_manpower > 100
+		}
 
+		visible = {
+			OR = {
+				has_country_flag = AFR_interstate_supplier
+				has_country_flag = AFR_interstate_consumer
+				has_idea = AFR_illegal_transatlantic
+			}
+			NOT = { has_idea = AFR_transatlantic_consumer }
+			OR = {	
+				has_idea = slavery
+				has_idea = usa_slavery_law
+				has_idea = tribal_slavery
+			}
+			GDC = {
+				has_country_flag = GDC_has_tricked_the_brits
+				OR = {	
+					has_idea = slavery
+					has_idea = usa_slavery_law
+					has_idea = tribal_slavery
+				}
+				is_neighbor_of = ROOT
+			}
+			afr_is_tribal = yes
+		}
+	
+		fire_only_once = no
+		days_re_enable = 60
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10000
+				OR = {
+					has_war_support > 0.5
+					has_idea = AFR_history_of_colonial_resistance
+					has_idea = AFR_history_of_colonial_resistance_1
+				}
+			}
+		}
+		
+		complete_effect = {
+			add_manpower = -100
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_rifle_0
+				amount = 25
+				producer = GDC
+			}
+			hidden_effect = {
+				GDC = { add_manpower = 100 }
+			}
+		}
+		
+	}
+	
+	LIB_sell_slaves_for_guns = {
+		icon = generic_prepare_civil_war
+		
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AFR_has_slavery_tooltip
+				OR = {	
+					has_idea = slavery
+					has_idea = usa_slavery_law
+					has_idea = tribal_slavery
+				}
+			}
+			has_manpower > 100
+		}
+
+		visible = {
+			NOT = { TAG = KRU }
+			OR = {
+				has_country_flag = AFR_interstate_supplier
+				has_country_flag = AFR_interstate_consumer
+				has_idea = AFR_illegal_transatlantic
+			}
+			NOT = { has_idea = AFR_transatlantic_consumer }
+			OR = {	
+				has_idea = slavery
+				has_idea = usa_slavery_law
+				has_idea = tribal_slavery
+			}
+			LIB = {
+				has_country_flag = LIB_trade_arms_for_slaves
+				OR = {
+					has_idea = slavery
+					has_idea = usa_slavery_law
+					has_idea = tribal_slavery
+				}
+				is_neighbor_of = ROOT
+			}
+			afr_is_tribal = yes
+		}
+	
+		fire_only_once = no
+		days_re_enable = 60
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10000
+				OR = {
+					has_war_support > 0.5
+					has_idea = AFR_history_of_colonial_resistance
+					has_idea = AFR_history_of_colonial_resistance_1
+				}
+			}
+		}
+		
+		complete_effect = {
+			add_manpower = -100
+			add_equipment_to_stockpile = {
+				type = infantry_equipment_rifle_0
+				amount = 25
+				producer = LIB
+			}
+			hidden_effect = {
+				LIB = { add_manpower = 100 }
+			}
+		}
+		
+	}
 
 	AFR_interstate_slave_trade_consumer = {
 
@@ -7,22 +143,25 @@ afr_transatlantic_slave_ban_decisions = {
 			NOT = {
 				has_idea = tribal_slavery
 			}
-			ROOT = {
-				OR = {
-					AND = {
-						any_owned_state = { is_coastal = yes }
-						any_country = {
-							AND = {
+			custom_trigger_tooltip = {
+				tooltip = AFR_interstate_slave_trade_consumer_tooltip
+				ROOT = {
+					OR = {
+						AND = {
+							any_owned_state = { is_coastal = yes }
+							any_country = {
+								AND = {
+									has_idea = AFR_illegal_transatlantic
+									any_owned_state = { is_coastal = yes }
+								}
+							}	
+						}
+						any_neighbor_country = {
+							OR = {
 								has_idea = AFR_illegal_transatlantic
-								any_owned_state = { is_coastal = yes }
-							}
-						}	
-					}
-					any_neighbor_country = {
-						OR = {
-							has_idea = AFR_illegal_transatlantic
-							has_country_flag = AFR_interstate_supplier
-						} 
+								has_country_flag = AFR_interstate_supplier
+							} 
+						}
 					}
 				}
 			}
@@ -43,10 +182,12 @@ afr_transatlantic_slave_ban_decisions = {
 			factor = 1
 		}
 
-		cost = 100
+		cost = 0
 		
 		complete_effect = {
 			remove_ideas = AFR_transatlantic_consumer
+			set_country_flag = AFR_interstate_consumer
+			add_timed_idea = { idea = AF_T_idea_slaves_developed days = 365 }
 		}
 	}
 
@@ -131,14 +272,14 @@ afr_transatlantic_slave_ban_decisions = {
 		complete_effect = {
 			remove_ideas = AFR_transatlantic_supplier
 			set_country_flag = AFR_interstate_supplier
+			add_timed_idea = { idea = AF_T_idea_slaves_developed days = 365 }
 		}
 	}
 
 	AFR_modernize_slavery = {
 
 		available = {
-			has_idea = tribal_slavery
-			has_stability > 0.25
+			has_stability > 0.40
 		}
 
 		visible = {
@@ -154,8 +295,8 @@ afr_transatlantic_slave_ban_decisions = {
 		ai_will_do = {
 			factor = 1
 		}
-
-		cost = 100
+		
+		cost = 0
 		
 		complete_effect = {
 			add_political_power = -100
@@ -200,25 +341,56 @@ afr_colony_generic_colonial_investments_decisions = {
 	afr_colony_generic_regional_resources_decision = {
 		ai_will_do = { factor = 1 }
 		available = {
-			always = no
+			hidden_trigger = {
+				has_country_flag = finish_afr_colony_generic_regional_resources_decision_mission
+			}
+		}
+		
+		allowed = {
+			
+		}
+		activation = { 
+			has_country_flag = afr_colony_generic_regional_resources_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
 		}
 
 		visible = {
-			always = no
+			has_country_flag = afr_colony_generic_regional_resources_decision_mission
 		}
 		
-		fire_only_once = yes
+		fire_only_once = no
 
-		cost = 0
+		#cost = 1
 		
-		days_remove = 360
+		days_mission_timeout = 1100
 		
-		modifier = {
-			political_power_cost = 0.1
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
+		
+		complete_effect = {
+			clr_country_flag = afr_colony_generic_regional_resources_decision_mission
+			capital_scope={
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+				add_resource = {
+					type = iron
+					amount = 5
+				}
+			}
+			set_country_flag = afr_colony_generic_regional_resources_decision_flag
 		}
-		
-		remove_effect = {
-			random_owned_state={
+		timeout_effect = {
+			clr_country_flag = afr_colony_generic_regional_resources_decision_mission
+			capital_scope={
 				add_resource = {
 					type = coal
 					amount = 3
@@ -262,29 +434,7 @@ afr_colony_generic_colonial_investments_decisions = {
 		}
 		
 		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					free_building_slots = {
-						building = fabric_weavery
-						size > 0
-						include_locked = yes
-					}
-					OR = {
-						is_in_home_area = yes
-						NOT = {
-							owner = {
-								any_owned_state = {
-									free_building_slots = {
-										building = fabric_weavery
-										size > 0
-										include_locked = yes
-									}
-									is_in_home_area = yes
-								}
-							}
-						}
-					}
-				}
+			capital_scope = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = fabric_weavery
@@ -328,29 +478,7 @@ afr_colony_generic_colonial_investments_decisions = {
 		}
 		
 		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					free_building_slots = {
-						building = logging_camp
-						size > 0
-						include_locked = yes
-					}
-					OR = {
-						is_in_home_area = yes
-						NOT = {
-							owner = {
-								any_owned_state = {
-									free_building_slots = {
-										building = logging_camp
-										size > 0
-										include_locked = yes
-									}
-									is_in_home_area = yes
-								}
-							}
-						}
-					}
-				}
+			capital_scope = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = logging_camp
@@ -369,24 +497,48 @@ afr_colony_generic_colonial_investments_decisions = {
 	afr_colony_generic_regional_industry_decision = {
 		ai_will_do = { factor = 1 }
 		available = {
-			always = no
+			hidden_trigger = {
+				has_country_flag = finish_afr_colony_generic_regional_industry_decision_mission
+				exists = yes
+			}
+		}
+		
+		#allowed = {
+		#	has_country_flag = afr_colony_generic_regional_industry_decision_mission
+		#}
+		activation = { 
+			has_country_flag = afr_colony_generic_regional_industry_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
 		}
 
 		visible = {
-			always = no
+			has_country_flag = afr_colony_generic_regional_industry_decision_mission
 		}
 		
-		fire_only_once = yes
+		#fire_only_once = no
 
-		cost = 0
+		#cost = 1
 		
-		days_remove = 540
+		days_mission_timeout = 900
 		
-		modifier = {
-			political_power_cost = 0.1
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
+		
+		complete_effect = {  
+			hidden_effect = {
+			clr_country_flag = afr_colony_generic_regional_industry_decision_mission
+			set_country_flag = afr_colony_generic_regional_industry_decision_flag
+			}
 		}
-		
-		remove_effect = {
+		timeout_effect = {  
+			clr_country_flag = afr_colony_generic_regional_industry_decision_mission
 			set_country_flag = afr_colony_generic_regional_industry_decision_flag
 		}
 	}
@@ -445,29 +597,7 @@ afr_colony_generic_colonial_investments_decisions = {
 		}
 		
 		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					free_building_slots = {
-						building = industrial_complex
-						size > 0
-						include_locked = yes
-					}
-					OR = {
-						is_in_home_area = yes
-						NOT = {
-							owner = {
-								any_owned_state = {
-									free_building_slots = {
-										building = industrial_complex
-										size > 0
-										include_locked = yes
-									}
-									is_in_home_area = yes
-								}
-							}
-						}
-					}
-				}
+			capital_scope = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = industrial_complex
@@ -510,29 +640,7 @@ afr_colony_generic_colonial_investments_decisions = {
 		}
 		
 		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					free_building_slots = {
-						building = arms_factory
-						size > 0
-						include_locked = yes
-					}
-					OR = {
-						is_in_home_area = yes
-						NOT = {
-							owner = {
-								any_owned_state = {
-									free_building_slots = {
-										building = arms_factory
-										size > 0
-										include_locked = yes
-									}
-									is_in_home_area = yes
-								}
-							}
-						}
-					}
-				}
+			capital_scope = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = arms_factory
@@ -553,6 +661,7 @@ afr_colony_generic_colonial_investments_decisions = {
 		ai_will_do = { factor = 1 }
 		available = {
 			has_country_flag = afr_colony_generic_regional_infrastructure_decision_flag
+			exists = yes
 		}
 
 		visible = {
@@ -576,53 +685,76 @@ afr_colony_generic_colonial_investments_decisions = {
     afr_colony_generic_regional_infrastructure_decision = {
 		ai_will_do = { factor = 1 }
 		available = {
-			always = no
+			hidden_trigger = {
+				has_country_flag = finish_afr_colony_generic_regional_infrastructure_decision_mission
+			}
+		}
+		
+		#allowed = {
+		#	has_country_flag = afr_colony_generic_regional_infrastructure_decision_mission
+		#}
+		activation = { 
+			has_country_flag = afr_colony_generic_regional_infrastructure_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
 		}
 
 		visible = {
-			always = no
+			has_country_flag = afr_colony_generic_regional_infrastructure_decision_mission
 		}
 		
-		fire_only_once = yes
+		#fire_only_once = no
 
-		cost = 0
+		#cost = 1
 		
-		days_remove = 900
+		days_mission_timeout = 1200
 		
-		modifier = {
-			political_power_cost = 0.1
-		}
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
 		
-		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					free_building_slots = {
-						building = infrastructure
-						size > 0
-					}
-					OR = {
-						is_in_home_area = yes
-						NOT = {
-							owner = {
-								any_owned_state = {
-									free_building_slots = {
-										building = infrastructure
-										size > 0
-									}
-									is_in_home_area = yes
-								}
-							}
+		complete_effect = {  
+			clr_country_flag = afr_colony_generic_regional_infrastructure_decision_mission
+			capital_scope = {
+				if = {
+					limit = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
 						}
 					}
-				}
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
 			}
 			set_country_flag = afr_colony_generic_regional_infrastructure_decision_flag
-			custom_effect_tooltip = afr_colony_generic_regional_infrastructure_tooltip
+		}
+		timeout_effect = {
+			clr_country_flag = afr_colony_generic_regional_infrastructure_decision_mission
+			capital_scope = {
+				if = {
+					limit = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			set_country_flag = afr_colony_generic_regional_infrastructure_decision_flag
 		}
 	}
 	

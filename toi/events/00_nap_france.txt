@@ -5,6 +5,7 @@
 add_namespace = nap_france
 add_namespace = fraprswar_france
 add_namespace = third_rep_france
+add_namespace = latin_monetary_union
 
 #----------------------------------------------------------------------------------------------
 # FOCUS TREE EVENTS - 1857 TO 1870
@@ -584,6 +585,8 @@ country_event = { # Kabyle startup event
 	if = {
 		limit = {
 			is_ai = yes
+			BAB = { is_ai = yes }
+			ALG = { is_ai = yes }
 		}
 		# France Algeria will annex Beni Abbas by event
 		BAB = {
@@ -1190,6 +1193,8 @@ country_event = { # The Government forces us to give the citizenship to some nat
 
   option = {
     name = nap_france.124.a
+	custom_effect_tooltip = afr_colonial_effect_tooltip
+	custom_effect_tooltip = AFR_Racial_Tension_minus_1
   }
 }
 
@@ -1627,13 +1632,31 @@ country_event = { # Algerian natives discontent with their situation (FRA vision
 
   option = { # We need to react properly
     name = nap_france.143.a
+	ALG = {
+	  custom_effect_tooltip = afr_colonial_effect_tooltip
+	  custom_effect_tooltip = AFR_Racial_Tension_minus_1
+	  
+    }
+	hidden_effect = {
+		ALG = {
+			country_event = {id = afr_rrp_racial_tension_decrease.1}
+		}
+	}
   }
 
   option = { # We don't care about the natives
     name = nap_france.143.b
     ALG = {
       set_country_flag = ALG_france_dont_care
+	  custom_effect_tooltip = afr_colonial_effect_tooltip
+	  custom_effect_tooltip = AFR_Racial_Tension_add_2
+	  
     }
+	hidden_effect = {
+		ALG = {
+			country_event = {id = afr_rrp_racial_tension_increase.2}
+		}
+	}
   }
 }
 
@@ -1892,6 +1915,27 @@ country_event = { # The integration of Southern Algeria into our colony
   }
 }
 
+country_event = { # Constantine come back to Algerian colony after victory in Kabyle revolt
+  id = nap_france.154
+  title = nap_france.154.t
+  desc = nap_france.154.d
+  picture = GFX_report_event_nap_france_carbonari
+
+  trigger = {
+    tag = FRA
+    owns_state = 460
+  }
+
+  fire_only_once = yes
+
+  option = { # As it should be
+    name = nap_france.154.a
+    ALG = {
+      transfer_state = 460
+    }
+  }
+}
+
 country_event = { # Cochinchina war simulation
   id = nap_france.160
   title = nap_france.160.t
@@ -1952,6 +1996,10 @@ country_event = { # Cochinchina war FRA victory
 	ai_chance = { factor = 100 }
 	CCH = {
 		transfer_state = 998
+	}
+	VIN = {
+		set_variable = { rival_country = CCH.id }
+		add_opinion_modifier = { target = CCH modifier = AFR_colonial_conflict }
 	}
     if = {
       limit = {
@@ -2931,7 +2979,7 @@ country_event = { # Switzerland - Refused
 # MEXICAN INTERVENTION
 #----------------------------------------------------------------------------------------------
 
-country_event = { # Start Civil War
+country_event = { # Treaty of London
   id = nap_france.360
   title = nap_france.360.t
   desc = nap_france.360.d
@@ -2939,123 +2987,297 @@ country_event = { # Start Civil War
 
   is_triggered_only = yes
 
-  option = {
+  option = { # Seen by FRA
     name = nap_france.360.a
-    MEX = {
-      create_country_leader = {
-        name = "Maximilian-Ferdinand of Austria"
-        picture = "Portrait_MEX_Maxililian_Ferdinand.dds"
-        ideology = despotism
-      }
-      start_civil_war = { 
-        ideology = autocracy 
-        size = 0.3 
-      }
+    trigger = {
+    	tag = FRA
     }
-    random_other_country = {
-      limit = {
-        original_tag = MEX
-        has_government = autocracy
-      }
-      FRA = {
-        set_autonomy = {
-          target = PREV
-          autonomous_state = autonomy_imperial_protectorate
-          freedom_level = 0.3
-        }
-        declare_war_on = { target = MEX type = annex_everything }
-      }
+    hidden_effect = {
+    	MEX = {
+	    	country_event = { 
+	    		id = nap_france.361
+	    		days = 1 
+	    	}
+	    }
+    }
+  }
+
+  option = { # Seen by ENG and SPR
+    name = nap_france.360.b
+    trigger = {
+    	OR = {
+    		tag = ENG
+    		tag = SPR
+    	}
     }
   }
 }
 
-country_event = { # Capture of Mexico City
+country_event = { # European Powers asks for repayments
   id = nap_france.361
   title = nap_france.361.t
   desc = nap_france.361.d
   picture = GFX_report_event_nap_france_peace_prussia
 
-  fire_only_once = yes
+  is_triggered_only = yes
 
-  trigger = {
-    FRA = {
-    controls_state = 277
-    }
+  option = { # Accept
+    name = nap_france.361.a
+    ai_chance = { factor = 0 }
   }
 
-  option = {
-    name = nap_france.361.a
-    add_political_power = 25
+  option = { # Refuse
+    name = nap_france.361.b
+    ai_chance = { factor = 100 }
+    hidden_effect = {
+    	FRA = {
+	    	country_event = { 
+	    		id = nap_france.362
+	    		days = 1 
+	    	}
+	    }
+
+	    ENG = {
+	    	country_event = { 
+	    		id = nap_france.362
+	    		days = 1 
+	    	}
+	    }
+
+	    SPR = {
+	    	country_event = { 
+	    		id = nap_france.362
+	    		days = 1 
+	    	}
+	    }
+
+        MEX = {
+	    	diplomatic_relation = {
+			    country = USA
+			    relation = guarantee
+			    active = no
+			}
+	    }
+    }
   }
 }
 
-country_event = { # Arrival of Maximilian-Ferdinand
+country_event = { # Mexico refuses!
   id = nap_france.362
   title = nap_france.362.t
   desc = nap_france.362.d
   picture = GFX_report_event_nap_france_peace_prussia
 
-  fire_only_once = yes
+  is_triggered_only = yes
 
-  trigger = {
+  option = { # Seen by the player in any of the three country
+    name = nap_france.362.a
+    trigger = {
+    	is_ai = no
+    	NOT = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+    }
     FRA = {
-    controls_state = 277
+    	set_country_flag = FRA_mexican_intervention_flag
+    	hidden_effect = {
+    		country_event = { 
+		    	id = nap_france.36200
+		    }
+    	}
     }
   }
 
-  mean_time_to_happen = {
-    days = 180
+  option = { # Seen by the AI if one of the nation is player controlled
+    name = nap_france.362.b
+    trigger = {
+    	is_ai = yes
+    	OR = {
+    		FRA = { is_ai = no }
+    		ENG = { is_ai = no }
+    		SPR = { is_ai = no }
+    	}
+    }
+    FRA = {
+    	hidden_effect = {
+    		country_event = { 
+		    	id = nap_france.36200
+		    }
+    	}
+    }
   }
 
-  option = {
-    name = nap_france.362.a #The emperor has arrived!
-    ai_chance = { factor = 99 }
-    random_country = {
-      limit = {
-        original_tag = MEX
-        NOT = { tag = MEX }
-      }
-      add_stability = 0.1
+  option = { # Seen by the AI if none of the nation is player controlled
+    name = nap_france.362.c
+    trigger = {
+    	is_ai = yes
+    	FRA = { is_ai = yes }
+    	ENG = { is_ai = yes }
+    	SPR = { is_ai = yes }
+    	tag = FRA
+    }
+    FRA = {
+    	set_country_flag = FRA_mexican_intervention_flag
+    }
+    FRA = {
+    	hidden_effect = {
+    		country_event = { 
+		    	id = nap_france.36200
+		    }
+    	}
     }
   }
 }
 
-country_event = { # Spanish and British help arrives
+country_event = { # Hidden event for war
+  hidden = yes
+  id = nap_france.36200
+  title = nap_france.36200.t
+  desc = nap_france.36200.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.36200.a
+    FRA = { declare_war_on = { target = MEX type = annex_everything } }
+    ENG = { declare_war_on = { target = MEX type = annex_everything } }
+    SPR = { declare_war_on = { target = MEX type = annex_everything } }
+  }
+}
+
+country_event = { # Mexico accepts!
   id = nap_france.363
   title = nap_france.363.t
   desc = nap_france.363.d
   picture = GFX_report_event_nap_france_peace_prussia
 
-  fire_only_once = yes
-
-  trigger = {
-    has_country_flag = fra_nap_iii_captured
-    tag = FRA
-    PRS = {
-      controls_state = 16
-    }
-  }
-
-  mean_time_to_happen = {
-    days = 10
-  }
+  is_triggered_only = yes
 
   option = {
-    name = nap_france.363.a #Ask for Peace
-    ai_chance = { factor = 99 }
-    PRS = {
-      country_event = { days = 1 id = nap_france.302 }
-    }
-  }
-
-  option = {
-    name = nap_france.363.b #Continue the War
-    ai_chance = { factor = 1 }
-    add_political_power = -300
+    name = nap_france.363.a
   }
 }
 
-country_event = { # Crowning of Maximilian I
+country_event = { # Troops lands on Veracruz
+  id = nap_france.364
+  title = nap_france.364.t
+  desc = nap_france.364.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.364.a
+  }
+}
+
+country_event = { # Proposal to end the Mexican Intervention
+  id = nap_france.365
+  title = nap_france.365.t
+  desc = nap_france.365.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  trigger = {
+    tag = FRA
+    has_country_flag = FRA_mexican_intervention_flag
+  }
+
+  mean_time_to_happen = {
+    days = 30
+  }
+
+  fire_only_once = yes
+
+  option = {
+    name = nap_france.365.a
+    MEX = {
+	    country_event = { 
+	    	id = nap_france.366
+	    	days = 1 
+	    }
+	}
+  }
+}
+
+country_event = { # Proposal to end the Mexican Intervention (MEX view)
+  id = nap_france.366
+  title = nap_france.366.t
+  desc = nap_france.366.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = { # Accept
+    name = nap_france.366.a
+    FRA = {
+	    country_event = { 
+	    	id = nap_france.367
+	    	days = 1 
+	    }
+	}
+  }
+
+  option = { # Refuse
+    name = nap_france.366.b
+  }
+}
+
+country_event = { # The Soledad Convention
+  id = nap_france.367
+  title = nap_france.367.t
+  desc = nap_france.367.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.367.a
+    FRA = {
+	    country_event = { 
+	    	id = nap_france.368
+	    	days = 1 
+	    }
+	}
+
+	ENG = {
+	    country_event = { 
+	    	id = nap_france.369
+	    	days = 1 
+	    }
+	}
+
+	SPR = {
+	    country_event = { 
+	    	id = nap_france.3610
+	    	days = 1 
+	    }
+	}
+  }
+}
+
+country_event = { # The Soledad Convention - The French Empire's position
+  id = nap_france.368
+  title = nap_france.368.t
+  desc = nap_france.368.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = { # Continue
+    name = nap_france.368.a
+    ai_chance = { factor = 100 }
+  }
+
+  option = { # Stop
+    name = nap_france.368.b
+    ai_chance = { factor = 0 }
+    FRA = {
+    	set_country_flag = FRA_soledad_conv_france_end
+    }
+    FRA = { white_peace = MEX }
+  }
+}
+
+country_event = { # The Soledad Convention - The United Kingdom's position
   id = nap_france.369
   title = nap_france.369.t
   desc = nap_france.369.d
@@ -3063,19 +3285,300 @@ country_event = { # Crowning of Maximilian I
 
   is_triggered_only = yes
 
-  option = {
+  option = { # Continue
     name = nap_france.369.a
-    create_country_leader = {
-      name = "Maximilian I"
-      picture = "Portrait_MEX_Maxililian_Ferdinand.dds"
-      ideology = despotism
+    ai_chance = { factor = 0 }
+  }
+
+  option = { # Stop
+    name = nap_france.369.b
+    ai_chance = { factor = 100 }
+    FRA = {
+    	set_country_flag = FRA_soledad_conv_england_end
+    }
+    ENG = { white_peace = MEX }
+  }
+}
+
+country_event = { # The Soledad Convention - Spain withdraws from the war
+  id = nap_france.3610
+  title = nap_france.3610.t
+  desc = nap_france.3610.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = { # Continue
+    name = nap_france.3610.a
+    ai_chance = { factor = 0 }
+  }
+
+  option = { # Stop
+    name = nap_france.3610.b
+    ai_chance = { factor = 100 }
+    FRA = {
+    	set_country_flag = FRA_soledad_conv_spain_end
+    }
+    SPR = { white_peace = MEX }
+  }
+}
+
+country_event = { # The End of the Mexican Intervention
+  id = nap_france.3611
+  title = nap_france.3611.t
+  desc = nap_france.3611.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  trigger = {
+  	tag = FRA
+  	FRA = {
+  		has_country_flag = FRA_soledad_conv_france_end
+  		has_country_flag = FRA_soledad_conv_england_end
+  		has_country_flag = FRA_soledad_conv_spain_end
+  	}
+  }
+
+  fire_only_once = yes
+
+  option = {
+    name = nap_france.3611.a
+  }
+}
+
+country_event = { # Mexico City in our hands!
+  id = nap_france.3612
+  title = nap_france.3612.t
+  desc = nap_france.3612.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  trigger = {
+  	tag = FRA
+  	FRA = {
+  		has_country_flag = FRA_mexican_intervention_flag
+   		controls_state = 277
+    }
+  }
+
+  fire_only_once = yes
+
+  option = {
+    name = nap_france.3612.a
+    hidden_effect = {
+    	FRA = {
+    		country_event = { 
+		    	id = nap_france.3613
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # Juan Nepomuceno Almonte named president of Mexico
+  id = nap_france.3613
+  title = nap_france.3613.t
+  desc = nap_france.3613.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3613.a
+    MXE = {
+    	transfer_state = 277
     }
     hidden_effect = {
-      add_ideas = MEX_idea_second_mexican_empire
-      add_ideas = MEX_idea_aftermath_maximilian_affair
-      add_ideas = MEX_idea_unpopular_among_liberals
-      add_ideas = MEX_idea_unpopular_among_conservative
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3614
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # Appointment of the Junta Superior de Gobierno
+  id = nap_france.3614
+  title = nap_france.3614.t
+  desc = nap_france.3614.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3614.a
+    create_country_leader = {
+		name = "Junta Superior de Gobierno"
+		desc = "POLITICS_JUNTA_SUPERIOR_GOBIERNO_DESC"
+		picture = "Portrait_MXE_Junta_Superior_de_Gobierno.dds"
+		expire = "1965.1.1"
+		ideology = conserv
+		traits = {
+			
+		}
+	}
+    hidden_effect = {
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3615
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # Proclamation of the Second Mexican Empire
+  id = nap_france.3615
+  title = nap_france.3615.t
+  desc = nap_france.3615.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3615.a
+    hidden_effect = {
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3616
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # The Comisiòn Mexicana meets Maximilian in Austria
+  id = nap_france.3616
+  title = nap_france.3616.t
+  desc = nap_france.3616.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3616.a
+    hidden_effect = {
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3617
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # The Emperor's referundum
+  id = nap_france.3617
+  title = nap_france.3617.t
+  desc = nap_france.3617.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = { # It passes
+    name = nap_france.3617.a
+    ai_chance = { factor = 100 }
+    hidden_effect = {
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3618
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+
+  option = { # It doesn't pass
+    name = nap_france.3617.b
+    ai_chance = { factor = 0 }
+  }
+}
+
+country_event = { # Maximilian sets sail for Mexico
+  id = nap_france.3618
+  title = nap_france.3618.t
+  desc = nap_france.3618.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3618.a
+    hidden_effect = {
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3619
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # Maximilian signs the Treaty of Miramar
+  id = nap_france.3619
+  title = nap_france.3619.t
+  desc = nap_france.3619.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3619.a
+    hidden_effect = {
+    	FRA = {
+    		country_event = { 
+		    	id = nap_france.3620
+		    	days = 7 
+		    }
+    	}
+    	MXE = {
+    		country_event = { 
+		    	id = nap_france.3620
+		    	days = 7 
+		    }
+    	}
+	}
+  }
+}
+
+country_event = { # The coronation of Emperor Maximilian
+  id = nap_france.3620
+  title = nap_france.3620.t
+  desc = nap_france.3620.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    name = nap_france.3620.a
+    trigger = {
+    	tag = FRA
     }
+  }
+
+  option = {
+    name = nap_france.3620.a
+    trigger = {
+    	tag = MXE
+    }
+    set_politics = {
+		ruling_party = autocracy
+	}
+    create_country_leader = {
+		name = "Maximilian I"
+		desc = "POLITICS_EMPEROR_MAXIMILIAN_DESC"
+		picture = "Portrait_MXE_Maximilian_I.dds"
+		expire = "1965.1.1"
+		ideology = constit_monarch
+		traits = {
+			
+		}
+	}
   }
 }
 
@@ -5318,5 +5821,92 @@ country_event = { # Renovation of  Marseille
 			    instant_build = yes
             }
         }
+    }
+}
+
+country_event = { #Latin Monetary Union Treaty
+
+	id = latin_monetary_union.1
+	title = latin_monetary_union.1.t
+	desc = latin_monetary_union.1.d
+	
+	is_triggered_only = yes
+
+
+	option = { 
+		name = latin_monetary_union.1.a
+		add_ideas = FRA_member_monetary_union
+		}
+    }
+	
+country_event = { #Latin Monetary Union Treaty - Greece
+
+	id = latin_monetary_union.2
+	title = latin_monetary_union.2.t
+	desc = latin_monetary_union.2.d
+	
+	is_triggered_only = yes
+
+
+	option = { 
+		name = latin_monetary_union.2.a
+		ai_chance = { factor = 80 }
+		add_ideas = FRA_member_monetary_union
+		FRA = { add_political_power = 75 }
+		}
+		
+	option = { 	
+		name = latin_monetary_union.2.b
+		ai_chance = { factor = 20 }
+		add_stability = -0.05
+		add_political_power = -50
+    }
+}
+
+country_event = { #Latin Monetary Union Treaty - BILATERAL AGREEMENT - Romania, Spain, Austria - Hungary, Monaco, Russia
+
+	id = latin_monetary_union.3
+	title = latin_monetary_union.3.t
+	desc = latin_monetary_union.3.d
+	
+	is_triggered_only = yes
+
+
+	option = { 
+		name = latin_monetary_union.3.a
+		ai_chance = { factor = 80 }
+		add_ideas = FRA_monetary_union_bilateral_agreement
+		FRA = { add_political_power = 75 }
+		}
+		
+	option = { 	
+		name = latin_monetary_union.3.b
+		ai_chance = { factor = 20 }
+		add_stability = -0.05
+		add_political_power = -50
+    }
+}
+
+country_event = { #Latin Monetary Union Treaty - UNILATERAL AGREEMENT - Serbia, Bulgaria
+
+	id = latin_monetary_union.4
+	title = latin_monetary_union.4.t
+	desc = latin_monetary_union.4.d
+	
+	is_triggered_only = yes
+
+
+	option = { 
+		name = latin_monetary_union.4.a
+		ai_chance = { factor = 80 }
+		add_ideas = FRA_monetary_union_unilateral_agreement
+		FRA = { add_political_power = 75 }
+		}
+		
+	option = { 	
+		name = latin_monetary_union.4.b
+		ai_chance = { factor = 20 }
+		add_stability = -0.05
+		add_political_power = -50
     }
 }

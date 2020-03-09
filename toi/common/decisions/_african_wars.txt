@@ -13,6 +13,7 @@ tribal_decisions_eoanb = {
 				has_idea = manpower_tribal_every_fifth
 				has_idea = manpower_tribal_everyone
 			}
+			num_of_military_factories < 1
 		}
 		days_re_enable = 120
 
@@ -21,13 +22,13 @@ tribal_decisions_eoanb = {
 		
 		custom_cost_trigger = {
 
-			command_power > 99
+			command_power > 79.9
 
 		}
-		custom_cost_text = command_power_more_than_99
+		custom_cost_text = command_power_more_than_79
 		
 		complete_effect = {
-			add_command_power = -100
+			hidden_effect = { add_command_power = -80 }
 			add_equipment_to_stockpile = {
 				type = tribal_weapons_0
 				amount = 50
@@ -41,15 +42,227 @@ tribal_decisions_eoanb = {
 				has_war_support > 0.5
 			}
 			modifier = {
-				factor = 0
-				any_state = {
-					is_claimed_by = ROOT
+				factor = 1000
+				has_equipment = {
+					tribal_weapons_0 < 50
 				}
+			}
+			modifier = {
+				factor = 100
+				check_variable = { Tribal_army_num < 10000 }
+				check_variable = { Tribal_army_num > 1000 }
+				has_equipment = {
+					tribal_weapons_0 < 1000
+				}
+				OR = {
+					has_war_support > 0.5
+					has_idea = AFR_history_of_colonial_resistance
+					has_idea = AFR_history_of_colonial_resistance_1
+				}
+			}
+		}
+	}
+	eoanb_decision_tribal_raise_warriors = {
+
+		icon = generic_political_discourse
+
+		available = {
+			has_manpower > 99
+		}
+
+		visible = {
+			afr_is_tribal = yes
+		}
+
+		custom_cost_trigger = {
+
+			command_power > 19.9
+
+		}
+		custom_cost_text = command_power_more_than_19
+
+		cost = 10
+		fire_only_once = no
+		complete_effect={
+			hidden_effect={add_command_power = -20}
+			add_manpower = -100
+		}
+
+		remove_effect = {
+			if={
+				limit={
+					NOT={has_idea = AF_T_Tribal_Army}
+				}
+				add_ideas={AF_T_Tribal_Army}
+			}
+			custom_effect_tooltip= EDC_add_100_to_tribal_army
+			add_to_variable = {Tribal_army_num = 100}
+		}
+		days_remove = 30
+		days_re_enable = 60
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 1000
+				has_manpower < 980
+			}
+		}
+	}
+	eoanb_decision_tribal_raise_warrior_army = {
+
+		icon = generic_political_discourse
+
+		available = {
+			has_manpower > 999
+		}
+
+		visible = {
+			afr_is_tribal = yes
+		}
+
+		custom_cost_trigger = {
+
+			command_power > 19.9
+			has_army_experience > 24
+
+		}
+		custom_cost_text = command_power_more_than_19_and_ae_more_than_49
+
+		cost = 10
+		fire_only_once = no
+		complete_effect={
+			hidden_effect={
+				add_command_power = -20
+				army_experience = -25
+			}
+			add_manpower = -1000
+		}
+
+		remove_effect = {
+			if={
+				limit={
+					NOT={has_idea = AF_T_Tribal_Army}
+				}
+				add_ideas={AF_T_Tribal_Army}
+			}
+			custom_effect_tooltip= EDC_add_1000_to_tribal_army
+			add_to_variable = {Tribal_army_num = 1000}
+		}
+		days_remove = 30
+		days_re_enable = 60
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 1000
+				has_manpower > 1000
 			}
 		}
 	}
 }
 unidustrialized_warfare = {
+	eoanb_decision_Tribal_raid_neighbor = {
+
+		icon = generic_political_discourse
+
+		available = {
+			any_state = {
+				is_owned_and_controlled_by = FROM
+				any_neighbor_state = {
+					is_fully_controlled_by = ROOT
+				}
+			}
+			afr_is_tribal = yes
+			custom_trigger_tooltip={
+				check_variable = { Tribal_army_num > 499 }
+				tooltip = EDC_Tribal_Army_over_500
+			}
+			NOT = { has_non_aggression_pact_with = FROM }
+			NOT = {has_country_flag = raiding_neighbour}
+		}
+
+		visible = {
+			afr_is_tribal = yes
+			NOT = { has_war_with = FROM }
+			any_state = {
+				is_owned_and_controlled_by = FROM
+				any_neighbor_state = {
+					is_fully_controlled_by = ROOT
+				}
+			}
+			NOT = { TAG = SKT }
+			NOT = { TAG = ETH }
+		}
+		
+		target_trigger = {
+			FROM = {
+				is_neighbor_of = ROOT
+				afr_is_tribal = yes
+			}
+			NOT = {
+				is_puppet_of= ROOT
+			}
+		}
+		days_remove = 30
+		fire_only_once = no
+
+		cost = 0
+		
+		cancel_trigger = {
+			OR = {
+				is_in_faction_with = FROM
+				has_war_with = FROM
+			}
+		}
+		complete_effect = {
+			set_country_flag = raiding_neighbour
+			FROM = {ROOT={country_event = { id = EDC_afr.43 }}}
+		}
+		remove_effect = {
+			clr_country_flag = raiding_neighbour
+			##raiding result based on numbers sent, defenders numbers
+			country_event = { id = EDC_afr.44 }
+		}
+
+		ai_will_do = {
+			base = 1
+		}
+	}
+	
+	eoanb_decision_raise_tribal_army = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			custom_trigger_tooltip={
+				check_variable = { Tribal_army_num > 499 }
+				tooltip = EDC_Tribal_Army_over_500
+			}
+			has_war = yes
+			NOT={has_country_flag = Tribal_Army_Raised}
+		}
+		visible = {
+			afr_is_tribal = yes
+		}
+		
+		fire_only_once = no
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = Tribal_Army_Raised
+			afr_call_warriors = yes
+		}
+
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 1000
+				has_war = yes
+			}
+		}
+	}
+
 #allows tribals to goto war for a limited gain(hopefully)
 }
 political_actions = {
@@ -93,9 +306,7 @@ political_actions = {
 				is_neighbor_of = ROOT
 			}
 			NOT = {
-				OVERLORD = {
-					tag = ROOT
-				}
+				is_puppet_of= ROOT
 			}
 		}
 
@@ -531,4 +742,96 @@ afr_rrp_african_expeditions={
 	}
 	
 	
+}
+
+afr_sa_unifaction = {
+	saf_pettion_ENG_for_union={
+		available={
+			TRV={
+				OR={
+					exists = no
+					is_puppet_of = ENG
+					is_puppet_of = SAF
+				}
+			}
+			OFS={
+				OR={
+					exists = no
+					is_puppet_of = ENG
+					is_puppet_of = SAF
+				}
+			}
+			NAT={
+				OR={
+					exists = no
+					is_puppet_of = ENG
+					is_puppet_of = SAF
+				}
+			}
+			has_country_flag = dreams_of_SAF
+		}
+		days_remove = 200
+		cost = 100
+		remove_effect={
+			ENG={
+				country_event = {id = boer_states.102 days = 10}
+			}
+		}
+	}
+	saf_develop_natal = {
+
+		icon = generic_political_discourse
+
+		available = {
+			NAT ={
+				exists = yes
+				is_subject_of = ENG
+			}
+			tag = SAF
+			always = yes
+		}
+
+		visible = {
+			tag = SAF
+		}
+		
+		highlight_states = {
+			state = 719
+		}
+		
+		# target_trigger = {
+			# tag = NAT
+		# }
+		days_remove = 120
+		fire_only_once = yes
+
+		cost = 10
+		
+		
+		cancel_trigger = {
+			NAT ={
+				NOT={
+					OR={
+						exists = yes
+						is_subject_of = ENG
+					}
+				}
+			}
+		}
+		modifier = {
+			civilian_factory_use = 1
+		}
+		complete_effect = {
+		}
+		remove_effect = {
+			719={
+				add_building_construction = { type = infrastructure level = 1 instant_build = yes }
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+		}
+	}
+
 }

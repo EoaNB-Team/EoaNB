@@ -31,6 +31,68 @@ news_event = {
 	}
 }
 
+#Military Junta Created - Airforce
+news_event = {
+	id = mhc.15
+	title = mhc.10.t
+	desc = mhc.10.d
+	
+	picture = GFX_MHC_news_picture_junta_airforce
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.a
+		
+		trigger = {
+			tag = FROM
+		}
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.b
+		
+		trigger = {
+			NOT = {
+				tag = FROM
+			}
+		}
+	}
+}
+
+#Military Junta Created - Navy
+news_event = {
+	id = mhc.16
+	title = mhc.10.t
+	desc = mhc.10.d
+	
+	picture = GFX_MHC_news_picture_junta_navy
+	
+	is_triggered_only = yes
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.a
+		
+		trigger = {
+			tag = FROM
+		}
+	}
+	
+	option = {
+		ai_chance = { factor = 100 }
+		name = mhc.10.b
+		
+		trigger = {
+			NOT = {
+				tag = FROM
+			}
+		}
+	}
+}
+
 #vote
 country_event = {
   id = mhc.11
@@ -112,7 +174,7 @@ country_event = {
 	
 	immediate = {
 		hidden_effect = {
-			clr_country_flag = mhc_temp_non_vote_army
+			clr_country_flag = mhc_temp_non_vote_junta
 			country_event = { id = mhc.14 days = 90 }
 		}
 	}
@@ -137,20 +199,47 @@ country_event = {
 		ai_chance = { factor = 100 }
 		name = mhc.14.a
 		
-		hidden_effect = {
-			clr_country_flag = MHC_military_junta_army
-			mhc_junta_enable_parliament_decisions = yes
+		if = {
+			limit = {
+				has_country_flag = MHC_military_junta_army
+			}
+			remove_ideas = mhc_military_junta_idea_army
+				add_timed_idea = {
+				idea = mhc_military_junta_idea_army_after_effects
+				days = 180
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = MHC_military_junta_airforce
+			}
+			remove_ideas = mhc_military_junta_idea_airforce
+				add_timed_idea = {
+				idea = mhc_military_junta_idea_airforce_after_effects
+				days = 180
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = MHC_military_junta_navy
+			}
+			remove_ideas = mhc_military_junta_idea_navy
+				add_timed_idea = {
+				idea = mhc_military_junta_idea_navy_after_effects
+				days = 180
+			}
 		}
 		
-		remove_ideas = mhc_military_junta_idea_army
-		add_timed_idea = {
-			idea = mhc_military_junta_idea_army_after_effects
-			days = 180
+		hidden_effect = {
+			clr_country_flag = MHC_military_junta_army
+			clr_country_flag = MHC_military_junta_airforce
+			clr_country_flag = MHC_military_junta_navy
+			mhc_junta_enable_parliament_decisions = yes
 		}
 	}
 }
 
-#Army generic setup
+#Generic setup
 country_event = {
 	id = mhc.99
 	title = mhc.99.t
@@ -161,6 +250,8 @@ country_event = {
 	
 	immediate = {
 		mhc_fill_generic_army_advisor = yes
+		mhc_fill_generic_airforce_advisor = yes
+		#mhc_fill_generic_navy_advisor = yes
 		
 		#AI that has war by the start of the game
 		if = {
@@ -174,6 +265,8 @@ country_event = {
 				set_country_flag = mhc_ai_is_active
 				mhc_ai_army_initiate_assign = yes
 				mhc_ai_army_initiate_activate = yes
+				mhc_ai_airforce_initiate_assign = yes
+				mhc_ai_airforce_initiate_activate = yes
 			}
 			clr_country_flag = mhc_ai_war_by_startup
 		}
@@ -280,15 +373,15 @@ country_event = {
 		###ALLOWED ADVISORS IN HIGH POSITIONS SETUP###
 		#Value is reference to minister
 		add_to_array = {
-			array = local_mhc_high_available_array
+			array = local_mhc_high_army_available_array
 			value = 1
 		}
 		add_to_array = {
-			array = local_mhc_high_available_array
+			array = local_mhc_high_army_available_array
 			value = 5
 		}
 		add_to_array = {
-			array = local_mhc_high_available_array
+			array = local_mhc_high_army_available_array
 			value = 7
 		}
 	}
@@ -308,7 +401,7 @@ country_event = {
 			mhc_get_results_collector = yes
 			mhc_get_results_effects_collector = yes
 			
-			#mhc_junta_collector = yes
+			mhc_junta_collector = yes
 		}
 	}
 	
@@ -380,14 +473,20 @@ country_event = {
 		name = mhc.1.d
 		
 		#mhc_remove_all_army_advisors = yes
+		#mhc_remove_all_airforce_advisors = yes
 		
 		#mhc_remove_generic_army_advisors = yes
 		
 		#generate_random_array_with_eight_random_numbers = yes
 		
+		#add_to_variable = {
+		#	var = mhc_afc_power
+		#	value = 100
+		#}
+		
 		add_to_variable = {
-			var = mhc_sec_power
-			value = 47
+			var = mhc_airforce_power
+			value = 80
 		}
 		
 		#mhc_ai_army_assign = yes

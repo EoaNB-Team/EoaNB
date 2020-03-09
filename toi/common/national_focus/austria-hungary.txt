@@ -4,6 +4,8 @@ focus_tree = {
 	country = {
 		factor = 0
 	}
+
+	continuous_focus_position = { x = 25 y = 1200 }
 	
 	default = no
 	
@@ -23,9 +25,7 @@ focus_tree = {
 			factor = 1
 		}
 		completion_reward = {
-		    AUS = {
-		    add_ideas = AUS_kaiser_franz
-			}
+		    
 		}
 	}
 	
@@ -758,26 +758,30 @@ focus_tree = {
 #####################################
 
 	focus = { 
-		id = AUS_HUN_Stock_Market_Crashes 
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 25
-		y = 0 
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
+		id = AUS_HUN_Stock_Market_Crashes
+		icon = GFX_focus_rom_parties_end
+		x = 22
+		y = 0
 
+		cost = 0
+
+		available_if_capitulated = no
+
+		available = {
+		    always = no
 		}
+
+		completion_reward = {}
+
+		ai_will_do = { factor = 3 }
 	}
 	
 	focus = { 
-		id = AUS_HUN_Raise_Taxes 
-		icon = GFX_goal_AUS_Complete_Compromise
+		id = AUS_HUN_Raise_Taxes
+		icon = GFX_goal_focus_increase_wages
 		x = -2
 		y = 1
-		cost = 70
+		cost = 35
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_Stock_Market_Crashes
         prerequisite = {
@@ -786,17 +790,57 @@ focus_tree = {
 		ai_will_do = {
 			factor = 1
 		}
-		mutually_exclusive = {
-			focus = AUS_HUN_Impose_Tariffs
-		}
+		mutually_exclusive = { focus = AUS_HUN_Impose_Tariffs }
 		completion_reward = {
-
+			if = {
+                limit = { has_idea = very_high_taxes }
+                add_political_power = 50
+            }
+            if = {
+                limit = { has_idea = high_taxes }
+                add_political_power = 20
+            }
+            if = {
+                limit = { has_idea = normal_taxes }
+                swap_ideas = {
+                    remove_idea = normal_taxes
+                    add_idea = high_taxes
+                }
+            }
+            if = {
+                limit = { has_idea = low_taxes }
+                swap_ideas = {
+                    remove_idea = low_taxes
+                    add_idea = high_taxes
+                }
+            }
+            if = {
+                limit = { has_idea = very_low_taxes }
+                swap_ideas = {
+                    remove_idea = very_low_taxes
+                    add_idea = high_taxes
+                }
+            }
+            hidden_effect = {
+            every_owned_state = {
+				limit = {
+				    OR = {
+				    has_state_flag = AUS_the_panic_of_1873_inf
+				    has_state_flag = AUS_the_panic_of_1873_infr
+				    has_state_flag = AUS_the_panic_of_1873_civr
+				    }
+				}
+            	clr_state_flag = AUS_the_panic_of_1873_inf
+            	clr_state_flag = AUS_the_panic_of_1873_infr
+            	clr_state_flag = AUS_the_panic_of_1873_civr
+		    }
+		    }
 		}
 	}
 	
 	focus = { 
 		id = AUS_HUN_Encourage_Global_Trade
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_goal_focus_support_liberalism
 		x = -3
 		y = 2
 		cost = 70
@@ -809,13 +853,48 @@ focus_tree = {
 			factor = 1
 		}
 		completion_reward = {
-
+		    add_stability = 0.06
+            add_popularity = {
+                ideology = centrism
+                popularity = 0.03
+            }
+            add_timed_idea = {
+                idea = AUH_idea_Global_Trade_1873
+                days = 365
+            }
+			if = {
+                limit = { has_idea = free_trade }
+                add_political_power = 60
+            }
+            if = {
+                limit = { has_idea = export_focus }
+                swap_ideas = {
+                    remove_idea = export_focus
+                    add_idea = free_trade
+                }
+                add_political_power = 25
+            }
+            if = {
+                limit = { has_idea = limited_exports }
+                swap_ideas = {
+                    remove_idea = limited_exports
+                    add_idea = free_trade
+                }
+            }
+            if = {
+                limit = { has_idea = closed_economy }
+                swap_ideas = {
+                    remove_idea = closed_economy
+                    add_idea = free_trade
+                }
+                add_political_power = -40
+            }
 		}
 	}
 
 	focus = { 
 		id = AUS_HUN_Trust_The_Markets
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_focus_generic_the_giant_wakes
 		x = -1
 		y = 2
 		cost = 70
@@ -828,15 +907,23 @@ focus_tree = {
 			factor = 1
 		}
 		completion_reward = {
-
+		    add_stability = 0.12
+			add_popularity = {
+                ideology = centrism
+                popularity = 0.04
+            }
+            add_timed_idea = {
+                idea = AUH_idea_Trust_Markets_1873
+                days = 365
+            }
 		}
 	}
 	focus = { 
 		id = AUS_HUN_Impose_Tariffs
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_goal_generic_trade
 		x = 2
 		y = 1
-		cost = 70
+		cost = 35
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_Stock_Market_Crashes
         prerequisite = {
@@ -845,20 +932,43 @@ focus_tree = {
 		ai_will_do = {
 			factor = 1
 		}
-		mutually_exclusive = {
-			focus = AUS_HUN_Raise_Taxes
-		}
+		mutually_exclusive = { focus = AUS_HUN_Raise_Taxes }
 		completion_reward = {
-
+			if = {
+                limit = { has_idea = free_trade }
+                swap_ideas = {
+                    remove_idea = free_trade
+                    add_idea = limited_exports
+                }
+            }
+            if = {
+                limit = { has_idea = export_focus }
+                swap_ideas = {
+                    remove_idea = export_focus
+                    add_idea = limited_exports
+                }
+                add_political_power = 25
+            }
+            if = {
+                limit = { has_idea = limited_exports }
+                add_political_power = 60
+            }
+            if = {
+                limit = { has_idea = closed_economy }
+                swap_ideas = {
+                    remove_idea = closed_economy
+                    add_idea = limited_exports
+                }
+            }
 		}
 	}
 	
 	focus = { 
 		id = AUS_HUN_Nationalise_Railways
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_goal_generic_forceful_treaty
 		x = 2
 		y = 2
-		cost = 70
+		cost = 35
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_Stock_Market_Crashes
         prerequisite = {
@@ -868,13 +978,40 @@ focus_tree = {
 			factor = 1
 		}
 		completion_reward = {
-
+			add_stability = 0.06
+			add_political_power = -180
+			add_popularity = {
+                ideology = traditional_conservatism
+                popularity = 0.04
+            }
+            custom_effect_tooltip = AUS_tt_the_panic_of_1873_railways_nat
+            every_owned_state = {
+				limit = { has_state_flag = AUS_the_panic_of_1873_inf }
+				damage_building = {
+                	type = infrastructure
+                	damage = -1
+            	}
+            	damage_building = {
+                	type = infrastructure
+                	damage = -1
+            	}
+            	clr_state_flag = AUS_the_panic_of_1873_inf
+		    }
+		    every_owned_state = {
+				limit = { has_state_flag = AUS_the_panic_of_1873_infr }
+				add_building_construction = {
+  				    type = infrastructure
+    				level = 1
+    				instant_build = yes
+				}
+            	clr_state_flag = AUS_the_panic_of_1873_infr
+		    }
 		}
 	}	
 	
 	focus = { 
 		id = AUS_HUN_Expand_Regulations
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_goal_focus_banks2
 		x = 2
 		y = 3
 		cost = 70
@@ -887,15 +1024,49 @@ focus_tree = {
 			factor = 1
 		}
 		completion_reward = {
-
+		    add_stability = 0.03
+			add_political_power = 25
+			add_popularity = {
+                ideology = traditional_conservatism
+                popularity = 0.03
+            }
+            add_popularity = {
+                ideology = social_egalitarianism
+                popularity = 0.02
+            }
+			custom_effect_tooltip = AUS_tt_the_panic_of_1873_2_civs_returned
+			random_owned_state = {
+			    limit = { has_state_flag = AUS_the_panic_of_1873_civr }
+				add_building_construction = {
+  				    type = industrial_complex
+    				level = 1
+    				instant_build = yes
+				}
+            	clr_state_flag = AUS_the_panic_of_1873_civr
+			}
+			random_owned_state = {
+			    limit = { has_state_flag = AUS_the_panic_of_1873_civr }
+				add_building_construction = {
+  				    type = industrial_complex
+    				level = 1
+    				instant_build = yes
+				}
+            	clr_state_flag = AUS_the_panic_of_1873_civr
+			}
+			hidden_effect = {
+				every_owned_state = {
+					limit = { has_state_flag = AUS_the_panic_of_1873_civr }
+            		clr_state_flag = AUS_the_panic_of_1873_civr
+		    	}
+			}
 		}
 	}
 	
 
 	focus = { 
 		id = AUS_HUN_United_Economy
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 40
+		icon = GFX_goal_generic_consumer_goods
+		x = 33
 		y = 0 
 		cost = 70
 		available_if_capitulated = no
@@ -906,109 +1077,13 @@ focus_tree = {
 
 		}
 	}
-	
-	focus = { 
-		id = AUS_HUN_Expand_Schooling_System
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -8
-		y = 2
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-            focus = AUS_HUN_United_Economy
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
 
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Found_New_Universities
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -8
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-            focus = AUS_HUN_Expand_Schooling_System
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
+	### Industry
 
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_New_School_Of_Economics
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -9
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-            focus = AUS_HUN_Found_New_Universities
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Found_AustroHungarian_Bank
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -7
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-            focus = AUS_HUN_Found_New_Universities
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Austrian_Capitalism
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -8
-		y = 5
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-		prerequisite = {
-			focus = AUS_HUN_New_School_Of_Economics
-        }
-		prerequisite = {
-			focus = AUS_HUN_Found_AustroHungarian_Bank
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
 	focus = { 
 		id = AUS_HUN_Rapid_Industrialisation
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -4
+		icon = GFX_goal_generic_construct_civ_factory
+		x = -5
 		y = 1
 		cost = 70
 		available_if_capitulated = no
@@ -1026,7 +1101,26 @@ focus_tree = {
 	
 	focus = { 
 		id = AUS_HUN_Develop_Skoda
-		icon = GFX_goal_AUS_Complete_Compromise
+		icon = GFX_goal_generic_air_production
+		x = -6
+		y = 2
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+			focus = AUS_HUN_Rapid_Industrialisation
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+
+	focus = { 
+		id = AUS_HUN_BreadBasket_of_Europe
+		icon = GFX_focus_research
 		x = -4
 		y = 2
 		cost = 70
@@ -1045,32 +1139,14 @@ focus_tree = {
 	
 	focus = { 
 		id = AUS_HUN_Baku_Of_Galicia
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -5
+		icon = GFX_goal_generic_oil_refinery
+		x = -6
 		y = 3
 		cost = 70
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_United_Economy
         prerequisite = {
-			focus = AUS_HUN_Develop_Skoda
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Trade_with_Neighbours
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -3
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
+			focus = AUS_HUN_BreadBasket_of_Europe
 			focus = AUS_HUN_Develop_Skoda
         }
 		ai_will_do = {
@@ -1083,8 +1159,8 @@ focus_tree = {
 	
 	focus = { 
 		id = AUS_HUN_Invest_In_Galicia
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -5
+		icon = GFX_goal_generic_construction
+		x = -6
 		y = 4
 		cost = 70
 		available_if_capitulated = no
@@ -1102,17 +1178,37 @@ focus_tree = {
 
 		}
 	}
+
+	focus = { 
+		id = AUS_HUN_Machine_Tools_Industry
+		icon = GFX_goal_generic_production2
+		x = -4
+		y = 3
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+			focus = AUS_HUN_BreadBasket_of_Europe
+			focus = AUS_HUN_Develop_Skoda
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
 	
 	focus = { 
 		id = AUS_HUN_Invest_In_Austria
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -3
+		icon = GFX_goal_generic_construction
+		x = -4
 		y = 4
 		cost = 70
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_United_Economy
         prerequisite = {
-			focus = AUS_HUN_Trade_with_Neighbours
+			focus = AUS_HUN_Machine_Tools_Industry
         }
 		mutually_exclusive = {
 			focus = AUS_HUN_Invest_In_Galicia
@@ -1127,8 +1223,8 @@ focus_tree = {
 	
 	focus = { 
 		id = AUS_HUN_Dig_Greedily
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = -4
+		icon = GFX_focus_generic_steel
+		x = -5
 		y = 5
 		cost = 70
 		available_if_capitulated = no
@@ -1144,12 +1240,113 @@ focus_tree = {
 
 		}
 	}
-	
+
+	### Tech
 	
 	focus = { 
-		id = AUS_HUN_Hungarian_State_Railways
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 4
+		id = AUS_HUN_Expand_Schooling_System
+		icon = GFX_goal_generic_scientific_exchange
+		x = 0
+		y = 1
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+            focus = AUS_HUN_United_Economy
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_Found_New_Universities
+		icon = GFX_goal_tfv_generic_tech_sharing
+		x = 0
+		y = 2
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+            focus = AUS_HUN_Expand_Schooling_System
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_New_School_Of_Economics
+		icon = GFX_goal_focus_freedom_economy
+		x = -1
+		y = 3
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+            focus = AUS_HUN_Found_New_Universities
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_Found_AustroHungarian_Bank
+		icon = GFX_goal_focus_banks
+		x = 1
+		y = 3
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+            focus = AUS_HUN_Found_New_Universities
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_Austrian_Capitalism
+		icon = GFX_goal_focus_fund_partisans
+		x = 0
+		y = 4
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+		prerequisite = {
+			focus = AUS_HUN_New_School_Of_Economics
+        }
+		prerequisite = {
+			focus = AUS_HUN_Found_AustroHungarian_Bank
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+
+	### Infra
+
+	focus = { 
+		id = AUS_HUN_Encourage_Shipping
+		icon = GFX_goal_generic_positive_trade_relations
+		x = 5
 		y = 1
 		cost = 70
 		available_if_capitulated = no
@@ -1166,10 +1363,29 @@ focus_tree = {
 	}
 	
 	focus = { 
-		id = AUS_HUN_Found_MAKVAG
-		icon = GFX_goal_AUS_Complete_Compromise
+		id = AUS_HUN_Hungarian_State_Railways
+		icon = GFX_goal_focus_railroad_development
 		x = 4
 		y = 2
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+			focus = AUS_HUN_Encourage_Shipping
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_Found_MAKVAG
+		icon = GFX_goal_generic_production
+		x = 4
+		y = 3
 		cost = 70
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_United_Economy
@@ -1185,66 +1401,9 @@ focus_tree = {
 	}
 	
 	focus = { 
-		id = AUS_HUN_BreadBasket_of_Europe
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 4
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-			focus = AUS_HUN_Found_MAKVAG
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Expand_Budapest
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 4
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-			focus = AUS_HUN_BreadBasket_of_Europe
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
-		id = AUS_HUN_Encourage_Shipping
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 8
-		y = 1
-		cost = 70
-		available_if_capitulated = no
-		relative_position_id = AUS_HUN_United_Economy
-        prerequisite = {
-			focus = AUS_HUN_United_Economy
-        }
-		ai_will_do = {
-			factor = 1
-		}
-		completion_reward = {
-
-		}
-	}
-	
-	focus = { 
 		id = AUS_HUN_Develop_River_Travel
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 8
+		icon = GFX_goal_generic_navy_cruiser
+		x = 6
 		y = 2
 		cost = 70
 		available_if_capitulated = no
@@ -1262,8 +1421,8 @@ focus_tree = {
 	
 	focus = { 
 		id = AUS_HUN_Expand_Danube_Canal
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 8
+		icon = GFX_goal_generic_construction2
+		x = 6
 		y = 3
 		cost = 70
 		available_if_capitulated = no
@@ -1278,15 +1437,18 @@ focus_tree = {
 
 		}
 	}
-	
+
 	focus = { 
-		id = AUS_HUN_Machine_Tools_Industry
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 8
+		id = AUS_HUN_Trade_with_Neighbours
+		icon = GFX_goal_focus_support_liberalism
+		x = 5
 		y = 4
 		cost = 70
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_United_Economy
+        prerequisite = {
+			focus = AUS_HUN_Found_MAKVAG
+        }
         prerequisite = {
 			focus = AUS_HUN_Expand_Danube_Canal
         }
@@ -1296,21 +1458,41 @@ focus_tree = {
 		completion_reward = {
 
 		}
-	}	
-	
+	}
+
 	focus = { 
-		id = AUS_HUN_Electrify_Monarchy
-		icon = GFX_goal_AUS_Complete_Compromise
-		x = 6
+		id = AUS_HUN_Expand_Budapest
+		icon = GFX_goal_generic_position_armies
+		x = 0
 		y = 5
 		cost = 70
 		available_if_capitulated = no
 		relative_position_id = AUS_HUN_United_Economy
         prerequisite = {
-			focus = AUS_HUN_Expand_Budapest
+			focus = AUS_HUN_Invest_In_Austria
+			focus = AUS_HUN_Invest_In_Galicia
         }
 		prerequisite = {
-			focus = AUS_HUN_Machine_Tools_Industry
+			focus = AUS_HUN_Trade_with_Neighbours
+        }
+		ai_will_do = {
+			factor = 1
+		}
+		completion_reward = {
+
+		}
+	}
+	
+	focus = { 
+		id = AUS_HUN_Electrify_Monarchy
+		icon = GFX_goal_generic_radar
+		x = 0
+		y = 6
+		cost = 70
+		available_if_capitulated = no
+		relative_position_id = AUS_HUN_United_Economy
+		prerequisite = {
+			focus = AUS_HUN_Expand_Budapest
         }
 		ai_will_do = {
 			factor = 1
