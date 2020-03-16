@@ -696,9 +696,7 @@ focus_tree = {
 			}
 			custom_trigger_tooltip = {
 				tooltip = afr_generic_jihadist_expand_to_survive_custom_trigger
-				SKT = {
-					has_completed_focus = afr_generic_jihadist_skt_a_united_african_jihad
-				}
+				has_global_flag = SKT_has_started_the_african_caliphate
 			}
 			
 		}
@@ -708,13 +706,16 @@ focus_tree = {
 		prerequisite = {
 			focus = afr_generic_jihadist_our_military_might
 		}
+		bypass = {
+			if = { 
+				limit = { TAG = SKT }
+				has_global_flag = SKT_has_started_the_african_caliphate
+			}
+		}
 		completion_reward = {
-			add_war_support = 0.075
 			if = {
 				limit = {
-					SKT = {
-						has_completed_focus = afr_generic_jihadist_skt_a_united_african_jihad
-					}
+					has_global_flag = SKT_has_started_the_african_caliphate
 				}
 				country_event = { id = SKT_join_caliphate.1 }
 			}
@@ -801,7 +802,7 @@ focus_tree = {
 			focus = afr_generic_jihadist_skt_branch
 		}
 		completion_reward = {
-			activate_decision = AFR_interstate_slave_trade_supplier
+			activate_decision = AFR_interstate_slave_trade_consumer
 			custom_effect_tooltip = afr_generic_jihadist_skt_spread_islam_tooltip
 			set_country_flag = SKT_Caliphate_raids
 		}
@@ -1038,7 +1039,6 @@ focus_tree = {
 					BAG = { 
 						owns_state = 805 
 						is_subject_of = KBO
-						has_country_flag = inward_perfect_flag
 					} 
 				}
 				declare_war_on = {
@@ -1063,7 +1063,6 @@ focus_tree = {
 					BAG = { 
 						owns_state = 805 
 						is_subject = no
-						has_country_flag = inward_perfect_flag
 					} 
 				}
 				declare_war_on = {
@@ -1076,7 +1075,10 @@ focus_tree = {
 					value = 10
 				}
 			}
-			else = {
+			if = {
+				limit = {
+					BAG = { NOT = { owns_state = 805 } }
+				}
 				every_other_country = {
 					limit = { owns_state = 805 }
 					SKT = {
@@ -1086,7 +1088,11 @@ focus_tree = {
 						}
 					}
 				}
-				
+				custom_effect_tooltip = afr_war_exhaustion_value_add_10
+				add_to_variable = {
+					var = afr_war_exhaustion_value
+					value = 10
+				}
 			}
 		}
 		allow_branch = {
@@ -1285,6 +1291,7 @@ focus_tree = {
 		completion_reward = {
 			create_faction = SKT_African_Caliphate
 			activate_decision = SKT_form_an_african_jihad
+			set_global_flag = SKT_has_started_the_african_caliphate
 			if = {
 				limit = {
 					TOU = { exists = yes }
@@ -1413,7 +1420,10 @@ focus_tree = {
 		icon = GFX_focus_generic_support_the_left_right
 		cost = 75
 		available = {
-
+			custom_trigger_tooltip = {
+				tooltip = afr_generic_jihadist_skt_islamic_liberation_trigger_tooltip
+				has_idea = industrializing
+			}
 		}
 		prerequisite = {
 			focus = afr_generic_jihadist_skt_a_united_african_jihad
@@ -1466,14 +1476,45 @@ focus_tree = {
 		icon = GFX_goal_continuous_boost_freedom
 		cost = 75
 		available = {
-			ETH = { has_completed_focus = ETH_put_down_revolts }
-			
-			ORO = {
-				custom_trigger_tooltip = {
-					tooltip = AFR_religion_sunni_tooltip
-					is_in_array = {
-						array = national_religion_array
-						value = global.sunni
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_oromo_is_opppressed
+				#OR = {
+					ETH = { has_country_flag = ETH_put_down_revolts_flag }
+				#}
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_oromo_has_followed_the_jihadist_path
+				ORO = { has_government = fundamentalism }
+				ORO = {
+					custom_trigger_tooltip = {
+						tooltip = AFR_religion_sunni_tooltip
+						is_in_array = {
+							array = national_religion_array
+							value = global.sunni
+						}
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_an_islamic_nation_does_not_exist_abyssinia
+				ORO = { exists = no }
+				ETH = { NOT = { has_government = fundamentalism } }
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_caliphate_member_in_close_proximity
+				OR = {
+					SKT = { is_neighbor_of = ORO }
+					any_country = {
+						AND = {
+							is_neighbor_of = ORO
+							is_in_faction_with = SKT
+						}
+					}
+					any_country = {
+						AND = {
+							is_neighbor_of = ORO
+							is_subject_of = SKT
+						}
 					}
 				}
 			}
@@ -1498,7 +1539,28 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 75
 		available = {
-			ETH = { has_completed_focus = ETH_embrace_islamic_surge }
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_jihadist_cell_is_ready
+				ETH = { has_completed_focus = ETH_embrace_islamic_surge }
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_caliphate_member_in_close_proximity
+				OR = {
+					271 = { OWNER = { is_neighbor_of = SKT } }
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 271 }
+							is_in_faction_with = SKT
+						}
+					}
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 271 }
+							is_subject_of = SKT
+						}
+					}
+				}
+			}
 		}
 		mutually_exclusive = {
 			focus = afr_generic_jihadist_skt_jihad_in_oromo
@@ -1522,11 +1584,33 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 75
 		available = {
-			ORO = { has_completed_focus = AF_T_benevolence_priest }
-			ETH = {
-				owns_state = 271
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_jihadist_cell_is_ready
+				ORO = { exists = no }
+				AND = {
+					ETH = { NOT = { has_government = fundamentalism } }
+					ETH = { owns_state = 271 }
+				}
 			}
-			ORO = { exists = no }
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_caliphate_member_in_close_proximity
+				OR = {
+					271 = { OWNER = { is_neighbor_of = SKT } }
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 271 }
+							is_in_faction_with = SKT
+						}
+					}
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 271 }
+							is_subject_of = SKT
+						}
+					}
+				}
+			}
+			
 		}
 		mutually_exclusive = {
 			focus = afr_generic_jihadist_skt_jihad_in_ethiopia
@@ -1549,15 +1633,78 @@ focus_tree = {
 		icon = GFX_goal_continuous_boost_freedom
 		cost = 75
 		available = {
-			ALG = { owns_state = 513 }
-			BAB = { exists = no }
-			KBY = { exists = no }
-			BAB = {
-				custom_trigger_tooltip = {
-					tooltip = AFR_religion_sunni_tooltip
-					is_in_array = {
-						array = national_religion_array
-						value = global.sunni
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_bab_is_opppressed
+				ALG = {
+					custom_trigger_tooltip = {
+						tooltip = DCI_is_greater_than_15
+						check_variable = { var = detrimental_colonial_impact_value > 15 }
+					}
+					NOT = {
+						AND = {
+							custom_trigger_tooltip = {
+								tooltip = AFR_religion_sunni_tooltip
+								is_in_array = {
+									array = national_religion_array
+									value = global.sunni
+								}
+							}
+							has_government = fundamentalism
+						}
+					}
+					owns_state = 513
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_bab_has_followed_the_jihadist_path
+				AND = {
+					BAB = { has_government = fundamentalism }
+					BAB = {
+						custom_trigger_tooltip = {
+							tooltip = AFR_religion_sunni_tooltip
+							is_in_array = {
+								array = national_religion_array
+								value = global.sunni
+							}
+						}
+					}
+					BAB = { has_country_flag = afr_jihadist_tree }
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_an_islamic_nation_does_not_exist_algers
+				BAB = { exists = no }
+				KBY = { exists = no }
+				ALG = {
+					NOT = {
+						AND = {
+							custom_trigger_tooltip = {
+								tooltip = AFR_religion_sunni_tooltip
+								is_in_array = {
+									array = national_religion_array
+									value = global.sunni
+								}
+							}
+							has_government = fundamentalism
+						}
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_caliphate_member_in_close_proximity
+				OR = {
+					513 = { OWNER = { is_neighbor_of = SKT } }
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 513 }
+							is_in_faction_with = SKT
+						}
+					}
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 513 }
+							is_subject_of = SKT
+						}
 					}
 				}
 			}
@@ -1586,9 +1733,49 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 75
 		available = {
-			ALG = { owns_state = 513 }
-			BAB = { exists = no }
-			KBY = { exists = no }
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_jihadist_cell_is_ready
+				ALG = {
+					custom_trigger_tooltip = {
+						tooltip = DCI_is_greater_than_15
+						check_variable = { var = detrimental_colonial_impact_value > 15 }
+					}
+					NOT = {
+						AND = {
+							custom_trigger_tooltip = {
+								tooltip = AFR_religion_sunni_tooltip
+								is_in_array = {
+									array = national_religion_array
+									value = global.sunni
+								}
+							}
+							has_government = fundamentalism
+						}
+					}
+					owns_state = 513
+				}
+				BAB = { exists = no }
+				KBY = { exists = no }
+			}
+			custom_trigger_tooltip = {
+				tooltip = skt_jihad_caliphate_member_in_close_proximity
+				OR = {
+					513 = { OWNER = { is_neighbor_of = SKT } }
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 513 }
+							is_in_faction_with = SKT
+						}
+					}
+					any_country = {
+						AND = {
+							any_neighbor_country = { owns_state = 513 }
+							is_subject_of = SKT
+						}
+					}
+				}
+			}
+			
 		}
 		prerequisite = {
 			focus = afr_generic_jihadist_skt_algerian_insurrection
