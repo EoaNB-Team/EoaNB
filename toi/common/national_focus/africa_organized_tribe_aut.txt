@@ -425,41 +425,137 @@ focus_tree = {
 		id = AF_O_K_western_oriented
 		icon = GFX_goal_support_democracy
 		cost = 150
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = afr_close_proximity_to_christianity
+				OR = {
+					ROOT = { 
+						OR = {
+							is_in_array = {
+								array = national_religion_array
+								value = global.protestant
+							}
+							is_in_array = {
+								array = national_religion_array
+								value = global.catholicism
+							}
+						}
+					}
+					any_neighbor_country = { 
+						OR = {
+							is_in_array = {
+								array = national_religion_array
+								value = global.protestant
+							}
+							is_in_array = {
+								array = national_religion_array
+								value = global.catholicism
+							}
+						}
+					}
+					any_neighbor_country = {
+						any_neighbor_country = { 
+							OR = {
+								is_in_array = {
+									array = national_religion_array
+									value = global.protestant
+								}
+								is_in_array = {
+									array = national_religion_array
+									value = global.catholicism
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		prerequisite = {
 			focus = AF_O_K_specialized_workforce
 		}
 		mutually_exclusive = {
+			focus = AF_O_K_adopt_abyssinian_faith
 			focus = AF_O_K_focus_our_culture
+			focus = AF_O_K_islamic_dawahs
 		}
-		allow_branch = {
-			NOT = {
-				custom_trigger_tooltip = {
-					tooltip = AFR_religion_not_sunni_tooltip                                     
-					is_in_array = {
-						array = national_religion_array
-						value = global.sunni
-					}   
-				}
-			}
-		}
-		x = 10
+		x = 9
 		y = 5
 		completion_reward = {
 			add_stability = 0.02
 			add_war_support = -0.04
 		}
+		allow_branch = {
+			NOT = { TAG = MSN }
+		}
+	}
+	focus = {
+		id = AF_O_K_adopt_abyssinian_faith
+		icon = GFX_goal_support_democracy
+		cost = 150
+		available = {
+			ETH = { has_country_flag = ETH_a_united_church_and_state_flag }
+			custom_trigger_tooltip = {
+				tooltip = afr_close_proximity_to_coptic_christianity
+				OR = {
+					ROOT = { 
+						is_in_array = {
+							array = national_religion_array
+							value = global.coptic
+						}
+					}
+					any_neighbor_country = { 
+						is_in_array = {
+							array = national_religion_array
+							value = global.coptic
+						}
+					}
+					any_neighbor_country = {
+						any_neighbor_country = { 
+							is_in_array = {
+								array = national_religion_array
+								value = global.coptic
+							}
+						}
+					}
+				}
+			}
+		}
+		prerequisite = {
+			focus = AF_O_K_specialized_workforce
+		}
+		mutually_exclusive = {
+			focus = AF_O_K_western_oriented
+			focus = AF_O_K_islamic_dawahs
+			focus = AF_O_K_focus_our_culture
+		}
+		x = 11
+		y = 5
+		completion_reward = {
+			add_stability = 0.03
+			add_war_support = -0.01
+		}
+		allow_branch = {
+			NOT = { TAG = MSN }
+		}
 	}
 	focus = {
 		id = AF_O_K_distribute_bibles
-		icon = GFX_goal_generic_forceful_treaty
+		icon = GFX_goal_focus_christianity_state_religion
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_western_oriented
+			focus = AF_O_K_adopt_abyssinian_faith
 		}
 		x = 10
 		y = 6
 		completion_reward = {
-			country_event = { days = 1 id = africa.7 }
+			if = {
+				limit = { has_completed_focus = AF_O_K_adopt_abyssinian_faith }
+				country_event = { days = 1 id = coptic_africa.1 }
+			}
+			else = {
+				country_event = { days = 1 id = africa.7 }
+			}
 		}
 	}
 	focus = {
@@ -489,8 +585,8 @@ focus_tree = {
 		}
 	}
 	focus = {
-		id = AF_O_K_organize_work
-		icon = GFX_goal_generic_production
+		id = AF_O_K_small_farms
+		icon = GFX_focus_focus_generic_industry_1
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_nascent_economy
@@ -499,21 +595,6 @@ focus_tree = {
 		y = 4
 		completion_reward = {
 			add_stability = 0.02
-		}
-	}
-	focus = {
-		id = AF_O_K_small_farms
-		icon = GFX_focus_focus_generic_industry_1
-		cost = 150
-		prerequisite = {
-			focus = AF_O_K_develop_slave_market
-		}
-		prerequisite = {
-			focus = AF_O_K_organize_work
-		}
-		x = 13
-		y = 5
-		completion_reward = {
 			capital_scope = {
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
@@ -528,6 +609,9 @@ focus_tree = {
 		id = AF_O_K_noble_feodalism
 		icon = GFX_focus_generic_self_management
 		cost = 150
+		prerequisite = {
+			focus = AF_O_K_develop_slave_market
+		}
 		prerequisite = {
 			focus = AF_O_K_small_farms
 		}
@@ -566,15 +650,82 @@ focus_tree = {
 	}
 	focus = {
 		id = AF_O_K_focus_our_culture
-		icon = GFX_focus_generic_support_the_left_right
+		icon = GFX_focus_generic_treaty
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_our_capital
 		}
 		mutually_exclusive = {
 			focus = AF_O_K_western_oriented
+			focus = AF_O_K_adopt_abyssinian_faith
+			focus = AF_O_K_islamic_dawahs
 		}
-		x = 16
+		x = 15
+		y = 5
+		completion_reward = {
+			add_stability = -0.02
+			add_war_support = 0.04
+			if = {
+				limit = { TAG = MSN }
+				hidden_effect = { remove_ideas = MSN_massina_jihad }
+				custom_effect_tooltip = AF_O_K_focus_our_culture_MSN_massina_jihad_removed_tooltip
+			}
+		}
+	}
+	focus = {
+		id = AF_O_K_sacred_text_language
+		icon = GFX_goal_focus_religious_prayers
+		cost = 150
+		prerequisite = {
+			focus = AF_O_K_focus_our_culture
+		}
+		x = 15
+		y = 6
+		completion_reward = {
+			add_ideas = AF_T_idea_sacred_texts
+		}
+	}
+	focus = {
+		id = AF_O_K_islamic_dawahs
+		icon = GFX_focus_holy_quran
+		cost = 150
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = afr_close_proximity_to_sunni
+				OR = {
+					ROOT = { 
+						is_in_array = {
+							array = national_religion_array
+							value = global.sunni
+						}
+					}
+					any_neighbor_country = { 
+						is_in_array = {
+							array = national_religion_array
+							value = global.sunni
+						}
+					}
+					any_neighbor_country = {
+						any_neighbor_country = { 
+							is_in_array = {
+								array = national_religion_array
+								value = global.sunni
+							}
+						}
+					}
+				}
+			}
+		}
+		prerequisite = {
+			focus = AF_O_K_our_capital
+		}
+		mutually_exclusive = {
+			focus = AF_O_K_western_oriented
+			focus = AF_O_K_adopt_abyssinian_faith
+			focus = AF_O_K_focus_our_culture
+			
+		}
+		x = 17
 		y = 5
 		completion_reward = {
 			add_stability = -0.02
@@ -582,16 +733,16 @@ focus_tree = {
 		}
 	}
 	focus = {
-		id = AF_O_K_sacred_text_language
-		icon = GFX_focus_generic_treaty
+		id = AF_O_K_distribute_the_quran
+		icon = GFX_focus_islam_state_religion
 		cost = 150
 		prerequisite = {
-			focus = AF_O_K_focus_our_culture
+			focus = AF_O_K_islamic_dawahs
 		}
-		x = 16
+		x = 17
 		y = 6
 		completion_reward = {
-			add_ideas = AF_T_idea_sacred_texts
+			country_event = { days = 1 id = jihadist_africa.1 }
 		}
 	}
 	focus = {
@@ -600,6 +751,7 @@ focus_tree = {
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_distribute_bibles
+			focus = AF_O_K_distribute_the_quran
 			focus = AF_O_K_sacred_text_language
 		}
 		prerequisite = {
@@ -790,7 +942,7 @@ focus_tree = {
 		prerequisite = {
 			focus = AF_O_K_limited_trade
 		}
-		x = 26
+		x = 25
 		y = 5
 		completion_reward = {
 			random_owned_controlled_state = {
@@ -1107,7 +1259,7 @@ focus_tree = {
 	}
 	focus = {
 		id = AF_O_K_western_kingdom
-		icon = GFX_focus_generic_self_management
+		icon = GFX_focus_Usurp_Throne
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_invite_foreign_investors
@@ -1117,6 +1269,7 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = AF_O_K_grand_kingdom
+			focus = AF_O_K_jihadist_revolution
 		}
 		x = 9
 		y = 8
@@ -1130,7 +1283,7 @@ focus_tree = {
 	}
 	focus = {
 		id = AF_O_K_grand_kingdom
-		icon = GFX_focus_generic_home_defense
+		icon = GFX_focus_rom_royal_dictatorship
 		cost = 150
 		prerequisite = {
 			focus = AF_O_K_regional_influence
@@ -1140,14 +1293,122 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = AF_O_K_western_kingdom
+			focus = AF_O_K_jihadist_revolution
 		}
-		x = 17
+		x = 13
 		y = 8
 		completion_reward = {
 			custom_effect_tooltip = eoanb_af_t_tt_small_kingdom_grand
 			hidden_effect = {
 				swap_ideas = { remove_idea = AF_T_organized_tribal_nation_3 add_idea = AF_T_small_kingdom }
 				load_focus_tree = inwards_oriented_kingdom
+			}
+			if = {
+				limit = {
+					NOT = { has_government = autocracy }
+					has_government = fundamentalism
+				}
+				set_politics = {
+					  ruling_party = autocracy
+				}
+				hidden_effect = {
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						autocracy = 27
+						fundamentalism = 73
+					}
+				}
+			}
+		}
+	}
+	focus = {
+		id = AF_O_K_jihadist_revolution
+		icon = GFX_focus_violent_revolution
+		cost = 150
+		available = {
+			if = {
+				limit = { is_subject = yes }
+				custom_trigger_tooltip = {
+					tooltip = afr_overlord_supports_jihadist_revolution
+					OVERLORD = {
+						has_country_flag = afr_jihadist_tree
+					}
+				}
+			}
+		}
+		prerequisite = {
+			focus = AF_O_K_regional_influence
+		}
+		prerequisite = {
+			focus = AF_O_K_distribute_the_quran
+		}
+		prerequisite = {
+			focus = AF_O_K_solidify_caste_system
+		}
+		mutually_exclusive = {
+			focus = AF_O_K_western_kingdom
+			focus = AF_O_K_grand_kingdom
+		}
+		x = 17
+		y = 8
+		completion_reward = {
+			custom_effect_tooltip = eoanb_af_t_tt_jihadist_revolution
+			hidden_effect = {
+				swap_ideas = { remove_idea = AF_T_organized_tribal_nation_3 add_idea = AF_T_small_kingdom }
+				load_focus_tree = inwards_oriented_kingdom
+			}
+			if = {
+				limit = {
+					NOT = { has_government = fundamentalism }
+					has_government = autocracy
+				}
+				set_politics = {
+					  ruling_party = fundamentalism
+				}
+				hidden_effect = {
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						autocracy = 73
+						fundamentalism = 27
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_government = fundamentalism }
+					has_government = chauvinist_populism
+				}
+				set_politics = {
+					  ruling_party = fundamentalism
+				}
+				hidden_effect = {
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 73
+						autocracy = 0
+						fundamentalism = 27
+					}
+				}
 			}
 		}
 	}
@@ -1187,7 +1448,7 @@ focus_tree = {
 		prerequisite = {
 			focus = AF_O_K_high_grade_swords
 		}
-		x = 18
+		x = 19
 		y = 5
 		completion_reward = {
 			if={
