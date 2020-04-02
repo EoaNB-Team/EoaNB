@@ -129,7 +129,15 @@ focus_tree = {
 			factor = 1 
 		}
 		completion_reward = {
-			add_manpower = 10000
+			if={
+				limit={
+					NOT={has_idea = AF_T_Tribal_Army}
+				}
+				hidden_effect = { add_ideas={AF_T_Tribal_Army} }
+			}
+			custom_effect_tooltip= EDC_add_5000_to_tribal_army
+			add_to_variable = {Tribal_army_num = 5000}
+			add_manpower = 5000
 		}
 		bypass = {
 			NOT = {
@@ -485,7 +493,7 @@ focus = {
 		bypass = {
 			
 		}
-		x = 13
+		x = 12
 		y = 2
 	}
 
@@ -498,19 +506,37 @@ focus = {
 				tooltip = skt_expand_slave_markets
 				any_owned_state = { NOT = { is_core_of = ROOT } }
 			}
+			custom_trigger_tooltip = {
+				tooltip = AFR_has_slavery_tooltip
+				OR = {	
+					has_idea = slavery
+					has_idea = usa_slavery_law
+					has_idea = tribal_slavery
+				}
+			}
 		}
 		prerequisite = {
 			focus = afr_jihadist_regional_power_adressing_empire_sprawl
 		}
 		completion_reward = {
-			add_timed_idea = { idea = AF_T_idea_slaves_developed days = 365 }
+			add_timed_idea = { idea = AF_T_idea_slave_market_expanded days = 3650 }
 			custom_effect_tooltip = skt_expand_slave_markets_colonial
+			if = { 
+				limit = { NOT = { has_country_flag = AFR_interstate_consumer } }
+				activate_decision = AFR_interstate_slave_trade_consumer
+			}
 		}
 		ai_will_do = { factor = 1000 }
 		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
-		x = 0
+		x = -3
 		y = 1
-
+		bypass = {
+			AND = {
+				NOT = { has_idea = slavery }
+				NOT = { has_idea = usa_slavery_law }
+				NOT = { has_idea = tribal_slavery }
+			}
+		}
 	}
 	focus = {
 		id = afr_generic_jihadist_skt_develop_frontier_ribats
@@ -528,16 +554,10 @@ focus = {
 		}
 		completion_reward = {
 			custom_effect_tooltip = Jihad_develop_frontier_ribats_tooltip
-			if = {
-				limit = { TAG = SKT }
-				set_country_flag = Jihad_develop_frontier_ribats
-			}
-			else = {
-				custom_effect_tooltip = afr_oops_not_done_tooltip
-			}
+			set_country_flag = Jihad_develop_frontier_ribats
 		}
 		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
-		x = 0
+		x = -3
 		y = 2
 
 	}
@@ -558,18 +578,947 @@ focus = {
 			factor = 1 
 		}
 		completion_reward = {
-			custom_effect_tooltip = afr_inward_regional_power_export_our_culture_abroad_tooltip
+			custom_effect_tooltip = afr_jihadist_regional_power_export_our_culture_abroad_tooltip
 		}
-		relative_position_id = afr_inward_regional_power_adressing_empire_sprawl
-		x = 0
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = -3
 		y = 3
 	}
+	focus = {
+		id = afr_jihadist_regional_power_adressing_oral_tradition
+		icon = GFX_focus_research
+		cost = 75
+		available = {
+			has_political_power > 100
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_empire_sprawl
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			if = {
+				limit = { has_idea = oral_tradition }
+				add_political_power = -50
+				hidden_effect = { add_ideas = privileged_education }
+				custom_effect_tooltip = afr_jihadist_regional_power_adressing_oral_tradition_tooltip
+			}
+			if = {
+				limit = { amount_research_slots < 2 }
+				add_political_power = -50
+				add_research_slot = 1
+				custom_effect_tooltip = afr_jihad_protect_our_own_land_space_tooltip
+			}
+			add_stability = 0.075
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = -1
+		y = 1
+	}
+	focus = {
+		id = afr_jihadist_regional_power_introduce_modern_labor_practices
+		icon = GFX_goal_focus_the_workers
+		cost = 75
+		available = {
+			has_political_power > 100
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_empire_sprawl
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			add_political_power = -100
+			add_stability = 0.03
+			add_tech_bonus = {
+				bonus = 0.5
+				uses = 3
+				category = mechanical_engineering_tech
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 1
+		y = 1
+	}
+	focus = {
+		id = afr_jihadist_regional_power_addressing_economic_policies
+		icon = GFX_goal_focus_increase_wages
+		cost = 75
+		available = {
+			has_political_power > 100
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_empire_sprawl
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			add_political_power = -100
+			add_stability = -0.03
+			hidden_effect = { add_ideas = normal_taxes }
+			custom_effect_tooltip = afr_jihadist_regional_power_addressing_economic_policies_tooltip
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 3
+		y = 1
+		bypass = {
+			AND = { 
+				NOT = { has_idea = very_low_taxes }
+				NOT = { has_idea = low_taxes }
+			}
+		}
+	}
+	focus = {
+		id = afr_jihadist_regional_power_introduction_of_private_property
+		icon = GFX_goal_focus_the_elite
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_oral_tradition
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_introduce_modern_labor_practices
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_addressing_economic_policies
+		}
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_retain_african_communalism
+			focus = afr_jihadist_regional_power_retain_land_estates
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			hidden_effect = { add_ideas = lp_land_purchase }
+			custom_effect_tooltip = afr_jihadist_regional_power_introduction_of_private_property_tooltip
+			add_stability = -0.05
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = -1
+		y = 2
+	}
+	focus = {
+		id = afr_jihadist_regional_power_retain_african_communalism
+		icon = GFX_goal_generic_national_unity
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_oral_tradition
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_introduce_modern_labor_practices
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_addressing_economic_policies
+		}
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_introduction_of_private_property
+			focus = afr_jihadist_regional_power_retain_land_estates
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			hidden_effect = { add_ideas = lp_african_communalism }
+			custom_effect_tooltip = afr_jihadist_regional_power_retain_african_communalism_tooltip
+			add_stability = 0.03
+			hidden_effect = {
+				add_popularity = {
+					ideology = anarchism
+					popularity = 0.03
+				}
+			}
+			custom_effect_tooltip = afr_anarchism_popularity_plus_3
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 1
+		y = 2
+	}
+	focus = {
+		id = afr_jihadist_regional_power_retain_land_estates
+		icon = GFX_goal_focus_the_elite
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_adressing_oral_tradition
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_introduce_modern_labor_practices
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_addressing_economic_policies
+		}
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_retain_african_communalism
+			focus = afr_jihadist_regional_power_introduction_of_private_property
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			hidden_effect = { add_ideas = lp_land_estate }
+			custom_effect_tooltip = afr_jihadist_regional_power_retain_land_estates_tooltip
+			add_stability = 0.05
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 3
+		y = 2
+	}
+	focus = {
+		id = afr_jihadist_regional_power_early_fabric_industry
+		icon = GFX_goal_focus_textile
+		cost = 75
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				Oceania_one_extra_building_slots_supported_trigger = yes
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_retain_african_communalism
+			focus = afr_jihadist_regional_power_introduction_of_private_property
+			focus = afr_jihadist_regional_power_retain_land_estates
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = fabric_weavery
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = -1
+		y = 3
+	}
+	focus = {
+		id = afr_jihadist_regional_power_three_crop_rotation
+		icon = GFX_focus_ITA_Wheat
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_retain_african_communalism
+			focus = afr_jihadist_regional_power_introduction_of_private_property
+			focus = afr_jihadist_regional_power_retain_land_estates
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			if = {
+				limit = {
+					has_tech = pre_industrial_farms 
+				}
+				add_tech_bonus = {
+					bonus = 0.5
+					uses = 1
+					category = biochemistry_tech
+				}
+			}
+			else = {
+				set_technology = {
+					pre_industrial_farms = 1
+				}
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 1
+		y = 3
+	}
+	focus = {
+		id = afr_jihadist_regional_power_address_underdeveloped_economies
+		icon = GFX_goal_focus_cotton
+		cost = 75
+		available = {
+			if = {
+				limit = { ROOT = { NOT = { num_of_civilian_factories > 0 } } }
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+					Oceania_two_extra_building_slots_supported_trigger = yes
+				}
+			}
+			else = {
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+					Oceania_one_extra_building_slots_supported_trigger = yes
+				}
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_retain_african_communalism
+			focus = afr_jihadist_regional_power_introduction_of_private_property
+			focus = afr_jihadist_regional_power_retain_land_estates
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			if = {
+				limit = { ROOT = { NOT = { num_of_civilian_factories > 0 } } }
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = industrial_complex
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = cotton_farm
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 3
+		y = 3
+	}
+	focus = {
+		id = afr_jihadist_regional_power_absolute_authority
+		icon = GFX_focus_generic_home_defense
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_send_dawahs_to_conquered_lands
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_early_fabric_industry
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_three_crop_rotation
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_underdeveloped_economies
+		}
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_limited_regional_representation
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			custom_effect_tooltip = afr_jihadist_regional_power_absolute_authority_tooltip
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = -1
+		y = 4
+	}
+	focus = {
+		id = afr_jihadist_regional_power_limited_regional_representation
+		icon = GFX_focus_Usurp_Throne
+		cost = 75
+		available = {
+			has_completed_focus = afr_jihadist_regional_power_retain_african_communalism
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_send_dawahs_to_conquered_lands
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_early_fabric_industry
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_three_crop_rotation
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_underdeveloped_economies
+		}
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_absolute_authority
+		}
+		ai_will_do = { 
+			factor = 1 
+		}
+		completion_reward = {
+			hidden_effect = { add_ideas = limited_elections }
+			custom_effect_tooltip = afr_jihadist_regional_power_limited_regional_representation_tooltip
+			hidden_effect = {
+				add_popularity = {
+					ideology = anarchism
+					popularity = 0.03
+				}
+			}
+			custom_effect_tooltip = afr_anarchism_popularity_plus_3
+		}
+		relative_position_id = afr_jihadist_regional_power_adressing_empire_sprawl
+		x = 1
+		y = 4
+	}
+	
 
-
-
-
-
-
+	focus = {
+		id = afr_jihadist_regional_power_address_tribal_military
+		icon = GFX_focus_generic_military_academy
+		cost = 75
+		x = 23
+		y = 2
+		available = {
+		
+		}
+		completion_reward = {
+			
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_specialized_army_doctrine
+		icon = GFX_focus_chi_army_reform
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -2
+		y = 1
+		available = {
+			NOT = {
+				has_tech = doctrine_victorian_tradition
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_tribal_military
+		}	
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_massive_army_doctrine
+		}
+		completion_reward = {
+			if = {
+				limit = {
+					NOT = { has_tech = doctrine_victorian_innovation }
+				}
+				set_technology = { doctrine_victorian_innovation = 1 }
+			}
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_special_infantry_corps
+		icon = GFX_focus_prc_infiltration
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -2
+		y = 2
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_specialized_army_doctrine
+		}	
+		completion_reward = {
+			if = {
+				limit = {
+					NOT = { has_tech = tech_infantry_special_infantry_corps }
+				}
+				set_technology = { tech_infantry_special_infantry_corps = 1 }
+			}
+		}
+		allow_branch = {
+			always = yes
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_massive_army_doctrine
+		icon = GFX_goal_focus_conscription
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -4
+		y = 1
+		available = {
+			NOT = {
+				has_tech = doctrine_victorian_innovation
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_tribal_military
+		}	
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_specialized_army_doctrine
+		}
+		completion_reward = {
+			if = {
+				limit = {
+					NOT = { has_tech = doctrine_victorian_tradition }
+				}
+				set_technology = { doctrine_victorian_tradition = 1 }
+			}
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_recruitment_drives
+		icon = GFX_focus_generic_little_entente
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -4
+		y = 2
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_massive_army_doctrine
+		}	
+		completion_reward = {
+			add_manpower = 5000
+		}
+		allow_branch = {
+			always = yes
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_stockpile_tribal_weapons
+		icon = GFX_focus_generic_concessions
+		cost = 75
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = afr_jihadist_regional_power_stockpile_tribal_weapons_trigger_tooltip
+				command_power > 99.9
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_recruitment_drives
+			focus = afr_jihadist_regional_power_special_infantry_corps
+		}
+		completion_reward = {
+			add_command_power = -100
+			add_equipment_to_stockpile = {
+				type = tribal_weapons_0
+				amount = 1000
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -2
+		y = 3
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_loyal_soldiers
+		icon = GFX_focus_generic_military_mission
+		cost = 75
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = afr_jihadist_regional_power_stockpile_tribal_weapons_trigger_tooltip
+				command_power > 99.9
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_recruitment_drives
+			focus = afr_jihadist_regional_power_special_infantry_corps
+		}
+		completion_reward = {
+			add_command_power = -100
+			if = {
+				limit = { 
+					has_idea = manpower_tribal_warriors
+				}
+				add_ideas = manpower_tribal_every_tenth
+			}
+			else = {
+				if={
+					limit={
+						NOT={has_idea = AF_T_Tribal_Army}
+					}
+					hidden_effect = { add_ideas={AF_T_Tribal_Army} }
+				}
+				custom_effect_tooltip= EDC_add_2500_to_tribal_army
+				add_to_variable = {Tribal_army_num = 2500}
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = -4
+		y = 3
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_improve_our_designs
+		icon = GFX_focus_PIE_Casus_Belli
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 0
+		y = 1
+		available = {
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_tribal_military
+		}	
+		completion_reward = {
+			add_tech_bonus = { bonus = 0.50 uses = 1 category = infantry_tech }
+			set_technology = {
+				tech_camel_cavalry = 1
+			}
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_introduce_camel_cavalry
+		icon = GFX_goal_generic_cavalry
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 0
+		y = 2
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_improve_our_designs
+		}	
+		completion_reward = {
+			add_equipment_to_stockpile = {
+				type = camel_equipment_0
+				amount = 100
+			}
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_camel_cavalry_tactics
+		icon = GFX_goal_generic_air_doctrine
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 0
+		y = 3
+		available = {
+			
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_introduce_camel_cavalry
+		}	
+		completion_reward = {
+			add_ideas = afr_camel_cavalry
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_decentralized_command_structure
+		icon = GFX_goal_focus_decentralisation_power
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 2
+		y = 1
+		available = {
+			if = {
+				limit = { 
+					OR = {
+						has_country_flag = afr_chose_decentralized_command_structure_flag
+						has_country_flag = afr_chose_centralized_command_structure_flag
+					}
+				}
+				custom_effect_tooltip = {
+					tooltip = afr_jihadist_regional_power_decentralized_command_structure_tooltip
+					NOT = { has_country_flag = afr_chose_centralized_command_structure_flag }
+				}
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_tribal_military
+		}	
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_centralized_command_structure
+		}
+		completion_reward = {
+			if = {
+				limit = { 
+					NOT = {
+						has_country_flag = afr_chose_decentralized_command_structure_flag
+						has_country_flag = afr_chose_centralized_command_structure_flag
+					}
+				}
+				add_ideas = afr_decentralized_command_structure
+				set_country_flag = afr_chose_decentralized_command_structure_flag
+			}
+			hidden_effect = {
+				add_popularity = {
+					ideology = anarchism
+					popularity = 0.01
+				}
+			}
+			custom_effect_tooltip = afr_anarchism_popularity_plus_1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_superior_weaponry
+		icon = GFX_focus_Colonial_Troops
+		cost = 75
+		prerequisite = {
+			focus = afr_jihadist_regional_power_decentralized_command_structure
+		}
+		completion_reward = {
+			if = {
+				limit = { has_idea = afr_superor_weaponry }
+				swap_ideas = {
+					remove_idea = afr_superor_weaponry
+					add_idea = afr_superor_weaponry_2
+				}
+			}
+			else = {
+				add_ideas = afr_superor_weaponry_2
+			}
+			custom_effect_tooltip = afr_jihadist_regional_power_superior_weaponry_tooltip
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 2
+		y = 2
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_centralized_command_structure
+		icon = GFX_focus_generic_self_management
+		cost = 75
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 4
+		y = 1
+		available = {
+			if = {
+				limit = { 
+					OR = {
+						has_country_flag = afr_chose_decentralized_command_structure_flag
+						has_country_flag = afr_chose_centralized_command_structure_flag
+					}
+				}
+				custom_effect_tooltip = {
+					tooltip = afr_jihadist_regional_power_centralized_command_structure_tooltip
+					NOT = { has_country_flag = afr_chose_decentralized_command_structure_flag }
+				}
+			}
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_address_tribal_military
+		}	
+		mutually_exclusive = {
+			focus = afr_jihadist_regional_power_decentralized_command_structure
+		}
+		completion_reward = {
+			if = {
+				limit = { 
+					NOT = {
+						has_country_flag = afr_chose_decentralized_command_structure_flag
+						has_country_flag = afr_chose_centralized_command_structure_flag
+					}
+				}
+				add_ideas = afr_centralized_command_structure_3
+				set_country_flag = afr_chose_centralized_command_structure_flag
+			}
+			else = {
+				army_experience = 10
+			}
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_streamlined_training
+		icon = GFX_goal_continuous_reduce_training_time
+		cost = 75
+		prerequisite = {
+			focus = afr_jihadist_regional_power_centralized_command_structure
+		}
+		completion_reward = {
+			if = {
+				limit = { has_idea = afr_vast_forces_3 }
+				swap_ideas = {
+					remove_idea = afr_vast_forces_3
+					add_idea = afr_vast_forces_4
+				}
+			}
+			else = {
+				swap_ideas = {
+					remove_idea = afr_centralized_command_structure_3
+					add_idea = afr_centralized_command_structure_4
+				}
+			}
+			custom_effect_tooltip = afr_jihadist_regional_power_streamlined_training_tooltip
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 4
+		y = 2
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_survival_training
+		icon = GFX_focus_exploration
+		cost = 75
+		prerequisite = {
+			focus = afr_jihadist_regional_power_superior_weaponry
+			focus = afr_jihadist_regional_power_streamlined_training
+		}
+		completion_reward = {
+			if = {
+				limit = { has_idea = afr_superor_weaponry_2 }
+				swap_ideas = {
+					remove_idea = afr_superor_weaponry_2
+					add_idea = afr_superor_weaponry_3
+				}
+			}
+			if = {
+				limit = { has_idea = afr_vast_forces_4 }
+				swap_ideas = {
+					remove_idea = afr_vast_forces_4
+					add_idea = afr_vast_forces_5
+				}
+			}
+			if = {
+				limit = { has_idea = afr_centralized_command_structure_4 }
+				swap_ideas = {
+					remove_idea = afr_centralized_command_structure_4
+					add_idea = afr_centralized_command_structure_5
+				}
+			}
+			custom_effect_tooltip = afr_jihadist_regional_power_survival_training_tooltip
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 2
+		y = 3
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_early_medicine
+		icon = GFX_focus_generic_concessions
+		cost = 75
+		prerequisite = {
+			focus = afr_jihadist_regional_power_superior_weaponry
+			focus = afr_jihadist_regional_power_streamlined_training
+		}
+		completion_reward = {
+			if = {
+				limit = {
+					has_tech = early_medicine 
+				}
+				add_tech_bonus = {
+					bonus = 0.5
+					uses = 1
+					category = biochemistry_tech
+				}
+			}
+			else = {
+				set_technology = {
+					early_medicine = 1
+				}
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 4
+		y = 3
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = afr_jihadist_regional_power_advanced_tribal_tactics
+		icon = GFX_goal_demand_sudetenland
+		cost = 75
+		prerequisite = {
+			focus = afr_jihadist_regional_power_stockpile_tribal_weapons
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_loyal_soldiers
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_camel_cavalry_tactics
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_survival_training
+		}
+		prerequisite = {
+			focus = afr_jihadist_regional_power_early_medicine
+		}
+		completion_reward = {
+			if = {
+				limit = { 
+					has_idea = law_army_tribal_basic
+				}
+				swap_ideas = {
+					remove_idea = law_army_tribal_basic
+					add_idea = law_army_tribal_advanced
+				}
+			}
+			if = {
+				limit = { 
+					has_idea = law_army_tribal_improved
+				}
+				swap_ideas = {
+					remove_idea = law_army_tribal_improved
+					add_idea = law_army_tribal_advanced
+				}
+			}
+			else = {
+				army_experience = 25
+			}
+		}
+		relative_position_id = afr_jihadist_regional_power_address_tribal_military
+		x = 0
+		y = 4
+		ai_will_do = { 
+			factor = 1
+		}
+	}
 
 
 #=======================================================================	
@@ -593,8 +1542,8 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 8
-		y = 10
+		x = 7
+		y = 7
 
 	}
 	focus = {
@@ -622,8 +1571,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 8
-		y = 11
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 0
+		y = 1
 
 	}
 	focus = {
@@ -644,8 +1594,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 10
-		y = 12
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 2
+		y = 2
 
 	}
 	focus = {
@@ -726,8 +1677,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 3
-		y = 12
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = -6
+		y = 2
 
 	}
 	focus = {
@@ -780,8 +1732,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 7
-		y = 12
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = -1
+		y = 2
 
 	}
 	focus = {
@@ -864,8 +1817,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 6
-		y = 13
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = -2
+		y = 3
 
 	}
 	focus = {
@@ -909,8 +1863,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 8
-		y = 13
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 0
+		y = 3
 
 	}
 	focus = {
@@ -948,8 +1903,9 @@ focus = {
 		ai_will_do = {
 			factor = 1
 		}
-		x = 6
-		y = 14
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = -2
+		y = 4
 
 	}
 	focus = {
@@ -1035,8 +1991,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 7
-		y = 15
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = -1
+		y = 5
 
 	}
 	focus = {
@@ -1078,8 +2035,9 @@ focus = {
 		ai_will_do = {
 			factor = 2
 		}
-		x = 10
-		y = 14
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 2
+		y = 4
 
 	}
 	focus = {
@@ -1160,8 +2118,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 9
-		y = 15
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 1
+		y = 5
 
 	}
 	focus = {
@@ -1214,8 +2173,9 @@ focus = {
 		bypass = {
 			MSN = { is_subject = yes }
 		}
-		x = 8
-		y = 16
+		relative_position_id = afr_generic_jihadist_skt_branch
+		x = 0
+		y = 6
 
 	}
 	focus = {
@@ -1238,7 +2198,7 @@ focus = {
 			TAG = SKT
 		}
 		x = 14
-		y = 16
+		y = 13
 
 	}
 	#focus = {
@@ -1270,8 +2230,9 @@ focus = {
 	#	allow_branch = {
 	#		TAG = SKT
 	#	}
-	#	x = 17
-	#	y = 17
+	#	relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+	#	x = 3
+	#	y = 1
 	#
 	#}
 	focus = {
@@ -1333,8 +2294,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 14
-		y = 17
+		relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+		x = 0
+		y = 1
 
 	}
 	focus = {
@@ -1378,8 +2340,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 13
-		y = 18
+		relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+		x = -1
+		y = 2
 
 	}
 	focus = {
@@ -1427,8 +2390,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 15
-		y = 18
+		relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+		x = 1
+		y = 2
 
 	}
 	focus = {
@@ -1438,11 +2402,23 @@ focus = {
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = skt_jihad_bab_is_opppressed
-				ALG = {
-					custom_trigger_tooltip = {
-						tooltip = DCI_is_greater_than_15
-						check_variable = { var = detrimental_colonial_impact_value > 15 }
+				any_country = {
+					OR = {
+						custom_trigger_tooltip = {
+							tooltip = DCI_is_greater_than_15
+							check_variable = { var = detrimental_colonial_impact_value > 15 }
+						}
+						if = {
+							limit = { TAG = ALG }
+							ALG = { has_country_flag = ALG_france_dont_care }
+						}
+						#if = {
+						#	limit = { TAG = FRA }
+						#	ALG = { has_country_flag = ALG_france_dont_care }
+						#}
 					}
+					TAG = ALG
+					NOT = { TAG = OTO }
 					NOT = {
 						AND = {
 							custom_trigger_tooltip = {
@@ -1527,8 +2503,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 11
-		y = 17
+		relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+		x = -3
+		y = 1
 
 	}
 	focus = {
@@ -1538,11 +2515,23 @@ focus = {
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = skt_jihad_jihadist_cell_is_ready
-				ALG = {
-					custom_trigger_tooltip = {
-						tooltip = DCI_is_greater_than_15
-						check_variable = { var = detrimental_colonial_impact_value > 15 }
+				any_country = {
+					OR = {
+						custom_trigger_tooltip = {
+							tooltip = DCI_is_greater_than_15
+							check_variable = { var = detrimental_colonial_impact_value > 15 }
+						}
+						if = {
+							limit = { TAG = ALG }
+							ALG = { has_country_flag = ALG_france_dont_care }
+						}
+						#if = {
+						#	limit = { TAG = FRA }
+						#	ALG = { has_country_flag = ALG_france_dont_care }
+						#}
 					}
+					TAG = ALG
+					NOT = { TAG = OTO }
 					NOT = {
 						AND = {
 							custom_trigger_tooltip = {
@@ -1652,8 +2641,9 @@ focus = {
 		allow_branch = {
 			TAG = SKT
 		}
-		x = 11
-		y = 18
+		relative_position_id = afr_generic_jihadist_skt_islamic_liberation
+		x = -3
+		y = 2
 
 	}
 #=======================================================================
