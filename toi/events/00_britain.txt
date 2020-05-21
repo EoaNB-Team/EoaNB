@@ -3343,6 +3343,120 @@ country_event = {
 	
 }
 
+#Workers damage factory in a riot
+country_event = {
+	id = britainworkerunrest.8
+	title = britainworkerunrest.8.t
+	desc = britainworkerunrest.8.d
+	picture = GFX_report_event_generic_riot
+	
+	trigger = {
+		trigger_ENG_worker_unrest = yes
+		check_variable = { ENG_worker_unrest > 10 }
+	}
+	
+	mean_time_to_happen = {
+		days = 500
+		modifier = {
+			factor = 0.8
+			check_variable = { ENG_worker_unrest > 20 }
+		}
+		modifier = {
+			factor = 0.75
+			check_variable = { ENG_worker_unrest > 30 }
+		}
+		modifier = {
+			factor = 0.7
+			check_variable = { ENG_worker_unrest > 40 }
+		}
+		modifier = {
+			factor = 0.5
+			check_variable = { ENG_worker_unrest > 50 }
+		}
+	}
+	
+	immediate = {
+		random_owned_controlled_state = {
+			limit = {
+				is_in_home_area = yes
+				num_of_civilian_factories > 0
+			}
+			set_state_flag = flag_state_ENG_worker_riot_target
+		}
+	}
+	
+	#Negotiate/Give Concessions. Costs PP and gives SE popularity, but lowers unrest
+	option = {
+		name = britainworkerunrest.8.a
+		ai_chance = { factor = 7 }
+		effect_ENG_damage_british_homeland_factory_heavy = yes
+		add_political_power = -50
+		add_popularity = { ideology = social_egalitarianism popularity = 0.02 }
+		custom_effect_tooltip = eoanb_tt_ENG_decrease_worker_unrest_2
+		hidden_effect = {
+			effect_ENG_decrease_worker_unrest_2 = yes
+			effect_ENG_clear_riot_target_state_flag = yes
+		}
+	}
+	
+	#Arrest rioters. No PP cost or popularity change, but can go wrong
+	option = {
+		name = britainworkerunrest.8.b
+		ai_chance = { factor = 85 }
+		effect_ENG_damage_british_homeland_factory_heavy = yes
+		random_list = {
+			70 = {
+				custom_effect_tooltip = eoanb_tt_ENG_event_workerunrest_8_b_1
+				custom_effect_tooltip = eoanb_tt_ENG_decrease_worker_unrest_1
+				hidden_effect = {
+					effect_ENG_decrease_worker_unrest_1 = yes
+				}
+			}
+			30 = {
+				custom_effect_tooltip = eoanb_tt_ENG_event_workerunrest_8_b_2
+				custom_effect_tooltip = eoanb_tt_ENG_increase_worker_unrest_4
+				hidden_effect = {
+					effect_ENG_increase_worker_unrest_4 = yes
+				}
+			}
+		}
+		hidden_effect = {
+			effect_ENG_clear_riot_target_state_flag = yes
+		}
+	}
+	
+	#Open fire on rioters. Cheapest option, less factory damage, but higher chance to fail and greater consequences when it fails
+	option = {
+		name = britainworkerunrest.8.c
+		ai_chance = { factor = 8 }
+		effect_ENG_damage_british_homeland_factory_light = yes
+		random_list = {
+			50 = {
+				custom_effect_tooltip = eoanb_tt_ENG_event_workerunrest_8_b_1
+				custom_effect_tooltip = eoanb_tt_ENG_decrease_worker_unrest_1
+				add_political_power = 50
+				hidden_effect = {
+					effect_ENG_decrease_worker_unrest_1 = yes
+				}
+			}
+			50 = {
+				custom_effect_tooltip = eoanb_tt_ENG_event_workerunrest_8_b_2
+				custom_effect_tooltip = eoanb_tt_ENG_increase_worker_unrest_8
+				add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
+				add_popularity = { ideology = vanguard_communism popularity = 0.01 }
+				add_popularity = { ideology = collectivist_socialism popularity = 0.01 }
+				hidden_effect = {
+					effect_ENG_increase_worker_unrest_8 = yes
+				}
+			}
+		}
+		hidden_effect = {
+			effect_ENG_clear_riot_target_state_flag = yes
+		}
+	}
+	
+}
+
 ### IRISH UNREST RELATED EVENTS BELOW ###
 
 #Hidden Event that prevents unrest from going below 0% or above 100%
