@@ -1295,7 +1295,385 @@ afr_islamic_renaissance = {
 }
 	
 
- SKT_Sokoto_Economy = {
+ afr_prosperity_mechanic_category = {
+ 
+	afr_ethiopia_send_gift_por = {
+		icon = generic_form_nation
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_greater_than_5
+					check_variable = {
+					afr_prosperity_mechanic_value > 4
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_ethiopia_send_gift_por_trigger
+				has_global_flag = scramble_for_africa
+			}
+		}
+
+		visible = {
+			TAG = ETH
+			NOT = { has_global_flag = scramble_for_africa }
+		}
+	
+		fire_only_once = yes
+		
+		ai_will_do = {
+			factor = 10
+		}
+		
+		complete_effect = {
+			POR = {
+				add_opinion_modifier = {
+					target = ROOT
+					modifier = ETH_gift_por
+				}
+			}
+			hidden_effect = {
+				add_opinion_modifier = {
+					target = POR
+					modifier = ETH_gift_por
+				}
+			}
+			custom_effect_tooltip = afr_prosperity_mechanic_minus_5
+			add_to_variable = {
+				var = afr_prosperity_mechanic_value
+				value = -5
+			}
+		}
+	}
+ 
+	afr_ethiopia_purchase_por_supplies = {
+		icon = generic_form_nation
+		available = {
+			POR = {
+				has_opinion = {
+					target = ROOT
+					value > 24
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_greater_than_5
+					check_variable = {
+					afr_prosperity_mechanic_value > 4
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_ethiopia_send_gift_por_trigger
+				has_global_flag = scramble_for_africa
+			}
+		}
+
+		visible = {
+			TAG = ETH
+			NOT = { has_global_flag = scramble_for_africa }
+		}
+	
+		fire_only_once = no
+		
+		ai_will_do = {
+			factor = 10
+		}
+	
+		days_re_enable = 360
+		
+		complete_effect = {
+			ROOT = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment_rifle_0
+					amount = 250
+					producer = POR
+				}
+				add_equipment_to_stockpile = {
+					type = uniform_equipment_0
+					amount = 250
+					producer = POR
+				}
+			}
+			custom_effect_tooltip = afr_prosperity_mechanic_minus_5
+			add_to_variable = {
+				var = afr_prosperity_mechanic_value
+				value = -5
+			}
+		}
+	}
+ 
+	afr_prosperity_mechanic_build_farm = {
+
+		available = {
+			if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						farm > 6 
+					}
+					NOT = { has_tech = threshing_machine }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_15
+						check_variable = {
+						afr_prosperity_mechanic_value > 14
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_farm_less_than_7
+					any_owned_state = { 
+						farm < 7 
+						is_core_of = ROOT
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_farm_research_threshing_machine
+					has_tech = threshing_machine
+				}
+			}
+			if = {
+				limit = {
+					has_tech = threshing_machine
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_15
+						check_variable = {
+						afr_prosperity_mechanic_value > 14
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_farm_less_than_10
+					any_owned_state = { 
+						farm < 10 
+						is_core_of = ROOT
+					}
+				}
+			}
+			if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						farm < 7 
+					}
+					NOT = { has_tech = threshing_machine }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_15
+						check_variable = {
+						afr_prosperity_mechanic_value > 14
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_farm_less_than_7
+					any_owned_state = { 
+						farm < 7 
+						is_core_of = ROOT
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				NOT = { has_country_flag = afr_prosperity_mechanic_construction_flag }
+			}
+		}
+
+		visible = {
+			afr_is_tribal = yes
+			
+		}
+
+
+		complete_effect = {
+			add_political_power = -25
+			custom_effect_tooltip = afr_prosperity_mechanic_minus_15
+			add_to_variable = {
+				var = afr_prosperity_mechanic_value
+				value = -15
+			}
+			set_country_flag = afr_prosperity_mechanic_construction_flag
+		}
+		
+		days_remove = 550
+		
+		modifier = {
+			political_power_cost = 0.5
+        }
+		
+		
+		remove_effect = {
+            random_owned_controlled_state = {
+				limit = { 
+					is_core_of = ROOT 
+					OR = {
+						AND = {
+							ROOT = { NOT = { has_tech = threshing_machine } }
+							farm < 7
+						}
+						AND = {
+							ROOT = { has_tech = threshing_machine }
+							farm < 10
+						}
+					}
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+				add_manpower = 1000
+		   }
+		   clr_country_flag = afr_prosperity_mechanic_construction_flag
+        }
+		
+		ai_will_do = {
+			factor = 10
+		}
+	}
+	
+	afr_prosperity_mechanic_build_cotton_farm = {
+
+		available = {
+			if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						cotton_farm > 6 
+					}
+					NOT = { has_tech = threshing_machine }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_20
+						check_variable = {
+						afr_prosperity_mechanic_value > 19
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_cotton_farm_less_than_7
+					any_state = { 
+						cotton_farm < 7 
+						is_core_of = ROOT
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_cotton_farm_research_threshing_machine
+					has_tech = threshing_machine
+				}
+			}
+			if = {
+				limit = {
+					has_tech = threshing_machine
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_20
+						check_variable = {
+						afr_prosperity_mechanic_value > 19
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_cotton_farm_less_than_10
+					any_state = { 
+						cotton_farm < 10 
+						is_core_of = ROOT
+					}
+				}
+			}
+			if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						cotton_farm < 7 
+					}
+					NOT = { has_tech = threshing_machine }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_20
+						check_variable = {
+						afr_prosperity_mechanic_value > 19
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_cotton_farm_less_than_7
+					any_state = { 
+						cotton_farm < 7 
+						is_core_of = ROOT
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				NOT = { has_country_flag = afr_prosperity_mechanic_construction_flag }
+			}
+		}
+
+		visible = {
+			afr_is_tribal = yes
+		}
+
+		complete_effect = {
+			add_political_power = -50
+			custom_effect_tooltip = afr_prosperity_mechanic_minus_20
+			add_to_variable = {
+				var = afr_prosperity_mechanic_value
+				value = -20
+			}
+			set_country_flag = afr_prosperity_mechanic_construction_flag
+		}
+		
+		days_remove = 720
+		
+		modifier = {
+			political_power_cost = 0.5
+        }
+		
+		remove_effect = {
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+					OR = {
+						AND = {
+							ROOT = { NOT = { has_tech = threshing_machine } }
+							cotton_farm < 7
+						}
+						AND = {
+							ROOT = { has_tech = threshing_machine }
+							cotton_farm < 10
+						}
+					}
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = cotton_farm
+					level = 1
+					instant_build = yes
+				}
+		   }
+		   clr_country_flag = afr_prosperity_mechanic_construction_flag
+        }
+		
+		ai_will_do = {
+			factor = 10
+		}
+	}
 	
 }
  SKT_war_exhaustion = {
@@ -1305,7 +1683,7 @@ afr_islamic_renaissance = {
 		activation = { 
 			hidden_trigger = {
 				has_war = no
-				has_idea = afr_large_kingdom
+				afr_is_tribal = yes
 			}
 		}
 		available = {
@@ -1338,20 +1716,148 @@ afr_islamic_renaissance = {
 		}
 		
 		timeout_effect = { 
+			#Base Income Here
 			if = {
 				limit = {
-					check_variable = {
-						afr_war_exhaustion_value = 0
+					check_variable = { afr_war_exhaustion_value = 0 }
+					OR = {
+						has_idea = AF_T_unorganized_tribal_nation
+						has_idea = AF_T_unorganized_tribal_nation_2
+						has_idea = AF_T_unorganized_tribal_nation_3
+						has_idea = AF_T_unorganized_tribal_nation_4
+						has_idea = AF_T_unorganized_tribal_nation_5
 					}
 				}
-				
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_growth
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_unorganized
 			}
-			else = {
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					OR = {
+						has_idea = AF_T_organized_tribal_nation
+						has_idea = AF_T_organized_tribal_nation_2
+						has_idea = AF_T_organized_tribal_nation_3
+					}
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_growth
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_organized
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = 1
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					has_idea = AF_T_small_kingdom
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_growth
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_small_kingdom
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = 2
+				}
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					OR = {
+						has_idea = afr_reforming_kingdom
+						has_idea = afr_large_kingdom
+					}
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_growth
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_regional_power
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = 3
+				}
+			}
+			#Place Extra Income Here
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					has_country_flag = afr_rrp_company_port
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_colonial_company
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = 1
+				}
+			}
+			
+			
+			#Tooltips to upgrade income
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					OR = {
+						has_idea = AF_T_unorganized_tribal_nation
+						has_idea = AF_T_unorganized_tribal_nation_2
+						has_idea = AF_T_unorganized_tribal_nation_3
+						has_idea = AF_T_unorganized_tribal_nation_4
+						has_idea = AF_T_unorganized_tribal_nation_5
+					}
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_unorganized_upgrade_tooltip
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					OR = {
+						has_idea = AF_T_organized_tribal_nation
+						has_idea = AF_T_organized_tribal_nation_2
+						has_idea = AF_T_organized_tribal_nation_3
+					}
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_organized_upgrade_tooltip
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value = 0 }
+					has_idea = AF_T_small_kingdom
+				}
+				custom_effect_tooltip = afr_peacetime_economy_base_prosperity_small_kingdom_upgrade_tooltip
+			}
+			#War Exhaustion Effects
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value > 0 }
+				}
 				custom_effect_tooltip = afr_war_exhaustion_value_minus_1
 				add_to_variable = {
 					var = afr_war_exhaustion_value
 					value = -1
 				}
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 20 }
+					has_idea = afr_war_exhaustion_value_penalty_1_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_1_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 30 }
+					has_idea = afr_war_exhaustion_value_penalty_2_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_2_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 40 }
+					has_idea = afr_war_exhaustion_value_penalty_3_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_3_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 50 }
+					has_idea = afr_war_exhaustion_value_penalty_4_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_4_idea
 			}
 			hidden_effect = { activate_mission = SKT_war_exhaustion_mission_peace }
 		}
@@ -1368,7 +1874,7 @@ afr_islamic_renaissance = {
 		activation = {  
 			hidden_trigger = {
 				has_war = yes
-				has_idea = afr_large_kingdom
+				afr_is_tribal = yes
 			}
 		}
 		available = {
@@ -1389,7 +1895,7 @@ afr_islamic_renaissance = {
 		fire_only_once = no
 		selectable_mission = no
 		is_good = no
-		days_mission_timeout = 30
+		days_mission_timeout = 45
 		
 		ai_will_do = {
 			factor = 1
@@ -1399,16 +1905,80 @@ afr_islamic_renaissance = {
 			}
 		}
 		
-		timeout_effect = {  
+		timeout_effect = {
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 20 }
+					has_idea = afr_war_exhaustion_value_penalty_1_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_1_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 30 }
+					has_idea = afr_war_exhaustion_value_penalty_2_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_2_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 40 }
+					has_idea = afr_war_exhaustion_value_penalty_3_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_3_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 50 }
+					has_idea = afr_war_exhaustion_value_penalty_4_idea
+				}
+				remove_ideas = afr_war_exhaustion_value_penalty_4_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value > 19 }
+					NOT = { has_idea = afr_war_exhaustion_value_penalty_1_idea }
+				}
+				add_ideas = afr_war_exhaustion_value_penalty_1_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value > 29 } 
+					NOT = { has_idea = afr_war_exhaustion_value_penalty_2_idea }
+				}
+				custom_effect_tooltip = afr_war_exhaustion_enter_space
+				add_ideas = afr_war_exhaustion_value_penalty_2_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value > 39 }
+					NOT = { has_idea = afr_war_exhaustion_value_penalty_3_idea }
+				}
+				custom_effect_tooltip = afr_war_exhaustion_enter_space
+				add_ideas = afr_war_exhaustion_value_penalty_3_idea
+			}
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value > 49 }
+					NOT = { has_idea = afr_war_exhaustion_value_penalty_4_idea }
+				}
+				custom_effect_tooltip = afr_war_exhaustion_enter_space
+				add_ideas = afr_war_exhaustion_value_penalty_4_idea
+			}
 			if = {
 				limit = {
 					check_variable = {
 						afr_war_exhaustion_value = 50
 					}
 				}
-				
+				custom_effect_tooltip = afr_war_exhaustion_enter_space
+				custom_effect_tooltip = afr_max_war_exhaustion_value_reached
 			}
-			else = {
+			if = {
+				limit = {
+					check_variable = { afr_war_exhaustion_value < 50 }
+				}
+				custom_effect_tooltip = afr_war_exhaustion_enter_space
 				custom_effect_tooltip = afr_war_exhaustion_value_add_1
 				add_to_variable = {
 					var = afr_war_exhaustion_value
@@ -1416,6 +1986,57 @@ afr_islamic_renaissance = {
 				}
 			}
 			hidden_effect = { activate_mission = SKT_war_exhaustion_mission }
+		}
+		
+		complete_effect = {
+			
+		}
+		
+	}
+	
+	afr_war_exhaustion_mission_exertion = {
+		icon = generic_prepare_civil_war
+		
+		activation = {  
+			hidden_trigger = {
+				has_war = yes
+				afr_is_tribal = yes
+				check_variable = {
+					afr_war_exhaustion_value > 20
+				}
+			}
+		}
+		available = {
+			hidden_trigger = {
+				has_war = no
+			}
+		}
+		cancel_trigger = {
+			hidden_trigger = {
+				has_war = no
+			}
+		}
+
+		visible = {
+			always = no
+		}
+	
+		fire_only_once = no
+		selectable_mission = no
+		is_good = no
+		days_mission_timeout = 200
+		
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 4
+				has_war_support > 0.5
+			}
+		}
+		
+		timeout_effect = {
+			ROOT = { country_event = { id = afr_war_exhaustion_exertion.1 } }
+			hidden_effect = { activate_mission = afr_war_exhaustion_mission_exertion }
 		}
 		
 		complete_effect = {

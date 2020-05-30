@@ -30,5 +30,5 @@ replace_path = "history/countries"
 replace_path = "history/states"
 replace_path = "map/supplyareas"
 
-supported_version="1.9.1"
+supported_version="1.9.2"
 picture="toi.jpg"
