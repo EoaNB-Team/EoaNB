@@ -1698,6 +1698,8 @@ country_event = {##territorial disputes on tribal border
 		}
 	}
 	trigger = {
+		always = no
+		is_subject = no
 		OR = {
 			AND = {
 				OR = {
@@ -1725,18 +1727,7 @@ country_event = {##territorial disputes on tribal border
 		}
 		any_state ={
 			owner = {
-				OR = {
-					has_idea = AF_T_unorganized_tribal_nation
-					has_idea = AF_T_unorganized_tribal_nation_2
-					has_idea = AF_T_unorganized_tribal_nation_3
-					has_idea = AF_T_unorganized_tribal_nation_4
-					has_idea = AF_T_unorganized_tribal_nation_5
-					has_idea = AF_T_organized_tribal_nation
-					has_idea = AF_T_organized_tribal_nation_2
-					has_idea = AF_T_organized_tribal_nation_3
-					has_idea = AF_T_small_kingdom
-					has_idea = afr_large_kingdom
-				}
+				afr_is_tribal = yes
 				#owns_state = PREV
 				any_neighbor_country = {
 					tag = ROOT
@@ -1756,14 +1747,8 @@ country_event = {##territorial disputes on tribal border
 		hidden_effect = {
 		random_neighbor_country = {
 			limit = {
-				OR = {
-					has_idea = AF_T_unorganized_tribal_nation
-					has_idea = AF_T_organized_tribal_nation
-					has_idea = AF_T_organized_tribal_nation_2
-					has_idea = AF_T_organized_tribal_nation_3
-					has_idea = AF_T_small_kingdom
-					has_idea = afr_large_kingdom
-				}
+				afr_is_tribal = yes
+				is_subject = no
 			}
 			country_event = {
 					id = EDC_afr.24
@@ -2333,7 +2318,20 @@ news_event = { #the scramble begins
 				is_secondary_power = yes
 			}
 			capital_scope = {is_on_continent = europe}
+			NOT={
+				OR={
+					tag = USA
+					tag = ARG
+					tag = BRA
+					tag = CHL
+					tag = MEX
+					tag = CHI
+					tag = RAJ
+					tag = EGY
+				}
+			}
 		}
+		set_country_flag = is_historical_colonial_power
 	}
 	option = {#The Hordes of Europe do decend apon us
 		name = EDC_afr.42.c
@@ -2363,71 +2361,349 @@ country_event = {###tribe - raid neighbour
 	
 	option = {#send a small force: 500 - should always be true, minium a country starts with and the required amount to deside to raid
 		name = EDC_afr.43.a
-		trigger={
-			check_variable = { Tribal_army_num > 499 }
+		ai_chance = { 
+			base = 1
 		}
 		subtract_from_variable={Tribal_army_num = 500}
 		set_country_flag = sent_500_troops_on_a_raid
 		##10% chance to intercept
-		random_list = {
-			10 = {
-				FROM.FROM = {country_event = { id = EDC_afr.45 }}
-			}
-			90 = {
-				custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+		hidden_effect = {
+			random_list = {
+				10 = {
+					FROM.FROM = {country_event = { id = EDC_afr.45 }}
+				}
+				90 = {
+					custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+				}
 			}
 		}
-		
+		custom_effect_tooltip = EDC_afr_43_a_tooltip
 	}
 	option = {#send a medium force: 1000
 		name = EDC_afr.43.b
 		trigger={
 			check_variable = { Tribal_army_num > 999 }
 		}
+		ai_chance = { 
+			base = 1
+		}
 		subtract_from_variable={Tribal_army_num = 1000}
 		set_country_flag = sent_1000_troops_on_a_raid
-		random_list = {
-			25 = {
-				FROM.FROM = {country_event = { id = EDC_afr.45 }}
-			}
-			75 = {
-				custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+		hidden_effect = {
+			random_list = {
+				25 = {
+					FROM.FROM = {country_event = { id = EDC_afr.45 }}
+				}
+				75 = {
+					custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+				}
 			}
 		}
 		##25% chance to intercept
+		custom_effect_tooltip = EDC_afr_43_b_tooltip
 	}
 	option = {#send a large force: 2500
 		name = EDC_afr.43.c
 		trigger={
 			check_variable = { Tribal_army_num > 2499 }
 		}
+		ai_chance = { 
+			base = 1
+		}
 		subtract_from_variable={Tribal_army_num = 2500}
 		set_country_flag = sent_2500_troops_on_a_raid
-		random_list = {
-			50 = {
-				FROM.FROM = {country_event = { id = EDC_afr.45 }}
-			}
-			50 = {
-				custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+		hidden_effect = {
+			random_list = {
+				50 = {
+					FROM.FROM = {country_event = { id = EDC_afr.45 }}
+				}
+				50 = {
+					custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+				}
 			}
 		}
 		##50% chance to intercept
+		custom_effect_tooltip = EDC_afr_43_c_tooltip
 	}
 	option = {#send them all - risks a major confrentation
 		name = EDC_afr.43.e
 		##90% chance to intercept
-		random_list = {
-			50 = {
-				FROM.FROM = {country_event = { id = EDC_afr.45 }}
+		trigger={
+			check_variable = { Tribal_army_num > 499 }
+		}
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 1000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 2000
+						}
+					}
+				}
 			}
-			40={
-				FROM.FROM = {country_event = { id = EDC_afr.46 }}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 2000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 3000
+						}
+					}
+				}
 			}
-			10 = {
-				custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 3000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 4000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 4000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 6000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 5000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 7000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 6000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 9000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 7000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 10000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 8000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 12000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 9000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 13000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 10000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 15000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 15000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 20000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 20000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 25000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 25000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 30000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 30000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 37000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 37000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 44000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 40000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 50000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 50000
+						}
+					}
+					FROM.FROM = {
+						check_variable = {
+							Tribal_army_num > 60000
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			random_list = {
+				50 = {
+					FROM.FROM = {country_event = { id = EDC_afr.45 }}
+				}
+				40={
+					FROM.FROM = {country_event = { id = EDC_afr.46 }}
+				}
+				10 = {
+					custom_effect_tooltip = EDC_SUCCESSFULL_RAID
+				}
 			}
 		}
 		set_country_flag = @ROOT_sent_all_troops_on_a_raid
+		custom_effect_tooltip = EDC_afr_43_e_tooltip
 	}
 }
 country_event = {###result of the raid
@@ -2478,6 +2754,11 @@ country_event = {###result of the raid
 					else={
 						add_political_power = 10
 					}
+					custom_effect_tooltip = afr_prosperity_mechanic_add_1
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 1
+						}
 				}
 				20 = {
 					if = {
@@ -2505,13 +2786,28 @@ country_event = {###result of the raid
 								add_manpower = -250
 							}
 						}
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 2
+						}
 					}
 					else={
 						add_political_power = 25
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 2
+						}
 					}
 				}
 				10 = {
 					add_political_power = 100
+					custom_effect_tooltip = afr_prosperity_mechanic_add_3
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 3
+					}
 				}
 				8 = {
 					if = {
@@ -2539,9 +2835,19 @@ country_event = {###result of the raid
 								add_manpower = -500
 							}
 						}
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 2
+						}
 					}
 					else={
 						add_political_power = 50
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 2
+						}
 					}
 				}
 				6 = {
@@ -2571,18 +2877,38 @@ country_event = {###result of the raid
 							}
 						}
 						add_political_power = 100
+						custom_effect_tooltip = afr_prosperity_mechanic_add_3
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 3
+						}
 					}
 					else={
 						add_political_power = 250
+						custom_effect_tooltip = afr_prosperity_mechanic_add_3
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 3
+						}
 					}
 				}
 				5 = {
 					add_political_power = 250
 					army_experience = 15
+					custom_effect_tooltip = afr_prosperity_mechanic_add_5
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 5
+					}
 				}
 				1={
 					custom_effect_tooltip = EDC_BORDER_TRIBE_JOINS
 					add_to_variable={Tribal_army_num = 150}
+					custom_effect_tooltip = afr_prosperity_mechanic_add_5
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 5
+					}
 				}
 			}
 			
@@ -2619,9 +2945,19 @@ country_event = {###result of the raid
 								add_manpower = -200
 							}
 						}
+						custom_effect_tooltip = afr_prosperity_mechanic_add_1
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 1
+						}
 					}
 					else={
 						add_political_power = 20
+						custom_effect_tooltip = afr_prosperity_mechanic_add_1
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 1
+						}
 					}
 				}
 				20 = {
@@ -2650,17 +2986,37 @@ country_event = {###result of the raid
 								add_manpower = -400
 							}
 						}
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 1
+						}
 					}
 					else={
 						add_political_power = 25
+						custom_effect_tooltip = afr_prosperity_mechanic_add_2
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 1
+						}
 					}
 				}
 				12 = {
 					add_political_power = 200
+					custom_effect_tooltip = afr_prosperity_mechanic_add_3
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 3
+					}
 				}
 				7 = {#recruit border tribe
 					custom_effect_tooltip = EDC_BORDER_TRIBE_JOINS
 					add_to_variable={Tribal_army_num = 100}
+					custom_effect_tooltip = afr_prosperity_mechanic_add_3
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 3
+					}
 				}
 				8 = {
 					if = {
@@ -2689,20 +3045,44 @@ country_event = {###result of the raid
 							}
 						}
 						add_political_power = 100
+						custom_effect_tooltip = afr_prosperity_mechanic_add_3
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 3
+						}
 					}
 					else={
 						add_political_power = 250
+						custom_effect_tooltip = afr_prosperity_mechanic_add_3
+						add_to_variable = {
+							var = afr_prosperity_mechanic_value
+							value = 3
+						}
 					}
 				}
 				5 = {
 					army_experience = 25
+					custom_effect_tooltip = afr_prosperity_mechanic_add_3
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 3
+					}
 				}
 				2={
-				
+					custom_effect_tooltip = afr_prosperity_mechanic_add_5
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 5
+					}
 				}
 				1={
 					custom_effect_tooltip = EDC_BORDER_TRIBE_JOINS_LARGE
 					add_to_variable={Tribal_army_num = 200}
+					custom_effect_tooltip = afr_prosperity_mechanic_add_5
+					add_to_variable = {
+						var = afr_prosperity_mechanic_value
+						value = 5
+					}
 				}
 			}
 		}
@@ -2766,10 +3146,12 @@ country_event = {###we are being raided
 			set_country_flag = Sent_2600_troops_om_sortee
 		}
 		##10% chance to intercept
+		custom_effect_tooltip = EDC_afr_45_a_tooltip
 	}
 	option = {#we cannont afford to pursue every raider group
 		name = EDC_afr.45.b
 		##10% chance to intercept
+		custom_effect_tooltip = EDC_afr_45_b_tooltip
 	}
 	option = {#this means war!
 		name = EDC_afr.45.c
@@ -2802,14 +3184,286 @@ country_event = {###we are being invaded
 	
 	option = {#respond in force
 		name = EDC_afr.46.a
+		ai_chance = {
+			base = 1
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 1000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 2000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 2000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 3000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 3000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 4000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 4000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 6000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 5000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 7000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 6000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 9000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 7000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 10000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 8000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 12000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 9000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 13000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 10000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 15000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 15000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 20000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 20000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 25000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 25000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 30000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 30000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 37000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 37000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 44000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 40000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 50000
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0 
+				AND = {
+					ROOT = {
+						check_variable = {
+							Tribal_army_num < 50000
+						}
+					}
+					FROM = {
+						check_variable = {
+							Tribal_army_num > 60000
+						}
+					}
+				}
+			}
+		}
+		trigger = {
+			ROOT = {
+				check_variable = {
+					Tribal_army_num > 500
+				}
+			}
+		}
 		declare_war_on = {
 			target = FROM
 			type = take_state_focus
 		}
 		afr_call_warriors = yes
+		set_country_flag = Tribal_Army_Raised
 	}
 	option = {#let them
 		name = EDC_afr.46.b
+		ai_chance = {
+			base = 1
+		}
+		trigger = {
+			NOT = { TAG = SKT }
+		}
 		add_stability = -0.05
 		add_political_power = -25
 	}
@@ -2826,14 +3480,18 @@ country_event = {###ping for the scramble
 		name = EDC_afr.48.a
 		set_global_flag = scramble_for_africa
 		country_event={id = EDC_afr.42}
-		hidden_effect={
+		#hidden_effect={
 			every_country={
 				limit={
+					capital_scope = {is_on_continent = europe}
 					OR={
 						is_great_power = yes
 						is_secondary_power = yes
+						tag = BEL
+						tag = POR
+						tag = FRA
+						tag = ENG
 					}
-					capital_scope = {is_on_continent = europe}
 				}
 				set_country_flag = is_historical_colonial_power
 				if= {
@@ -2870,11 +3528,11 @@ country_event = {###ping for the scramble
 						}
 					}
 					set_technology = {
-						tech_humanities_colonialism = 1
+							tech_humanities_colonialism = 1
 					}
 				}
 			}
-		}
+		#}
 	}
 	mean_time_to_happen = {
 		days = 20
@@ -2945,8 +3603,13 @@ country_event = {###post war, lower tribal armies again
 		has_war = no
 	}
 	
+	mean_time_to_happen = {
+		days = 2
+	}
+	
 	option = {#Send the Men Home
 		name = EDC_afr.51.a
 		afr_dismiss_warriors = yes
+		clr_country_flag = Tribal_Army_Raised
 	}
 }

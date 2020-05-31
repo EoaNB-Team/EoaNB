@@ -7,7 +7,12 @@ tribal_decisions_eoanb = {
 			has_war_support > 0.25
 		}
 		visible = {
+			NOT = { has_country_flag = stockpile_tribal_weapons_flag }
 			OR = {
+				AND = {
+					TAG = SKT
+					afr_is_tribal = yes
+				}
 				has_idea = manpower_tribal_warriors
 				has_idea = manpower_tribal_every_tenth
 				has_idea = manpower_tribal_every_fifth
@@ -15,9 +20,9 @@ tribal_decisions_eoanb = {
 			}
 			num_of_military_factories < 1
 		}
-		days_re_enable = 120
+		days_re_enable = 90
 
-		cost = 100
+		cost = 80
 		fire_only_once = no
 		
 		custom_cost_trigger = {
@@ -62,6 +67,78 @@ tribal_decisions_eoanb = {
 			}
 		}
 	}
+	stockpile_tribal_weapons={
+		icon = generic_prepare_civil_war
+		
+		available = {
+			NOT = { has_idea = disarmed_nation }
+			has_war_support > 0.25
+			has_political_power > 100
+		}
+		visible = {
+			has_country_flag = stockpile_tribal_weapons_flag
+			OR = {
+				AND = {
+					TAG = ZUL
+					afr_is_tribal = yes
+				}
+				has_idea = manpower_tribal_warriors
+				has_idea = manpower_tribal_every_tenth
+				has_idea = manpower_tribal_every_fifth
+				has_idea = manpower_tribal_everyone
+			}
+			num_of_military_factories < 1
+		}
+		days_re_enable = 120
+
+		fire_only_once = no
+		
+		custom_cost_trigger = {
+			command_power > 99.9
+			has_political_power > 99.9
+		}
+		custom_cost_text = command_and_political_power_more_than_100
+		
+		complete_effect = {
+			hidden_effect = {
+				add_command_power = -100
+				add_political_power = -100
+			}
+			add_equipment_to_stockpile = {
+				type = tribal_weapons_0
+				amount = 500
+			}
+		}
+		ai_will_do = {
+			factor = 4
+			modifier = {
+				factor = 2
+				has_war_support > 0.5
+			}
+			modifier = {
+				factor = 100
+				has_equipment = {
+					tribal_weapons_0 < 10000
+				}
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 350
+				has_country_flag = afr_jihadist_tree
+				has_completed_focus = afr_jihadist_regional_power_expanding_our_regional_power
+				Oceania_one_extra_building_slots_supported_for_coast_trigger = yes
+				NOT = { has_completed_focus = afr_jihadist_regional_power_establish_port_town }
+			}
+			modifier = {
+				factor = 0
+				has_political_power < 350
+				has_country_flag = afr_traditional_tree
+				has_completed_focus = afr_inward_regional_power_expanding_our_regional_power
+				Oceania_one_extra_building_slots_supported_for_coast_trigger = yes
+				NOT = { has_completed_focus = afr_inward_regional_power_establish_port_town }
+			}
+		}
+	}
 	eoanb_decision_tribal_raise_warriors = {
 
 		icon = generic_political_discourse
@@ -71,7 +148,13 @@ tribal_decisions_eoanb = {
 		}
 
 		visible = {
-			afr_is_tribal = yes
+			OR = {
+				afr_is_tribal = yes
+				AND = {
+					has_cosmetic_tag = EGY_mahdist_insurgency
+					has_idea = afr_reforming_kingdom
+				}
+			}
 		}
 
 		custom_cost_trigger = {
@@ -98,14 +181,14 @@ tribal_decisions_eoanb = {
 			custom_effect_tooltip= EDC_add_100_to_tribal_army
 			add_to_variable = {Tribal_army_num = 100}
 		}
-		days_remove = 30
-		days_re_enable = 60
+		days_remove = 15
+		days_re_enable = 30
 
 		ai_will_do = {
-			base = 1
+			base = 1000
 			modifier = {
-				factor = 1000
-				has_manpower < 980
+				factor = 0
+				has_war = yes
 			}
 		}
 	}
@@ -118,13 +201,19 @@ tribal_decisions_eoanb = {
 		}
 
 		visible = {
-			afr_is_tribal = yes
+			OR = {
+				afr_is_tribal = yes
+				AND = {
+					has_cosmetic_tag = EGY_mahdist_insurgency
+					has_idea = afr_reforming_kingdom
+				}
+			}
 		}
 
 		custom_cost_trigger = {
 
 			command_power > 19.9
-			has_army_experience > 24
+			has_army_experience > 10
 
 		}
 		custom_cost_text = command_power_more_than_19_and_ae_more_than_49
@@ -134,7 +223,7 @@ tribal_decisions_eoanb = {
 		complete_effect={
 			hidden_effect={
 				add_command_power = -20
-				army_experience = -25
+				army_experience = -10
 			}
 			add_manpower = -1000
 		}
@@ -150,13 +239,13 @@ tribal_decisions_eoanb = {
 			add_to_variable = {Tribal_army_num = 1000}
 		}
 		days_remove = 30
-		days_re_enable = 60
+		days_re_enable = 120
 
 		ai_will_do = {
-			base = 1
+			base = 1000
 			modifier = {
-				factor = 1000
-				has_manpower > 1000
+				factor = 0
+				has_war = yes
 			}
 		}
 	}
@@ -167,6 +256,7 @@ unidustrialized_warfare = {
 		icon = generic_political_discourse
 
 		available = {
+			has_war = no
 			any_state = {
 				is_owned_and_controlled_by = FROM
 				any_neighbor_state = {
@@ -191,17 +281,27 @@ unidustrialized_warfare = {
 					is_fully_controlled_by = ROOT
 				}
 			}
-			NOT = { TAG = SKT }
+			NOT = { has_idea = afr_large_kingdom }
 			NOT = { TAG = ETH }
 		}
 		
 		target_trigger = {
-			FROM = {
-				is_neighbor_of = ROOT
-				afr_is_tribal = yes
+			if = {
+				limit = { has_idea = WDD_KBO_TRUCE }
+				FROM = {
+					is_neighbor_of = ROOT
+					NOT = { has_idea = WDD_KBO_TRUCE }
+					afr_is_tribal = yes
+				}
+			}
+			else = {
+				FROM = {
+					is_neighbor_of = ROOT
+					afr_is_tribal = yes
+				}
 			}
 			NOT = {
-				is_puppet_of= ROOT
+				is_subject_of = ROOT
 			}
 		}
 		days_remove = 30
@@ -227,6 +327,38 @@ unidustrialized_warfare = {
 
 		ai_will_do = {
 			base = 1
+			modifier = {
+				factor = 0 
+				ROOT = {
+					has_opinion = {
+						target = FROM
+						value > 45
+					}
+				}
+			}
+			modifier = {
+				factor = 10 
+				ROOT = {
+					has_opinion = {
+						target = FROM
+						value < -40
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				AND = {
+					TAG = FTT
+					date < 1861.01.01
+				}
+			}
+			modifier = {
+				factor = 0
+				AND = {
+					TAG = BAB
+					date < 1861.01.01
+				}
+			}
 		}
 	}
 	
@@ -236,8 +368,8 @@ unidustrialized_warfare = {
 
 		available = {
 			custom_trigger_tooltip={
-				check_variable = { Tribal_army_num > 499 }
-				tooltip = EDC_Tribal_Army_over_500
+				check_variable = { Tribal_army_num > 999 }
+				tooltip = EDC_Tribal_Army_over_1000
 			}
 			has_war = yes
 			NOT={has_country_flag = Tribal_Army_Raised}
@@ -247,7 +379,7 @@ unidustrialized_warfare = {
 		}
 		
 		fire_only_once = no
-		cost = 0
+		#cost = 0
 		
 		complete_effect = {
 			set_country_flag = Tribal_Army_Raised
@@ -255,10 +387,10 @@ unidustrialized_warfare = {
 		}
 
 		ai_will_do = {
-			base = 1
+			base = 1000
 			modifier = {
-				factor = 1000
-				has_war = yes
+				factor = 10
+				ROOT = { has_war = yes }
 			}
 		}
 	}
@@ -306,7 +438,7 @@ political_actions = {
 				is_neighbor_of = ROOT
 			}
 			NOT = {
-				is_puppet_of= ROOT
+				is_subject_of = ROOT
 			}
 		}
 
@@ -345,9 +477,9 @@ political_actions = {
 			industrial_capacity_factory = -0.05
 		}
 		
-		fire_only_once = yes
+		#fire_only_once = yes
 
-		cost = 10
+		cost = 25
 
 		remove_effect = {
 			custom_effect_tooltip = EGY_afr_decrease_debt_1
@@ -355,7 +487,7 @@ political_actions = {
 				subtract_from_variable = {var = debt_level value = 1}
 			}
 		}
-		days_remove = 120
+		days_remove = 200
 		days_re_enable = 360
 
 		ai_will_do = {
@@ -504,12 +636,10 @@ afr_rrp_african_expeditions={
 				exists = yes
 				afr_is_tribal = yes
 				NOT ={
-					is_puppet = yes
+					is_subject = yes
 				}
 				any_neighbor_country={
-					OVERLORD={
-						tag = OMA
-					}
+					is_subject_of = OMA
 				}
 				any_owned_state={
 					OR={
@@ -750,22 +880,22 @@ afr_sa_unifaction = {
 			TRV={
 				OR={
 					exists = no
-					is_puppet_of = ENG
-					is_puppet_of = SAF
+					is_subject_of = ENG
+					is_subject_of = SAF
 				}
 			}
 			OFS={
 				OR={
 					exists = no
-					is_puppet_of = ENG
-					is_puppet_of = SAF
+					is_subject_of = ENG
+					is_subject_of = SAF
 				}
 			}
 			NAT={
 				OR={
 					exists = no
-					is_puppet_of = ENG
-					is_puppet_of = SAF
+					is_subject_of = ENG
+					is_subject_of = SAF
 				}
 			}
 			has_country_flag = dreams_of_SAF

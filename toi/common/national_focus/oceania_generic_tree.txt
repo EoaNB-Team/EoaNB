@@ -14,6 +14,8 @@ focus_tree = {
 				tag = CAM
 				tag = VIN
 				tag = LAN
+				tag = MDN
+				tag = RYU
 			}
 		}
 	}
@@ -169,6 +171,7 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
 		}
 		x = 4
 		y = 1
@@ -216,7 +219,14 @@ focus_tree = {
 		x = 4
 		y = 2
 		completion_reward = {
-			swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_2 }
+			if = {
+				limit = { has_idea = AF_T_idea_trading_nation }
+				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_2 }
+			}
+			else = {
+				add_ideas = AF_T_idea_trading_nation_2
+				custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
+			}
 			add_ideas = export_focus
 			custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
 			custom_effect_tooltip = EDC_afr.5.t
@@ -289,6 +299,8 @@ focus_tree = {
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = ACE }
 		}
 	}
@@ -477,6 +489,8 @@ focus_tree = {
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = ACE }
 		}
 	}
@@ -618,7 +632,8 @@ focus_tree = {
 		x = 2
 		y = 4
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = wood amount = 2 }
 			}
 			custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
@@ -629,6 +644,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -659,6 +676,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -684,7 +703,8 @@ focus_tree = {
 		x = 2
 		y = 6
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = cotton amount = 4 }
 			}
 		}
@@ -771,6 +791,8 @@ focus_tree = {
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = ACE }
 		}
 	}
@@ -969,6 +991,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -985,6 +1009,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -1038,6 +1064,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -1183,6 +1211,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -1195,11 +1225,45 @@ focus_tree = {
 		x = 4
 		y = 5
 		completion_reward = {
-			capital_scope = {
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
 			}
 			custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
@@ -1351,18 +1415,6 @@ focus_tree = {
 		icon = GFX_goal_focus_french_algeria_citizenship
 		cost = 75
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = Oceania_industrisation_progress_greater_than_45
-				check_variable = {ROOT.industrisation_progress > 44}
-			}
-			FRA = {
-				has_country_flag = FRA_has_colonial_ambitions
-			}
-			CCH = {
-				is_subject_of = FRA
-				exists = yes
-			}
-			is_subject = no
 			if = {
 				limit = {
 					OR = {
@@ -1375,6 +1427,18 @@ focus_tree = {
 				}
 				has_country_flag = Oceania_generic_disavow_treaty
 			}
+			custom_trigger_tooltip = {
+				tooltip = Oceania_industrisation_progress_greater_than_45
+				check_variable = {ROOT.industrisation_progress > 44}
+			}
+			FRA = {
+				has_country_flag = FRA_has_colonial_ambitions
+			}
+			CCH = {
+				is_subject_of = FRA
+				exists = yes
+			}
+			is_subject = no
 		}
 		mutually_exclusive = {
 			focus = Oceania_generic_invite_foreign_investors
@@ -1407,6 +1471,8 @@ focus_tree = {
 			factor = 1
 		}
 		allow_branch = {
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = LAN }
 			NOT = { TAG = VIN }
 		}
@@ -1433,6 +1499,8 @@ focus_tree = {
 			load_focus_tree = afr_colony_generic_1
 		}
 		allow_branch = {
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = LAN }
 			NOT = { TAG = VIN }
 		}
@@ -1491,6 +1559,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = VIN }
@@ -1520,6 +1590,8 @@ focus_tree = {
 		}
 		allow_branch = {
 			NOT = { TAG = LAN }
+			NOT = { tag = MDN }
+			NOT = { tag = RYU }
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = VIN }
@@ -1531,18 +1603,6 @@ focus_tree = {
 		icon = GFX_goal_focus_ally_CHI
 		cost = 75
 		available = {
-			if = {
-				limit = {
-					OR = {
-						TAG = ACE
-						TAG = SAM
-						TAG = BUN
-						TAG = BRU
-						TAG = JOH
-					}
-				}
-				has_country_flag = Oceania_generic_disavow_treaty
-			}
 			CHI = {
 				custom_trigger_tooltip = {
 					tooltip = Oceania_is_eastern_oriented_nation_tooltip
@@ -1623,6 +1683,8 @@ focus_tree = {
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = ACE }
+			NOT = { TAG = MDN }
+			NOT = { tag = RYU }
 		}
 	}
 	focus = {
@@ -1630,18 +1692,6 @@ focus_tree = {
 		icon = GFX_goal_focus_ally_CHI
 		cost = 75
 		available = {
-			if = {
-				limit = {
-					OR = {
-						TAG = ACE
-						TAG = SAM
-						TAG = BUN
-						TAG = BRU
-						TAG = JOH
-					}
-				}
-				has_country_flag = Oceania_generic_disavow_treaty
-			}
 			CHI = {
 				custom_trigger_tooltip = {
 					tooltip = Oceania_is_eastern_oriented_nation_tooltip
@@ -1728,18 +1778,6 @@ focus_tree = {
 		icon = GFX_goal_focus_ally_CHI
 		cost = 75
 		available = {
-			if = {
-				limit = {
-					OR = {
-						TAG = ACE
-						TAG = SAM
-						TAG = BUN
-						TAG = BRU
-						TAG = JOH
-					}
-				}
-				has_country_flag = Oceania_generic_disavow_treaty
-			}
 			CHI = {
 				custom_trigger_tooltip = {
 					tooltip = Oceania_is_eastern_oriented_nation_tooltip
@@ -1796,6 +1834,102 @@ focus_tree = {
 	}
 	
 	focus = {
+		id = Oceania_generic_chinese_merchants_maguindanao
+		icon = GFX_goal_focus_ally_CHI
+		cost = 75
+		available = {
+			CHI = {
+				custom_trigger_tooltip = {
+					tooltip = Oceania_is_eastern_oriented_nation_tooltip
+				}
+			}
+		}
+		prerequisite = {
+			focus = Oceania_generic_limited_trade
+			focus = Oceania_generic_open_trading_post
+		}
+		mutually_exclusive = {
+			focus = Oceania_generic_pursue_isolationist_policy_maguindanao
+		}
+		x = 12
+		y = 3
+		completion_reward = {
+			hidden_effect = {
+				add_opinion_modifier = { target = CHI modifier = eoanb_om_africa_trade_focus }
+				reverse_add_opinion_modifier = { target = CHI modifier = eoanb_om_africa_trade_focus }
+			}
+			custom_effect_tooltip = Oceania_merchant_adopted_china
+			set_country_flag = Oceania_generic_qing_merchants
+			CHI = { country_event = { id = oceania_trading_partner.2 } }
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_1
+			
+			hidden_effect = {
+				country_event = {id = afr_rrp_racial_tension_increase.1}
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				TAG = MDN
+				is_historical_focus_on = yes
+			}
+		}
+		allow_branch = {
+			TAG = MDN
+		}
+	}
+	
+	focus = {
+		id = Oceania_generic_chinese_merchants_ryukyu
+		icon = GFX_goal_focus_ally_CHI
+		cost = 75
+		available = {
+			CHI = {
+				custom_trigger_tooltip = {
+					tooltip = Oceania_is_eastern_oriented_nation_tooltip
+				}
+			}
+		}
+		prerequisite = {
+			focus = Oceania_generic_limited_trade
+			focus = Oceania_generic_open_trading_post
+		}
+		mutually_exclusive = {
+			focus = Oceania_generic_pursue_isolationist_policy_ryukyu
+		}
+		x = 12
+		y = 3
+		completion_reward = {
+			hidden_effect = {
+				add_opinion_modifier = { target = CHI modifier = eoanb_om_africa_trade_focus }
+				reverse_add_opinion_modifier = { target = CHI modifier = eoanb_om_africa_trade_focus }
+			}
+			custom_effect_tooltip = Oceania_merchant_adopted_china
+			set_country_flag = Oceania_generic_qing_merchants
+			CHI = { country_event = { id = oceania_trading_partner.2 } }
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			custom_effect_tooltip = AFR_Racial_Tension_plus_1
+			
+			hidden_effect = {
+				country_event = {id = afr_rrp_racial_tension_increase.1}
+			}
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 0
+				TAG = RYU
+				is_historical_focus_on = yes
+			}
+		}
+		allow_branch = {
+			TAG = RYU
+		}
+	}
+	
+	focus = {
 		id = Oceania_generic_chinese_mining_practices
 		icon = GFX_goal_focus_coal_mines
 		cost = 75
@@ -1803,11 +1937,14 @@ focus_tree = {
 			focus = Oceania_generic_chinese_merchants
 			focus = Oceania_generic_chinese_merchants_dutch
 			focus = Oceania_generic_chinese_merchants_ottoman
+			focus = Oceania_generic_chinese_merchants_maguindanao
+			focus = Oceania_generic_chinese_merchants_ryukyu
 		}
 		x = 12
 		y = 4
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = iron amount = 2 }
 			}
 			custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
@@ -1892,6 +2029,10 @@ focus_tree = {
 				}
 				has_country_flag = Oceania_generic_disavow_treaty
 			}
+			if = {
+				limit = { TAG = RYU }
+				has_country_flag = Oceania_ryukyuan_satsuma_loyalty_broken_flag
+			}
 		}
 		prerequisite = {
 			focus = Oceania_generic_chinese_mining_practices
@@ -1929,9 +2070,9 @@ focus_tree = {
 		y = 6
 		completion_reward = {
 			set_country_flag = Oceania_generic_chinese_military_advisors
-			hidden_effect = { add_ideas = { Oceania_xiang_ling } }
+			#hidden_effect = { add_ideas = { Oceania_xiang_ling } }
 			custom_effect_tooltip = available_political_advisor
-			show_ideas_tooltip = Oceania_xiang_ling
+			#show_ideas_tooltip = Oceania_xiang_ling
 			custom_effect_tooltip = afr_colonial_effect_tooltip
 			custom_effect_tooltip = AFR_Racial_Tension_plus_1
 			
@@ -2011,6 +2152,12 @@ focus_tree = {
 		id = Oceania_generic_chinese_logging_industry
 		icon = GFX_focus_back_to_basics
 		cost = 75
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				Oceania_one_extra_building_slots_supported_trigger = yes
+			}
+		}
 		prerequisite = {
 			focus = Oceania_generic_limit_chinese_influence
 			focus = Oceania_generic_chinese_administrators
@@ -2018,7 +2165,15 @@ focus_tree = {
 		x = 13
 		y = 6
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+					NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = logging_camp
@@ -2056,11 +2211,45 @@ focus_tree = {
 				}
 				set_technology = { tech_humanities_mercantilism = 1 }
 			}
-			capital_scope = {
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
 			}
 		}
@@ -2169,7 +2358,8 @@ focus_tree = {
 		y = 4
 		completion_reward = {
 			
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = oil amount = 4 }
 			}
 			if = {
@@ -2306,6 +2496,7 @@ focus_tree = {
 			}
 			add_stability = 0.10
 			set_country_flag = ACE_OTO_alliance
+			#guarantee event to assist aceh in dutch war
 		}
 		allow_branch = {
 			TAG = ACE
@@ -2324,11 +2515,51 @@ focus_tree = {
 					has_idea = Oceania_western_oriented_regional_power
 				}
 			}
+			OTO = { has_completed_focus = OTO_vic_traditional_ideals }
 		}
 		prerequisite = {
 			focus = Oceania_generic_become_ottoman_ally
 		}
-		x = 16
+		mutually_exclusive = {
+			focus = Oceania_generic_future_with_ottoman_empire
+		}
+		x = 15
+		y = 8
+		completion_reward = {
+			load_focus_tree = generic
+			OTO={
+				set_autonomy = {
+					target = ACE
+					autonomous_state = autonomy_khedive
+					freedom_level = 0.7
+				}
+			}
+		}
+		allow_branch = {
+			TAG = ACE
+		}
+	}
+	
+	focus = {
+		id = Oceania_generic_future_with_ottoman_empire
+		icon = GFX_goal_SWE_unity
+		cost = 75
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = Oceania_generic_regional_power		
+				OR = {
+					has_idea = Oceania_eastern_oriented_regional_power
+					has_idea = Oceania_western_oriented_regional_power
+				}
+			}
+		}
+		prerequisite = {
+			focus = Oceania_generic_become_ottoman_ally
+		}
+		mutually_exclusive = {
+			focus = Oceania_generic_become_ottoman_khedivate
+		}
+		x = 17
 		y = 8
 		completion_reward = {
 			load_focus_tree = generic
@@ -2443,7 +2674,8 @@ focus_tree = {
 		y = 4
 		completion_reward = {
 			
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = cotton amount = 6 }
 			}
 		}
@@ -2488,12 +2720,47 @@ focus_tree = {
 		x = 17
 		y = 5
 		completion_reward = {
-			capital_scope = {
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
 			}
 			if = {
@@ -2662,6 +2929,18 @@ focus_tree = {
 			hidden_effect = {
 				add_ideas = border_control
 			}
+			if = {
+				limit = {
+					OR = {
+						TAG = ACE
+						TAG = SAM
+						TAG = BUN
+						TAG = BRU
+						TAG = JOH
+					}
+				}
+				complete_national_focus = Oceania_generic_disavow_treaty
+			}
 		}
 		ai_will_do = {
 			factor = 1
@@ -2828,6 +3107,64 @@ focus_tree = {
 	}
 	
 	focus = {
+		id = Oceania_generic_pursue_isolationist_policy_maguindanao
+		icon = GFX_idea_isolation
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = Oceania_generic_limited_trade
+		}
+		mutually_exclusive = {
+			focus = Oceania_generic_chinese_merchants_maguindanao
+		}
+		x = 20
+		y = 3
+		completion_reward = {
+			custom_effect_tooltip = Oceania_generic_pursue_isolationist_policy_tooltip
+			add_ideas = closed_economy
+			hidden_effect = { add_ideas = closed_borders }
+			set_country_flag = Oceania_generic_pursue_isolationist_policy
+		}
+		allow_branch = {
+			TAG = MDN
+		}
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
+		id = Oceania_generic_pursue_isolationist_policy_ryukyu
+		icon = GFX_idea_isolation
+		cost = 75
+		available = {
+			
+		}
+		prerequisite = {
+			focus = Oceania_generic_limited_trade
+		}
+		mutually_exclusive = {
+			focus = Oceania_generic_chinese_merchants_ryukyu
+		}
+		x = 20
+		y = 3
+		completion_reward = {
+			custom_effect_tooltip = Oceania_generic_pursue_isolationist_policy_tooltip
+			add_ideas = closed_economy
+			hidden_effect = { add_ideas = closed_borders }
+			set_country_flag = Oceania_generic_pursue_isolationist_policy
+		}
+		allow_branch = {
+			TAG = RYU
+		}
+		ai_will_do = { 
+			factor = 1
+		}
+	}
+	
+	focus = {
 		id = Oceania_generic_pursue_isolationist_policy
 		icon = GFX_idea_isolation
 		cost = 75
@@ -2866,6 +3203,8 @@ focus_tree = {
 			NOT = { TAG = SAM }
 			NOT = { TAG = BUN }
 			NOT = { TAG = LAN }
+			NOT = { TAG = MDN }
+			NOT = { TAG = RYU }
 			NOT = { TAG = ACE }
 		}
 		ai_will_do = { 
@@ -2927,12 +3266,18 @@ focus_tree = {
 			focus = Oceania_generic_pursue_isolationist_policy
 			focus = Oceania_generic_pursue_isolationist_policy_dutch
 			focus = Oceania_generic_pursue_isolationist_policy_ottoman
+			focus = Oceania_generic_pursue_isolationist_policy_maguindanao
+			focus = Oceania_generic_pursue_isolationist_policy_ryukyu
 		}
 		x = 20
 		y = 4
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = wood amount = 2 }
+			}
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT NOT = { has_state_flag = Oceania_historically_colonized_land  } }
 				add_resource = { type = iron amount = 2 }
 			}
 		}
@@ -3014,6 +3359,10 @@ focus_tree = {
 				tooltip = Oceania_industrisation_progress_greater_than_25
 				check_variable = {ROOT.industrisation_progress > 24}
 			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				Oceania_one_extra_building_slots_supported_trigger = yes
+			}
 		}
 		prerequisite = {
 			focus = Oceania_generic_isolationist_promote_our_national_agenda
@@ -3021,7 +3370,15 @@ focus_tree = {
 		x = 20
 		y = 6
 		completion_reward = {
-			capital_scope = {
+			random_owned_controlled_state ={
+				limit = {
+					is_core_of = ROOT 
+					NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
 				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
 					type = arms_factory
@@ -3156,7 +3513,7 @@ focus_tree = {
 			}
 		}
 		allow_branch = {
-			always = yes
+			NOT = { TAG = RYU }
 		}
 	}
 	
@@ -3164,6 +3521,9 @@ focus_tree = {
 		id = Oceania_generic_trade_with_ryukyu
 		icon = GFX_focus_jap_spiritual_mobilization
 		cost = 75
+		available = {
+			RYU = { has_country_flag = Oceania_ryukyuan_trade_expanded_flag }
+		}
 		prerequisite = {
 			focus = Oceania_generic_limited_trade
 			focus = Oceania_generic_open_trading_post
@@ -3194,7 +3554,39 @@ focus_tree = {
 			}
 		}
 		allow_branch = {
-			always = yes
+			NOT = { TAG = RYU }
+		}
+	}
+	
+	focus = {
+		id = Oceania_generic_establish_ryukyuan_trade
+		icon = GFX_focus_jap_spiritual_mobilization
+		cost = 75
+		prerequisite = {
+			focus = Oceania_generic_limited_trade
+			focus = Oceania_generic_open_trading_post
+		}
+		x = 23
+		y = 4
+		completion_reward = {
+			custom_effect_tooltip = Oceania_establish_ryukyuan_trade_tooltip
+			set_country_flag = Oceania_ryukyuan_trade_expanded_flag
+		}
+		ai_will_do = {
+			factor = 1
+			modifier = {
+				factor = 10
+				date > 1857.1.1
+			}
+			modifier = {
+				factor = 1000
+				RYU = {
+					has_idea = RYU_ryukyu_treaty
+				}
+			}
+		}
+		allow_branch = {
+			TAG = RYU
 		}
 	}
 	
@@ -3286,6 +3678,12 @@ focus_tree = {
 				}
 			}
 			add_stability = -0.05
+			#add_ai_strategy = {
+			#	type = build_building
+			#	id = infrastructure
+			#	target = capital_scope
+			#	value = 200
+			#}
 		}
 		allow_branch = {
 
@@ -3311,7 +3709,15 @@ focus_tree = {
 		}
 		completion_reward = {
 			if = {
-				limit = { has_idea = Oceania_large_kingdom }
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 2
+						}
+					}
+				}
 				capital_scope = {
 					add_building_construction = {
 						type = infrastructure
@@ -3320,11 +3726,236 @@ focus_tree = {
 					}
 				}
 			}
-			else = {
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 3
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
 				capital_scope = {
 					add_building_construction = {
 						type = infrastructure
 						level = 2
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 2
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			
+			
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 2
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
 						instant_build = yes
 					}
 				}
@@ -3350,6 +3981,17 @@ focus_tree = {
 				tooltip = Oceania_industrisation_progress_greater_than_35
 				check_variable = {ROOT.industrisation_progress > 34}
 			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				if = {
+					limit = { has_idea = Oceania_large_kingdom }
+					Oceania_two_extra_building_slots_supported_trigger = yes
+				}
+				if = {
+					limit = { has_idea = Oceania_small_kingdom }
+					Oceania_one_extra_building_slots_supported_trigger = yes
+				}
+			}
 		}
 		x = 2
 		y = 13
@@ -3359,17 +4001,49 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = { has_idea = Oceania_large_kingdom }
-				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = industrial_complex
-						level = 2
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = industrial_complex
+						level = 1
 						instant_build = yes
 					}
 				}
 			}
 			else = {
-				capital_scope = {
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
 					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = industrial_complex
@@ -3440,6 +4114,12 @@ focus_tree = {
 					remove_idea = no_constitution
 				}
 			}
+			#add_ai_strategy = {
+			#	type = build_building
+			#	id = infrastructure
+			#	target = capital_scope
+			#	value = 200
+			#}
 			add_stability = 0.05
 		}
 		allow_branch = {
@@ -3465,7 +4145,15 @@ focus_tree = {
 		}
 		completion_reward = {
 			if = {
-				limit = { has_idea = Oceania_large_kingdom }
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
 				capital_scope = {
 					add_building_construction = {
 						type = infrastructure
@@ -3474,8 +4162,119 @@ focus_tree = {
 					}
 				}
 			}
-			else = {
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 2
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
 				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			
+			
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
 					add_building_construction = {
 						type = infrastructure
 						level = 1
@@ -3502,6 +4301,17 @@ focus_tree = {
 				tooltip = Oceania_industrisation_progress_greater_than_35
 				check_variable = {ROOT.industrisation_progress > 34}
 			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				if = {
+					limit = { has_idea = Oceania_large_kingdom }
+					Oceania_two_extra_building_slots_supported_trigger = yes
+				}
+				if = {
+					limit = { has_idea = Oceania_small_kingdom }
+					Oceania_one_extra_building_slots_supported_trigger = yes
+				}
+			}
 		}
 		x = 10
 		y = 13
@@ -3511,17 +4321,49 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = { has_idea = Oceania_large_kingdom }
-				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = industrial_complex
-						level = 2
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = industrial_complex
+						level = 1
 						instant_build = yes
 					}
 				}
 			}
 			else = {
-				capital_scope = {
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
 					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = industrial_complex
@@ -3551,21 +4393,150 @@ focus_tree = {
 			}
 		}
 		x = 6
-		y = 12
+		y = 13
 		prerequisite = {
-			focus = Oceania_generic_western_domestic_policies
-			focus = Oceania_generic_traditional_domestic_policies
+			focus = Oceania_generic_grow_more_food
+		}
+		prerequisite = {
+			focus = Oceania_generic_expand_cotton_plantation
 		}
 		completion_reward = {
 			if = {
-				limit = { has_idea = Oceania_large_kingdom }
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
 				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
 				}
 			}
-			else = {
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 2
+						}
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
 				capital_scope = {
-					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_idea = Oceania_large_kingdom
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			
+			
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					NOT = { has_idea = Oceania_large_kingdom }
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
 			}
 		}
@@ -3585,24 +4556,45 @@ focus_tree = {
 			}
 		}
 		x = 5
-		y = 13
+		y = 12
 		prerequisite = {
-			focus = Oceania_generic_plan_for_new_cities
+			focus = Oceania_generic_western_domestic_policies
+			focus = Oceania_generic_traditional_domestic_policies
 		}
 		completion_reward = {
 			if = {
 				limit = { has_idea = Oceania_large_kingdom }
-				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = cotton_farm
-						level = 2
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = cotton_farm
+						level = 1
 						instant_build = yes
 					}
 				}
 			}
 			else = {
-				capital_scope = {
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
 					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = cotton_farm
@@ -3632,28 +4624,73 @@ focus_tree = {
 			}
 		}
 		x = 7
-		y = 13
+		y = 12
 		prerequisite = {
-			focus = Oceania_generic_plan_for_new_cities
+			focus = Oceania_generic_western_domestic_policies
+			focus = Oceania_generic_traditional_domestic_policies
 		}
 		completion_reward = {
 			if = {
 				limit = { has_idea = Oceania_large_kingdom }
-				capital_scope = {
-					add_extra_state_shared_building_slots = 3
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = farm
-						level = 3
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = farm
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = farm
+						level = 1
 						instant_build = yes
 					}
 				}
 			}
 			else = {
-				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = farm
-						level = 2
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = farm
+						level = 1
 						instant_build = yes
 					}
 				}
@@ -3677,29 +4714,70 @@ focus_tree = {
 				tooltip = Oceania_industrisation_progress_greater_than_45
 				check_variable = {ROOT.industrisation_progress > 44}
 			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				if = {
+					limit = { has_idea = Oceania_large_kingdom }
+					Oceania_three_extra_building_slots_supported_trigger = yes
+				}
+				if = {
+					limit = { has_idea = Oceania_small_kingdom }
+					Oceania_two_extra_building_slots_supported_trigger = yes
+				}
+			}
 		}
 		x = 6
 		y = 14
 		prerequisite = {
 			focus = Oceania_generic_modern_cities
 			focus = Oceania_generic_introduce_industrial_centers
-		}
-		prerequisite = {
-			focus = Oceania_generic_expand_cotton_plantation
-		}
-		prerequisite = {
-			focus = Oceania_generic_grow_more_food
+			focus = Oceania_generic_plan_for_new_cities
 		}
 		completion_reward = {
 			if = {
 				limit = { has_idea = Oceania_large_kingdom }
-				capital_scope = {
-					add_extra_state_shared_building_slots = 3
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land  }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = arms_factory
-						level = 2
+						level = 1
 						instant_build = yes
 					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = arms_factory
+						level = 1
+						instant_build = yes
+					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = fabric_weavery
 						level = 1
@@ -3722,13 +4800,32 @@ focus_tree = {
 					has_idea = Oceania_small_kingdom
 					NOT = { has_country_flag = Oceania_generic_pursue_isolationist_policy }
 				}
-				capital_scope = {
-					add_extra_state_shared_building_slots = 2
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = arms_factory
 						level = 1
 						instant_build = yes
 					}
+				}
+				random_owned_controlled_state ={
+					limit = {
+						is_core_of = ROOT 
+						NOT = { has_state_flag = Oceania_historically_colonized_land }
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+					}
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
 					add_building_construction = {
 						type = fabric_weavery
 						level = 1
@@ -3783,6 +4880,7 @@ focus_tree = {
 				remove_idea = Oceania_small_kingdom
 				add_idea = Oceania_large_kingdom
 			}
+			add_research_slot = 1
 		}
 		bypass = {
 			has_idea = Oceania_large_kingdom
@@ -3861,6 +4959,13 @@ focus_tree = {
 			if = {
 				limit = { has_idea = law_army_tribal_basic }
 				custom_trigger_tooltip = {
+					tooltip = Oceania_industrisation_progress_greater_than_15
+					check_variable = {ROOT.industrisation_progress > 14}
+				}
+			}
+			if = {
+				limit = { has_idea = law_army_tribal_improved }
+				custom_trigger_tooltip = {
 					tooltip = Oceania_industrisation_progress_greater_than_10
 					check_variable = {ROOT.industrisation_progress > 9}
 				}
@@ -3876,28 +4981,25 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = { has_idea = law_army_tribal_basic }
-				swap_ideas = {
-					remove_idea = law_army_tribal_basic
-					add_idea = law_pre_industrial_army
-				}
 				army_experience = 5
 			}
 			if = {
-				limit = { has_idea = law_army_tribal_advanced }
-				swap_ideas = {
-					remove_idea = law_army_tribal_advanced
-					add_idea = law_pre_industrial_army
-				}
+				limit = { has_idea = law_army_tribal_improved }
 				army_experience = 10
+			}
+			if = {
+				limit = { has_idea = law_army_tribal_advanced }
+				army_experience = 15
 			}
 			if = {
 				limit = { 
 					AND = {
 						NOT = { has_idea = law_army_tribal_advanced }
+						NOT = { has_idea = law_army_tribal_improved }
 						NOT = { has_idea = law_army_tribal_basic }					
 					}
 				}
-				army_experience = 15
+				army_experience = 20
 			}
 			
 		}

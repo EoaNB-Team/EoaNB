@@ -189,7 +189,7 @@ country_event = {
 	option = { #agree
 		name = afr_EGY_vic.4.a
 		ai_chance = { 
-			factor = 75 
+			factor = 100 
 			#modifier = {
 			#	add = 25
 			#	has_completed_focus = 
@@ -271,6 +271,7 @@ country_event = {
 		ETH = {
 			set_country_flag = ETH_EGY_ALZ_alliance
 		}
+		EGY = { add_to_faction = ALZ }
 	}
 	
 	option = {#refuse
@@ -629,8 +630,8 @@ country_event = {
 	option = {#pay our debt
 		name = afr_EGY_vic.10.b
 		ai_chance = { factor = 25 }
-		custom_effect_tooltip = EGY_afr_decrease_debt_1
-		subtract_from_variable = {var = debt_level value = 1}
+		custom_effect_tooltip = EGY_afr_decrease_debt_2
+		subtract_from_variable = {var = debt_level value = 2}
 	}
 }
 
@@ -643,7 +644,17 @@ country_event = { #ENG- EGY is collapsing due to debt, should we move in?
 		tag = ENG
 		EGY={
 			has_idea = egy_vic_debt
-			check_variable = {ROOT.debt_level > 24}
+			OR={
+				AND={
+					date > 1878.1.1
+					check_variable = {ROOT.debt_level > 24}
+				}
+				AND={
+					date > 1874.1.1
+					check_variable = {ROOT.debt_level > 29}
+				}
+				check_variable = {ROOT.debt_level > 34}
+			}
 		}
 	}
 		
@@ -698,7 +709,7 @@ country_event = { #EGY - FRA and ENG are seizing control of our country, what do
 		if={
 			limit ={
 				FROM={
-					tag = FRA
+					has_country_flag = FRA_assists_ENG_in_EGY
 				}
 			}
 			add_ideas={
@@ -719,6 +730,7 @@ country_event = { #FRA- EGY is collapsing due to debt, ENG is moving in, should 
 		ai_chance = { factor = 95 }
 		custom_effect_tooltip = FRA_help_ENG_attempt_seize_EGY
 		add_manpower = -1000
+		set_country_flag = FRA_assists_ENG_in_EGY
 		hidden_effect={
 			EGY={
 				country_event={id=afr_EGY_vic.12}
@@ -742,11 +754,6 @@ country_event = { #ENG - EGY submits
 	desc = afr_EGY_vic.14.d 
 	
 	is_triggered_only = yes
-	immediate={
-		ENG={
-			country_event={id=afr_EGY_vic.15 days = 100 random = 260}#conflict with france over EGY
-		}
-	}
 		
 	option = {#great
 		name = afr_EGY_vic.14.a
@@ -754,30 +761,28 @@ country_event = { #ENG - EGY submits
 		add_political_power = 50
 	}
 }
-country_event = { #ENG - friction with FRA over EGY administration
+country_event = { #EGY - establishment of the dual control
 	id = afr_EGY_vic.15
 	title = afr_EGY_vic.15.t
 	desc = afr_EGY_vic.15.d 
 	
-	is_triggered_only = yes
+	trigger={
+		date > 1876.11.5
+		has_idea = EGY_ENG_controlled_government
+		has_idea = EGY_FRA_controlled_government
+	}
+	mean_time_to_happen={
+		days = 2
+	}
 		
-	option = {#fully take over
+	option = {#damn
 		name = afr_EGY_vic.15.a
-		ai_chance = { factor = 50 }
-		
-	}
-	option = {#leave it to france
-		name = afr_EGY_vic.15.b
-		ai_chance = { factor = 25 }
-		trigger ={
-		
+		ai_chance = { factor = 100 }
+		remove_ideas ={
+			EGY_ENG_controlled_government
+			EGY_FRA_controlled_government
 		}
-		
-	}
-	option = {#attempt to smooth relations
-		name = afr_EGY_vic.15.c
-		ai_chance = { factor = 25 }
-		
+		add_ideas={EGY_dual_control}
 	}
 }
 country_event = { #OTO - due to EGY independance, lose hold on AWS and HRR
@@ -1006,11 +1011,13 @@ country_event = { #ENG - a plan to stop EGY using forced labour on the suez
 	is_triggered_only = yes
 	
 	immediate={
-		set_country_flag = EGY_corvee_suez
+		set_country_flag = EGY_corvee_suez_disabled
 	}
 	
 	option = {#pressure the Egyptian government
 		name = afr_EGY_vic.21.a
+		add_political_power = -50
+		EGY={country_event={id = afr_EGY_vic.25 days = 2}}
 	}
 	option = {#Incite the Egyptian Bedouins to revolt
 		name = afr_EGY_vic.21.b
@@ -1107,5 +1114,96 @@ country_event = { # FRA Offer to invest in the suez project
 	option = {#no
 		name = afr_EGY_vic.24.b
 		ai_chance = { factor = 70 }
+	}
+}
+
+country_event = { #EGY - ENG pressures our government to stop the corvee system
+	id = afr_EGY_vic.25
+	title = afr_EGY_vic.25.t
+	desc = afr_EGY_vic.25.d 
+	
+	is_triggered_only = yes
+	
+	option = {#submit
+		name = afr_EGY_vic.25.a
+		set_country_flag= EGY_corvee_suez_disabled
+	}
+	option = {#refused
+		name = afr_EGY_vic.25.b
+	}
+}
+
+country_event = { # ETH - EGY offers shares in the suez canal
+	id = afr_EGY_vic.26
+	title = afr_EGY_vic.26.t
+	desc = afr_EGY_vic.26.d 
+	
+	is_triggered_only = yes
+	
+	option = {#yes
+		name = afr_EGY_vic.26.a
+		custom_effect_tooltip=EGY_insvest_suez
+		add_to_array = { EGY.suezInvestors = THIS.id }
+		hidden_effect={
+			set_country_flag = suez_constructor
+			set_variable = { suez_investment = 0 }
+		}
+		ai_chance = { 
+			factor = 30
+			modifier = {
+				factor = 0.5
+				TAG = ENG
+			}
+			modifier = {
+				factor = 0.2
+				OR={
+					TAG = AUS
+					TAG = RUS
+				}
+			}
+			modifier = {
+				factor = 0.1
+				OR={
+					TAG = PRS
+					TAG = SPA
+					TAG = SWE
+					TAG = OTO
+				}
+			}
+		}
+	}
+	option = {#no
+		name = afr_EGY_vic.26.b
+		ai_chance = { factor = 70 }
+	}
+}
+country_event = {#colony of equatoria
+	id = afr_EGY_vic.27
+	title = afr_EGY_vic.27.t
+	desc = afr_EGY_vic.27.d 
+	#hidden = yes
+	
+	fire_only_once = yes
+	
+	trigger = {
+		is_neighbor_of = EQA
+		EQA={
+			is_subject = no
+		}
+		tag = EGY
+	}
+	
+	mean_time_to_happen={
+		days = 8
+	}
+	
+	option = {
+		name = afr_EGY_vic.27.a
+		annex_country = {
+			target = EQA
+			transfer_troops = yes
+		}
+		add_state_core = 845
+		
 	}
 }
