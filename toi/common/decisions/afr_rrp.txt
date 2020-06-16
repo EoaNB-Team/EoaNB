@@ -210,6 +210,10 @@ afr_rrp_british_company_port = {
 			}
 		}
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		custom_trigger_tooltip = {
+			tooltip = AFR_accept_bribes_for_slave_smuggling_trigger
+			NOT = { has_idea = AFR_illegal_transatlantic }
+		}
     }
     visible = {
 		afr_visible_company_trigger = yes
@@ -4929,7 +4933,7 @@ afr_scramble_for_africa={
 							afr_is_tribal = yes
 						}
 						is_capital = no
-						is_ai = yes
+						#is_ai = yes
 						owner={
 							has_idea = AFR_history_of_colonial_resistance
 						}
@@ -5632,153 +5636,68 @@ afr_scramble_for_africa={
 	afr_annex_african_horn={
 		available = {
 			has_idea = afr_colonial_power
-			
 		}
 		visible={
 			has_country_flag = BC_Granted_African_Horn
+			tag = EGY
 		}
 		cost = 50
 		fire_only_once = yes
 		days_remove = 240
 		remove_effect = {
-			every_state={#tribes are subsumed
+			#take somailand if oman is not colonial
+			if={
 				limit={
-					is_in_african_horn = yes
-					owner={
-						afr_is_tribal = yes
-					}
-					owner={
-						NOT={has_idea = AFR_history_of_colonial_resistance}
-						if={
-							limit={
-								is_puppet = yes
-							}
-							overlord={
-								afr_is_tribal = yes
-							}
-						}
-						is_ai = yes
-					}
-				}
-				if={
-					limit={
-						any_country={
-							is_subject_of = ROOT
-							capital_scope={
-								is_in_african_horn = yes
-							}
-						}
-					}
-					random_country={
-						limit={
-							is_subject_of = ROOT
-							capital_scope={
-								is_in_african_horn = yes
-							}
-						}
-						transfer_state = PREV
-						PREV={add_compliance = 50}
-					}
-				}
-				else={
-					ROOT={transfer_state = PREV}
-					add_compliance = 50
-				}
-			}
-			every_state={#the border states of resistors are annexed, but with high resistance
-				limit={
-					is_in_african_horn = yes
-					owner={
-						afr_is_tribal = yes
-					}
-					is_capital = no
-					owner={
-						OR={
-							is_ai = yes
-							has_idea = AFR_history_of_colonial_resistance
-						}
-					}
-				}
-				if={
-					limit={
-						any_country={
-							is_subject_of = ROOT
-							capital_scope={
-								is_in_african_horn = yes
-							}
-						}
-					}
-					random_country={
-						limit={
-							is_subject_of = ROOT
-							capital_scope={
-								is_in_african_horn = yes
-							}
-						}
-						transfer_state = PREV
-						PREV={add_resistance = 30}
-					}
-				}
-				else={
-					ROOT={transfer_state = PREV}
-					add_resistance = 30
-				}
-			}
-			every_state={#declare war on resistor capitals, due to cores if they win they should get thier land back, will likely script the peace later
-				limit={
-					is_in_african_horn = yes
-					owner={
-						afr_is_tribal = yes
-					}
-					is_capital = yes
-					owner={
-						OR={
-							is_ai = yes
-							has_idea = AFR_history_of_colonial_resistance
-						}
-					}
-				}
-				if={
-					limit={
-						any_country={
-							is_subject_of = ROOT
-							capital_scope={
-								is_in_african_horn = yes
-							}
-						}
-					}
-					owner={
-						random_country={
-							limit={
-								is_subject_of = ROOT
-								capital_scope={
-									is_in_african_horn = yes
-								}
-							}
-							declare_war_on = {
-								target = PREV
-								type = take_claimed_state
-							}
-							ROOT={
-								add_to_war = {
-									targeted_alliance = PREV 
-									enemy = PREV.PREV 
-									hostility_reason = asked_to_join
+					OMA={
+						NOT={
+							OR={
+								owns_state = 821
+								owns_state = 559
+								MAJ={is_subject_of = PREV}
+								GLD={is_subject_of = PREV}
+								SOM={
+									exists = yes
+									is_subject_of = PREV
 								}
 							}
 						}
 					}
 				}
-				else={
-					owner={
-						ROOT={
-							declare_war_on = {
-								target = PREV
-								type = take_claimed_state
+				transfer_state = 821
+				add_state_core = 821
+				transfer_state = 559
+				add_state_core = 559
+			}
+			if={#if egpyt is distracted, take eritrea
+				limit={
+					OR={
+						AND={
+							MED={
+								is_subject_of = EGY
 							}
+							EGY={
+								OR={
+									check_variable = {EGY_debt > 20}
+									has_idea = EGY_ENG_controlled_government
+									has_idea = EGY_FRA_controlled_government
+									has_idea = EGY_ITA_controlled_government
+								}
+							}
+						}
+						MED = {
+							is_subject = no
 						}
 					}
 				}
+				transfer_state = 550
+				add_state_core = 550
+				transfer_state = 983
+				add_state_core = 983
+			}
+			else={#buy eritrea later
+				add_state_core = 550
+				add_state_core = 983
+				set_country_flag = EDC_can_buy_eritrea
 			}
 		}
 		ai_will_do = { 
@@ -6819,6 +6738,858 @@ afr_scramble_for_africa={
 		}
 		ai_will_do = { 
 			factor = 16
+		}
+	}
+
+}
+
+afr_reforming_regional_power_foreign_investments_decisions = {
+	# ----------------------------------
+	#Modern Resource Production Decisions
+	# ----------------------------------
+	afr_reforming_regional_power_regional_resources_completed = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_has_fabric_industry
+			has_country_flag = afr_reforming_regional_power_has_logging_industry
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_resources_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_reforming_regional_power_regional_resources_completed
+		}
+	}
+	
+	afr_reforming_regional_power_regional_resources_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			hidden_trigger = {
+				has_country_flag = finish_afr_reforming_regional_power_regional_resources_decision_mission
+			}
+		}
+		
+		allowed = {
+			
+		}
+		activation = { 
+			has_country_flag = afr_reforming_regional_power_regional_resources_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_resources_decision_mission
+		}
+		
+		fire_only_once = no
+
+		#cost = 1
+		
+		days_mission_timeout = 1100
+		
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
+		
+		complete_effect = {
+			clr_country_flag = afr_reforming_regional_power_regional_resources_decision_mission
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT }
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+			}
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT }
+				add_resource = {
+					type = iron
+					amount = 5
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_regional_resources_decision_flag
+		}
+		timeout_effect = {
+			clr_country_flag = afr_reforming_regional_power_regional_resources_decision_mission
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT }
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+			}
+			random_owned_controlled_state ={
+				limit = { is_core_of = ROOT }
+				add_resource = {
+					type = iron
+					amount = 5
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_regional_resources_decision_flag
+		}
+	}
+	
+	afr_reforming_regional_power_construct_fabric_industry = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_regional_resources_decision_flag 
+			has_country_flag = afr_reforming_regional_power_regional_industry_decision_flag
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				check_variable = { afr_reforming_regional_power_construction_in_progress < 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			if = {
+				limit = { has_country_flag = afr_rrp_company_port }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_has_company
+					has_country_flag = afr_rrp_company_port
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = afr_rrp_company_port } }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_no_company
+					check_variable = {
+						afr_prosperity_mechanic_value > 39
+					}
+				}
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_resources_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = 1 }
+			if = {
+				limit = { afr_is_tribal = no }
+				custom_effect_tooltip = EGY_afr_increase_debt_1
+				hidden_effect = {
+					add_to_variable = {var = debt_level value = 1}
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					OR = {
+						check_variable = { afr_prosperity_mechanic_value > 39 }
+						NOT = { has_country_flag = afr_rrp_company_port }
+					}
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					check_variable = { afr_prosperity_mechanic_value < 40 }
+					has_country_flag = afr_rrp_company_port
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_debt_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state ={
+				limit = { 
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = fabric_weavery
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_has_fabric_industry
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = -1 }
+		}
+	}
+	
+	afr_reforming_regional_power_establish_logging_industry = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_regional_resources_decision_flag 
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				check_variable = { afr_reforming_regional_power_construction_in_progress < 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			if = {
+				limit = { has_country_flag = afr_rrp_company_port }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_has_company
+					has_country_flag = afr_rrp_company_port
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = afr_rrp_company_port } }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_no_company
+					check_variable = {
+						afr_prosperity_mechanic_value > 39
+					}
+				}
+			}
+		}
+
+		visible = {
+			OR = {
+				has_country_flag = afr_reforming_regional_power_regional_resources_focus
+				has_country_flag = afr_reforming_regional_power_regional_industry_focus
+			}
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = 1 }
+			if = {
+				limit = { afr_is_tribal = no }
+				custom_effect_tooltip = EGY_afr_increase_debt_1
+				hidden_effect = {
+					add_to_variable = {var = debt_level value = 1}
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					OR = {
+						check_variable = { afr_prosperity_mechanic_value > 39 }
+						NOT = { has_country_flag = afr_rrp_company_port }
+					}
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					check_variable = { afr_prosperity_mechanic_value < 40 }
+					has_country_flag = afr_rrp_company_port
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_debt_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state ={
+				limit = { 
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_has_logging_industry
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = -1 }
+		}
+	}
+	
+	# ---------------------------------- 
+	# Modern Factories Decisions
+	# ----------------------------------
+	afr_reforming_regional_power_regional_industry_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			hidden_trigger = {
+				has_country_flag = finish_afr_reforming_regional_power_regional_industry_decision_mission
+				exists = yes
+			}
+		}
+		
+		#allowed = {
+		#	has_country_flag = afr_reforming_regional_power_regional_industry_decision_mission
+		#}
+		activation = { 
+			has_country_flag = afr_reforming_regional_power_regional_industry_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_industry_decision_mission
+		}
+		
+		#fire_only_once = no
+
+		#cost = 1
+		
+		days_mission_timeout = 900
+		
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
+		
+		complete_effect = {  
+			hidden_effect = {
+			clr_country_flag = afr_reforming_regional_power_regional_industry_decision_mission
+			set_country_flag = afr_reforming_regional_power_regional_industry_decision_flag
+			}
+		}
+		timeout_effect = {  
+			clr_country_flag = afr_reforming_regional_power_regional_industry_decision_mission
+			set_country_flag = afr_reforming_regional_power_regional_industry_decision_flag
+		}
+	}
+	
+	afr_reforming_regional_power_regional_industry_completed = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_has_civilian_industry
+			has_country_flag = afr_reforming_regional_power_has_military_industry
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_industry_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_reforming_regional_power_regional_industry_completed
+		}
+	}
+	
+	afr_reforming_regional_power_construct_civ_factory = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_has_fabric_industry
+			has_country_flag = afr_reforming_regional_power_has_logging_industry
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				check_variable = { afr_reforming_regional_power_construction_in_progress < 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			if = {
+				limit = { has_country_flag = afr_rrp_company_port }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_has_company
+					has_country_flag = afr_rrp_company_port
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = afr_rrp_company_port } }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_no_company
+					check_variable = {
+						afr_prosperity_mechanic_value > 39
+					}
+				}
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_industry_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = 1 }
+			if = {
+				limit = { afr_is_tribal = no }
+				custom_effect_tooltip = EGY_afr_increase_debt_1
+				hidden_effect = {
+					add_to_variable = {var = debt_level value = 1}
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					OR = {
+						check_variable = { afr_prosperity_mechanic_value > 39 }
+						NOT = { has_country_flag = afr_rrp_company_port }
+					}
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					check_variable = { afr_prosperity_mechanic_value < 40 }
+					has_country_flag = afr_rrp_company_port
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_debt_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state ={
+				limit = { 
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_has_civilian_industry
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = -1 }
+		}
+	}
+	
+	afr_reforming_regional_power_construct_mil_factory = {
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_has_fabric_industry
+			has_country_flag = afr_reforming_regional_power_has_logging_industry
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				check_variable = { afr_reforming_regional_power_construction_in_progress < 1 }
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_new_buildings
+				any_owned_state = { 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			if = {
+				limit = { has_country_flag = afr_rrp_company_port }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_has_company
+					has_country_flag = afr_rrp_company_port
+				}
+			}
+			if = {
+				limit = { NOT = { has_country_flag = afr_rrp_company_port } }
+				custom_trigger_tooltip = {
+					tooltip = afr_prosperity_mechanic_greater_than_40_no_company
+					check_variable = {
+						afr_prosperity_mechanic_value > 39
+					}
+				}
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_industry_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		days_remove = 770
+		
+		modifier = {
+			political_power_cost = 0.1
+		}
+		
+		complete_effect = {
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = 1 }
+			if = {
+				limit = { afr_is_tribal = no }
+				custom_effect_tooltip = EGY_afr_increase_debt_1
+				hidden_effect = {
+					add_to_variable = {var = debt_level value = 1}
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					OR = {
+						check_variable = { afr_prosperity_mechanic_value > 39 }
+						NOT = { has_country_flag = afr_rrp_company_port }
+					}
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+			if = {
+				limit = { 
+					afr_is_tribal = yes 
+					check_variable = { afr_prosperity_mechanic_value < 40 }
+					has_country_flag = afr_rrp_company_port
+				}
+				custom_effect_tooltip = afr_prosperity_mechanic_minus_40_investment_debt_tooltip
+				add_to_variable = {
+					var = afr_prosperity_mechanic_value
+					value = -40
+				}
+			}
+		}
+		
+		remove_effect = {
+			random_owned_controlled_state ={
+				limit = { 
+					is_core_of = ROOT 
+					Oceania_infrastructure_for_extra_building_slots_trigger = yes
+				}
+				hidden_effect = {
+					add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_has_military_industry
+			add_to_variable = { var = afr_reforming_regional_power_construction_in_progress value = -1 }
+		}
+	}
+	
+	# ----------------------------------
+	# Modern Cities Decisions
+	# ----------------------------------
+	afr_reforming_regional_power_regional_infrastructure = {
+		icon = generic_form_nation
+		ai_will_do = { factor = 1 }
+		available = {
+			has_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_flag
+			exists = yes
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_infrastructure_focus
+		}
+		
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			set_country_flag = afr_reforming_regional_power_regional_infrastructure_completed
+			
+		}
+	}
+	
+    afr_reforming_regional_power_regional_infrastructure_decision = {
+		ai_will_do = { factor = 1 }
+		available = {
+			hidden_trigger = {
+				has_country_flag = finish_afr_reforming_regional_power_regional_infrastructure_decision_mission
+			}
+		}
+		
+		#allowed = {
+		#	has_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_mission
+		#}
+		activation = { 
+			has_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_mission
+		}
+		selectable_mission = no
+		is_good = no
+		cancel_trigger = {
+			hidden_trigger = {
+				always = no
+			}
+		}
+
+		visible = {
+			has_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_mission
+		}
+		
+		#fire_only_once = no
+
+		#cost = 1
+		
+		days_mission_timeout = 1200
+		
+		#modifier = {
+		#	political_power_cost = 0.1
+		#}
+		
+		complete_effect = {  
+			clr_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_mission
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = { TAG = ETH }
+				custom_effect_tooltip = ETH_connect_the_villages_tooltip
+				swap_ideas = {
+					remove_idea=ETH_idea_isolated_villages
+					add_idea = ETH_idea_isolated_villages_2
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_flag
+		}
+		timeout_effect = {
+			clr_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_mission
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				capital_scope = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					capital_scope = {
+						free_building_slots = {
+							building = infrastructure
+							size < 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						is_capital = no
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = { TAG = ETH }
+				custom_effect_tooltip = ETH_connect_the_villages_tooltip
+				swap_ideas = {
+					remove_idea=ETH_idea_isolated_villages
+					add_idea = ETH_idea_isolated_villages_2
+				}
+			}
+			set_country_flag = afr_reforming_regional_power_regional_infrastructure_decision_flag
+		}
+	}
+	
+	afr_reforming_regional_power_clear_development_decision = {
+
+		available = {
+			#custom_trigger_tooltip = {
+			#	tooltip = afr_prosperity_mechanic_greater_than_10
+			#		check_variable = {
+			#		afr_prosperity_mechanic_value > 9
+			#	}
+			#}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_insufficient_infrastructure_to_support_new_buildings
+				all_owned_state = {
+					if = {
+						limit = {
+							is_core_of = ROOT
+						}
+						is_core_of = ROOT
+						Oceania_infrastructure_for_extra_building_slots_trigger = no 
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = Ocenaia_has_infrastructure_to_support_clearing_land
+				any_owned_state = { 
+					Oceania_infrastructure_for_clearing_building_slots_trigger = yes 
+					is_core_of = ROOT
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_prosperity_mechanic_construction
+				check_variable = { afr_reforming_regional_power_construction_in_progress < 1 }
+			}
+		}
+
+		visible = {
+			all_owned_state = {
+				if = {
+					limit = {
+						is_core_of = ROOT
+					}
+					is_core_of = ROOT
+					Oceania_infrastructure_for_extra_building_slots_trigger = no 
+				}
+			}
+		}
+
+		complete_effect = {
+			add_political_power = -15
+			#custom_effect_tooltip = afr_prosperity_mechanic_minus_10
+			#add_to_variable = {
+			#	var = afr_prosperity_mechanic_value
+			#	value = -10
+			#}
+			set_country_flag = afr_prosperity_mechanic_construction_flag
+		}
+		
+		days_remove = 30
+		
+		modifier = {
+			political_power_cost = 0.1
+        }
+		
+		
+		remove_effect = {
+			hidden_effect = {
+				random_owned_controlled_state = {
+					limit = {
+						is_core_of = ROOT 
+						Oceania_infrastructure_for_clearing_building_slots_trigger = yes
+					}
+					add_to_variable = { Oceania_extra_state_shared_building_slots = -1 }
+					add_extra_state_shared_building_slots = -1
+				}
+			}
+			custom_effect_tooltip = Oceania_infrastructure_for_clearing_building_slots_tooltip
+			clr_country_flag = afr_prosperity_mechanic_construction_flag
+        }
+		
+		ai_will_do = {
+			factor = 10
 		}
 	}
 

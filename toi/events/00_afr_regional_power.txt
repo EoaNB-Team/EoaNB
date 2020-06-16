@@ -67,12 +67,28 @@ add_namespace = afr_war_exhaustion_exertion
 			ai_chance = { factor = 50 }
 			trigger = {
 				has_offensive_war = yes
+				surrender_progress < 0.10
 			}
 			every_country = {
-				limit = {
-					has_defensive_war_with = ROOT
+				limit = { has_defensive_war_with = ROOT }
+				white_peace = ROOT
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						OR = {
+							has_country_flag = SKT_WDD_Joint_War_KAN
+							has_country_flag = SKT_WDD_Joint_War_BAG_Buffer
+							has_country_flag = SKT_WDD_Joint_War_Buffer
+							has_country_flag = SKT_WDD_Joint_War_BAG
+						
+						}
+					}
+					clr_country_flag = SKT_WDD_Joint_War_KAN
+					clr_country_flag = SKT_WDD_Joint_War_BAG_Buffer
+					clr_country_flag = SKT_WDD_Joint_War_Buffer
+					clr_country_flag = SKT_WDD_Joint_War_BAG
 				}
-				white_peace = ROOT 
 			}
 		}
 	}
@@ -188,7 +204,7 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_raid_supply.2.a
 			ai_chance = { factor = 100 }
 			trigger = {
-				has_country_flag = afr_poison_provisions_outcome_1
+				has_country_flag = afr_raid_supplies_outcome_1
 			}
 			FROM = {
 				add_timed_idea = {
@@ -196,7 +212,7 @@ add_namespace = afr_war_exhaustion_exertion
 					days = 120
 				}
 			}
-			clr_country_flag = afr_poison_provisions_outcome_1
+			clr_country_flag = afr_raid_supplies_outcome_1
 			custom_effect_tooltip= afr_tribal_lost_200_army_raid_supply
 			add_to_variable = {Tribal_army_num = -200}
 			add_equipment_to_stockpile = {
@@ -209,7 +225,7 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_raid_supply.2.b
 			ai_chance = { factor = 100 }
 			trigger = {
-				has_country_flag = afr_poison_provisions_outcome_2
+				has_country_flag = afr_raid_supplies_outcome_2
 			}
 			FROM = {
 				add_timed_idea = {
@@ -219,7 +235,7 @@ add_namespace = afr_war_exhaustion_exertion
 			}
 			custom_effect_tooltip= afr_tribal_lost_100_army_raid_supply
 			add_to_variable = {Tribal_army_num = -100}
-			clr_country_flag = afr_poison_provisions_outcome_2
+			clr_country_flag = afr_raid_supplies_outcome_2
 			add_equipment_to_stockpile = {
 				type = tribal_weapons_0
 				amount = 500
@@ -230,11 +246,11 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_raid_supply.2.c
 			ai_chance = { factor = 100 }
 			trigger = {
-				has_country_flag = afr_poison_provisions_outcome_3
+				has_country_flag = afr_raid_supplies_outcome_3
 			}
 			custom_effect_tooltip= afr_tribal_lost_400_army_raid_supply
 			add_to_variable = {Tribal_army_num = -400}
-			clr_country_flag = afr_poison_provisions_outcome_3
+			clr_country_flag = afr_raid_supplies_outcome_3
 		}
 	}
 	
@@ -250,7 +266,7 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_poison_provisions.1.a
 			ai_chance = { factor = 100 }
 			trigger = {
-				FROM = { has_country_flag = afr_raid_supplies_outcome_1 }
+				FROM = { has_country_flag = afr_poison_provisions_outcome_1 }
 			}
 			custom_effect_tooltip= afr_tribal_lost_500_army_poison_provisions
 			add_to_variable = {Tribal_army_num = -500}
@@ -260,7 +276,7 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_poison_provisions.1.b
 			ai_chance = { factor = 100 }
 			trigger = {
-				FROM = { has_country_flag = afr_raid_supplies_outcome_2 }
+				FROM = { has_country_flag = afr_poison_provisions_outcome_2 }
 			}
 			hidden_effect = { FROM = { country_event = { id = afr_integration_tribe_poison_provisions.2 days = 1 } } }
 		}
@@ -268,7 +284,7 @@ add_namespace = afr_war_exhaustion_exertion
 			name = afr_integration_tribe_poison_provisions.1.c
 			ai_chance = { factor = 100 }
 			trigger = {
-				FROM = { has_country_flag = afr_raid_supplies_outcome_3 }
+				FROM = { has_country_flag = afr_poison_provisions_outcome_3 }
 			}
 			custom_effect_tooltip= afr_tribal_lost_2000_army_poison_provisions
 			add_to_variable = {Tribal_army_num = -2000}
@@ -586,14 +602,11 @@ add_namespace = afr_war_exhaustion_exertion
 		option = {
 			name = afr_caliphate_integration_kingdom.1.a
 			trigger = {
-				AND = {
-					NOT = {
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}
+				NOT = {
+					is_in_array = {
+						array = national_religion_array
+						value = global.sunni
 					}
-					NOT = { has_government = fundamentalism }
 				}
 			}
 			ai_chance = { 
@@ -645,14 +658,11 @@ add_namespace = afr_war_exhaustion_exertion
 		option = {
 			name = afr_caliphate_integration_kingdom.1.b
 			trigger = {
-				AND = {
-					NOT = {
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}
+				NOT = {
+					is_in_array = {
+						array = national_religion_array
+						value = global.sunni
 					}
-					NOT = { has_government = fundamentalism }
 				}
 			}
 			ai_chance = {
@@ -735,6 +745,84 @@ add_namespace = afr_war_exhaustion_exertion
 			}
 			ai_chance = { 
 				factor = 30 
+				modifier = {
+					factor = 0
+					AND = {
+						ROOT = { has_army_size = { size < 5 } }
+						ROOT = { check_variable = { Tribal_army_num < 4999 } }
+					}
+				}
+			}
+			custom_effect_tooltip = SKT_sunni_integration_tooltip
+			FROM = { country_event = { id = afr_caliphate_integration_kingdom.2 days = 45 } }
+		}
+		
+		option = {
+			name = afr_caliphate_integration_kingdom.1.c
+			trigger = {
+				is_in_array = {
+					array = national_religion_array
+					value = global.sunni
+				}
+				NOT = { has_government = fundamentalism }
+			}
+			ai_chance = { 
+				factor = 30
+			}
+			hidden_effect = {
+				ROOT = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = FROM
+						value = -200
+					}
+				}
+				FROM = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = -200
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_dlc = "Death or Dishonor" 
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_puppet
+						freedom_level = 0.3
+					}
+				}
+			}
+			if = {
+				limit = { 
+					NOT = { has_dlc = "Death or Dishonor" }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_puppet
+						freedom_level = 0.3
+					}
+				}
+			}
+			
+		}
+		
+		option = {
+			name = afr_caliphate_integration_kingdom.1.e
+			trigger = {
+				is_in_array = {
+					array = national_religion_array
+					value = global.sunni
+				}
+				NOT = { has_government = fundamentalism }
+			}
+			ai_chance = { 
+				factor = 60 
 				modifier = {
 					factor = 0
 					AND = {

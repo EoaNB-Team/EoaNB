@@ -384,6 +384,16 @@ focus_tree = {
 		icon = GFX_goal_anschluss
 		cost = 75
 		available = {
+			if = {
+				limit = { 
+					has_global_flag = SKT_has_started_the_african_caliphate
+					is_subject = yes
+				}
+				OVERLORD = { is_in_faction_with = SKT }
+			}
+			else = {
+				is_subject = no
+			}
 			custom_trigger_tooltip = {
 				tooltip = afr_generic_jihadist_expand_to_survive_custom_trigger
 				has_global_flag = SKT_has_started_the_african_caliphate
@@ -508,6 +518,7 @@ focus = {
 		icon = GFX_focus_research
 		cost = 75
 		available = {
+			has_idea = privileged_education
 		}
 		prerequisite = {
 			focus = afr_jihadist_regional_power_adressing_empire_sprawl
@@ -516,12 +527,6 @@ focus = {
 			factor = 1 
 		}
 		completion_reward = {
-			if = {
-				limit = { has_idea = oral_tradition }
-				add_political_power = -50
-				hidden_effect = { add_ideas = privileged_education }
-				custom_effect_tooltip = afr_jihadist_regional_power_adressing_oral_tradition_tooltip
-			}
 			if = {
 				limit = { amount_research_slots < 2 }
 				add_political_power = -50
@@ -1613,6 +1618,8 @@ focus = {
 			if = {
 				limit = { 
 					all_owned_state = { naval_base < 1 }
+					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = no }
 				}
 				add_political_power = -250
 				random_owned_controlled_state = {
@@ -1620,6 +1627,7 @@ focus = {
 						Oceania_infrastructure_for_extra_building_slots_trigger = yes
 						is_coastal = yes
 					}
+					set_state_flag = afr_port_town
 					hidden_effect = {
 						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
 					}
@@ -1642,6 +1650,79 @@ focus = {
 					add_manpower = 1000
 				}
 			}
+			if = {
+				limit = {
+					any_owned_state = { has_state_flag = afr_port_town }
+				}
+				add_political_power = -100
+				random_owned_controlled_state = {
+					limit = {
+						has_state_flag = afr_port_town
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 1000
+				}
+			}
+			if = {
+				limit = {
+					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base < 1 }
+				}
+				add_political_power = -100
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = naval_base
+						level = 1
+						instant_build = yes
+						province = {
+							all_provinces = yes
+							limit_to_coastal = yes
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			if = {
+				limit = {
+					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base > 0 }
+				}
+				add_political_power = -100
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
 			else = {
 				add_political_power = -100
 				random_owned_controlled_state = {
@@ -1649,6 +1730,7 @@ focus = {
 						naval_base > 0
 						is_coastal = yes
 					}
+					set_state_flag = afr_port_town
 					add_building_construction = {
 						type = infrastructure
 						level = 1
