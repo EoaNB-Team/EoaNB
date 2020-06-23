@@ -11,7 +11,6 @@ focus_tree = {
 				tag = DAH
 				tag = MAJ
 				tag = MOM
-				tag = ZAN
 				tag = SOT
 			}
 		}
@@ -22,6 +21,12 @@ focus_tree = {
 		cost = 100
 		mutually_exclusive = {
 			focus = afr_wes_governmental_westernisation
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
 		}
 		completion_reward = {
 			add_stability = 0.05
@@ -39,12 +44,17 @@ focus_tree = {
 			focus = afr_wes_government_traditionalism
 		}
 		available={
-			NOT = {
-				has_country_flag = afr_traditional_tree
-			}
+			NOT = { has_country_flag = afr_traditional_tree }
+			NOT = { has_country_flag = afr_jihadist_tree }
 		}
 		allow_branch = {
 			NOT = { has_idea = AFR_history_of_colonial_resistance }
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
 		}
 		completion_reward = {
 			add_political_power = 100
@@ -474,9 +484,11 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = afr_wes_our_way_not_thiers
-			focus = afr_wes_jihad_way_not_thiers
+			focus = afr_wes_inspired_by_allah
 		}
 		available = {
+			NOT = { has_country_flag = afr_traditional_tree }
+			NOT = { has_country_flag = afr_jihadist_tree }
 			OR = {
 				any_owned_state = {
 					is_coastal = yes
@@ -486,8 +498,15 @@ focus_tree = {
 				}
 			}
 		}
-		completion_reward ={
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
+		}
+		completion_reward = {
 			add_political_power = 50
+			set_country_flag = afr_wes_western_protection_flag
 		}
 		x = 18
 		y = 2
@@ -541,14 +560,25 @@ focus_tree = {
 		icon = GFX_goal_molotov_ribbentrop_pact
 		cost = 75
 		prerequisite = {
-			focus = afr_wes_government_traditionalism
+			focus = afr_wes_western_protection
+			focus = afr_wes_our_way_not_thiers
+			focus = afr_wes_inspired_by_allah
 		}
 		mutually_exclusive = {
-			focus = afr_wes_our_way_not_thiers
+			focus = afr_wes_revise_progress
 			focus = afr_wes_jihad_way_not_thiers
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
 		}
 		completion_reward = {
 			add_stability = 0.05
+			set_country_flag = afr_traditional_western_blend_tree
+			clr_country_flag = afr_traditional_tree
+			clr_country_flag =afr_jihadist_tree
 		}
 		x = 21
 		y = 3
@@ -633,6 +663,7 @@ focus_tree = {
 		}
 		completion_reward={
 			add_stability = 0.25#will be removed by the request colony event
+			set_country_flag = afr_tribal_to_colonial_tree
 		}
 		x = 16
 		y = 6
@@ -1007,6 +1038,15 @@ focus_tree = {
 			focus = afr_wes_revise_progress
 		}
 		completion_reward={
+			if = {
+				limit = {
+					has_stability < 0
+				}
+				set_stability = 0.05
+			}
+			else = {
+				add_stability = 0.05
+			}
 			load_focus_tree = inwards_oriented_kingdom
 		}
 		x = 24
@@ -1014,16 +1054,60 @@ focus_tree = {
 
 	}
 	focus = {
-		id = afr_wes_jihad_way_not_thiers
-		icon = GFX_focus_assassination
+		id = afr_wes_inspired_by_allah
+		icon = GFX_focus_islam_state_religion
 		cost = 75
+		available = {
+			NOT = { has_country_flag = afr_progress_tree }
+			NOT = { has_country_flag = afr_traditional_tree }
+			custom_trigger_tooltip = {
+				tooltip = AFR_religion_sunni_tooltip
+				is_in_array = {
+					array = national_religion_array
+					value = global.sunni
+				}
+			}
+		}
 		mutually_exclusive = {
 			focus = afr_wes_western_protection
-			focus = afr_wes_traditional_western_blend
 			focus = afr_wes_our_way_not_thiers
 		}
 		prerequisite = {
 			focus = afr_wes_government_traditionalism
+		}
+		allow_branch = {
+			is_in_array = {
+				array = national_religion_array
+				value = global.sunni
+			}
+			NOT = { TAG = MDN }
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
+		}
+		completion_reward = {
+			add_popularity = {
+				ideology = fundamentalism
+				popularity = 0.075
+			}
+			set_country_flag =afr_jihadist_tree
+		}
+		x = 26
+		y = 2
+	}
+	focus = {
+		id = afr_wes_jihad_way_not_thiers
+		icon = GFX_focus_assassination
+		cost = 75
+		mutually_exclusive = {
+			focus = afr_wes_traditional_western_blend
+			focus = afr_wes_revise_progress
+		}
+		prerequisite = {
+			focus = afr_wes_inspired_by_allah
 		}
 		available = {
 			if = {
@@ -1031,7 +1115,10 @@ focus_tree = {
 				custom_trigger_tooltip = {
 					tooltip = afr_overlord_supports_jihadist_revolution
 					OVERLORD = {
-						has_country_flag = afr_jihadist_tree
+						OR = {
+							has_country_flag = afr_jihadist_tree
+							has_country_flag = OTO_traditionalist_tree
+						}
 					}
 				}
 			}
@@ -1045,6 +1132,27 @@ focus_tree = {
 				}
 			}
 		}
+		bypass = {
+			if = {
+				limit = { 
+					is_subject = yes 
+					OVERLORD = {
+						OR = {
+							has_country_flag = afr_jihadist_tree
+							has_country_flag = OTO_traditionalist_tree
+						}
+					}
+					NOT = { has_country_flag = afr_jihadist_tree }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_go_with_overlord_jihadist_revolution_trigger
+					has_country_flag = afr_go_with_overlords_jihadist_revolution_flag
+				}
+			}
+			else = {
+				always = no
+			}
+		}
 		allow_branch = {
 			is_in_array = {
 				array = national_religion_array
@@ -1052,60 +1160,67 @@ focus_tree = {
 			}
 			NOT = { TAG = MDN }
 		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
+		}
 		completion_reward = {
-			add_stability = -0.50
-			add_political_power = 45
-			set_country_flag = afr_jihadist_tree
 			if = {
 				limit = {
-					NOT = { has_government = fundamentalism }
-					has_government = autocracy
-				}
-				set_politics = {
-					  ruling_party = fundamentalism
-				}
-				hidden_effect = {
-					set_popularities = {
-						anarchism = 0
-						vanguard_communism = 0
-						collectivist_socialism = 0
-						social_egalitarianism = 0
-						centrism = 0
-						traditional_conservatism = 0
-						radical_democracy = 0
-						chauvinist_populism = 0
-						autocracy = 87
-						fundamentalism = 13
+					NOT = { has_country_flag = afr_jihadist_tree }
+					is_subject = yes
+					OVERLORD = {
+						OR = {
+							has_country_flag = afr_jihadist_tree
+							has_country_flag = OTO_traditionalist_tree
+						}
 					}
 				}
+				custom_effect_tooltip = eoanb_af_t_tt_jihadist_revolution
 			}
 			if = {
 				limit = {
-					NOT = { has_government = fundamentalism }
-					has_government = chauvinist_populism
-				}
-				set_politics = {
-					  ruling_party = fundamentalism
-				}
-				hidden_effect = {
-					set_popularities = {
-						anarchism = 0
-						vanguard_communism = 0
-						collectivist_socialism = 0
-						social_egalitarianism = 0
-						centrism = 0
-						traditional_conservatism = 0
-						radical_democracy = 0
-						chauvinist_populism = 87
-						autocracy = 0
-						fundamentalism = 13
+					NOT = { has_country_flag = afr_jihadist_tree }
+					is_subject = yes
+					OVERLORD = {
+						NOT = {
+							has_country_flag = afr_jihadist_tree
+							has_country_flag = OTO_traditionalist_tree
+						}
 					}
 				}
+				custom_effect_tooltip = afr_jihadist_coup_against_master_tooltip
+			}
+			if = {
+				limit = {
+					NOT = { has_country_flag = afr_jihadist_tree }
+					is_subject = no
+				}
+				custom_effect_tooltip = afr_jihadist_coup_against_western_tooltip
+			}
+			if = {
+				limit = {
+					has_stability < 0.30
+				}
+				set_stability = 0.05
+			}
+			if = {
+				limit = {
+					has_stability > 0.29
+				}
+				add_stability = -0.25
+			}
+			set_country_flag = afr_jihadist_tree
+			add_popularity = {
+				ideology = fundamentalism
+				popularity = 0.15
 			}
 			
 		}
 		x = 26
-		y = 2
+		y = 3
 		ai_will_do = { 
 			factor = 1
 			modifier = {
@@ -1118,8 +1233,8 @@ focus_tree = {
 		}
 	}
 	focus = {
-		id = afr_wes_inspired_by_allah
-		icon = GFX_focus_islam_state_religion
+		id = afr_wes_turn_to_sharia
+		icon = GFX_focus_holy_quran
 		cost = 75
 		prerequisite = {
 			focus = afr_wes_jihad_way_not_thiers
@@ -1132,35 +1247,14 @@ focus_tree = {
 			NOT = { TAG = MDN }
 		}
 		completion_reward = {
-			add_stability = 0.15
-			add_popularity = {
-				ideology = fundamentalism
-				popularity = 0.05
+			if = {
+				limit = {
+					NOT = { has_country_flag = afr_jihadist_tree }
+				}
+				set_country_flag = afr_jihadist_tree
 			}
-		}
-		x = 26
-		y = 3
-	}
-	focus = {
-		id = afr_wes_turn_to_sharia
-		icon = GFX_focus_holy_quran
-		cost = 75
-		prerequisite = {
-			focus = afr_wes_inspired_by_allah
-		}
-		allow_branch = {
-			is_in_array = {
-				array = national_religion_array
-				value = global.sunni
-			}
-			NOT = { TAG = MDN }
-		}
-		completion_reward = {
-			add_popularity = {
-				ideology = fundamentalism
-				popularity = 0.075
-			}
-			load_focus_tree = afr_generic_jihadist_1
+			custom_effect_tooltip = afr_jihadist_revolution_western_tooltip
+			country_event = { id = EDC_afr_focus_path_jihadist_coup.1 }
 		}
 		x = 26
 		y = 4
@@ -1175,8 +1269,7 @@ focus_tree = {
 		}
 		mutually_exclusive = {
 			focus = afr_wes_western_protection
-			focus = afr_wes_traditional_western_blend
-			focus = afr_wes_jihad_way_not_thiers
+			focus = afr_wes_inspired_by_allah
 		}
 		allow_branch = {
 			NOT = {
@@ -1184,12 +1277,17 @@ focus_tree = {
 			}
 		}
 		available = {
-			NOT = {
-				has_country_flag = afr_progress_tree
+			NOT = { has_country_flag = afr_progress_tree }
+			NOT = { has_country_flag = afr_jihadist_tree }
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
 			}
 		}
 		completion_reward = {
-			add_stability = -0.5
+			add_stability = 0.05
 			set_country_flag = afr_traditional_tree
 		}
 		x = 24
@@ -1209,11 +1307,26 @@ focus_tree = {
 		id = afr_wes_revise_progress
 		icon = GFX_goal_generic_forceful_treaty
 		cost = 75
+		available = {
+			NOT = { has_country_flag = afr_progress_tree }
+			NOT = { has_country_flag = afr_jihadist_tree }
+		}
 		prerequisite = {
 			focus = afr_wes_our_way_not_thiers
 		}
+		mutually_exclusive = {
+			focus = afr_wes_jihad_way_not_thiers
+			focus = afr_wes_revise_progress
+		}
+		cancel = {
+			custom_trigger_tooltip = {
+				tooltip = afr_focus_decided_to_switch_branches
+				has_country_flag = afr_follow_overlord_trigger
+			}
+		}
 		completion_reward = {
-			add_stability = 0.15
+			add_stability = -0.25
+			set_country_flag = afr_traditional_tree
 		}
 		x = 24
 		y = 3
