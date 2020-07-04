@@ -3734,24 +3734,31 @@ afr_jihadist_regional_power_caliphate_wars = {
  
  SKT_Caliphate_raids = {
 
-	#TUG
-	SKT_TUG_raid_village = {
-		icon = generic_prepare_civil_war
+	SKT_raid_infidel_neighbor = {
 		available = {
-			ROOT = {
-				is_neighbor_of = TUG
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with = TUG 
-						is_subject_of = TUG 
-					}
+			has_tech = tribal_tatics
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_raid_neighbor_at_peace_trigger
+				has_war = no
+				has_border_war = no
+				NOT = { has_country_flag = raiding_neighbour }
+			}
+			custom_trigger_tooltip={
+				tooltip = EDC_Any_Tribal_Army_over_1000
+				OR = {
+					check_variable = { Tribal_army_num > 999 }
+					check_variable = { Tribal_horse_army_num > 999 }
+					check_variable = { Tribal_camel_army_num > 999 }
 				}
 			}
-			NOT = {has_country_flag = raiding_neighbour}
-			TUG = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
+			FROM = {
+				custom_trigger_tooltip = {
+					tooltip = AFR_religion_not_sunni_tooltip           
+					NOT = {
 						is_in_array = {
 							array = national_religion_array
 							value = global.sunni
@@ -3759,839 +3766,205 @@ afr_jihadist_regional_power_caliphate_wars = {
 					}
 				}
 			}
+			custom_trigger_tooltip = {
+				tooltip = afr_war_exhaustion_value_less_than_5
+				check_variable = {
+					afr_war_exhaustion_value < 5
+				}
+			}
 		}
+
+		visible = {
+			TAG = SKT
+			ROOT = { 
+				afr_is_tribal = yes
+				NOT = { has_border_war_with = FROM }
+				NOT = { has_war_with = FROM }
+				NOT = { is_in_faction_with = FROM }
+			}
+		}
+		
+		target_trigger = {
+			OR = {
+				if = {
+					limit = { ROOT = { owns_state = 873 } }
+					OR = {
+						FROM = { owns_state = 515 }
+						FROM = { owns_state = 872 }
+						FROM = { owns_state = 770 }
+					}
+				}
+				if = { 
+					limit = { ROOT = { owns_state = 1219 } }
+					OR = {
+						FROM = { owns_state = 805 }
+						FROM = { owns_state = 558 }
+					}
+				}
+				if = { 
+					limit = { ROOT = { owns_state = 1218 } }
+					OR = {
+						FROM = { owns_state = 871 }
+						FROM = { owns_state = 769 }
+					}
+				}
+			}
+			ROOT = {
+				has_country_flag = SKT_Caliphate_raids
+				is_in_array = {
+					array = national_religion_array
+					value = global.sunni
+				}  
+				TAG = SKT
+			}
+			OR = {
+				ROOT = { owns_state = 873 }
+				ROOT = { owns_state = 1219 }
+				ROOT = { owns_state = 1218 }
+			}
+			ROOT = {
+				NOT = { is_subject_of = FROM }
+				NOT = { is_in_faction_with = FROM }
+			}
+			FROM = {
+				NOT = { is_subject_of = ROOT }
+			}
+			FROM = {
+				NOT = { is_subject_of = OVERLORD }
+			}
+		}
+		days_remove = 30
+		fire_only_once = no
+		days_re_enable = 90
+
+		cost = 0
 		
 		custom_cost_trigger = {
 
-			command_power > 50
+			command_power > 99.9
 
 		}
 		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
-				ROOT = {
-					is_neighbor_of = TUG
-					owns_state = 873
-				}
-				TUG = {
-					owns_state = 515
-				}
-			}
-			NOT = { TUG = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				TUG = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = TUG
-						}
-					}
-				}
-				TUG = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				TUG = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_TUG_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_TUG_prepare_border_raid
 			
-		}
 		
 		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 873
-					defender = 515
-				}
-			}
-			#custom_effect_tooltip = SKT_TUG_end_border_raid
-		}
-	}
-	
-	#BAG
-	SKT_BAG_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = BAG
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with = BAG
-						is_subject_of = BAG
-					}
-				}
-			}
-			NOT = {has_country_flag = raiding_neighbour}
-			BAG = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
-					}
+			custom_trigger_tooltip = {
+				tooltip = edc_raid_decision_cancel_trigger
+				OR = {
+					is_in_faction_with = FROM
+					has_war_with = FROM
 				}
 			}
 		}
-		
-		custom_cost_trigger = {
-
-			command_power > 50
-
+		modifier = {
+			command_power_gain_mult = -0.90
 		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
-				ROOT = {
-					is_neighbor_of = BAG
-					owns_state = 1219
-				}
-				BAG = {
-					owns_state = 805
-				}
-			}
-			NOT = { BAG = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
 		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				BAG = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = BAG
-						}
-					}
-				}
-				BAG = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				BAG = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_BAG_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_BAG_prepare_border_raid
+			hidden_effect = { add_command_power = -50 }
+			set_country_flag = raiding_neighbour
 		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
 		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 1219
-					defender = 805
+			clr_country_flag = raiding_neighbour
+			if = {
+				limit = {
+					ROOT = { owns_state = 1219 }
+					FROM = { owns_state = 805 }
 				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_BAG_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_BAG_prepare_border_raid
 			}
-			#custom_effect_tooltip = SKT_BAG_end_border_raid
-		}
-		}
-		
-		SKT_GBG_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = GBG
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with = GBG 
-						is_subject_of = GBG 
-					}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 1219 }
+					FROM = { owns_state = 558 }
 				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_GBG_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_GBG_prepare_border_raid
 			}
-			NOT = {has_country_flag = raiding_neighbour}
-			GBG = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
-					}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 1218 }
+					FROM = { owns_state = 871 }
 				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_OYO_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_OYO_prepare_border_raid
+			}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 1218 }
+					FROM = { owns_state = 769 }
+				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_DAH_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_DAH_prepare_border_raid
+			}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 873 }
+					FROM = { owns_state = 872 }
+				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_BRG_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_BRG_prepare_border_raid
+			}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 873 }
+					FROM = { owns_state = 770 }
+				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_DDI_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_DDI_prepare_border_raid
+			}
+			else_if = {
+				limit = {
+					ROOT = { owns_state = 873 }
+					FROM = { owns_state = 515 }
+				}
+				hidden_effect = { 
+					FROM = { country_event = { id = skt_islamic_raid_defender.1 } }
+					ROOT = { country_event = { id = SKT_TUG_islamic_raid.1 } }
+				}
+				custom_effect_tooltip = SKT_TUG_prepare_border_raid
 			}
 		}
-		
-		custom_cost_trigger = {
 
-			command_power > 50
-
-		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
-				ROOT = {
-					is_neighbor_of = GBG
-					owns_state = 1219
-				}
-				GBG = {
-					owns_state = 558
-				}
-			}
-			NOT = { GBG = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
 		ai_will_do = {
-			factor = 1
+			base = 1
 			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				GBG = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = GBG
-						}
-					}
-				}
-				GBG = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				GBG = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_GBG_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_GBG_prepare_border_raid
-		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 1219
-					defender = 558
-				}
-			}
-			#custom_effect_tooltip = SKT_GBG_end_border_raid
-		}
-		}
-		
-		SKT_OYO_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = OYO
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with = OYO 
-						is_subject_of = OYO 
-					}
-				}
-			}
-			NOT = {has_country_flag = raiding_neighbour}
-			OYO = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
-					}
-				}
-			}
-		}
-		
-		custom_cost_trigger = {
-
-			command_power > 50
-
-		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
+				factor = 0 
 				ROOT = {
-					is_neighbor_of = OYO
-					owns_state = 1218
+					has_opinion = {
+						target = FROM
+						value > 45
+					}
 				}
-				OYO = {
-					owns_state = 871
-				}
-			}
-			NOT = { OYO = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
 			}
 			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				OYO = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = OYO
-						}
-					}
-				}
-				OYO = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				OYO = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_OYO_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_OYO_prepare_border_raid
-		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 871
-					defender = 1218
-				}
-			}
-			#custom_effect_tooltip = SKT_OYO_end_border_raid
-		}
-		}
-		
-		SKT_DAH_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = DAH
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with = DAH 
-						is_subject_of = DAH 
-					}
-				}
-			}
-			NOT = {has_country_flag = raiding_neighbour}
-			DAH = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
-					}
-				}
-			}
-		}
-		
-		custom_cost_trigger = {
-
-			command_power > 50
-
-		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
+				factor = 10 
 				ROOT = {
-					is_neighbor_of = DAH
-					owns_state = 1218
-				}
-				DAH = {
-					owns_state = 769
-				}
-			}
-			NOT = { DAH = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_kingdoms_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				DAH = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = DAH
-						}
-					}
-				}
-				DAH = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				DAH = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_DAH_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_GBG_prepare_border_raid
-		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 1218
-					defender = 769
-				}
-			}
-			#custom_effect_tooltip = SKT_GBG_end_border_raid
-		}
-		}
-		
-		SKT_BRG_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = BRG
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with =  BRG
-						is_subject_of = BRG 
-					}
-				}
-			}
-			NOT = {has_country_flag = raiding_neighbour}
-			BRG = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
+					has_opinion = {
+						target = FROM
+						value < -40
 					}
 				}
 			}
 		}
-		
-		custom_cost_trigger = {
-
-			command_power > 50
-
-		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
-				ROOT = {
-					is_neighbor_of = BRG
-					owns_state = 873
-				}
-				BRG = {
-					owns_state = 872
-				}
-			}
-			NOT = { BRG = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				BRG = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = BRG
-						}
-					}
-				}
-				BRG = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				BRG = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_BRG_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_BRG_prepare_border_raid
-		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 873
-					defender = 872
-				}
-			}
-			#custom_effect_tooltip = SKT_BRG_end_border_raid
-		}
-		
-	}
-	
-	SKT_DDI_raid_village = {
-		icon = generic_prepare_civil_war
-		available = {
-			ROOT = {
-				is_neighbor_of = DDI
-				NOT = { 
-					OR = {
-						has_non_aggression_pact_with =  DDI
-						is_subject_of = DDI 
-					}
-				}
-			}
-			NOT = {has_country_flag = raiding_neighbour}
-			DDI = {
-				NOT = {
-					custom_trigger_tooltip = {
-						tooltip = AFR_religion_not_sunni_tooltip                                     
-						is_in_array = {
-							array = national_religion_array
-							value = global.sunni
-						}   
-					}
-				}
-			}
-		}
-		
-		custom_cost_trigger = {
-
-			command_power > 50
-
-		}
-		custom_cost_text = skt_command_power_more_than_50
-
-		visible = {
-			AND = {
-				tag = SKT
-				ROOT = {
-					is_neighbor_of = DDI
-					owns_state = 873
-				}
-				DDI = {
-					owns_state = 770
-				}
-			}
-			NOT = { DDI = { is_subject_of = SKT } }
-		}
-	
-		fire_only_once = no
-		
-		days_re_enable = 180
-
-		cost = 100
-		
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				factor = 4
-				has_war_support > 0.5
-			}
-			modifier = {
-				factor = 0
-				has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag
-			}
-		}
-	
-		days_remove = 60
-		
-		complete_effect = {
-			army_experience = 25
-			add_command_power = -50
-			hidden_effect = {
-				
-				DDI = {
-					division_template = {
-						name = "Elite Tribal Infantry"
-						priority = 2
-						division_names_group = KRU_TRIBAL_INFANTRY_01
-						regiments = {
-							tribal_infantry = { x = 0 y = 0 }
-						
-							tribal_infantry = { x = 1 y = 0 }
-						}
-					}
-					set_division_template_lock = {
-						division_template = "Elite Tribal Infantry"
-						is_locked = yes
-					}
-					capital_scope ={
-						create_unit = {
-							division = "name = \"Elite Tribal Infantry\" division_template = \"Elite Tribal Infantry\" start_experience_factor = 3.0" 
-							owner = DDI
-						}
-					}
-				}
-				DDI = {
-					add_ideas = ETH_generals_inspire
-				}
-				SKT = {
-					clr_country_flag = SKT_border_war_ended
-				}
-				DDI = { country_event = { days = 7 id = skt_islamic_raid_defender.1 } }
-				SKT = { country_event = { days = 7 id = SKT_DDI_islamic_raid.1 } }
-			}
-			custom_effect_tooltip = SKT_DDI_prepare_border_raid
-		}
-		
-		cancel_trigger = {
-			hidden_trigger = { has_country_flag = SKT_border_war_ended }
-		}
-	
-		remove_effect = {
-			hidden_effect = {
-				finalize_border_war = {
-					attacker_win = yes
-					attacker = 873
-					defender = 770
-				}
-			}
-			#custom_effect_tooltip = SKT_DDI_end_border_raid
-		}
-		
 	}
 }
 
