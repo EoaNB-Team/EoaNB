@@ -155,7 +155,11 @@ tribal_decisions_eoanb = {
 
 		visible = {
 			OR = {
-				afr_is_tribal = yes
+				OR = {
+					afr_is_tribal = yes
+					is_first_nations_tribe = yes
+					is_south_american_tribe = yes
+				}
 				AND = {
 					has_cosmetic_tag = EGY_mahdist_insurgency
 					has_idea = afr_reforming_kingdom
@@ -209,7 +213,11 @@ tribal_decisions_eoanb = {
 
 		visible = {
 			OR = {
-				afr_is_tribal = yes
+				OR = {
+					afr_is_tribal = yes
+					is_first_nations_tribe = yes
+					is_south_american_tribe = yes
+				}
 				AND = {
 					has_cosmetic_tag = EGY_mahdist_insurgency
 					has_idea = afr_reforming_kingdom
@@ -256,6 +264,169 @@ tribal_decisions_eoanb = {
 			}
 		}
 	}
+	eoanb_decision_tribal_raise_horse_cavalry_army = {
+
+		icon = generic_political_discourse
+
+		available = {
+			has_tech = basic_cavalry
+			custom_trigger_tooltip = {
+				tooltip = EDC_Tribal_Army_over_1000
+				check_variable = {
+					Tribal_army_num > 1000
+				}
+			}
+			has_equipment = {
+				cavalry_equipment > 49
+			}
+		}
+
+		visible = {
+			OR = {
+				OR = {
+					afr_is_tribal = yes
+					is_first_nations_tribe = yes
+					is_south_american_tribe = yes
+				}
+				AND = {
+					has_cosmetic_tag = EGY_mahdist_insurgency
+					has_idea = afr_reforming_kingdom
+				}
+			}
+		}
+
+		custom_cost_trigger = {
+
+			command_power > 49.9
+			has_army_experience > 10
+
+		}
+		custom_cost_text = command_power_more_than_49_and_ae_more_than_49_horse_army
+
+		cost = 10
+		fire_only_once = no
+		complete_effect={
+			hidden_effect={
+				add_command_power = -50
+				army_experience = -10
+			}
+			add_to_variable = {Tribal_army_num = -1000}
+			add_equipment_to_stockpile = {
+				type = cavalry_equipment
+				amount = -50
+			}
+		}
+
+		remove_effect = {
+			if={
+				limit={
+					NOT={has_idea = AF_T_Tribal_Army}
+				}
+				add_ideas={AF_T_Tribal_Army}
+			}
+			custom_effect_tooltip= EDC_add_1000_to_tribal_horse_army
+			add_to_variable = {Tribal_horse_army_num = 1000}
+		}
+		days_remove = 30
+		days_re_enable = 120
+
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				has_war = yes
+			}
+		}
+	}
+	
+	eoanb_decision_tribal_raise_camel_cavalry_army = {
+
+		icon = generic_political_discourse
+
+		available = {
+			has_tech = tech_camel_cavalry
+			custom_trigger_tooltip = {
+				tooltip = EDC_Tribal_Army_over_1000
+				check_variable = {
+					Tribal_army_num > 1000
+				}
+			}
+			has_equipment = {
+				camel_equipment_0 > 49
+			}
+		}
+
+		visible = {
+			OR = {
+				OR = {
+					afr_is_tribal = yes
+					is_first_nations_tribe = yes
+					is_south_american_tribe = yes
+				}
+				AND = {
+					has_cosmetic_tag = EGY_mahdist_insurgency
+					has_idea = afr_reforming_kingdom
+				}
+			}
+			OR = {
+				AND = {
+					any_owned_state = {
+						is_core_of = ROOT
+						is_on_continent = africa
+					}
+				}
+				AND = {
+					any_owned_state = {
+						is_core_of = ROOT
+						is_on_continent = middle_east
+					}
+				}
+			}
+		}
+
+		custom_cost_trigger = {
+
+			command_power > 49.9
+			has_army_experience > 10
+
+		}
+		custom_cost_text = command_power_more_than_49_and_ae_more_than_49_camel_army
+
+		cost = 10
+		fire_only_once = no
+		complete_effect={
+			hidden_effect={
+				add_command_power = -50
+				army_experience = -10
+			}
+			add_to_variable = {Tribal_army_num = -1000}
+			add_equipment_to_stockpile = {
+				type = camel_equipment_0
+				amount = -50
+			}
+		}
+
+		remove_effect = {
+			if={
+				limit={
+					NOT={has_idea = AF_T_Tribal_Army}
+				}
+				add_ideas={AF_T_Tribal_Army}
+			}
+			custom_effect_tooltip= EDC_add_1000_to_tribal_camel_army
+			add_to_variable = {Tribal_camel_army_num = 1000}
+		}
+		days_remove = 30
+		days_re_enable = 120
+
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				has_war = yes
+			}
+		}
+	}
 }
 unidustrialized_warfare = {
 	eoanb_decision_Tribal_raid_neighbor = {
@@ -264,25 +435,45 @@ unidustrialized_warfare = {
 
 		available = {
 			has_tech = tribal_tatics
-			has_war = no
-			any_state = {
-				is_owned_and_controlled_by = FROM
-				any_neighbor_state = {
-					is_fully_controlled_by = ROOT
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+			}
+			custom_trigger_tooltip = {
+				tooltip = afr_raid_neighbor_at_peace_trigger
+				has_war = no
+				has_border_war = no
+				NOT = { has_country_flag = raiding_neighbour }
+			}
+			custom_trigger_tooltip={
+				tooltip = EDC_Any_Tribal_Army_over_1000
+				OR = {
+					check_variable = { Tribal_army_num > 999 }
+					check_variable = { Tribal_horse_army_num > 999 }
+					check_variable = { Tribal_camel_army_num > 999 }
 				}
 			}
-			afr_is_tribal = yes
-			custom_trigger_tooltip={
-				check_variable = { Tribal_army_num > 499 }
-				tooltip = EDC_Tribal_Army_over_500
+			custom_trigger_tooltip = {
+				tooltip = afr_war_exhaustion_value_less_than_5
+				check_variable = {
+					afr_war_exhaustion_value < 5
+				}
 			}
-			NOT = { has_non_aggression_pact_with = FROM }
-			NOT = {has_country_flag = raiding_neighbour}
+			hidden_trigger = {
+				any_state = {
+					is_owned_and_controlled_by = FROM
+					any_neighbor_state = {
+						is_fully_controlled_by = ROOT
+					}
+				}
+				afr_is_tribal = yes
+			}
 		}
 
 		visible = {
 			afr_is_tribal = yes
 			NOT = { has_war_with = FROM }
+			NOT = { is_in_faction_with = FROM }
 			any_state = {
 				is_owned_and_controlled_by = FROM
 				any_neighbor_state = {
@@ -310,6 +501,7 @@ unidustrialized_warfare = {
 			}
 			ROOT = {
 				NOT = { is_subject_of = FROM }
+				NOT = { is_in_faction_with = FROM }
 			}
 			FROM = {
 				NOT = { is_subject_of = ROOT }
@@ -320,6 +512,7 @@ unidustrialized_warfare = {
 		}
 		days_remove = 30
 		fire_only_once = no
+		days_re_enable = 90
 
 		cost = 0
 		
@@ -332,9 +525,12 @@ unidustrialized_warfare = {
 			
 		
 		cancel_trigger = {
-			OR = {
-				is_in_faction_with = FROM
-				has_war_with = FROM
+			custom_trigger_tooltip = {
+				tooltip = edc_raid_decision_cancel_trigger
+				OR = {
+					is_in_faction_with = FROM
+					has_war_with = FROM
+				}
 			}
 		}
 		modifier = {
@@ -482,14 +678,22 @@ unidustrialized_warfare = {
 
 		available = {
 			custom_trigger_tooltip={
-				check_variable = { Tribal_army_num > 999 }
-				tooltip = EDC_Tribal_Army_over_1000
+				tooltip = EDC_Any_Tribal_Army_over_1000
+				OR = {
+					check_variable = { Tribal_army_num > 999 }
+					check_variable = { Tribal_horse_army_num > 999 }
+					check_variable = { Tribal_camel_army_num > 999 }
+				}
 			}
 			has_war = yes
 			NOT={has_country_flag = Tribal_Army_Raised}
 		}
 		visible = {
-			afr_is_tribal = yes
+			OR = {
+				afr_is_tribal = yes
+				is_first_nations_tribe = yes
+				is_south_american_tribe = yes
+			}
 		}
 		
 		fire_only_once = no
@@ -498,6 +702,8 @@ unidustrialized_warfare = {
 		complete_effect = {
 			set_country_flag = Tribal_Army_Raised
 			afr_call_warriors = yes
+			afr_call_tribal_horse_cavalry = yes
+			afr_call_tribal_camel_cavalry = yes
 		}
 
 		ai_will_do = {
