@@ -1,4 +1,196 @@
+##########################
+#Tribal Pistoleer Cavalry#
+##########################
+USA_call_state_militia_units={
+	if = {
+		limit = { 
+			THIS = {
+				any_province_building_level = {
+					province = {
+						all_provinces = yes
+					}
+					building = bunker
+					level > 2
+				}
+			}
+		}
+		set_temp_variable = { Temp_State_bunker_level = 3 }
+		add_to_temp_variable = { State_militia_army_num = 6000 }
+	}
+	if = {
+		limit = { 
+			THIS = {
+				any_province_building_level = {
+					province = {
+						all_provinces = yes
+					}
+					building = bunker
+					level > 1
+				}
+				check_variable = {
+					var = Temp_State_bunker_level
+					value = 3
+					compare = not_equals
+				}
+			}
+		}
+		set_temp_variable = { Temp_State_bunker_level = 2 }
+		add_to_temp_variable = { State_militia_army_num = 4000 }
+	}
+	if = {
+		limit = { 
+			THIS = {
+				any_province_building_level = {
+					province = {
+						all_provinces = yes
+					}
+					building = bunker
+					level > 0
+				}
+				check_variable = {
+					var = Temp_State_bunker_level
+					value = 3
+					compare = not_equals
+				}
+				check_variable = {
+					var = Temp_State_bunker_level
+					value = 2
+					compare = not_equals
+				}
+			}
+		}
+		set_temp_variable = { Temp_State_bunker_level = 1 }
+		add_to_temp_variable = { State_militia_army_num = 2000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 5000 }
+			THIS = { state_population < 15000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 1000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 15000 }
+			THIS = { state_population < 25000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 2000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 25000 }
+			THIS = { state_population < 35000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 3000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 35000 }
+			THIS = { state_population < 45000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 4000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 45000 }
+			THIS = { state_population < 55000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 5000 }
+	}
+	if = {
+		limit = {
+			THIS = { is_core_of = FROM }
+			THIS = { state_population > 55000 }
+		}
+		add_to_temp_variable = { State_militia_army_num = 6000 }
+	}
+	if = {
+		limit = {
+			check_variable = {
+				var = State_militia_army_num
+				value = 6000
+				compare = greater_than
+			}
+		}
+		set_temp_variable = { State_militia_army_num = 6000 }
+	}
+	subtract_from_temp_variable = { State_militia_army_num = State_militia_army_used }
+	if = {
+		limit = { 
+			check_variable = {
+				var = State_militia_army_num
+				value = 0
+				compare = greater_than
+			}
+		}
+		set_temp_variable = {temp_state_militia_army = State_militia_army_num}
+		divide_temp_variable = {temp_state_militia_army = 1000}
+		round_variable = temp_state_militia_army
+		add_to_temp_array={
+			array = num_of_state_militia_divisions_to_raise
+			value = 1
+			index = 1
+		}
+		resize_temp_array = {num_of_state_militia_divisions_to_raise = temp_state_militia_army}
+		FROM = {
+			if = {
+				limit = { FROM = { NOT = { has_template = "State Militia" } } }
+				division_template = {
+					name = "State Militia"
+					priority = 2
+					division_names_group = USA_STATE_MILITIA_01
+					regiments = {
+						state_militia_infantry = { x = 0 y = 0 }
+					}
+					is_locked = yes
+				}
+			}
+		}
+		for_each_loop={
+			array = num_of_state_militia_divisions_to_raise
+			THIS ={
+				create_unit = {
+					division = "name = \"State Militia\" division_template = \"State Militia\" start_experience_factor = 1.0" 
+					owner = FROM
+				}
+			}
+			subtract_from_variable = { State_militia_army_num = 1000 }
+			clamp_variable = {
+				var = State_militia_army_num
+				min = 0
+				max = 6000
+			}
+			add_to_temp_variable = { State_militia_army_used = 1000 }
+			clamp_variable = {
+				var = State_militia_army_used
+				min = 0
+				max = 6000
+			}
+		}
+	}
+}
 
+USA_dismiss_state_militia_units={
+	delete_unit_template_and_units = { division_template = "State Militia" }
+	every_owned_state = {
+		limit = {
+			check_variable = {
+				var = State_militia_army_used
+				value = 0
+				compare = greater_than
+			}
+		}
+		set_variable = { State_militia_army_used = 0 }
+    }
+}
+##############################
+#Dynamic Border War Mechanics#
+##############################
 set_dynamic_american_state_border_war_variables = {
 
 			hidden_effect = {
