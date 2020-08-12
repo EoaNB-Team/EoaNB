@@ -21,6 +21,13 @@ add_namespace = first_nations_tribal_raid_colonial_neighbor_on_win_defender
 add_namespace = first_nations_tribal_raid_colonial_neighbor_on_lose_defender
 add_namespace = first_nations_tribal_raid_colonial_neighbor_on_cancel_defender
 
+add_namespace = afr_tribal_raid_colonial_neighbor_on_win_attacker
+add_namespace = afr_tribal_raid_colonial_neighbor_on_lose_attacker
+add_namespace = afr_tribal_raid_colonial_neighbor_on_cancel_attacker
+add_namespace = afr_tribal_raid_colonial_neighbor_on_win_defender
+add_namespace = afr_tribal_raid_colonial_neighbor_on_lose_defender
+add_namespace = afr_tribal_raid_colonial_neighbor_on_cancel_defender
+
 add_namespace = first_nations_tribal_border_war_enemy_on_win_attacker
 add_namespace = first_nations_tribal_border_war_enemy_on_lose_attacker
 add_namespace = first_nations_tribal_border_war_enemy_on_cancel_attacker
@@ -42,11 +49,13 @@ add_namespace = set_border_war_data_first_nations_tribal_raid
 add_namespace = first_nations_tribal_raid_neighbor_detect_raid
 add_namespace = first_nations_tribal_raid_colonial_neighbor_detect_raid
 add_namespace = first_nations_tribal_border_war_enemy_detect_raid
+add_namespace = afr_tribal_raid_colonial_neighbor_detect_raid
 
 add_namespace = USA_successor_state_decision
 
 add_namespace = USA_state_militia_flag_change
 add_namespace = USA_lower_state_militia_event
+add_namespace = AFR_lower_colonial_militia_event
 
 country_event = {
 	id = USA_state_militia_flag_change.1
@@ -63,7 +72,19 @@ country_event = {###post war, lower state militia again
 	hidden = yes
 	
 	trigger={
-		has_border_war = no
+		has_template = "State Militia"
+		any_neighbor_country = {
+			if = {
+				limit = { 
+					is_first_nations_tribe = yes
+					has_border_war_with = ROOT
+				}
+				always = no
+			}
+			else = {
+				always = yes 
+			}
+		}
 		NOT = { has_country_flag = State_Militia_Raised_Due_To_Border_War }
 	}
 	
@@ -75,6 +96,40 @@ country_event = {###post war, lower state militia again
 		hidden_effect = {
 			ROOT = {
 				USA_dismiss_state_militia_units = yes
+			}
+		}
+	}
+}
+
+country_event = {###post war, lower colonial militia again
+	id = AFR_lower_colonial_militia_event.1
+	hidden = yes
+	
+	trigger={
+		has_template = "Colonial Militia"
+		any_neighbor_country = {
+			if = {
+				limit = { 
+					afr_is_tribal = yes
+					has_border_war_with = ROOT
+				}
+				always = no
+			}
+			else = {
+				always = yes 
+			}
+		}
+		NOT = { has_country_flag = State_Militia_Raised_Due_To_Border_War }
+	}
+	
+	mean_time_to_happen = {
+		days = 2
+	}
+	
+	immediate = {
+		hidden_effect = {
+			ROOT = {
+				AFR_dismiss_colonial_militia_units = yes
 			}
 		}
 	}
@@ -187,6 +242,10 @@ country_event = {
 		if = {
 			limit = { ROOT = { has_country_flag = set_border_war_data_first_nations_tribal_border_war_enemy_flag } }
 			ROOT = { clr_country_flag = set_border_war_data_first_nations_tribal_border_war_enemy_flag }
+		}
+		if = {
+			limit = { ROOT = { has_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag } }
+			ROOT = { clr_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }
 		}
 	}
 }
@@ -848,6 +907,143 @@ country_event = {
 	}
 }
 
+####################################################
+#African Tribes vs Colonial Forces Border War Events#
+####################################################
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_detect_raid.1
+	title = afr_tribal_raid_colonial_neighbor_detect_raid.1.t
+	desc = afr_tribal_raid_colonial_neighbor_detect_raid.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_detect_raid.1.a
+		ai_chance = {
+			factor = 100
+		}
+		custom_effect_tooltip = set_border_war_data_afr_tribal_raid_colonial_neighbor_combat_width_tooltip
+	}
+}
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_win_attacker.1
+	title = afr_tribal_raid_colonial_neighbor_on_win_attacker.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_win_attacker.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = { ROOT = { afr_tribal_raid_colonial_neighbor_reward_random_list = yes } }
+	}
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_win_attacker.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+		army_experience = 20
+		afr_tribal_raid_colonial_neighbor_reward = yes
+	}
+}
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_lose_attacker.1
+	title = afr_tribal_raid_colonial_neighbor_on_lose_attacker.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_lose_attacker.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_lose_attacker.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+		army_experience = 5
+		custom_effect_tooltip = afr_war_exhaustion_value_add_1
+		add_to_variable = {
+			var = afr_war_exhaustion_value
+			value = 1
+		}
+	}
+}
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_cancel_attacker.1
+	title = afr_tribal_raid_colonial_neighbor_on_cancel_attacker.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_cancel_attacker.1.d
+	picture = GFX_report_event_parwar
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_cancel_attacker.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+		army_experience = 10
+	}
+}
+
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_win_defender.1
+	title = afr_tribal_raid_colonial_neighbor_on_win_defender.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_win_defender.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_win_defender.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+		army_experience = 1
+		add_political_power = 20
+	}
+}
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_lose_defender.1
+	title = afr_tribal_raid_colonial_neighbor_on_lose_defender.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_lose_defender.1.d
+	picture = GFX_report_event_chinese_army_training
+	
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = { ROOT = { afr_tribal_raid_colonial_neighbor_penalty_random_list = yes } }
+	}
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_lose_defender.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+		afr_tribal_raid_colonial_neighbor_penalty = yes
+	}
+}
+country_event = {
+	id = afr_tribal_raid_colonial_neighbor_on_cancel_defender.1
+	title = afr_tribal_raid_colonial_neighbor_on_cancel_defender.1.t
+	desc = afr_tribal_raid_colonial_neighbor_on_cancel_defender.1.d
+	picture = GFX_report_event_parwar
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_tribal_raid_colonial_neighbor_on_cancel_defender.1.a
+		if = { 
+			limit = { ROOT = { has_border_war = no } }
+			hidden_effect = { ROOT = { clr_country_flag = afr_tribal_raid_colonial_neighbor_flag } }
+		}
+	}
+}
+
 
 ####################################
 #Dynamic Attacker Border War Events#
@@ -866,6 +1062,10 @@ country_event = {
 		if = {
 			limit = { has_country_flag = first_nations_tribal_raid_colonial_neighbor_flag }
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_win_attacker.1 } }
+		}
+		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_win_attacker.1 } }
 		}
 		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
@@ -894,6 +1094,10 @@ country_event = {
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_lose_attacker.1 } }
 		}
 		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_lose_attacker.1 } }
+		}
+		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
 			ROOT = { country_event = { id = first_nations_tribal_border_war_enemy_on_lose_attacker.1 } }
 		}
@@ -918,6 +1122,10 @@ country_event = {
 		if = {
 			limit = { has_country_flag = first_nations_tribal_raid_colonial_neighbor_flag }
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_cancel_attacker.1 } }
+		}
+		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_cancel_attacker.1 } }
 		}
 		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
@@ -948,6 +1156,10 @@ country_event = {
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_win_defender.1 } }
 		}
 		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_win_defender.1 } }
+		}
+		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
 			ROOT = { country_event = { id = first_nations_tribal_border_war_enemy_on_win_defender.1 } }
 		}
@@ -974,6 +1186,10 @@ country_event = {
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_lose_defender.1 } }
 		}
 		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_lose_defender.1 } }
+		}
+		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
 			ROOT = { country_event = { id = first_nations_tribal_border_war_enemy_on_lose_defender.1 } }
 		}
@@ -998,6 +1214,10 @@ country_event = {
 		if = {
 			limit = { has_country_flag = first_nations_tribal_raid_colonial_neighbor_flag }
 			ROOT = { country_event = { id = first_nations_tribal_raid_colonial_neighbor_on_cancel_defender.1 } }
+		}
+		if = {
+			limit = { has_country_flag = afr_tribal_raid_colonial_neighbor_flag }
+			ROOT = { country_event = { id = afr_tribal_raid_colonial_neighbor_on_cancel_defender.1 } }
 		}
 		if = {
 			limit = { has_country_flag = first_nations_tribal_border_war_enemy_flag }
