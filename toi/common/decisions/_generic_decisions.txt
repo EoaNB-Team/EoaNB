@@ -797,6 +797,205 @@ economic_decisions = {
 
 #Internal Politics
 internal_politics_eoanb = {
+
+	afr_fractured_kingdom_set_tribal_politics = {
+		icon = generic_break_treaty
+		
+		available = {
+			hidden_trigger = { always = no }
+		}
+		
+		visible = {
+			hidden_trigger = { always = no }
+		}
+		
+		fire_only_once = yes
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = afr_fractured_kingdom_set_tribal_politics_flag
+				if = {
+					limit = {
+						AND = {
+							has_idea = dethroned_heir
+							has_idea = afr_fractured_kingdom
+						}
+					}
+					set_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 20 }
+					set_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 80 }
+				}
+				else_if = {
+					limit = {
+						OR = {
+							has_idea = dethroned_heir
+							has_idea = afr_fractured_kingdom
+						}
+					}
+					set_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 35 }
+					set_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 65 }
+				}
+				else = {
+					set_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 55 }
+					set_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 45 }
+				}
+			}
+		}
+		
+		ai_will_do = {
+			base = 0
+		}
+	}
+
+	afr_decision_internal_tribal_coup = {
+		icon = generic_civil_support               
+		available = {                          
+			command_power > 75
+		}
+		activation = {                  
+			OR = {
+				has_idea = afr_fractured_kingdom
+				has_idea = afr_stagnant_kingdom
+			}
+			NOT = { has_country_flag = afr_fractured_kingdom_opposition_crushed_flag }
+		}
+		
+		highlight_states = {
+			STATE = var:afr_capital_scope_var@ROOT
+		}
+		
+		visible = {
+			OR = {
+				has_idea = afr_fractured_kingdom
+				has_idea = afr_stagnant_kingdom
+			}
+			NOT = { has_country_flag = afr_fractured_kingdom_opposition_crushed_flag }
+		}
+
+		fire_only_once = no
+		selectable_mission = yes
+		custom_cost_trigger = {
+			command_power > 74.9
+		}
+		custom_cost_text = afr_calm_tribes_command_power_more_than_75
+		
+		is_good = no
+		days_mission_timeout = 75
+		
+		days_re_enable = 100
+	 
+		complete_effect = {
+			hidden_effect = {
+				if = {
+					limit = { NOT = { has_country_flag = afr_fractured_kingdom_set_tribal_politics_flag } }
+					activate_decision = afr_fractured_kingdom_set_tribal_politics
+				}
+				capital_scope = { set_variable = { afr_capital_scope_var@ROOT = THIS.id } }
+				activate_decision = afr_fractured_kingdom_opposition_crushed
+				set_country_flag = afr_fractured_kingdom_opposition_crushed_flag
+				add_command_power = -75
+				if = {
+					limit = { 
+						ROOT = { 
+							check_variable = { afr_fractured_kingdom_loyalist_support < 90 } 
+							check_variable = { afr_fractured_kingdom_opposition_support < 90 } 
+						} 
+					}
+					random_list = {
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 3 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = -3 }
+						}
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 1 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = -1 }
+						}
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 2 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = -2 }
+						}
+						10 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = 5 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = -5 }
+						}
+					}
+				}
+			}
+		}
+		
+		timeout_effect = {
+			hidden_effect = { 
+				capital_scope = { set_variable = { afr_capital_scope_var@ROOT = THIS.id } } 
+				if = {
+					limit = { NOT = { has_country_flag = afr_fractured_kingdom_set_tribal_politics_flag } }
+					activate_decision = afr_fractured_kingdom_set_tribal_politics
+				}
+			}
+			if = {
+				limit = { 
+					ROOT = { 
+						check_variable = { afr_fractured_kingdom_loyalist_support < 90 } 
+						check_variable = { afr_fractured_kingdom_opposition_support < 90 } 
+					} 
+				}
+				custom_effect_tooltip = afr_fractured_kingdom_opposition_support_increased_tooltip
+				hidden_effect = {
+					random_list = {
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = -3 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 3 }
+						}
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = -1 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 1 }
+						}
+						30 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = -2 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 2 }
+						}
+						10 = {
+							add_to_variable = { ROOT.afr_fractured_kingdom_loyalist_support@ROOT = -5 }
+							add_to_variable = { ROOT.afr_fractured_kingdom_opposition_support@ROOT = 5 }
+						}
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+		  base = 1000
+		}
+	}
+	
+	afr_fractured_kingdom_opposition_crushed = {
+		
+		icon = generic_decision
+		
+		available = {
+			hidden_trigger = { always = no }
+		}
+		
+		visible = {
+			has_country_flag = afr_fractured_kingdom_opposition_crushed_flag
+		}
+		
+		fire_only_once = no
+		
+		days_remove = 60
+		
+		modifier = {
+			political_power_gain = 0.05
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = afr_fractured_kingdom_opposition_crushed_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 1
+		}
+	}
 	
 	#Encourage Centrism
 	eoanb_decision_drift_centrism = {
