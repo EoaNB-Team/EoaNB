@@ -78,13 +78,178 @@ focus_tree = {
 
 	focus = {
 		id = SIA_expand_our_trade_network
-		icon = GFX_goal_focus_continent_west_europe
+		icon = GFX_goal_generic_construct_naval_dockyard
 		cost = 70
 		relative_position_id = SIA_our_neighbors
 		x = 1
 		y = 2
+		available = {
+			if = {
+				limit = { 
+					all_owned_state = { naval_base < 1 }
+				}
+				has_political_power > 250
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings_on_coast
+					Oceania_one_extra_building_slots_supported_for_coast_not_core_trigger = yes
+				}
+			}
+			else = {
+				has_political_power > 100
+				any_owned_state = {
+					is_coastal = yes
+					naval_base > 0
+				}
+			}
+		}
 		prerequisite = {
 			focus = SIA_our_neighbors
+		}
+		completion_reward = {
+			if = {
+				limit = { 
+					all_owned_state = { naval_base < 1 }
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = no }
+				}
+				add_political_power = -250
+				random_owned_controlled_state = {
+					limit = {
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+						is_coastal = yes
+					}
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = naval_base
+						level = 1
+						instant_build = yes
+						province = {
+							all_provinces = yes
+							limit_to_coastal = yes
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					add_core_of = ROOT
+					add_manpower = 12853
+				}
+			}
+			else_if = {
+				limit = {
+					any_owned_state = { has_state_flag = afr_port_town }
+				}
+				add_political_power = -150
+				random_owned_controlled_state = {
+					limit = {
+						has_state_flag = afr_port_town
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 12853
+				}
+			}
+			else_if = {
+				limit = {
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base < 1 }
+				}
+				add_political_power = -250
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					add_building_construction = {
+						type = naval_base
+						level = 1
+						instant_build = yes
+						province = {
+							all_provinces = yes
+							limit_to_coastal = yes
+						}
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base > 0 }
+				}
+				add_political_power = -100
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			else = {
+				add_political_power = -150
+				random_owned_controlled_state = {
+					limit = {
+						naval_base > 0
+						is_coastal = yes
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 12853
+				}
+			}
+			add_equipment_to_stockpile = { type = convoy_1 amount = 35 }
+			if = {
+				limit = {
+					check_variable = {ROOT.industrisation_progress < 100}
+					OR = {
+						has_idea = afr_reforming_kingdom
+						has_country_flag = Oceania_industrializing
+						has_country_flag = afr_colony_industrializing
+						has_country_flag = afr_an_african_industrializing
+					}
+				}
+				custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
+				custom_effect_tooltip = EDC_afr.6.t
+				hidden_effect = {
+					country_event = { id = EDC_afr.6 hours = 1 } 
+				}
+			}
 		}
 	}
 
@@ -93,7 +258,7 @@ focus_tree = {
 		icon = GFX_goal_focus_ally_ENG
 		cost = 70
 		relative_position_id = SIA_expand_our_trade_network
-		x = 1
+		x = 2
 		y = 1
 		prerequisite = {
 			focus = SIA_expand_our_trade_network
@@ -113,9 +278,9 @@ focus_tree = {
 	focus = {
 		id = SIA_open_embassy_in_france
 		icon = GFX_goal_focus_ally_FRA
-		cost = 140
+		cost = 70
 		relative_position_id = SIA_expand_our_trade_network
-		x = 3
+		x = 4
 		y = 1
 		prerequisite = {
 			focus = SIA_expand_our_trade_network
@@ -132,6 +297,31 @@ focus_tree = {
 			}
 			custom_effect_tooltip = SIA_FRA_influence_increased
 			add_to_variable = { SIA_french_influence = 1}
+		}
+	}
+	
+	focus = {
+		id = SIA_trade_with_ryukyu
+		icon = GFX_focus_jap_spiritual_mobilization
+		cost = 70
+		available = {
+			RYU = { has_country_flag = Oceania_ryukyuan_trade_expanded_flag }
+		}
+		prerequisite = {
+			focus = SIA_expand_our_trade_network
+		}
+		relative_position_id = SIA_expand_our_trade_network
+		x = 0
+		y = 1
+		completion_reward = {
+			hidden_effect = {
+				add_opinion_modifier = { target = RYU modifier = eoanb_om_africa_trade_focus }
+				reverse_add_opinion_modifier = { target = RYU modifier = eoanb_om_africa_trade_focus }
+			}
+			custom_effect_tooltip = Oceania_merchant_adopted_ryu
+			RYU = {
+				country_event = { id = RYU_open_trade.1 }
+			}
 		}
 	}
 	
@@ -281,6 +471,10 @@ focus_tree = {
 		}
 		completion_reward = {
 			add_tech_bonus = { bonus = 0.5 uses = 1 category = electronics_devices_tech }
+			custom_effect_tooltip = EDC_afr.5.t
+			hidden_effect = {
+				country_event = { id = EDC_afr.5 hours = 1 } 
+			}
 		}
 	}
 

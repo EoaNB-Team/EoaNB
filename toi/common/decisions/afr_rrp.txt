@@ -59,7 +59,15 @@ afr_rrp_american_colonization_society = {
 				has_country_flag = afr_rrp_german_company_port
 				has_country_flag = afr_rrp_bremen_company_port
 				has_country_flag = afr_rrp_sweden_company_port
+				has_country_flag = afr_rrp_orange_company_port
 				has_country_flag = afr_rrp_portugal_company_port
+				AND = {
+					has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+					OR = {
+						has_country_flag = afr_progress_tree
+						has_country_flag = afr_jihadist_tree
+					}
+				}
 			}
 		}
     }
@@ -181,6 +189,13 @@ afr_rrp_british_company_port = {
 
 	ai_will_do = { factor = 1 }
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = ENG
 		custom_trigger_tooltip = {
@@ -209,6 +224,15 @@ afr_rrp_british_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -229,7 +253,22 @@ afr_rrp_british_company_port = {
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
 		add_offsite_building = { type = cotton_farm level = 1 }
-			
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_british_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}
 	}
 	
 	complete_effect = {
@@ -237,13 +276,9 @@ afr_rrp_british_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_3
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			ENG = { 
 				country_event = { days = 1 id = afr_rrp.11 } 
-				diplomatic_relation = {
-					country = ROOT
-					relation = docking_rights
-					active = yes
-				}
 			}
 			add_opinion_modifier = { target = ENG modifier = eoanb_om_africa_trade_focus }
 			reverse_add_opinion_modifier = { target = ENG modifier = eoanb_om_africa_trade_focus }
@@ -251,17 +286,77 @@ afr_rrp_british_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_british_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					ENG = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.3 }
 						set_state_flag = afr_rrp_british_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					ENG = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_british_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					ENG = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -302,6 +397,13 @@ afr_rrp_french_company_port = {
 	ai_will_do = { factor = 1 }
     available = {
 		FRA = { has_country_flag = FRA_has_colonial_ambitions }
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = FRA
 		custom_trigger_tooltip = {
@@ -326,6 +428,15 @@ afr_rrp_french_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -347,8 +458,23 @@ afr_rrp_french_company_port = {
 	
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
-			add_offsite_building = { type = cotton_farm level = 1 }
-			
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_french_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}
 	}
 	
 	 complete_effect = {
@@ -356,13 +482,9 @@ afr_rrp_french_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_3
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			FRA = { 
 				country_event = { days = 1 id = afr_rrp.11 } 
-				diplomatic_relation = {
-					country = ROOT
-					relation = docking_rights
-					active = yes
-				}
 			}
 			add_opinion_modifier = { target = FRA modifier = eoanb_om_africa_trade_focus }
 			reverse_add_opinion_modifier = { target = FRA modifier = eoanb_om_africa_trade_focus }
@@ -370,17 +492,77 @@ afr_rrp_french_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_french_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					FRA = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.3 }
 						set_state_flag = afr_rrp_french_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					FRA = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_french_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					FRA = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -417,6 +599,13 @@ afr_rrp_portugal_company_port = {
 
 	ai_will_do = { factor = 1 }
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = POR
 		custom_trigger_tooltip = {
@@ -446,6 +635,15 @@ afr_rrp_portugal_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -467,8 +665,23 @@ afr_rrp_portugal_company_port = {
 	
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
-			add_offsite_building = { type = cotton_farm level = 1 }
-			
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_portugal_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}	
 	}
 	
 	complete_effect = {
@@ -476,13 +689,9 @@ afr_rrp_portugal_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_5
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			POR = { 
 				country_event = { days = 1 id = afr_rrp.11 } 
-				diplomatic_relation = {
-					country = ROOT
-					relation = docking_rights
-					active = yes
-				}
 			}	
 			add_opinion_modifier = { target = POR modifier = eoanb_om_africa_trade_focus }
 			reverse_add_opinion_modifier = { target = POR modifier = eoanb_om_africa_trade_focus }
@@ -490,17 +699,77 @@ afr_rrp_portugal_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.5 }
+						set_state_flag = afr_rrp_portugal_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					POR = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.5 }
 						set_state_flag = afr_rrp_portugal_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					POR = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.5 }
+						set_state_flag = afr_rrp_portugal_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					POR = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -544,6 +813,13 @@ afr_rrp_prussian_company_port = {
 		}
 	}
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = PRS
 		custom_trigger_tooltip = {
@@ -572,6 +848,15 @@ afr_rrp_prussian_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -593,8 +878,23 @@ afr_rrp_prussian_company_port = {
 	
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
-			add_offsite_building = { type = cotton_farm level = 1 }
-			
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_german_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}		
 	}
 	
 	complete_effect = {
@@ -602,13 +902,9 @@ afr_rrp_prussian_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_2
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			PRS = { 
 				country_event = { days = 1 id = afr_rrp.11 } 
-				diplomatic_relation = {
-					country = ROOT
-					relation = docking_rights
-					active = yes
-				}
 			}	
 			add_opinion_modifier = { target = PRS modifier = eoanb_om_africa_trade_focus }
 			reverse_add_opinion_modifier = { target = PRS modifier = eoanb_om_africa_trade_focus }
@@ -616,17 +912,77 @@ afr_rrp_prussian_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.2 }
+						set_state_flag = afr_rrp_german_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					PRS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.2 }
 						set_state_flag = afr_rrp_german_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					PRS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.2 }
+						set_state_flag = afr_rrp_german_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					PRS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -663,6 +1019,13 @@ afr_rrp_bremen_company_port = {
 
 	ai_will_do = { factor = 1 }
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = BRE
 		custom_trigger_tooltip = {
@@ -693,6 +1056,15 @@ afr_rrp_bremen_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -714,8 +1086,23 @@ afr_rrp_bremen_company_port = {
 	
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
-			add_offsite_building = { type = cotton_farm level = 1 }
-			
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_bremen_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}	
 	}
 	
 	 complete_effect = {
@@ -723,13 +1110,9 @@ afr_rrp_bremen_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_1
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			BRE = { 
 				country_event = { days = 1 id = afr_rrp.11 } 
-				diplomatic_relation = {
-					country = ROOT
-					relation = docking_rights
-					active = yes
-				}
 			}	
 			add_opinion_modifier = { target = BRE modifier = eoanb_om_africa_trade_focus }
 			reverse_add_opinion_modifier = { target = BRE modifier = eoanb_om_africa_trade_focus }
@@ -737,17 +1120,77 @@ afr_rrp_bremen_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.1 }
+						set_state_flag = afr_rrp_bremen_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					BRE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.1 }
 						set_state_flag = afr_rrp_bremen_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					BRE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.1 }
+						set_state_flag = afr_rrp_bremen_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					BRE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -786,6 +1229,13 @@ afr_rrp_hamburg_company_port = {
 
 	ai_will_do = { factor = 1 }
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = HAM
 		custom_trigger_tooltip = {
@@ -815,6 +1265,15 @@ afr_rrp_hamburg_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -840,8 +1299,23 @@ afr_rrp_hamburg_company_port = {
 	
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
-			add_offsite_building = { type = cotton_farm level = 1 }
-			
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_hamburg_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}		
 	}
 	
 	complete_effect = {
@@ -849,15 +1323,11 @@ afr_rrp_hamburg_company_port = {
 		custom_effect_tooltip = AFR_Racial_Tension_plus_1
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			HAM = {
 				if = {
 					limit = { ROOT = { NOT = { has_country_flag = HAM_negotiation_with_afr_kingdom_success_flag } } }
 					country_event = { days = 1 id = afr_rrp.11 } 
-					diplomatic_relation = {
-						country = ROOT
-						relation = docking_rights
-						active = yes
-					}
 					ROOT = { give_military_access = HAM }
 					add_ideas = HAM_woermann_trading_company_idea
 				}
@@ -868,17 +1338,77 @@ afr_rrp_hamburg_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.1 }
+						set_state_flag = afr_rrp_hamburg_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					HAM = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.1 }
 						set_state_flag = afr_rrp_hamburg_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					HAM = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.1 }
+						set_state_flag = afr_rrp_hamburg_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					HAM = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -916,6 +1446,13 @@ afr_rrp_sweden_company_port = {
 
 	ai_will_do = { factor = 1 }
     available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
 		afr_start_company_trigger = yes
 		country_exists = SWE
 		custom_trigger_tooltip = {
@@ -945,6 +1482,16 @@ afr_rrp_sweden_company_port = {
     visible = {
 		afr_visible_company_trigger = yes
 		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		SWE = { has_country_flag = SWE_negotiation_with_afr_kingdom_started_flag }
+		NOT = {
+			AND = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				OR = {
+					has_country_flag = afr_progress_tree
+					has_country_flag = afr_jihadist_tree
+				}
+			}
+		}
     }
 	
 	fire_only_once = yes
@@ -971,23 +1518,34 @@ afr_rrp_sweden_company_port = {
 	remove_effect = {
 		clr_country_flag = afr_rrp_colonial_project_active
 		add_offsite_building = { type = cotton_farm level = 1 }
-			
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_sweden_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}	
 	}
 	
 	complete_effect = {
 		afr_company_port_effect= yes
-		custom_effect_tooltip = AFR_Racial_Tension_plus_1
+		custom_effect_tooltip = AFR_Racial_Tension_plus_3
 		
 		hidden_effect = {
+			set_afr_port_town_random_pop = yes
 			SWE = {
 				if = {
 					limit = { ROOT = { NOT = { has_country_flag = SWE_negotiation_with_afr_kingdom_success_flag } } }
 					country_event = { days = 1 id = afr_rrp.11 } 
-					diplomatic_relation = {
-						country = ROOT
-						relation = docking_rights
-						active = yes
-					}
 					ROOT = { give_military_access = SWE }
 					add_ideas = SWE_swedish_african_company_idea
 				}
@@ -998,17 +1556,77 @@ afr_rrp_sweden_company_port = {
 				if = {
 					limit = {
 						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_sweden_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					SWE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						} 
 					}
 					random_owned_state = {
 						limit = { 
 							is_coastal = yes 
+							is_capital = no
 							is_core_of = ROOT
 						}
 						state_event = { id = afr_rrp_racial_tension_increase.3 }
 						set_state_flag = afr_rrp_sweden_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					SWE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.3 }
+						set_state_flag = afr_rrp_sweden_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					SWE = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
 					}
 				}
 				else_if = {
@@ -1036,6 +1654,214 @@ afr_rrp_sweden_company_port = {
 				}
 			}
 			set_country_flag = afr_rrp_sweden_company_port
+		}
+    }
+	
+}
+
+afr_rrp_orange_company_port = {
+
+	ai_will_do = { factor = 1 }
+    available = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_kingdom_power_tooltip
+			OR = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
+				has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag
+				has_idea = afr_reforming_kingdom
+				has_idea = AF_T_small_kingdom
+			}
+		}
+		afr_start_company_trigger = yes
+		country_exists = OFS
+		custom_trigger_tooltip = {
+			tooltip = afr_start_ofs_company_tooltip
+			OR = { 
+				ROOT = {
+					any_owned_state = { is_coastal = yes }
+				}
+				OFS = { 
+					is_neighbor_of = ROOT
+				}
+				any_country = {
+					AND = {
+						is_subject_of = OFS
+						is_neighbor_of = ROOT
+					}
+				}
+			}
+		}
+		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+		
+    }
+    visible = {
+		OR = {
+			has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
+			has_country_flag = afr_rrp_orange_rhodesia_company_proposal_failed_flag	
+		}
+		afr_visible_company_trigger = yes
+		NOT = { has_completed_focus = afr_generic_jihadist_jihad_way_not_thiers }
+    }
+	
+	fire_only_once = yes
+
+    cost = 0
+	
+	days_remove = 360
+	
+	modifier = {
+		political_power_gain = -1
+		MONTHLY_POPULATION = 1
+	}
+	
+	cancel_trigger = {
+		if = {
+			limit = { NOT = { has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag } }
+			NOT = { afr_orange_company_port_trigger = yes }
+		}
+		else = {
+			hidden_trigger = { always = no }
+		}
+	}
+	
+	remove_effect = {
+		clr_country_flag = afr_rrp_colonial_project_active
+		add_offsite_building = { type = cotton_farm level = 1 }
+		random_owned_state = {
+			limit = { has_state_flag = afr_rrp_orange_company_headquarters }
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
+			if = {
+				limit = { NOT = { has_state_flag = afr_port_town_already_established } }
+				set_afr_port_town_for_company = yes
+			}
+			if = {
+				limit = { has_state_flag = afr_port_town_already_established }
+				hidden_effect = { clr_state_flag = afr_port_town_already_established }
+			}
+		}
+	}
+	
+	complete_effect = {
+		afr_company_port_effect= yes
+		custom_effect_tooltip = AFR_Racial_Tension_plus_6
+		
+		hidden_effect = {
+			set_afr_port_town_random_pop = yes
+			OFS = {
+				if = {
+					limit = { ROOT = { NOT = { has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag } } }
+					country_event = { days = 1 id = afr_rrp.11 } 
+					ROOT = { give_military_access = OFS }
+				}
+			}
+			add_opinion_modifier = { target = OFS modifier = eoanb_om_africa_trade_focus }
+			reverse_add_opinion_modifier = { target = OFS modifier = eoanb_om_africa_trade_focus }
+			ROOT = {
+				if = {
+					limit = {
+						any_owned_state = {
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							has_state_flag = afr_port_town
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.6 }
+						set_state_flag = afr_rrp_orange_company_headquarters
+						set_state_flag = afr_port_town_already_established
+					}
+					OFS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = no
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = no
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.6 }
+						set_state_flag = afr_rrp_orange_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					OFS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_coastal = yes 
+							is_capital = yes
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.6 }
+						set_state_flag = afr_rrp_orange_company_headquarters
+						set_state_flag = afr_port_town
+					}
+					OFS = {
+						diplomatic_relation = {
+							country = ROOT
+							relation = docking_rights
+							active = yes
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						any_owned_state = {
+							is_capital = no
+							is_core_of = ROOT
+						} 
+					}
+					random_owned_state = {
+						limit = { 
+							is_capital = no 
+							is_core_of = ROOT
+						}
+						state_event = { id = afr_rrp_racial_tension_increase.6 }
+						set_state_flag = afr_rrp_orange_company_headquarters
+					}
+				}
+				else = {
+					random_owned_state = {
+						limit = { is_core_of = ROOT }
+						state_event = { id = afr_rrp_racial_tension_increase.6 }
+						set_state_flag = afr_rrp_orange_company_headquarters
+					}
+				}
+			}
+			set_country_flag = afr_rrp_orange_company_port
 		}
     }
 	
@@ -1399,8 +2225,10 @@ afr_rrp_weapon_contract = {
 
 	ai_will_do = { factor = 1 }
     available = {
-		Root = {
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_reforming_regional_power_tooltip
 			OR = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
 				has_idea = AF_T_small_kingdom
 				has_idea = afr_reforming_kingdom
 			}
@@ -1469,6 +2297,12 @@ afr_rrp_weapon_contract = {
 				}
 				SWE = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
 			}
+			else_if = {
+				limit = {
+					has_country_flag = afr_rrp_orange_company_port
+				}
+				OFS = { country_event = { days = 7 id = afr_rrp_weapon_contract.1 } }
+			}
 		}
 		set_country_flag = afr_rrp_colonial_weapon_contract_requested
     }
@@ -1509,7 +2343,6 @@ afr_rrp_weapon_contract_active = {
 	}
 	
 	complete_effect = {
-		set_country_flag = afr_rrp_colonial_project_active
 		if = {
 			limit = {
 				has_country_flag = afr_rrp_british_company_port
@@ -1608,10 +2441,23 @@ afr_rrp_weapon_contract_active = {
 				}
 			}
 		}
+		else_if = {
+			limit = {
+				has_country_flag = afr_rrp_orange_company_port
+			}
+			OFS = {
+				create_production_license = {
+					target = ROOT
+					equipment = {
+						type = infantry_equipment_rifle_1
+					}
+					cost_factor = 0
+				}
+			}
+		}
 	}
 	
 	remove_effect = {
-		clr_country_flag = afr_rrp_colonial_project_active
 		if = {
 			limit = {
 				ROOT = { has_country_flag = afr_rrp_colonial_weapon_contract_full_support }
@@ -1627,7 +2473,13 @@ afr_rrp_railway_line_1 = {
 
 	ai_will_do = { factor = 1 }
     available = {
-		has_idea = afr_reforming_kingdom
+		custom_trigger_tooltip = {
+			tooltip = afr_rrp_is_reforming_regional_power_tooltip
+			OR = {
+				has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
+				has_idea = afr_reforming_kingdom
+			}
+		}
 		afr_has_company_port_trigger = yes
 		ROOT = { has_completed_focus = afr_Build_more_roads }
 		NOT = {
@@ -1684,6 +2536,10 @@ afr_rrp_railway_line_1 = {
 			SWE = { country_event = { days = 7 id = afr_rrp.2 } }
 		}
 		if = {
+			limit = { has_country_flag = afr_rrp_orange_company_port }
+			OFS = { country_event = { days = 7 id = afr_rrp.2 } }
+		}
+		if = {
 			limit = { has_country_flag = afr_rrp_usa_investments }
 			if = { 
 				limit = { country_exists = USA }
@@ -1702,7 +2558,13 @@ afr_rrp_railway_infrastructure_construction = {
     available = {
 		if = {
 			limit = { afr_is_tribal = yes }
-			has_idea = afr_reforming_kingdom
+			custom_trigger_tooltip = {
+				tooltip = afr_rrp_is_reforming_regional_power_tooltip
+				OR = {
+					has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
+					has_idea = afr_reforming_kingdom
+				}
+			}
 			afr_has_company_port_trigger = yes
 		}
 		has_tech = iron_railways
@@ -1777,6 +2639,10 @@ afr_rrp_railway_infrastructure_construction = {
 				SWE = { country_event = { days = 7 id = afr_rrp.7 } }
 			}
 			if = {
+				limit = { has_country_flag = afr_rrp_orange_company_port }
+				OFS = { country_event = { days = 7 id = afr_rrp.7 } }
+			}
+			if = {
 				limit = { has_country_flag = afr_rrp_usa_investments }
 				if = { 
 					limit = { country_exists = USA }
@@ -1794,6 +2660,7 @@ afr_rrp_railway_infrastructure_construction = {
 							has_state_flag = afr_rrp_bremen_company_headquarters
 							has_state_flag = afr_rrp_hamburg_company_headquarters
 							has_state_flag = afr_rrp_sweden_company_headquarters
+							has_state_flag = afr_rrp_orange_company_headquarters
 						}
 					}
 				}
@@ -1807,6 +2674,7 @@ afr_rrp_railway_infrastructure_construction = {
 							has_state_flag = afr_rrp_bremen_company_headquarters
 							has_state_flag = afr_rrp_hamburg_company_headquarters
 							has_state_flag = afr_rrp_sweden_company_headquarters
+							has_state_flag = afr_rrp_orange_company_headquarters
 						}
 					}
 					add_extra_state_shared_building_slots = 1
@@ -1829,6 +2697,7 @@ afr_rrp_railway_infrastructure_construction = {
 							has_state_flag = afr_rrp_bremen_company_headquarters
 							has_state_flag = afr_rrp_hamburg_company_headquarters
 							has_state_flag = afr_rrp_sweden_company_headquarters
+							has_state_flag = afr_rrp_orange_company_headquarters
 						}
 					}
 				}
@@ -1851,7 +2720,13 @@ afr_rrp_main_railway_route_construction = {
     available = {
 		if = {
 			limit = { afr_is_tribal = yes }
-			has_idea = afr_reforming_kingdom
+			custom_trigger_tooltip = {
+				tooltip = afr_rrp_is_reforming_regional_power_tooltip
+				OR = {
+					has_country_flag = afr_rrp_orange_rhodesia_company_partnership_flag
+					has_idea = afr_reforming_kingdom
+				}
+			}
 			afr_has_company_port_trigger = yes
 		}
 		AND = {
