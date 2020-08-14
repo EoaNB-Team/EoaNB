@@ -1584,7 +1584,7 @@ focus_tree = {
 	}
 	focus = {
 		id = afr_build_a_port
-		icon = GFX_goal_generic_construct_naval_dockyard
+		icon = GFX_goal_focus_profits_tea_spices
 		cost = 70
 		prerequisite = {
 			focus = afr_plan_a_naval_force
@@ -1593,23 +1593,152 @@ focus_tree = {
 			focus = afr_reforming_regional_power_regional_infrastructure
 		}
 		available = {
-			any_owned_state = { is_coastal = yes }
+			if = {
+				limit = { 
+					all_owned_state = { naval_base < 1 }
+				}
+				custom_trigger_tooltip = {
+					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings_on_coast
+					Oceania_one_extra_building_slots_supported_for_coast_not_core_trigger = yes
+				}
+			}
+			else = {
+				any_owned_state = {
+					is_coastal = yes
+					naval_base > 0
+				}
+			}
 		}
 		completion_reward={
-			random_owned_controlled_state = {
-				limit = {
-					is_coastal = yes
-					#free_building_slots = { 
-					#	building = naval_base
-					#	size > 1
-					#	include_locked = yes 
-					#}
+			if = {
+				limit = { 
+					all_owned_state = { naval_base < 1 }
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = no }
 				}
-				add_building_construction = {
-					type = naval_base
-					#province = THIS
-					level = 2
-					instant_build = yes
+				add_political_power = -250
+				random_owned_controlled_state = {
+					limit = {
+						Oceania_infrastructure_for_extra_building_slots_trigger = yes
+						is_coastal = yes
+					}
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					afr_add_one_building_naval_base_scripted_effect = yes
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 1853
+				}
+			}
+			else_if = {
+				limit = {
+					any_owned_state = { has_state_flag = afr_port_town }
+				}
+				add_political_power = -100
+				random_owned_controlled_state = {
+					limit = {
+						has_state_flag = afr_port_town
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 1853
+				}
+			}
+			else_if = {
+				limit = {
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base < 1 }
+				}
+				add_political_power = -250
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					afr_add_one_building_naval_base_scripted_effect = yes
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base > 0 }
+				}
+				add_political_power = -100
+				random_owned_state = {
+					limit = {
+						is_coastal = yes
+						is_capital = yes
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			else = {
+				add_political_power = -100
+				random_owned_controlled_state = {
+					limit = {
+						naval_base > 0
+						is_coastal = yes
+					}
+					set_state_flag = afr_port_town
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+					}
+					add_manpower = 1853
+				}
+			}
+			add_equipment_to_stockpile = { type = convoy_1 amount = 14 }
+			if = {
+				limit = {
+					check_variable = {ROOT.industrisation_progress < 100}
+					OR = {
+						has_idea = afr_reforming_kingdom
+						has_country_flag = Oceania_industrializing
+						has_country_flag = afr_colony_industrializing
+						has_country_flag = afr_an_african_industrializing
+					}
+				}
+				custom_effect_tooltip = AFR_GENERIC_COLONIAL_ENTER_TOOLTIP
+				custom_effect_tooltip = EDC_afr.6.t
+				hidden_effect = {
+					country_event = { id = EDC_afr.6 hours = 1 } 
 				}
 			}
 		}
