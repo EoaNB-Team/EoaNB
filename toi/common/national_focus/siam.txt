@@ -78,7 +78,7 @@ focus_tree = {
 
 	focus = {
 		id = SIA_expand_our_trade_network
-		icon = GFX_goal_generic_construct_naval_dockyard
+		icon = GFX_goal_focus_profits_tea_spices
 		cost = 70
 		relative_position_id = SIA_our_neighbors
 		x = 1
@@ -88,14 +88,12 @@ focus_tree = {
 				limit = { 
 					all_owned_state = { naval_base < 1 }
 				}
-				has_political_power > 250
 				custom_trigger_tooltip = {
 					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings_on_coast
 					Oceania_one_extra_building_slots_supported_for_coast_not_core_trigger = yes
 				}
 			}
 			else = {
-				has_political_power > 100
 				any_owned_state = {
 					is_coastal = yes
 					naval_base > 0
@@ -108,37 +106,60 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = { 
-					all_owned_state = { naval_base < 1 }
-					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
-					capital_scope = { is_coastal = no }
+					OR = {
+						AND = {
+							all_owned_state = { naval_base < 1 }
+							all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+							capital_scope = { is_coastal = no }
+						}
+						owns_state = 724
+					}
 				}
 				add_political_power = -250
-				random_owned_controlled_state = {
-					limit = {
-						Oceania_infrastructure_for_extra_building_slots_trigger = yes
-						is_coastal = yes
-					}
-					set_state_flag = afr_port_town
-					hidden_effect = {
-						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
-					}
-					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-						type = naval_base
-						level = 1
-						instant_build = yes
-						province = {
-							all_provinces = yes
-							limit_to_coastal = yes
+				if = {
+					limit = { owns_state = 724 }
+					724 = {
+						set_state_flag = afr_port_town
+						hidden_effect = {
+							add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
 						}
+						add_extra_state_shared_building_slots = 1
+						afr_add_one_building_naval_base_scripted_effect = yes
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+						if = {
+							limit = { THIS = { NOT = { is_core_of = ROOT } } }
+							add_core_of = ROOT
+						}
+						add_manpower = 12853
 					}
-					add_building_construction = {
-						type = infrastructure
-						level = 1
-						instant_build = yes
+				}
+				else = {
+					random_owned_controlled_state = {
+						limit = {
+							Oceania_infrastructure_for_extra_building_slots_trigger = yes
+							is_coastal = yes
+						}
+						set_state_flag = afr_port_town
+						hidden_effect = {
+							add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+						}
+						add_extra_state_shared_building_slots = 1
+						afr_add_one_building_naval_base_scripted_effect = yes
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+						if = {
+							limit = { THIS = { NOT = { is_core_of = ROOT } } }
+							add_core_of = ROOT
+						}
+						add_manpower = 12853
 					}
-					add_core_of = ROOT
-					add_manpower = 12853
 				}
 			}
 			else_if = {
@@ -178,15 +199,7 @@ focus_tree = {
 						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
 					}
 					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-						type = naval_base
-						level = 1
-						instant_build = yes
-						province = {
-							all_provinces = yes
-							limit_to_coastal = yes
-						}
-					}
+					afr_add_one_building_naval_base_scripted_effect = yes
 					add_building_construction = {
 						type = infrastructure
 						level = 1
