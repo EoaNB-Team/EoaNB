@@ -1238,14 +1238,120 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_centralized_administration }
 		prerequisite = { focus = afr_colony_generic_focus_centralized_army }
 		completion_reward = {
-			capital_scope = {
-				add_extra_state_shared_building_slots = 2
+			if = {
+				limit = {
+					any_owned_state = {
+						any_neighbor_state = { 
+							is_core_of = ROOT 
+							is_owned_by = ROOT
+						}
+						NOT = { is_core_of = ROOT }
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						any_neighbor_state = { 
+							is_core_of = ROOT 
+							is_owned_by = ROOT
+						}
+						NOT = { is_core_of = ROOT }
+					}
+					if = {
+						limit = {
+							free_building_slots = {
+								building = infrastructure
+								size > 1
+							}
+						}
+						add_building_construction = {
+							type = infrastructure
+							level = 2
+							instant_build = yes
+						}
+					}
+					else_if = {
+						limit = {
+							free_building_slots = {
+								building = infrastructure
+								size > 0
+							}
+						}
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+					add_core_of = ROOT
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.6 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_6
+				}
 			}
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = {
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
-				custom_effect_tooltip = AFR_Racial_Tension_plus_2
-			}			
+			else_if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+						is_core_of = ROOT
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+			else_if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+						is_core_of = ROOT
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+			else = {
+				random_owned_controlled_state ={
+					limit = { 
+						is_core_of = ROOT
+					}
+					add_extra_state_shared_building_slots = 2
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+				
 		}
 	}
 	
@@ -1400,14 +1506,14 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = {
-					has_idea = limited_exports
+					has_idea = closed_economy
 				}
-				swap_ideas = { add_idea = free_trade remove_idea = limited_exports }
+				swap_ideas = { add_idea = limited_exports remove_idea = closed_economy }
 			}
 			else_if = {
-				add_ideas = free_trade
+				add_ideas = limited_exports
 			}
-			custom_effect_tooltip = afr_colony_generic_focus_laissez_faire_markets_tooltip
+			#custom_effect_tooltip = afr_colony_generic_focus_laissez_faire_markets_tooltip
 		}
 	}
 	
@@ -1460,31 +1566,113 @@ focus_tree = {
 			factor = 0.50
 		}
 		available = {
-			custom_trigger_tooltip={
-			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_1
-				check_variable = { detrimental_colonial_impact_value < 11 }
+			any_owned_state = {
+				NOT = { is_core_of = ROOT }
+				custom_trigger_tooltip={
+					tooltip = afr_colony_generic_focus_native_reservations_tooltip_trigger_1
+					check_variable = { detrimental_colonial_impact_value < 11 }
+				}
 			}
 			custom_trigger_tooltip={
-			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_2
+				tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_2
 				NOT = { has_idea = tribal_slavery }				
 				NOT = { has_idea = usa_slavery_law }
 				NOT = { has_idea = slavery }
 			}
-				
 		}
 		prerequisite = { focus = afr_colony_generic_focus_decentralized_autonomy }
 		prerequisite = { focus = afr_colony_generic_focus_spread_military }
 		completion_reward = {
-			add_popularity = {
-				ideology = social_egalitarianism
-				popularity = 0.05
+			hidden_effect = { add_popularity = { ideology = social_egalitarianism popularity = 0.05 } }
+			if = {
+				limit = {
+					any_owned_state = {
+						check_variable = { detrimental_colonial_impact_value > 5 }
+						NOT = { is_core_of = ROOT }
+						any_country = { PREV = { is_core_of = PREV } }
+					}
+					always = no
+				}
+				add_ideas = AFR_colonial_native_reservations
+				custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						check_variable = { detrimental_colonial_impact_value > 5 }
+						NOT = { is_core_of = ROOT }
+						any_country = { PREV = { is_core_of = PREV } }
+						is_capital = no
+					}
+					set_state_flag = afr_colonial_native_reservation_state_flag
+					if = {
+						limit = { Oceania_infrastructure_for_clearing_building_slots_trigger = yes }
+						add_to_variable = { Oceania_extra_state_shared_building_slots = -1 }
+						add_extra_state_shared_building_slots = -1
+					}
+					custom_effect_tooltip = AFR_Racial_Tension_minus_6
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.6 trigger_for = controller } }
+				}
 			}
-			add_ideas = AFR_colonial_native_reservations
-			custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = { 
-				custom_effect_tooltip = AFR_Racial_Tension_minus_3
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.3 trigger_for = controller } }
+			else_if = {
+				limit = {
+					any_owned_state = {
+						NOT = { is_core_of = ROOT }
+						all_neighbor_state = { is_capital = no }
+						state_population < 30000
+					}
+				}
+				add_ideas = AFR_colonial_native_reservations
+				custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						NOT = { is_core_of = ROOT }
+						all_neighbor_state = { is_capital = no }
+						is_capital = no
+						state_population < 30000
+					}
+					set_state_flag = afr_colonial_native_reservation_state_flag
+					if = {
+						limit = { Oceania_infrastructure_for_clearing_building_slots_trigger = yes }
+						add_to_variable = { Oceania_extra_state_shared_building_slots = -1 }
+						add_extra_state_shared_building_slots = -1
+					}
+					if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 2 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_3
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.3 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 1 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_2
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.2 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 0 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.1 trigger_for = controller } }
+					}
+				}
+			}
+			else = {
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						check_variable = { detrimental_colonial_impact_value > 0 }
+						NOT = { is_core_of = ROOT }
+						is_capital = no
+					}
+					if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 1 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_2
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.2 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 0 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.1 trigger_for = controller } }
+					}
+				}
 			}
 		}
 	}
@@ -1599,16 +1787,20 @@ focus_tree = {
 		available = {
 			if = {
 				limit = { 
+					TAG = SNG 
+					owns_state = 1108
+				}
+			}
+			else_if = {
+				limit = { 
 					all_owned_state = { naval_base < 1 }
 				}
-				has_political_power > 250
 				custom_trigger_tooltip = {
 					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings_on_coast
 					Oceania_one_extra_building_slots_supported_for_coast_not_core_trigger = yes
 				}
 			}
 			else = {
-				has_political_power > 100
 				any_owned_state = {
 					is_coastal = yes
 					naval_base > 0
@@ -1621,6 +1813,33 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_decide_future_gov_1860 }
 		completion_reward = {
 			if = {
+				limit = { 
+					TAG = GDC
+					owns_state = 1108
+				}
+				add_political_power = -250
+				1108 = {
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					afr_add_one_building_naval_base_scripted_effect = yes
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+						custom_effect_tooltip = AFR_Racial_Tension_plus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
+					}
+					add_manpower = 6325
+				}
+			}
+			else_if = {
 				limit = { 
 					all_owned_state = { naval_base < 1 }
 					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
@@ -1742,7 +1961,7 @@ focus_tree = {
 			}
 			add_equipment_to_stockpile = { type = convoy_1 amount = 45 }
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1784,8 +2003,44 @@ focus_tree = {
 			else = {
 				custom_effect_tooltip = afr_colony_generic_focus_1860_gov_naval_base_tooltip
 			}
+			hidden_effect = {
+				if = {
+					limit = { NOT = { has_tech = tech_naval_corvette } }
+					set_technology = { tech_naval_corvette = 1 }
+				}
+				if = {
+					limit = { NOT = { has_tech = tech_naval_corvette_1 } }
+					set_technology = { tech_naval_corvette_1 = 1 }
+				}
+			}
+			add_equipment_production = {
+				equipment = {
+					type = ship_hull_corvette_0
+				}
+				requested_factories = 1
+				progress = 0.90
+				amount = 1
+			}
+			hidden_effect = {
+				add_equipment_production = {
+					equipment = {
+						type = ship_hull_corvette_0
+					}
+					requested_factories = 0
+					progress = 0.77
+					amount = 1
+				}
+				add_equipment_production = {
+					equipment = {
+						type = ship_hull_corvette_0
+					}
+					requested_factories = 0
+					progress = 0.63
+					amount = 1
+				}
+			}
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1803,10 +2058,24 @@ focus_tree = {
 			factor = 1
 		}
 		prerequisite = { focus = afr_colony_generic_focus_1860_gov_naval_base }
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_establish_senegal_navy_flag } }
 		completion_reward = {
+			hidden_effect = {
+				if = {
+					limit = { NOT = { has_tech = tech_naval_capital_ship_naval_transportation } }
+					set_technology = { tech_naval_capital_ship_naval_transportation = 1 }
+				}
+			}
+			if = {
+				limit = { NOT = { has_tech = tech_infantry_special_infantry_corps } }
+				set_technology = { tech_infantry_special_infantry_corps = 1 }
+			}
+			if = {
+				limit = { NOT = { has_tech = tech_infantry_colonial_marines } }
+				set_technology = { tech_infantry_colonial_marines = 1 }
+			}
 			
 		}
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1828,7 +2097,7 @@ focus_tree = {
 		completion_reward = {
 			
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_establish_senegal_navy_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
