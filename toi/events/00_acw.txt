@@ -612,9 +612,7 @@ country_event = {
   }
   option = {
     name = acw_beckenridge.10.b
-    trigger = {
-      is_ai = no
-    }
+    trigger = { is_ai = no }
     NEG = {
       change_tag_from = USA
     }
@@ -757,7 +755,7 @@ country_event = { # Historic USA Win — CSA Submission
   option = {
     name = acw_peace_deal.1.a
     trigger = { tag = CSA }
-    ai_chance = { factor = 0 }
+    ai_chance = { factor = 100 }
     custom_effect_tooltip = 01_ACW_PEACEDEAL_tt
     hidden_effect = {
       CSA = {
@@ -765,20 +763,22 @@ country_event = { # Historic USA Win — CSA Submission
           remove_claim_by = USA
           add_core_of = USA
           remove_core_of = CSA
+          add_claim_by = CSA
         }
       }
-      USA = { country_event = { id = acw_peace_deal.2 } }
+      USA = { country_event = { id = acw_peace_deal.2 hours = 3 } }
     }
   }
   option = {
     name = acw_peace_deal.1.b
-    trigger = { tag = CSA }
+    trigger = { tag = ASA } # Temporary Endpoint. Not supposed to be seen
     ai_chance = { factor = 100 }
     custom_effect_tooltip = 02_ACW_PEACEDEAL_tt
   }
 }
 
-country_event = { # Historic USA Win — USA Accepts (Full Admission)
+# Historic USA Win — USA Accepts (Full Admission)
+country_event = {
   id = acw_peace_deal.2
   title = acw_peace_deal.2.t
   desc = acw_peace_deal.2.d
@@ -797,29 +797,37 @@ country_event = { # Historic USA Win — USA Accepts (Full Admission)
       limit = { ENG = { has_war_together_with = CSA } }
       custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
       white_peace = ENG
-      transfer_state = 426 # New Brunswick
-      add_state_claim = 426
-      transfer_state = 740 # Vancouver Island
-      add_state_claim = 740 # England
+      hidden_effect = {
+        transfer_state = 426 # New Brunswick
+        add_state_claim = 426
+        transfer_state = 740 # Vancouver Island
+        add_state_claim = 740
+      }
     }
     if = {
       limit = { FRA = { has_war_together_with = CSA } }
+      custom_effect_tooltip = 02_ACW_PEACEDEAL_VAL_tt
       white_peace = FRA
-      transfer_state = 730 # Saint Pierre & Miquelon
-      add_state_claim = 730 # # France
+      hidden_effect = {
+        transfer_state = 730 # Saint Pierre & Miquelon
+        add_state_claim = 730
+      }
     }
     if = {
       limit = { RUS = { has_war_together_with = CSA } }
       white_peace = RUS
       if = {
         limit = { RUS = { owns_state = 463 } }
-        transfer_state = 463
-        add_state_claim = 463
-        463 = {
-          remove_core_of = RUS
-          add_claim_by = RUS
+        custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
+        hidden_effect = {
+          transfer_state = 463 # Alaska
+          add_state_claim = 463
+          463 = {
+            remove_core_of = RUS
+            add_claim_by = RUS
+          }
         }
-      } # Russia
+      }
     }
 
     add_timed_idea = { days = 10950 id = USA_temp_reconstruction_balance }
@@ -841,18 +849,131 @@ country_event = { # Historic USA Win — USA Accepts (Full Admission)
     name = acw_peace_deal.2.b
     trigger = {
       OR = {
+        major = yes
         tag = CAN
-        tag = ENG
-        tag = FRA
-        tag = SPR
-        tag = PRS
         tag = MEX
-        tag = RUS
       }
+    }
+    if = {
+      limit = {
+        OR ={
+          tag = ENG
+          tag = CAN
+        }
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 04_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = FRA
+        USA = { owns_state = 730 }
+      }
+      custom_effect_tooltip = 05_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = RUS
+        USA = { owns_state = 463 }
+      }
+      custom_effect_tooltip = 06_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 463
+            owns_state = 730
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 07_ACW_PEACEDEAL_VAL_tt
+    }
+    else = {
+      custom_effect_tooltip = 08_ACW_PEACEDEAL_VAL_tt
     }
   }
 }
 
+# Historic USA Win — USA Accepts (Occupation)
+country_event = {
+  id = acw_peace_deal.3
+  title = acw_peace_deal.3.t
+  desc = acw_peace_deal.3.d
+  picture = GFX_news_event_appomattox_acw
+
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  option = {
+    name = acw_peace_deal.3.a
+    trigger = { tag = USA }
+    custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
+  }
+
+  option = {
+    name = acw_peace_deal.2.b
+    trigger = {
+      OR = {
+        major = yes
+        tag = CAN
+        tag = MEX
+      }
+    }
+    if = {
+      limit = {
+        OR ={
+          tag = ENG
+          tag = CAN
+        }
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 04_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = FRA
+        USA = { owns_state = 730 }
+      }
+      custom_effect_tooltip = 05_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = RUS
+        USA = { owns_state = 463 }
+      }
+      custom_effect_tooltip = 06_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 463
+            owns_state = 730
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 07_ACW_PEACEDEAL_VAL_tt
+    }
+    else = {
+      custom_effect_tooltip = 08_ACW_PEACEDEAL_VAL_tt
+    }
+  }
+}
 
 
 add_namespace = acw_beckenridge_news
