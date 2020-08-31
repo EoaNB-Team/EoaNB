@@ -410,7 +410,7 @@ country_event = {
         remove_state_core = 372
         add_state_claim = 372
 
-        set_country_flag = USAAmerican_Civil_War
+        set_country_flag = USA_American_Civil_War
         news_event = { id = acw_beckenridge_news.1 }
         country_event = { hours = 1 id = acw_beckenridge.8 } #end union mobilization
         country_event = { days = 4 id = acw.5 } #end south generals leave
@@ -420,7 +420,7 @@ country_event = {
         add_stability = 0.3
         add_war_support = 0.3
 
-        set_country_flag = CSAAmerican_Civil_War
+        set_country_flag = CSA_American_Civil_War
         country_event = { hours = 1 id = csa.10 } #end
         country_event = { days = 7 id = acw.6 } #end
       }
@@ -612,9 +612,7 @@ country_event = {
   }
   option = {
     name = acw_beckenridge.10.b
-    trigger = {
-      is_ai = no
-    }
+    trigger = { is_ai = no }
     NEG = {
       change_tag_from = USA
     }
@@ -729,7 +727,267 @@ country_event = {
   }
 }
 
+add_namespace = acw_peace_deal
+
+country_event = { # Historic USA Win — CSA Submission
+  id = acw_peace_deal.1
+  title = acw_peace_deal.1.t
+  desc = acw_peace_deal.1.d
+  picture = GFX_news_event_appomattox_acw
+
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  immediate = {
+    clr_global_flag = ACWAmerican_Civil_War
+    set_global_flag = USAWins_Civil_War
+    CSA = {
+      clr_country_flag = CSA_American_Civil_War
+      set_country_flag = CSAIndependence_Lost
+    }
+    USA = {
+      clr_country_flag = USA_American_Civil_War
+      clr_country_flag = USA_Radical_Coup
+      set_country_flag = USASoaring_Eagle
+    }
+  }
+
+  option = {
+    name = acw_peace_deal.1.a
+    trigger = { tag = CSA }
+    ai_chance = { factor = 100 }
+    custom_effect_tooltip = 01_ACW_PEACEDEAL_tt
+    hidden_effect = {
+      CSA = {
+        every_owned_state = {
+          remove_claim_by = USA
+          add_core_of = USA
+          remove_core_of = CSA
+          add_claim_by = CSA
+        }
+      }
+      USA = { country_event = { id = acw_peace_deal.2 hours = 3 } }
+    }
+  }
+  option = {
+    name = acw_peace_deal.1.b
+    trigger = { tag = ASA } # Temporary Endpoint. Not supposed to be seen
+    ai_chance = { factor = 100 }
+    custom_effect_tooltip = 02_ACW_PEACEDEAL_tt
+  }
+}
+
+# Historic USA Win — USA Accepts (Full Admission)
+country_event = {
+  id = acw_peace_deal.2
+  title = acw_peace_deal.2.t
+  desc = acw_peace_deal.2.d
+  picture = GFX_news_event_appomattox_acw
+
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  option = {
+    name = acw_peace_deal.2.a
+    trigger = { tag = USA }
+    custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
+
+    annex_country = { target = CSA }
+    if = {
+      limit = { ENG = { has_war_together_with = CSA } }
+      custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
+      white_peace = ENG
+      hidden_effect = {
+        transfer_state = 426 # New Brunswick
+        add_state_claim = 426
+        transfer_state = 740 # Vancouver Island
+        add_state_claim = 740
+      }
+    }
+    if = {
+      limit = { FRA = { has_war_together_with = CSA } }
+      custom_effect_tooltip = 02_ACW_PEACEDEAL_VAL_tt
+      white_peace = FRA
+      hidden_effect = {
+        transfer_state = 730 # Saint Pierre & Miquelon
+        add_state_claim = 730
+      }
+    }
+    if = {
+      limit = { RUS = { has_war_together_with = CSA } }
+      white_peace = RUS
+      if = {
+        limit = { RUS = { owns_state = 463 } }
+        custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
+        hidden_effect = {
+          transfer_state = 463 # Alaska
+          add_state_claim = 463
+          463 = {
+            remove_core_of = RUS
+            add_claim_by = RUS
+          }
+        }
+      }
+    }
+
+    add_timed_idea = { days = 10950 idea = USA_temp_reconstruction_balance }
+    add_ideas = USA_recovery
+    remove_ideas = USA_Civil_War
+    hidden_effect = {
+      delete_unit_template_and_units = { division_template = "Union Regimental" }
+      delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+      set_division_template_lock = {
+        division_template = "National Guard"
+        is_locked = no
+      }
+      remove_ideas = USA_civil_war_historical_buff_hidden
+
+      news_event = { id = acw_news.6 hours = 2 }
+    }
+  }
+  option = {
+    name = acw_peace_deal.2.b
+    trigger = {
+      OR = {
+        tag = ENG
+        tag = FRA
+        tag = SPR
+        tag = PRS
+        tag = RUS
+        tag = TSH
+        tag = CAN
+        tag = MEX
+      }
+    }
+    if = {
+      limit = {
+        OR ={
+          tag = ENG
+          tag = CAN
+        }
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 04_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = FRA
+        USA = { owns_state = 730 }
+      }
+      custom_effect_tooltip = 05_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = RUS
+        USA = { owns_state = 463 }
+      }
+      custom_effect_tooltip = 06_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 463
+            owns_state = 730
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 07_ACW_PEACEDEAL_VAL_tt
+    }
+    else = {
+      custom_effect_tooltip = 08_ACW_PEACEDEAL_VAL_tt
+    }
+  }
+}
+
+# Historic USA Win — USA Accepts (Occupation)
+country_event = {
+  id = acw_peace_deal.3
+  title = acw_peace_deal.3.t
+  desc = acw_peace_deal.3.d
+  picture = GFX_news_event_appomattox_acw
+
+  is_triggered_only = yes
+  fire_only_once = yes
+
+  option = {
+    name = acw_peace_deal.3.a
+    trigger = { tag = USA }
+    custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
+  }
+
+  option = {
+    name = acw_peace_deal.2.b
+    trigger = {
+      OR = {
+      tag = ENG
+      tag = FRA
+      tag = SPR
+      tag = PRS
+      tag = RUS
+      tag = TSH
+      tag = CAN
+      tag = MEX
+      }
+    }
+    if = {
+      limit = {
+        OR ={
+          tag = ENG
+          tag = CAN
+        }
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 04_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = FRA
+        USA = { owns_state = 730 }
+      }
+      custom_effect_tooltip = 05_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        tag = RUS
+        USA = { owns_state = 463 }
+      }
+      custom_effect_tooltip = 06_ACW_PEACEDEAL_VAL_tt
+    }
+    else_if = {
+      limit = {
+        USA = {
+          OR = {
+            owns_state = 426
+            owns_state = 463
+            owns_state = 730
+            owns_state = 740
+          }
+        }
+      }
+      custom_effect_tooltip = 07_ACW_PEACEDEAL_VAL_tt
+    }
+    else = {
+      custom_effect_tooltip = 08_ACW_PEACEDEAL_VAL_tt
+    }
+  }
+}
+
+
 add_namespace = acw_beckenridge_news
+add_namespace = acw_douglas_news
 
 #Northern Coup
 news_event = {
