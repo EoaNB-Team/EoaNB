@@ -322,8 +322,8 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		if = {
-			hidden_effect = {
+		hidden_effect = {
+			if = {
 				limit = { tag = USA }
 				363 = { set_demilitarized_zone = yes }
 				362 = { set_demilitarized_zone = yes }
@@ -333,6 +333,8 @@ country_event = {
 				373 = { set_demilitarized_zone = yes }
 				374 = { set_demilitarized_zone = yes }
 				746 = { set_demilitarized_zone = yes }
+				1285 = { set_demilitarized_zone = yes }
+				1300 = { set_demilitarized_zone = yes }
 				if = {
 					limit = { has_country_flag  = USA_BreckinridgeElected }
 					country_event = { id = acw_generic.8 days = 100 }
@@ -453,6 +455,8 @@ country_event = {
 			373 = { set_demilitarized_zone = no }
 			374 = { set_demilitarized_zone = no }
 			746 = { set_demilitarized_zone = no }
+			1285 = { set_demilitarized_zone = no }
+			1300 = { set_demilitarized_zone = no }
 
 			country_event = { id = acw_generic.9 hours = 12 }
 			country_event = { id = acw_generic.10 days = 7 }
@@ -470,32 +474,48 @@ country_event = {
 				add_stability = 0.10
 				add_war_support = 0.10
 				set_country_flag = CSA_American_Civil_War
-				declare_war_on = {
-					target = USA
-					type = acw_civil_war_wargoal
-				}
 			}
 		}
 	}
 
 	option = {
-		if = {
-			limit = { has_country_flag = USA_BreckinridgeElected }
-			name = acw_generic.8.a
+		trigger = {
+			AND = {
+				tag = USA
+				has_country_flag = USA_BreckinridgeElected
+			}
 		}
-		else = {
-			name = acw_generic.8.b
-		}
+		name = acw_generic.8.a
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
-		trigger = { tag = USA }
 		add_popularity = {
 			ideology = traditional_conservatism
 			popularity = -0.15
 		}
 	}
 	option = {
+		trigger = {
+			AND = {
+				tag = USA
+				NOT = { has_country_flag = USA_BreckinridgeElected }
+			}
+		}
+		name = acw_generic.8.b
+		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = -0.15
+		}
+	}
+	option = {
+		trigger = {
+			tag = CSA
+		}
 		name = acw_generic.8.c
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		declare_war_on = {
+			target = USA
+			type = acw_civil_war_wargoal
+		}
 	}
 }
 
@@ -609,6 +629,36 @@ country_event = {
 
 	option = {
 		name = acw_generic.11.a
+
+		add_political_power = 120
+    add_ideas = USA_Civil_War
+		add_war_support = 0.8
+    add_stability = 0.6
+
+    if = {
+      limit = { tag = USA }
+      remove_ideas = american_slavery_3
+      add_timed_idea = {
+        idea = USA_civil_war_over_by_christmas
+        days = 240
+      }
+      set_country_flag = USA_American_Civil_War
+			hidden_effect = {
+	      if = {
+	        limit = { is_historical_focus_on = yes }
+          add_ideas = USA_civil_war_historical_buff_hidden
+	      }
+	    }
+    }
+    if = {
+      limit = { tag = CSA }
+      add_timed_idea = {
+        idea = CSA_civil_war_cotton_dismay
+        days = 240
+      }
+    }
+    set_global_flag = ACWAmerican_Civil_War
+    set_global_flag = ACWAmerican_Civil_War_Happened
 	}
 }
 
@@ -709,6 +759,9 @@ country_event = {
 		add_popularity = {
 			ideology = centrism
 			popularity = 0.02
+		}
+		hidden_effect = {
+			country_event = { id = acw_lincoln.5 days = 80 }
 		}
 	}
 }
@@ -1167,43 +1220,6 @@ country_event = {
       }
     }
   }
-}
-
-# Union Mobilization
-country_event = {
-	id = acw_beckenridge.8
-	title = acw_beckenridge.8.t
-	desc = acw_beckenridge.8.d
-	picture = GFX_report_event_generic_military_parade
-
-	is_triggered_only = yes
-
-	fire_only_once = yes
-
-	option = {
-		name = acw_beckenridge.8.a
-		if = {
-			limit = {
-				has_country_flag = USA_Radical_Coup
-			}
-			load_oob = USA_CIVIL_WAR_RADICAL
-			hidden_effect = {
-				set_division_template_lock = {
-					division_template = "Union Regimental"
-					is_locked = yes
-				}
-			}
-		}
-		else = {
-			load_oob = USA_CIVIL_WAR
-			hidden_effect = {
-				set_division_template_lock = {
-					division_template = "Union Regimental"
-					is_locked = yes
-				}
-			}
-		}
-	}
 }
 
 # FSA Hamlin Revolt
