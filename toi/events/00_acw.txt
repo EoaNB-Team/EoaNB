@@ -261,20 +261,10 @@ country_event = {
 				limit = { USA = { has_country_flag = USA_BreckinridgeElected } }
 				USA = { country_event = { id = acw_generic.4 days = 6 } }
 				country_event = { id = csa.11 days = 12 }
-				load_oob = CSA_AFTER_SUMTER_RADICAL
-				set_division_template_lock = {
-					division_template = "Confederate Regimental"
-					is_locked = yes
-				}
 			}
 			else = {
 				USA = { country_event = { id = acw_generic.4 days = 10 } }
 				country_event = { id = csa.11 days = 12 }
-				load_oob = CSA_AFTER_SUMTER
-				set_division_template_lock = {
-					division_template = "Confederate Regimental"
-					is_locked = yes
-				}
 			}
 			USA = { country_event = { id = acw_generic.3 days = 2 } }
 			news_event = { id = acw_news.1 }
@@ -345,6 +335,7 @@ country_event = {
 					CSA = { country_event = { id = acw_generic.8 days = 65 } }
 				}
 			}
+			country_event = { id = acw_generic.5 }
 		}
 	}
 
@@ -677,6 +668,13 @@ country_event = {
 	option = {
 		name = acw_lincoln.1.a
 		custom_effect_tooltip = 04_ACW_GENERIC_tt
+		ai_chance = {
+			factor = 75
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}
 		hidden_effect = {
 			set_country_flag = USA_Lincoln_Historical
 			country_event = { id = acw_lincoln.2 days = 4 }
@@ -686,6 +684,13 @@ country_event = {
 	option = {
 		name = acw_lincoln.1.b
 		custom_effect_tooltip = 06_ACW_GENERIC_tt
+		ai_chance = {
+			factor = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
 		hidden_effect = {
 			set_country_flag = USA_Lincoln_Ahistorical
 			country_event = { id = acw_lincoln.3 days = 4 }
@@ -785,7 +790,172 @@ country_event = {
 				election_frequency = 48
 	  		elections_allowed = yes
 			}
+			create_country_leader = {
+				name = "Stephen A. Douglas"
+				desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+				picture = "Portrait_USA_Stephen_Douglas.dds"
+				expire = "1947.1.1"
+				ideology = conserv_liberal
+			}
 		}
+	}
+}
+
+# Lincoln's Assassination (usa.45)
+country_event = {
+	id = acw_lincoln.100
+	title = acw_lincoln.100.t
+	desc = acw_lincoln,100.d
+	picture = GFX_report_event_worker_protests
+
+	trigger = {
+		tag = USA
+		AND = {
+			has_country_flag = USASoaring_Eagle
+			has_country_leader = {
+				name = "Abraham Lincoln"
+				ruling_only = yes
+			}
+		}
+	}
+	mean_time_to_happen = { days = 4 }
+	fire_only_once = yes
+
+	option = {
+		name = acw_lincoln.100.a
+		ai_chance = {
+			factor = 80
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = 01_lincoln_tt
+		add_stability = -0.2
+		hidden_effect = {
+			set_global_flag = Lincoln_Assassinated
+			set_country_flag = Lincoln_Assassinated
+		}
+		kill_country_leader = yes
+		hidden_effect = { news_event = { id = usa_news.18 } }
+		if = {
+			limit = { date > 1864.11.5 }
+			hidden_effect = {
+				create_country_leader = {
+					name = "Andrew Johnson"
+					desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+					picture = "Portrait_USA_Andrew_Johnson.dds"
+					expire = "1947.1.1"
+					ideology = federal
+				}
+				set_politics = {
+					ruling_party = traditional_conservatism
+					last_election = "1864.11.5"
+  				election_frequency = 48
+  				elections_allowed = yes
+				}
+			}
+		}
+		else_if = {
+			limit = { date < 1864.11.5 }
+			hidden_effect = {
+				create_country_leader = {
+					name = "Hannibal Hamlin"
+					desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+					picture = ""
+					expire = "1947.1.1"
+					ideology = social_liberal
+				}
+				set_politics = {
+					ruling_party = centrism
+					last_election = "1860.11.5"
+  				election_frequency = 48
+  				elections_allowed = yes
+				}
+			}
+		}
+	}
+	option = {
+		name = acw_lincoln.100.b
+		ai_chance = {
+			factor = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = 02_lincoln_tt
+		hidden_effect = { news_event = { id = usa_news.19 } }
+		set_global_flag = Lincoln_Survived
+		set_country_flag = Lincoln_Survived
+	}
+}
+
+# Lincoln Assassination Investigations (usa.46)
+country_event = {
+	id = acw_lincoln.101
+	title = usa.46.t
+	desc = usa.46.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	trigger = {
+		TAG = USA
+		has_country_flag = Lincoln_Assassinated
+	}
+	fire_only_once = yes
+	mean_time_to_happen = { days = 6 }
+
+	option = {
+		name = usa.46.a
+		add_political_power = -50
+		add_stability = 0.05
+	}
+	option = {
+		name = usa.46.b
+		add_political_power = -5
+	}
+}
+
+# Convince Lincoln to Egalitarianism (usa.56)
+country_event = {
+	id = acw_lincoln.120
+	title = acw_lincoln.120.t
+	desc = acw_lincoln.120.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	trigger = {
+		tag = USA
+		has_country_flag = Lincoln_Survived
+	}
+	mean_time_to_happen = { days = 45 }
+	fire_only_once = yes
+
+	option = {
+		name = usa.120.t
+		add_political_power = 25
+		add_popularity = {
+			ideology = social_egalitarianism
+			popularity = 0.01
+		}
+	}
+	option = {
+		name = usa.56.b
+		add_political_power = -100
+		add_stability = -0.1
+		add_popularity = { ideology = social_egalitarianism popularity = 0.05 }
+		create_country_leader = {
+			name = "Abraham Lincoln"
+			desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+			picture = "Portrait_USA_Abraham_Lincoln.dds"
+			expire = "1947.1.1"
+			ideology = liberal_social
+		}
+		set_politics = {
+			ruling_party = social_egalitarianism
+			election_frequency = 48
+			elections_allowed = yes
+		}
+		set_country_flag = USA_Radical_Lincoln
 	}
 }
 
@@ -1476,6 +1646,140 @@ country_event = {
       }
     }
   }
+}
+
+############################# NORTON REBELS ###########################
+
+# Norton? (usa.43)
+country_event = {
+	id = acw_norton.1
+	title = acw_norton.1.t
+	desc = usa_norton.1.d
+	picture = GFX_report_event_royal_visit
+
+	trigger = {
+		tag = USA
+		date > 1859.4.1
+	}
+	mean_time_to_happen = { days = 35 }
+	fire_only_once = yes
+
+	option = {
+		name = acw_norton.1
+		add_political_power = -10
+		hidden_effect = {
+			add_popularity = {
+				ideology = autocracy
+				popularity = 0.02
+			}
+		}
+	}
+	option = {
+		name = acw_norton.2
+		add_political_power = -25
+		hidden_effect = {
+			add_popularity = {
+				ideology = autocracy
+				popularity = 0.01
+			}
+			country_event = { id = acw_norton.2 days = 80 }
+		}
+	}
+}
+
+# Mutanies? (usa.70)
+country_event = {
+	id = acw_norton.2
+	title = acw_norton.2.t
+	desc = acw_norton.2.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	is_triggered_only = yes
+
+	option = {
+		name = usa.70.a
+		hidden_effect = { country_event = { id = acw_norton.3 days = 40 } }
+	}
+	option = {
+		name = usa.70.b
+		add_political_power = -25
+		hidden_effect = { country_event = { id = acw_norton.4 days = 40 } }
+	}
+}
+
+# Mutany! (usa.71)
+country_event = {
+	id = acw_norton.3
+	title = acw_norton.3.t
+	desc = acw_norton.3.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_norton.3.a
+		add_political_power = -5
+		add_stability = -0.05
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		hidden_effect = { country_event = { id = acw_norton.5 days = 30 } }
+	}
+	option = {
+		name = acw_norton.3.b
+		add_political_power = -50
+		add_stability = -0.05
+		add_manpower = -1000
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		set_country_flag = USA_Norton_Mutiny
+		hidden_effect = { country_event = { id = acw_norton.4 days = 80 } }
+	}
+}
+
+# No Longer an issue (usa.72)
+country_event = {
+	id = acw_norton.4
+	title = acw_norton.4.t
+	desc = {
+		text = acw_norton.4.d
+		trigger = { NOT = { has_country_flag = USA_Norton_Mutiny } }
+	}
+	desc = {
+		text = acw_norton.4.d_mutiny
+		trigger = { has_country_flag = USA_Norton_Mutiny }
+	}
+	picture = GFX_report_event_german_reichstag_gathering
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_norton.4.a
+		add_political_power = 10
+		add_manpower = 500
+		add_popularity = {
+			ideology = autocracy
+			popularity = -0.02
+		}
+	}
+}
+
+#Norton Grows Powerful (usa.77)
+country_event = {
+	id = acw_norton.5
+	title = acw_norton.5.t
+	desc = acw_norton.5.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_norton.5.a
+		set_country_flag = USA_Norton_Marked_ACW
+	}
 }
 
 ############################ PEACE TREATIES ###########################
