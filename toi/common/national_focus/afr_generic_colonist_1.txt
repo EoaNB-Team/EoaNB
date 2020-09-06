@@ -580,6 +580,9 @@ focus_tree = {
 				complete_national_focus = afr_colony_generic_french_approval
 			}
 		}
+		allow_branch = {
+			is_subject = yes
+		}
 	}
 	
 	focus = {
@@ -802,7 +805,10 @@ focus_tree = {
 		cost = 75
 		available_if_capitulated = no
 		available = {
-			has_completed_focus = afr_colony_generic_focus_strengthen_government
+			OR = {
+				has_completed_focus = afr_colony_generic_focus_strengthen_government
+				is_subject = no
+			}
 		}
 		prerequisite = { 
 			focus = afr_colony_generic_focus_social_reforms
@@ -1003,22 +1009,16 @@ focus_tree = {
 				set_technology = { tech_humanities_mercantilism = 1 }
 			}
 			if = {
-				limit = {
-					has_idea = limited_exports
-				}
-				swap_ideas = { add_idea = closed_economy remove_idea = limited_exports }
+				limit = { has_idea = limited_exports }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = limited_exports } }
 			}
 			if = {
-				limit = {
-					has_idea = export_focus
-				}
-				swap_ideas = { add_idea = closed_economy remove_idea = export_focus }
+				limit = { has_idea = export_focus }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = export_focus } }
 			}
 			if = {
-				limit = {
-					has_idea = free_trade
-				}
-				swap_ideas = { add_idea = closed_economy remove_idea = free_trade }
+				limit = { has_idea = free_trade }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = free_trade } }
 			}
 			if = {
 				limit = { has_country_flag = AFR_is_a_colonial_company_flag }
@@ -1053,9 +1053,10 @@ focus_tree = {
 					remove_ideas = AF_T_idea_trading_nation_3
 				}
 			}
-			add_equipment_to_stockpile = { type = convoy_1 amount = 35 }
+			add_equipment_to_stockpile = { type = convoy_1 amount = 45 }
 		}
 		allow_branch = {
+			is_subject = yes
 			OR = {
 				has_idea = AFR_french_colony
 				has_idea = AFR_french_colony_tribute
@@ -1083,42 +1084,84 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = {
-					has_idea = AFR_french_colony
+					is_subject = yes
+					NOT = {
+						has_idea = AFR_french_colony
+						has_idea = AFR_french_colony_tribute
+						has_idea = AFR_british_colony
+						has_idea = AFR_british_colony_tribute
+						has_idea = AFR_netherland_colony
+						has_idea = AFR_netherland_colony_tribute
+						has_idea = AFR_spanish_colony
+						has_idea = AFR_spanish_colony_tribute
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_french_colony
-					add_idea = AFR_french_colony_tribute
+				if = {
+					limit = { is_subject_of = FRA }
+					add_ideas = AFR_french_colony_tribute
+				}	
+				if = {
+					limit = { is_subject_of = ENG }
+					add_ideas = AFR_british_colony_tribute
 				}
-			}	
-			if = {
-				limit = {
-					has_idea = AFR_british_colony
+				if = {
+					limit = { is_subject_of = HOL }
+					add_ideas = AFR_netherland_colony_tribute
 				}
-				swap_ideas = {
-					remove_idea = AFR_british_colony
-					add_idea = AFR_british_colony_tribute
+				if = {
+					limit = { is_subject_of = SPR }
+					add_ideas = AFR_spanish_colony_tribute
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					has_idea = AFR_netherland_colony
+					OR = {
+						has_idea = AFR_french_colony
+						has_idea = AFR_british_colony
+						has_idea = AFR_netherland_colony
+						has_idea = AFR_spanish_colony
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_netherland_colony
-					add_idea = AFR_netherland_colony_tribute
+				if = {
+					limit = {
+						has_idea = AFR_french_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_french_colony
+						add_idea = AFR_french_colony_tribute
+					}
+				}	
+				if = {
+					limit = {
+						has_idea = AFR_british_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_british_colony
+						add_idea = AFR_british_colony_tribute
+					}
 				}
-			}
-			if = {
-				limit = {
-					has_idea = AFR_spanish_colony
+				if = {
+					limit = {
+						has_idea = AFR_netherland_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_netherland_colony
+						add_idea = AFR_netherland_colony_tribute
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_spanish_colony
-					add_idea = AFR_spanish_colony_tribute
+				if = {
+					limit = {
+						has_idea = AFR_spanish_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_spanish_colony
+						add_idea = AFR_spanish_colony_tribute
+					}
 				}
 			}
 		}
 		allow_branch = {
+			is_subject = yes
 			OR = {
 				has_idea = AFR_french_colony
 				has_idea = AFR_french_colony_tribute
@@ -1153,6 +1196,9 @@ focus_tree = {
 		completion_reward = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
+		}
+		allow_branch = {
+			always = yes
 		}
 	}
 	
@@ -1282,7 +1328,13 @@ focus_tree = {
 							instant_build = yes
 						}
 					}
-					add_core_of = ROOT
+					if = {
+						limit = { state_population < 300000 }
+						add_core_of = ROOT
+					}
+					else = {
+						add_extra_state_shared_building_slots = 2
+					}
 					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.6 trigger_for = controller } }
 					custom_effect_tooltip = AFR_Racial_Tension_plus_6
 				}
@@ -1567,6 +1619,7 @@ focus_tree = {
 		}
 		available = {
 			any_owned_state = {
+				is_capital = no
 				NOT = { is_core_of = ROOT }
 				custom_trigger_tooltip={
 					tooltip = afr_colony_generic_focus_native_reservations_tooltip_trigger_1
@@ -1773,6 +1826,9 @@ focus_tree = {
 		completion_reward = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
+		}
+		allow_branch = {
+			always = yes
 		}
 	}
 	
@@ -2026,7 +2082,7 @@ focus_tree = {
 					equipment = {
 						type = ship_hull_corvette_0
 					}
-					requested_factories = 0
+					requested_factories = 1
 					progress = 0.77
 					amount = 1
 				}
@@ -2034,7 +2090,7 @@ focus_tree = {
 					equipment = {
 						type = ship_hull_corvette_0
 					}
-					requested_factories = 0
+					requested_factories = 1
 					progress = 0.63
 					amount = 1
 				}
@@ -2119,6 +2175,10 @@ focus_tree = {
 		completion_reward = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
+		}
+		
+		allow_branch = {
+			always = yes
 		}
 	}
 	
