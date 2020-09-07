@@ -1806,7 +1806,7 @@ country_event = { # Historic USA Win — CSA Submission
 		tag = USA
 		has_global_flag = ACWAmerican_Civil_War
 		count_triggers = {
-			amount = 14
+			amount = 15
 			date > 1863.7.1
 			date > 1864.7.1
 			date > 1865.7.1
@@ -1930,6 +1930,11 @@ country_event = { # Historic USA Win — CSA Submission
       clr_country_flag = USA_Radical_Coup
       set_country_flag = USASoaring_Eagle
     }
+		WVG = {
+			if = {
+				limit = { is_puppet_of = USA }
+				USA = { annex_country = { target = WVG } }
+		}
   }
 
   option = {
@@ -1944,9 +1949,13 @@ country_event = { # Historic USA Win — CSA Submission
           add_core_of = USA
           remove_core_of = CSA
           add_claim_by = CSA
+					set_state_flag = USA_unintegrated_seceded_state
         }
       }
-      USA = { country_event = { id = acw_peace_deal.2 hours = 3 } }
+      USA = {
+				set_country_flag = annexing_csa
+				country_event = { id = acw_peace_deal.2 hours = 3 }
+			}
     }
   }
   option = {
@@ -1954,10 +1963,16 @@ country_event = { # Historic USA Win — CSA Submission
     trigger = { tag = ASA } # Temporary Endpoint. Not supposed to be seen
     ai_chance = { factor = 100 }
     custom_effect_tooltip = 02_ACW_PEACEDEAL_tt
+		hidden_effect = {
+			USA = {
+				set_country_flag = occupying_csa
+				country_event = { id = acw_peace_deal.2 hours = 3 }
+			}
+		}
   }
 }
 
-# Historic USA Win — USA Accepts (Full Admission)
+# Historic USA Win — CSA Accepts
 country_event = {
   id = acw_peace_deal.2
   title = acw_peace_deal.2.t
@@ -1969,7 +1984,7 @@ country_event = {
 
   option = {
     name = acw_peace_deal.2.a
-    trigger = { tag = USA }
+    trigger = { has_country_flag = annexing_csa }
     custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
 
     annex_country = { target = CSA }
@@ -2018,23 +2033,643 @@ country_event = {
       }
     }
 
-    add_timed_idea = { days = 10950 idea = USA_temp_reconstruction_balance }
-    add_ideas = USA_recovery
-    remove_ideas = USA_Civil_War
-    hidden_effect = {
-      delete_unit_template_and_units = { division_template = "Union Regimental" }
-      delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
-      set_division_template_lock = {
-        division_template = "National Guard"
-        is_locked = no
-      }
-      remove_ideas = USA_civil_war_historical_buff_hidden
+		swap_ideas = {
+			remove_idea = USA_Civil_War
+			add_idea = USA_recovery
+		}
 
-      news_event = { id = acw_news.6 hours = 2 }
-    }
+		hidden_effect = {
+			news_event = { acw_news.6 days = 1 }
+			USA = {
+				add_timed_idea = { days = 10950 idea = USA_temp_reconstruction_balance }
+				delete_unit_template_and_units = { division_template = "Union Regimental" }
+	      delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+	      set_division_template_lock = {
+	        division_template = "National Guard"
+	        is_locked = no
+	      }
+			}
+			CSA = {
+				delete_unit_template_and_units = { division_template = "Confederate Regimental" }
+			}
+			ENG = { country_event = { id = acw_peace_deal.2 } }
+			FRA = { country_event = { id = acw_peace_deal.2 } }
+			SPR = { country_event = { id = acw_peace_deal.2 } }
+			PRS = { country_event = { id = acw_peace_deal.2 } }
+			RUS = { country_event = { id = acw_peace_deal.2 } }
+			TSH = { country_event = { id = acw_peace_deal.2 } }
+			CAN = { country_event = { id = acw_peace_deal.2 } }
+			MEX = { country_event = { id = acw_peace_deal.2 } }
+		}
   }
-  option = {
+	option = {
     name = acw_peace_deal.2.b
+    trigger = { has_country_flag = occupying_csa }
+    custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
+
+    if = {
+      limit = {
+				ENG = { has_war_together_with = CSA }
+			}
+      custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
+      white_peace = ENG
+      hidden_effect = {
+				if = {
+					limit = { owns_state = 386 }
+					transfer_state = 426 # New Brunswick
+	        add_state_claim = 426
+				}
+				if = {
+					limit = { owns_state = }
+				}
+        transfer_state = 740 # Vancouver Island
+        add_state_claim = 740
+      }
+    }
+    if = {
+      limit = { FRA = { has_war_together_with = CSA } }
+      custom_effect_tooltip = 02_ACW_PEACEDEAL_VAL_tt
+      white_peace = FRA
+      hidden_effect = {
+        transfer_state = 730 # Saint Pierre & Miquelon
+        add_state_claim = 730
+      }
+    }
+    if = {
+      limit = { RUS = { has_war_together_with = CSA } }
+      white_peace = RUS
+      if = {
+        limit = { RUS = { owns_state = 463 } }
+        custom_effect_tooltip = 03_ACW_PEACEDEAL_tt
+        hidden_effect = {
+          transfer_state = 463 # Alaska
+          add_state_claim = 463
+          463 = {
+            remove_core_of = RUS
+            add_claim_by = RUS
+          }
+        }
+      }
+    }
+		swap_ideas = {
+			remove_idea = USA_Civil_War
+			add_idea = USA_recovery
+		}
+
+		hidden_effect = {
+			news_event = { acw_news.6 days = 1 }
+			USA = {
+				add_timed_idea = { days = 10950 idea = USA_temp_reconstruction_balance }
+				delete_unit_template_and_units = { division_template = "Union Regimental" }
+	      delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+	      set_division_template_lock = {
+	        division_template = "National Guard"
+	        is_locked = no
+	      }
+			}
+			CSA = {
+				delete_unit_template_and_units = { division_template = "Confederate Regimental" }
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 362 }
+						CSA = { owns_state = 746 }
+					}
+				}
+				WVG = {
+					if = {
+						limit = { CSA = { owns_state = 362 } }
+						transfer_state = 362
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 746 } }
+						transfer_state = 746
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+					}
+					else = {
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+					}
+					set_politics = {
+						ruling_party = radical_democracy
+						elections_allowed = no
+					}
+					set_popularities = {
+						traditional_conservatism = 70
+						radical_democracy = 11
+						centrism = 19
+					}
+					create_country_leader = {
+						name = "John McAllister Schofield"
+						desc = ""
+						picture = "Portrait_USA_John_McAllister_Schofield.dds"
+						expire = "1900.7.1"
+						ideology = federal
+						traits = {}
+					}
+					USA = { puppet = WVG }
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 363 }
+						CSA = { owns_state = 364 }
+					}
+				}
+				NCA = {
+					if = {
+						limit = { CSA = { owns_state = 363 } }
+						transfer_state = 363
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 364 } }
+						transfer_state = 364
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+					}
+					else = {
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+					}
+					set_politics = {
+						ruling_party = radical_democracy
+						elections_allowed = no
+					}
+					set_popularities = {
+						traditional_conservatism = 68
+						radical_democracy = 13
+						centrism = 19
+					}
+					create_country_leader = {
+						name = "Daniel Edgar Sickles"
+						desc = ""
+						picture = "Portrait_USA_Daniel_Edgar_Sickles.dds"
+						expire = "1900.7.1"
+						ideology = federal
+						traits = {}
+					}
+					USA = { puppet = NCA }
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 365 }
+						CSA = { owns_state = 366 }
+						CSA = { owns_state = 367 }
+						CSA = { owns_state = 1211 }
+					}
+				}
+				USG = {
+					if = {
+						limit = { CSA = { owns_state = 365 } }
+						transfer_state = 365
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 366 } }
+						transfer_state = 366
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 367 } }
+						transfer_state = 367
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 1211 } }
+						transfer_state = 1211
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+					}
+					else = {
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+					}
+					set_politics = {
+						ruling_party = radical_democracy
+						elections_allowed = no
+					}
+					set_popularities = {
+						traditional_conservatism = 69
+						radical_democracy = 23
+						centrism = 8
+					}
+					create_country_leader = {
+						name = "George Gordan Meade"
+						desc = ""
+						picture = "Portrait_USA_George_Gordan_Meade.dds"
+						expire = "1900.7.1"
+						ideology = federal
+						traits = {}
+					}
+					USA = { puppet = USG }
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 370 }
+						CSA = { owns_state = 372 }
+						CSA = { owns_state = 374 }
+					}
+				}
+				MIS = {
+					if = {
+						limit = { CSA = { owns_state = 370 } }
+						transfer_state = 370
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 372 } }
+						transfer_state = 372
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { CSA = { owns_state = 374 } }
+						transfer_state = 374
+						set_state_flag = USA_unintegrated_seceded_state
+					}
+					if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+					}
+					else_if = {
+						limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+					}
+					else = {
+						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+					}
+					set_politics = {
+						ruling_party = radical_democracy
+						elections_allowed = no
+					}
+					set_popularities = {
+						traditional_conservatism = 60
+						radical_democracy = 23
+						centrism = 17
+					}
+					create_country_leader = {
+						name = "Edward Ord"
+						desc = ""
+						picture = "Portrait_USA_Edward_Ord.dds"
+						expire = "1900.7.1"
+						ideology = federal
+						traits = {}
+					}
+					USA = { puppet = MIS }
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 371 }
+						CSA = { owns_state = 375 }
+						CSA = { owns_state = 1303 }
+						CSA = { owns_state = 1304 }
+						CSA = { owns_state = 1305 }
+						CSA = { owns_state = 1306 }
+					}
+				}
+				if = {
+					limit = { country_exists = TEX }
+					MIS = {
+						if = {
+							limit = { CSA = { owns_state = 371 } }
+							transfer_state = 371
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 375 } }
+							transfer_state = 375
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1305 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1306 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+					}
+				}
+				else = {
+					LOU = {
+						if = {
+							limit = { CSA = { owns_state = 371 } }
+							transfer_state = 371
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 375 } }
+							transfer_state = 375
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1303 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1304 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1305 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 1306 } }
+							transfer_state = 1303
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+						}
+						else = {
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+						}
+						set_politics = {
+							ruling_party = radical_democracy
+							elections_allowed = no
+						}
+						set_popularities = {
+							traditional_conservatism = 52
+							radical_democracy = 21
+							centrism = 27
+						}
+						create_country_leader = {
+							name = "Philip Sheridan"
+							desc = ""
+							picture = "Portrait_USA_Philip_Sheridan.dds"
+							expire = "1900.7.1"
+							ideology = federal
+							traits = {}
+						}
+						USA = { puppet = LOU }
+					}
+				}
+			}
+			if = {
+				limit = {
+					OR = {
+						CSA = { owns_state = 368 }
+						CSA = { owns_state = 369 }
+						CSA = { owns_state = 373 }
+						CSA = { owns_state = 383 }
+					}
+				}
+				if = {
+					limit = { CSA = { NOT = { owns_state = 373 } } }
+					WVG = {
+						if = {
+							limit = { CSA = { owns_state = 369 } }
+							transfer_state = 369
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+					}
+					NCA = {
+						if = {
+							limit = { CSA = { owns_state = 368 } }
+							transfer_state = 368
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+					}
+				}
+				else = {
+					TEN = {
+						if = {
+							limit = { CSA = { owns_state = 368 } }
+							transfer_state = 368
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 369 } }
+							transfer_state = 369
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 373 } }
+							transfer_state = 373
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { CSA = { owns_state = 383 } }
+							transfer_state = 383
+							set_state_flag = USA_unintegrated_seceded_state
+						}
+						if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_1
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_2
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_3
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_4
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_5
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_6
+						}
+						else_if = {
+							limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_7
+						}
+						else = {
+							set_cosmetic_tag = USA_unintegrated_seceded_zone_8
+						}
+						set_politics = {
+							ruling_party = radical_democracy
+							elections_allowed = no
+						}
+						set_popularities = {
+							traditional_conservatism = 44
+							radical_democracy = 30
+							centrism = 26
+						}
+						if = {
+							limit = {
+								USA = { has_country_leader = "George B. McClellan"}
+								create_country_leader = {
+									name = "William T. Sherman"
+									desc = ""
+									picture = "Portrait_USA_William_Sherman.dds"
+									expire = "1900.7.1"
+									ideology = federal
+									traits = {}
+								}
+							}
+						}
+						else = {
+							create_country_leader = {
+								name = "George B. McClellan"
+								desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+								picture = "Portrait_USA_George_McClellan.dds"
+								expire = "1900.1.1"
+								ideology = federal
+							}
+						}
+						USA = { puppet = TEN }
+					}
+				}
+			}
+			ENG = { country_event = { id = acw_peace_deal.2 } }
+			FRA = { country_event = { id = acw_peace_deal.2 } }
+			SPR = { country_event = { id = acw_peace_deal.2 } }
+			PRS = { country_event = { id = acw_peace_deal.2 } }
+			RUS = { country_event = { id = acw_peace_deal.2 } }
+			TSH = { country_event = { id = acw_peace_deal.2 } }
+			CAN = { country_event = { id = acw_peace_deal.2 } }
+			MEX = { country_event = { id = acw_peace_deal.2 } }
+		}
+  }
+  option = { # Reaction
+    name = acw_peace_deal.2.c
     trigger = {
       OR = {
         tag = ENG
@@ -2199,7 +2834,6 @@ country_event = { # CSA Win
 
 	picture = GFX_news_event_appomattox_acw
 
-  is_triggered_only = yes
   fire_only_once = yes
 
 	trigger = {
