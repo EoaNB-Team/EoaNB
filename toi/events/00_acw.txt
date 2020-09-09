@@ -907,7 +907,7 @@ country_event = {
 	}
 }
 
-# Virginia Referendum (CSA)
+# Reformed Virginia Referendum (CSA)
 country_event = {
 	id = acw_generic.43
 	title = acw_generic.43.t
@@ -926,7 +926,7 @@ country_event = {
 	}
 }
 
-# Reformed Virginia votes Counter-Secession (USA)
+# Reformed Virginia Results (USA)
 country_event = {
 	id = acw_generic.44
 	title = acw_generic.44.t
@@ -976,7 +976,7 @@ country_event = {
 	}
 }
 
-# Referendum Success (CSA)
+# Reformed Virginia Results (CSA)
 country_event = {
 	id = acw_generic.45
 	title = acw_generic.45.t
@@ -994,7 +994,7 @@ country_event = {
 
 	option = {
 		name = acw_generic.43.a
-		custom_effect_tooltip = 30_ACW_LINCOLN_tt
+		custom_effect_tooltip = 43_ACW_GENERIC_tt
 	}
 }
 
@@ -1002,55 +1002,120 @@ country_event = {
 country_event = {
 	id = acw_generic.46
 	title = acw_generic.46.t
-	desc = {
-		text = acw_generic.46.d
-		trigger = {
-			count_triggers = {
-				amount = 2
-				has_global_flag = ACW_virginia_talks_1
-				has_global_flag = ACW_virginia_talks_2
-				has_global_flag = ACW_virginia_talks_3
-			}
-		}
-	}
-	desc = {
-		text = acw_generic.46.d_1
-		trigger = {
-			count_triggers = {
-				amount = 2
-				NOT = { has_global_flag = ACW_virginia_talks_1 }
-				NOT = { has_global_flag = ACW_virginia_talks_2 }
-				NOT = { has_global_flag = ACW_virginia_talks_3 }
-			}
-		}
-	}
+	desc = acw_generic.46.d
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = acw_generic.46.a
-		trigger = {
-			count_triggers = {
-				amount = 2
-				has_global_flag = ACW_virginia_talks_1
-				has_global_flag = ACW_virginia_talks_2
-				has_global_flag = ACW_virginia_talks_3
+	}
+}
+
+# West Virginia Uprising
+country_event = {
+	id = acw_generic.47
+	title = acw_generic.47.t
+	desc = acw_generic.47.d
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_generic.47.a
+		trigger = { tag = USA }
+		hidden_effect = {
+			clr_global_flag = ACW_virginia_talks_1
+			clr_global_flag = ACW_virginia_talks_2
+			clr_global_flag = ACW_virginia_talks_3
+			if = {
+				limit = { USA = { controls_state = 746 } }
+				USA = { load_oob = USA_WVG_1864 }
+			}
+			else_if = {
+				limit = { CSA = { controls_state = 746 } }
+				custom_effect_tooltip = 44_ACW_GENERIC_tt
+				WVG = {
+					transfer_state = 746
+					add_state_core = 746
+					add_manpower = 10000
+					add_equipment_to_stockpile = {
+	          type = infantry_equipment
+	          amount = 5000
+	          producer = USA
+	        }
+	        add_equipment_to_stockpile = {
+	          type = uniform_equipment
+	          amount = 5000
+	          producer = USA
+	        }
+					inherit_technology = USA
+					set_politics = {
+						ruling_party = centrism
+						elections_allowed = yes
+						election_frequency = 96
+					}
+					set_popularities = {
+						traditional_conservatism = 30
+						radical_democracy = 11
+						centrism = 59
+					}
+					load_oob = USA_WVG_1864
+					country_event = { id = acw_generic.48 days = 10 }
+				}
+			}
+			CSA = {
+				country_event = { id = acw_generic.47 hours = 6 }
 			}
 		}
-		custom_effect_tooltip = 30_ACW_LINCOLN_tt
 	}
 	option = {
-		name = acw_generic.46.b
-		trigger = {
-			count_triggers = {
-				amount = 2
-				NOT = { has_global_flag = ACW_virginia_talks_1 }
-				NOT = { has_global_flag = ACW_virginia_talks_2 }
-				NOT = { has_global_flag = ACW_virginia_talks_3 }
+		name = acw_generic.46.a
+		trigger = { tag = CSA }
+		hidden_effect = {
+			news_event = { id = acw_generic_news.41 }
+		}
+	}
+}
+
+country_event = {
+	id = acw_generic.48
+	title = acw_generic.48.t
+	desc = acw_generic.48.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+
+	immediate = {
+		if = {
+			limit = { has_dlc = "Together for Victory" }
+			USA = {
+				set_autonomy = {
+					target = WVG
+					autonomous_state = autonomy_organized_unincorporated_territory
+				}
+			}
+			else = {
+				USA = { puppet = WVG }
 			}
 		}
-		custom_effect_tooltip = 30_ACW_LINCOLN_tt
+		WVG = {
+			set_politics = {
+				ruling_party = centrism
+				elections_allowed = yes
+				election_frequency = 96
+			}
+			set_popularities = {
+				traditional_conservatism = 30
+				radical_democracy = 11
+				centrism = 59
+			}
+			add_to_war = {
+				targeted_alliance = USA
+				enemy = CSA
+				hostility_reason = asked_to_join
+			}
+		}
 	}
 }
 
@@ -2421,7 +2486,12 @@ country_event = { # Historic USA Win — CSA Submission
     }
 		WVG = {
 			if = {
-				limit = { is_puppet_of = USA }
+				limit = {
+					OR = {
+						is_puppet_of = USA
+						is_subject_of = USA
+					}
+				}
 				USA = { annex_country = { target = WVG } }
 			}
 		}
@@ -2671,7 +2741,14 @@ country_event = {
 						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 					}
 					inherit_technology = USA
-					USA = { puppet = WVG }
+					if = {
+				    limit = { has_dlc = "Together for Victory" }
+				    set_autonomy = {
+				      target = WVG
+				      autonomous_state = autonomy_unintegrated_seceded_state
+				    }
+				    else = { puppet = WVG }
+				  }
 					set_politics = {
 						ruling_party = radical_democracy
 						elections_allowed = no
@@ -2686,7 +2763,7 @@ country_event = {
 						desc = ""
 						picture = "Portrait_USA_John_McAllister_Schofield.dds"
 						expire = "1900.7.1"
-						ideology = federal
+						ideology = military_goverment
 						traits = {}
 					}
 				}
@@ -2741,7 +2818,14 @@ country_event = {
 						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 					}
 					inherit_technology = USA
-					USA = { puppet = NCA }
+					if = {
+				    limit = { has_dlc = "Together for Victory" }
+				    set_autonomy = {
+				      target = NCA
+				      autonomous_state = autonomy_unintegrated_seceded_state
+				    }
+				    else = { puppet = NCA }
+				  }
 					set_politics = {
 						ruling_party = radical_democracy
 						elections_allowed = no
@@ -2756,7 +2840,7 @@ country_event = {
 						desc = ""
 						picture = "Portrait_USA_Daniel_Edgar_Sickles.dds"
 						expire = "1900.7.1"
-						ideology = federal
+						ideology = military_goverment
 						traits = {}
 					}
 				}
@@ -2823,7 +2907,14 @@ country_event = {
 						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 					}
 					inherit_technology = USA
-					USA = { puppet = USG }
+					if = {
+				    limit = { has_dlc = "Together for Victory" }
+				    set_autonomy = {
+				      target = USG
+				      autonomous_state = autonomy_unintegrated_seceded_state
+				    }
+				    else = { puppet = USG }
+				  }
 					set_politics = {
 						ruling_party = radical_democracy
 						elections_allowed = no
@@ -2838,7 +2929,7 @@ country_event = {
 						desc = ""
 						picture = "Portrait_USA_George_Gordan_Meade.dds"
 						expire = "1900.7.1"
-						ideology = federal
+						ideology = military_goverment
 						traits = {}
 					}
 				}
@@ -2899,7 +2990,14 @@ country_event = {
 						set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 					}
 					inherit_technology = USA
-					USA = { puppet = MIS }
+					if = {
+				    limit = { has_dlc = "Together for Victory" }
+				    set_autonomy = {
+				      target = MIS
+				      autonomous_state = autonomy_unintegrated_seceded_state
+				    }
+				    else = { puppet = MIS }
+				  }
 					set_politics = {
 						ruling_party = radical_democracy
 						elections_allowed = no
@@ -2914,7 +3012,7 @@ country_event = {
 						desc = ""
 						picture = "Portrait_USA_Edward_Ord.dds"
 						expire = "1900.7.1"
-						ideology = federal
+						ideology = military_goverment
 						traits = {}
 					}
 				}
@@ -3019,7 +3117,14 @@ country_event = {
 							set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 						}
 						inherit_technology = USA
-						USA = { puppet = LOU }
+						if = {
+					    limit = { has_dlc = "Together for Victory" }
+					    set_autonomy = {
+					      target = LOU
+					      autonomous_state = autonomy_unintegrated_seceded_state
+					    }
+					    else = { puppet = LOU }
+					  }
 						set_politics = {
 							ruling_party = radical_democracy
 							elections_allowed = no
@@ -3034,7 +3139,7 @@ country_event = {
 							desc = ""
 							picture = "Portrait_USA_Philip_Sheridan.dds"
 							expire = "1900.7.1"
-							ideology = federal
+							ideology = military_goverment
 							traits = {}
 						}
 					}
@@ -3120,7 +3225,14 @@ country_event = {
 							set_cosmetic_tag = USA_unintegrated_seceded_zone_8
 						}
 						inherit_technology = USA
-						USA = { puppet = TEN }
+						if = {
+					    limit = { has_dlc = "Together for Victory" }
+					    set_autonomy = {
+					      target = TEN
+					      autonomous_state = autonomy_unintegrated_seceded_state
+					    }
+					    else = { puppet = TEN }
+					  }
 						set_politics = {
 							ruling_party = radical_democracy
 							elections_allowed = no
@@ -3139,7 +3251,7 @@ country_event = {
 								desc = ""
 								picture = "Portrait_USA_William_Sherman.dds"
 								expire = "1900.7.1"
-								ideology = federal
+								ideology = military_goverment
 								traits = {}
 							}
 						}
@@ -3149,7 +3261,7 @@ country_event = {
 								desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
 								picture = "Portrait_USA_George_McClellan.dds"
 								expire = "1900.1.1"
-								ideology = federal
+								ideology = military_goverment
 								traits = {}
 							}
 						}
@@ -3735,6 +3847,20 @@ news_event = {
 	}
 }
 
+# Kanawha
+news_event = {
+	id = acw_generic_news.41
+	title = acw_generic_news.41.t
+	desc = acw_generic_news.41.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	major = yes
+
+	option = {
+		name = acw_generic_news.40.a
+	}
+}
 
 #Northern Coup
 news_event = {
