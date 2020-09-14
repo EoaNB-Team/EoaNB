@@ -4,17 +4,13 @@ def rdc(s_y,s_m,s_d,d):
     e_y = s_y + d // 365
     d = d % 365
     m = s_m
-    while True:
+    while d > months[m]:
         d -= months[m]
-        if d >= 0:
-            if m == 12:
-                m = 1
-                e_y += 1
-            else:
-                m += 1
+        if m == 12:
+            m = 1
+            e_y += 1
         else:
-            d += months[m]
-            break
+            m += 1
     if d == 0:
         m -= 1
         d = months[m]
