@@ -15,7 +15,11 @@ def dc(e_y, e_m, e_d, random_days = 100, s_y = 1857, s_m = 5, s_d = 1):
     if random_days % 2 == 1:
         random_days += 1
         c = 1
-    print("days =",int(days-random_days*0.5),"random_days =",random_days-c)
+    print("days =",int(days-random_days*0.5),end=" ")
+    if random_days > 0:
+        print("random_days =",random_days-c)
+    else:
+        print()
 while True:
     vl = input("Enter the date around which you want to receive the event (YYYY MM DD, separated by spaces):").split()
     for i in range(0,3):
