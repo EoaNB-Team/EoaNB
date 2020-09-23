@@ -18,7 +18,7 @@ shared_focus = {
   }
 
   completion_reward = {
-    random_owned_state = {
+    random_owned_controlled_state = {
       limit = {
         free_building_slots = {
           building = infrastructure
@@ -57,7 +57,7 @@ shared_focus = {
   }
 
   completion_reward = {
-    random_owned_state = {
+    random_owned_controlled_state = {
       limit = {
         free_building_slots = {
           building = infrastructure
@@ -71,7 +71,7 @@ shared_focus = {
         instant_build = yes
       }
     }
-    random_owned_state = {
+    random_owned_controlled_state = {
       limit = {
         free_building_slots = {
           building = infrastructure
@@ -88,7 +88,6 @@ shared_focus = {
     }
   }
 }
-
 shared_focus = {
   id = NA_B_recon_standard_rails
   icon = GFX_goal_focus_railroad_development
@@ -156,35 +155,56 @@ shared_focus = {
   ai_will_do = { base = 20 }
   bypass = {
     OR = {
-      has_idea = victorian_era
-      has_idea = machine_era
-      has_idea = oil_era
-      has_idea = aviation_era
-      has_idea = modern_era
-      has_idea = atomic_era
-      has_idea = information_era
-      has_idea = digital_era
-      has_idea = post_digital_era
+      has_idea = electrification
+      has_idea = mass_production
+      has_idea = industrializing
     }
   }
 
   completion_reward = {
     add_political_power = -100
-    add_building_construction = {
-      type = industrial_complex
-      level = 1
-      instant_build = yes
+    random_owned_controlled_state = {
+      add_offsite_building = {
+        type = industrial_complex
+        level = 1
+        instant_build = yes
+      }
     }
     if = {
-      has_idea = pre_industrial_era
+      limit = { has_idea = pre_industrial_era }
       swap_ideas = {
         remove_idea = pre_industrial_era
         add_idea = victorian_era
       }
+      set_technology = {
+        popup = no
+        tribal_carrier_birds = 1
+        tribal_electrical_theory = 1
+      	tribal_steel_tools = 1
+      	tribal_tatics = 1
+      	tribal_gunpowder = 1
+      	tribal_riding = 1
+      	tribal_steam_experiments = 1
+      	tribal_forging = 1
+      	tribal_artisan = 1
+      	tribal_chemistry = 1
+      	tribal_guilds_trade = 1
+      	tribal_crop_planting = 1
+      	tribal_irrigation = 1
+      	tribal_crop_rotation = 1
+      	tribal_salted_smoked_goods = 1
+      	tribal_leching = 1
+      }
+    }
+    if = {
+      limit = { has_idea = agrarian }
+      swap_ideas = {
+        remove_idea = agrarian
+        add_idea = industrializing
+      }
     }
   }
 }
-
 shared_focus = {
   id = NA_B_recon_resource_surveys
   icon = GFX_focus_generic_steel
@@ -204,7 +224,6 @@ shared_focus = {
     # Resource Survey Decisions
   }
 }
-
 shared_focus = {
   id = NA_B_recon_land_reforms
   icon = GFX_goal_focus_reform_administration
@@ -218,10 +237,388 @@ shared_focus = {
 
   ai_will_do = { base = 5 }
   bypass = {
-    num_of_controlled_states < 2
+    num_of_controlled_states < 3
   }
 
   completion_reward = {
-    # Swap Ideas
+    random_owned_controlled_state = {
+      limit = { is_capital = no }
+      add_extra_state_shared_building_slots = 1
+    }
+    random_owned_controlled_state = {
+      add_extra_state_shared_building_slots = 1
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_nationalized_farms
+  icon = placeholder
+  cost = 70
+
+  prerequisite = { focus = NA_B_recon_standard_rails }
+  prerequisite = { focus = NA_B_recon_resource_surveys }
+  relative_position_id = NA_B_recon_standard_rails
+  x = 1
+  y = 2
+
+  available_if_capitulated = no
+  ai_will_do = { base = 10 }
+
+  completion_reward = {
+    random_owned_controlled_state = {
+      add_building_construction = {
+        type = farm
+        level = 1
+        instant_build = yes
+      }
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_construct_focus
+  icon = GFX_goal_continuous_repairments
+  cost = 35
+
+  prerequisite = { focus = NA_B_recon_private_construction }
+  prerequisite = { focus = NA_B_recon_nationalized_farms }
+  prerequisite = { focus = NA_B_recon_land_reforms }
+  relative_position_id = NA_B_recon_private_construction
+  x = 0
+  y = 2
+
+  ai_will_do = { base = 5 }
+  bypass = {
+    num_of_factories > 25
+  }
+
+  completion_reward = {
+    # Idea that speeds up construction a bit
+  }
+}
+shared_focus = {
+  id = NA_B_recon_production_focus
+  icon = GFX_goal_generic_construction2
+  cost = 35
+
+  prerequisite = { focus = NA_B_recon_private_construction }
+  prerequisite = { focus = NA_B_recon_nationalized_farms }
+  prerequisite = { focus = NA_B_recon_land_reforms }
+  relative_position_id = NA_B_recon_land_reforms
+  x = 0
+  y = 2
+
+  ai_will_do = { base =  5 }
+  bypass = {
+    num_of_factories > 25
+  }
+
+  completion_reward = {
+    # Idea that speeds up production a bit
+  }
+}
+shared_focus = {
+  id = NA_B_recon_industrialize_2
+  icon = GFX_goal_focus_industrial_revolution
+  cost = 105
+
+  prerequisite = {
+    focus = NA_B_recon_construct_focus
+    focus = NA_B_recon_production_focus
+  }
+  relative_position_id = NA_B_recon_construct_focus
+  x = 1
+  y = 1
+
+  available = {
+    has_political_power > 0
+    OR = {
+      date > 1875.7.1
+      num_of_factories > 5
+    }
+  }
+  ai_will_do = { base = 20 }
+  bypass = {
+    OR = {
+      has_idea = electrification
+      has_idea = mass_production
+    }
+    num_of_factories > 25
+  }
+
+  completion_reward = {
+    random_owned_controlled_state = {
+      limit = {
+        OR = {
+          is_capital = yes
+          is_coastal = yes
+        }
+      }
+      add_extra_state_shared_building_slots = 1
+    }
+    random_owned_controlled_state = {
+      add_extra_state_shared_building_slots = 1
+    }
+    if = {
+      limit = {
+        num_of_controlled_states > 3
+      }
+      random_owned_controlled_state = {
+        add_extra_state_shared_building_slots = 1
+      }
+      add_political_power = -135
+    }
+    else = {
+      add_political_power = -100
+    }
+    if = {
+      limit = { has_idea = industrializing }
+      swap_ideas = {
+        remove_idea = industrializing
+        add_idea = industrialized
+      }
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_consumer_concern
+  icon = GFX_focus_focus_generic_industry_1
+  cost = 140
+
+  prerequisite = { focus = NA_B_recon_industrialize_2 }
+  relative_position_id = NA_B_recon_industrialize_2
+  x = 0
+  y = 1
+
+  mutually_exclusive = { focus = NA_B_recon_balanced_concern }
+  mutually_exclusive = { focus = NA_B_recon_military_concern }
+  available_if_capitulated = no
+  ai_will_do = { base = 10 }
+  bypass = {
+    OR = {
+      num_of_controlled_states > 25
+      has_capitulated = yes
+    }
+  }
+
+  completion_reward = {
+    add_offsite_building = {
+      type = industrial_complex
+      level = 2
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_engineering_effort_1
+  icon = GFX_focus_secret_rearmament
+  cost = 56
+
+  prerequisite = { focus = NA_B_recon_industrialize_1 }
+  relative_position_id = NA_B_recon_industrialize_1
+  x = 0
+  y = 1
+
+  ai_will_do = { base = 8 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = mechanical_engineering_tech
+      bonus = 0.35
+      uses = 2
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_engineering_effort_2
+  icon = GFX_focus_secret_rearmament
+  cost = 56
+
+  prerequisite = { focus = NA_B_recon_engineering_effort_1 }
+  relative_position_id = NA_B_recon_engineering_effort_1
+  x = 0
+  y = 1
+
+  ai_will_do = { base = 8 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = process_engineering_tech
+      bonus = 0.35
+      uses = 2
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_standard_equipment_1
+  icon = GFX_focus_focus_generic_industry_1
+  cost = 56
+
+  prerequisite = { focus = NA_B_recon_engineering_effort_2 }
+  prerequisite = { focus = NA_B_recon_civilian_research_grants }
+  relative_position_id = NA_B_recon_engineering_effort_2
+  x = 1
+  y = 1
+
+  ai_will_do = { base = 8 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = biochemistry_tech
+      bonus = 0.5
+      uses = 1
+    }
+    add_tech_bonus = {
+      category = electronics_devices_tech
+      bonus = 0.5
+      uses = 1
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_academic_effort_1
+  icon = GFX_focus_research
+  cost = 56
+
+  relative_position_id = NA_B_recon_infrastructure_effort_1
+  x = 5
+  y = 0
+
+  ai_will_do = { base = 8 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = tech_humanities_industrial_society
+      bonus = 0.6
+      uses = 1
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_found_a_university
+  icon = GFX_focus_generic_military_academy
+  cost = 105
+
+  prerequisite = { focus = { NA_B_recon_academic_effort_1} }
+  relative_position_id = NA_B_recon_academic_effort_1
+  x = 0
+  y = 1
+
+  ai_will_do = { base = 10 }
+  bypass = {
+    OR = {
+      has_idea = machine_era
+      has_idea = oil_era
+      has_idea = aviation_era
+      has_idea = modern_era
+      has_idea = atomic_era
+      has_idea = information_era
+    }
+  }
+
+  completion_reward = {
+    # add idea tech bonuses
+  }
+}
+shared_focus = {
+  id = NA_B_recon_academic_effort_2
+  icon = GFX_focus_research
+  cost = 56
+
+  prerequisite = { focus = { NA_B_recon_found_a_university } }
+  relative_position_id = NA_B_recon_found_a_university
+  x = 0
+  y = 1
+
+  ai_will_do = { base = 8 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = tech_humanities_industrial_society
+      bonus = 0.6
+      uses = 1
+    }
+  }
+}
+shared_focus = {
+  id = NA_B_recon_civilian_research_grants
+  icon = GFX_goal_focus_reform_administration
+  cost = 42
+
+  prerequisite = { focus = NA_B_recon_academic_effort_2 }
+  relative_position_id = NA_B_recon_academic_effort_2
+  x = -1
+  y = 1
+
+  ai_will_do = { base = 5 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = process_engineering_tech
+      bonus = 0.6
+      uses = 1
+    }
+  }
+}
+
+shared_focus = {
+  id = NA_B_recon_study_aviation
+  icon = GFX_goal_generic_build_airforce
+  cost = 56
+
+  prerequisite = { focus = NA_B_recon_academic_effort_2 }
+  relative_position_id = NA_B_recon_academic_effort_2
+  x = 0
+  y = 2
+
+  available = { has_tech = balloon_designs }
+
+  completion_reward = {
+    air_experience = 15
+    add_tech_bonus = {
+      category = aviation_tech
+      bonus = 0.3
+      uses = 1
+    }
+  }
+}
+
+
+shared_focus = {
+  id = NA_B_recon_support_focus
+  icon = GFX_goal_generic_production2
+  cost = 42
+
+  prerequisite = { focus = NA_B_recon_academic_effort_2 }
+  relative_position_id = NA_B_recon_academic_effort_2
+  x = 1
+  y = 1
+
+  ai_will_do = { base = 8 }
+  bypass = { date > 1890.1.1 }
+
+  completion_reward = {
+    add_tech_bonus = {
+      category = support_tech
+      uses = 2
+      bonus = 0.4
+    }
+  }
+}
+
+shared_focus = {
+  id = NA_B_recon_militia_effort_1
+  icon = GFX_focus_generic_military_academy
+  cost = 70
+
+  relative_position_id = NA_B_recon_academic_effort_1
+  x = 4
+  y = 0
+
+  ai_will_do = { base = 15 }
+  available = {
+    has_political_power > 0
+  }
+
+  completion_reward = {
+  
   }
 }
