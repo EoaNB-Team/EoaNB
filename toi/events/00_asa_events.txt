@@ -2,8 +2,8 @@ add_namespace = asa_isolation
 add_namespace = asa_cont_ambition
 add_namespace = asa_legitimacy_proclamation
 add_namespace = asa_nap
-add_namespace = asa_take_connecticut
-add_namespace = asa_take_ohio
+add_namespace = asa_referendum_in_connecticut
+add_namespace = asa_referendum_in_ohio
 add_namespace = asa_create_a_new_doctrine_event
 add_namespace = asa_utilize_an_old_doctrine_event
 add_namespace = asa_congress_reaffirms_constitution
@@ -27,6 +27,7 @@ add_namespace = asa_take_virginia
 add_namespace = asa_over_fishing
 add_namespace = asa_soil_infertility
 add_namespace = asa_devegetation
+add_namespace = asa_imperial_palace
 
 #Global Events
 news_event = {
@@ -171,6 +172,9 @@ country_event = {
 	fire_only_once = yes
 
 	trigger = {
+		not = {
+			has_country_flag = ASA_Took_Connecticut
+		}
 		ASA = {
 			has_offensive_war_with = NEG
 			has_completed_focus = ASA_Strike_East
@@ -194,14 +198,83 @@ country_event = {
 				remove_state_core = 958
 			}
 			ASA = { transfer_state = 958 }
+			set_country_flag = ASA_Took_Connecticut
 		}
 	}
 }
 
 country_event = {
-	id = asa_take_ohio.1
-	title = asa_take_ohio.1.t
-	desc = asa_take_ohio.1.desc
+	id = asa_referendum_in_ohio.1
+	title = asa_referendum_in_ohio.1.t
+	desc = asa_referendum_in_ohio.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = { #Allow the referendum
+		name = asa_referendum_in_ohio.1.a
+		custom_effect_tooltip = asa_referendum_in_ohio_1_a_tt
+		hidden_effect = {
+			ASA = {
+				country_event = {
+					id = asa_referendum_in_ohio.2
+					days = 1
+				}
+			}
+		}
+	}
+	option = { #Don't allow the referendum
+		name = asa_referendum_in_ohio.1.a
+		custom_effect_tooltip = asa_referendum_in_ohio_1_b_tt
+		hidden_effect = {
+			ASA = {
+				country_event = {
+					id = asa_referendum_in_ohio.3
+					days = 1
+				}
+			}
+		}
+	}
+}
+
+country_event = { #Ohio Referendum
+	id = asa_referendum_in_ohio.2
+	title = asa_referendum_in_ohio.2.t
+	desc = asa_referendum_in_ohio.2.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	hidden = yes
+
+	option = { #Ohio joins the ASA
+		name = asa_referendum_in_ohio.2.a
+		ASA = {
+			country_event = {
+				id = asa_referendum_in_ohio.4
+				days = 1
+			}
+		}
+	}
+	option = { #Ohio does not join the ASA
+		name = asa_referendum_in_ohio.2.b
+		ASA = {
+			country_event = {
+				id = asa_referendum_in_ohio.5
+				days = 1
+			}
+		}
+	}
+}
+
+country_event = { #ASA Response To GLC Not Allowing Ohio Referendum
+	id = asa_referendum_in_ohio.3
+	title = asa_referendum_in_ohio.3.t
+	desc = asa_referendum_in_ohio.3.desc
 	picture = placeholder
 	
 	fire_only_once = yes
@@ -209,7 +282,7 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = asa_take_ohio.1.a
+		name = asa_referendum_in_ohio.3.a
 		declare_war_on = {
 			target = GRL
 			type = topple_government
@@ -217,33 +290,140 @@ country_event = {
 		add_ideas = ASA_Taking_Back_Ohio
 		add_state_core = 261
 	}
+	option = {
+		name = asa_referendum_in_ohio.3.b
+	}
 }
 
-country_event = {
-	id = asa_take_ohio.2
-	title = asa_take_ohio.2.t
-	desc = asa_take_ohio.2.d
+country_event = { #Ohio joins ASA via vote (ASA Perspective)
+	id = asa_referendum_in_ohio.4
+	title = asa_referendum_in_ohio.4.t
+	desc = asa_referendum_in_ohio.4.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = { #Ohio votes to join the ASA
+		name = asa_referendum_in_ohio.4.a
+		ASA = { transfer_state = 261 }
+		add_state_core = 261
+		GRL = {
+			remove_state_core = 261
+			country_event = {
+				id = asa_referendum_in_ohio.6
+				days = 1
+			}
+		}
+		every_unit_leader = [
+			limit = {
+				OR = {
+					has_id = 5001
+					has_id - 5002
+				}
+			}
+			set_nationality = ASA
+		]
+		hidden_effect = {
+			set_country_flag = ASA_Took_Ohio
+		}
+	}
+}
+
+country_event = { #Ohio votes to not join the ASA
+	id = asa_referendum_in_ohio.5
+	title = asa_referendum_in_ohio.5.t
+	desc = asa_referendum_in_ohio.5.desc
+	picture = placeholder
+	
+	fire_only_once = yes
+	
+	is_triggered_only = yes
+
+	option = { #Chicago rigged the vote!
+		name = asa_referendum_in_ohio.5.a
+		declare_war_on = {
+			target = GRL
+			type = topple_government
+		}
+		add_ideas = ASA_Taking_Back_Ohio
+		add_state_core = 261
+	}
+	option = { #It was worth a try
+		name = asa_referendum_in_ohio.5.b
+	}
+}
+
+country_event = { #Ohio votes not to join the ASA (GRL Perspective)
+	id = asa_referendum_in_ohio.6
+	title = asa_referendum_in_ohio.6.t
+	desc = asa_referendum_in_ohio.6.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_referendum_in_ohio.6.a
+	}
+}
+
+country_event = { #Ohio vote to join ASA (GRL Perspective)
+	id = asa_referendum_in_ohio.7
+	title = asa_referendum_in_ohio.7
+	desc = asa_referendum_in_ohio.7.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		option = { #Washington rigged the vote!
+		name = asa_referendum_in_ohio.7.a
+		declare_war_on = {
+			target = GRL
+			type = topple_government
+		}
+		add_ideas = ASA_Taking_Back_Ohio
+		add_state_core = 261
+		set_country_flag = GRL_Taking_Back_Ohio
+	}
+	option = { #If it's what the people want...
+		name = asa_referendum_in_ohio.7.b
+	}
+}
+
+country_event = { # ASA Offensive + Victory
+	id = asa_referendum_in_ohio.8
+	title = asa_referendum_in_ohio.8.t
+	desc = asa_referendum_in_ohio.8.desc
 	picture = placeholder
 	
 	fire_only_once = yes
 	
 	trigger = {
+		not = {
+			has_country_flag = ASA_Took_Ohio
+		}
 		ASA = {
 			has_offensive_war_with = GRL
 			has_completed_focus = ASA_Strike_West
 		}
 		OR = {
-			GRL = { surrender_progress > 0.3 }
+			GRL = { surrender_progress < 0.3 }
 			ASA = { controls_state = 261 }
 		}
 	}
 
 	option = {
-		name = asa_take_ohio.2.a
+		name = asa_referendum_in_ohio.8.a
 		ai_chance = {
 			base = 100
 		}
-		custom_effect_tooltip = asa_take_ohio_tt
+		custom_effect_tooltip = asa_referendum_in_ohio_8_tt
 		hidden_effect = {
 			ASA = {
 				white_peace = GRL
@@ -251,8 +431,86 @@ country_event = {
 				remove_state_core = 261
 			}
 			ASA = { transfer_state = 261 }
+			set_country_flag = ASA_Took_Ohio
 		}
 	}
+}
+
+country_event = { # GRL Offensive + Victory
+	id = asa_referendum_in_ohio.9
+	title = asa_referendum_in_ohio.9.t
+	desc = asa_referendum_in_ohio.9.desc
+	picture = placeholder
+	
+	fire_only_once = yes
+	
+	trigger = {
+
+		has_country_flag = GRL_Taking_Back_Ohio
+
+		GRL = {
+			has_offensive_war_with = ASA
+			has_completed_focus = ASA_Strike_West
+		}
+		OR = {
+			ASA = { surrender_progress < 0.3 }
+			GRL = { controls_state = 261 }
+		}
+	}
+
+	option = {
+		name = asa_referendum_in_ohio.9.a
+		ai_chance = {
+			base = 100
+		}
+		custom_effect_tooltip = asa_referendum_in_ohio_9_tt
+		hidden_effect = {
+			GRL = {
+				white_peace = ASA
+				remove_ideas = ASA_Taking_Back_Ohio
+			}
+			ASA = { transfer_state = 261 }
+			remove_country_flag = GRL_Taking_Back_Ohio
+		}
+	}
+}
+
+country_event = { # ASA Offensive + Defeat
+	id = asa_referendum_in_ohio.10
+	title = asa_referendum_in_ohio.10.t
+	desc = asa_referendum_in_ohio.10.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_referendum_in_ohio.10.a
+		ASA = {
+			white_peace = GRL
+			remove_ideas = ASA_Taking_Back_Ohio
+		}
+	}	
+}
+
+country_event = { # GRL Offensive + Defeat
+	id = asa_referendum_in_ohio.11
+	title = asa_referendum_in_ohio.11.t
+	desc = asa_referendum_in_ohio.11.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_referendum_in_ohio.11.a
+		GRL = {
+			white_peace = ASA
+			remove_ideas = ASA_Taking_Back_Ohio
+		}
+	}	
 }
 
 country_event = {
@@ -453,8 +711,10 @@ country_event = {
 			remove_idea = non_monarchical_system
 			add_idea = has_heir
 		}
-		country_event = {
-			id = asa_new_country.1
+		ASA = {
+			country_event = {
+				id = asa_new_country.1
+			}
 		}
 	}
 }
@@ -482,7 +742,6 @@ country_event = {
 		set_cosmetic_tag = ASA_autocracy_uda
 	}
 }
-
 
 
 ### AMEND THE CONSTITUTION - MILITARIST ###
@@ -971,5 +1230,259 @@ country_event = {
 	option = {
 		name = asa_devegetation.2.a
 		add_ideas = ASA_Devegitation_Famine
+	}
+}
+
+country_event = {
+	id = asa_imperial_palace.1
+	title = asa_imperial_palace.1.t
+	desc = asa_imperial_palace.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_imperial_palace.1.a
+		set_province_name = {
+			id = 6845
+			name = "McClellan City"
+		}
+		set_capital = 360
+		add_ideas = ASA_The_Imperial_Palace_1
+	}
+	option = {
+		name = asa_imperial_palace.1.b
+		set_province_name = {
+			id = 6845
+			name = "McClellan City"
+		}
+		add_ideas = ASA_The_Imperial_Palace_2
+	}
+}
+
+##################################
+### MCCLELLAN INFLUENCE EVENTS ###
+##################################
+
+country_event = {
+	id = asa_mcclellan_founds_charity.1
+	title = asa_mcclellan_founds_charity.1.t
+	desc = asa_mcclellan_founds_charity.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_mcclellan_founds_charity.1.a
+		360 = {
+			add_building_construction = {
+				type = industrial_complex
+				level = 1
+				instant_build = yes
+			}
+		}
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = radical_democracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = centrism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = social_egalitarianism
+			popularity = -0.01
+		}
+	}
+
+	option = {
+		name = asa_mcclellan_founds_charity.1.b
+		add_popularity = {
+			popularity = 0.005
+		}
+		360 = {
+			add_building_construction = {
+				type = industrial_complex
+				level = 1
+				instant_build = yes
+			}
+		}
+		custom_effect_tooltip = asa_mcclellan_cult_anger_tt
+		hidden_effect = {
+			add_to_variable = {
+				var = asa_mcclellan_cult_anger
+				value = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = asa_mcclellan_founds_food_bank.1
+	title = asa_mcclellan_founds_food_bank.1.t
+	desc = asa_mcclellan_founds_food_bank.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		name = asa_mcclellan_founds_food_bank.1.a
+		360 = {
+			add_building_construction = {
+				type = farm
+				level = 1
+				instant_build = yes
+			}
+		}
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = radical_democracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = centrism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = social_egalitarianism
+			popularity = -0.01
+		}
+	}
+
+	option = {
+		name = asa_mcclellan_founds_food_bank.1.b
+		add_popularity = {
+			popularity = 0.005
+		}
+		custom_effect_tooltip = asa_mcclellan_cult_anger_tt
+		hidden_effect = {
+			add_to_variable = {
+				var = asa_mcclellan_cult_anger
+				value = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = asa_mcclellan_personally_recruits_soldiers.1
+	title = asa_mcclellan_personally_recruits_soldiers.1.t
+	desc = asa_mcclellan_personally_recruits_soldiers.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		add_manpower = 2000
+		name = asa_mcclellan_personally_recruits_soldiers.1.a
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = radical_democracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = centrism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = social_egalitarianism
+			popularity = -0.01
+		}
+	}
+
+	option = {
+		name = asa_mcclellan_personally_recruits_soldiers.1.b
+		add_manpower = 2000
+		add_popularity = {
+			popularity = 0.005
+		}
+		custom_effect_tooltip = asa_mcclellan_cult_anger_tt
+		hidden_effect = {
+			add_to_variable = {
+				var = asa_mcclellan_cult_anger
+				value = 1
+			}
+		}
+	}
+}
+
+country_event = {
+	id = asa_mcclellan_gives_speech.1
+	title = asa_mcclellan_gives_speech.1.t
+	desc = asa_mcclellan_gives_speech.1.desc
+	picture = placeholder
+
+	fire_only_once = yes
+
+	is_triggered_only = yes
+
+	option = {
+		add_manpower = 2000
+		name = asa_mcclellan_gives_speech.1.a
+		add_popularity = {
+			ideology = autocracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = radical_democracy
+			popularity = 0.01
+		}
+		add_popularity = {
+			ideology = centrism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = traditional_conservatism
+			popularity = -0.01
+		}
+		add_popularity = {
+			ideology = social_egalitarianism
+			popularity = -0.01
+		}
+	}
+
+	option = {
+		name = asa_mcclellan_gives_speech.1.b
+		add_manpower = 2000
+		add_popularity = {
+			popularity = 0.005
+		}
+		custom_effect_tooltip = asa_mcclellan_cult_anger_tt
+		hidden_effect = {
+			add_to_variable = {
+				var = asa_mcclellan_cult_anger
+				value = 1
+			}
+		}
 	}
 }
