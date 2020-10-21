@@ -924,7 +924,7 @@ NGraphics = {
 	NATIONAL_FOCUS_PULSE_BASE =	10.0,
 	NATIONAL_FOCUS_PULSE_RANDOM = 10.0,
 	POLITICAL_GRID_SMALL_BOX_LIMIT = 100,              	-- Limit for gridbox in political view before it will be replaced with extended gridbox
-	SETUP_SPIRIT_GRID_BOX_LIMIT = 100,					-- Limit for gridbox in game setup before it will be replaced with extended gridbox 
+	SETUP_SPIRIT_GRID_BOX_LIMIT = 3,					-- Limit for gridbox in game setup before it will be replaced with extended gridbox 
 	POLITICAL_PULSE_BASE =	10.0,
 	POLITICAL_PULSE_RANDOM = 10.0,
 

@@ -3,12 +3,12 @@ add_namespace = acw_lincoln
 add_namespace = acw_beckenridge
 add_namespace = acw_douglas
 add_namespace = acw_norton
+add_namespace = acw_reconstruction_progress
 add_namespace = acw_reconstruction
-add_namespace = acw_reconstruction_setup
 
 ############################## GENERIC #############################
 # Election of 1860
-country_event = {
+news_event = {
 	id = acw_generic.1
 	title = acw_generic.1.t
 	desc = acw_generic.1.d
@@ -17,9 +17,9 @@ country_event = {
 	fire_only_once = yes
 	mean_time_to_happen = { days = 1 }
 
+	is_triggered_only = yes
 	trigger = {
 		TAG = USA
-		date > 1860.11.5
 		OR = {
 			has_government = centrism
 			has_government = traditional_conservatism
@@ -30,7 +30,9 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
-			country_event = { days = 100 id = usa_national_guard_unlock.1 }
+			complete_national_focus = USA_Focus_ACW_Election_1860
+			country_event = { days = 100 id = NA_B_unlock_units.1 }
+			CSA = { country_event = { days = 100 id = NA_B_unlock_units.1 } }
 		}
 	}
 
@@ -47,7 +49,7 @@ country_event = {
 
     hidden_effect = {
 			set_country_flag = USA_LincolnElected
-			clr_country_flag = USASlavery_Debate
+			clr_country_flag = USA_Slavery_Debate
 			remove_ideas = american_slavery_tension_1
 			remove_ideas = american_slavery_tension_2
 			remove_ideas = american_slavery_tension_3
@@ -56,7 +58,7 @@ country_event = {
 			remove_ideas = american_slavery_tension_6
       news_event = { id = usa_news.3 }
 			country_event = { id = acw_lincoln.1 days = 15 }
-      country_event = { id = csa_secession.1 days = 44 }
+      news_event = { id = csa_secession.1 days = 44 }
 			add_ideas = USA_southern_secession_crisis
     }
 	}
@@ -93,7 +95,7 @@ country_event = {
 				remove_ideas = american_slavery_tension_5
 				remove_ideas = american_slavery_tension_6
 				set_country_flag = USA_BreckinridgeElected
-				clr_country_flag = USASlavery_Debate
+				clr_country_flag = USA_Slavery_Debate
 			}
 		}
 	}
@@ -122,10 +124,7 @@ country_event = {
 				remove_ideas = american_slavery_tension_5
 				remove_ideas = american_slavery_tension_6
 				set_country_flag = USA_DouglasElected
-				clr_country_flag = USASlavery_Debate
-			}
-			ASA = {
-				country_event = { days = 720 id = usa_national_guard_unlock.1 }
+				clr_country_flag = USA_Slavery_Debate
 			}
 		}
 		add_popularity = {
@@ -233,7 +232,7 @@ country_event = {
 			news_event = { id = usa_news.24 }
 			USA = {
 				set_country_flag = USA_BellElected
-				clr_country_flag = USASlavery_Debate
+				clr_country_flag = USA_Slavery_Debate
 			}
 		}
 	}
@@ -478,15 +477,25 @@ country_event = {
 				add_war_support = 0.10
 				country_event = { id = acw_first_nations_trigger.1 days = 10 }
 				remove_ideas = USA_southern_secession_crisis
-				set_country_flag = USA_American_Civil_War
-				set_global_flag = ACWAmerican_Civil_War
-				set_global_flag = ACWAmerican_Civil_War_Happened
+				set_global_flag = ACW_American_Civil_War
+				set_global_flag = ACW_American_Civil_War_Happened
+				add_to_variable = {
+					var = acw_weapons_count_left
+					value = 35
+				}
+				add_to_variable = {
+					var = acw_draft_count_left
+					value = 25
+				}
 			}
 			else_if = {
 				limit = { tag = CSA }
 				add_stability = 0.10
 				add_war_support = 0.10
-				set_country_flag = CSA_American_Civil_War
+				add_to_variable = {
+					var = acw_draft_count_left
+					value = 20
+				}
 			}
 		}
 	}
@@ -553,29 +562,29 @@ country_event = {
 			limit = { USA = { has_country_flag = USA_BreckinridgeElected } }
 			if = {
 				limit = { tag = USA }
-				ROOT = { load_oob = USA_CIVIL_WAR }
+				ROOT = { load_oob = USA_Big_ACW }
 			}
 			else_if = {
 				limit = { tag = CSA }
-				ROOT = { load_oob = CSA_AFTER_SUMTER }
+				ROOT = { load_oob = CSA_Big_ACW }
 			}
 		}
 		else_if = {
 			limit = {
-				OR = {
-					USA = {
-						has_country_flag = USA_BellElected
+				USA = {
+					OR = {
 						has_country_flag = USA_LincolnElected
+						has_country_flag = USA_BellElected
 					}
 				}
 			}
 			if = {
 				limit = { tag = USA }
-				ROOT = { load_oob = USA_CIVIL_WAR_RADICAL }
+				ROOT = { load_oob = USA_Standard_ACW }
 			}
 			else_if = {
 				limit = { tag = CSA }
-				ROOT = { load_oob = CSA_AFTER_SUMTER_RADICAL }
+				ROOT = { load_oob = CSA_Standard_ACW }
 			}
 		}
 	}
@@ -694,7 +703,7 @@ country_event = {
 	fire_only_once = yes
 	trigger = {
 		tag = USA
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		has_war_with = CSA
 		date > 1862.1.1
 	}
@@ -771,7 +780,7 @@ country_event = {
 	fire_only_once = yes
 	trigger = {
 		tag = CSA
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		has_war_with = USA
 		date > 1862.1.1
 	}
@@ -897,7 +906,7 @@ country_event = {
     create_corps_commander = {
       name = "Ulysses S. Grant"
       picture = "Portrait_USA_Ulysses_grant.dds"
-      traits = { old_guard ranger }
+      traits = { old_guard ranger butcher }
       skill = 4
       id = 5001
       attack_skill = 6
@@ -941,7 +950,7 @@ country_event = {
 
   trigger = {
     tag = USA
-		has_global_flag = ACWAmerican_Civil_War_Happened
+		has_global_flag = ACW_American_Civil_War
     has_idea = USA_memories_of_confederation
   }
 	fire_only_once = yes
@@ -976,7 +985,7 @@ country_event = {
 
 	is_triggered_only = yes
   trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		NOT = { has_idea = ACW_observer }
 		has_war = no
 	}
@@ -1131,7 +1140,7 @@ country_event = {
   title = acw_generic.23.t
   desc = {
     text = acw_generic.23.d
-    trigger = { has_global_flag = Trent_Affair_ENG_Yes}
+    trigger = { has_global_flag = Trent_Affair_ENG_Yes }
   }
   desc = {
     text = acw_generic.23.d_a
@@ -1329,7 +1338,7 @@ country_event = {
 
 	trigger = {
 		tag = USA
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		has_war_with = CSA
 		date > 1861.6.1
 		NOT = { has_country_flag = USA_BreckinridgeElected }
@@ -1397,7 +1406,7 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1426,7 +1435,7 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1448,7 +1457,7 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1508,7 +1517,7 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1526,7 +1535,7 @@ country_event = {
 	is_triggered_only = yes
 	fire_only_once = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1542,7 +1551,7 @@ country_event = {
 
 	is_triggered_only = yes
 	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 	}
 
 	option = {
@@ -1553,7 +1562,7 @@ country_event = {
 			clr_global_flag = ACW_virginia_talks_2
 			clr_global_flag = ACW_virginia_talks_3
 			if = {
-				limit = { has_global_flag = ACWAmerican_Civil_War }
+				limit = { has_global_flag = ACW_American_Civil_War }
 				if = {
 					limit = { USA = { controls_state = 746 } }
 					USA = { load_oob = USA_WVG_1864 }
@@ -1780,8 +1789,7 @@ country_event = {
 			retire_country_leader = yes
 			set_politics = {
 				ruling_party = centrism
-				election_frequency = 48
-	  		elections_allowed = yes
+				elections_allowed = no
 			}
 			create_country_leader = {
 				name = "Abraham Lincoln"
@@ -1802,16 +1810,11 @@ country_event = {
 	picture = GFX_report_event_worker_protests
 
 	trigger = {
-		tag = USA
-		AND = {
-			has_country_flag = USASoaring_Eagle
-			has_country_leader = {
-				name = "Abraham Lincoln"
-				ruling_only = yes
-			}
+		has_country_leader = {
+			name = "Abraham Lincoln"
+			ruling_only = yes
 		}
 	}
-	mean_time_to_happen = { days = 4 }
 	fire_only_once = yes
 
 	option = {
@@ -1848,8 +1851,7 @@ country_event = {
 				set_politics = {
 					ruling_party = traditional_conservatism
 					last_election = "1864.11.5"
-  				election_frequency = 48
-  				elections_allowed = yes
+  				elections_allowed = no
 				}
 			}
 		}
@@ -1866,8 +1868,7 @@ country_event = {
 				set_politics = {
 					ruling_party = centrism
 					last_election = "1860.11.5"
-  				election_frequency = 48
-  				elections_allowed = yes
+  				elections_allowed = no
 				}
 			}
 		}
@@ -2042,8 +2043,7 @@ country_event = {
 		}
 		set_politics = {
 			ruling_party = social_egalitarianism
-			election_frequency = 48
-			elections_allowed = yes
+			elections_allowed = no
 		}
 		set_country_flag = USA_Radical_Lincoln
 	}
@@ -2062,7 +2062,7 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
-			country_event = { id = acw_douglas.2 days = 30 random_days = 10 }
+			country_event = { id = acw_douglas.2 days = 35 random_days = 5 }
 		}
 	}
 	option = {
@@ -2100,6 +2100,7 @@ country_event = {
 	immediate = {
 		hidden_effect = {
 			country_event = { id = acw_douglas.3 days = 25 random_days = 10 }
+			add_ideas = USA_southern_secession_crisis
 		}
 	}
 
@@ -2152,7 +2153,7 @@ country_event = {
 	option = {
 		name = acw_douglas.3.a
 		custom_effect_tooltip = 03_ACW_GENERIC_tt
-		add_ideas = USA_southern_secession_crisis
+		complete_national_focus = USA_Focus_ACW_Douglas_Support
 	}
 }
 
@@ -2178,8 +2179,7 @@ country_event = {
 		retire_country_leader = yes
 		set_politics = {
 			ruling_party = centrism
-			election_frequency = 48
-			elections_allowed = yes
+			elections_allowed = no
 		}
 		set_party_name = {
 			ideology = centrism
@@ -2213,6 +2213,7 @@ country_event = {
 	option = {
 		name = acw_douglas.5.a
 		hidden_effect = {
+			complete_national_focus = USA_Focus_ACW_Popular_Sovereignty
 			country_event = { id = acw_douglas.6 }
 			#news_event = { id = acw_douglas_news.2 }
 		}
@@ -2230,6 +2231,7 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
+			set_country_flag = USA_Douglas_Tour_Start
 			country_event = { id = acw_douglas.7 days = 1 random_days = 2 }
 			news_event = { id = acw_douglas_news.3 }
 		}
@@ -2449,6 +2451,7 @@ country_event = {
 			ideology = market_liberal
 		}
 		hidden_effect = {
+			complete_national_focus = USA_Focus_ACW_New_Presidency
 			country_event = { id = acw_douglas.16 }
 		}
 	}
@@ -2457,7 +2460,7 @@ country_event = {
 		name = acw_douglas.15.a
 		add_timed_idea = {
 			idea = idea_national_funeral
-			days = 14
+			days = 7
 		}
 		hidden_effect = {
 			remove_ideas = Generic_Shocked_Nation_2
@@ -2481,17 +2484,17 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
-			set_country_flag = USA_ACW_Balkanization
 			retire_country_leader = yes
 			if = {
 				limit = { NOT = { has_country_flag = USA_DouglasElected } }
 				set_country_flag = USA_DouglasElected
 			}
+			complete_national_focus = USA_Focus_ACW_New_Presidency1
 			#swap_ideas = {
 				#remove_idea = Generic_Shocked_Nation_3
 				#add_timed_idea = Generic_Shocked_Nation_4
 			#}
-			country_event = { id = csa_secession.1 days = 3 } # CSA
+			news_event = { id = csa_secession.1 days = 3 } # CSA
 			country_event = { id = acw_douglas.17 days = 10 random_days = 75 } # Oregon
 			country_event = { id = acw_douglas.18 days = 10 random_days = 75 } # California
 			country_event = { id = acw_douglas.19 days = 10 random_days = 75 } # Utah
@@ -2515,7 +2518,7 @@ country_event = {
 		hidden_effect = {
 			add_timed_idea = {
 				idea = idea_national_funeral
-				days = 14
+				days = 7
 			}
 		}
 	}
@@ -2624,15 +2627,11 @@ country_event = {
 				}
 			}
 			ORE = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				country_event = { id = form_cascadia_event.1 days = 7 random_days = 5 }
 				set_politics = {
 					ruling_party = traditional_conservatism
-					election_frequency = 48
-					elections_allowed = yes
+					elections_allowed = no
 				}
 				set_popularities = {
 					autocracy = 2
@@ -2791,14 +2790,17 @@ country_event = {
 				}
 			}
 			CAL = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = centrism
-					election_frequency = 48
-					elections_allowed = yes
+					elections_allowed = no
+				}
+				create_country_leader = {
+					name = "Leland Stanford"
+					desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+					picture = ""
+					expire = "1947.1.1"
+					ideology = liberal_social
 				}
 				set_popularities = {
 					autocracy = 26
@@ -2877,6 +2879,40 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
+			if = {
+				limit = {
+					country_exists = UTA
+					UTA = { is_subject = yes }
+				}
+				UTA = {
+					every_owned_state = {
+						if = {
+							limit = { is_controlled_by = CAL }
+							CAL = {
+								transfer_state = PREV
+								add_state_core = PREV
+							}
+							UTA = {
+								remove_state_core = PREV
+								add_state_claim = PREV
+							}
+						}
+					}
+					OVERLORD = {
+						if = {
+							limit = { has_dlc = "Together for Victory" }
+							set_autonomy = {
+								target = UTA
+								autonomy_state = autonomy_free
+							}
+						}
+						else = {
+							end_puppet = UTA
+						}
+					}
+					white_peace = CAL
+				}
+			}
 			if = {
 				limit = { has_war_with = CAL }
 				every_owned_state = {
@@ -2966,10 +3002,7 @@ country_event = {
 				}
 			}
 			UTA = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = fundamentalism
 					elections_allowed = no
@@ -3202,14 +3235,11 @@ country_event = {
 				}
 			}
 			NMX = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = traditional_conservatism
-					election_frequency = 48
 					elections_allowed = yes
+					election_frequency = 60
 				}
 				set_popularities = {
 					autocracy = 3
@@ -3462,14 +3492,11 @@ country_event = {
 			}
 
 			TEX = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = traditional_conservatism
-					election_frequency = 48
 					elections_allowed = yes
+					election_frequency = 48
 				}
 				set_popularities = {
 					fundamentalism = 0
@@ -3629,10 +3656,7 @@ country_event = {
 				}
 			}
 			OKL = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = fundamentalism
 					elections_allowed = no
@@ -3887,14 +3911,10 @@ country_event = {
 				}
 			}
 			KNS = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = centrism
-					elections_allowed = yes
-					election_frequency = 48
+					elections_allowed = no
 				}
 				set_popularities = {
 					fundamentalism = 14
@@ -4090,31 +4110,29 @@ country_event = {
 				}
 			}
 			DAK = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
+				set_country_flag = NA_B_infrastructure_progress_disabled
+				set_country_flag = NA_B_academic_progress_disabled
+				set_country_flag = NA_B_militia_progress_disabled
+				load_focus_tree = NA_B_reconstruction_DAK
+				create_country_leader = {
+					name = "Wilmot W. Brookings"
+					desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+					picture = "Portrait_USA_Wilmot_Brookings.dds"
+					expire = "1905.1.6"
+					ideology = moderatism
+					traits = {
+					}
+				}
 				set_politics = {
 					ruling_party = traditional_conservatism
-					elections_allowed = yes
-					election_frequency = 48
+					elections_allowed = no
 				}
 				set_popularities = {
-					fundamentalism = 15
-					anarchism = 10
-					traditional_conservatism = 4
-					centrism = 55
+					traditional_conservatism = 49
+					centrism = 35
 					social_egalitarianism = 16
 				}
-				create_country_leader = {
-			    name = "Julius Sterling Morton"
-			    desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-			    picture = "Portrait_USA_Edward_Ord.dds"
-			    expire = "1894.1.6"
-			    ideology = moderatism
-			    traits = {
-			    }
-			  }
 				if = {
 					limit = { country_exists = DAK }
 					DAK = {
@@ -4260,14 +4278,10 @@ country_event = {
 				}
 			}
 			GRL = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = centrism
-					elections_allowed = yes
-					election_frequency = 48
+					elections_allowed = no
 				}
 				set_popularities = {
 					fundamentalism = 2
@@ -4379,10 +4393,7 @@ country_event = {
 				}
 			}
 			MIO = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = traditional_conservatism
 					elections_allowed = yes
@@ -4491,10 +4502,7 @@ country_event = {
 				}
 			}
 			KTY = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = traditional_conservatism
 					elections_allowed = yes
@@ -4598,14 +4606,11 @@ country_event = {
 				}
 			}
 			WVG = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = centrism
 					elections_allowed = yes
-					election_frequency = 48
+					election_frequency = 96
 				}
 				set_popularities = {
 					fundamentalism = 8
@@ -4722,21 +4727,22 @@ country_event = {
 				}
 			}
 			MHC = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = anarchism
 					elections_allowed = no
 				}
 				set_popularities = {
-					traditional_conservatism = 25
-					centrism = 22
-					social_egalitarianism = 33
 					anarchism = 16
-					collectivist_socialism = 1
-					radical_democracy = 3
+					vanguard_communism = 6
+					collectivist_socialism = 11
+					social_egalitarianism = 31
+					centrism = 21
+					traditional_conservatism = 13
+					radical_democracy = 0
+					chauvinist_populism = 0
+					autocracy = 0
+					fundamentalism = 2
 				}
 				create_country_leader = {
 			    name = "Revolutionary Council"
@@ -4866,14 +4872,10 @@ country_event = {
 				}
 			}
 			NEG = {
-				inherit_technology = USA
-				set_country_flag = American_System_Eligible
-				add_ideas = Gen_America_American_System
-				country_event = { id = NA_B_start.1 days = 1 }
+				country_event = { id = NA_B_start.1 days = 2 }
 				set_politics = {
 					ruling_party = social_egalitarianism
-					elections_allowed = yes
-					election_frequency = 48
+					elections_allowed = no
 				}
 				set_popularities = {
 					traditional_conservatism = 16
@@ -4994,10 +4996,7 @@ country_event = {
 					add_core_of = ALK
 				}
 				ALK = {
-					inherit_technology = USA
-					set_country_flag = American_System_Eligible
-					add_ideas = Gen_America_American_System
-					country_event = { id = NA_B_start.1 days = 1 }
+					country_event = { id = NA_B_start.1 days = 2 }
 					if = {
 						limit = { country_exists = ORE }
 						ORE = {
@@ -5069,9 +5068,6 @@ country_event = {
 						add_claim_by = ASA
 					}
 				}
-				ASA = {
-					inherit_technology = USA
-				}
 			}
 		}
 	}
@@ -5080,17 +5076,19 @@ country_event = {
 		name = acw_douglas.33.a
 		trigger = { is_ai = no }
 		custom_effect_tooltip = 46_ACW_GENERIC_tt
-		set_global_flag = USA_great_collapse
+		set_global_flag = ACW_Great_Collapse
 		hidden_effect = {
 			country_event = { id = acw_douglas.34 days = 2 }
 			ASA = { change_tag_from = ROOT }
+			ASA = { country_event = { id = NA_B_start.1 } }
 		}
 	}
 	option = {
 		name = acw_douglas.33.a
-		set_global_flag = USA_great_collapse
+		set_global_flag = ACW_Great_Collapse
 		trigger = { is_ai = yes }
 		country_event = { id = acw_douglas.34 days = 2 }
+		ASA = { country_event = { id = NA_B_start.1 } }
 	}
 }
 
@@ -5107,14 +5105,24 @@ country_event = {
 				add_core_of = ASA
 				ASA = { transfer_state = PREV }
 			}
+			every_unit_leader = {
+				limit = {
+					OR = {
+						has_id = 5003
+						has_id = 5004
+						has_id = 5005 
+						has_id = 5016
+						has_id = 5018
+						has_id = 5019
+					}
+				}
+				set_nationality = ASA
+			}
 		}
 		ASA = {
-			set_country_flag = American_System_Eligible
-			add_ideas = Gen_America_American_System
 			set_politics = {
-				ruling_party = traditional_conservatism
-				elections_allowed = yes
-				election_frequency = 48
+				ruling_party = social_egalitarianism
+				elections_allowed = no
 			}
 			set_popularities = {
 				traditional_conservatism = 33
@@ -5123,13 +5131,7 @@ country_event = {
 				fundamentalism = 4
 				radical_democracy = 14
 			}
-			create_country_leader = {
-				name = "George B. McClellan"
-				desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-				picture = "Portrait_USA_George_McClellan.dds"
-				expire = "1897.3.1"
-				ideology = federal
-			}
+			country_event = { id = asa_emergency_election.1 days = 14 }
 			ASA = {
 				set_variable = { rival_country = CSA.id }
 			}
@@ -5145,7 +5147,6 @@ country_event = {
 					set_variable = { most_favoured_country = WVG.id }
 				}
 			}
-			country_event = { id = NA_B_start.1 days = 1 }
 		}
 	}
 }
@@ -5349,7 +5350,7 @@ country_event = {
   is_triggered_only = yes
 
   immediate = {
-    set_country_flag = USA_Radical_Coup
+    set_global_flag = ACW_Radical_Coup
   }
 
   option = {
@@ -5363,7 +5364,7 @@ country_event = {
 		  news_event = { id = acw_beckenridge_news.1 }
   		USA = {
         country_event = { days = 15 id = acw_beckenridge.6 } # fort sumter
-  			country_event = { days = 20 id = csa_secession.1 } # Mississippi
+  			news_event = { days = 20 id = csa_secession.1 } # Mississippi
   			remove_state_core = 364
   			add_state_claim = 364
   			set_politics = { ruling_party = radical_democracy }
@@ -5413,7 +5414,7 @@ country_event = {
 		  news_event = { id = acw_beckenridge.1 }
   		USA = {
         country_event = { days = 15 id = acw_beckenridge.6 } # fort sumter
-  			country_event = { days = 20 id = csa_secession.1 } # Mississippi
+  			news_event = { days = 20 id = csa_secession.1 } # Mississippi
   			remove_state_core = 364
   			add_state_claim = 364
   			set_politics = { ruling_party = radical_democracy }
@@ -5559,7 +5560,7 @@ country_event = {
         remove_state_core = 372
         add_state_claim = 372
 
-        set_country_flag = USA_American_Civil_War
+        set_global_flag = ACW_American_Civil_War
         news_event = { id = acw_beckenridge_news.1 }
         country_event = { hours = 1 id = acw_beckenridge.8 } #end union mobilization
         country_event = { days = 4 id = acw.5 } #end south generals leave
@@ -5569,7 +5570,6 @@ country_event = {
         add_stability = 0.3
         add_war_support = 0.3
 
-        set_country_flag = CSA_American_Civil_War
         country_event = { hours = 1 id = csa.10 } #end
         country_event = { days = 7 id = acw.6 } #end
       }
@@ -5610,7 +5610,6 @@ country_event = {
       }
 
       NEG = {
-        set_country_flag = fsa_acw_rebellion
         load_focus_tree = fsa_reconstruction
         transfer_state = 357
         transfer_state = 1031
@@ -5703,21 +5702,17 @@ country_event = {
     hidden_effect = {
       if = {
         limit = {
-          has_country_flag = USA_Norton_Marked_ACW
+          has_global_flag = ACW_Norton_Marked
         }
         country_event = { id = acw.52 days = 1 }
       }
       else_if = {
         limit = {
-          has_country_flag = USA_Manhattan_Marked_ACW
+          has_global_flag = ACW_Manhattan_Marked
         }
         country_event = { id = acw.53 days = 1 }
       }
-      else_if = {
-        limit = {
-          NOT = { has_country_flag = USA_Norton_Marked_ACW }
-          NOT = { has_country_flag = USA_Manhattan_Marked_ACW }
-        }
+      else = {
         country_event = { id = acw.46 days = 4 }
       }
     }
@@ -5818,21 +5813,17 @@ country_event = {
     hidden_effect = {
       if = {
         limit = {
-          has_country_flag = USA_Norton_Marked_ACW
+          has_global_flag = ACW_Norton_Marked
         }
         country_event = { id = acw.52 days = 1 }
       }
       else_if = {
         limit = {
-          has_country_flag = USA_Manhattan_Marked_ACW
+          has_global_flag= ACW_Manhattan_Marked
         }
         country_event = { id = acw.53 days = 1 }
       }
-      else_if = {
-        limit = {
-          NOT = { has_country_flag = USA_Norton_Marked_ACW }
-          NOT = { has_country_flag = USA_Manhattan_Marked_ACW }
-        }
+      else = {
         country_event = { id = acw.46 days = 4 }
       }
     }
@@ -6075,7 +6066,6 @@ country_event = {
 		name = acw_norton.5.a
 		hidden_effect = {
 			country_event = { id = acw_norton.6 days = 10 }
-			set_country_flag = USA_Norton_Marked_ACW
 		}
 	}
 }
@@ -6247,7 +6237,8 @@ country_event = {
 	option = {
 		name = acw_norton.9.a
 		trigger = { tag = CAL }
-		set_cosmetic_tag = USA_imperial_states_of_america
+		#set_cosmetic_tag = USA_imperial_states_of_america
+		set_global_flag = ACW_Norton_War
 		declare_war_on = {
 			target = USA
 			type = annex_everything
@@ -6262,16 +6253,16 @@ country_event = {
 ############################ PEACE TREATIES ###########################
 add_namespace = acw_peace_deal
 
-country_event = { # Historic USA Win — CSA Submission
+# USA > CSA
+news_event = {
   id = acw_peace_deal.1
   title = acw_peace_deal.1.t
   desc = acw_peace_deal.1.d
   picture = GFX_news_event_appomattox_acw
 
-  fire_only_once = yes
 	trigger = {
 		tag = USA
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		count_triggers = {
 			amount = 15
 			date > 1863.7.1
@@ -6384,68 +6375,167 @@ country_event = { # Historic USA Win — CSA Submission
 			}
 		}
 	}
-
-  immediate = {
-    clr_global_flag = ACWAmerican_Civil_War
-    set_global_flag = USAWins_Civil_War
-    CSA = {
-      clr_country_flag = CSA_American_Civil_War
-      set_country_flag = CSAIndependence_Lost
-    }
-    USA = {
-      clr_country_flag = USA_American_Civil_War
-      clr_country_flag = USA_Radical_Coup
-      set_country_flag = USASoaring_Eagle
-    }
-		WVG = {
-			if = {
-				limit = {
-					OR = {
-						is_puppet_of = USA
-						is_subject_of = USA
-					}
-				}
-				USA = { annex_country = { target = WVG } }
-			}
-		}
-  }
-
-  option = {
-    name = acw_peace_deal.1.a
-    trigger = { tag = CSA }
-    ai_chance = { factor = 100 }
-    custom_effect_tooltip = 02_ACW_PEACEDEAL_tt
-    hidden_effect = {
-      CSA = {
-        every_owned_state = {
-          remove_claim_by = USA
-          add_core_of = USA
-          remove_core_of = CSA
-          add_claim_by = CSA
-					clr_state_flag = USA_seceding_state
-					set_state_flag = USA_unintegrated_seceded_state
-        }
-      }
-      USA = {
-				country_event = { id = acw_peace_deal.2 hours = 3 }
-			}
-    }
-  }
-}
-
-# Historic USA Win — CSA Accepts
-country_event = {
-  id = acw_peace_deal.2
-  title = acw_peace_deal.2.t
-  desc = acw_peace_deal.2.d
-  picture = GFX_news_event_appomattox_acw
-
-  is_triggered_only = yes
   fire_only_once = yes
 
+	immediate = {
+		if = {
+			limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
+			clr_global_flag = ACW_American_Civil_War
+			set_global_flag = ACW_American_Civil_War_Happened
+		}
+		set_global_flag = ACW_CSA_Lost
+		if = {
+			limit = { tag = USA }
+			UCT = {
+				# Anarchists
+				if = {
+					limit = {
+						USA = { NOT = { has_government = anarchism } }
+					}
+					set_variable = {
+						var = forming_usaanarchy_progress
+						value = 3
+					}
+					clamp_variable = {
+						var = forming_usaanarchy_progress
+						min = 0
+						max = 100
+					}
+				}
+				# Ku Klux
+				set_variable = {
+					var = forming_kuklux_progress
+					value = 2
+				}
+				clamp_variable = {
+					var = forming_kuklux_progress
+					min = 0
+					max = 100
+				}
+				if = {
+					limit = {
+						NOT = { has_country_flag = USA_LincolnorDouglas_Moderate_Appeal }
+					}
+					add_to_variable = {
+						var = forming_kuklux_progress
+						value = 8
+					}
+				}
+				# Free America
+				if = {
+					limit = {
+						OR = {
+							has_global_flag = USA_Radical_Coup
+						}
+					}
+					set_variable = {
+						var = forming_radabolition_progress
+						value = 2
+					}
+					clamp_variable = {
+						var = forming_radabolition_progress
+						min = 0
+						max = 100
+					}
+				}
+				# Norton
+				if = {
+					limit = {
+						NOT = {	country_exists = CAL }
+						USA = { has_global_flag = ACW_Norton_Imprisoned }
+					}
+					set_variable = {
+						var = forming_nortonrevival_progress
+						value = 11
+					}
+					clamp_variable = {
+						var = forming_nortonrevival_progress
+						min = 0
+						max = 100
+					}
+					if = {
+						limit = {
+							USA = { NOT = { has_country_flag = USA_Norton_Empowered } }
+						}
+						add_to_variable = {
+							var = forming_nortonrevival_progress
+							value = 15
+						}
+					}
+				}
+				# National Labor
+				if = {
+					limit = {
+						NOT = {
+							any_country = {
+								OR = {
+									has_government = collectivist_socialism
+									has_government = vanguard_communism
+									has_government = social_egalitarianism
+								}
+							}
+						}
+					}
+					set_variable = {
+						var = forming_usasyndicate_progress
+						value = 4
+					}
+					clamp_variable = {
+						var = forming_usasyndicate_progress
+						min = 0
+						max = 100
+					}
+					if = {
+						limit = { country_exists = MHC }
+						add_to_variable = {
+							var = forming_usasyndicate_progress
+							value = 20
+						}
+					}
+				}
+			}
+			country_event = { id = acw_lincoln.100 days = 4 random_days = 5 }
+		}
+	}
+
 	option = {
-    name = acw_peace_deal.2.a
+    name = acw_peace_deal.1.a
     custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
+		hidden_effect = {
+			if = {
+				limit = { has_global_flag = ACW_American_Civil_War_Happened }
+				USA = {
+					delete_unit_template_and_units = { division_template = "Union Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Union Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Union Cavalry" }
+					delete_unit_template_and_units = { division_template = "Union Army" }
+					delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+					set_division_template_lock = {
+						division_template = "American Militia Battalion"
+						is_locked = no
+					}
+					set_division_template_lock = {
+						division_template = "American Infantry Regiment"
+						is_locked = no
+					}
+					set_division_template_lock = {
+						division_template = "American Infantry Regiment with Support"
+						is_locked = no
+					}
+					set_division_template_lock = {
+						division_template = "American National Guard"
+						is_locked = no
+					}
+				}
+				CSA = {
+					delete_unit_template_and_units = { division_template = "Confederate Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Confederate Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Confederate Cavalry" }
+					delete_unit_template_and_units = { division_template = "Confederate Army" }
+					delete_unit_template_and_units = { division_template = "South American Confederate Volunteers" }
+				}
+			}
+		}
 
     if = {
       limit = {
@@ -6523,7 +6613,7 @@ country_event = {
 						limit = { CSA = { owns_state = 746 } }
 						transfer_state = 746
 					}
-					country_event = { id = acw_reconstruction_setup.1 }
+					USAROD_reconstruction_zones_setup = yes
 				}
 			}
 			if = {
@@ -6542,7 +6632,7 @@ country_event = {
 						limit = { CSA = { owns_state = 364 } }
 						transfer_state = 364
 					}
-					country_event = { id = acw_reconstruction_setup.1 }
+					USAROD_reconstruction_zones_setup = yes
 				}
 			}
 			if = {
@@ -6571,7 +6661,7 @@ country_event = {
 						limit = { CSA = { owns_state = 1211 } }
 						transfer_state = 1211
 					}
-					country_event = { id = acw_reconstruction_setup.1 }
+					USAROD_reconstruction_zones_setup = yes
 				}
 			}
 			if = {
@@ -6595,7 +6685,7 @@ country_event = {
 						limit = { CSA = { owns_state = 374 } }
 						transfer_state = 374
 					}
-					country_event = { id = acw_reconstruction_setup.1 }
+					USAROD_reconstruction_zones_setup = yes
 				}
 			}
 			if = {
@@ -6615,18 +6705,22 @@ country_event = {
 						if = {
 							limit = { CSA = { owns_state = 371 } }
 							transfer_state = 371
+							371 = { USAROD_reconstruction_progress_setup = yes }
 						}
 						if = {
 							limit = { CSA = { owns_state = 375 } }
 							transfer_state = 375
+							375 = { USAROD_reconstruction_progress_setup = yes }
 						}
 						if = {
 							limit = { CSA = { owns_state = 1305 } }
 							transfer_state = 1305
+							1305 = { USAROD_reconstruction_progress_setup = yes }
 						}
 						if = {
 							limit = { CSA = { owns_state = 1306 } }
 							transfer_state = 1306
+							1306 = { USAROD_reconstruction_progress_setup = yes }
 						}
 					}
 				}
@@ -6656,7 +6750,7 @@ country_event = {
 							limit = { CSA = { owns_state = 1306 } }
 							transfer_state = 1306
 						}
-						country_event = { id = acw_reconstruction_setup.1 }
+						USAROD_reconstruction_zones_setup = yes
 					}
 				}
 			}
@@ -6675,12 +6769,14 @@ country_event = {
 						if = {
 							limit = { CSA = { owns_state = 369 } }
 							transfer_state = 369
+							369 = { USAROD_reconstruction_progress_setup = yes }
 						}
 					}
 					NCA = {
 						if = {
 							limit = { CSA = { owns_state = 368 } }
 							transfer_state = 368
+							368 = { USAROD_reconstruction_progress_setup = yes }
 						}
 					}
 				}
@@ -6702,7 +6798,7 @@ country_event = {
 							limit = { CSA = { owns_state = 383 } }
 							transfer_state = 383
 						}
-						country_event = { id = acw_reconstruction_setup.1 }
+						USAROD_reconstruction_zones_setup = yes
 					}
 				}
 			}
@@ -6722,22 +6818,21 @@ country_event = {
 						limit = { CSA = { owns_state = 315} }
 						transfer_state = 315
 					}
-					country_event = { id = acw_reconstruction_setup.1 }
+					USAROD_reconstruction_zones_setup = yes
 				}
 			}
-			USA = { country_event = { id = acw_peace_deal.3 days = 1 } }
-			ENG = { country_event = { id = acw_peace_deal.2 } }
-			FRA = { country_event = { id = acw_peace_deal.2 } }
-			SPR = { country_event = { id = acw_peace_deal.2 } }
-			PRS = { country_event = { id = acw_peace_deal.2 } }
-			RUS = { country_event = { id = acw_peace_deal.2 } }
-			TSH = { country_event = { id = acw_peace_deal.2 } }
-			CAN = { country_event = { id = acw_peace_deal.2 } }
-			MEX = { country_event = { id = acw_peace_deal.2 } }
+			ENG = { news_event = { id = acw_peace_deal.1 } }
+			FRA = { news_event = { id = acw_peace_deal.1 } }
+			SPR = { news_event = { id = acw_peace_deal.1 } }
+			PRS = { news_event = { id = acw_peace_deal.1 } }
+			RUS = { news_event = { id = acw_peace_deal.1 } }
+			TSH = { news_event = { id = acw_peace_deal.1 } }
+			CAN = { news_event = { id = acw_peace_deal.1 } }
+			MEX = { news_event = { id = acw_peace_deal.1 } }
 		}
   }
   option = { # Reaction
-    name = acw_peace_deal.2.c
+    name = acw_peace_deal.1.b
     trigger = {
       OR = {
         tag = ENG
@@ -6798,29 +6893,11 @@ country_event = {
   }
 }
 
-country_event = { # CSA Win
-	id = acw_peace_deal.4
-	title = acw_peace_deal.4
-	desc = {
-		text = acw_peace_deal.4.d_1
-		trigger = {
-			CSA = { controls_state = 360 }
-		}
-	}
-	desc = {
-		text = acw_peace_deal.4.d_2
-		trigger = {
-			CSA = { controls_state = 395 }
-			NOT = { CSA = { controls_state = 360 } }
-		}
-	}
-	desc = {
-		text = acw_peace_deal
-		trigger = {
-			NOT = { CSA = { controls_state = 360 } }
-			NOT = { CSA = { controls_state = 395 } }
-		}
-	}
+# USA < CSA
+news_event = {
+	id = acw_peace_deal.2
+	title = acw_peace_deal.2.t
+	desc = acw_peace_deal.2.d
 
 	picture = GFX_news_event_appomattox_acw
 
@@ -6828,7 +6905,7 @@ country_event = { # CSA Win
 
 	trigger = {
 		tag = USA
-		has_global_flag = ACWAmerican_Civil_War
+		has_global_flag = ACW_American_Civil_War
 		count_triggers = {
 			amount = 17
 			has_country_leader = {
@@ -7060,17 +7137,12 @@ country_event = { # CSA Win
 
 	immediate = {
 		hidden_effect = {
-			clr_global_flag = ACWAmerican_Civil_War
-			set_global_flag = CSAWins_Civil_War
-			CSA = {
-				clr_country_flag = CSA_American_Civil_War
-				set_country_flag = CSAIndependence_Won
+			if = {
+				limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
+				clr_global_flag = ACW_American_Civil_War
+				set_global_flag = ACW_American_Civil_War_Happened
 			}
-			USA = {
-				clr_country_flag = USA_American_Civil_War
-				clr_country_flag = USA_Radical_Coup
-				set_country_flag = USABroken_Eagle
-			}
+			set_global_flag = ACW_CSA_Independence
 			CSA = {
 				white_peace = USA
 				if = {
@@ -7099,8 +7171,6 @@ country_event = { # CSA Win
 					add_state_claim = 374
 				}
 				every_owned_state = {
-					clr_state_flag = USA_seceding_state
-					set_state_flag = USA_seceded_state
 					remove_core_of = USA
 					add_claim_by = USA
 				}
@@ -7126,31 +7196,210 @@ country_event = { # CSA Win
 		}
 	}
 	option = {
-		name = acw_peace_deal.4.a
+		name = acw_peace_deal.2.a
+		trigger = { tag = USA }
+		hidden_effect = {
+			if = {
+				limit = { has_global_flag = ACW_American_Civil_War_Happened }
+				USA = {
+					delete_unit_template_and_units = { division_template = "Union Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Union Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Union Cavalry" }
+					delete_unit_template_and_units = { division_template = "Union Army" }
+					delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+				}
+				CSA = {
+					delete_unit_template_and_units = { division_template = "Confederate Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Confederate Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Confederate Cavalry" }
+					delete_unit_template_and_units = { division_template = "Confederate Army" }
+					delete_unit_template_and_units = { division_template = "South American Confederate Volunteers" }
+				}
+			}
+		}
+	}
+	option = {
+		name = acw_peace_deal.2.b
+		trigger = { tag = CSA }
+		hidden_effect = {
+			if = {
+				limit = { has_global_flag = ACW_American_Civil_War_Happened }
+				USA = {
+					delete_unit_template_and_units = { division_template = "Union Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Union Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Union Cavalry" }
+					delete_unit_template_and_units = { division_template = "Union Army" }
+					delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+				}
+				CSA = {
+					delete_unit_template_and_units = { division_template = "Confederate Militia Battalion" }
+					delete_unit_template_and_units = { division_template = "Confederate Infantry Regiment" }
+					delete_unit_template_and_units = { division_template = "Confederate Cavalry" }
+					delete_unit_template_and_units = { division_template = "Confederate Army" }
+					delete_unit_template_and_units = { division_template = "South American Confederate Volunteers" }
+				}
+			}
+		}
+	}
+	option = {
+		name = acw_peace_deal.2.c
+		trigger = { NOT = { tag = USA tag = CSA } }
 	}
 }
 
-country_event = {
-	id = acw_peace_deal.5
-	title = acw_peace_deal.5.t
-	desc = acw_peace_deal.5.d
+# USA > NEG
+news_event = {
+	id = acw_peace_deal.3
+	title = acw_peace_deal.3.t
+	desc = acw_peace_deal.3.d
+
+	picture = GFX_report_event_royal_visit
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
-	trigger = {
-		has_global_flag = ACWAmerican_Civil_War
-		tag = USA
-		has_war_with = CSA
-		date > 1867.1.1
+	immediate = {
+		if = {
+			limit = { tag = USA }
+			annex_country = {
+				target = NEG
+				transfer_troops = no
+			}
+		}
 	}
 
+	option = {
+		name = acw_peace_deal.3.a
+		trigger = { tag = USA }
+	}
+	option = {
+		name = acw_peace_deal.3.b
+		trigger = { tag = CSA }
+	}
+	option = {
+		name = acw_peace_deal.3.c
+		trigger = { tag = CAN }
+	}
+	option = {
+		name = acw_peace_deal.3.d
+		trigger = {
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = CAN
+			}
+		}
+	}
+}
+
+# USA < NEG
+news_event = {
+	id = acw_peace_deal.4
+	title = acw_peace_deal.4.t
+	desc = acw_peace_deal.4.d
+
+	picture = GFX_report_event_royal_visit
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
 	immediate = {
-		USA = { white_peace = CSA }
+		if = {
+			limit = { tag = NEG }
+			annex_country = {
+				target = USA
+				transfer_troops = yes
+			}
+		}
+	}
+
+	option = {
+		name = acw_peace_deal.4.a
+		trigger = { tag = USA }
+	}
+	option = {
+		name = acw_peace_deal.4.b
+		trigger = { tag = CSA }
+	}
+	option = {
+		name = acw_peace_deal.3.c
+		trigger = { tag = CAN }
+	}
+	option = {
+		name = acw_peace_deal.3.d
+		trigger = {
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = CAN
+			}
+		}
+	}
+}
+
+# USA > CAL
+news_event = {
+	id = acw_peace_deal.5
+	title = acw_peace_deal.5.t
+	desc = acw_peace_deal.5.d
+
+	trigger = {
+		tag = USA
+		has_global_flag = ACW_Norton_War
+		has_war_with = CAL
+		OR = {
+			controls_state = 1343
+			controls_state = 1341
+		}
+	}
+
+	fire_only_once = yes
+
+	immediate = {
+		annex_country = {
+			target = CAL
+			transfer_troops = yes
+		}
+		clr_global_flag = ACW_Norton_War
+		set_global_flag = ACW_Norton_Loss
 	}
 
 	option = {
 		name = acw_peace_deal.5.a
+		add_political_power = -15
+	}
+	option = {
+		name = acw_peace_deal.5.b
+		set_global_flag = ACW_Norton_Imprisoned
+	}
+}
+
+# USA < CAL
+news_event = {
+	id = acw_peace_deal.6
+	title = acw_peace_deal.5.t
+	desc = acw_peace_deal.5.d
+
+	trigger = {
+		tag = CAL
+		has_global_flag = ACW_Norton_War
+		has_war_with = USA
+		controls_state = 1091
+	}
+
+	fire_only_once = yes
+
+	immediate = {
+		annex_country = {
+			target = USA
+			transfer_troops = no
+		}
+		clr_global_flag = ACW_Norton_War
+		set_global_flag = ACW_Norton_Win
+	}
+
+	option = {
+		name = acw_peace_deal.6.a
 	}
 }
 
@@ -7366,1633 +7615,1063 @@ news_event = {
 		name = acw_beckenridge_news.2.c
 	}
 }
-# The Fall of Washington
-news_event = {
-  id = acw_news.2
-  title = acw_news.2.t
-  desc = acw_news.2.d
-  picture = GFX_news_event_fall_of_washington_acw
+# # The Fall of Washington
+# news_event = {
+#   id = acw_news.2
+#   title = acw_news.2.t
+#   desc = acw_news.2.d
+#   picture = GFX_news_event_fall_of_washington_acw
 
-  major = yes
+#   trigger = {
+# 		tag = USA
+# 		has_global_flag = ACW_American_Civil_War
+# 		1091 = {
+# 			is_owned_by = USA
+# 			OR = {
+# 				is_controlled_by = ENG
+# 				is_controlled_by = CAN
+# 				is_controlled_by = CSA
+# 				is_controlled_by = NEG
+# 				is_controlled_by = CAL
+# 				is_controlled_by = FRA
+# 			}
+# 		}
+#   }
 
-  trigger = {
-    1091 = { is_controlled_by = CSA }
-    1091 = { is_owned_by = USA }
-    NOT = { has_global_flag = fall_of_washington_ACW }
-  }
+#   mean_time_to_happen = { days = 2 }
 
-  immediate = {
-    set_global_flag = fall_of_washington_ACW
-  }
+#   option = {
+#     name = acw_news.2.a
+#     trigger = {
+#       NOT = {
+#         TAG = CSA
+#         TAG = USA
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_news.2.b
+#     trigger = { TAG = USA }
+# 		hidden_effect = {
+# 			every_other_country = {
+# 				news_event = acw_news.2
+# 			}
+# 		}
+#   }
+#   option = {
+#     name = acw_news.2.c
+#     trigger = { TAG = CSA }
+#   }
+# }
+# # The Fall of New York
+# news_event = {
+#   id = acw_news.3
+#   title = acw_news.3.t
+#   desc = acw_news.3.d
+#   picture = GFX_news_event_fall_of_nyc_acw
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   major = yes
 
-  option = {
-    name = acw_news.2.a
-    trigger = {
-      NOT = {
-        TAG = CSA
-        TAG = USA
-      }
-    }
-  }
-  option = {
-    name = acw_news.2.b
-    trigger = { TAG = USA }
-  }
-  option = {
-    name = acw_news.2.c
-    trigger = { TAG = CSA }
-  }
-}
-# The Fall of New York
-news_event = {
-  id = acw_news.3
-  title = acw_news.3.t
-  desc = acw_news.3.d
-  picture = GFX_news_event_fall_of_nyc_acw
+#   trigger = {
+# 		tag = USA
+# 		has_global_flag = ACW_American_Civil_War
+# 		954 = {
+# 			is_owned_by = USA
+# 			OR = {
+# 				is_controlled_by = ENG
+# 				is_controlled_by = CAN
+# 				is_controlled_by = CSA
+# 				is_controlled_by = NEG
+# 				is_controlled_by = CAL
+# 				is_controlled_by = FRA
+# 			}
+# 		}
+#   }
 
-  major = yes
+#   mean_time_to_happen = { days = 2 }
+	
 
-  trigger = {
-    954 = { is_controlled_by = CSA }
-    954 = { is_owned_by = USA }
-    NOT = { has_global_flag = fall_of_nyc_ACW }
-  }
+#   option = {
+#     name = acw_news.3.a
+#     trigger = {
+#       NOT = {
+#         TAG = CSA
+#         TAG = USA
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_news.3.b
+#     trigger = { TAG = USA }
+#   }
+#   option = {
+#     name = acw_news.3.c
+#     trigger = { TAG = CSA }
+#   }
+# }
+# # The Fall of New Orleans
+# news_event = {
+#   id = acw_news.4
+#   title = acw_news.4.t
+#   desc = acw_news.4.d
+#   picture = GFX_news_event_fall_of_new_orleans_acw
 
-  immediate = {
-    set_global_flag = fall_of_nyc_ACW
-  }
+#   major = yes
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   trigger = {
+#     371 = { is_controlled_by = USA }
+#     371 = { is_owned_by = CSA }
+#     USA = { has_war_with = CSA }
+#     NOT = { has_global_flag = fall_of_new_orleans_ACW }
+#   }
 
-  option = {
-    name = acw_news.3.a
-    trigger = {
-      NOT = {
-        TAG = CSA
-        TAG = USA
-      }
-    }
-  }
-  option = {
-    name = acw_news.3.b
-    trigger = { TAG = USA }
-  }
-  option = {
-    name = acw_news.3.c
-    trigger = { TAG = CSA }
-  }
-}
-# The Fall of New Orleans
-news_event = {
-  id = acw_news.4
-  title = acw_news.4.t
-  desc = acw_news.4.d
-  picture = GFX_news_event_fall_of_new_orleans_acw
+#   immediate = {
+#     set_global_flag = fall_of_new_orleans_ACW
+#   }
 
-  major = yes
+#   mean_time_to_happen = {
+#     days = 2
+#   }
 
-  trigger = {
-    371 = { is_controlled_by = USA }
-    371 = { is_owned_by = CSA }
-    USA = { has_war_with = CSA }
-    NOT = { has_global_flag = fall_of_new_orleans_ACW }
-  }
+#   option = {
+#     name = acw_news.4.a
+#     trigger = {
+#       NOT = {
+#         TAG = CSA
+#         TAG = USA
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_news.4.b
+#     trigger = { TAG = USA }
+#   }
+#   option = {
+#     name = acw_news.4.c
+#     trigger = { TAG = CSA }
+#   }
+# }
+# # The Fall of Charleston
+# news_event = {
+#   id = acw_news.5
+#   title = acw_news.5.t
+#   desc = acw_news.5.d
+#   picture = GFX_news_event_fall_of_charleston_acw
 
-  immediate = {
-    set_global_flag = fall_of_new_orleans_ACW
-  }
+#   major = yes
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   trigger = {
+#     364 = { is_controlled_by = USA }
+#     364 = { is_owned_by = CSA }
+#     USA = { has_war_with = CSA }
+#     NOT = { has_global_flag = fall_of_richmond_ACW }
+#   }
 
-  option = {
-    name = acw_news.4.a
-    trigger = {
-      NOT = {
-        TAG = CSA
-        TAG = USA
-      }
-    }
-  }
-  option = {
-    name = acw_news.4.b
-    trigger = { TAG = USA }
-  }
-  option = {
-    name = acw_news.4.c
-    trigger = { TAG = CSA }
-  }
-}
-# The Fall of Charleston
-news_event = {
-  id = acw_news.5
-  title = acw_news.5.t
-  desc = acw_news.5.d
-  picture = GFX_news_event_fall_of_charleston_acw
+#   immediate = {
+#     set_global_flag = fall_of_richmond_ACW
+#   }
 
-  major = yes
+#   mean_time_to_happen = {
+#     days = 2
+#   }
 
-  trigger = {
-    364 = { is_controlled_by = USA }
-    364 = { is_owned_by = CSA }
-    USA = { has_war_with = CSA }
-    NOT = { has_global_flag = fall_of_richmond_ACW }
-  }
+#   option = {
+#     name = acw_news.5.a
+#     trigger = {
+#       NOT = {
+#         TAG = CSA
+#         TAG = USA
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_news.5.b
+#     trigger = { TAG = USA }
+#   }
+#   option = {
+#     name = acw_news.5c
+#     trigger = { TAG = CSA }
+#   }
+# }
+# # Appottomax Surrender
+# news_event = {
+#   id = acw_news.6
+#   title = acw_news.6.t
+#   desc = acw_news.6.d
+#   picture = GFX_news_event_appomattox_acw
 
-  immediate = {
-    set_global_flag = fall_of_richmond_ACW
-  }
+#   major = yes
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   is_triggered_only = yes
 
-  option = {
-    name = acw_news.5.a
-    trigger = {
-      NOT = {
-        TAG = CSA
-        TAG = USA
-      }
-    }
-  }
-  option = {
-    name = acw_news.5.b
-    trigger = { TAG = USA }
-  }
-  option = {
-    name = acw_news.5c
-    trigger = { TAG = CSA }
-  }
-}
-# Appottomax Surrender
-news_event = {
-  id = acw_news.6
-  title = acw_news.6.t
-  desc = acw_news.6.d
-  picture = GFX_news_event_appomattox_acw
+#   option = {
+#     trigger = {
+#       NOT = { TAG = USA }
+#     }
+#     name = acw_news.6.a
+#   }
+#   option = {
+#     trigger = {
+#       TAG = USA
+#     }
+#     name = acw_news.6.b
+#   }
+# }
+# # Chicago Surrender
+# news_event = {
+#   id = acw_news.7
+#   title = acw_news.7.t
+#   desc = acw_news.7.d
 
-  major = yes
+#   picture = GFX_news_event_chicago_surrender_acw
 
-  is_triggered_only = yes
+#   major = yes
 
-  option = {
-    trigger = {
-      NOT = { TAG = USA }
-    }
-    name = acw_news.6.a
-  }
-  option = {
-    trigger = {
-      TAG = USA
-    }
-    name = acw_news.6.b
-  }
-}
-# Chicago Surrender
-news_event = {
-  id = acw_news.7
-  title = acw_news.7.t
-  desc = acw_news.7.d
+#   is_triggered_only = yes
 
-  picture = GFX_news_event_chicago_surrender_acw
+#   option = {
+#     trigger = {
+#       NOT = { TAG = USA }
+#       NOT = { TAG = CSA }
+#     }
+#     name = acw_news.7.a
+#   }
+#   option = {
+#     trigger = {
+#       TAG = USA
+#     }
+#     name = acw_news.7.b
+#   }
+#   option = {
+#     trigger = {
+#       TAG = CSA
+#     }
+#     name = acw_news.7.c
+#   }
+# }
+# # Trent Affair
+# news_event = {
+#   id = acw_news.8
+#   title = acw_news.8.t
+#   desc = acw_news.8.d
 
-  major = yes
+#   picture = GFX_news_event_trent_affair
 
-  is_triggered_only = yes
+#   major = yes
 
-  option = {
-    trigger = {
-      NOT = { TAG = USA }
-      NOT = { TAG = CSA }
-    }
-    name = acw_news.7.a
-  }
-  option = {
-    trigger = {
-      TAG = USA
-    }
-    name = acw_news.7.b
-  }
-  option = {
-    trigger = {
-      TAG = CSA
-    }
-    name = acw_news.7.c
-  }
-}
-# Trent Affair
-news_event = {
-  id = acw_news.8
-  title = acw_news.8.t
-  desc = acw_news.8.d
+#   is_triggered_only = yes
 
-  picture = GFX_news_event_trent_affair
+#   option = {
+#     trigger = {
+#       NOT = { TAG = USA }
+#       NOT = { TAG = CSA }
+#     }
+#     name = acw_news.8.a
+#   }
+#   option = {
+#     trigger = {
+#       TAG = USA
+#     }
+#     name = acw_news.8.b
+#   }
+#   option = {
+#     trigger = {
+#       TAG = CSA
+#     }
+#     name = acw_news.8.c
+#   }
+#   option = {
+#     trigger = {
+#       OR = {
+#         TAG = FRA
+#         TAG = ENG
+#       }
+#     }
+#     name = acw_news.8.e
+#   }
+# }
+# # Trent Affair Calm
+# news_event = {
+#   id = acw_news.9
+#   title = acw_news.9.t
+#   desc = {
+#     text = acw_news.9.d
+#     trigger = { NOT = { has_global_flag = Trent_Affair_ENG_Yes } }
+#   }
+#   desc = {
+#     text = acw_news.9.d_a
+#     trigger = { NOT = { has_global_flag = Trent_Affair_USA_Firm } }
+#   }
+#   desc = {
+#     text = acw_news.9.d_b
+#     trigger = { has_global_flag = Trent_Affair_USA_Firm }
+#   }
+#   picture = GFX_news_event_trent_affair_calm
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = { TAG = USA }
-      NOT = { TAG = CSA }
-    }
-    name = acw_news.8.a
-  }
-  option = {
-    trigger = {
-      TAG = USA
-    }
-    name = acw_news.8.b
-  }
-  option = {
-    trigger = {
-      TAG = CSA
-    }
-    name = acw_news.8.c
-  }
-  option = {
-    trigger = {
-      OR = {
-        TAG = FRA
-        TAG = ENG
-      }
-    }
-    name = acw_news.8.e
-  }
-}
-# Trent Affair Calm
-news_event = {
-  id = acw_news.9
-  title = acw_news.9.t
-  desc = {
-    text = acw_news.9.d
-    trigger = { NOT = { has_global_flag = Trent_Affair_ENG_Yes } }
-  }
-  desc = {
-    text = acw_news.9.d_a
-    trigger = { NOT = { has_global_flag = Trent_Affair_USA_Firm } }
-  }
-  desc = {
-    text = acw_news.9.d_b
-    trigger = { has_global_flag = Trent_Affair_USA_Firm }
-  }
-  picture = GFX_news_event_trent_affair_calm
+#   option = {
+#     trigger = {
+#       NOT = { TAG = USA }
+#       NOT = { TAG = CSA }
+#     }
+#     name = acw_news.9.a
+#   }
+#   option = {
+#     trigger = {
+#       TAG = USA
+#     }
+#     name = acw_news.9.b
+#   }
+#   option = {
+#     trigger = {
+#       TAG = CSA
+#     }
+#     name = acw_news.9.c
+#   }
+# }
+# # Trent Affair Escalation
+# news_event = {
+#   id = acw_generic_news.20
+#   title = acw_generic_news.20.t
+#   desc = {
+#     text = acw_generic_news.20.d
+#     trigger = { has_global_flag = Trent_Affair_FRA_Yes }
+#   }
+#   desc =  {
+#     text = acw_generic_news.20.d_a
+#     trigger = { NOT = { has_global_flag = Trent_Affair_FRA_Yes } }
+#   }
+#   picture = GFX_news_event_trent_affair_escalation
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = { TAG = USA }
-      NOT = { TAG = CSA }
-    }
-    name = acw_news.9.a
-  }
-  option = {
-    trigger = {
-      TAG = USA
-    }
-    name = acw_news.9.b
-  }
-  option = {
-    trigger = {
-      TAG = CSA
-    }
-    name = acw_news.9.c
-  }
-}
-# Trent Affair Escalation
-news_event = {
-  id = acw_generic_news.20
-  title = acw_generic_news.20.t
-  desc = {
-    text = acw_generic_news.20.d
-    trigger = { has_global_flag = Trent_Affair_FRA_Yes }
-  }
-  desc =  {
-    text = acw_generic_news.20.d_a
-    trigger = { NOT = { has_global_flag = Trent_Affair_FRA_Yes } }
-  }
-  picture = GFX_news_event_trent_affair_escalation
-
-  major = yes
-
-  is_triggered_only = yes
-
-  option = {
-    trigger = {
-      NOT = { TAG = USA }
-      NOT = { TAG = CSA }
-      NOT = { TAG = ENG }
-      NOT = { TAG = FRA }
-    }
-    name = acw_generic_news.20.a
-  }
-  option = {
-    trigger = {
-      TAG = USA
-    }
-    name = acw_generic_news.20.b
-  }
-  option = {
-    trigger = {
-      TAG = CSA
-    }
-    name = acw_generic_news.20.c
-  }
-  option = {
-    trigger = {
-      TAG = ENG
-    }
-    name = acw_generic_news.20.e
-  }
-  option = {
-    trigger = {
-      has_global_flag = Trent_Affair_FRA_Yes
-      TAG = FRA
-    }
-    name = acw_generic_news.20.f
-  }
-}
+#   option = {
+#     trigger = {
+#       NOT = { TAG = USA }
+#       NOT = { TAG = CSA }
+#       NOT = { TAG = ENG }
+#       NOT = { TAG = FRA }
+#     }
+#     name = acw_generic_news.20.a
+#   }
+#   option = {
+#     trigger = {
+#       TAG = USA
+#     }
+#     name = acw_generic_news.20.b
+#   }
+#   option = {
+#     trigger = {
+#       TAG = CSA
+#     }
+#     name = acw_generic_news.20.c
+#   }
+#   option = {
+#     trigger = {
+#       TAG = ENG
+#     }
+#     name = acw_generic_news.20.e
+#   }
+#   option = {
+#     trigger = {
+#       has_global_flag = Trent_Affair_FRA_Yes
+#       TAG = FRA
+#     }
+#     name = acw_generic_news.20.f
+#   }
+# }
 # Surrender - Peace
-news_event = {
-    id = acw_generic_news.21
-    title = acw_generic_news.21.t
-    desc = {
-      text = acw_generic_news.21.d
-      trigger = { has_global_flag = USA_peace_1 }
-    }
-    desc = {
-      text = acw_generic_news.21.d_a
-      trigger = { has_global_flag = USA_peace_2 }
-    }
-    desc = {
-      text = acw_generic_news.21.d_b
-      trigger = { has_global_flag = USA_peace_3 }
-    }
-    picture = GFX_news_event_chicago_surrender_acw
+# news_event = {
+#     id = acw_generic_news.21
+#     title = acw_generic_news.21.t
+#     desc = {
+#       text = acw_generic_news.21.d
+#       trigger = { has_global_flag = USA_peace_1 }
+#     }
+#     desc = {
+#       text = acw_generic_news.21.d_a
+#       trigger = { has_global_flag = USA_peace_2 }
+#     }
+#     desc = {
+#       text = acw_generic_news.21.d_b
+#       trigger = { has_global_flag = USA_peace_3 }
+#     }
+#     picture = GFX_news_event_chicago_surrender_acw
 
-    major = yes
+#     major = yes
 
-    is_triggered_only = yes
+#     is_triggered_only = yes
 
-    option = {
-      trigger = {
-        NOT = { TAG = USA }
-        NOT = { TAG = CSA }
-      }
-        name = acw_generic_news.21.a
-    }
-    option = {
-      trigger = {
-        TAG = USA
-      }
-      name = acw_generic_news.21.b
-    }
-    option = {
-      trigger = {
-        TAG = CSA
-      }
-      name = acw_generic_news.21.c
-    }
-}
-# Radical Civil War
-news_event = {
-  id = acw_generic_news.22
-  title = acw_generic_news.22.t
-  desc = acw_generic_news.22.d
-  picture = GFX_news_event_acw_radical_coup
+#     option = {
+#       trigger = {
+#         NOT = { TAG = USA }
+#         NOT = { TAG = CSA }
+#       }
+#         name = acw_generic_news.21.a
+#     }
+#     option = {
+#       trigger = {
+#         TAG = USA
+#       }
+#       name = acw_generic_news.21.b
+#     }
+#     option = {
+#       trigger = {
+#         TAG = CSA
+#       }
+#       name = acw_generic_news.21.c
+#     }
+# }
+# # Radical Civil War
+# news_event = {
+#   id = acw_generic_news.22
+#   title = acw_generic_news.22.t
+#   desc = acw_generic_news.22.d
+#   picture = GFX_news_event_acw_radical_coup
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = {
-        tag = USA
-        AND = {
-          original_tag = USA
-          has_government = radical_democracy
-        }
-        tag = CSA
-      }
-    }
-    name = acw_generic_news.22.a
-  }
-  option = {
-    trigger = {
-      tag = USA
-    }
-    name = acw_generic_news.22.b
-  }
-  option = {
-    trigger = {
-      original_tag = USA
-      has_government = radical_democracy
-    }
-    name = acw_generic_news.22.c
-  }
-  option = {
-    trigger = {
-      tag = CSA
-    }
-    name = acw_generic_news.22.e
-  }
-}
-# Reactionaries take back USA
-news_event = {
-  id = acw_generic_news.23
-  title = acw_generic_news.23.t
-  desc = {
-    text = acw_generic_news.23.d
-    trigger = { CSA = { exists = yes } }
-  }
-  desc = {
-    text = acw_generic_news.23.d_nocsa
-    trigger = { CSA = { exists = no } }
-  }
-  picture = GFX_news_event_acw_freestates_win
+#   option = {
+#     trigger = {
+#       NOT = {
+#         tag = USA
+#         AND = {
+#           original_tag = USA
+#           has_government = radical_democracy
+#         }
+#         tag = CSA
+#       }
+#     }
+#     name = acw_generic_news.22.a
+#   }
+#   option = {
+#     trigger = {
+#       tag = USA
+#     }
+#     name = acw_generic_news.22.b
+#   }
+#   option = {
+#     trigger = {
+#       original_tag = USA
+#       has_government = radical_democracy
+#     }
+#     name = acw_generic_news.22.c
+#   }
+#   option = {
+#     trigger = {
+#       tag = CSA
+#     }
+#     name = acw_generic_news.22.e
+#   }
+# }
+# # Reactionaries take back USA
+# news_event = {
+#   id = acw_generic_news.23
+#   title = acw_generic_news.23.t
+#   desc = {
+#     text = acw_generic_news.23.d
+#     trigger = { CSA = { exists = yes } }
+#   }
+#   desc = {
+#     text = acw_generic_news.23.d_nocsa
+#     trigger = { CSA = { exists = no } }
+#   }
+#   picture = GFX_news_event_acw_freestates_win
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = {
-        tag = USA
-        tag = CSA
-      }
-    }
-    name = acw_generic_news.23.a
-  }
-  option = {
-    trigger = {
-      tag = USA
-    }
-    name = acw_generic_news.23.b
-  }
-  option = {
-    trigger = {
-      tag = CSA
-    }
-    name = acw_generic_news.23.c
-  }
-}
-# CSA rejoins union
-news_event = {
-  id = acw_generic_news.24
-  title = acw_generic_news.24.t
-  desc = acw_generic_news.24.d
-  picture = GFX_news_event_appomattox_acw
+#   option = {
+#     trigger = {
+#       NOT = {
+#         tag = USA
+#         tag = CSA
+#       }
+#     }
+#     name = acw_generic_news.23.a
+#   }
+#   option = {
+#     trigger = {
+#       tag = USA
+#     }
+#     name = acw_generic_news.23.b
+#   }
+#   option = {
+#     trigger = {
+#       tag = CSA
+#     }
+#     name = acw_generic_news.23.c
+#   }
+# }
+# # CSA rejoins union
+# news_event = {
+#   id = acw_generic_news.24
+#   title = acw_generic_news.24.t
+#   desc = acw_generic_news.24.d
+#   picture = GFX_news_event_appomattox_acw
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = { tag = USA }
-    }
-    name = acw_generic_news.24.a
-  }
-  option = {
-    trigger = {
-      tag = USA
-    }
-    name = acw_generic_news.24.b
-  }
-}
-#Norton takes USA
-news_event = {
-  id = acw_generic_news.25
-  title = acw_generic_news.25.t
-  desc = {
-      text = acw_generic_news.25.d
-      trigger = { CSA = { exists = yes } }
-  }
-  desc = {
-      text = acw_generic_news.25.d_nocsa
-      trigger = { CSA = { exists = no } }
-  }
-  picture = GFX_news_event_usa_monarchist_revolution
+#   option = {
+#     trigger = {
+#       NOT = { tag = USA }
+#     }
+#     name = acw_generic_news.24.a
+#   }
+#   option = {
+#     trigger = {
+#       tag = USA
+#     }
+#     name = acw_generic_news.24.b
+#   }
+# }
+# #Norton takes USA
+# news_event = {
+#   id = acw_generic_news.25
+#   title = acw_generic_news.25.t
+#   desc = {
+#       text = acw_generic_news.25.d
+#       trigger = { CSA = { exists = yes } }
+#   }
+#   desc = {
+#       text = acw_generic_news.25.d_nocsa
+#       trigger = { CSA = { exists = no } }
+#   }
+#   picture = GFX_news_event_usa_monarchist_revolution
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = {
-        tag = USA
-        tag = CSA
-      }
-    }
-    name = acw_generic_news.25.a
-  }
-  option = {
-    trigger = {
-      tag = USA
-    }
-    name = acw_generic_news.25.b
-  }
-  option = {
-    trigger = {
-      tag = CSA
-    }
-    name = acw_generic_news.25.c
-  }
-}
-# Anarcho-Socialists takes USA
-news_event = {
-  id = acw_generic_news.26
-  title = acw_generic_news.26.t
-  desc = {
-    text = acw_generic_news.26.d
-    trigger = { CSA = { exists = yes } }
-  }
-  desc = {
-    text = acw_generic_news.26.d_nocsa
-    trigger = { CSA = { exists = no } }
-  }
+#   option = {
+#     trigger = {
+#       NOT = {
+#         tag = USA
+#         tag = CSA
+#       }
+#     }
+#     name = acw_generic_news.25.a
+#   }
+#   option = {
+#     trigger = {
+#       tag = USA
+#     }
+#     name = acw_generic_news.25.b
+#   }
+#   option = {
+#     trigger = {
+#       tag = CSA
+#     }
+#     name = acw_generic_news.25.c
+#   }
+# }
+# # Anarcho-Socialists takes USA
+# news_event = {
+#   id = acw_generic_news.26
+#   title = acw_generic_news.26.t
+#   desc = {
+#     text = acw_generic_news.26.d
+#     trigger = { CSA = { exists = yes } }
+#   }
+#   desc = {
+#     text = acw_generic_news.26.d_nocsa
+#     trigger = { CSA = { exists = no } }
+#   }
 
-  picture = GFX_news_event_usa_socialist_revolution
+#   picture = GFX_news_event_usa_socialist_revolution
 
-  major = yes
+#   major = yes
 
-  is_triggered_only = yes
+#   is_triggered_only = yes
 
-  option = {
-    trigger = {
-      NOT = {
-        tag = USA
-        tag = CSA
-      }
-    }
-    name = acw_generic_news.26.a
-  }
-  option = {
-    trigger = {
-      tag = USA
-    }
-    name = acw_generic_news.26.b
-  }
-  option = {
-    trigger = {
-      tag = CSA
-    }
-    name = acw_generic_news.26.c
-  }
-}
-# The Fall of Boston FSA
-news_event = {
-  id = acw_generic_news.27
-  title = acw_generic_news.27.t
-  desc = {
-    text = acw_generic_news.27.d_usa
-    trigger = {
-      357 = { is_controlled_by = USA }
-    }
-  }
-  desc = {
-    text = acw_generic_news.27.d_cal
-    trigger = {
-      357 = { is_controlled_by = CAL }
-    }
-  }
-  desc = {
-    text = acw_generic_news.27.d_mhc
-    trigger = {
-      357 = { is_controlled_by = MHC }
-    }
-  }
-  picture = GFX_news_event_fall_of_boston_acw
+#   option = {
+#     trigger = {
+#       NOT = {
+#         tag = USA
+#         tag = CSA
+#       }
+#     }
+#     name = acw_generic_news.26.a
+#   }
+#   option = {
+#     trigger = {
+#       tag = USA
+#     }
+#     name = acw_generic_news.26.b
+#   }
+#   option = {
+#     trigger = {
+#       tag = CSA
+#     }
+#     name = acw_generic_news.26.c
+#   }
+# }
+# # The Fall of Boston FSA
+# news_event = {
+#   id = acw_generic_news.27
+#   title = acw_generic_news.27.t
+#   desc = {
+#     text = acw_generic_news.27.d_usa
+#     trigger = {
+#       357 = { is_controlled_by = USA }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.27.d_cal
+#     trigger = {
+#       357 = { is_controlled_by = CAL }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.27.d_mhc
+#     trigger = {
+#       357 = { is_controlled_by = MHC }
+#     }
+#   }
+#   picture = GFX_news_event_fall_of_boston_acw
 
-  major = yes
+#   major = yes
 
-  trigger = {
-    OR = {
-      357 = { is_controlled_by = USA }
-      357 = { is_controlled_by = CAL }
-      357 = { is_controlled_by = MHC }
-    }
-    357 = { is_owned_by = NEG }
-    NOT = { has_global_flag = fall_of_boston_ACW }
-    NEG = { has_cosmetic_tag = USA_free_states_of_america }
-  }
+#   trigger = {
+#     OR = {
+#       357 = { is_controlled_by = USA }
+#       357 = { is_controlled_by = CAL }
+#       357 = { is_controlled_by = MHC }
+#     }
+#     357 = { is_owned_by = NEG }
+#     NOT = { has_global_flag = fall_of_boston_ACW }
+#     NEG = { has_cosmetic_tag = USA_free_states_of_america }
+#   }
 
-  immediate = {
-    set_global_flag = fall_of_boston_ACW
-  }
+#   immediate = {
+#     set_global_flag = fall_of_boston_ACW
+#   }
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   mean_time_to_happen = {
+#     days = 2
+#   }
 
-  option = {
-    name = acw_generic_news.27.a
-    trigger = {
-      NOT = {
-        TAG = NEG
-        TAG = USA
-        TAG = CAL
-        TAG = MHC
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.27.b
-    trigger = {
-      OR = {
-        TAG = USA
-        TAG = CAL
-        TAG = MHC
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.27.c
-    trigger = { TAG = NEG }
-  }
-}
-# The Fall of San Fransisco CAL
-news_event = {
-  id = acw_generic_news.28
-  title = acw_generic_news.28.t
-  desc = {
-    text = acw_generic_news.28.d_usa
-    trigger = {
-      378 = { is_controlled_by = USA }
-    }
-  }
-  desc = {
-    text = acw_generic_news.28.d_neg
-    trigger = {
-      378 = { is_controlled_by = NEG }
-    }
-  }
-  desc = {
-    text = acw_generic_news.28.d_mhc
-    trigger = {
-      378 = { is_controlled_by = MHC }
-    }
-  }
-  picture = GFX_news_event_fall_of_san_fransisco_acw
+#   option = {
+#     name = acw_generic_news.27.a
+#     trigger = {
+#       NOT = {
+#         TAG = NEG
+#         TAG = USA
+#         TAG = CAL
+#         TAG = MHC
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.27.b
+#     trigger = {
+#       OR = {
+#         TAG = USA
+#         TAG = CAL
+#         TAG = MHC
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.27.c
+#     trigger = { TAG = NEG }
+#   }
+# }
+# # The Fall of San Fransisco CAL
+# news_event = {
+#   id = acw_generic_news.28
+#   title = acw_generic_news.28.t
+#   desc = {
+#     text = acw_generic_news.28.d_usa
+#     trigger = {
+#       378 = { is_controlled_by = USA }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.28.d_neg
+#     trigger = {
+#       378 = { is_controlled_by = NEG }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.28.d_mhc
+#     trigger = {
+#       378 = { is_controlled_by = MHC }
+#     }
+#   }
+#   picture = GFX_news_event_fall_of_san_fransisco_acw
 
-  major = yes
+#   major = yes
 
-  trigger = {
-    OR = {
-      378 = { is_controlled_by = USA }
-      378 = { is_controlled_by = NEG }
-      378 = { is_controlled_by = MHC }
-    }
-    378 = { is_owned_by = CAL }
-    NOT = { has_global_flag = fall_of_san_fransisco_ACW }
-    CAL = { has_cosmetic_tag = USA_imperial_states_of_america }
-  }
+#   trigger = {
+#     OR = {
+#       378 = { is_controlled_by = USA }
+#       378 = { is_controlled_by = NEG }
+#       378 = { is_controlled_by = MHC }
+#     }
+#     378 = { is_owned_by = CAL }
+#     NOT = { has_global_flag = fall_of_san_fransisco_ACW }
+#     CAL = { has_cosmetic_tag = USA_imperial_states_of_america }
+#   }
 
-  immediate = {
-    set_global_flag = fall_of_san_fransisco_ACW
-  }
+#   immediate = {
+#     set_global_flag = fall_of_san_fransisco_ACW
+#   }
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   mean_time_to_happen = {
+#     days = 2
+#   }
 
-  option = {
-    name = acw_generic_news.28.a
-    trigger = {
-      NOT = {
-        TAG = CAL
-        TAG = USA
-        TAG = NEG
-        TAG = MHC
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.28.b
-    trigger = {
-      OR = {
-        TAG = USA
-        TAG = NEG
-        TAG = MHC
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.28.c
-    trigger = { TAG = CAL }
-  }
-}
-# The Fall of New York City MHC
-news_event = {
-  id = acw_generic_news.29
-  title = acw_generic_news.29.t
-  desc = {
-    text = acw_generic_news.29.d_usa
-    trigger = {
-      954 = { is_controlled_by = USA }
-    }
-  }
-  desc = {
-    text = acw_generic_news.29.d_neg
-    trigger = {
-      954 = { is_controlled_by = NEG }
-    }
-  }
-  desc = {
-    text = acw_generic_news.29.d_cal
-    trigger = {
-      954 = { is_controlled_by = CAL }
-    }
-  }
-  picture = GFX_news_event_fall_of_nyc_acw
+#   option = {
+#     name = acw_generic_news.28.a
+#     trigger = {
+#       NOT = {
+#         TAG = CAL
+#         TAG = USA
+#         TAG = NEG
+#         TAG = MHC
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.28.b
+#     trigger = {
+#       OR = {
+#         TAG = USA
+#         TAG = NEG
+#         TAG = MHC
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.28.c
+#     trigger = { TAG = CAL }
+#   }
+# }
+# # The Fall of New York City MHC
+# news_event = {
+#   id = acw_generic_news.29
+#   title = acw_generic_news.29.t
+#   desc = {
+#     text = acw_generic_news.29.d_usa
+#     trigger = {
+#       954 = { is_controlled_by = USA }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.29.d_neg
+#     trigger = {
+#       954 = { is_controlled_by = NEG }
+#     }
+#   }
+#   desc = {
+#     text = acw_generic_news.29.d_cal
+#     trigger = {
+#       954 = { is_controlled_by = CAL }
+#     }
+#   }
+#   picture = GFX_news_event_fall_of_nyc_acw
 
-  major = yes
+#   major = yes
 
-  trigger = {
-    OR = {
-      954 = { is_controlled_by = USA }
-      954 = { is_controlled_by = NEG }
-      954 = { is_controlled_by = CAL }
-    }
-    954 = { is_owned_by = MHC }
-    NOT = { has_global_flag = fall_of_new_york_mhc_ACW }
-  }
+#   trigger = {
+#     OR = {
+#       954 = { is_controlled_by = USA }
+#       954 = { is_controlled_by = NEG }
+#       954 = { is_controlled_by = CAL }
+#     }
+#     954 = { is_owned_by = MHC }
+#     NOT = { has_global_flag = fall_of_new_york_mhc_ACW }
+#   }
 
-  immediate = {
-    set_global_flag = fall_of_new_york_mhc_ACW
-  }
+#   immediate = {
+#     set_global_flag = fall_of_new_york_mhc_ACW
+#   }
 
-  mean_time_to_happen = {
-    days = 2
-  }
+#   mean_time_to_happen = {
+#     days = 2
+#   }
 
-  option = {
-    name = acw_generic_news.29.a
-    trigger = {
-      NOT = {
-        TAG = MHC
-        TAG = USA
-        TAG = CAL
-        TAG = NEG
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.29.b
-    trigger = {
-      OR = {
-        TAG = USA
-        TAG = CAL
-        TAG = NEG
-      }
-    }
-  }
-  option = {
-    name = acw_generic_news.29.c
-    trigger = { TAG = MHC }
-  }
-}
+#   option = {
+#     name = acw_generic_news.29.a
+#     trigger = {
+#       NOT = {
+#         TAG = MHC
+#         TAG = USA
+#         TAG = CAL
+#         TAG = NEG
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.29.b
+#     trigger = {
+#       OR = {
+#         TAG = USA
+#         TAG = CAL
+#         TAG = NEG
+#       }
+#     }
+#   }
+#   option = {
+#     name = acw_generic_news.29.c
+#     trigger = { TAG = MHC }
+#   }
+# }
 
 ############################## RECONSTRUCTION #############################
 
+state_event = {
+	id = acw_reconstruction_progress.1
+	title = acw_reconstruction_progress.1.t
+	desc = acw_reconstruction_progress.1.d
+	picture = GFX_report_event_election_vote
+
+	is_triggered_only = yes
+
+	immediate = {
+		custom_effect_tooltip = 01_ACW_RECON_tt
+		hidden_effect = {
+			set_state_flag = USAROD_constitution_signed
+		}
+	}
+
+	option = {
+		name = acw_reconstruction_progress.1.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.2
+	title = acw_reconstruction_progress.2.t
+	desc = acw_reconstruction_progress.2.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.2.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.3
+	title = acw_reconstruction_progress.3.t
+	desc = acw_reconstruction_progress.3.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.3.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.4
+	title = acw_reconstruction_progress.4.t
+	desc = acw_reconstruction_progress.4.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.4.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.5
+	title = acw_reconstruction_progress.5.t
+	desc = acw_reconstruction_progress.5.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.5.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.6
+	title = acw_reconstruction_progress.6.t
+	desc = acw_reconstruction_progress.6.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.6.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.7
+	title = acw_reconstruction_progress.7.t
+	desc = acw_reconstruction_progress.7.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.7.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.8
+	title = acw_reconstruction_progress.8.t
+	desc = acw_reconstruction_progress.8.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.8.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.9
+	title = acw_reconstruction_progress.9.t
+	desc = acw_reconstruction_progress.9.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.9.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.10
+	title = acw_reconstruction_progress.10.t
+	desc = acw_reconstruction_progress.10.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.10.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.11
+	title = acw_reconstruction_progress.11.t
+	desc = acw_reconstruction_progress.11.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress11.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.12
+	title = acw_reconstruction_progress.12.t
+	desc = acw_reconstruction_progress.12.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.12.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.13
+	title = acw_reconstruction_progress.13.t
+	desc = acw_reconstruction_progress.13.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.13.a
+	}
+}
+
+state_event = {
+	id = acw_reconstruction_progress.14
+	title = acw_reconstruction_progress.14.t
+	desc = acw_reconstruction_progress.14.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_reconstruction_progress.14.a
+	}
+}
+
+# Proceedings go well
 country_event = {
-	id = acw_reconstruction_setup.1
-
-	hidden = yes
-	is_triggered_only = yes
-
-	immediate = {
-		USA = {
-			if = {
-				limit = { has_dlc = "Together for Victory" }
-				set_autonomy = {
-					target = ROOT
-					autonomous_state = autonomy_unintegrated_seceded_state
-				}
-			}
-			else = { puppet = ROOT }
-		}
-
-		inherit_technology = USA
-		load_focus_tree = usa_reconstruction_occupation
-		add_ideas = USAROD_occupation
-		set_politics = {
-			ruling_party = radical_democracy
-			elections_allowed = no
-		}
-		set_popularities = {
-			radical_democracy = 100
-		}
-
-		if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_1 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_1
-			create_country_leader = {
-				name = "John McAllister Schofield"
-				desc = ""
-				picture = "Portrait_USA_John_McAllister_Schofield.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_2 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_2
-			create_country_leader = {
-				name = "Daniel Edgar Sickles"
-				desc = ""
-				picture = "Portrait_USA_Daniel_Edgar_Sickles.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_3 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_3
-			create_country_leader = {
-				name = "George Gordan Meade"
-				desc = ""
-				picture = "Portrait_USA_George_Gordan_Meade.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_4 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_4
-			create_country_leader = {
-				name = "Edward Ord"
-				desc = ""
-				picture = "Portrait_USA_Edward_Ord.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_5 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_5
-			create_country_leader = {
-				name = "Philip Sheridan"
-				desc = ""
-				picture = "Portrait_USA_Philip_Sheridan.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_6 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_6
-			create_country_leader = {
-				name = "George B. McClellan"
-				desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-				picture = "Portrait_USA_George_McClellan.dds"
-				expire = "1900.1.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_7 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_7
-			create_country_leader = {
-				name = "William T. Sherman"
-				desc = ""
-				picture = "Portrait_USA_William_Sherman.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else_if = {
-			limit = { NOT = { any_country = { has_cosmetic_tag = USA_unintegrated_seceded_zone_8 } } }
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_8
-			create_country_leader = {
-				name = "Irvin McDowell"
-				desc = ""
-				picture = "Portrait_USA_Irvin_McDowell.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		else = {
-			set_cosmetic_tag = USA_unintegrated_seceded_zone_9
-			create_country_leader = {
-				name = "Henry Halleck"
-				desc = ""
-				picture = "Portrait_USA_Henry_Halleck.dds"
-				expire = "1900.7.1"
-				ideology = military_goverment
-				traits = {}
-			}
-		}
-		every_owned_state = {
-			if = {
-				limit = { NOT = { has_state_flag = NA_B_minor_state } }
-				state_event = { id = acw_reconstruction_setup.2 }
-			}
-		}
-	}
-}
-
-# Reconstruction Points Setup
-state_event = {
-	id = acw_reconstruction_setup.2
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		random_list = {
-			18 = {
-				set_variable = {
-					var = reconstruction_integration_progress
-					value = 1
-				}
-			}
-			12 = {
-				set_variable = {
-					var = reconstruction_integration_progress
-					value = 2
-				}
-			}
-			35 = {
-				set_variable = {
-					var = reconstruction_integration_progress
-					value = 3
-				}
-			}
-			25 = {
-				set_variable = {
-					var = reconstruction_integration_progress
-					value = 4
-				}
-			}
-			10 = {
-				set_variable = {
-					var = reconstruction_integration_progress
-					value = 5
-				}
-			}
-		}
-		clamp_variable = {
-			var = reconstruction_integration_progress
-			min = 0
-			max = 100
-		}
-		state_event = { id = acw_reconstruction_setup.3 hours = 3 }
-	}
-}
-
-# Event Randomization
-state_event = {
-	id = acw_reconstruction_setup.3
-	hidden = yes
-
-	is_triggered_only = yes
-
-	immediate = {
-		if = {
-			limit = {
-				check_variable = {
-					var = reconstruction_integration_progress
-					value = 99
-					compare = greater_than
-				}
-			}
-			OWNER = { OVERLORD = { state_event = { id = acw_reconstruction_setup.10 } } }
-		}
-		else = {
-			if = {
-				limit = { has_state_flag = USA_unintegrated_seceded_state_constit }
-				random_list = {
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.2 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.3 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.4 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.5 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.6 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.7 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.8 days = 30 random_days = 90 } } }
-					}
-				}
-			}
-			else = {
-				random_list = {
-					20 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.1 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.2 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.3 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.4 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.5 days = 30 random_days = 90 } } }
-					}
-					15 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.6 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.7 days = 30 random_days = 90 } } }
-					}
-					10 = {
-						OWNER = { OVERLORD = { state_event = { id = acw_reconstruction.8 days = 30 random_days = 90 } } }
-					}
-				}
-			}
-		}
-	}
-}
-
-
-state_event = {
-	id = acw_reconstruction_setup.10
-	title = acw_reconstruction_setup.10.t
-	desc = {
-		text = acw_reconstruction_setup.10.d
-		trigger = { has_political_power > -1 }
-	}
-	desc = {
-		text = acw_reconstruction_setup.10.d_unstable
-		trigger = { has_political_power < 0  }
-	}
-
-	is_triggered_only = yes
-
-	option = {
-		name = acw_reconstruction_setup.10.a
-		trigger = { ROOT = { has_political_power > -1 } }
-		custom_effect_tooltip = 20_ACW_RECON_tt
-		ROOT = {
-			add_timed_idea = {
-				idea = USAROD_readmission
-				days = 90
-			}
-		}
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.11 days = 76 random_days = 16}
-		}
-	}
-	option = {
-		name = acw_reconstruction_setup.10.b
-		trigger = { ROOT = { has_political_power > -1 } }
-		custom_effect_tooltip = 21_ACW_RECON_tt
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.10 days = 120 random_days = 10 }
-		}
-	}
-	option = {
-		name = acw_reconstruction_setup.10.c
-		trigger = { ROOT = { has_political_power > 0 } }
-		custom_effect_tooltip = 21_ACW_RECON_tt
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.10 days = 120 random_days = 10 }
-		}
-	}
-}
-
-state_event = {
-	id = acw_reconstruction_setup.11
-	title = acw_reconstruction_setup.11.t
-	desc = acw_reconstruction_setup.11.d
-
-	is_triggered_only = yes
-
-	immediate = {
-		ROOT = { transfer_state = THIS }
-		hidden_effect = {
-			ROOT = {
-				remove_state_claim = THIS
-				add_state_core = THIS
-			}
-			# Cuba
-			if = {
-				limit = { state = 315 }
-				if = {
-					limit {
-						OWNER = { owns_state = 1022 }
-					}
-					ROOT = {
-						transfer_state = 1022
-						remove_state_claim = 1022
-						add_state_core = 1022
-					}
-				}
-			}
-			# Florida
-			if = {
-				limit = { state = 366 }
-				if = {
-					limit = {
-						OWNER = { owns_state = 1211 }
-					}
-					ROOT = {
-						transfer_state = 1211
-						remove_state_claim = 1211
-						add_state_core = 1211
-					}
-				}
-			}
-			# Virginia
-			if = {
-				limit = { state = 362 }
-				if = {
-					limit = { OWNER = { owns_state = 746} }
-					ROOT = {
-						transfer_state = 1022
-						remove_state_claim = 1022
-						add_state_core = 1022
-					}
-				}
-			}
-			# Texas
-			if = {
-				limit = { state = 375 }
-				if = {
-					limit = { OWNER = { owns_state = 1306 } }
-					ROOT = {
-						transfer_state = 1306
-						remove_state_claim = 1306
-						add_state_core = 1306
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1305 } }
-					ROOT = {
-						transfer_state = 1305
-						remove_state_claim = 1305
-						add_state_core = 1305
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1304 } }
-					ROOT = {
-						transfer_state = 1304
-						remove_state_claim = 1304
-						add_state_core = 1304
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1303 } }
-					ROOT = {
-						transfer_state = 1303
-						remove_state_claim = 1303
-						add_state_core = 1303
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1281 } }
-					ROOT = {
-						transfer_state = 1281
-						remove_state_claim = 1281
-						add_state_core = 1281
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1280 } }
-					ROOT = {
-						transfer_state = 1280
-						remove_state_claim = 1280
-						add_state_core = 1280
-					}
-				}
-			}
-			# Oklahoma
-			if = {
-				limit = { state = 374 }
-				if = {
-					limit = { OWNER = { owns_state = 1293 } }
-					ROOT = {
-						transfer_state = 1293
-						remove_state_claim = 1293
-						add_state_core = 1293
-					}
-				}
-			}
-			# Kansas
-			if = {
-				limit = { state = 383 }
-				if = {
-					limit = { OWNER = { owns_state = 1052 } }
-					ROOT = {
-						transfer_state = 1052
-						remove_state_claim = 1052
-						add_state_core = 1052
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1296 } }
-					ROOT = {
-						transfer_state = 1296
-						remove_state_claim = 1296
-						add_state_core = 1296
-					}
-				}
-			}
-			# California
-			if = {
-				limit = { state = 1343 }
-				if = {
-					limit = { OWNER = { owns_state = 378 } }
-					ROOT = {
-						transfer_state = 378
-						remove_state_claim = 378
-						add_state_core = 378
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1342 } }
-					ROOT = {
-						transfer_state = 1342
-						remove_state_claim = 1342
-						add_state_core = 1342
-					}
-				}
-				if = {
-					limit = { OWNER = { owns_state = 1341 } }
-					ROOT = {
-						transfer_state = 1341
-						remove_state_claim = 1341
-						add_state_core = 1341
-					}
-				}
-			}
-		}
-	}
-
-	option = {
-		name = acw_reconstruction_setup.11.a
-	}
-}
-
-state_event = {
 	id = acw_reconstruction.1
 	title = acw_reconstruction.1.t
 	desc = acw_reconstruction.1.d
+	picture = GFX_report_event_worker_protests
 
 	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
 
 	option = {
 		name = acw_reconstruction.1.a
-		custom_effect_tooltip = 01_ACW_RECON_tt
-		custom_effect_tooltip = 02_ACW_RECON_tt
-		hidden_effect = {
-			set_state_flag = USA_unintegrated_seceded_state_constit
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 20
-			}
-		}
 	}
 }
 
-state_event = {
+# Proceedings go ok
+country_event = {
 	id = acw_reconstruction.2
 	title = acw_reconstruction.2.t
 	desc = acw_reconstruction.2.d
+	picture = GFX_report_event_worker_protests
 
 	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
 
 	option = {
 		name = acw_reconstruction.2.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -15
-		}
-		custom_effect_tooltip = 03_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.2.b
-		ai_chance = { base = 20 }
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 3
-			}
-		}
 	}
 }
 
-state_event = {
+# Proceedings stalled
+country_event = {
 	id = acw_reconstruction.3
 	title = acw_reconstruction.3.t
 	desc = acw_reconstruction.3.d
+	picture = GFX_report_event_worker_protests
 
 	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
 
 	option = {
 		name = acw_reconstruction.3.a
-		ai_chance = { base = 80 }
-		ROOT = { add_political_power = -40 }
-		add_manpower = 200
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.3.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
 	}
 }
 
-state_event = {
+# Wide Protests
+country_event = {
 	id = acw_reconstruction.4
 	title = acw_reconstruction.4.t
 	desc = acw_reconstruction.4.d
+	picture = GFX_report_event_worker_protests
 
 	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
 
 	option = {
 		name = acw_reconstruction.4.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.4.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
-	}
-}
-
-state_event = {
-	id = acw_reconstruction.5
-	title = acw_reconstruction.5.t
-	desc = acw_reconstruction.5.d
-
-	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
-
-	option = {
-		name = acw_reconstruction.5.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.5.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
-	}
-}
-
-state_event = {
-	id = acw_reconstruction.6
-	title = acw_reconstruction.6.t
-	desc = acw_reconstruction.6.d
-
-	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
-
-	option = {
-		name = acw_reconstruction.6.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.6.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
-	}
-}
-
-state_event = {
-	id = acw_reconstruction.7
-	title = acw_reconstruction.7.t
-	desc = acw_reconstruction.7.d
-
-	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
-
-	option = {
-		name = acw_reconstruction.7.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.7.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
-	}
-}
-
-state_event = {
-	id = acw_reconstruction.8
-	title = acw_reconstruction.8.t
-	desc = acw_reconstruction.8.d
-
-	is_triggered_only = yes
-
-	immediate = {
-		hidden_effect = {
-			state_event = { id = acw_reconstruction_setup.3 }
-		}
-	}
-
-	option = {
-		name = acw_reconstruction.8.a
-		ai_chance = { base = 80 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 05_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 5
-			}
-		}
-	}
-	option = {
-		name = acw_reconstruction.8.b
-		ai_chance = { base = 20 }
-		ROOT = {
-			add_political_power = -10
-			add_manpower = -150
-		}
-		custom_effect_tooltip = 04_ACW_RECON_tt
-		hidden_effect = {
-			add_to_variable = {
-				var = reconstruction_integration_progress
-				value = 1
-			}
-		}
 	}
 }

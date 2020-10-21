@@ -3,6 +3,8 @@ It is way better to, instead, fire it on startup in a specific amount of days. I
 The events are put to trigger in common/on_actions/on_startup_events.txt as to not clutter the other files. 
 It is still possible to not make it always trigger by leaving in trigger = {} and just putting is_triggered_only = yes and removing the date check from the trigger.
 
+The scripts are to be opened in Python 3. You can download it in https://www.python.org/downloads/, where you can select any version beginning with 3.
+
 Event_date_calculation.py allows you to easily calculate the amount of days between each start date and the event.
 To speed the progress up, just pressing enter without entering a number in the range prompt will assume a range of 100 days.
 
