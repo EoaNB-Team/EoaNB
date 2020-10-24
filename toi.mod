@@ -1,6 +1,6 @@
 name="End of a New Beginning"
 path="mod/toi/"
-version="0.2 Deus Ex Machina"
+version="0.2 Deus ex Machina"
 tags={
 	"Alternative History"
 	"Balance"
