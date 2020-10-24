@@ -1,413 +1,259 @@
-﻿add_namespace = danish_votes
-add_namespace = danish_votes_results
+﻿add_namespace = secschwar_denmark
+add_namespace = denmark_focus
 
-country_event = { # danish_votes_of_1857_1
-  id = danish_votes.1
-  title = danish_votes.1.t
-  desc = danish_votes.1.d
-  picture = GFX_report_event_uk_parliament
-
-  is_triggered_only = yes
-
-  immediate = {
-    set_variable = { 
-      var = current_reform_id
-      value = -1    
-    }
-
-    reset_approval_arrays = yes 
-    set_1_approval_highly_agree = yes 
-    set_2_approval_disagree = yes 
-    set_3_approval_neutral = yes 
-    set_4_approval_highly_agree = yes 
-
-    set_vote_eco = yes
-    compute_voting_approval = yes 
-
-    compute_number_seats_tot = yes 
-    compute_number_seats_approve_est = yes
+country_event = {  #German Conscripts Deserted 
+		id = secschwar_denmark.1
+		title = secschwar_denmark.1.t
+		desc = secschwar_denmark.1.d
+		
+		fire_only_once = yes
+		
+		trigger = {
+		    tag = DEN
+			has_global_flag = eoanb_flag_second_schleswig_war
+		    date > 1863.12.01
+		    date < 1864.01.21
+		}
+		
+		option = {
+			name = secschwar_denmark.1.a
+			    add_timed_idea = {
+			        idea = DEN_german_conscripts_deserted
+			        days = 31
+		        }
+		}
+	}
 	
-  }
+country_event = {  #East Pomerania Blockade
+		id = secschwar_denmark.2
+		title = secschwar_denmark.2.t
+		desc = secschwar_denmark.2.d
+		
+		fire_only_once = yes
 
-  option = { # Let's vote in a month
-    name = danish_votes.1.a
-    country_event = {
-      id = danish_votes_results.1
-      days = 35 
-    }
-  }
-
-  option = { # Abandon the idea
-    name = danish_votes.1.b
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-  }
+        is_triggered_only = yes
+		
+		option = { ###Leave them, focus on land war
+			name = secschwar_denmark.2.a
+		}
+		
+		option = { ###Send navy
+			name = secschwar_denmark.2.b
+			hidden_effect = {
+			PRS = { country_event = { days = 10 id = secschwar_denmark.3 } }
+		}
+	}
 }
 
-country_event = { # Vote on the reform
-  id = danish_votes_results.1
-  title = danish_votes_results.1.t
-  desc = danish_votes_results.1.d
-  picture = GFX_report_event_uk_parliament
+country_event = {  #Prussian navy is coming
+		id = secschwar_denmark.3
+		title = secschwar_denmark.3.t
+		desc = secschwar_denmark.3.d
+		
+		fire_only_once = yes
 
-  is_triggered_only = yes
-
-  immediate = {
-    hidden_effect = {
-      hold_vote = yes
-    }
-  }
-
-  option = { # It's a success !
-    name = danish_votes_results.1.a
-    trigger = {
-      has_country_flag = eoanb_reform_vote_success
-    }
-    clr_country_flag = eoanb_reform_vote_success
-    enact_voted_reform = yes
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-	add_ideas = DEN_new_buisness_act
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
-			}
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
+        is_triggered_only = yes
+		
+		option = { ###Fuck
+			name = secschwar_denmark.3.a
+			hidden_effect = {
+			random_list = {
+                70 = {
+                    PRS = { country_event = { days = 10 id = secschwar_denmark.4 } }
+					DEN = { country_event = { days = 10 id = secschwar_denmark.5 } }
+                    }
+                30 = {
+                    PRS = { country_event = { days = 10 id = secschwar_denmark.6 } }
+					DEN = { country_event = { days = 10 id = secschwar_denmark.7 } }
+                }
+		    }
+	    }
     }
 }
 
-  option = { # It's a failure...
-    name = danish_votes_results.1.b
-    trigger = {
-      has_country_flag = eoanb_reform_vote_failure
+country_event = {  #Prussian loose 
+		id = secschwar_denmark.4
+		title = secschwar_denmark.4.t
+		desc = secschwar_denmark.4.d
+		
+		fire_only_once = yes
+
+        is_triggered_only = yes
+		
+		option = { 
+			name = secschwar_denmark.4.a
+		}
     }
-    clr_country_flag = eoanb_reform_vote_failure
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
-    }
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
-        }
-    }
-
-  option = { # This is somehow worse than a failure
-    name = danish_votes_results.1.c
-    trigger = {
-      has_country_flag = eoanb_reform_vote_tie
-    }
-    clr_country_flag = eoanb_reform_vote_tie
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-    ## MAYBE RESTART THE 2 WEEKS VOTING PROCESS AGAIN
-
-  }
-}
-
-country_event = { # danish_votes_of_1857_2
-  id = danish_votes.2
-  title = danish_votes.2.t
-  desc = danish_votes.2.d
-  picture = GFX_report_event_uk_parliament
-
-  is_triggered_only = yes
-
-  immediate = {
-    set_variable = { 
-      var = current_reform_id
-      value = -1    
-    }
-
-    reset_approval_arrays = yes 
-    set_1_approval_highly_agree = yes 
-    set_2_approval_disagree = yes 
-    set_3_approval_neutral = yes 
-    set_4_approval_highly_agree = yes 
-
-    set_vote_eco = yes
-    compute_voting_approval = yes 
-
-    compute_number_seats_tot = yes 
-    compute_number_seats_approve_est = yes
 	
-  }
+country_event = {  #Alexander III and our princess
+		id = denmark_focus.1
+		title = denmark_focus.1.t
+		desc = denmark_focus.1.d
+		
+		fire_only_once = yes
 
-  option = { # Let's vote in a month
-    name = danish_votes.2.a
-    country_event = {
-      id = danish_votes_results.2
-      days = 35 
-    }
-  }
-
-  option = { # Abandon the idea
-    name = danish_votes.2.b
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-  }
+        is_triggered_only = yes
+		
+		option = { ###We agree to that
+			name = denmark_focus.1.a
+			ai_chance = { factor = 80 }
+			hidden_effect = {
+			DEN = { country_event = { days = 90 id = denmark_focus.2 } }
+		}
+	}
+		
+		option = { ###We dont agree to that
+			name = denmark_focus.1.b
+			ai_chance = { factor = 20 }
+			hidden_effect = {
+			RUS = { country_event = { days = 10 id = denmark_focus.3 } }
+		}
+	}
 }
 
-country_event = { # Vote on the reform
-  id = danish_votes_results.2
-  title = danish_votes_results.2.t
-  desc = danish_votes_results.2.d
-  picture = GFX_report_event_uk_parliament
+country_event = {  #Marriage
+		id = denmark_focus.2
+		title = denmark_focus.2.t
+		desc = denmark_focus.2.d
+		
+		fire_only_once = yes
 
-  is_triggered_only = yes
+        is_triggered_only = yes
+		
+		option = { 
+			name = denmark_focus.2.a
+                add_opinion_modifier = { target = RUS modifier = PRS_ENG_WEDDING }
+			    reverse_add_opinion_modifier = { target = RUS modifier = PRS_ENG_WEDDING }
+	}
+}
 
-  immediate = {
-    hidden_effect = {
-      hold_vote = yes
-    }
-  }
+country_event = {  #Trade w Japan
+		id = denmark_focus.4
+		title = denmark_focus.4.t
+		desc = denmark_focus.4.d
+		
+		fire_only_once = yes
 
-  option = { # It's a success !
-    name = danish_votes_results.2.a
-    trigger = {
-      has_country_flag = eoanb_reform_vote_success
-    }
-    clr_country_flag = eoanb_reform_vote_success
-    enact_voted_reform = yes
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-	DEN = { remove_state_core = 100 }
-	ICE = { add_state_core = 100 }
-	add_political_power = 25
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
+        is_triggered_only = yes
+		
+		option = { 
+			name = denmark_focus.4.a
+			ai_chance = { factor = 80 }
+                JAP = { add_timed_idea = {
+		    	idea = DEN_danish_japanese_trade
+		    	days = 720
+		    }
+		}
+		add_timed_idea = {
+		    	idea = DEN_danish_japanese_trade
+		    	days = 720
+		    }
+        add_political_power = 25
+		    add_opinion_modifier = {
+				target = JAP 
+				modifier = small_increase  
 			}
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
-    }
-}
-
-  option = { # It's a failure...
-    name = danish_votes_results.2.b
-    trigger = {
-      has_country_flag = eoanb_reform_vote_failure
-    }
-    clr_country_flag = eoanb_reform_vote_failure
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
-    }
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
-        }
-    }
-
-  option = { # This is somehow worse than a failure
-    name = danish_votes_results.2.c
-    trigger = {
-      has_country_flag = eoanb_reform_vote_tie
-    }
-    clr_country_flag = eoanb_reform_vote_tie
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-    ## MAYBE RESTART THE 2 WEEKS VOTING PROCESS AGAIN
-
-  }
-}
-
-country_event = { # danish_votes_of_1857_3
-  id = danish_votes.3
-  title = danish_votes.3.t
-  desc = danish_votes.3.d
-  picture = GFX_report_event_uk_parliament
-
-  is_triggered_only = yes
-
-  immediate = {
-    set_variable = { 
-      var = current_reform_id
-      value = -1    
-    }
-
-    reset_approval_arrays = yes 
-    set_1_approval_highly_agree = yes 
-    set_2_approval_disagree = yes 
-    set_3_approval_neutral = yes 
-    set_4_approval_highly_agree = yes 
-
-    set_vote_eco = yes
-    compute_voting_approval = yes 
-
-    compute_number_seats_tot = yes 
-    compute_number_seats_approve_est = yes
+	    }
+		
+		option = { 
+			name = denmark_focus.4.b
+			ai_chance = { factor = 20 }
+                add_opinion_modifier = { target = JAP modifier = eoanb_om_RUS_decrease_medium }
+			    reverse_add_opinion_modifier = { target = JAP modifier = eoanb_om_RUS_decrease_medium }
+	    }
+    } 
 	
-  }
+#Treaty of Peace, Amity and Trade - step 1 Denmark
+country_event = {
+		id = denmark_focus.5
+		title = denmark_focus.5.t
+		desc = denmark_focus.5.d
+		picture = GFX_report_event_generic_sign_treaty2
 
-  option = { # Let's vote in a month
-    name = danish_votes.3.a
-    country_event = {
-      id = danish_votes_results.3
-      days = 35 
+        is_triggered_only = yes
+		
+		option = {
+			name = denmark_focus.5.a
+			ai_chance = { factor = 80 }
+			hidden_effect = {
+			add_political_power = -50
+			TSH = { country_event = { days = 60 id = denmark_focus.6 } }
+		}
+	}
+		
+		option = {
+			name = denmark_focus.5.b
+			ai_chance = { factor = 20 }
+			hidden_effect = {
+			add_political_power = -100
+			add_stability = -0.01
+			add_war_support = 0.03
+		}
     }
-  }
-
-  option = { # Abandon the idea
-    name = danish_votes.3.b
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-  }
 }
 
-country_event = { # Vote on the reform
-  id = danish_votes_results.3
-  title = danish_votes_results.3.t
-  desc = danish_votes_results.3.d
-  picture = GFX_report_event_uk_parliament
-
-  is_triggered_only = yes
-
-  immediate = {
-    hidden_effect = {
-      hold_vote = yes
-    }
-  }
-
-  option = { # It's a success !
-    name = danish_votes_results.3.a
-    trigger = {
-      has_country_flag = eoanb_reform_vote_success
-    }
-    clr_country_flag = eoanb_reform_vote_success
-    enact_voted_reform = yes
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-    37 = { add_extra_state_shared_building_slots = 1 }
-	37 = { add_building_construction = { type = naval_base level = 1 instant_build = yes province = 6287 } }
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
+#Treaty of Peace, Amity and Trade - step 2 Tokugawa	
+country_event = { 
+		id = denmark_focus.6
+		title = denmark_focus.6.t
+		desc = denmark_focus.6.d
+		picture = GFX_report_event_merchant_ship_01
+		
+		is_triggered_only = yes
+		
+		option = { 
+			name = denmark_focus.6.a
+			ai_chance = { factor = 80 }
+			hidden_effect = {
+			add_political_power = -25
+			DEN = { country_event = { days = 60 id = denmark_focus.8 } }
 			}
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = 50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
-    }
+		}
+			
+		option = { 
+			name = denmark_focus.6.b
+			ai_chance = { factor = 20 }
+			hidden_effect = {
+			add_political_power = -50
+			DEN = { country_event = { days = 60 id = denmark_focus.7 } }
+
+	    }
+	}
 }
 
-  option = { # It's a failure...
-    name = danish_votes_results.3.b
-    trigger = {
-      has_country_flag = eoanb_reform_vote_failure
-    }
-    clr_country_flag = eoanb_reform_vote_failure
+#Treaty of Peace, Amity and Trade - step 4 Denmark - failure
+country_event = { 
+		id = denmark_focus.7
+		title = denmark_focus.7.t
+		desc = denmark_focus.7.d
+		picture = GFX_report_event_merchant_ship_01
+		
+		is_triggered_only = yes
+		
+		option = { 
+			name = denmark_focus.7.a
+			add_opinion_modifier = { target = TSH modifier = eoanb_om_RUS_decrease_small }
+			reverse_add_opinion_modifier = { target = TSH modifier = eoanb_om_RUS_decrease_small }
+			}
+	    }
+		
+#Treaty of Peace, Amity and Trade - step 3 Denmark - success
+country_event = { 
+		id = denmark_focus.8
+		title = denmark_focus.8.t
+		desc = denmark_focus.8.d
+		picture = GFX_report_event_merchant_ship_01
+		
+		is_triggered_only = yes
+		
+		option = { 
+			name = denmark_focus.8.a
+			add_political_power = 100
+			TSH = { add_political_power = 100 }
+			hidden_effect = {
+			add_opinion_modifier = { target = TSH modifier = eoanb_om_RUS_increase_very_small }
+			reverse_add_opinion_modifier = { target = TSH modifier = eoanb_om_RUS_increase_very_small }
+			}
+		}
+	}
 
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-	if = {
-        limit = {
-		         has_government  = traditional_conservatism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-				 add_popularity = { ideology = centrism popularity = 0.01 }
-    }
-	if = {
-        limit = {
-		         has_government  = centrism
-				 }
-				 add_political_power = -50
-	             add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-				 add_popularity = { ideology = centrism popularity = -0.01 }
-        }
-    }
-
-  option = { # This is somehow worse than a failure
-    name = danish_votes_results.3.c
-    trigger = {
-      has_country_flag = eoanb_reform_vote_tie
-    }
-    clr_country_flag = eoanb_reform_vote_tie
-
-    set_variable = { 
-      var = current_reform_id
-      value = 0
-    }
-    ## MAYBE RESTART THE 2 WEEKS VOTING PROCESS AGAIN
-
-  }
-}

@@ -116,13 +116,21 @@ afr_inward_regional_power_imperial_expansion = {
 					afr_war_exhaustion_value < 10
 				}
 			}
-			NOT = { has_non_aggression_pact_with = FROM }
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+				check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
+				NOT = {
+					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
+				}
+			}
 		}
 
 		visible = {
 			ROOT = { has_country_flag = afr_inward_regional_power_expansion_wars_tribes_flag }
 			ROOT = { NOT = { has_country_flag = afr_inward_preparing_expansion_war_flag } }
-			is_subject = no
+			ROOT = { is_subject = no }
 			country_exists = FROM
 		}
 		
@@ -184,8 +192,8 @@ afr_inward_regional_power_imperial_expansion = {
 					#afr_is_tribal = yes
 				}
 			}
-			NOT = { is_subject_of = ROOT }
-			NOT = { is_in_faction_with = ROOT }
+			FROM = { NOT = { is_subject_of = ROOT } }
+			FROM = { NOT = { is_in_faction_with = ROOT } }
 			OR = {
 				any_country = {
 					AND = { 
@@ -204,7 +212,7 @@ afr_inward_regional_power_imperial_expansion = {
 	
 		fire_only_once = no
 		days_remove = 60
-		days_re_enable = 240
+		days_re_enable = 360
 		
 		ai_will_do = {
 			factor = 1
@@ -212,10 +220,22 @@ afr_inward_regional_power_imperial_expansion = {
 				factor = 4
 				has_war_support > 0.5
 			}
+			modifier = {
+				factor = 2
+				FROM = {
+					any_owned_state = {
+						any_neighbor_state = {
+							is_in_home_area = yes
+							is_owned_by = ROOT
+						}
+					}
+				}
+			}
 		}
 		
 		modifier = {
 			ai_desired_divisions_factor = 1
+			command_power_gain_mult = -1
 		}
 		
 		complete_effect = {
@@ -258,27 +278,8 @@ afr_inward_regional_power_imperial_expansion = {
 			#}
 		}
 		
-		cancel_trigger = {
-			OR = {
-				is_in_faction_with = FROM
-				has_war_with = FROM
-				FROM = { is_subject_of = ROOT }
-				hidden_trigger = { NOT = { has_country_flag = afr_inward_preparing_expansion_war_flag } }
-			}
-		}
-		
 		remove_effect = {
-			clr_country_flag = afr_inward_preparing_expansion_war_flag
-			declare_war_on = {
-				target = FROM
-				type = annex_everything
-			}
-			hidden_effect = { FROM = { every_owned_state = { add_claim_by = ROOT } } }
-			custom_effect_tooltip = afr_war_exhaustion_value_add_10
-			add_to_variable = {
-				var = afr_war_exhaustion_value
-				value = 10
-			}
+			
 			ROOT = {
 				add_ai_strategy = {
 					type = prepare_for_war
@@ -293,8 +294,32 @@ afr_inward_regional_power_imperial_expansion = {
 					value = -200
 				}
 			}
+			if = {
+				limit = {
+					NOT = {
+						is_in_faction_with = FROM
+						has_war_with = FROM
+						FROM = { is_subject_of = ROOT }
+					}
+					has_country_flag = afr_inward_preparing_expansion_war_flag
+				}
+				declare_war_on = {
+					target = FROM
+					type = annex_everything
+				}
+				hidden_effect = { FROM = { every_owned_state = { add_claim_by = ROOT } } }
+				custom_effect_tooltip = afr_war_exhaustion_value_add_10
+				add_to_variable = {
+					var = afr_war_exhaustion_value
+					value = 10
+				}
+				hidden_effect = {
+					set_variable = { ROOT.afr_regional_power_expansion_attacker@FROM = 1 }
+					set_variable = { FROM.afr_regional_power_expansion_defender@ROOT = 1 }
+				}
+			}
+			clr_country_flag = afr_inward_preparing_expansion_war_flag
 		}
-		
 	}
 	
 	
@@ -308,13 +333,21 @@ afr_inward_regional_power_imperial_expansion = {
 					afr_war_exhaustion_value < 10
 				}
 			}
-			NOT = { has_non_aggression_pact_with = FROM }
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+				check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
+				NOT = {
+					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
+				}
+			}
 		}
 
 		visible = {
 			ROOT = { has_country_flag = afr_inward_regional_power_expansion_wars_kingdoms_flag }
 			ROOT = { NOT = { has_country_flag = afr_inward_preparing_expansion_war_flag } }
-			is_subject = no
+			ROOT = { is_subject = no }
 			country_exists = FROM
 		}
 		
@@ -348,8 +381,8 @@ afr_inward_regional_power_imperial_expansion = {
 					#afr_is_tribal = yes
 				}
 			}
-			NOT = { is_subject_of = ROOT }
-			NOT = { is_in_faction_with = ROOT }
+			FROM = { NOT = { is_subject_of = ROOT } }
+			FROM = { NOT = { is_in_faction_with = ROOT } }
 			OR = {
 				any_country = {
 					AND = {
@@ -376,10 +409,22 @@ afr_inward_regional_power_imperial_expansion = {
 				factor = 4
 				has_war_support > 0.5
 			}
+			modifier = {
+				factor = 2
+				FROM = {
+					any_owned_state = {
+						any_neighbor_state = {
+							is_in_home_area = yes
+							is_owned_by = ROOT
+						}
+					}
+				}
+			}
 		}
 		
 		modifier = {
 			ai_desired_divisions_factor = 1
+			command_power_gain_mult = -1
 		}
 		
 		complete_effect = {
@@ -431,13 +476,21 @@ afr_jihadist_regional_power_caliphate_wars = {
 					}
 				}
 			}
-			NOT = { has_non_aggression_pact_with = FROM }
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+				check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
+				NOT = {
+					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
+				}
+			}
 		}
 
 		visible = {
 			ROOT = { has_country_flag = afr_jihadist_regional_power_caliphate_wars_tribes_flag }
-			#ROOT = { NOT = { has_country_flag = afr_jihadist_preparing_caliphate_war_flag } }
-			is_subject = no
+			ROOT = { NOT = { has_country_flag = afr_jihadist_preparing_caliphate_war_flag } }
+			ROOT = { is_subject = no }
 			country_exists = FROM
 		}
 		
@@ -499,8 +552,8 @@ afr_jihadist_regional_power_caliphate_wars = {
 					#afr_is_tribal = yes
 				}
 			}
-			NOT = { is_subject_of = ROOT }
-			NOT = { is_in_faction_with = ROOT }
+			FROM = { NOT = { is_subject_of = ROOT } }
+			FROM = { NOT = { is_in_faction_with = ROOT } }
 			OR = {
 				any_country = {
 					AND = { 
@@ -519,7 +572,7 @@ afr_jihadist_regional_power_caliphate_wars = {
 	
 		fire_only_once = no
 		days_remove = 60
-		days_re_enable = 240
+		days_re_enable = 360
 		
 		ai_will_do = {
 			factor = 1
@@ -527,10 +580,22 @@ afr_jihadist_regional_power_caliphate_wars = {
 				factor = 4
 				has_war_support > 0.5
 			}
+			modifier = {
+				factor = 2
+				FROM = {
+					any_owned_state = {
+						any_neighbor_state = {
+							is_in_home_area = yes
+							is_owned_by = ROOT
+						}
+					}
+				}
+			}
 		}
 		
 		modifier = {
 			ai_desired_divisions_factor = 1
+			command_power_gain_mult = -1
 		}
 		
 		complete_effect = {
@@ -573,27 +638,7 @@ afr_jihadist_regional_power_caliphate_wars = {
 			}
 		}
 		
-		cancel_trigger = {
-			OR = {
-				is_in_faction_with = FROM
-				has_war_with = FROM
-				FROM = { is_subject_of = ROOT }
-				hidden_trigger = { NOT = { has_country_flag = afr_jihadist_preparing_caliphate_war_flag } }
-			}
-		}
-		
 		remove_effect = {
-			clr_country_flag = afr_jihadist_preparing_caliphate_war_flag
-			declare_war_on = {
-				target = FROM
-				type = annex_everything
-			}
-			hidden_effect = { FROM = { every_owned_state = { add_claim_by = ROOT } } }
-			custom_effect_tooltip = afr_war_exhaustion_value_add_10
-			add_to_variable = {
-				var = afr_war_exhaustion_value
-				value = 10
-			}
 			ROOT = {
 				add_ai_strategy = {
 					type = prepare_for_war
@@ -608,6 +653,31 @@ afr_jihadist_regional_power_caliphate_wars = {
 					value = -200
 				}
 			}
+			if = {
+				limit = {
+					NOT = {
+						is_in_faction_with = FROM
+						has_war_with = FROM
+						FROM = { is_subject_of = ROOT }
+					}
+					has_country_flag = afr_jihadist_preparing_caliphate_war_flag
+				}
+				declare_war_on = {
+					target = FROM
+					type = annex_everything
+				}
+				hidden_effect = { FROM = { every_owned_state = { add_claim_by = ROOT } } }
+				custom_effect_tooltip = afr_war_exhaustion_value_add_10
+				add_to_variable = {
+					var = afr_war_exhaustion_value
+					value = 10
+				}
+				hidden_effect = {
+					set_variable = { ROOT.afr_regional_power_expansion_attacker@FROM = 1 }
+					set_variable = { FROM.afr_regional_power_expansion_defender@ROOT = 1 }
+				}
+			}
+			clr_country_flag = afr_jihadist_preparing_caliphate_war_flag
 		}	
 	}
 	
@@ -635,13 +705,21 @@ afr_jihadist_regional_power_caliphate_wars = {
 					}
 				}
 			}
-			NOT = { has_non_aggression_pact_with = FROM }
+			custom_trigger_tooltip = {
+				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+				NOT = { has_non_aggression_pact_with = FROM }
+				check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
+				NOT = {
+					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
+				}
+			}
 		}
 
 		visible = {
 			ROOT = { has_country_flag = afr_jihadist_regional_power_caliphate_wars_kingdoms_flag }
 			ROOT = { NOT = { has_country_flag = afr_jihadist_preparing_caliphate_war_flag } }
-			is_subject = no
+			ROOT = { is_subject = no }
 			country_exists = FROM
 		}
 		
@@ -675,8 +753,8 @@ afr_jihadist_regional_power_caliphate_wars = {
 					#afr_is_tribal = yes
 				}
 			}
-			NOT = { is_subject_of = ROOT }
-			NOT = { is_in_faction_with = ROOT }
+			FROM = { NOT = { is_subject_of = ROOT } }
+			FROM = { NOT = { is_in_faction_with = ROOT } }
 			OR = {
 				any_country = {
 					AND = { 
@@ -703,10 +781,22 @@ afr_jihadist_regional_power_caliphate_wars = {
 				factor = 4
 				has_war_support > 0.5
 			}
+			modifier = {
+				factor = 2
+				FROM = {
+					any_owned_state = {
+						any_neighbor_state = {
+							is_in_home_area = yes
+							is_owned_by = ROOT
+						}
+					}
+				}
+			}
 		}
 		
 		modifier = {
 			ai_desired_divisions_factor = 1
+			command_power_gain_mult = -1
 		}
 		
 		complete_effect = {

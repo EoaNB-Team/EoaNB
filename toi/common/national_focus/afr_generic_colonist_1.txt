@@ -580,6 +580,9 @@ focus_tree = {
 				complete_national_focus = afr_colony_generic_french_approval
 			}
 		}
+		allow_branch = {
+			is_subject = yes
+		}
 	}
 	
 	focus = {
@@ -802,7 +805,10 @@ focus_tree = {
 		cost = 75
 		available_if_capitulated = no
 		available = {
-			has_completed_focus = afr_colony_generic_focus_strengthen_government
+			OR = {
+				has_completed_focus = afr_colony_generic_focus_strengthen_government
+				is_subject = no
+			}
 		}
 		prerequisite = { 
 			focus = afr_colony_generic_focus_social_reforms
@@ -998,34 +1004,59 @@ focus_tree = {
 			add_political_power = -25
 			if = {
 				limit = {
-					has_idea = closed_economy
+					NOT = { has_tech = tech_humanities_mercantilism }
 				}
-				swap_ideas = { add_idea = limited_exports remove_idea = closed_economy }
+				set_technology = { tech_humanities_mercantilism = 1 }
 			}
 			if = {
-				limit = {
-					has_idea = AF_T_idea_trading_nation
-				}
-				swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_4 }
+				limit = { has_idea = limited_exports }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = limited_exports } }
 			}
 			if = {
-				limit = {
-					has_idea = AF_T_idea_trading_nation_2
-				}
-				swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_4 }
+				limit = { has_idea = export_focus }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = export_focus } }
 			}
 			if = {
-				limit = {
-					has_idea = AF_T_idea_trading_nation_3
+				limit = { has_idea = free_trade }
+				hidden_effect = { swap_ideas = { add_idea = closed_economy remove_idea = free_trade } }
+			}
+			if = {
+				limit = { has_country_flag = AFR_is_a_colonial_company_flag }
+				if = {
+					limit = { has_idea = AF_T_idea_trading_nation }
+					swap_ideas = { remove_idea = AF_T_idea_trading_nation add_idea = AF_T_idea_trading_nation_4 }
 				}
-				swap_ideas = { remove_idea = AF_T_idea_trading_nation_3 add_idea = AF_T_idea_trading_nation_4 }
+				else_if = {
+					limit = { has_idea = AF_T_idea_trading_nation_2 }
+					swap_ideas = { remove_idea = AF_T_idea_trading_nation_2 add_idea = AF_T_idea_trading_nation_4 }
+				}
+				else_if = {
+					limit = { has_idea = AF_T_idea_trading_nation_3 }
+					swap_ideas = { remove_idea = AF_T_idea_trading_nation_3 add_idea = AF_T_idea_trading_nation_4 }
+				}
+				else = {
+					add_ideas = AF_T_idea_trading_nation_4
+				}
 			}
-			else_if = {
-				add_ideas = AF_T_idea_trading_nation_4
+			if = {
+				limit = { NOT = { has_country_flag = AFR_is_a_colonial_company_flag } }
+				if = {
+					limit = { has_idea = AF_T_idea_trading_nation }
+					remove_ideas = AF_T_idea_trading_nation
+				}
+				else_if = {
+					limit = { has_idea = AF_T_idea_trading_nation_2 }
+					remove_ideas = AF_T_idea_trading_nation_2
+				}
+				else_if = {
+					limit = { has_idea = AF_T_idea_trading_nation_3 }
+					remove_ideas = AF_T_idea_trading_nation_3
+				}
 			}
-			add_equipment_to_stockpile = { type = convoy_1 amount = 35 }
+			add_equipment_to_stockpile = { type = convoy_1 amount = 45 }
 		}
 		allow_branch = {
+			is_subject = yes
 			OR = {
 				has_idea = AFR_french_colony
 				has_idea = AFR_french_colony_tribute
@@ -1053,42 +1084,84 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = {
-					has_idea = AFR_french_colony
+					is_subject = yes
+					NOT = {
+						has_idea = AFR_french_colony
+						has_idea = AFR_french_colony_tribute
+						has_idea = AFR_british_colony
+						has_idea = AFR_british_colony_tribute
+						has_idea = AFR_netherland_colony
+						has_idea = AFR_netherland_colony_tribute
+						has_idea = AFR_spanish_colony
+						has_idea = AFR_spanish_colony_tribute
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_french_colony
-					add_idea = AFR_french_colony_tribute
+				if = {
+					limit = { is_subject_of = FRA }
+					add_ideas = AFR_french_colony_tribute
+				}	
+				if = {
+					limit = { is_subject_of = ENG }
+					add_ideas = AFR_british_colony_tribute
 				}
-			}	
-			if = {
-				limit = {
-					has_idea = AFR_british_colony
+				if = {
+					limit = { is_subject_of = HOL }
+					add_ideas = AFR_netherland_colony_tribute
 				}
-				swap_ideas = {
-					remove_idea = AFR_british_colony
-					add_idea = AFR_british_colony_tribute
+				if = {
+					limit = { is_subject_of = SPR }
+					add_ideas = AFR_spanish_colony_tribute
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					has_idea = AFR_netherland_colony
+					OR = {
+						has_idea = AFR_french_colony
+						has_idea = AFR_british_colony
+						has_idea = AFR_netherland_colony
+						has_idea = AFR_spanish_colony
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_netherland_colony
-					add_idea = AFR_netherland_colony_tribute
+				if = {
+					limit = {
+						has_idea = AFR_french_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_french_colony
+						add_idea = AFR_french_colony_tribute
+					}
+				}	
+				if = {
+					limit = {
+						has_idea = AFR_british_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_british_colony
+						add_idea = AFR_british_colony_tribute
+					}
 				}
-			}
-			if = {
-				limit = {
-					has_idea = AFR_spanish_colony
+				if = {
+					limit = {
+						has_idea = AFR_netherland_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_netherland_colony
+						add_idea = AFR_netherland_colony_tribute
+					}
 				}
-				swap_ideas = {
-					remove_idea = AFR_spanish_colony
-					add_idea = AFR_spanish_colony_tribute
+				if = {
+					limit = {
+						has_idea = AFR_spanish_colony
+					}
+					swap_ideas = {
+						remove_idea = AFR_spanish_colony
+						add_idea = AFR_spanish_colony_tribute
+					}
 				}
 			}
 		}
 		allow_branch = {
+			is_subject = yes
 			OR = {
 				has_idea = AFR_french_colony
 				has_idea = AFR_french_colony_tribute
@@ -1123,6 +1196,9 @@ focus_tree = {
 		completion_reward = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
+		}
+		allow_branch = {
+			always = yes
 		}
 	}
 	
@@ -1208,14 +1284,126 @@ focus_tree = {
 		prerequisite = { focus = afr_colony_generic_focus_centralized_administration }
 		prerequisite = { focus = afr_colony_generic_focus_centralized_army }
 		completion_reward = {
-			capital_scope = {
-				add_extra_state_shared_building_slots = 2
+			if = {
+				limit = {
+					any_owned_state = {
+						any_neighbor_state = { 
+							is_core_of = ROOT 
+							is_owned_by = ROOT
+						}
+						NOT = { is_core_of = ROOT }
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						any_neighbor_state = { 
+							is_core_of = ROOT 
+							is_owned_by = ROOT
+						}
+						NOT = { is_core_of = ROOT }
+					}
+					if = {
+						limit = {
+							free_building_slots = {
+								building = infrastructure
+								size > 1
+							}
+						}
+						add_building_construction = {
+							type = infrastructure
+							level = 2
+							instant_build = yes
+						}
+					}
+					else_if = {
+						limit = {
+							free_building_slots = {
+								building = infrastructure
+								size > 0
+							}
+						}
+						add_building_construction = {
+							type = infrastructure
+							level = 1
+							instant_build = yes
+						}
+					}
+					if = {
+						limit = { state_population < 300000 }
+						add_core_of = ROOT
+					}
+					else = {
+						add_extra_state_shared_building_slots = 2
+					}
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.6 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_6
+				}
 			}
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = {
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
-				custom_effect_tooltip = AFR_Racial_Tension_plus_2
-			}			
+			else_if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						free_building_slots = {
+							building = infrastructure
+							size > 1
+						}
+						is_core_of = ROOT
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 2
+						instant_build = yes
+					}
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+			else_if = {
+				limit = {
+					any_owned_state = {
+						is_core_of = ROOT
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+					}
+				}
+				random_owned_controlled_state ={
+					limit = { 
+						free_building_slots = {
+							building = infrastructure
+							size > 0
+						}
+						is_core_of = ROOT
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+			else = {
+				random_owned_controlled_state ={
+					limit = { 
+						is_core_of = ROOT
+					}
+					add_extra_state_shared_building_slots = 2
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 trigger_for = controller } }
+					custom_effect_tooltip = AFR_Racial_Tension_plus_2
+				}
+			}
+				
 		}
 	}
 	
@@ -1370,14 +1558,14 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = {
-					has_idea = limited_exports
+					has_idea = closed_economy
 				}
-				swap_ideas = { add_idea = free_trade remove_idea = limited_exports }
+				swap_ideas = { add_idea = limited_exports remove_idea = closed_economy }
 			}
 			else_if = {
-				add_ideas = free_trade
+				add_ideas = limited_exports
 			}
-			custom_effect_tooltip = afr_colony_generic_focus_laissez_faire_markets_tooltip
+			#custom_effect_tooltip = afr_colony_generic_focus_laissez_faire_markets_tooltip
 		}
 	}
 	
@@ -1430,31 +1618,114 @@ focus_tree = {
 			factor = 0.50
 		}
 		available = {
-			custom_trigger_tooltip={
-			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_1
-				check_variable = { detrimental_colonial_impact_value < 11 }
+			any_owned_state = {
+				is_capital = no
+				NOT = { is_core_of = ROOT }
+				custom_trigger_tooltip={
+					tooltip = afr_colony_generic_focus_native_reservations_tooltip_trigger_1
+					check_variable = { detrimental_colonial_impact_value < 11 }
+				}
 			}
 			custom_trigger_tooltip={
-			tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_2
+				tooltip= afr_colony_generic_focus_native_reservations_tooltip_trigger_2
 				NOT = { has_idea = tribal_slavery }				
 				NOT = { has_idea = usa_slavery_law }
 				NOT = { has_idea = slavery }
 			}
-				
 		}
 		prerequisite = { focus = afr_colony_generic_focus_decentralized_autonomy }
 		prerequisite = { focus = afr_colony_generic_focus_spread_military }
 		completion_reward = {
-			add_popularity = {
-				ideology = social_egalitarianism
-				popularity = 0.05
+			hidden_effect = { add_popularity = { ideology = social_egalitarianism popularity = 0.05 } }
+			if = {
+				limit = {
+					any_owned_state = {
+						check_variable = { detrimental_colonial_impact_value > 5 }
+						NOT = { is_core_of = ROOT }
+						any_country = { PREV = { is_core_of = PREV } }
+					}
+					always = no
+				}
+				add_ideas = AFR_colonial_native_reservations
+				custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						check_variable = { detrimental_colonial_impact_value > 5 }
+						NOT = { is_core_of = ROOT }
+						any_country = { PREV = { is_core_of = PREV } }
+						is_capital = no
+					}
+					set_state_flag = afr_colonial_native_reservation_state_flag
+					if = {
+						limit = { Oceania_infrastructure_for_clearing_building_slots_trigger = yes }
+						add_to_variable = { Oceania_extra_state_shared_building_slots = -1 }
+						add_extra_state_shared_building_slots = -1
+					}
+					custom_effect_tooltip = AFR_Racial_Tension_minus_6
+					hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.6 trigger_for = controller } }
+				}
 			}
-			add_ideas = AFR_colonial_native_reservations
-			custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
-			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = { 
-				custom_effect_tooltip = AFR_Racial_Tension_minus_3
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.3 trigger_for = controller } }
+			else_if = {
+				limit = {
+					any_owned_state = {
+						NOT = { is_core_of = ROOT }
+						all_neighbor_state = { is_capital = no }
+						state_population < 30000
+					}
+				}
+				add_ideas = AFR_colonial_native_reservations
+				custom_effect_tooltip = afr_colony_generic_focus_native_reservations_tooltip
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						NOT = { is_core_of = ROOT }
+						all_neighbor_state = { is_capital = no }
+						is_capital = no
+						state_population < 30000
+					}
+					set_state_flag = afr_colonial_native_reservation_state_flag
+					if = {
+						limit = { Oceania_infrastructure_for_clearing_building_slots_trigger = yes }
+						add_to_variable = { Oceania_extra_state_shared_building_slots = -1 }
+						add_extra_state_shared_building_slots = -1
+					}
+					if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 2 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_3
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.3 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 1 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_2
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.2 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 0 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.1 trigger_for = controller } }
+					}
+				}
+			}
+			else = {
+				custom_effect_tooltip = afr_colonial_effect_tooltip
+				random_owned_controlled_state = {
+					limit = {
+						check_variable = { detrimental_colonial_impact_value > 0 }
+						NOT = { is_core_of = ROOT }
+						is_capital = no
+					}
+					if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 1 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_2
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.2 trigger_for = controller } }
+					}
+					else_if = {
+						limit = { check_variable = { detrimental_colonial_impact_value > 0 } }
+						custom_effect_tooltip = AFR_Racial_Tension_minus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.1 trigger_for = controller } }
+					}
+				}
 			}
 		}
 	}
@@ -1556,6 +1827,9 @@ focus_tree = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
 		}
+		allow_branch = {
+			always = yes
+		}
 	}
 	
 	focus = {
@@ -1569,16 +1843,20 @@ focus_tree = {
 		available = {
 			if = {
 				limit = { 
+					TAG = SNG 
+					owns_state = 1108
+				}
+			}
+			else_if = {
+				limit = { 
 					all_owned_state = { naval_base < 1 }
 				}
-				has_political_power > 250
 				custom_trigger_tooltip = {
 					tooltip = Ocenaia_has_infrastructure_to_support_new_buildings_on_coast
 					Oceania_one_extra_building_slots_supported_for_coast_not_core_trigger = yes
 				}
 			}
 			else = {
-				has_political_power > 100
 				any_owned_state = {
 					is_coastal = yes
 					naval_base > 0
@@ -1592,8 +1870,35 @@ focus_tree = {
 		completion_reward = {
 			if = {
 				limit = { 
+					TAG = GDC
+					owns_state = 1108
+				}
+				add_political_power = -250
+				1108 = {
+					set_state_flag = afr_port_town
+					hidden_effect = {
+						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
+					}
+					add_extra_state_shared_building_slots = 1
+					afr_add_one_building_naval_base_scripted_effect = yes
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+						custom_effect_tooltip = AFR_Racial_Tension_plus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
+					}
+					add_manpower = 6325
+				}
+			}
+			else_if = {
+				limit = { 
 					all_owned_state = { naval_base < 1 }
-					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
 					capital_scope = { is_coastal = no }
 				}
 				add_political_power = -250
@@ -1607,34 +1912,7 @@ focus_tree = {
 						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
 					}
 					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-						type = naval_base
-						level = 1
-						instant_build = yes
-						province = {
-							all_provinces = yes
-							limit_to_coastal = yes
-						}
-					}
-					add_building_construction = {
-						type = infrastructure
-						level = 1
-						instant_build = yes
-					}
-					add_core_of = ROOT
-					add_manpower = 1000
-				}
-			}
-			if = {
-				limit = {
-					any_owned_state = { has_state_flag = afr_port_town }
-				}
-				add_political_power = -100
-				random_owned_controlled_state = {
-					limit = {
-						has_state_flag = afr_port_town
-					}
-					set_state_flag = afr_port_town
+					afr_add_one_building_naval_base_scripted_effect = yes
 					add_building_construction = {
 						type = infrastructure
 						level = 1
@@ -1643,16 +1921,41 @@ focus_tree = {
 					if = {
 						limit = { THIS = { NOT = { is_core_of = ROOT } } }
 						add_core_of = ROOT
+						custom_effect_tooltip = AFR_Racial_Tension_plus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
 					}
-					add_manpower = 1000
+					add_manpower = 6325
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
-					capital_scope = { is_coastal = yes naval_base < 1 }
+					any_owned_state = { has_state_flag = afr_port_town }
 				}
 				add_political_power = -100
+				random_owned_controlled_state = {
+					limit = {
+						has_state_flag = afr_port_town
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					if = {
+						limit = { THIS = { NOT = { is_core_of = ROOT } } }
+						add_core_of = ROOT
+						custom_effect_tooltip = AFR_Racial_Tension_plus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
+					}
+					add_manpower = 6325
+				}
+			}
+			else_if = {
+				limit = {
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					capital_scope = { is_coastal = yes naval_base < 1 }
+				}
+				add_political_power = -250
 				random_owned_state = {
 					limit = {
 						is_coastal = yes
@@ -1663,15 +1966,7 @@ focus_tree = {
 						add_to_variable = { Oceania_extra_state_shared_building_slots = 1 }
 					}
 					add_extra_state_shared_building_slots = 1
-					add_building_construction = {
-						type = naval_base
-						level = 1
-						instant_build = yes
-						province = {
-							all_provinces = yes
-							limit_to_coastal = yes
-						}
-					}
+					afr_add_one_building_naval_base_scripted_effect = yes
 					add_building_construction = {
 						type = infrastructure
 						level = 1
@@ -1679,9 +1974,9 @@ focus_tree = {
 					}
 				}
 			}
-			if = {
+			else_if = {
 				limit = {
-					any_owned_state = { NOT = { has_state_flag = afr_port_town } }
+					all_owned_state = { NOT = { has_state_flag = afr_port_town } }
 					capital_scope = { is_coastal = yes naval_base > 0 }
 				}
 				add_political_power = -100
@@ -1714,13 +2009,15 @@ focus_tree = {
 					if = {
 						limit = { THIS = { NOT = { is_core_of = ROOT } } }
 						add_core_of = ROOT
+						custom_effect_tooltip = AFR_Racial_Tension_plus_1
+						hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
 					}
-					add_manpower = 1000
+					add_manpower = 6325
 				}
 			}
-			add_equipment_to_stockpile = { type = convoy_1 amount = 25 }
+			add_equipment_to_stockpile = { type = convoy_1 amount = 45 }
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1762,8 +2059,44 @@ focus_tree = {
 			else = {
 				custom_effect_tooltip = afr_colony_generic_focus_1860_gov_naval_base_tooltip
 			}
+			hidden_effect = {
+				if = {
+					limit = { NOT = { has_tech = tech_naval_corvette } }
+					set_technology = { tech_naval_corvette = 1 }
+				}
+				if = {
+					limit = { NOT = { has_tech = tech_naval_corvette_1 } }
+					set_technology = { tech_naval_corvette_1 = 1 }
+				}
+			}
+			add_equipment_production = {
+				equipment = {
+					type = ship_hull_corvette_0
+				}
+				requested_factories = 1
+				progress = 0.90
+				amount = 1
+			}
+			hidden_effect = {
+				add_equipment_production = {
+					equipment = {
+						type = ship_hull_corvette_0
+					}
+					requested_factories = 1
+					progress = 0.77
+					amount = 1
+				}
+				add_equipment_production = {
+					equipment = {
+						type = ship_hull_corvette_0
+					}
+					requested_factories = 1
+					progress = 0.63
+					amount = 1
+				}
+			}
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1781,10 +2114,24 @@ focus_tree = {
 			factor = 1
 		}
 		prerequisite = { focus = afr_colony_generic_focus_1860_gov_naval_base }
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_establish_senegal_navy_flag } }
 		completion_reward = {
+			hidden_effect = {
+				if = {
+					limit = { NOT = { has_tech = tech_naval_capital_ship_naval_transportation } }
+					set_technology = { tech_naval_capital_ship_naval_transportation = 1 }
+				}
+			}
+			if = {
+				limit = { NOT = { has_tech = tech_infantry_special_infantry_corps } }
+				set_technology = { tech_infantry_special_infantry_corps = 1 }
+			}
+			if = {
+				limit = { NOT = { has_tech = tech_infantry_colonial_marines } }
+				set_technology = { tech_infantry_colonial_marines = 1 }
+			}
 			
 		}
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1806,7 +2153,7 @@ focus_tree = {
 		completion_reward = {
 			
 		}
-		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_establish_senegal_navy_flag } }
+		bypass = { if = { limit = { TAG = SNG } has_country_flag = FRA_develop_port_dakar_flag } else = { always = no } }
 	}
 	
 	focus = {
@@ -1829,6 +2176,10 @@ focus_tree = {
 			#country_event = { id = afr_colony_generic.1 days = 1 }
 			add_political_power = 100
 		}
+		
+		allow_branch = {
+			always = yes
+		}
 	}
 	
 	
@@ -1850,32 +2201,49 @@ focus_tree = {
 		y = 0
 		completion_reward = {
 			add_political_power = -150
-			SUW = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			673 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
-			SUN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			667 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
-			MAT = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1187 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 100
+					}
 				}
 			}
-			KAN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1188 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 100
+					}
+				}
+			}
+			1189 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
 		}
@@ -1889,19 +2257,107 @@ focus_tree = {
 		icon = GFX_goal_generic_more_territorial_claims
 		cost = 75
 		available = {
-			BRU = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			919 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
+						}
+						NOT = { is_subject_of = OTO }
+					}
+				}
+			}
+			if = {
+				limit = {
+					1177 = {
+						OWNER = {
+							NOT = { owns_state = 919 }
+						}
+					}
+				}
+				1177 = {
+					OWNER = {
+						if = {
+							limit = { 
+								OR = {
+									TAG = BUN
+									TAG = SAM
+								}
+							}
+							NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+						}
+						custom_trigger_tooltip = {
+							tooltip = Oceania_is_colonial_subject
+							NOT = {
+								is_subject_of = FRA
+								is_subject_of = ENG
+								AND = {
+									is_subject_of = CCH
+									CCH = { is_subject_of = FRA }
+								}
+								AND = {
+									is_subject_of = SRW
+									SRW = { is_subject_of = ENG }
+								}
+							}
+							NOT = { is_subject_of = OTO }
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					1178 = {
+						OWNER = {
+							NOT = { owns_state = 919 }
+						}
+					}
+				}
+				1178 = {
+					OWNER = {
+						if = {
+							limit = { 
+								OR = {
+									TAG = BUN
+									TAG = SAM
+								}
+							}
+							NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+						}
+						custom_trigger_tooltip = {
+							tooltip = Oceania_is_colonial_subject
+							NOT = {
+								is_subject_of = FRA
+								is_subject_of = ENG
+								AND = {
+									is_subject_of = CCH
+									CCH = { is_subject_of = FRA }
+								}
+								AND = {
+									is_subject_of = SRW
+									SRW = { is_subject_of = ENG }
+								}
+							}
+							NOT = { is_subject_of = OTO }
 						}
 					}
 				}
@@ -1914,17 +2370,56 @@ focus_tree = {
 		y = 1
 		relative_position_id = afr_colony_generic_ignore_treaty
 		completion_reward = {	
-			BRU = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1178 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
 				}
 			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = BRU
-				value = 200
+			1177 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
+				}
+			}
+			919 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
+				}
 			}
 		}
 		allow_branch = {
@@ -1937,6 +2432,16 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 180
 		available = {
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 0
 		y = 1
@@ -1945,14 +2450,59 @@ focus_tree = {
 			focus = afr_colony_generic_while_brunei_is_alone
 		}
 		completion_reward = {
-			add_ai_strategy = {
-				type = declare_war
-				id = BRU
-				value = 200
+			1178 = {
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			create_wargoal = {
-				type = puppet_wargoal_focus
-				target = BRU
+			1177 = {
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
+			}
+			919 = {
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
 		}
 		allow_branch = {
@@ -1965,20 +2515,32 @@ focus_tree = {
 		icon = GFX_goal_generic_more_territorial_claims
 		cost = 75
 		available = {
-			SRW = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			920 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
 						}
+						NOT = { is_subject_of = OTO }
 					}
 				}
 			}
@@ -1990,17 +2552,22 @@ focus_tree = {
 		y = 1
 		relative_position_id = afr_colony_generic_ignore_treaty
 		completion_reward = {	
-			SRW = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			920 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 200
+						}
+					}
 				}
-			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = SRW
-				value = 200
 			}
 		}
 		allow_branch = {
@@ -2013,6 +2580,16 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 180
 		available = {
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 0
 		y = 1
@@ -2021,14 +2598,18 @@ focus_tree = {
 			focus = afr_colony_generic_while_sarawak_is_independent
 		}
 		completion_reward = {	
-			add_ai_strategy = {
-				type = declare_war
-				id = SRW
-				value = 200
-			}
-			create_wargoal = {
-				type = puppet_wargoal_focus
-				target = SRW
+			920 = {
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+						}
+					}
+				}
 			}
 		}
 		allow_branch = {
@@ -2042,24 +2623,34 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1870.01.01
-			ACE = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			1182 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
 						}
+						NOT = { is_subject_of = OTO }
 					}
 				}
-				NOT = { is_subject_of = OTO }
 			}
 		}
 		prerequisite = {
@@ -2070,21 +2661,57 @@ focus_tree = {
 		y = 1
 		relative_position_id = afr_colony_generic_ignore_treaty
 		completion_reward = {	
-			ACE = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			918 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
 				}
 			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = ACE
-				value = 200
+			1184 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
+				}
 			}
-			add_state_claim = 918
-			add_state_claim = 1184
-			add_state_claim = 1185
+			1185 = {
+				add_claim_by = ROOT
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 75
+					}
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 75
+						}
+					}
+				}
+			}
 		}
 		allow_branch = {
 			TAG = INS
@@ -2096,6 +2723,16 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 180
 		available = {
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 0
 		y = 1
@@ -2104,16 +2741,49 @@ focus_tree = {
 			focus = afr_colony_generic_as_the_british_ignore_aceh
 		}
 		completion_reward = {
-			add_ai_strategy = {
-				type = declare_war
-				id = ACE
-				value = 200
+			hidden_effect = { set_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag }
+			918 = {
+				OWNER = { 
+					hidden_effect = { set_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag }
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+						}
+					}
+				}
 			}
-			declare_war_on = {
-				target = ACE
-				type = annex_everything
+			1184 = {
+				OWNER = { 
+					hidden_effect = { set_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag }
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+						}
+					}
+				}
 			}
-			
+			1185 = {
+				OWNER = { 
+					hidden_effect = { set_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag }
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+						}
+					}
+				}
+			}
 		}
 		allow_branch = {
 			TAG = INS
@@ -2134,32 +2804,49 @@ focus_tree = {
 		y = 0
 		completion_reward = {
 			add_political_power = 100
-			SUW = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			673 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
-			SUN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			667 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
-			MAT = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1187 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 100
+					}
 				}
 			}
-			KAN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1188 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 100
+					}
+				}
+			}
+			1189 = {
+				OWNER = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
 		}
@@ -2174,24 +2861,43 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1878.01.01
-			SAM = {
-				NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
-			}
-			SAM = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			1182 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
-						}
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
 					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
+						}
+						NOT = { is_subject_of = OTO }
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
 				}
 			}
 		}
@@ -2203,26 +2909,29 @@ focus_tree = {
 			focus = afr_colony_generic_respect_treaty
 		}
 		completion_reward = {
-			SAM = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1182 = {
+				add_claim_by = ROOT
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
-			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = SAM
-				value = 200
-			}
-			add_ai_strategy = {
-				type = declare_war
-				id = SAM
-				value = 200
-			}
-			create_wargoal = {
-				type = puppet_wargoal_focus
-				target = SAM
 			}
 		}
 		bypass = {
@@ -2241,24 +2950,43 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1882.01.01	
-			BUN = {
-				NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
-			}
-			BUN = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			1175 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
-						}
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
 					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
+						}
+						NOT = { is_subject_of = OTO }
+					}
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
 				}
 			}
 		}
@@ -2270,26 +2998,29 @@ focus_tree = {
 			focus = afr_colony_generic_respect_treaty
 		}
 		completion_reward = {
-			BUN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+			1175 = {
+				add_claim_by = ROOT
+				OWNER = {
+					ROOT = {
+						if = {
+							limit = { NOT = { has_wargoal_against = PREV } }
+							create_wargoal = {
+								type = puppet_wargoal_focus
+								target = PREV
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
-			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = BUN
-				value = 200
-			}
-			add_ai_strategy = {
-				type = declare_war
-				id = BUN
-				value = 200
-			}
-			create_wargoal = {
-				type = puppet_wargoal_focus
-				target = BUN
 			}
 		}
 		bypass = {
@@ -2308,20 +3039,23 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1884.01.01
-			LAN = {
-				custom_trigger_tooltip = {
-					tooltip = Oceania_is_colonial_subject
-					NOT = {
-						is_subject_of = FRA
-						is_subject_of = ENG
-						AND = {
-							is_subject_of = CCH
-							CCH = { is_subject_of = FRA }
+			673 = {
+				OWNER = {
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
 						}
-						AND = {
-							is_subject_of = SRW
-							SRW = { is_subject_of = ENG }
-						}
+						NOT = { is_subject_of = OTO }
 					}
 				}
 			}
@@ -2333,20 +3067,24 @@ focus_tree = {
 			focus = afr_colony_generic_ignore_treaty
 			focus = afr_colony_generic_respect_treaty
 		}
-		completion_reward = {	
-			LAN = {
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = ROOT
-					value = 200
+		completion_reward = {
+			673 = {
+				add_claim_by = ROOT
+				OWNER = {
+					ROOT = {
+						add_ai_strategy = {
+							type = prepare_for_war
+							id = PREV
+							value = 200
+						}
+					}
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = ROOT
+						value = 200
+					}
 				}
 			}
-			add_ai_strategy = {
-				type = prepare_for_war
-				id = LAN
-				value = 200
-			}
-			add_state_claim = 673
 		}
 		allow_branch = {
 			TAG = INS
@@ -2357,6 +3095,16 @@ focus_tree = {
 		icon = GFX_focus_RAJ_lions_of_the_great_war
 		cost = 180
 		available = {
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 0
 		y = 1
@@ -2365,9 +3113,18 @@ focus_tree = {
 			focus = afr_colony_generic_while_qing_is_weak
 		}
 		completion_reward = {	
-			declare_war_on = {
-				target = LAN
-				type = annex_everything
+			1183 = {
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+						}
+					}
+				}
 			}
 		}
 		allow_branch = {
@@ -2382,6 +3139,16 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1886.01.01
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 4
 		y = 1
@@ -2391,36 +3158,82 @@ focus_tree = {
 			focus = afr_colony_generic_respect_treaty
 		}
 		completion_reward = {	
-			add_ai_strategy = {
-				type = declare_war
-				id = SUN
-				value = 200
+			667 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			add_ai_strategy = {
-				type = declare_war
-				id = KAN
-				value = 200
+			1187 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			add_ai_strategy = {
-				type = declare_war
-				id = MAT
-				value = 200
+			1188 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			declare_war_on = {
-				target = SUN
-				type = annex_everything
+			1189 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			declare_war_on = {
-				target = KAN
-				type = annex_everything
-			}
-			declare_war_on = {
-				target = MAT
-				type = annex_everything
-			}
-			add_state_claim = 667
-			add_state_claim = 1188
-			add_state_claim = 1189
 		}
 		allow_branch = {
 			TAG = INS
@@ -2432,6 +3245,16 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1890.01.01
+			custom_trigger_tooltip = {
+				tooltip = INS_indonesia_colonial_expansion_war_exhaustion_trigger
+				NOT = { has_idea = INS_indonesia_colonial_expansion_war_exhaustion_idea }
+			}
+			custom_trigger_tooltip = {
+				tooltip = INS_not_in_colonial_expansion_war_trigger
+				NOT = {
+					has_country_flag = INS_ACE_indonesia_colonial_expansion_war_flag
+				}
+			}
 		}
 		x = 0
 		y = 1
@@ -2440,14 +3263,24 @@ focus_tree = {
 			focus = afr_colony_generic_secure_the_south
 		}
 		completion_reward = {
-			add_ai_strategy = {
-				type = declare_war
-				id = SUW
-				value = 200
-			}
-			declare_war_on = {
-				target = SUW
-				type = annex_everything
+			673 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
 		}
 		allow_branch = {
@@ -2469,20 +3302,58 @@ focus_tree = {
 		cost = 75
 		available = {
 			date > 1888.01.01
+			627 = {
+				OWNER = {
+					if = {
+						limit = { 
+							OR = {
+								TAG = BUN
+								TAG = SAM
+							}
+						}
+						NOT = { has_completed_focus = Oceania_generic_pursue_dutch_cooperation }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Oceania_is_colonial_subject
+						NOT = {
+							is_subject_of = FRA
+							is_subject_of = ENG
+							AND = {
+								is_subject_of = CCH
+								CCH = { is_subject_of = FRA }
+							}
+							AND = {
+								is_subject_of = SRW
+								SRW = { is_subject_of = ENG }
+							}
+						}
+						NOT = { is_subject_of = OTO }
+					}
+				}
+			}
 		}
 		x = 20
 		y = 0
 		completion_reward = {	
-			add_ai_strategy = {
-				type = declare_war
-				id = MDN
-				value = 200
+			627 = {
+				add_claim_by = ROOT
+				OWNER = { 
+					ROOT = {
+						if = {
+							limit = { NOT = { has_war_with = PREV } }
+							declare_war_on = {
+								target = PREV
+								type = annex_everything
+							}
+							add_ai_strategy = {
+								type = declare_war
+								id = PREV
+								value = 200
+							}
+						}
+					}
+				}
 			}
-			declare_war_on = {
-				target = MDN
-				type = annex_everything
-			}
-			add_state_claim = 627
 		}
 		allow_branch = {
 			TAG = SPH
