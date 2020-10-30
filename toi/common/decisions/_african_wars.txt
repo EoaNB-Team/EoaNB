@@ -1440,84 +1440,98 @@ unidustrialized_warfare = {
 		icon = generic_prepare_civil_war
 
 		available = {
-			has_tech = tribal_tatics
 			if = {
 				limit = { 
-					OR = {
-						has_idea = AFR_history_of_colonial_resistance
-						has_idea = AFR_history_of_colonial_resistance_1
-					}
+					check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals }
 				}
-				custom_trigger_tooltip = {
-					tooltip = afr_is_colonial_resistor_tooltip
-					OR = {
-						has_idea = AFR_history_of_colonial_resistance
-						has_idea = AFR_history_of_colonial_resistance_1
-					}
+				hidden_trigger = {
+					NOT = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } }
 				}
 			}
 			else = {
-				FROM = {
+				has_tech = tribal_tatics
+				if = {
+					limit = { 
+						OR = {
+							has_idea = AFR_history_of_colonial_resistance
+							has_idea = AFR_history_of_colonial_resistance_1
+						}
+					}
 					custom_trigger_tooltip = {
-						tooltip = afr_colonial_neighbor_has_our_land_tooltip
-						any_state = {
-							is_owned_and_controlled_by = FROM
-							OR = {
-								NOT = { is_core_of = FROM }
-								is_claimed_by = ROOT
-								is_core_of = ROOT
-							}
-							any_neighbor_state = {
-								is_fully_controlled_by = ROOT
+						tooltip = afr_is_colonial_resistor_tooltip
+						OR = {
+							has_idea = AFR_history_of_colonial_resistance
+							has_idea = AFR_history_of_colonial_resistance_1
+						}
+					}
+				}
+				else = {
+					FROM = {
+						custom_trigger_tooltip = {
+							tooltip = afr_colonial_neighbor_has_our_land_tooltip
+							any_state = {
+								is_owned_and_controlled_by = FROM
+								OR = {
+									NOT = { is_core_of = FROM }
+									is_claimed_by = ROOT
+									is_core_of = ROOT
+								}
+								any_neighbor_state = {
+									is_fully_controlled_by = ROOT
+								}
 							}
 						}
 					}
 				}
-			}
-			custom_trigger_tooltip = {
-				tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
-				NOT = { has_non_aggression_pact_with = FROM }
-				check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
-				NOT = {
-					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
-					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
-				}
-			}
-			custom_trigger_tooltip = {
-				tooltip = first_nations_tribal_raid_neighbor_at_peace_trigger
-				has_border_war = no
-				has_war = no
-				NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_neighbor_flag }
-				NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }	
-			}
-			custom_trigger_tooltip = {
-				tooltip = afr_war_exhaustion_value_less_than_5
-				check_variable = {
-					afr_war_exhaustion_value < 5
-				}
-			}
-			custom_trigger_tooltip={
-				tooltip = EDC_Has_Division_Or_Any_Tribal_Army_over_1000
-				OR = {
-					check_variable = { Tribal_army_num > 999 }
-					check_variable = { Tribal_horse_army_num > 999 }
-					check_variable = { Tribal_horse_pistoleer_army_num > 999 }
-					check_variable = { Tribal_camel_army_num > 999 }
-					num_divisions > 0
-				}
-			}
-			hidden_trigger = {
-				any_state = {
-					is_owned_and_controlled_by = FROM
-					any_neighbor_state = {
-						is_fully_controlled_by = ROOT
+				custom_trigger_tooltip = {
+					tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+					NOT = { has_non_aggression_pact_with = FROM }
+					check_variable = { var = ROOT.afr_has_special_diplomacy@FROM value = 0 compare = equals }
+					NOT = {
+						check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+						check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
 					}
 				}
-				OR = {
-					afr_is_tribal = yes
-					is_south_american_tribe = yes
+				custom_trigger_tooltip = {
+					tooltip = first_nations_tribal_raid_neighbor_at_peace_trigger
+					has_border_war = no
+					has_war = no
+					NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_neighbor_flag }
+					NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }	
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_war_exhaustion_value_less_than_5
+					check_variable = {
+						afr_war_exhaustion_value < 5
+					}
+				}
+				custom_trigger_tooltip={
+					tooltip = EDC_Has_Division_Or_Any_Tribal_Army_over_1000
+					OR = {
+						check_variable = { Tribal_army_num > 999 }
+						check_variable = { Tribal_horse_army_num > 999 }
+						check_variable = { Tribal_horse_pistoleer_army_num > 999 }
+						check_variable = { Tribal_camel_army_num > 999 }
+						num_divisions > 0
+					}
+				}
+				hidden_trigger = {
+					any_state = {
+						is_owned_and_controlled_by = FROM
+						any_neighbor_state = {
+							is_fully_controlled_by = ROOT
+						}
+					}
+					OR = {
+						afr_is_tribal = yes
+						is_south_american_tribe = yes
+					}
 				}
 			}
+		}
+		
+		highlight_states = {
+			state = var:FROM.defender_state_vs_@ROOT
 		}
 		
 		allowed = {
@@ -1664,12 +1678,31 @@ unidustrialized_warfare = {
 			
 		
 		cancel_trigger = {
-			custom_trigger_tooltip = {
-				tooltip = edc_raid_decision_cancel_trigger
-				OR = {
-					is_in_faction_with = FROM
-					has_war_with = FROM
-					has_border_war_with = FROM
+			if = {
+				limit = {
+					check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals }
+				}
+				custom_trigger_tooltip = {
+					tooltip = MOR_tribal_raid_colonial_neighbor_random_intertribe_raid_tooltip
+					NOT = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = edc_raid_decision_cancel_trigger
+					OR = {
+						is_in_faction_with = FROM
+						has_war_with = FROM
+						has_border_war_with = FROM
+					}
+				}
+			}
+			else = {
+				custom_trigger_tooltip = {
+					tooltip = edc_raid_decision_cancel_trigger
+					OR = {
+						is_in_faction_with = FROM
+						has_war_with = FROM
+						has_border_war_with = FROM
+					}
 				}
 			}
 		}
@@ -1677,8 +1710,15 @@ unidustrialized_warfare = {
 			command_power_gain_mult = -0.90
 		}
 		complete_effect = {
+			if = {
+				limit = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } }
+				custom_effect_tooltip = afr_has_unsanctioned_raid_against_colonial_neighbor_effect_tooltip
+			}
 			hidden_effect = { 
-				add_command_power = -100
+				if = {
+					limit = { NOT = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } } }
+					add_command_power = -100
+				}
 				ROOT = { set_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }
 				ROOT = { country_event = { id = set_border_war_data_first_nations_tribal_raid.1 days = 31 } }
 				random_list = {
@@ -1767,10 +1807,17 @@ unidustrialized_warfare = {
 				ROOT = { clr_country_flag = afr_neighbor_state_colonial_militia_spawn_flag }
 			}
 			start_dynamic_american_state_border_war = yes
-			custom_effect_tooltip = afr_war_exhaustion_value_add_1
-			add_to_variable = {
-				var = afr_war_exhaustion_value
-				value = 1
+			if = {
+				limit = { NOT = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } } }
+				custom_effect_tooltip = afr_war_exhaustion_value_add_1
+				add_to_variable = {
+					var = afr_war_exhaustion_value
+					value = 1
+				}
+			}
+			if = {
+				limit = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@FROM value = 1 compare = greater_than_or_equals } }
+				custom_effect_tooltip = afr_has_unsanctioned_raid_against_colonial_neighbor_timeout_tooltip
 			}
 			hidden_effect = {
 				if = {
