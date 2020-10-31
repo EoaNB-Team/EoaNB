@@ -1,4 +1,4 @@
-name="End of a New Beginning"
+name="End of a New Beginning (Development)"
 path="mod/toi/"
 version="0.2 Deus ex Machina"
 tags={
