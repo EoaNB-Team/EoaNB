@@ -17,7 +17,7 @@ focus_tree = {
 
 	continuous_focus_position = { x = 4750 y = 1450 }
 
-  ######################################################################################
+	######################################################################################
 	#		Buchanan Era by Energywelder
 	######################################################################################
 	
@@ -666,10 +666,20 @@ focus_tree = {
 		x = 12
 		y = 22
 
+		ai_will_do = { base = 4 }
+
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = USA_Focus_ACW_Election_1860_tt
 				always = no
+			}
+		}
+		bypass = {
+			OR = {
+				has_country_flag = USA_BeckenridgeElected
+				has_country_flag = USA_BellElected
+				has_country_flag = USA_DouglasElected
+				has_country_flag = USA_LincolnElected
 			}
 		}
 
@@ -677,7 +687,7 @@ focus_tree = {
 			add_political_power = 150
 		}
 	}
-  focus = {
+	focus = {
 		id = USA_Focus_ACW_PACW_POLITICS1
 		icon = GFX_goal_focus_american_civil_war
 		cost = 35
@@ -686,48 +696,78 @@ focus_tree = {
 		x = -1
 		y = 1
 
-    mutually_exclusive = { focus = USA_Focus_ACW_PACW_POLITICS2 }
+		ai_will_do = { 
+			base = 4
+			modifer = {
+				factor = 0
+				check_variable = { USA_Slavery_Debate_Leaning > 0 }
+			}
+		}
+
+		mutually_exclusive = { focus = USA_Focus_ACW_PACW_POLITICS2 }
 		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
-    available = {
-      has_country_flag = USA_LincolnElected
-    }
-    completion_reward = {
+		available = {
+			check_variable = { USA_Slavery_Debate_Leaning < 5 }
+		}
+
+		completion_reward = {
 			add_political_power = 50
-			add_stability = 0.01
-    }
+			if = {
+				limit = { has_country_flag = USA_Slavery_Debate_Ongoing }
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -5 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+				set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+				USA_Slavery_Debate_Tension_Modify = yes
+				activate_decision = USA_Slavery_Debate_Repeal_Fugitive_Act
+			}
+		}
 	}
 	focus = {
 		id = USA_Focus_ACW_PACW_POLITICS2
 		icon = GFX_goal_focus_american_civil_war
-		cost = 35
+		cost = 21
 
 		relative_position_id = USA_Focus_ACW_Election_1860
 		x = 1
 		y = 1
 
-		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
-    available = {
-      OR = {
-				has_country_flag = USA_BeckenridgeElected
-				has_country_flag = USA_BellElected
-				has_country_flag = USA_DouglasElected
-				has_country_flag = USA_LincolnElected
+		ai_will_do = { 
+			base = 4
+			modifer = {
+				factor = 0
+				check_variable = { USA_Slavery_Debate_Leaning < 0 }
 			}
-    }
-    completion_reward = {
+		}
+
+		mutually_exclusive = { focus = USA_Focus_ACW_PACW_POLITICS1 }
+		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
+		available = {
+			check_variable = { USA_Slavery_Debate_Leaning > -5 }
+		}
+
+		completion_reward = {
 			add_political_power = 50
-			add_stability = 0.01
-    }
+		if = {
+				limit = { has_country_flag = USA_Slavery_Debate_Ongoing }
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 5 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+				set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+				USA_Slavery_Debate_Tension_Modify = yes
+				activate_decision = USA_Slavery_Debate_Corwin_Amendment
+			}
+			
+		}
 	}
 	focus = {
 		id = USA_Focus_ACW_Crisis_of_1861
 		icon = GFX_goal_focus_american_civil_war
 		cost = 35
-    relative_position_id = USA_Focus_ACW_Election_1860
+
+		relative_position_id = USA_Focus_ACW_Election_1860
 		x = 0
 		y = 2
 
-    prerequisite = { focus = USA_Focus_ACW_Election_1860 }
+		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
 		available = {
 			date > 1861.1.1
 		}
@@ -736,7 +776,7 @@ focus_tree = {
 		}
 
 		completion_reward = {
-			add_stability = -0.05
+			add_war_support = -0.025
 			add_political_power = 75
 		}
 	}
@@ -744,17 +784,18 @@ focus_tree = {
 	######################################################################################
 	#		Avoid the American Civil War by Vanadium
 	######################################################################################
+	
 	focus = {
 		id = USA_Focus_ACW_Moderate_Elected
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 7
 
-    relative_position_id = USA_Focus_ACW_Crisis_of_1861
+		relative_position_id = USA_Focus_ACW_Crisis_of_1861
 		x = 7
 		y = 1
 
 		mutually_exclusive = { focus = USA_Focus_ACW_Controversial_Elected }
-    prerequisite = { focus = USA_Focus_ACW_Crisis_of_1861 }
+		prerequisite = { focus = USA_Focus_ACW_Crisis_of_1861 }
 		available = {
 			OR = {
 				has_country_flag = USA_DouglasElected
@@ -763,24 +804,22 @@ focus_tree = {
 		}
 
 		completion_reward = {
-			add_stability = -0.05
 			add_political_power = 75
+			activate_decision = USA_Slavery_Debate_Moderate_Voice
 		}
 	}
 	focus = {
 		id = USA_Focus_NACW_Union_Party
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 56
 
-    relative_position_id = USA_Focus_ACW_Moderate_Elected
+		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = -3
 		y = 1
 
-    prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
+		prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
 		available = {
-			OR = {
-				has_country_flag = USA_BellElected
-			}
+			has_country_flag = USA_BellElected
 		}
 
 		completion_reward = {
@@ -809,18 +848,16 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_NACW_Federal_Ideology
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 56
 
-    relative_position_id = USA_Focus_ACW_Moderate_Elected
+		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = -1
 		y = 1
 
-    prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
+		prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
 		mutually_exclusive = { focus = USA_Focus_NACW_Liberal_Ideology }
 		available = {
-			OR = {
-				has_country_flag = USA_BellElected
-			}
+			has_country_flag = USA_BellElected
 		}
 
 		completion_reward = {
@@ -832,16 +869,17 @@ focus_tree = {
 		icon = GFX_goal_focus_american_civil_war
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Federal_Ideology
+		relative_position_id = USA_Focus_NACW_Federal_Ideology
 		x = -1
 		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Union_Party }
 		prerequisite = { focus = USA_Focus_NACW_Federal_Ideology }
 		available = {
-			OR = {
-				has_country_flag = USA_BellElected
-			}
+			has_country_flag = USA_BellElected
+		}
+		bypass = {
+			NOT = { has_country_flag = USA_Slavery_Debate_Ongoing
 		}
 
 		completion_reward = {
@@ -852,18 +890,16 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_NACW_Liberal_Ideology
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 56
 
-    relative_position_id = USA_Focus_ACW_Moderate_Elected
+		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = 1
 		y = 1
 
-    prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
+		prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
 		mutually_exclusive = { focus = USA_Focus_NACW_Federal_Ideology }
 		available = {
-			OR = {
-				has_country_flag = USA_DouglasElected
-			}
+			has_country_flag = USA_DouglasElected
 		}
 
 		completion_reward = {
@@ -873,17 +909,15 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_NACW_Democrat_Party
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 56
 
-    relative_position_id = USA_Focus_ACW_Moderate_Elected
+		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = 3
 		y = 1
 
-    prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
+		prerequisite = { focus = USA_Focus_ACW_Moderate_Elected }
 		available = {
-			OR = {
-				has_country_flag = USA_DouglasElected
-			}
+			has_country_flag = USA_DouglasElected
 		}
 
 		completion_reward = {
@@ -903,16 +937,17 @@ focus_tree = {
 		icon = GFX_goal_focus_american_civil_war
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Democrat_Party
+		relative_position_id = USA_Focus_NACW_Democrat_Party
 		x = -1
 		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Liberal_Ideology }
-    prerequisite = { focus = USA_Focus_NACW_Democrat_Party }
+		prerequisite = { focus = USA_Focus_NACW_Democrat_Party }
 		available = {
-			OR = {
-				has_country_flag = USA_DouglasElected
-			}
+			has_country_flag = USA_DouglasElected
+		}
+		bypass = {
+			NOT = { has_country_flag = USA_Slavery_Debate_Ongoing
 		}
 
 		completion_reward = {
@@ -923,7 +958,7 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_ACW_Tour_of_America
 		icon = GFX_goal_focus_american_civil_war
-		cost = 35
+		cost = 70
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = 0
@@ -933,7 +968,7 @@ focus_tree = {
 		available = { custom_trigger_tooltip = { tooltip = USA_NACW_Tour_Complete always = no } }
 		bypass = {
 			has_country_flag = USA_NACW_Tour_Complete
-    }
+		}
 
 		completion_reward = {
 			add_political_power = 50
@@ -943,92 +978,63 @@ focus_tree = {
 			clr_country_flag = USA_NACW_Tour_Complete
 		}
 	}
-  focus = {
-    id = USA_Focus_ACW_New_Presidency
-    icon = GFX_goal_focus_american_civil_war
-    cost = 70
-
-    relative_position_id = USA_Focus_NACW_Popular_Sovereignty
-    x = 3
-    y = -1
-
-    available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_New_Presidency_tt
-				has_country_leader = {
-					name = "William Herschel"
-					ruling_only = yes
-				}
-			}
-    }
-
-    completion_reward = {
-      if = {
-        limit = { has_political_power < -50 }
-        set_political_power = 0
-      }
-			else = {
-				add_political_power = 50
-			}
-    }
-  }
-  focus = {
-    id = USA_Focus_ACW_New_Presidency1
-    icon = GFX_goal_focus_american_civil_war
-    cost = 70
-
-    relative_position_id = USA_Focus_ACW_New_Presidency
-    x = 0
-    y = 1
-
-    prerequisite = { focus = USA_Focus_ACW_New_Presidency }
-    available = { 
-      custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_New_Presidency1_tt
-				has_country_leader = {
-					name = "William Pennington"
-					ruling_only = yes
-				}
-			}
-    }
-
-    completion_reward = {
-      if = {
-        limit = { has_political_power < -50 }
-        set_political_power = 0
-      }
-			else = {
-				add_political_power = 50
-			}
-    }  
-	}
 	focus = {
-    id = USA_Focus_ACW_Great_Collapse
-    icon = GFX_goal_focus_american_civil_war
-    cost = 105
+		id = USA_Focus_ACW_New_Presidency
+		icon = GFX_goal_focus_american_civil_war
+		cost = 70
 
-    relative_position_id = USA_Focus_ACW_New_Presidency1
-    x = 0
-    y = 1
+		relative_position_id = USA_Focus_NACW_Popular_Sovereignty
+		x = 3
+		y = -1
 
-    prerequisite = { focus = USA_Focus_ACW_New_Presidency1 }
-    available = { 
-      custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Great_Collapse_tt
+		available = {
+			NOT = { has_idea = national_funeral }
+			hidden_trigger = {
+				has_country_flag = USA_Douglas_Dead
+			}
+		}
+		bypass = {
+			hidden_trigger = {
 				has_global_flag = ACW_Great_Collapse
 			}
-    }
+		}
 
-    completion_reward = {
-      if = {
-        limit = { has_political_power < -50 }
-        set_political_power = 0
-      }
+		completion_reward = {
+      			if = {
+        			limit = { has_political_power < -50 }
+				set_political_power = 0
+			}
 			else = {
 				add_political_power = 50
 			}
-    }
-  }
+		}
+	}
+
+	focus = {
+		id = USA_Focus_ACW_Great_Collapse
+    		icon = GFX_goal_focus_american_civil_war
+    		cost = 105
+
+		relative_position_id = USA_Focus_ACW_New_Presidency1
+		x = 0
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_New_Presidency1 }
+		available = { 
+			has_global_flag = ACW_Great_Collapse
+		}
+    	
+
+		completion_reward = {
+			if = {
+				limit = { has_political_power < -50 }
+				set_political_power = 0
+			}
+			else = {
+				add_political_power = 50
+			}
+		}
+	}
   focus = {
 		id = USA_Focus_NACW_Complete_Cabinet
 		icon = GFX_goal_focus_enact_law
@@ -1699,6 +1705,7 @@ focus_tree = {
         days = 3650
       }
     }
+	USA_Slavery_Debate_remove = yes
 	}
 
 	######################################################################################
