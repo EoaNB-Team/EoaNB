@@ -161,6 +161,43 @@ USA_Slavery_Debate_Decision_Category = {
 			}
 		}
 	}
+	USA_Slavery_Debate_Moderate_Voice = {
+		icon = generic_political_discourse
+
+		allowed = { tag = USA }
+
+		available = { always = no }
+
+		ai_will_do = {
+			base = 8
+			modify = {
+				factor = 100
+				check_variable = { USA_Slavey_Debate_Tension > 80 }
+			}
+		}
+
+		cost = 20
+
+		days_re_enable = 30
+
+		complete_effect = {
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -1 }
+			USA_Slavery_Debate_Tension_Modify = yes
+			if = {
+				limit = {
+					check_variable = { USA_Slavery_Debate_Leaning > 5 }
+				}
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -1 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+			}
+			else_if = {
+				limit = {
+					check_variable = { USA_Slavery_Debate_Leaning < -5 }
+				}
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 1 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+			}
+	}
 	USA_Election_of_1860_Mission = {
 		icon = generic_break_treaty
 
@@ -268,9 +305,9 @@ ACW_American_Civil_War_Decisions = {
 			news_event = acw_peace_deal.2
 		}
 	}
-	# Confiscate Weapons
+	# Procure Arms
 	eoanb_decision_acw_confiscate_weapons = {
-		icon = generic_nationalism
+		icon = generic_infantry_arms
 
 		available = {
 			has_global_flag = ACW_American_Civil_War
@@ -284,7 +321,7 @@ ACW_American_Civil_War_Decisions = {
 				}
 			}
 			custom_trigger_tooltip = {
-				tooltip = eoanb_decision_acw_exhaust_weapons_tt
+				tooltip = eoanb_decision_acw_weapons_exhausted_tt
 				check_variable = {
 					var = acw_weapons_count_left
 					value = 0
@@ -302,14 +339,22 @@ ACW_American_Civil_War_Decisions = {
 			}
 		}
 
-		ai_will_do = {
-			base = 10
-		}
-		cost = 35
-		days_re_enable = 25
+		ai_will_do = { base = 10 }
+		
+		cost = 10
+		custom_cost_trigger = { command_power > 9.9 }
+		custom_cost_text = command_power_more_than_9
 
+		days_re_enable = 7
 		complete_effect = {
-			subtract_from_variable = { acw_draft_count_left = 1 }
+			ACW_Weapons_Count_Use = yes
+			consumer_goods_factor = 0.05
+			hidden_effect = {
+				command_power = -10
+			}
+		}
+		remove_effect = {
+			consumer_goods_factor = -0.05
 			if = {
 				limit = { tag = USA }
 				add_equipment_to_stockpile = {
@@ -331,17 +376,17 @@ ACW_American_Civil_War_Decisions = {
 			else = {
 				add_equipment_to_stockpile = {
 				type = infantry_equipment_rifle_1
-					amount = 400
+					amount = 360
 					producer = USA
 				}
 				add_equipment_to_stockpile = {
 					type = cannon_equipment_0
-					amount = 35
+					amount = 32
 					producer = USA
 				}
 				add_equipment_to_stockpile={
 					type = uniform_equipment_0
-					amount = 600
+					amount = 480
 					producer = USA
 				}
 			}
@@ -349,7 +394,7 @@ ACW_American_Civil_War_Decisions = {
 	}
 	# Draft
 	eoanb_decision_acw_force_draft = {
-		icon = GFX_decision_oppression
+		icon = GFX_decision_nationalism
 
 		available = {
 			has_global_flag = ACW_American_Civil_War
@@ -402,59 +447,60 @@ ACW_American_Civil_War_Decisions = {
 			}
 		}
 
-		cost = 35
-		days_re_enable = 25
+		cost = 25
+		custom_cost_trigger = { command_power > 24.9 }
+		custom_cost_text = command_power_more_than_24
+		
+		days_re_enable = 7
 
 		complete_effect = {
-			add_war_support = -0.01
-			hidden_effect = {
-				subtract_from_variable = {
-					var = acw_draft_count_left
-					value = 1
-				}
-			}
+			ACW_Draft_Count_Use = yes
+			consumer_goods_factor = 0.05
+			hidden_effect = { command_power = -25 }
+		}
+		remove_effect = {
 			if = {
 				limit = { tag = USA }
-				add_manpower = 1500
+				add_manpower = 1300
 				random_owned_controlled_state = {
 					limit = { 
 						is_fully_controlled_by = ROOT
 						is_core_of = ROOT
 					}
 					create_unit = {
-						division = "name = \"Drafted Union Infantry Regiment\" division_template = \"Union Infantry Regiment\" start_experience_factor = 0.2" owner = ROOT
+						division = "name = \"Drafted Union Infantry Regiment\" division_template = \"Union Infantry Regiment\" start_experience_factor = 0.1" owner = ROOT
 					}
 				}
 			}
 			else_if = {
 				limit = { tag = CSA }
-				add_manpower = 1500
+				add_manpower = 1200
 				random_owned_controlled_state = {
 					limit = { 
 						is_fully_controlled_by = ROOT
 						is_core_of = ROOT
 					}
 					create_unit = {
-						division = "name = \"Drafted Confederate Infantry Regiment\" division_template = \"Confederate Infantry Regiment\" start_experience_factor = 0.2" owner = ROOT
+						division = "name = \"Drafted Confederate Infantry Regiment\" division_template = \"Confederate Infantry Regiment\" start_experience_factor = 0.1" owner = ROOT
 					}
 				}
 			}
 			else_if = {
 				limit = { tag = NEG }
-				add_manpower = 1000
+				add_manpower = 1200
 				random_owned_controlled_state = {
 					limit = { 
 						is_fully_controlled_by = ROOT
 						is_core_of = ROOT
 					}
 					create_unit = {
-						division = "name = \"Drafted Abolitionist Infantry Regiment\" division_template = \"Abolitionist Infantry Regiment\" start_experience_factor = 0.2" owner = ROOT
+						division = "name = \"Drafted Abolitionist Infantry Regiment\" division_template = \"Abolitionist Infantry Regiment\" start_experience_factor = 0.1" owner = ROOT
 					}
 				}
 			}
 			else_if = {
 				limit = { tag = CAL }
-				add_manpower = 850
+				add_manpower = 800
 				random_owned_controlled_state = {
 					limit = { 
 						is_fully_controlled_by = ROOT
