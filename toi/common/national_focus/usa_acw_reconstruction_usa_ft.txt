@@ -767,6 +767,8 @@ focus_tree = {
 		x = 0
 		y = 2
 
+		ai_will_do = { base = 10 }
+
 		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
 		available = {
 			date > 1861.1.1
@@ -778,6 +780,67 @@ focus_tree = {
 		completion_reward = {
 			add_war_support = -0.025
 			add_political_power = 75
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_New_Presidency
+		icon = GFX_goal_focus_american_civil_war
+		cost = 70
+
+		relative_position_id = USA_Focus_NACW_Popular_Sovereignty
+		x = 3
+		y = -1
+
+		ai_will_do = { base = 100 }
+
+		available = {
+			NOT = { has_idea = national_funeral }
+			hidden_trigger = {
+				has_country_flag = USA_Douglas_Dead
+			}
+		}
+		bypass = {
+			hidden_trigger = {
+				has_global_flag = ACW_Great_Collapse
+			}
+		}
+
+		completion_reward = {
+      			if = {
+        			limit = { has_political_power < -50 }
+				set_political_power = 0
+			}
+			else = {
+				add_political_power = 50
+			}
+		}
+	}
+
+	focus = {
+		id = USA_Focus_ACW_Great_Collapse
+    		icon = GFX_goal_focus_american_civil_war
+    		cost = 105
+
+		relative_position_id = USA_Focus_ACW_New_Presidency1
+		x = 0
+		y = 1
+
+		ai_will_do = { base = 100 }
+
+		prerequisite = { focus = USA_Focus_ACW_New_Presidency1 }
+		available = { 
+			has_global_flag = ACW_Great_Collapse
+		}
+    	
+
+		completion_reward = {
+			if = {
+				limit = { has_political_power < -50 }
+				set_political_power = 0
+			}
+			else = {
+				add_political_power = 50
+			}
 		}
 	}
 
@@ -805,7 +868,10 @@ focus_tree = {
 
 		completion_reward = {
 			add_political_power = 75
-			activate_decision = USA_Slavery_Debate_Moderate_Voice
+			if = {
+				limit = { has_country_flag = USA_Slavery_Debate_Ongoing }
+				activate_decision = USA_Slavery_Debate_Moderate_Voice
+			}
 		}
 	}
 	focus = {
@@ -958,7 +1024,7 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_ACW_Tour_of_America
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 35
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
 		x = 0
@@ -976,91 +1042,36 @@ focus_tree = {
 			USA_Slavery_Debate_Tension_Modify = yes
 			clr_country_flag = USA_NACW_Tour_Start
 			clr_country_flag = USA_NACW_Tour_Complete
+
+			country_event = usa_slavery_debate.200
 		}
 	}
 	focus = {
-		id = USA_Focus_ACW_New_Presidency
-		icon = GFX_goal_focus_american_civil_war
-		cost = 70
-
-		relative_position_id = USA_Focus_NACW_Popular_Sovereignty
-		x = 3
-		y = -1
-
-		available = {
-			NOT = { has_idea = national_funeral }
-			hidden_trigger = {
-				has_country_flag = USA_Douglas_Dead
-			}
-		}
-		bypass = {
-			hidden_trigger = {
-				has_global_flag = ACW_Great_Collapse
-			}
-		}
-
-		completion_reward = {
-      			if = {
-        			limit = { has_political_power < -50 }
-				set_political_power = 0
-			}
-			else = {
-				add_political_power = 50
-			}
-		}
-	}
-
-	focus = {
-		id = USA_Focus_ACW_Great_Collapse
-    		icon = GFX_goal_focus_american_civil_war
-    		cost = 105
-
-		relative_position_id = USA_Focus_ACW_New_Presidency1
-		x = 0
-		y = 1
-
-		prerequisite = { focus = USA_Focus_ACW_New_Presidency1 }
-		available = { 
-			has_global_flag = ACW_Great_Collapse
-		}
-    	
-
-		completion_reward = {
-			if = {
-				limit = { has_political_power < -50 }
-				set_political_power = 0
-			}
-			else = {
-				add_political_power = 50
-			}
-		}
-	}
-  focus = {
 		id = USA_Focus_NACW_Complete_Cabinet
 		icon = GFX_goal_focus_enact_law
 		cost = 70
 
-    relative_position_id = USA_Focus_ACW_Tour_of_America
+		relative_position_id = USA_Focus_ACW_Tour_of_America
 		x = 0
 		y = 1
 
-    prerequisite = { 
-      focus = USA_Focus_ACW_Tour_of_America
-		}
+		prerequisite = { focus = USA_Focus_ACW_Tour_of_America }
 		prerequisite = { 
 			focus = USA_Focus_NACW_Federal_Thought
 			focus = USA_Focus_NACW_Popular_Sovereignty
-    }
-    completion_reward = {
-      # Add temp idea for greater stab trend
-    }
+		}
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+    
+		completion_reward = {
+			add_political_power = 100
+		}
 	}
 	focus = {
 		id = USA_Focus_NACW_Solidify_Standings
 		icon = GFX_goal_focus_enact_law
 		cost = 70
 
-    relative_position_id = USA_Focus_ACW_Tour_of_America
+		relative_position_id = USA_Focus_ACW_Tour_of_America
 		x = -2
 		y = 1
 
@@ -1068,117 +1079,120 @@ focus_tree = {
 		prerequisite = { 
 			focus = USA_Focus_NACW_Federal_Thought
 			focus = USA_Focus_NACW_Popular_Sovereignty
-    }
+		}
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
-    completion_reward = {
-      add_war_support = 0.035
-    }
+		completion_reward = {
+			add_war_support = 0.035
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes			
+		}
 	}
-  focus = {
+	focus = {
 		id = USA_Focus_NACW_Promote_Unity
 		icon = GFX_goal_focus_enact_law
 		cost = 70
 
-    relative_position_id = USA_Focus_ACW_Tour_of_America
+		relative_position_id = USA_Focus_ACW_Tour_of_America
 		x = 2
 		y = 1
 
-    prerequisite = { 
-      focus = USA_Focus_ACW_Tour_of_America
-    }
+		prerequisite = {  focus = USA_Focus_ACW_Tour_of_America }
 		prerequisite = { 
 			focus = USA_Focus_NACW_Federal_Thought
 			focus = USA_Focus_NACW_Popular_Sovereignty
-    }
-    completion_reward = {
-      add_stability = 0.035
-    }
+		}
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
+		completion_reward = {
+			add_stability = 0.035
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
+		}
 	}
 	focus = {
 		id = USA_Focus_NACW_Continue_Recovery_1857
 		icon = GFX_goal_generic_construct_civ_factory
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Complete_Cabinet
-    x = -4
-    y = 1
+		relative_position_id = USA_Focus_NACW_Complete_Cabinet
+		x = -4
+		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Complete_Cabinet }
 		prerequisite = { focus = USA_Focus_NACW_Promote_Unity }
 		prerequisite = { focus = USA_Focus_NACW_Solidify_Standings }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
-    completion_reward = {
-      add_ideas = USA_south_industrializing_1
-    }
+		completion_reward = {
+			add_ideas = USA_south_industrializing_1
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
+		}
 	}
 	focus = {
 		id = USA_Focus_NACW_Support_Homesteads
 		icon = GFX_goal_generic_construction2
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Continue_Recovery_1857
-    x = 1
-    y = 1
+		relative_position_id = USA_Focus_NACW_Continue_Recovery_1857
+		x = 1
+		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Continue_Recovery_1857 }
-		
-    completion_reward = {
-      373 = {
-        add_manpower = 15000
-      }
-      383 = {
-        add_manpower = 10000
-      }
-      384 = {
-        add_manpower = 8500
-      }
-      add_political_power = 50
-    }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
+		completion_reward = {
+			activate_decision = USA_Homestead_Act
+			add_political_power = 50
+		}
 	}
 	focus = {
 		id = USA_Focus_NACW_Westward_Rails
 		icon = GFX_goal_focus_railroad_development
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Continue_Recovery_1857
-    x = -1
-    y = 1
+		relative_position_id = USA_Focus_NACW_Continue_Recovery_1857
+		x = -1
+		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Continue_Recovery_1857 }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
 
-    available = { has_political_power > 0 }
-
-    completion_reward = {
-      373 = {
-        add_building_construction = {
-          type = infrastructure
-          level = 1
-          instant_build = yes
-        }
-      }
-      374 = {
-        add_building_construction = {
-          type = infrastructure
-          level = 1
-          instant_build = yes
-        }
-      }
-      383 = {
-        add_building_construction = {
-          type = infrastructure
-          level = 1
-          instant_build = yes
-        }
-      }
-      384 = {
-        add_building_construction = {
-          type = infrastructure
-          level = 1
-          instant_build = yes
-        }
-      }
-      add_political_power = -100
-    }
+		completion_reward = {
+			373 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			374 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+			383 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			384 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			add_political_power = -100
+		}
 
 	}
 	focus = {
@@ -1186,78 +1200,84 @@ focus_tree = {
 		icon = GFX_goal_generic_production
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Support_Homesteads
-    x = -1
+		relative_position_id = USA_Focus_NACW_Support_Homesteads
+		x = -1
 		y = 1
+		
 		prerequisite = { focus = USA_Focus_NACW_Support_Homesteads }
 		prerequisite = { focus = USA_Focus_NACW_Westward_Rails }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
 
-    available = { has_political_power > 0 }
-
-    completion_reward = {
-      add_political_power = -50
-      swap_ideas = {
-        remove_idea = USA_south_industrializing_1
-        add_idea = USA_south_industrializing_2
-      }
-    }
-
+		completion_reward = {
+			add_political_power = -50
+			swap_ideas = {
+				remove_idea = USA_south_industrializing_1
+				add_idea = USA_south_industrializing_2
+			}
+		}
 	}
-  focus = {
+	focus = {
 		id = USA_Focus_NACW_Virginia
 		icon = GFX_goal_generic_construct_civilian
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Industrialize_Dixie
-    x = -1
-    y = 1
+		relative_position_id = USA_Focus_NACW_Industrialize_Dixie
+		x = -1
+		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Industrialize_Dixie }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Rep_Factions }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Dem_Factions }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
 
-    available = { has_political_power > 0 }
-
-    completion_reward = {
-      362 = {
-        add_extra_state_shared_building_slots = 1
-        add_building_construction = {
-          type = dockyard
+		completion_reward = {
+			362 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+    	}
+				remove_building = {
+      		type = cotton_farm
           level = 1
-          instant_build = yes
-        }
-        remove_building = {
-          type = cotton_farm
-          level = 1
-        }
-      }
-      746 = {
-        add_extra_state_shared_building_slots = 1
-        remove_building = {
-          type = cotton_farm
-          level = 1
-        }
-      }
-      add_political_power = -25
-    }
+				}
+			}		
+			746 = {
+				add_extra_state_shared_building_slots = 1
+				remove_building = {
+					type = cotton_farm
+					level = 1
+				}
+			}
+			add_political_power = -25
+		}
 	}
-  focus = {
+	focus = {
 		id = USA_Focus_NACW_Carolinas
 		icon = GFX_goal_generic_construct_civilian
 		cost = 70
 
-    relative_position_id = USA_Focus_NACW_Virginia
-    x = 0
-    y = 1
+		relative_position_id = USA_Focus_NACW_Virginia
+		x = 0
+		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Virginia }
 		prerequisite = { focus = USA_Focus_NACW_West_Dixie }
-
-    available = { has_political_power > 0 }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
     
-    completion_reward = {
-      363 = {
-        add_extra_state_shared_building_slots = 1
+		completion_reward = {
+			363 = {
+				add_extra_state_shared_building_slots = 1
         add_building_construction = {
           type = industrial_complex
           level = 1
@@ -1290,8 +1310,10 @@ focus_tree = {
 		prerequisite = { focus = USA_Focus_NACW_Industrialize_Dixie }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Rep_Factions }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Dem_Factions }
-
-    available = { has_political_power > 0 }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
 		
     completion_reward = {
       371 = {
@@ -1332,8 +1354,10 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_NACW_West_Dixie }
 		prerequisite = { focus = USA_Focus_NACW_Virginia }
-
-    available = { has_political_power > 0 }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
     
     completion_reward = {
       365 = {
@@ -1362,8 +1386,10 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_NACW_Deep_Dixie }
 		prerequisite = { focus = USA_Focus_NACW_Carolinas }
-
-    available = { has_political_power > 0 }
+		available = { 
+			NOT = { has_global_flag = ACW_American_Civil_War }
+			has_political_power > 0 
+		}
 			
     completion_reward = {
 			remove_ideas = { USA_south_industrializing_2 }
@@ -1371,6 +1397,8 @@ focus_tree = {
 				idea = USA_south_industrializing_3
 				days = 365
 			}
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1385,9 +1413,12 @@ focus_tree = {
 		prerequisite = { focus = USA_Focus_NACW_Complete_Cabinet }
 		prerequisite = { focus = USA_Focus_NACW_Promote_Unity }
 		prerequisite = { focus = USA_Focus_NACW_Solidify_Standings }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
     
     completion_reward = {
       add_ideas = USA_south_politics_1
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1400,11 +1431,13 @@ focus_tree = {
 		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Politics }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
     
     completion_reward = {
       add_political_power = 25
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
-
 	}
 	focus = {
 		id = USA_Focus_NACW_Reign_In_Rep_Factions
@@ -1416,9 +1449,12 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Demand_Attendance }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
       add_political_power = 25
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_popularity = {
         ideology = social_egalitarianism
         popularity = -0.03
@@ -1439,8 +1475,11 @@ focus_tree = {
 		y = 1
 
 		prerequisite = { focus = USA_Focus_NACW_Demand_Attendance }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_popularity = {
         ideology = radical_democracy
         popularity = -0.05
@@ -1462,12 +1501,15 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Rep_Factions }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Dem_Factions }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
       swap_ideas = {
         remove_idea = USA_south_politics_1
         add_idea = USA_south_politics_2
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_popularity = {
         ideology = centrism
         popularity = 0.03
@@ -1488,8 +1530,11 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Unite_Two_Parties }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_popularity = {
         ideology = centrism
         popularity = 0.04
@@ -1506,12 +1551,15 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Deslaverize }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
       swap_ideas = {
         remove_idea = USA_south_politics_2
         add_idea = USA_south_politics_3
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_popularity = {
         ideology = centrism
         popularity = 0.05
@@ -1530,7 +1578,8 @@ focus_tree = {
     prerequisite = { focus = USA_Focus_NACW_Complete_Cabinet }
 		prerequisite = { focus = USA_Focus_NACW_Promote_Unity }
 		prerequisite = { focus = USA_Focus_NACW_Solidify_Standings }
-    
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
     completion_reward = {
       add_ideas = USA_south_culture_1
     }
@@ -1545,7 +1594,8 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Culture }
-			
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
     completion_reward = {
       add_ideas = USA_southern_wages
     }
@@ -1560,10 +1610,13 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Culture }
-    
+ 		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
+
     completion_reward = {
       add_political_power = 25
-      add_stability = 0.05
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1577,15 +1630,17 @@ focus_tree = {
 
     prerequisite = { focus = USA_Focus_NACW_Relations }
 		prerequisite = { focus = USA_Focus_NACW_Wages }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
       swap_ideas = {
         remove_idea = USA_south_culture_1
         add_idea = USA_south_culture_2
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
       add_stability = -0.1
     }
-
 	}
 	focus = {
 		id = USA_Focus_NACW_Music
@@ -1599,10 +1654,12 @@ focus_tree = {
 		prerequisite = { focus = USA_Focus_NACW_Society }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Rep_Factions }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Dem_Factions }
-    
+    available = { NOT = { has_global_flag = ACW_American_Civil_War } }
+
     completion_reward = {
-      add_stability = 0.025
       add_political_power = 25
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1615,13 +1672,15 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Music }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
-      add_stability = 0.025
       add_timed_idea = {
         idea = USA_south_trade
         days = 1000
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1636,10 +1695,12 @@ focus_tree = {
 		prerequisite = { focus = USA_Focus_NACW_Society }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Rep_Factions }
 		prerequisite = { focus = USA_Focus_NACW_Reign_In_Dem_Factions }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
-      add_stability = 0.025
       add_political_power = 25
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
 	focus = {
@@ -1652,13 +1713,15 @@ focus_tree = {
 		y = 1
 
     prerequisite = { focus = USA_Focus_NACW_Ideas }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
-      add_stability = 0.025
       add_timed_idea = {
         idea = USA_south_state_ideology
         days = 1000
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
   focus = {
@@ -1672,12 +1735,15 @@ focus_tree = {
 
     prerequisite = { focus = USA_Focus_NACW_Trade }
 		prerequisite = { focus = USA_Focus_NACW_State }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
 
     completion_reward = {
       swap_ideas = {
         remove_idea = USA_south_culture_2
         add_idea = USA_south_culture_3
       }
+			set_temp_variable = { USA_Slavery_Debate_Tension_Change = -5 }
+			USA_Slavery_Debate_Tension_Modify = yes
     }
 	}
   focus = {
@@ -1692,6 +1758,7 @@ focus_tree = {
     prerequisite = { focus = USA_Focus_NACW_New_Industries }
 		prerequisite = { focus = USA_Focus_NACW_Deslaverize1 }
 		prerequisite = { focus = USA_Focus_NACW_Cults }
+		available = { NOT = { has_global_flag = ACW_American_Civil_War } }
     
     completion_reward = {
 			hidden_effect = {
@@ -1704,12 +1771,13 @@ focus_tree = {
         idea = USA_assimilation_programs
         days = 3650
       }
+			country_event = usa_slavery_debate.500
+			USA_Slavery_Debate_remove = yes
     }
-	USA_Slavery_Debate_remove = yes
 	}
 
 	######################################################################################
-	#		Avoid the American Civil War by Vanadium
+	#		Deal with the American Civil War by Vanadium
 	######################################################################################
 
 	focus = {
@@ -1742,21 +1810,34 @@ focus_tree = {
 	focus = {
 		id = USA_Focus_ACW_The_North
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 5
 
 		relative_position_id = USA_Focus_ACW_Controversial_Elected
 		x = -2
 		y = 1
 
-		prerequisite = { focus = USA_Focus_ACW_Controversial_Elected }
+		prerequisite = { 
+			focus = USA_Focus_ACW_Controversial_Elected
+			focus = USA_Focus_ACW_Moderate_Elected 
+		}
 		available = {
-			has_global_flag = ACW_Radical_Coup
+			custom_trigger_tooltip = {
+				tooltip = USA_Focus_ACW_Secession_Crisis
+				has_idea = USA_northern_secession_crisis
+			}
 		}
 		bypass = {
-			has_global_flag = ACW_Radical_Coup
+			custom_trigger_tooltip = {
+				tooltip = USA_Focus_ACW_Secession_Crisis
+				has_idea = USA_northern_secession_crisis
+			}
 		}
 
 		completion_reward = {
+			add_manpower = 5000
+			hidden_effect = {
+				add_ideas = Generic_National_Riot_1
+			}
 		}
 	}
 	focus = {
@@ -1772,20 +1853,11 @@ focus_tree = {
 			focus = USA_Focus_ACW_The_North
 			focus = USA_Focus_American_Civil_War
 		}
-		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_southern_secession_crisis
-			}
-		}
-		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_southern_secession_crisis
-			}
-		}
+		available = { has_idea = Generic_National_Riot_1 }
 
 		completion_reward = {
+			add_stability = 0.02
+			add_ideas = Generic_National_Riot_1
 		}
 	} 
 	focus = {
