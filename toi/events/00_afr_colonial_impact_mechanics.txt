@@ -8,8 +8,26 @@ add_namespace = afr_total_detrimental_colonial_level
 add_namespace = DCI_african_colonial_incident_mission_event
 add_namespace = DCI_american_south_incident_mission_event
 add_namespace = DCI_native_american_incident_mission_event
+add_namespace = DCI_native_south_american_incident_mission_event
 add_namespace = DCI_south_american_slave_coast_incident_mission_event
 add_namespace = DCI_irish_incident_mission_event
+add_namespace = DCI_west_africa_incident_mission_event
+
+add_namespace = DCI_american_south_incident_event
+add_namespace = DCI_american_south_random_event_1
+
+add_namespace = DCI_native_american_incident_event
+
+add_namespace = DCI_native_south_american_incident_event
+
+add_namespace = DCI_south_american_slave_coast_incident_event
+add_namespace = DCI_south_american_slave_coast_random_event_1
+
+add_namespace = DCI_irish_incident_event
+
+add_namespace = DCI_west_africa_incident_event
+add_namespace = DCI_west_africa_random_event_1
+
 
 
 country_event = {
@@ -31,6 +49,15 @@ country_event = {
 }
 
 country_event = {
+	id = DCI_native_south_american_incident_mission_event.1
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		hidden_effect = { clr_country_flag = DCI_native_south_american_incident_mission_stop }
+	}
+}
+
+country_event = {
 	id = DCI_south_american_slave_coast_incident_mission_event.1
 	hidden = yes
 	is_triggered_only = yes
@@ -48,29 +75,186 @@ country_event = {
 	}
 }
 
+country_event = {
+	id = DCI_west_africa_incident_mission_event.1
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		hidden_effect = { clr_country_flag = DCI_west_africa_incident_mission_stop }
+	}
+}
+
 ###########################
 # DCI Random Events
 ###########################
 
 state_event = {
 	id = DCI_american_south_incident_event.1
-	title = DCI_american_south_incident_event.1.t
-	desc = DCI_american_south_incident_event.1.d
-	#picture = GFX_Muhammad
 	is_triggered_only = yes
+	timeout_days = 1
+	hidden = yes
 	
 	trigger = {
-		FROM = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+	}
+
+	immediate = {
+		ROOT = {
+			OWNER = {
+				random_list = {
+					90 = {
+						set_country_flag = DCI_american_south_random_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_american_south_random_event_1_flag }
+					}
+					10 = {  
+						clr_country_flag = DCI_american_south_random_event_1_flag
+						set_country_flag = DCI_american_south_random_event_none_flag
+					}
+				}
+			}
+		}
+	}
+	option = {
+		OWNER = {
+			if = {
+				limit = {
+					has_country_flag = DCI_american_south_random_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						any_neighbor_state = {
+							OWNER = {
+								NOT = { 
+									has_idea = usa_slavery_law
+									has_idea = tribal_slavery
+									has_idea = slavery
+									has_idea = slavery_all_but_name
+								}
+							}
+						}
+					}
+				}
+				clr_country_flag = DCI_american_south_random_event_1_flag
+				country_event = { id = DCI_american_south_random_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = { has_country_flag = DCI_american_south_random_event_none_flag }
+				clr_country_flag = DCI_american_south_random_event_none_flag
+			}
+			else = {
+				ROOT = { state_event = { id = DCI_american_south_incident_event.1 } }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = DCI_american_south_random_event_1.1
+	title = DCI_american_south_random_event_1.1.t
+	desc = DCI_american_south_random_event_1.1.d
+	picture = GFX_event_ITA_Po_Valley_Modernization
+	is_triggered_only = yes
+	
+	option = {
+		name = DCI_american_south_random_event_1.1.a
+		trigger = { always = yes }
+		ai_chance = { 
+			factor = 40 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		set_country_flag = DCI_american_south_random_event_2_d
+		hidden_effect = { country_event = { id = DCI_american_south_random_event_1.2 days = 7 } }
 	}
 	
 	option = {
-		name = DCI_american_south_incident_event.1.a
-		ai_chance = { factor = 1}
+		name = DCI_american_south_random_event_1.1.b
+		trigger = { command_power > 149 }
+		ai_chance = { 
+			factor = 60 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		add_command_power = -150
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				40 = { set_country_flag = DCI_american_south_random_event_2_e }
+				40 = { set_country_flag = DCI_american_south_random_event_2_f }
+				20 = { set_country_flag = DCI_american_south_random_event_2_g }
+			}
+			country_event = { id = DCI_american_south_random_event_1.2 days = 7 }
+		}
 	}
 	
 	option = {
-		name = DCI_american_south_incident_event.1.b
-		ai_chance = { factor = 1}
+		name = DCI_american_south_random_event_1.1.c
+		trigger = { has_political_power > 50 }
+		ai_chance = { factor = 100 }
+		add_political_power = -50
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				10 = { set_country_flag = DCI_american_south_random_event_2_e }
+				20 = { set_country_flag = DCI_american_south_random_event_2_f }
+				70 = { set_country_flag = DCI_american_south_random_event_2_g }
+			}
+			country_event = { id = DCI_american_south_random_event_1.2 days = 7 }
+		}
+	}
+}
+
+country_event = {
+	id = DCI_american_south_random_event_1.2
+	title = DCI_american_south_random_event_1.2.t
+	#picture = GFX_Muhammad
+	is_triggered_only = yes
+	desc = {
+		text = DCI_american_south_random_event_1.2.d
+		trigger = { has_country_flag = DCI_american_south_random_event_2_d }
+	}
+	desc = {
+		text = DCI_american_south_random_event_1.2.e
+		trigger = { has_country_flag = DCI_american_south_random_event_2_e }
+	}
+	desc = {
+		text = DCI_american_south_random_event_1.2.f
+		trigger = { has_country_flag = DCI_american_south_random_event_2_f }
+	}
+	desc = {
+		text = DCI_american_south_random_event_1.2.g
+		trigger = { has_country_flag = DCI_american_south_random_event_2_g }
+	}
+	
+	option = {
+		name = DCI_american_south_random_event_1.2.a
+		trigger = { 
+			OR = {
+				has_country_flag = DCI_american_south_random_event_2_d
+				has_country_flag = DCI_american_south_random_event_2_e
+			}
+		}
+		clr_country_flag = DCI_american_south_random_event_2_d
+		clr_country_flag = DCI_american_south_random_event_2_e
+	}
+	option = {
+		name = DCI_american_south_random_event_1.2.b
+		trigger = { has_country_flag = DCI_american_south_random_event_2_f }
+		clr_country_flag = DCI_american_south_random_event_2_f
+		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+	}
+	option = {
+		name = DCI_american_south_random_event_1.2.c
+		trigger = { has_country_flag = DCI_american_south_random_event_2_g }
+		clr_country_flag = DCI_american_south_random_event_2_g
+		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
 	}
 }
 
@@ -82,7 +266,7 @@ state_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		FROM = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
 	}
 	
 	option = {
@@ -97,24 +281,194 @@ state_event = {
 }
 
 state_event = {
-	id = DCI_south_american_slave_coast_incident_event.1
-	title = DCI_south_american_slave_coast_incident_event.1.t
-	desc = DCI_south_american_slave_coast_incident_event.1.d
+	id = DCI_native_south_american_incident_event.1
+	title = DCI_native_south_american_incident_event.1.t
+	desc = DCI_native_south_american_incident_event.1.d
 	#picture = GFX_Muhammad
 	is_triggered_only = yes
 	
 	trigger = {
-		FROM = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
 	}
 	
 	option = {
-		name = DCI_south_american_slave_coast_incident_event.1.a
+		name = DCI_native_south_american_incident_event.1.a
 		ai_chance = { factor = 1}
 	}
 	
 	option = {
-		name = DCI_south_american_slave_coast_incident_event.1.b
+		name = DCI_native_south_american_incident_event.1.b
 		ai_chance = { factor = 1}
+	}
+}
+
+state_event = {
+	id = DCI_south_american_slave_coast_incident_event.1
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	
+	trigger = {
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+	}
+
+	immediate = {
+		ROOT = {
+			OWNER = {
+				random_list = {
+					90 = {
+						set_country_flag = DCI_south_american_slave_coast_random_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_south_american_slave_coast_random_event_1_flag }
+					}
+					10 = {  
+						clr_country_flag = DCI_south_american_slave_coast_random_event_1_flag
+						set_country_flag = DCI_south_american_slave_coast_random_event_none_flag
+					}
+				}
+			}
+		}
+	}
+	option = {
+		OWNER = {
+			if = {
+				limit = {
+					has_country_flag = DCI_south_american_slave_coast_random_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						any_neighbor_state = {
+							OWNER = {
+								NOT = { 
+									has_idea = usa_slavery_law
+									has_idea = tribal_slavery
+									has_idea = slavery
+									has_idea = slavery_all_but_name
+								}
+							}
+						}
+					}
+				}
+				clr_country_flag = DCI_south_american_slave_coast_random_event_1_flag
+				country_event = { id = DCI_south_american_slave_coast_random_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = { has_country_flag = DCI_south_american_slave_coast_random_event_none_flag }
+				clr_country_flag = DCI_south_american_slave_coast_random_event_none_flag
+			}
+			else = {
+				ROOT = { state_event = { id = DCI_south_american_slave_coast_incident_event.1 } }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = DCI_south_american_slave_coast_random_event_1.1
+	title = DCI_south_american_slave_coast_random_event_1.1.t
+	desc = DCI_south_american_slave_coast_random_event_1.1.d
+	picture = GFX_event_ITA_Po_Valley_Modernization
+	is_triggered_only = yes
+	
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.1.a
+		trigger = { always = yes }
+		ai_chance = { 
+			factor = 40 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		set_country_flag = DCI_south_american_slave_coast_random_event_2_d
+		hidden_effect = { country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 } }
+	}
+	
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.1.b
+		trigger = { command_power > 149 }
+		ai_chance = { 
+			factor = 60 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		add_command_power = -150
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				40 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_e }
+				40 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_f }
+				20 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_g }
+			}
+			country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 }
+		}
+	}
+	
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.1.c
+		trigger = { has_political_power > 50 }
+		ai_chance = { factor = 100 }
+		add_political_power = -50
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				10 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_e }
+				20 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_f }
+				70 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_g }
+			}
+			country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 }
+		}
+	}
+}
+
+country_event = {
+	id = DCI_south_american_slave_coast_random_event_1.2
+	title = DCI_south_american_slave_coast_random_event_1.2.t
+	#picture = GFX_Muhammad
+	is_triggered_only = yes
+	desc = {
+		text = DCI_south_american_slave_coast_random_event_1.2.d
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_d }
+	}
+	desc = {
+		text = DCI_south_american_slave_coast_random_event_1.2.e
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_e }
+	}
+	desc = {
+		text = DCI_south_american_slave_coast_random_event_1.2.f
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_f }
+	}
+	desc = {
+		text = DCI_south_american_slave_coast_random_event_1.2.g
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_g }
+	}
+	
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.2.a
+		trigger = { 
+			OR = {
+				has_country_flag = DCI_south_american_slave_coast_random_event_2_d
+				has_country_flag = DCI_south_american_slave_coast_random_event_2_e
+			}
+		}
+		clr_country_flag = DCI_south_american_slave_coast_random_event_2_d
+		clr_country_flag = DCI_south_american_slave_coast_random_event_2_e
+	}
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.2.b
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_f }
+		clr_country_flag = DCI_south_american_slave_coast_random_event_2_f
+		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+	}
+	option = {
+		name = DCI_south_american_slave_coast_random_event_1.2.c
+		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_g }
+		clr_country_flag = DCI_south_american_slave_coast_random_event_2_g
+		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
 	}
 }
 
@@ -126,7 +480,7 @@ state_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		FROM = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
 	}
 	
 	option = {
@@ -137,6 +491,177 @@ state_event = {
 	option = {
 		name = DCI_irish_incident_event.1.b
 		ai_chance = { factor = 1}
+	}
+}
+
+
+state_event = {
+	id = DCI_west_africa_incident_event.1
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	
+	trigger = {
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+	}
+	
+	immediate = {
+		ROOT = {
+			OWNER = {
+				random_list = {
+					90 = {
+						set_country_flag = DCI_west_africa_random_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_west_africa_random_event_1_flag }
+					}
+					10 = {  
+						clr_country_flag = DCI_west_africa_random_event_1_flag
+						set_country_flag = DCI_west_africa_random_event_none_flag
+					}
+				}
+			}
+		}
+	}
+	option = {
+		OWNER = {
+			if = {
+				limit = {
+					has_country_flag = DCI_west_africa_random_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						any_neighbor_state = {
+							OWNER = {
+								NOT = { 
+									has_idea = usa_slavery_law
+									has_idea = tribal_slavery
+									has_idea = slavery
+									has_idea = slavery_all_but_name
+								}
+							}
+						}
+					}
+				}
+				clr_country_flag = DCI_west_africa_random_event_1_flag
+				country_event = { id = DCI_west_africa_random_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = { has_country_flag = DCI_west_africa_random_event_none_flag }
+				clr_country_flag = DCI_west_africa_random_event_none_flag
+			}
+			else = {
+				ROOT = { state_event = { id = DCI_west_africa_incident_event.1 } }
+			}
+		}
+	}
+}
+
+country_event = {
+	id = DCI_west_africa_random_event_1.1
+	title = DCI_west_africa_random_event_1.1.t
+	desc = DCI_west_africa_random_event_1.1.d
+	picture = GFX_event_ITA_Po_Valley_Modernization
+	is_triggered_only = yes
+	
+	option = {
+		name = DCI_west_africa_random_event_1.1.a
+		trigger = { always = yes }
+		ai_chance = { 
+			factor = 40 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		set_country_flag = DCI_west_africa_random_event_2_d
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = { country_event = { id = DCI_west_africa_random_event_1.2 days = 7 } }
+	}
+	
+	option = {
+		name = DCI_west_africa_random_event_1.1.b
+		trigger = { command_power > 149 }
+		ai_chance = { 
+			factor = 60 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		add_command_power = -150
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				40 = { set_country_flag = DCI_west_africa_random_event_2_e }
+				40 = { set_country_flag = DCI_west_africa_random_event_2_f }
+				20 = { set_country_flag = DCI_west_africa_random_event_2_g }
+			}
+			country_event = { id = DCI_west_africa_random_event_1.2 days = 7 }
+		}
+	}
+	
+	option = {
+		name = DCI_west_africa_random_event_1.1.c
+		trigger = { has_political_power > 50 }
+		ai_chance = { factor = 100 }
+		add_political_power = -50
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				10 = { set_country_flag = DCI_west_africa_random_event_2_e }
+				20 = { set_country_flag = DCI_west_africa_random_event_2_f }
+				70 = { set_country_flag = DCI_west_africa_random_event_2_g }
+			}
+			country_event = { id = DCI_west_africa_random_event_1.2 days = 7 }
+		}
+	}
+}
+
+country_event = {
+	id = DCI_west_africa_random_event_1.2
+	title = DCI_west_africa_random_event_1.2.t
+	#picture = GFX_Muhammad
+	is_triggered_only = yes
+	desc = {
+		text = DCI_west_africa_random_event_1.2.d
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_d }
+	}
+	desc = {
+		text = DCI_west_africa_random_event_1.2.e
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_e }
+	}
+	desc = {
+		text = DCI_west_africa_random_event_1.2.f
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_f }
+	}
+	desc = {
+		text = DCI_west_africa_random_event_1.2.g
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_g }
+	}
+	
+	option = {
+		name = DCI_west_africa_random_event_1.2.a
+		trigger = { 
+			OR = {
+				has_country_flag = DCI_west_africa_random_event_2_d
+				has_country_flag = DCI_west_africa_random_event_2_e
+			}
+		}
+		clr_country_flag = DCI_west_africa_random_event_2_d
+		clr_country_flag = DCI_west_africa_random_event_2_e
+	}
+	option = {
+		name = DCI_west_africa_random_event_1.2.b
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_f }
+		clr_country_flag = DCI_west_africa_random_event_2_f
+		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+	}
+	option = {
+		name = DCI_west_africa_random_event_1.2.c
+		trigger = { has_country_flag = DCI_west_africa_random_event_2_g }
+		clr_country_flag = DCI_west_africa_random_event_2_g
+		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
 	}
 }
 
@@ -326,7 +851,7 @@ state_event = {
 			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 7 } } }
 		}
 		else = {
-			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 27 } }
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 7 } }
 		}
 	}
 }
@@ -408,6 +933,546 @@ state_event = {
 		}
 		else = {
 			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 10 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.11
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_11
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 11 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 11 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 11 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 11 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.12
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_12
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 12 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 12 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 12 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 12 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.13
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_13
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 13 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 13 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 13 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 13 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.14
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_14
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 14 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 14 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 14 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 14 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.15
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_15
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 15 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 15 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 15 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 15 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.16
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_16
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 16 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 16 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 16 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 16 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.17
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_12
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 17 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 17 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 17 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 17 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.18
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_3
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 18 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 18 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 18 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 18 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.19
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_4
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 19 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 19 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 19 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 19 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.20
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_5
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 20 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 20 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 20 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 20 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.21
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_1
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 21 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 21 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 21 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 21 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.22
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_2
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 22 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 22 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 22 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 22 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.23
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_3
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 23 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 23 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 23 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 23 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.24
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_4
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 24 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 24 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 24 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 24 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.25
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_25
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 25 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 25 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 25 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 25 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.26
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_26
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 26 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 26 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 26 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 26 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.27
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_2
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 27 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 27 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 27 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 27 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.28
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_3
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 28 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 28 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 28 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 28 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.29
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_4
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 29 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 29 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 29 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 29 } }
+		}
+	}
+}
+
+state_event = {
+	id = afr_rrp_racial_tension_increase.30
+	
+	is_triggered_only = yes
+	hidden = yes
+	timeout_days = 1
+	option = {
+		name = AFR_Racial_Tension_plus_5
+		trigger = { always = yes }
+		OWNER = { add_to_variable = { var = total_detrimental_colonial_impact_value value = 30 } }
+		add_to_variable = { var = ROOT.detrimental_colonial_impact_value value = 30 }
+		ROOT = {
+			if = {
+				limit = { OWNER = { NOT = { has_idea = afr_total_detrimental_colonial_impact_idea } } }
+				OWNER = { add_ideas = afr_total_detrimental_colonial_impact_idea }
+			}
+		}
+		if = {
+			limit = { OWNER = { is_subject = yes } }
+			OWNER = { OVERLORD = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 30 } } }
+		}
+		else = {
+			OWNER = { add_to_variable = { var = ROOT.detrimental_colonial_impact_value@THIS value = 30 } }
 		}
 	}
 }
