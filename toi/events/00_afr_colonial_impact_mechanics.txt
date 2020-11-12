@@ -7,6 +7,7 @@ add_namespace = afr_total_detrimental_colonial_level
 
 add_namespace = DCI_african_colonial_incident_mission_event
 add_namespace = DCI_american_south_incident_mission_event
+add_namespace = DCI_caribbean_incident_mission_event
 add_namespace = DCI_native_american_incident_mission_event
 add_namespace = DCI_native_south_american_incident_mission_event
 add_namespace = DCI_south_american_slave_coast_incident_mission_event
@@ -16,17 +17,21 @@ add_namespace = DCI_west_africa_incident_mission_event
 add_namespace = DCI_american_south_incident_event
 add_namespace = DCI_american_south_random_event_1
 
+add_namespace = DCI_caribbean_incident_event
+
 add_namespace = DCI_native_american_incident_event
 
 add_namespace = DCI_native_south_american_incident_event
 
 add_namespace = DCI_south_american_slave_coast_incident_event
-add_namespace = DCI_south_american_slave_coast_random_event_1
 
 add_namespace = DCI_irish_incident_event
 
 add_namespace = DCI_west_africa_incident_event
-add_namespace = DCI_west_africa_random_event_1
+
+add_namespace = DCI_generic_vote_discrimination_event_1
+add_namespace = DCI_generic_runaway_slave_land_event_1
+add_namespace = DCI_generic_runaway_slave_coastal_event_1
 
 
 
@@ -36,6 +41,15 @@ country_event = {
 	is_triggered_only = yes
 	immediate = {
 		hidden_effect = { clr_country_flag = DCI_american_south_incident_mission_stop }
+	}
+}
+
+country_event = {
+	id = DCI_caribbean_incident_mission_event.1
+	hidden = yes
+	is_triggered_only = yes
+	immediate = {
+		hidden_effect = { clr_country_flag = DCI_caribbean_incident_mission_stop }
 	}
 }
 
@@ -102,12 +116,25 @@ state_event = {
 		ROOT = {
 			OWNER = {
 				random_list = {
-					90 = {
+					50 = {
 						set_country_flag = DCI_american_south_random_event_1_flag 
 						modifier = { factor = 0 has_country_flag = DCI_american_south_random_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					20 = {
+						set_country_flag = DCI_american_south_runaway_slave_coastal_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_american_south_runaway_slave_coastal_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					20 = {
+						set_country_flag = DCI_american_south_vote_discrimination_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_american_south_vote_discrimination_event_1_flag }
+						modifier = { factor = 0 OR = { has_idea = absolutism has_idea = full_equality } }
 					}
 					10 = {  
 						clr_country_flag = DCI_american_south_random_event_1_flag
+						clr_country_flag = DCI_american_south_runaway_slave_coastal_event_1_flag
+						clr_country_flag = DCI_american_south_vote_discrimination_event_1_flag
 						set_country_flag = DCI_american_south_random_event_none_flag
 					}
 				}
@@ -138,6 +165,31 @@ state_event = {
 				}
 				clr_country_flag = DCI_american_south_random_event_1_flag
 				country_event = { id = DCI_american_south_random_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_american_south_runaway_slave_coastal_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						is_coastal = yes
+					}
+				}
+				clr_country_flag = DCI_american_south_runaway_slave_coastal_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_coastal_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_american_south_vote_discrimination_event_1_flag
+					NOT = {
+						has_idea = absolutism
+						has_idea = full_equality
+					}
+				}
+				clr_country_flag = DCI_american_south_vote_discrimination_event_1_flag
+				country_event = { id = DCI_generic_vote_discrimination_event_1.1 random_days = 7 }
 			}
 			else_if = {
 				limit = { has_country_flag = DCI_american_south_random_event_none_flag }
@@ -259,6 +311,156 @@ country_event = {
 }
 
 state_event = {
+	id = DCI_caribbean_incident_event.1
+	is_triggered_only = yes
+	timeout_days = 1
+	hidden = yes
+	
+	trigger = {
+		ROOT = { check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals } }
+	}
+
+	immediate = {
+		ROOT = {
+			OWNER = {
+				random_list = {
+					30 = {
+						set_country_flag = DCI_caribbean_runaway_slave_land_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_caribbean_runaway_slave_land_event_1_flag }
+						modifier = {
+							factor = 0 
+							if = { 
+								limit = { TAG = SPR }
+								if = { limit = { ROOT = { OR = { STATE = 1350 STATE = 315 STATE = 1022 } } } date > 1886.1.1 }
+								else_if = { limit = { ROOT = { STATE = 686 } } date > 1873.1.1 }
+								else = { date > 1886.1.1 }
+							}
+							else_if = { 
+								limit = { TAG = HOL }
+								date > 1873.1.1
+							}
+							else = { AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+						}
+					}
+					30 = {
+						set_country_flag = DCI_caribbean_runaway_slave_coastal_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_caribbean_runaway_slave_coastal_event_1_flag }
+						modifier = {
+							factor = 0 
+							if = { 
+								limit = { TAG = SPR }
+								if = { limit = { ROOT = { OR = { STATE = 1350 STATE = 315 STATE = 1022 } } } date > 1886.1.1 }
+								else_if = { limit = { ROOT = { STATE = 686 } } date > 1873.1.1 }
+								else = { date > 1886.1.1 }
+							}
+							else_if = { 
+								limit = { TAG = HOL }
+								date > 1873.1.1
+							}
+							else = { AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+						}
+					}
+					30 = {
+						set_country_flag = DCI_caribbean_vote_discrimination_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_caribbean_vote_discrimination_event_1_flag }
+						modifier = { factor = 0 OR = { has_idea = absolutism has_idea = full_equality } }
+					}
+					10 = {  
+						clr_country_flag = DCI_caribbean_runaway_slave_coastal_event_1_flag
+						clr_country_flag = DCI_caribbean_runaway_slave_land_event_1_flag
+						clr_country_flag = DCI_caribbean_vote_discrimination_event_1_flag
+						set_country_flag = DCI_caribbean_random_event_none_flag
+					}
+				}
+			}
+		}
+	}
+	option = {
+		OWNER = {
+			if = {
+				limit = {
+					has_country_flag = DCI_caribbean_runaway_slave_land_event_1_flag
+					if = { 
+						limit = { TAG = SPR }
+						if = { limit = { ROOT = { OR = { STATE = 1350 STATE = 315 STATE = 1022 } } } date < 1886.1.1 }
+						else_if = { limit = { ROOT = { STATE = 686 } } date < 1873.1.1 }
+						else = { date < 1886.1.1 }
+					}
+					else_if = { 
+						limit = { TAG = HOL }
+						date < 1873.1.1
+					}
+					else = {
+						OR = {
+							has_idea = usa_slavery_law
+							has_idea = slavery
+						}
+					}
+					ROOT = {
+						any_neighbor_state = {
+							OWNER = {
+								NOT = { 
+									has_idea = usa_slavery_law
+									has_idea = tribal_slavery
+									has_idea = slavery
+									has_idea = slavery_all_but_name
+								}
+							}
+						}
+					}
+				}
+				clr_country_flag = DCI_caribbean_runaway_slave_land_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_land_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_caribbean_runaway_slave_coastal_event_1_flag
+					if = { 
+						limit = { TAG = SPR }
+						if = { limit = { ROOT = { OR = { STATE = 1350 STATE = 315 STATE = 1022 } } } date < 1886.1.1 }
+						else_if = { limit = { ROOT = { STATE = 686 } } date < 1873.1.1 }
+						else = { date < 1886.1.1 }
+					}
+					else_if = { 
+						limit = { TAG = HOL }
+						date < 1873.1.1
+					}
+					else = {
+						OR = {
+							has_idea = usa_slavery_law
+							has_idea = slavery
+						}
+					}
+					ROOT = {
+						is_coastal = yes
+					}
+				}
+				clr_country_flag = DCI_caribbean_runaway_slave_coastal_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_coastal_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_caribbean_vote_discrimination_event_1_flag
+					NOT = {
+						has_idea = absolutism
+						has_idea = full_equality
+					}
+				}
+				clr_country_flag = DCI_caribbean_vote_discrimination_event_1_flag
+				country_event = { id = DCI_generic_vote_discrimination_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = { has_country_flag = DCI_caribbean_random_event_none_flag }
+				clr_country_flag = DCI_caribbean_random_event_none_flag
+			}
+			else = {
+				ROOT = { state_event = { id = DCI_caribbean_incident_event.1 } }
+			}
+		}
+	}
+}
+
+state_event = {
 	id = DCI_native_american_incident_event.1
 	title = DCI_native_american_incident_event.1.t
 	desc = DCI_native_american_incident_event.1.d
@@ -316,12 +518,25 @@ state_event = {
 		ROOT = {
 			OWNER = {
 				random_list = {
-					90 = {
-						set_country_flag = DCI_south_american_slave_coast_random_event_1_flag 
-						modifier = { factor = 0 has_country_flag = DCI_south_american_slave_coast_random_event_1_flag }
+					30 = {
+						set_country_flag = DCI_south_american_slave_coast_runaway_slave_land_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_south_american_slave_coast_runaway_slave_land_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					30 = {
+						set_country_flag = DCI_south_american_slave_coast_runaway_slave_coastal_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_south_american_slave_coast_runaway_slave_coastal_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					30 = {
+						set_country_flag = DCI_south_american_slave_coast_vote_discrimination_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_south_american_slave_coast_vote_discrimination_event_1_flag }
+						modifier = { factor = 0 OR = { has_idea = absolutism has_idea = full_equality } }
 					}
 					10 = {  
-						clr_country_flag = DCI_south_american_slave_coast_random_event_1_flag
+						clr_country_flag = DCI_south_american_slave_coast_runaway_slave_coastal_event_1_flag
+						clr_country_flag = DCI_south_american_slave_coast_runaway_slave_land_event_1_flag
+						clr_country_flag = DCI_south_american_slave_coast_vote_discrimination_event_1_flag
 						set_country_flag = DCI_south_american_slave_coast_random_event_none_flag
 					}
 				}
@@ -332,7 +547,7 @@ state_event = {
 		OWNER = {
 			if = {
 				limit = {
-					has_country_flag = DCI_south_american_slave_coast_random_event_1_flag
+					has_country_flag = DCI_south_american_slave_coast_runaway_slave_land_event_1_flag
 					OR = {
 						has_idea = usa_slavery_law
 						has_idea = slavery
@@ -350,8 +565,33 @@ state_event = {
 						}
 					}
 				}
-				clr_country_flag = DCI_south_american_slave_coast_random_event_1_flag
-				country_event = { id = DCI_south_american_slave_coast_random_event_1.1 random_days = 7 }
+				clr_country_flag = DCI_south_american_slave_coast_runaway_slave_land_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_land_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_south_american_slave_coast_runaway_slave_coastal_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						is_coastal = yes
+					}
+				}
+				clr_country_flag = DCI_south_american_slave_coast_runaway_slave_coastal_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_coastal_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_south_american_slave_coast_vote_discrimination_event_1_flag
+					NOT = {
+						has_idea = absolutism
+						has_idea = full_equality
+					}
+				}
+				clr_country_flag = DCI_south_american_slave_coast_vote_discrimination_event_1_flag
+				country_event = { id = DCI_generic_vote_discrimination_event_1.1 random_days = 7 }
 			}
 			else_if = {
 				limit = { has_country_flag = DCI_south_american_slave_coast_random_event_none_flag }
@@ -361,114 +601,6 @@ state_event = {
 				ROOT = { state_event = { id = DCI_south_american_slave_coast_incident_event.1 } }
 			}
 		}
-	}
-}
-
-country_event = {
-	id = DCI_south_american_slave_coast_random_event_1.1
-	title = DCI_south_american_slave_coast_random_event_1.1.t
-	desc = DCI_south_american_slave_coast_random_event_1.1.d
-	picture = GFX_event_ITA_Po_Valley_Modernization
-	is_triggered_only = yes
-	
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.1.a
-		trigger = { always = yes }
-		ai_chance = { 
-			factor = 40 
-			modifier = {
-				factor = 0
-				has_political_power > 50
-			}
-		}
-		custom_effect_tooltip = DCI_incident_outcome_tooltip
-		set_country_flag = DCI_south_american_slave_coast_random_event_2_d
-		hidden_effect = { country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 } }
-	}
-	
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.1.b
-		trigger = { command_power > 149 }
-		ai_chance = { 
-			factor = 60 
-			modifier = {
-				factor = 0
-				has_political_power > 50
-			}
-		}
-		add_command_power = -150
-		custom_effect_tooltip = DCI_incident_outcome_tooltip
-		hidden_effect = {
-			random_list = {
-				40 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_e }
-				40 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_f }
-				20 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_g }
-			}
-			country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 }
-		}
-	}
-	
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.1.c
-		trigger = { has_political_power > 50 }
-		ai_chance = { factor = 100 }
-		add_political_power = -50
-		custom_effect_tooltip = DCI_incident_outcome_tooltip
-		hidden_effect = {
-			random_list = {
-				10 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_e }
-				20 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_f }
-				70 = { set_country_flag = DCI_south_american_slave_coast_random_event_2_g }
-			}
-			country_event = { id = DCI_south_american_slave_coast_random_event_1.2 days = 7 }
-		}
-	}
-}
-
-country_event = {
-	id = DCI_south_american_slave_coast_random_event_1.2
-	title = DCI_south_american_slave_coast_random_event_1.2.t
-	#picture = GFX_Muhammad
-	is_triggered_only = yes
-	desc = {
-		text = DCI_south_american_slave_coast_random_event_1.2.d
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_d }
-	}
-	desc = {
-		text = DCI_south_american_slave_coast_random_event_1.2.e
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_e }
-	}
-	desc = {
-		text = DCI_south_american_slave_coast_random_event_1.2.f
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_f }
-	}
-	desc = {
-		text = DCI_south_american_slave_coast_random_event_1.2.g
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_g }
-	}
-	
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.2.a
-		trigger = { 
-			OR = {
-				has_country_flag = DCI_south_american_slave_coast_random_event_2_d
-				has_country_flag = DCI_south_american_slave_coast_random_event_2_e
-			}
-		}
-		clr_country_flag = DCI_south_american_slave_coast_random_event_2_d
-		clr_country_flag = DCI_south_american_slave_coast_random_event_2_e
-	}
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.2.b
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_f }
-		clr_country_flag = DCI_south_american_slave_coast_random_event_2_f
-		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
-	}
-	option = {
-		name = DCI_south_american_slave_coast_random_event_1.2.c
-		trigger = { has_country_flag = DCI_south_american_slave_coast_random_event_2_g }
-		clr_country_flag = DCI_south_american_slave_coast_random_event_2_g
-		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
 	}
 }
 
@@ -509,12 +641,25 @@ state_event = {
 		ROOT = {
 			OWNER = {
 				random_list = {
-					90 = {
-						set_country_flag = DCI_west_africa_random_event_1_flag 
-						modifier = { factor = 0 has_country_flag = DCI_west_africa_random_event_1_flag }
+					30 = {
+						set_country_flag = DCI_west_africa_runaway_slave_land_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_west_africa_runaway_slave_land_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					30 = {
+						set_country_flag = DCI_west_africa_runaway_slave_coastal_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_west_africa_runaway_slave_coastal_event_1_flag }
+						modifier = { factor = 0 AND = { NOT = { has_idea = usa_slavery_law } NOT = { has_idea = slavery } } }
+					}
+					30 = {
+						set_country_flag = DCI_west_africa_vote_discrimination_event_1_flag 
+						modifier = { factor = 0 has_country_flag = DCI_west_africa_vote_discrimination_event_1_flag }
+						modifier = { factor = 0 OR = { has_idea = absolutism has_idea = full_equality } }
 					}
 					10 = {  
-						clr_country_flag = DCI_west_africa_random_event_1_flag
+						clr_country_flag = DCI_west_africa_runaway_slave_land_event_1_flag
+						clr_country_flag = DCI_west_africa_runaway_slave_coastal_event_1_flag
+						clr_country_flag = DCI_west_africa_vote_discrimination_event_1_flag
 						set_country_flag = DCI_west_africa_random_event_none_flag
 					}
 				}
@@ -525,7 +670,7 @@ state_event = {
 		OWNER = {
 			if = {
 				limit = {
-					has_country_flag = DCI_west_africa_random_event_1_flag
+					has_country_flag = DCI_west_africa_runaway_slave_land_event_1_flag
 					OR = {
 						has_idea = usa_slavery_law
 						has_idea = slavery
@@ -543,8 +688,33 @@ state_event = {
 						}
 					}
 				}
-				clr_country_flag = DCI_west_africa_random_event_1_flag
-				country_event = { id = DCI_west_africa_random_event_1.1 random_days = 7 }
+				clr_country_flag = DCI_west_africa_runaway_slave_land_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_land_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_west_africa_runaway_slave_coastal_event_1_flag
+					OR = {
+						has_idea = usa_slavery_law
+						has_idea = slavery
+					}
+					ROOT = {
+						is_coastal = yes
+					}
+				}
+				clr_country_flag = DCI_west_africa_runaway_slave_coastal_event_1_flag
+				country_event = { id = DCI_generic_runaway_slave_coastal_event_1.1 random_days = 7 }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = DCI_west_africa_vote_discrimination_event_1_flag
+					NOT = {
+						has_idea = absolutism
+						has_idea = full_equality
+					}
+				}
+				clr_country_flag = DCI_west_africa_vote_discrimination_event_1_flag
+				country_event = { id = DCI_generic_vote_discrimination_event_1.1 random_days = 7 }
 			}
 			else_if = {
 				limit = { has_country_flag = DCI_west_africa_random_event_none_flag }
@@ -557,15 +727,37 @@ state_event = {
 	}
 }
 
+##########################
+##### GENERIC RANDOM #####
+##########################
+
+
+###
 country_event = {
-	id = DCI_west_africa_random_event_1.1
-	title = DCI_west_africa_random_event_1.1.t
-	desc = DCI_west_africa_random_event_1.1.d
-	picture = GFX_event_ITA_Po_Valley_Modernization
+	id = DCI_generic_vote_discrimination_event_1.1
+	title = DCI_generic_vote_discrimination_event_1.1.t
+	picture = GFX_ITA_Crowd_Gathers
 	is_triggered_only = yes
 	
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.1.d
+		trigger = { OR = { has_idea = limited_equality has_idea = segregation has_idea = slavery_all_but_name } OR = { has_idea = universal_male_suffrage has_idea = universal_male_suffrage } }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.1.e
+		trigger = { OR = { has_idea = limited_equality has_idea = segregation has_idea = slavery_all_but_name } OR = { has_idea = parliamentary_suffrage has_idea = property_owners_sufferage } }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.1.e
+		trigger = { NOT = { has_idea = limited_equality } NOT = { has_idea = segregation } NOT = { has_idea = slavery_all_but_name } OR = { has_idea = parliamentary_suffrage has_idea = property_owners_sufferage } }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.1.f
+		trigger = { NOT = { has_idea = limited_equality } NOT = { has_idea = segregation } NOT = { has_idea = slavery_all_but_name } has_idea = universal_male_suffrage }
+	}
+	
 	option = {
-		name = DCI_west_africa_random_event_1.1.a
+		name = DCI_generic_vote_discrimination_event_1.1.a
 		trigger = { always = yes }
 		ai_chance = { 
 			factor = 40 
@@ -574,13 +766,119 @@ country_event = {
 				has_political_power > 50
 			}
 		}
-		set_country_flag = DCI_west_africa_random_event_2_d
 		custom_effect_tooltip = DCI_incident_outcome_tooltip
-		hidden_effect = { country_event = { id = DCI_west_africa_random_event_1.2 days = 7 } }
+		hidden_effect = { 
+			random_list = {
+				70 = { set_country_flag = DCI_generic_vote_discrimination_event_1_2_d }
+				30 = { set_country_flag = DCI_generic_vote_discrimination_event_1_2_e }
+			}
+			country_event = { id = DCI_generic_vote_discrimination_event_1.2 days = 7 } 
+		}
 	}
 	
 	option = {
-		name = DCI_west_africa_random_event_1.1.b
+		name = DCI_generic_vote_discrimination_event_1.1.b
+		trigger = { command_power > 149 }
+		ai_chance = { 
+			factor = 60 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		add_command_power = -150
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			set_country_flag = DCI_generic_vote_discrimination_event_1_2_f
+			country_event = { id = DCI_generic_vote_discrimination_event_1.2 days = 7 }
+		}
+	}
+	
+	option = {
+		name = DCI_generic_vote_discrimination_event_1.1.c
+		trigger = { has_political_power > 50 }
+		ai_chance = { factor = 100 }
+		add_political_power = -50
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				30 = { set_country_flag = DCI_generic_vote_discrimination_event_1_2_f }
+				70 = { set_country_flag = DCI_generic_vote_discrimination_event_1_2_g }
+			}
+			country_event = { id = DCI_generic_vote_discrimination_event_1.2 days = 7 }
+		}
+	}
+}
+country_event = {
+	id = DCI_generic_vote_discrimination_event_1.2
+	title = DCI_generic_vote_discrimination_event_1.2.t
+	#picture = GFX_Muhammad
+	is_triggered_only = yes
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.2.d
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_d }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.2.e
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_e }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.2.f
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_f }
+	}
+	desc = {
+		text = DCI_generic_vote_discrimination_event_1.2.g
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_g }
+	}
+	
+	option = {
+		name = DCI_generic_vote_discrimination_event_1.2.a
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_d }
+		clr_country_flag = DCI_generic_vote_discrimination_event_1_2_d
+	}
+	option = {
+		name = DCI_generic_vote_discrimination_event_1.2.b
+		trigger = { 
+			OR = {
+				has_country_flag = DCI_generic_vote_discrimination_event_1_2_e
+				has_country_flag = DCI_generic_vote_discrimination_event_1_2_f 
+			}
+		}
+		clr_country_flag = DCI_generic_vote_discrimination_event_1_2_e
+		clr_country_flag = DCI_generic_vote_discrimination_event_1_2_f
+	}
+	option = {
+		name = DCI_generic_vote_discrimination_event_1.2.c
+		trigger = { has_country_flag = DCI_generic_vote_discrimination_event_1_2_g }
+		clr_country_flag = DCI_generic_vote_discrimination_event_1_2_g
+		add_timed_idea = { idea = DCI_random_event_push_universal_suffrage_idea days = 60 } 
+	}
+}
+###
+country_event = {
+	id = DCI_generic_runaway_slave_coastal_event_1.1
+	title = DCI_generic_runaway_slave_coastal_event_1.1.t
+	desc = DCI_generic_runaway_slave_coastal_event_1.1.d
+	picture = GFX_report_event_amazonas
+	is_triggered_only = yes
+	
+	option = {
+		name = DCI_generic_runaway_slave_coastal_event_1.1.a
+		trigger = { always = yes }
+		ai_chance = { 
+			factor = 40 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_d
+		hidden_effect = { country_event = { id = DCI_generic_runaway_slave_coastal_event_1.2 days = 7 } }
+	}
+	
+	option = {
+		name = DCI_generic_runaway_slave_coastal_event_1.1.b
 		trigger = { command_power > 149 }
 		ai_chance = { 
 			factor = 60 
@@ -593,78 +891,192 @@ country_event = {
 		custom_effect_tooltip = DCI_incident_outcome_tooltip
 		hidden_effect = {
 			random_list = {
-				40 = { set_country_flag = DCI_west_africa_random_event_2_e }
-				40 = { set_country_flag = DCI_west_africa_random_event_2_f }
-				20 = { set_country_flag = DCI_west_africa_random_event_2_g }
+				40 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e }
+				40 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_f }
+				20 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_g }
 			}
-			country_event = { id = DCI_west_africa_random_event_1.2 days = 7 }
+			country_event = { id = DCI_generic_runaway_slave_coastal_event_1.2 days = 7 }
 		}
 	}
 	
 	option = {
-		name = DCI_west_africa_random_event_1.1.c
+		name = DCI_generic_runaway_slave_coastal_event_1.1.c
 		trigger = { has_political_power > 50 }
 		ai_chance = { factor = 100 }
 		add_political_power = -50
 		custom_effect_tooltip = DCI_incident_outcome_tooltip
 		hidden_effect = {
 			random_list = {
-				10 = { set_country_flag = DCI_west_africa_random_event_2_e }
-				20 = { set_country_flag = DCI_west_africa_random_event_2_f }
-				70 = { set_country_flag = DCI_west_africa_random_event_2_g }
+				10 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e }
+				20 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_f }
+				70 = { set_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_g }
 			}
-			country_event = { id = DCI_west_africa_random_event_1.2 days = 7 }
+			country_event = { id = DCI_generic_runaway_slave_coastal_event_1.2 days = 7 }
 		}
 	}
 }
-
 country_event = {
-	id = DCI_west_africa_random_event_1.2
-	title = DCI_west_africa_random_event_1.2.t
+	id = DCI_generic_runaway_slave_coastal_event_1.2
+	title = DCI_generic_runaway_slave_coastal_event_1.2.t
 	#picture = GFX_Muhammad
 	is_triggered_only = yes
 	desc = {
-		text = DCI_west_africa_random_event_1.2.d
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_d }
+		text = DCI_generic_runaway_slave_coastal_event_1.2.d
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_d }
 	}
 	desc = {
-		text = DCI_west_africa_random_event_1.2.e
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_e }
+		text = DCI_generic_runaway_slave_coastal_event_1.2.e
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e }
 	}
 	desc = {
-		text = DCI_west_africa_random_event_1.2.f
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_f }
+		text = DCI_generic_runaway_slave_coastal_event_1.2.f
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_f }
 	}
 	desc = {
-		text = DCI_west_africa_random_event_1.2.g
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_g }
+		text = DCI_generic_runaway_slave_coastal_event_1.2.g
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_g }
 	}
 	
 	option = {
-		name = DCI_west_africa_random_event_1.2.a
+		name = DCI_generic_runaway_slave_coastal_event_1.2.a
 		trigger = { 
 			OR = {
-				has_country_flag = DCI_west_africa_random_event_2_d
-				has_country_flag = DCI_west_africa_random_event_2_e
+				has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_d
+				has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e
 			}
 		}
-		clr_country_flag = DCI_west_africa_random_event_2_d
-		clr_country_flag = DCI_west_africa_random_event_2_e
+		if = {
+			limit = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e }
+			clr_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_e
+			add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+		}
+		clr_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_d
 	}
 	option = {
-		name = DCI_west_africa_random_event_1.2.b
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_f }
-		clr_country_flag = DCI_west_africa_random_event_2_f
+		name = DCI_generic_runaway_slave_coastal_event_1.2.b
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_f }
+		clr_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_f
 		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
 	}
 	option = {
-		name = DCI_west_africa_random_event_1.2.c
-		trigger = { has_country_flag = DCI_west_africa_random_event_2_g }
-		clr_country_flag = DCI_west_africa_random_event_2_g
+		name = DCI_generic_runaway_slave_coastal_event_1.2.c
+		trigger = { has_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_g }
+		clr_country_flag = DCI_generic_runaway_slave_coastal_event_1_2_g
 		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
 	}
 }
-
+###
+country_event = {
+	id = DCI_generic_runaway_slave_land_event_1.1
+	title = DCI_generic_runaway_slave_land_event_1.1.t
+	desc = DCI_generic_runaway_slave_land_event_1.1.d
+	picture = GFX_event_ITA_Po_Valley_Modernization
+	is_triggered_only = yes
+	
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.1.a
+		trigger = { always = yes }
+		ai_chance = { 
+			factor = 40 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		set_country_flag = DCI_generic_runaway_slave_land_event_1_2_d
+		hidden_effect = { country_event = { id = DCI_generic_runaway_slave_land_event_1.2 days = 7 } }
+	}
+	
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.1.b
+		trigger = { command_power > 149 }
+		ai_chance = { 
+			factor = 60 
+			modifier = {
+				factor = 0
+				has_political_power > 50
+			}
+		}
+		add_command_power = -150
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				40 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_e }
+				40 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_f }
+				20 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_g }
+			}
+			country_event = { id = DCI_generic_runaway_slave_land_event_1.2 days = 7 }
+		}
+	}
+	
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.1.c
+		trigger = { has_political_power > 50 }
+		ai_chance = { factor = 100 }
+		add_political_power = -50
+		custom_effect_tooltip = DCI_incident_outcome_tooltip
+		hidden_effect = {
+			random_list = {
+				10 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_e }
+				20 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_f }
+				70 = { set_country_flag = DCI_generic_runaway_slave_land_event_1_2_g }
+			}
+			country_event = { id = DCI_generic_runaway_slave_land_event_1.2 days = 7 }
+		}
+	}
+}
+country_event = {
+	id = DCI_generic_runaway_slave_land_event_1.2
+	title = DCI_generic_runaway_slave_land_event_1.2.t
+	#picture = GFX_Muhammad
+	is_triggered_only = yes
+	desc = {
+		text = DCI_generic_runaway_slave_land_event_1.2.d
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_d }
+	}
+	desc = {
+		text = DCI_generic_runaway_slave_land_event_1.2.e
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_e }
+	}
+	desc = {
+		text = DCI_generic_runaway_slave_land_event_1.2.f
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_f }
+	}
+	desc = {
+		text = DCI_generic_runaway_slave_land_event_1.2.g
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_g }
+	}
+	
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.2.a
+		trigger = { 
+			OR = {
+				has_country_flag = DCI_generic_runaway_slave_land_event_1_2_d
+				has_country_flag = DCI_generic_runaway_slave_land_event_1_2_e
+			}
+		}
+		if = {
+			limit = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_e }
+			clr_country_flag = DCI_generic_runaway_slave_land_event_1_2_e
+			add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+		}
+		clr_country_flag = DCI_generic_runaway_slave_land_event_1_2_d
+	}
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.2.b
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_f }
+		clr_country_flag = DCI_generic_runaway_slave_land_event_1_2_f
+		add_timed_idea = { idea = DCI_random_event_angry_slave_owners_idea days = 60 }
+	}
+	option = {
+		name = DCI_generic_runaway_slave_land_event_1.2.c
+		trigger = { has_country_flag = DCI_generic_runaway_slave_land_event_1_2_g }
+		clr_country_flag = DCI_generic_runaway_slave_land_event_1_2_g
+		add_timed_idea = { idea = DCI_random_event_push_slave_abolition_idea days = 60 } 
+	}
+}
+###
 
 #This is Detrimental Colonial Impact DCI
 state_event = {
