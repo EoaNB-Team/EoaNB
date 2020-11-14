@@ -1,7 +1,6 @@
 ﻿add_namespace = usa
 add_namespace = usa_panic
 add_namespace = USA_utah_war
-add_namespace = USA_utah_war_start
 
 add_namespace = usa_intro
 add_namespace = usa_panic_of_1857
@@ -10,6 +9,8 @@ add_namespace = usa_manifest_destiny
 add_namespace = usa_flavor
 add_namespace = usa_infrastructure
 add_namespace = usa_internal_politics
+
+add_namespace = usaPolitics
 
 ####################### Bookmark Introductions to the United States ##########################
 # 1857 — Divided States of America
@@ -74,7 +75,52 @@ country_event = {
 	}
 }
 
+# Oil Creek Pennsylvania
+state_event = {
+	id = usa_flavor.2
+	title = usa_flavor.2.t
+	desc = usa_flavor.2.d
+	picture = GFX_report_event_royal_visit
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+
+	option = {
+		name = usa_flavor.2.a
+		360 = { 
+			add_resource = {
+				type = oil
+				amount = 16
+			} 
+		}
+		hidden_effect = {
+			OWNER = { news_event = usa_flavor.3 }
+		}
+	}
+}
+
+# Oil Creek Pennsylvania News
+news_event = {
+	id = usa_flavor.3
+	title = usa_flavor.2.t
+	desc = usa_flavor.2.d
+	picture = GFX_report_event_royal_visit
+
+	is_triggered_only = yes
+	major = yes
+
+	option = {
+		name = usa_flavor.2.b
+		if = {
+			limit = { owns_state = 360 }
+			# Nothing yet
+		}
+	}
+}
+
 ####################### Panic of 1857 ##########################
+
 # Panic of 1857
 country_event = {
 	id = usa_panic_of_1857.1
@@ -90,6 +136,7 @@ country_event = {
 		trigger = { tag = USA }
 		add_ideas = USA_1857Panic0
 		hidden_effect = {
+			complete_national_focus = USA_under_panic
 			set_global_flag = Panic_of_1857
 			news_event = usa_panic_of_1857.2
 		}
@@ -118,21 +165,77 @@ news_event = {
 				days = 30
 			}
 		}
+		if = {
+			limit = { 
+				NOT = { tag = USA }
+				NOT = { has_idea = agrarian }
+			}
+			set_country_flag = Panic_of_1857_hit
+			if = {#major power
+				limit = {
+					OR = {
+						tag = ENG
+						tag = FRA
+						tag = PRS
+						tag = BRA
+						is_major = yes
+					}
+				}
+				add_timed_idea = {
+					idea = Panic_of_1857_4
+					days = 300
+				}
+			}
+			else_if = {#more than 20 factories
+				limit = {
+					num_of_factories > 20
+				}
+				add_timed_idea = {
+					idea = Panic_of_1857_3
+					days = 280
+				}
+			}
+			else_if = {#more than 10 factories
+				limit = {
+					num_of_factories > 10
+				}
+				add_timed_idea = {
+					idea = Panic_of_1857_2
+					days = 260
+				}
+			}
+			else_if = {#has 10 factories
+				limit = {
+					AND = {
+						num_of_factories < 10
+						NOT = { num_of_factories > 10 }
+					}
+				}
+				add_timed_idea = {
+					idea = Panic_of_1857_1
+					days = 240
+				}
+			}
+			else={#has less than 10 factories
+				add_political_power = -10
+			}
+		}
 	}
 }
 
 # Panic of 1857 2
 country_event = {
-	id = usa_panic_of_1857.3
-	title = usa_panic_of_1857.3.t
-	desc = usa_panic_of_1857.3.d
+	id = usa_panic.1
+	title = usa_panic.1.t
+	desc = usa_panic.1.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
+
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.3.a
+		name = usa_panic.1.a
 		random_owned_controlled_state = {
 			limit = {
 				industrial_complex > 0
@@ -152,7 +255,7 @@ country_event = {
 			}
 			damage_building = {
 				type = industrial_complex
-				  damage = 0.95
+				damage = 0.95
 			}
 		}
 		random_owned_controlled_state = {
@@ -169,16 +272,17 @@ country_event = {
 
 # Panic of 1857 3
 country_event = {
-	id = usa_panic_of_1857.4
-	title = usa_panic_of_1857.4.t
-	desc = usa_panic_of_1857.4.d
+	id = usa_panic.2
+	title = usa_panic.2.t
+	desc = usa_panic.2.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
+
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.4.a
+		name = usa_panic.2.a
 		random_owned_controlled_state = {
 			limit = {
 				industrial_complex > 0
@@ -233,9 +337,9 @@ country_event = {
 
 # Panic of 1857 4
 country_event = {
-	id = usa_panic_of_1857.5
-	title = usa_panic_of_1857.5.t
-	desc = usa_panic_of_1857.5.d
+	id = usa_panic.3
+	title = usa_panic.3.t
+	desc = usa_panic.3.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
@@ -243,7 +347,7 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.a
+		name = usa_panic.3.a
 		random_owned_controlled_state = {
 			limit = {
 				industrial_complex > 0
@@ -300,16 +404,17 @@ country_event = {
 
 # Panic of 1857 5
 country_event = {
-	id = usa_panic_of_1857.6
-	title = usa_panic_of_1857.6.t
-	desc = usa_panic_of_1857.6.d
+	id = usa_panic.4
+	title = usa_panic.4.t
+	desc = usa_panic.4.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
+
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.6.a
+		name = usa_panic.4.a
 		random_owned_controlled_state = {
 			limit = {
 				industrial_complex > 0
@@ -364,16 +469,17 @@ country_event = {
 
 # Panic of 1857 6
 country_event = {
-	id = usa_panic_of_1857.7
-	title = usa_panic_of_1857.7.t
-	desc = usa_panic_of_1857.7.d
+	id = usa_panic.5
+	title = usa_panic.5.t
+	desc = usa_panic.5.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
+
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.7.a
+		name = usa_panic.5.a
 		random_owned_controlled_state = {
 			limit = {
 				industrial_complex > 0
@@ -385,7 +491,7 @@ country_event = {
 				  damage = 0.95
 			}
 		}
-		random_owned_controlled_state = {
+		random_owned_controlled_state = {	
 			limit = {
 				infrastructure > 0
 			}
@@ -399,9 +505,9 @@ country_event = {
 
 # Panic of 1857 7
 country_event = {
-	id = usa_panic_of_1857.8
-	title = usa_panic_of_1857.7.8.t
-	desc = usa_panic_of_1857.8.d
+	id = usa_panic.6
+	title = usa_panic.6.t
+	desc = usa_panic.6.d
 	picture = GFX_report_event_generic_rally2
 
 	fire_only_once = yes
@@ -409,168 +515,1636 @@ country_event = {
 	is_triggered_only = yes
 
 	option = {
-		name = usa_panic_of_1857.8.a
+		name = usa_panic.6.a
 		remove_ideas = USA_1857Panic5
 	}
 }
 
 #################### Utah/Mormon War ##################
 
-country_event = {
-	id = USA_utah_war_start.1
+country_event = {#sets AI behavior
+	id = USA_utah_war_start
 	title = USA_utah_war_start.t
 	desc = USA_utah_war_start.d
-	#picture =
+	#picture = 
 
 	is_triggered_only = yes
 	fire_only_once = yes
 
 	option = {
 		name = USA_utah_war_start.a
+		hidden_effect = {
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				set_country_flag = AI_USA_mormonWar_historical
+			}
+			else = {
+				random_list = {
+					85 = {
+						set_country_flag = AI_USA_mormonWar_historical
+					}
+					15 = {
+						set_country_flag = AI_USA_mormonWar_aggressive
+					}
+				}
+			}			
+		}
+	}
+}
+
+country_event = {#revoke new governor
+	id = USA_utah_war.1
+	title = USA_utah_war.1.t
+	desc = USA_utah_war.1.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.1.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -2
+		}
+		add_political_power = -100
+	}
+}
+
+country_event = {#Revoke Posse Comitatus
+	id = USA_utah_war.2
+	title = USA_utah_war.2.t
+	desc = USA_utah_war.2.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.2.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -2
+		}
+		add_political_power = -100
+	}
+}
+
+country_event = {#Send small military escort
+	id = USA_utah_war.3
+	title = USA_utah_war.3.t
+	desc = USA_utah_war.3.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.3.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Send medium military escort
+	id = USA_utah_war.4
+	title = USA_utah_war.4.t
+	desc = USA_utah_war.4.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.4.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 4
+		}
+	}
+}
+
+country_event = {#Send large military escort
+	id = USA_utah_war.5
+	title = USA_utah_war.5.t
+	desc = USA_utah_war.5.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.5.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 6
+		}
+	}
+}
+
+country_event = {#Equating Dissenters with Traitors
+	id = USA_utah_war.6
+	title = USA_utah_war.6.t
+	desc = USA_utah_war.6.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.6.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Pardon Dissenters
+	id = USA_utah_war.7
+	title = USA_utah_war.7.t
+	desc = USA_utah_war.7.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.7.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -1
+		}
+	}
+}
+
+country_event = {#Send a special delegate to ease tensions#Captain Van Vliet
+	id = USA_utah_war.8
+	title = USA_utah_war.8.t
+	desc = USA_utah_war.8.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.8.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -1
+		}
+	}
+}
+
+country_event = {#Send a special delegate who is a complete fool#whoever
+	id = USA_utah_war.9
+	title = USA_utah_war.9.t
+	desc = USA_utah_war.9.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.9.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Send a second special delegate who is competent#Thomas L Kane
+	id = USA_utah_war.10
+	title = USA_utah_war.10.t
+	desc = USA_utah_war.10.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.10.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -3
+		}
+	}
+}
+
+country_event = {#Re-route CO expedition#lieutenant Ives
+	id = USA_utah_war.11
+	title = USA_utah_war.11.t
+	desc = USA_utah_war.11.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.11.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 1.5
+		}
+	}
+}
+
+country_event = {#Offer Alaska as a Mormon Refuge
+	id = USA_utah_war.12
+	title = USA_utah_war.12.t
+	desc = USA_utah_war.12.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.12.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -4
+		}
+	}
+}
+
+country_event = {#Guarantee an equal rights religious policy (in an era before the 14th amendment)
+	id = USA_utah_war.13
+	title = USA_utah_war.13.t
+	desc = USA_utah_war.13.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.13.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -2
+		}
+	}
+}
+
+country_event = {#Demand a closure of all ecclesiastic courts in the territory
+	id = USA_utah_war.14
+	title = USA_utah_war.14.t
+	desc = USA_utah_war.14.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.14.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Officially close borders to the territory
+	id = USA_utah_war.15
+	title = USA_utah_war.15.t
+	desc = USA_utah_war.15.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.15.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Demand the Nauvoo Legions and other militias be dissolved
+	id = USA_utah_war.16
+	title = USA_utah_war.16.t
+	desc = USA_utah_war.16.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.16.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 1.5
+		}
+	}
+}
+
+country_event = {#Pressure Natives against Mormons
+	id = USA_utah_war.17
+	title = USA_utah_war.17.t
+	desc = USA_utah_war.17.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.17.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 1
+		}
+	}
+}
+
+country_event = {#March on defended pass
+	id = USA_utah_war.18
+	title = USA_utah_war.18.t
+	desc = USA_utah_war.18.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.18.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Reinforce military escort by one step
+	id = USA_utah_war.20
+	title = USA_utah_war.20.t
+	desc = USA_utah_war.20.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.20.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 2
+		}
+	}
+}
+
+country_event = {#Reinforce military escort by 2 steps
+	id = USA_utah_war.21
+	title = USA_utah_war.21.t
+	desc = USA_utah_war.21.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.21.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = 4
+		}
+	}
+}
+
+country_event = {#Decrease military escort by one step
+	id = USA_utah_war.22
+	title = USA_utah_war.22.t
+	desc = USA_utah_war.22.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.22.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -2
+		}
+	}
+}
+
+country_event = {#Decrease military escort by 2 steps
+	id = USA_utah_war.23
+	title = USA_utah_war.23.t
+	desc = USA_utah_war.23.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.23.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -4
+		}
+	}
+}
+
+country_event = {#Promise to expedite statehood
+	id = USA_utah_war.24
+	title = USA_utah_war.24.t
+	desc = USA_utah_war.24.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#ruling party support malus?
+		name = USA_utah_war.24.a
+		add_to_variable = {
+			var = USA_mormon_unrest
+    		value = -3
+		}
+	}
+}
+
+country_event = {#ongoing event which adds mormon unrest forcing the player to do something
+	id = USA_utah_war.98
+	title = USA_utah_war.98.t
+	desc = USA_utah_war.98.d
+
+	is_triggered_only = yes
+	fire_only_once = no
+
+	option = {
+		name = USA_utah_war.98.a
+		trigger = {
+			USA = {
+				has_country_flag = utahWarOngoing
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 5
+				compare = less_than_or_equals
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 0
+				compare = greater_than_or_equals
+			}
+		}
+		add_to_variable = {
+			var = USA_mormon_unrest
+			value = 1
+		}
+		hidden_effect = {
+			country_event = USA_utah_war.98
+			days = 35
+		}
+	}
+	option = {
+		name = USA_utah_war.98.b
+		trigger = {
+			USA = {
+				has_country_flag = utahWarOngoing
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 10
+				compare = less_than_or_equals
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 5
+				compare = greater_than
+			}
+		}
+		add_to_variable = {
+			var = USA_mormon_unrest
+			value = 2
+		}
+		hidden_effect = {
+			country_event = USA_utah_war.98
+			days = 35
+		}
+	}
+	option = {
+		name = USA_utah_war.98.c
+		trigger = {
+			USA = {
+				has_country_flag = utahWarOngoing
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 15
+				compare = less_than_or_equals
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value = 10
+				compare = greater_than
+			}
+		}
+		add_to_variable = {
+			var = USA_mormon_unrest
+			value = 3
+		}
+		hidden_effect = {
+			country_event = USA_utah_war.98
+			days = 35
+		}
+	}
+	option = {
+		name = USA_utah_war.98.d
+		trigger = {
+			USA = {
+				has_country_flag = utahWarOngoing
+			}
+			check_variable = {
+				var = USA_mormon_unrest
+				value < 0 
+			}
+		}
+		set_variable = {
+			var = USA_mormon_unrest
+			value = 0
+		}
+		hidden_effect = {
+			country_event = USA_utah_war.98
+			days = 35
+		}
+	}
+	option = {
+		name = USA_utah_was.98.e
+		trigger = {
+			USA = {
+				NOT = {
+					has_country_flag = utahWarOngoing
+				}
+			}
+		}
+		add_political_power = 75
 	}
 }
 
 country_event = {#Utah War Conclusion
-	id = USA_utah_war.1
+	id = USA_utah_war.99
+	title = USA_utah_war.99.t                      
+	desc = USA_utah_war.99.d
 
-	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		trigger = {
+			check_variable = {
+				variable = USA_mormon_unrest
+				value > 14
+			}
+		}
+		name = USA_utah_war.99.a
+	}
+	option = {
+		trigger = {
+			check_variable = {
+				variable = USA_mormon_unrest
+				value < 15
+			}
+		}
+		name = USA_utah_war.99.b
+	}
+}
+######################################################
+
+country_event = {
+	id = usaPolitics.1
+	title = usaPolitics.1.t
+	desc = usaPolitics.1.d
+
 	is_triggered_only = yes
 
-	immediate = {}
-}
-
-#Raid on Harper Ferry
-country_event = {
-	id = usa.7
-	title = usa.7.t
-	desc = usa.7.d
-	picture = GFX_report_event_yugoslavian_cavalry
-
-	fire_only_once = yes
-
-	trigger = {
-		TAG = USA
-		date > 1859.8.18
-		has_country_flag = USASlavery_Debate
-	}
-
-	option = {
-		name = usa.7.a
-		ai_chance = { factor = 25 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.7.b
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.7.c
-		ai_chance = { factor = 25 }
-		add_political_power = -25
-		add_popularity = { ideology = centrism popularity = 0.01 }
-		hidden_effect = { USA = { set_country_flag = USA_Civil_War_Avoid_Attempt_5 } }
-	}
-	option = {
-		name = usa.7.e
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
-		add_political_power = -25
-	}
-}
-
-#John Brown Executed
-country_event = {
-	id = usa.8
-	title = usa.8.t
-	desc = usa.8.d
-	picture = GFX_report_event_generic_riot
-
-	fire_only_once = yes
-
-	trigger = {
-		TAG = USA
-		date > 1859.12.2
-		has_country_flag = USASlavery_Debate
-	}
-
-	option = {
-		name = usa.8.a
-		ai_chance = { factor = 25 }
-		add_political_power = -25
-		hidden_effect = { USA = { set_country_flag = USA_Civil_War_Avoid_Attempt_6 } }
-	}
-	option = {
-		name = usa.8.b
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = traditional_conservatism popularity = 0.02 }
-		add_popularity = { ideology = centrism popularity = 0.01 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.8.c
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = social_egalitarianism popularity = 0.02 }
-		add_popularity = { ideology = centrism popularity = 0.01 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.8.e
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = centrism popularity = 0.01 }
-		add_political_power = -25
-	}
-}
-
-#Fugitive Slave Act
-country_event = {
-	id = usa.9
-	title = usa.9.t
-	desc = usa.9.d
-	picture = GFX_report_event_generic_rally_3
-
-	fire_only_once = yes
-
-	trigger = {
-		TAG = USA
-		has_country_flag = USASlavery_Debate
-	}
-
-	mean_time_to_happen = {
-		days = 600
-		modifier = {
-			factor = 0.1
-			date > 1860.1.1
+	immediate = {
+		if = {
+			limit = {
+				date < 1860.11.6
+				USA = {
+					has_completed_focus = USA_covode_committee
+				}
+			}
+			country_event = {
+				id = usaPolitics.1
+				days = 1
+			}
+			if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_2_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl2}
+				add_ideas = {USA_doughface_2_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_2_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl3}
+				add_ideas = {USA_doughface_2_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_2_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl4}
+				add_ideas = {USA_doughface_2_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_2_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl5}
+				add_ideas = {USA_doughface_2_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_2_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl1}
+				add_ideas = {USA_doughface_2_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_2_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl3}
+				add_ideas = {USA_doughface_2_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_2_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl4}
+				add_ideas = {USA_doughface_2_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_2_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl5}
+				add_ideas = {USA_doughface_2_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_2_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl1}
+				add_ideas = {USA_doughface_2_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_2_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl2}
+				add_ideas = {USA_doughface_2_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_2_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl4}
+				add_ideas = {USA_doughface_2_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_2_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl5}
+				add_ideas = {USA_doughface_2_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_2_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl1}
+				add_ideas = {USA_doughface_2_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_2_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl2}
+				add_ideas = {USA_doughface_2_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_2_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl3}
+				add_ideas = {USA_doughface_2_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_2_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl5}
+				add_ideas = {USA_doughface_2_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_2_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl1}
+				add_ideas = {USA_doughface_2_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_2_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl2}
+				add_ideas = {USA_doughface_2_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_2_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl3}
+				add_ideas = {USA_doughface_2_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_2_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_2_lvl4}
+				add_ideas = {USA_doughface_2_lvl5}
+			}
+		}
+		else_if = {
+			limit = {
+				date < 1860.11.6
+				USA = {
+					has_completed_focus = USA_doughface_cabinet
+				}
+			}
+			country_event = {
+				id = usaPolitics.1
+				days = 1
+			}
+			if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_1_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl2}
+				add_ideas = {USA_doughface_1_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_1_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl3}
+				add_ideas = {USA_doughface_1_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_1_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl4}
+				add_ideas = {USA_doughface_1_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_doughface_1_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl5}
+				add_ideas = {USA_doughface_1_lvl1}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_1_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl1}
+				add_ideas = {USA_doughface_1_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_1_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl3}
+				add_ideas = {USA_doughface_1_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_1_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl4}
+				add_ideas = {USA_doughface_1_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_doughface_1_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl5}
+				add_ideas = {USA_doughface_1_lvl2}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_1_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl1}
+				add_ideas = {USA_doughface_1_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_1_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl2}
+				add_ideas = {USA_doughface_1_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_1_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl4}
+				add_ideas = {USA_doughface_1_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_doughface_1_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl5}
+				add_ideas = {USA_doughface_1_lvl3}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_1_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl1}
+				add_ideas = {USA_doughface_1_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_1_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl2}
+				add_ideas = {USA_doughface_1_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_1_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl3}
+				add_ideas = {USA_doughface_1_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_doughface_1_lvl5
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl5}
+				add_ideas = {USA_doughface_1_lvl4}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_1_lvl1
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl1}
+				add_ideas = {USA_doughface_1_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_1_lvl2
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl2}
+				add_ideas = {USA_doughface_1_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_1_lvl3
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl3}
+				add_ideas = {USA_doughface_1_lvl5}
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_doughface_1_lvl4
+					}
+				}
+				remove_ideas = {USA_doughface_1_lvl4}
+				add_ideas = {USA_doughface_1_lvl5}
+			}
+		}
+		else_if = {
+			limit = {
+				date < 1860.11.6
+				USA = {
+					has_completed_focus = USA_close_ranks
+				}
+			}
+			country_event = {
+				id = usaPolitics.1
+				days = 1
+			}
+			if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_2_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl2
+				add_ideas = USA_inclusive_2_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_2_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl3
+				add_ideas = USA_inclusive_2_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_2_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl4
+				add_ideas = USA_inclusive_2_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_2_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl5
+				add_ideas = USA_inclusive_2_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_2_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl1
+				add_ideas = USA_inclusive_2_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_2_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl3
+				add_ideas = USA_inclusive_2_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_2_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl4
+				add_ideas = USA_inclusive_2_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_2_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl5
+				add_ideas = USA_inclusive_2_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_2_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl1
+				add_ideas = USA_inclusive_2_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_2_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl2
+				add_ideas = USA_inclusive_2_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_2_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl4
+				add_ideas = USA_inclusive_2_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_2_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl5
+				add_ideas = USA_inclusive_2_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_2_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl1
+				add_ideas = USA_inclusive_2_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_2_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl2
+				add_ideas = USA_inclusive_2_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_2_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl3
+				add_ideas = USA_inclusive_2_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_2_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl5
+				add_ideas = USA_inclusive_2_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_2_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl1
+				add_ideas = USA_inclusive_2_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_2_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl2
+				add_ideas = USA_inclusive_2_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_2_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl3
+				add_ideas = USA_inclusive_2_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_2_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_2_lvl4
+				add_ideas = USA_inclusive_2_lvl5
+			}
+		}
+		else_if = {
+			limit = {
+				date < 1860.11.6
+				USA = {
+					has_completed_focus = USA_inclusive_cabinet
+				}
+			}
+			country_event = {
+				id = usaPolitics.1
+				days = 1
+			}
+			if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_1_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl2
+				add_ideas = USA_inclusive_1_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_1_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl3
+				add_ideas = USA_inclusive_1_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_1_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl4
+				add_ideas = USA_inclusive_1_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -75
+							has_political_power = -75
+						}
+						has_idea = USA_inclusive_1_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl5
+				add_ideas = USA_inclusive_1_lvl1
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_1_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl1
+				add_ideas = USA_inclusive_1_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_1_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl3
+				add_ideas = USA_inclusive_1_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_1_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl4
+				add_ideas = USA_inclusive_1_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -150
+							has_political_power = -150
+						}
+						has_idea = USA_inclusive_1_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl5
+				add_ideas = USA_inclusive_1_lvl2
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_1_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl1
+				add_ideas = USA_inclusive_1_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_1_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl2
+				add_ideas = USA_inclusive_1_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_1_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl4
+				add_ideas = USA_inclusive_1_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -225
+							has_political_power = -225
+						}
+						has_idea = USA_inclusive_1_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl5
+				add_ideas = USA_inclusive_1_lvl3
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_1_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl1
+				add_ideas = USA_inclusive_1_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_1_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl2
+				add_ideas = USA_inclusive_1_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_1_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl3
+				add_ideas = USA_inclusive_1_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						OR = {
+							has_political_power > -300
+							has_political_power = -300
+						}
+						has_idea = USA_inclusive_1_lvl5
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl5
+				add_ideas = USA_inclusive_1_lvl4
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_1_lvl1
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl1
+				add_ideas = USA_inclusive_1_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_1_lvl2
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl2
+				add_ideas = USA_inclusive_1_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_1_lvl3
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl3
+				add_ideas = USA_inclusive_1_lvl5
+			}
+			else_if = {
+				limit = {
+					USA = {
+						has_political_power < -300
+						has_idea = USA_inclusive_1_lvl4
+					}
+				}
+				remove_ideas = USA_inclusive_1_lvl4
+				add_ideas = USA_inclusive_1_lvl5
+			}
 		}
 	}
-
-	option = {
-		name = usa.9.a
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.9.b
-		ai_chance = { factor = 25 }
-		add_political_power = -25
-		add_popularity = { ideology = centrism popularity = 0.01 }
-		add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
-		hidden_effect = { USA = { set_country_flag = USA_Civil_War_Avoid_Attempt_7 } }
-	}
-	option = {
-		name = usa.9.c
-		ai_chance = { factor = 25 }
-		add_political_power = -25
-	}
-	option = {
-		name = usa.9.e
-		ai_chance = { factor = 25 }
-		add_popularity = { ideology = traditional_conservatism popularity = 0.02 }
-		add_political_power = -25
-	}
-} 
+}
 
 # #Election of 1860
 # country_event = {
@@ -580,8 +2154,18 @@ country_event = {
 # 	picture = GFX_report_event_election_vote
 
 # 	fire_only_once = yes
+# 	mean_time_to_happen = { days = -1 }
 
-# 	is_triggered_only = yes
+# 	trigger = {
+# 		TAG = ASA
+# 		date > 1861.11.5
+# 		OR = {
+# 			has_government = centrism
+# 			has_government = traditional_conservatism
+# 			has_government = radical_democracy
+# 			has_government = social_egalitarianism
+# 		}
+# 	}
 
 # 	option = { # Lincoln
 # 		name = usa.10.a
@@ -589,8 +2173,8 @@ country_event = {
 # 		ai_chance = { factor = 60 }
 
 # 		swap_ideas = {
-# 			remove_idea = american_slavery_tension_6
-# 			add_idea = american_slavery_3
+# 			remove_ideas = american_slavery_tension_6
+# 			add_ideas = american_slavery_3
 # 		}
 # 		add_popularity = {
 # 			ideology = centrism
@@ -618,8 +2202,8 @@ country_event = {
 # 		}
 
 # 		swap_ideas = {
-# 			remove_idea = american_slavery_tension_6
-# 			add_idea = american_slavery_3
+# 			remove_ideas = american_slavery_tension_6
+# 			add_ideas = american_slavery_3
 # 		}
 # 		add_popularity = {
 # 			ideology = traditional_conservatism
@@ -649,8 +2233,8 @@ country_event = {
 #     	}
 # 		}
 # 		swap_ideas = {
-# 			remove_idea = american_slavery_tension_6
-# 			add_idea = american_slavery_3
+# 			remove_ideas = american_slavery_tension_6
+# 			add_ideas = american_slavery_3
 # 		}
 # 		hidden_effect = {
 # 			news_event = { id = usa_news.5 }
@@ -688,8 +2272,8 @@ country_event = {
 #   		}
 # 		}
 # 		swap_ideas = {
-# 			remove_idea = american_slavery_tension_6
-# 			add_idea = american_slavery_3
+# 			remove_ideas = american_slavery_tension_6
+# 			add_ideas = american_slavery_3
 # 		}
 # 		add_popularity = {
 # 			ideology = centrism
@@ -769,59 +2353,6 @@ country_event = {
 # 		}
 # 	}
 # }
-
-# Douglas Inaugerated
-country_event = {
-	id = usa.12
-	title = usa.12.t
-	desc = usa.12.d
-	picture = GFX_report_event_german_reichstag_gathering
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = usa.12.a
-		retire_country_leader = yes
-		set_politics = {
-			ruling_party = centrism
-			election_frequency = 48
-			elections_allowed = yes
-		}
-		set_party_name = { ideology = centrism long_name = USA_northern_democrats name = USA_northern_democrats }
-		set_party_name = { ideology = traditional_conservatism long_name = USA_southern_democrats name = USA_southern_democrats }
-		create_country_leader = {
-			name = "Stephen A. Douglas"
-			desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-			picture = "Portrait_USA_Stephen_Douglas.dds"
-			expire = "1947.1.1"
-			ideology = conserv_liberal
-		}
-		hidden_effect = { USA = { country_event = { days = 15 id = usa.143 } } }
-	}
-}
-
-# Bell Inaugerated
-country_event = {
-	id = usa.13
-	title = usa.13.t
-	desc = usa.13.d
-	picture = GFX_report_event_german_reichstag_gathering
-
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = usa.13.a
-		retire_country_leader = yes
-		set_politics = {
-			ruling_party = radical_democracy
-			election_frequency = 48
-			elections_allowed = yes
-		}
-		hidden_effect = { CSA = { country_event = { days = 15 id = acw.2 } } }
-	}
-}
 
 # Call Up to Arms
 country_event = {
@@ -977,7 +2508,7 @@ country_event = {
 		hidden_effect = {
 			news_event = { id = usa_news.8 }
 			USA = {
-				country_event { days = 3561 id = usa.21 }
+				country_event = { days = 3561 id = usa.21 }
 				set_country_flag = USA_Civil_War_Avoided
 			}
 			set_global_flag = ACW_Civil_War_Avoided
@@ -999,33 +2530,6 @@ country_event = {
 		name = usa.19.a
 		ai_chance = { factor = 100 }
 		hidden_effect = { USA = { country_event = { days = 10 id = acw.1 } } }
-	}
-}
-
-# Oil Creek Pennsylvania
-country_event = {
-	id = usa.20
-	title = usa.20.t
-	desc = usa.20.d
-	picture = GFX_report_event_royal_visit
-
-	fire_only_once = yes
-	mean_time_to_happen = { days = 6 }
-	trigger = {
-		owns_state = 360
-		controls_state = 360
-		date > 1857.8.10
-	}
-
-	option = {
-		name = usa.20.a
-		360 = {
-			add_resource = {
-				type = oil
-				amount = 16
-			}
-		}
-		hidden_effect = { news_event = { id = usa_news.9 } }
 	}
 }
 
@@ -1080,8 +2584,8 @@ country_event = {
 		name = usa.23.a
 		add_political_power = 100
 		swap_ideas = {
-			remove_idea = usa_slavery_law
-			add_idea = limited_equality
+			remove_ideas = usa_slavery_law
+			add_ideas = limited_equality
 		}
 	}
 }
@@ -1291,6 +2795,16 @@ country_event = {
 			}
 		}
 		name = usa.29.c
+		if = {
+			limit = {
+				has_dlc = "Together for Victory"
+				has_dlc = "Waking The Tiger"
+				has_dlc = "Death or Dishonor"
+			}
+			add_autonomy_ratio = {
+				value = 0.05
+			}
+		}
 	}
 }
 
@@ -1327,6 +2841,16 @@ country_event = {
 			}
 		}
 		name = usa.30.c
+		if = {
+			limit = {
+				has_dlc = "Together for Victory"
+				has_dlc = "Waking The Tiger"
+				has_dlc = "Death or Dishonor"
+			}
+			add_autonomy_ratio = {
+				value = -0.05
+			}
+		}
 	}
 }
 
@@ -1365,8 +2889,8 @@ country_event = {
 			target = UTA
 		}
 		swap_ideas = {
-			remove_idea = state_religion
-			add_idea = secular_state
+			remove_ideas = state_religion
+			add_ideas = secular_state
 		}
 		hidden_effect = {
 			#set_country_flag = USAUtah_War_Over
@@ -1420,8 +2944,8 @@ country_event = {
 		}
 		hidden_effect = {
 			swap_ideas = {
-				remove_idea = presidential_republic
-				add_idea = socialist_republic
+				remove_ideas = presidential_republic
+				add_ideas = socialist_republic
 			}
 		}
 		remove_ideas = USA_recovery
@@ -1443,12 +2967,12 @@ country_event = {
 		name = usa.35.a
 		hidden_effect = {
 			swap_ideas = {
-				remove_idea = non_monarchical_system
-				add_idea = no_heir
+				remove_ideas = non_monarchical_system
+				add_ideas = no_heir
 			}
 			swap_ideas = {
-				remove_idea = presidential_republic
-				add_idea = constitutional_monarchy
+				remove_ideas = presidential_republic
+				add_ideas = constitutional_monarchy
 			}
 		}
 		hidden_effect = { remove_ideas = USA_recovery }
@@ -2617,8 +4141,8 @@ country_event = {
 			name = usa.65.a
 			#remove_ideas = USA_UtahWar_2
 			swap_ideas = {
-				remove_idea = state_religion
-				add_idea = secular_state
+				remove_ideas = state_religion
+				add_ideas = secular_state
 			}
 			if = {
 				limit = {
@@ -2702,14 +4226,14 @@ country_event = {
 					has_war_with = CSA
 				}
 				swap_ideas = {
-					remove_idea = USA_Spirit_Anti_Irish
-					add_idea = USA_Spirit_Anti_Irish_ACW
+					remove_ideas = USA_Spirit_Anti_Irish
+					add_ideas = USA_Spirit_Anti_Irish_ACW
 				}
 			}
 			else = {
 				swap_ideas = {
-					remove_idea = USA_Spirit_Anti_Irish
-					add_idea = USA_Spirit_Anti_Irish_2
+					remove_ideas = USA_Spirit_Anti_Irish
+					add_ideas = USA_Spirit_Anti_Irish_2
 				}
 			}
 		}
@@ -2733,8 +4257,8 @@ country_event = {
 		option = {
 			name = usa.67.a
 			swap_ideas = {
-				remove_idea = USA_Spirit_Anti_Irish_ACW
-				add_idea = USA_Spirit_Anti_Irish_2
+				remove_ideas = USA_Spirit_Anti_Irish_ACW
+				add_ideas = USA_Spirit_Anti_Irish_2
 			}
 		}
 }
@@ -4034,8 +5558,8 @@ country_event = {
 				}
 			}
 			swap_ideas = {
-				remove_idea = limited_equality
-				add_idea = full_equality
+				remove_ideas = limited_equality
+				add_ideas = full_equality
 			}
 			clr_country_flag = USA_enforcement_act
 			set_global_flag = USA_gilded_age_ft
@@ -4065,8 +5589,8 @@ country_event = {
 				}
 			}
 			swap_ideas = {
-				remove_idea = limited_equality
-				add_idea = segregation
+				remove_ideas = limited_equality
+				add_ideas = segregation
 			}
 			clr_country_flag = USA_enforcement_act
 			set_global_flag = USA_gilded_age_ft
@@ -4080,8 +5604,8 @@ country_event = {
 				}
 			}
 			swap_ideas = {
-				remove_idea = limited_equality
-				add_idea = racial_laws
+				remove_ideas = limited_equality
+				add_ideas = racial_laws
 			}
 			clr_country_flag = USA_enforcement_act
 			set_global_flag = USA_gilded_age_ft
@@ -4103,8 +5627,8 @@ country_event = {
 		option = {
 			name = usa.96.a
 			swap_ideas = {
-				remove_idea = lp_land_purchase
-				add_idea = lp_land_estates
+				remove_ideas = lp_land_purchase
+				add_ideas = lp_land_estates
 			}
 		}
 		option = {
@@ -4126,8 +5650,8 @@ country_event = {
 		option = {
 			name = usa.97.a
 			swap_ideas = {
-				remove_idea = secular_state
-				add_idea = state_religion
+				remove_ideas = secular_state
+				add_ideas = state_religion
 			}
 		}
 		option = {
@@ -11566,6 +13090,16 @@ country_event = {
 				}
 			}
 			name = usa.179.c
+			if = {
+				limit = {
+					has_dlc = "Together for Victory"
+					has_dlc = "Waking The Tiger"
+					has_dlc = "Death or Dishonor"
+				}
+				add_autonomy_ratio = {
+					value = 0.05
+				}
+			}
 		}
 	}
 
@@ -11606,6 +13140,16 @@ country_event = {
 				}
 			}
 			name = usa.180.c
+			if = {
+				limit = {
+					has_dlc = "Together for Victory"
+					has_dlc = "Waking The Tiger"
+					has_dlc = "Death or Dishonor"
+				}
+				add_autonomy_ratio = {
+					value = -0.05
+				}
+			}
 		}
 	}
 ## WIP Scripted Treaties for transfer of British Columbia or some parts of Oregon, or status Quo##
@@ -11976,34 +13520,6 @@ country_event = { # National Union Convention
 
 }
 
-country_event = { # Radical Democracy Party merge to the National Union Party
-		id = usa.192
-		title = usa.192.t
-		desc = usa.192.d
-		picture = GFX_report_event_generic_rally2
-
-		fire_only_once = yes
-		trigger = {
-			TAG = USA
-			date > 1864.9.20
-			has_country_flag = USA_national_union_party_created
-			NOT = {
-				has_country_flag = USA_hannibal_hamlin
-			}
-		}
-
-		option = { # Splendid
-			name = usa.192.a
-			add_war_support = 0.01
-			add_stability = 0.01
-			set_party_name = {
-				ideology = social_egalitarianism
-				long_name = USA_national_union_party_long
-				name = USA_national_union_party
-			}
-		}
-	}
-
 country_event =  { # Collapse of the National Union Party (Choosing Hannibal)
 		id = usa.193
 		title = usa.193.t
@@ -12050,6 +13566,8 @@ country_event =  { # Collapse of the National Union Party (Andrew `John`son)
 		picture = GFX_Collapse_party
 
 		fire_only_once = yes
+
+		is_triggered_only = yes
 
 		trigger = {
 			TAG = USA
@@ -12108,6 +13626,8 @@ country_event = { # Collapse of the National Union Party (Infighting between the
 		picture = GFX_Collapse_party
 
 		fire_only_once = yes
+
+		is_triggered_only = yes
 
 		trigger = {
 			TAG = USA
@@ -12290,196 +13810,6 @@ country_event = {
 #News Events
 
 add_namespace = usa_news
-#Panic of 1857
-news_event = {
-		id = usa_news.0
-		title = usa_news.0.t
-		desc = usa_news.0.d
-		picture = GFX_news_event_panic_eighteen_fifty
-
-		major = yes
-
-		is_triggered_only = yes
-
-		option = {
-			name = usa_news.0.a
-			trigger = {
-				NOT = { tag = USA }
-			}
-		}
-		option = {
-			name = usa_news.0.b
-			trigger = {
-				tag = USA
-			}
-			set_global_flag = Panic_of_1857
-		}
-}
-#Lincoln-Douglas debate
-news_event = {
-		id = usa_news.1
-		title = usa_news.1.t
-		desc = usa_news.1.d
-		picture = GFX_news_event_lincoln_douglas
-
-		fire_only_once = yes
-
-		major = no
-
-		trigger = {
-			TAG = USA
-			date > 1858.10.20
-		}
-
-		mean_time_to_happen = {
-			days = 2
-		}
-
-		option = {
-				name = usa_news.1.a
-				add_popularity = { ideology = centrism popularity = 0.1 }
-				add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
-		}
-}
-#1860 Campaigning
-news_event = {
-		id = usa_news.2
-		title = usa_news.2.t
-		desc = usa_news.2.d
-		picture = GFX_news_event_1860_campaigning
-
-		fire_only_once = yes
-
-		major = no
-
-		trigger = {
-			TAG = USA
-			date > 1860.5.18
-		}
-
-		mean_time_to_happen = {
-			days = 2
-		}
-
-		option = {
-			name = usa_news.2.a
-			add_popularity = { ideology = centrism popularity = 0.05 }
-			add_popularity = { ideology = radical_democracy popularity = 0.05 }
-			create_country_leader = {
-    			name = "Abraham Lincoln"
-    			desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-    			picture = "Portrait_USA_Abraham_Lincoln.dds"
-    			expire = "1886.5.2"
-    			ideology = conserv_liberal
-    			traits = {
-    			  controversial_figure
-    			  eoanb_trait_patriotic_orator
-    			}
-  			}
-  			create_country_leader = {
-			    name = "John C. Frémont"
-			    desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-			    picture = "Portrait_USA_John_C_Fremont.dds"
-			    expire = "1886.5.2"
-			    ideology = liberal_social
-			    traits = {
-			    }
-			}
-			create_country_leader = {
-			    name = "John Bell"
-			    desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-			    picture = "Portrait_USA_John_Bell.dds"
-			    expire = "1886.5.2"
-			    ideology = reactionary
-			}
-			set_party_name = {
-				ideology = radical_democracy
-				long_name = USA_radical_democracy_party
-				name = USA_radical_democracy_party
-			}
-		}
-}
-#1860 Election - Lincoln
-news_event = {
-	id = usa_news.3
-	title = usa_news.3.t
-	desc = usa_news.3.d
-
-	picture = GFX_news_event_lincoln_elected
-
-	major = yes
-
-	is_triggered_only = yes
-
-	option = {
-		name = usa_news.3.a
-	}
-}
-
-#1860 Election - Breckinridge
-news_event = {
-		id = usa_news.4
-		title = usa_news.4.t
-		desc = usa_news.4.d
-
-		picture = GFX_news_event_breckenridge_elected
-
-		major = yes
-
-		is_triggered_only = yes
-
-		option = {
-			name = usa_news.4.a
-		}
-}
-#1860 Election - Douglas
-news_event = {
-		id = usa_news.5
-		title = usa_news.5.t
-		desc = usa_news.5.d
-
-		picture = GFX_news_event_douglas_elected
-
-		major = yes
-
-		is_triggered_only = yes
-
-		option = {
-			name = usa_news.5.a
-		}
-}
-#South Carolina Independent
-news_event = {
-		id = usa_news.6
-		title = usa_news.6.t
-		desc = usa_news.6.d
-
-		picture = GFX_news_event_south_carolina
-
-		major = yes
-
-		is_triggered_only = yes
-
-		option = {
-			trigger = {
-				NOT = { TAG = USA }
-				NOT = { TAG = CSA }
-			}
-				name = usa_news.6.a
-		}
-		option = {
-			trigger = {
-				TAG = USA
-			}
-			name = usa_news.6.b
-		}
-		option = {
-			trigger = {
-				TAG = CSA
-			}
-			name = usa_news.6.c
-		}
-}
 
 #Civil War Avoided
 news_event = {
@@ -12607,49 +13937,6 @@ news_event = {
 				TAG = USA
 			}
 			name = usa_news.11.c
-		}
-}
-#Election of 1864
-news_event = {
-		id = usa_news.12
-		title = usa_news.12.t
-		desc = {
-            text = usa_news.12.d
-            trigger = { NOT = { has_country_flag = USA_DouglasElected } }
-            trigger = { has_war_with = CSA }
-        }
-        desc =  {
-            text = usa_news.12.d_a
-            trigger = { has_country_flag = USA_DouglasElected }
-            trigger = { has_war_with = CSA }
-        }
-        desc = {
-            text = usa_news.12.d_b
-            trigger = { NOT = { has_country_flag = USA_DouglasElected } }
-            trigger = { NOT = { has_war_with = CSA } }
-        }
-        desc =  {
-            text = usa_news.12.d_c
-            trigger = { has_country_flag = USA_DouglasElected }
-            trigger = { NOT = { has_war_with = CSA } }
-        }
-		picture = GFX_news_event_usa_election_of_1864
-
-		fire_only_once = yes
-
-		major = no
-
-		trigger = {
-			TAG = USA
-			date > 1864.1.20
-		}
-
-		mean_time_to_happen = {
-			days = 2
-		}
-
-		option = {
-				name = usa_news.12.a
 		}
 }
 #1864 Election - Lincoln
