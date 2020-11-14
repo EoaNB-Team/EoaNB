@@ -47,3 +47,41 @@ We also do not tolerate redistribution of the components of EoaNB that are our c
 
 Have more questions? Comments? etc.? Join the Discord:
 - https://discord.gg/VgufEME
+
+# Centurions
+<table>
+<tr>
+<td align="center">
+  <strong>AtomicFalco</strong>
+  <img src="https://cdn.discordapp.com/avatars/264200249545850890/1806a4b3a24bc961790f2e5cf99c63c4.png?size=256" width="120px;" alt="AtomicFalco"/>
+</td>
+<td align="center">
+  <strong>Coggernaut</strong>
+  <img src="https://cdn.discordapp.com/avatars/201845856553533440/7711758951cf45569d84d3f648c56aae.png?size=256" width="120px;" alt="Coggernaut"/>
+</td>
+<td align="center">
+  <strong>Garion132</strong>
+  <img src="https://cdn.discordapp.com/avatars/118877444542300164/ee0bac252d2038b1cf77d1b382618918.png?size=256" width="120px;" alt="Garion132"/>
+</td>
+<td align="center">
+  <strong>Imperialism</strong>
+  <img src="https://cdn.discordapp.com/avatars/254066709252669440/dbe57d4081757cc0aa36ae256e106284.png?size=256" width="120px;" alt="Imperialism"/>
+</td>
+<td align="center">
+  <strong>Kuba</strong>
+  <img src="https://cdn.discordapp.com/avatars/320588200026308608/6109e4fcecf4e966d92545d72efdc332.png?size=256" width="120px;" alt="Kraken"/>
+</td>
+<td align="center">
+  <strong>Londinium</strong>
+  <img src="https://cdn.discordapp.com/avatars/246957288881913857/09f0493f82af5544031208bf01afe898.png?size=256" width="120px;" alt="Kuba"/>
+</td>
+<td align="center">
+  <strong>TPS-Geronam</strong>
+  <img src="https://cdn.discordapp.com/avatars/212693204519223296/12c04fd0ebb1cde05159ae6c5c25e41c.png?size=256" width="120px;" alt="TPS-Geronam"/>
+</td>
+<td align="center">
+  <strong>Vanadium</strong>
+  <img src="https://cdn.discordapp.com/avatars/260139598972321793/936e61461f6e82564be9a2b29d3d2f14.png?size=256" width="120px;" alt="Vanadium"/>
+</td>
+</tr>
+</table>
