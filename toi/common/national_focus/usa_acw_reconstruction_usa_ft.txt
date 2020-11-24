@@ -684,14 +684,169 @@ focus_tree = {
 	######################################################################################
 
 	focus = {
-		id = USA_Focus_ACW_Election_1860
-		icon = GFX_goal_focus_elections
-		cost = 14
+		id = USA_Focus_PACW_1860_Campaigns
+		icon = GFX_goal_focus_newspapers
+		cost = 70
 
 		x = 12
-		y = 22
+		y = 21
 
 		ai_will_do = { base = 4 }
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = USA_Focus_ACW_Election_Campaign_1860_tt
+				always = no
+			}
+		}
+		bypass = {
+			hidden_trigger = {
+				OR = {
+					has_country_flag = USA_BeckenridgeElected
+					has_country_flag = USA_BellElected
+					has_country_flag = USA_DouglasElected
+					has_country_flag = USA_LincolnElected
+				}
+			}
+		}
+
+		completion_reward = {
+			add_stability = 0.025
+			add_war_support = -0.025
+		}
+	}
+	focus = {
+		id = USA_Focus_PACW_The_Abolitionists
+		icon = GFX_goal_continuous_boost_freedom
+		cost = 21
+
+		relative_position_id = USA_Focus_PACW_1860_Campaigns
+		x = -3
+		y = 1
+
+		ai_will_do = { base = 75 }
+
+		prerequisite = { focus = USA_Focus_PACW_1860_Campaigns }
+		mutually_exclusive = { focus = USA_Focus_PACW_The_Unionists }
+		mutually_exclusive = { focus = USA_Focus_PACW_Pro_Slavery }
+
+		available = {
+			has_country_flag = USA_Slavery_Debate_Ongoing
+			check_variable = { USA_Slavery_Debate_Leaning < 5 }
+		}
+
+		select_effect = {
+			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -10 }
+			USA_Slavery_Debate_Leaning_Modify = yes
+		}
+
+		completion_reward = {
+			add_political_power = 25
+			add_war_support = 0.05
+			# if = {
+			# 	limit = { has_idea = usa_slavery_law }
+			# 	activate_decision = USA_Slavery_Debate_Repeal_Fugitive_Act
+			# }
+		}
+	}
+	focus = {
+		id = USA_Focus_PACW_The_Unionists
+		icon = GFX_goal_focus_reform_administration
+		cost = 21
+		dynamic = yes
+
+		relative_position_id = USA_Focus_PACW_1860_Campaigns
+		x = 0
+		y = 1
+
+		ai_will_do = { base = 5 }
+
+		prerequisite = { focus = USA_Focus_PACW_1860_Campaigns }
+		mutually_exclusive = { focus = USA_Focus_PACW_The_Abolitionists }
+		mutually_exclusive = { focus = USA_Focus_PACW_Pro_Slavery }
+		available = {
+			has_country_flag = USA_Slavery_Debate_Ongoing
+			check_variable = { USA_Slavery_Debate_Leaning < 10 }
+			check_variable = { USA_Slavery_Debate_Leaning > -10 }
+		}
+		bypass = {
+			NOT = { has_country_flag = USA_Slavery_Debate_Ongoing }
+		}
+
+		select_effect = {
+			if = {
+				limit = { check_variable = { USA_Slavery_Debate_Leaning < -5 } }
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 5 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+			}
+			else_if = {
+				limit = { check_variable = { USA_Slavery_Debate_Leaning > 5 } }
+				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -5 }
+				USA_Slavery_Debate_Leaning_Modify = yes
+			}
+		}
+
+		completion_reward = {
+			add_political_power = 25
+			add_war_support = 0.05
+			# if = {
+			# 	limit = { has_idea = usa_slavery_law }
+			# 	activate_decision = USA_Slavery_Debate_Liberia_Investments
+			#		activate_decision = USA_Slavery_Debate_Amazonian_Colony
+			#		activate_decision = USA_Slavery_Debate_Our_Domincan_Republic
+			# }
+		}
+	}
+	focus = {
+		id = USA_Focus_PACW_Pro_Slavery
+		icon = GFX_goal_generic_forceful_treaty
+		cost = 21
+
+		relative_position_id = USA_Focus_PACW_1860_Campaigns
+		x = 3
+		y = 1
+
+		ai_will_do = { base = 15 }
+
+		prerequisite = { focus = USA_Focus_PACW_1860_Campaigns }
+		mutually_exclusive = { focus = USA_Focus_PACW_The_Unionists }
+		mutually_exclusive = { focus = USA_Focus_PACW_The_Abolitionists }
+
+		available = {
+			has_country_flag = USA_Slavery_Debate_Ongoing
+			check_variable = { USA_Slavery_Debate_Leaning > -5 }
+		}
+
+		select_effect = {
+			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 10 }
+			USA_Slavery_Debate_Leaning_Modify = yes
+		}
+
+		completion_reward = {
+			add_political_power = 25
+			add_war_support = 0.05
+			# if = {
+			# 	limit = { has_idea = usa_slavery_law }
+			# 	activate_decision = USA_Slavery_Debate_Corwin_Amendment
+			# }
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Election_1860
+		icon = GFX_goal_focus_elections
+		cost = 7
+
+		relative_position_id = USA_Focus_PACW_The_Unionists
+		x = 0
+		y = 1
+
+		ai_will_do = { base = 1000 }
+
+		prerequisite = {
+			focus = USA_Focus_PACW_The_Abolitionists
+			focus = USA_Focus_PACW_The_Unionists
+			focus = USA_Focus_PACW_Pro_Slavery
+		}
 
 		available = {
 			custom_trigger_tooltip = {
@@ -712,120 +867,28 @@ focus_tree = {
 
 		completion_reward = {
 			add_political_power = 150
-		}
-	}
-	focus = {
-		id = USA_Focus_ACW_PACW_POLITICS1
-		icon = GFX_goal_continuous_boost_freedom
-		cost = 35
-
-		relative_position_id = USA_Focus_ACW_Election_1860
-		x = -1
-		y = 1
-
-		ai_will_do = { 
-			base = 4
-			modifier = {
-				factor = 0
-				check_variable = { USA_Slavery_Debate_Leaning > 0 }
-			}
-		}
-
-		mutually_exclusive = { focus = USA_Focus_ACW_PACW_POLITICS2 }
-		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
-		available = {
-			check_variable = { USA_Slavery_Debate_Leaning < 5 }
-		}
-
-		completion_reward = {
-			add_political_power = 50
-			if = {
-				limit = { has_country_flag = USA_Slavery_Debate_Ongoing }
-				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -5 }
-				USA_Slavery_Debate_Leaning_Modify = yes
-				set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
-				USA_Slavery_Debate_Tension_Modify = yes
-				#activate_decision = USA_Slavery_Debate_Repeal_Fugitive_Act
+			hidden_effect = {
+				mark_focus_tree_layout_dirty = yes
 			}
 		}
 	}
 	focus = {
-		id = USA_Focus_ACW_PACW_POLITICS2
-		icon = GFX_goal_generic_forceful_treaty
-		cost = 21
-
-		relative_position_id = USA_Focus_ACW_Election_1860
-		x = 1
-		y = 1
-
-		ai_will_do = { 
-			base = 4
-			modifier = {
-				factor = 0
-				check_variable = { USA_Slavery_Debate_Leaning < 0 }
-			}
-		}
-
-		mutually_exclusive = { focus = USA_Focus_ACW_PACW_POLITICS1 }
-		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
-		available = {
-			check_variable = { USA_Slavery_Debate_Leaning > -5 }
-		}
-
-		completion_reward = {
-			add_political_power = 50
-			if = {
-				limit = { has_country_flag = USA_Slavery_Debate_Ongoing }
-				set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 5 }
-				USA_Slavery_Debate_Leaning_Modify = yes
-				set_temp_variable = { USA_Slavery_Debate_Tension_Change = -3 }
-				USA_Slavery_Debate_Tension_Modify = yes
-				#activate_decision = USA_Slavery_Debate_Corwin_Amendment
-			}
-			
-		}
-	}
-	focus = {
-		id = USA_Focus_ACW_Crisis_of_1861
-		icon = GFX_goal_focus_american_civil_war
-		cost = 35
-
-		relative_position_id = USA_Focus_ACW_Election_1860
-		x = 0
-		y = 2
-
-		ai_will_do = { base = 10 }
-
-		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
-		available = {
-			date > 1861.1.1
-		}
-		bypass = {
-			NOT = { has_country_flag = USA_Slavery_Debate_Ongoing }
-		}
-
-		completion_reward = {
-			add_war_support = -0.025
-			add_political_power = 75
-		}
-	}
-	focus = {
-		id = USA_Focus_ACW_New_Presidency
-		icon = GFX_goal_focus_american_civil_war
+		id = USA_Focus_NACW_New_Presidency
+		icon = GFX_goal_focus_government_control
 		cost = 70
 
-		relative_position_id = USA_Focus_ACW_Crisis_of_1861
+		relative_position_id = USA_Focus_ACW_Election_1860
 		x = 12
 		y = 2
 
 		ai_will_do = { base = 100 }
 
+		allowed_branch = { has_country_flag = USA_Douglas_Dead }
+
 		available = {
 			NOT = { has_idea = idea_national_funeral }
-			hidden_trigger = {
-				has_country_flag = USA_Douglas_Dead
-			}
 		}
+
 		bypass = {
 			hidden_trigger = {
 				has_global_flag = ACW_Great_Collapse
@@ -840,21 +903,24 @@ focus_tree = {
 			else = {
 				add_political_power = 50
 			}
+			hidden_effect = {
+				mark_focus_tree_layout_dirty = yes
+			}
 		}
 	}
 
 	focus = {
-		id = USA_Focus_ACW_Great_Collapse
-		icon = GFX_goal_focus_american_civil_war
+		id = USA_Focus_NACW_Great_Collapse
+		icon = GFX_goal_focus_eagle_shattered
 		cost = 105
 
-		relative_position_id = USA_Focus_ACW_Crisis_of_1861
-		x = 12
-		y = 3
+		relative_position_id = USA_Focus_NACW_New_Presidency
+		x = 0
+		y = 1
 
 		ai_will_do = { base = 100 }
 
-		prerequisite = { focus = USA_Focus_ACW_New_Presidency }
+		prerequisite = { focus = USA_Focus_NACW_New_Presidency }
 		available = { 
 			has_global_flag = ACW_Great_Collapse
 		}
@@ -880,12 +946,12 @@ focus_tree = {
 		icon = GFX_goal_SWE_legislative_agenda
 		cost = 7
 
-		relative_position_id = USA_Focus_ACW_Crisis_of_1861
+		relative_position_id = USA_Focus_ACW_Election_1860
 		x = 7
 		y = 1
 
 		mutually_exclusive = { focus = USA_Focus_ACW_Controversial_Elected }
-		prerequisite = { focus = USA_Focus_ACW_Crisis_of_1861 }
+		prerequisite = { focus = USA_Focus_ACW_Election_1860 }
 		available = {
 			OR = {
 				has_country_flag = USA_DouglasElected
@@ -903,7 +969,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Union_Party
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_cardwell_reforms
 		cost = 56
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
@@ -940,7 +1006,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Federal_Ideology
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_popularize
 		cost = 56
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
@@ -959,7 +1025,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Federal_Thought
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_government_control
 		cost = 70
 
 		relative_position_id = USA_Focus_NACW_Federal_Ideology
@@ -982,7 +1048,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Liberal_Ideology
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_freedom_press
 		cost = 56
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
@@ -1001,7 +1067,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Democrat_Party
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_the_volunteer_movement
 		cost = 56
 
 		relative_position_id = USA_Focus_ACW_Moderate_Elected
@@ -1027,7 +1093,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Popular_Sovereignty
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_focus_decentralisation_power
 		cost = 70
 
 		relative_position_id = USA_Focus_NACW_Democrat_Party
@@ -1075,7 +1141,7 @@ focus_tree = {
 	}
 	focus = {
 		id = USA_Focus_NACW_Complete_Cabinet
-		icon = GFX_goal_focus_enact_law
+		icon = GFX_goal_focus_reform_administration
 		cost = 70
 
 		relative_position_id = USA_Focus_ACW_Tour_of_America
@@ -1812,12 +1878,12 @@ focus_tree = {
 		icon = GFX_goal_SWE_purge_liberals
 		cost = 70
 
-    relative_position_id = USA_Focus_ACW_Crisis_of_1861
+    relative_position_id = USA_Focus_ACW_Election_1860
 		x = -7
 		y = 1
 
 		mutually_exclusive = { focus = USA_Focus_ACW_Moderate_Elected }
-    prerequisite = { focus = USA_Focus_ACW_Crisis_of_1861 }
+    prerequisite = { focus = USA_Focus_ACW_Election_1860 }
 		available = {
 			OR = {
 				has_country_flag = USA_BeckenridgeElected
