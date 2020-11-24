@@ -679,7 +679,7 @@ focus_tree = {
 
 # }
 
-	######################################################################################
+ #######################################################################################
 	#		Prelude to the American Civil War by Vanadium
 	######################################################################################
 
@@ -707,6 +707,8 @@ focus_tree = {
 				has_country_flag = USA_LincolnElected
 			}
 		}
+
+		dynamic = yes
 
 		completion_reward = {
 			add_political_power = 150
@@ -831,8 +833,8 @@ focus_tree = {
 		}
 
 		completion_reward = {
-      			if = {
-        			limit = { has_political_power < -50 }
+			if = {
+				limit = { has_political_power < -50 }
 				set_political_power = 0
 			}
 			else = {
@@ -869,7 +871,7 @@ focus_tree = {
 		}
 	}
 
-	######################################################################################
+ #######################################################################################
 	#		Avoid the American Civil War by Vanadium
 	######################################################################################
 	
@@ -1801,7 +1803,7 @@ focus_tree = {
     }
 	}
 
-	######################################################################################
+ #######################################################################################
 	#		Deal with the American Civil War by Vanadium
 	######################################################################################
 
@@ -1817,25 +1819,22 @@ focus_tree = {
 		mutually_exclusive = { focus = USA_Focus_ACW_Moderate_Elected }
     prerequisite = { focus = USA_Focus_ACW_Crisis_of_1861 }
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis_tt
-				OR = {
-					has_idea = USA_Spirit_Southern_Secession_Crisis
-					has_idea = USA_northern_coup_crisis
-          has_war_with = CAL
-				}
+			OR = {
+				has_country_flag = USA_BeckenridgeElected
+				has_country_flag = USA_LincolnElected
 			}
 		}
 
 		completion_reward = {
 			add_stability = -0.05
 			add_political_power = 75
+			add_command_power = 20
 		}
 	}
 	focus = {
 		id = USA_Focus_ACW_The_North
 		icon = GFX_goal_focus_american_civil_war
-		cost = 5
+		cost = 35
 
 		relative_position_id = USA_Focus_ACW_Controversial_Elected
 		x = -2
@@ -1846,49 +1845,45 @@ focus_tree = {
 			focus = USA_Focus_ACW_Moderate_Elected 
 		}
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Northern_Secession_Crisis
-			}
+			country_exists = NEG
 		}
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Northern_Secession_Crisis
-			}
+			has_idea = USA_Spirit_Northern_Secession_Crisis
 		}
 
 		completion_reward = {
-			add_manpower = 5000
-			hidden_effect = {
-				add_ideas = Generic_National_Riot_1
-			}
+			set_temp_variable = { acw_weapons_count_change = 3 }
+			ACW_Weapons_Count_Get = yes
+			set_temp_variable = { acw_draft_count_change = 2 }
+			ACW_Draft_Count_Get = yes
 		}
 	}
 	focus = {
 		id = USA_Focus_ACW_The_North2
-		icon = GFX_goal_focus_american_civil_war
+		icon = GFX_goal_continuous_boost_freedom
 		cost = 70
 
 		relative_position_id = USA_Focus_ACW_The_North
 		x = 0
 		y = 1
 
-		prerequisite = { 
-			focus = USA_Focus_ACW_The_North
-			focus = USA_Focus_American_Civil_War
-		}
+		prerequisite = { focus = USA_Focus_ACW_The_North }
+		prerequisite = { focus = USA_Focus_American_Civil_War }
 		available = { has_idea = Generic_National_Riot_1 }
 
 		completion_reward = {
 			add_stability = 0.02
-			add_ideas = Generic_National_Riot_1
+			remove_ideas = Generic_National_Riot_1
+			if = {
+				limit = { NOT = { 359 = { is_core_of = ROOT } } }
+				add_state_core = 359
+			}
 		}
 	} 
 	focus = {
 		id = USA_Focus_ACW_The_South
 		icon = GFX_goal_focus_american_civil_war
-		cost = 70
+		cost = 35
 
 		relative_position_id = USA_Focus_ACW_Controversial_Elected
 		x = 2
@@ -1896,41 +1891,60 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_ACW_Controversial_Elected }
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_The_South_tt
-				has_global_flag = ACW_American_Civil_War
-				CSA = { exists = yes }
-			}
+			country_exists = CSA
 		}
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_The_South_tt
-				has_global_flag = ACW_American_Civil_War
-				CSA = { exists = yes }
-			}
+			has_idea = USA_Spirit_Southern_Secession_Crisis
 		}
 
-		completion_reward = {	
+		completion_reward = {
+			set_temp_variable = { acw_weapons_count_change = 3 }
+			ACW_Weapons_Count_Get = yes
+			set_temp_variable = { acw_draft_count_change = 2 }
+			ACW_Draft_Count_Get = yes
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_The_South2
+		icon = GFX_goal_continuous_restrict_freedom
+		cost = 70
+
+		relative_position_id = USA_Focus_ACW_The_South
+		x = 0
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_The_South }
+		prerequisite = { focus = USA_Focus_American_Civil_War }
+		available = { has_idea = Generic_National_Riot_1 }
+
+		completion_reward = {
+			add_stability = 0.02
+			remove_ideas = Generic_National_Riot_1
+			if = {
+				limit = { NOT = { 368 = { is_core_of = ROOT } } }
+				add_state_core = 368
+			}
 		}
 	}
 	focus = {
 		id = USA_Focus_American_Civil_War
 		icon = GFX_goal_focus_american_civil_war
-		cost = 5
+		cost = 21
 
 		relative_position_id = USA_Focus_ACW_Controversial_Elected
 		x = 0
-		y = 3
+		y = 1
 
 		prerequisite = { focus = USA_Focus_ACW_Controversial_Elected }
 		available = {
 			has_global_flag = ACW_American_Civil_War
 		}
 		bypass = {
-			has_global_flag = ACW_American_Civil_War
+			has_global_flag = ACW_American_Civil_War_Happened
 		}
 
 		completion_reward = {
+			add_command_power = 50
 		}
 	}
 	focus = {
@@ -1939,7 +1953,7 @@ focus_tree = {
 		cost = 70
 
 		relative_position_id = USA_Focus_ACW_The_South
-		x = 0
+		x = 3
 		y = 1
 
 		prerequisite = { 
@@ -1947,45 +1961,10 @@ focus_tree = {
 			focus = USA_Focus_ACW_The_South
 		}
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
+			has_idea = USA_Spirit_Southern_Secession_Crisis
 		}
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
-		}
-
-		completion_reward = {
-		}
-	}
-	focus = {
-		id = USA_Focus_ACW_Innaguration_1861
-		icon = GFX_goal_focus_american_civil_war
-		cost = 70
-
-		
-		relative_position_id = USA_Focus_ACW_Empty_Congress
-		x = 0
-		y = 1
-
-		prerequisite = { 
-			focus = USA_Focus_ACW_Empty_Congress
-		}
-		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
-		}
-		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
+			has_idea = USA_Spirit_Southern_Secession_Crisis
 		}
 
 		completion_reward = {
@@ -1996,24 +1975,18 @@ focus_tree = {
 		icon = GFX_goal_focus_american_civil_war
 		cost = 70
 
-		relative_position_id = USA_Focus_ACW_Innaguration_1861
+		relative_position_id = USA_Focus_ACW_Empty_Congress
 		x = 0
 		y = 1
 
 		prerequisite = { 
-			focus = USA_Focus_ACW_Innaguration_1861
+			focus = USA_Focus_ACW_Empty_Congress
 		}
 		available = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
+			has_idea = USA_Spirit_Southern_Secession_Crisis
 		}
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = USA_Focus_ACW_Secession_Crisis
-				has_idea = USA_Spirit_Southern_Secession_Crisis
-			}
+			has_idea = USA_Spirit_Southern_Secession_Crisis
 		}
 
 		completion_reward = {
@@ -2031,10 +2004,7 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_American_Civil_War }
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = ACW_American_Civil_War_Happened_tt
-				has_global_flag = ACW_American_Civil_War_Happened
-			}
+			has_global_flag = ACW_American_Civil_War_Happened
 		}
 
 		completion_reward = {
@@ -2049,27 +2019,25 @@ focus_tree = {
 		}
 	}
 	focus = {
-		id = USA_Focus_ACW_Sign_Draft
-		icon = GFX_goal_focus_us_anaconda_plan
+		id = USA_Focus_ACW_Revenue_Act
+		icon = GFX_goal_focus_banks
 		cost = 35
 
 		relative_position_id = USA_Focus_ACW_Defend_Washington
-		x = -3
+		x = 1
 		y = 1
 
 		prerequisite = { focus = USA_Focus_ACW_Defend_Washington }
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = ACW_American_Civil_War_Happened_tt
-				has_global_flag = ACW_American_Civil_War_Happened
-			}
+			has_global_flag = ACW_American_Civil_War_Happened
 		}
 		completion_reward = {
+			add_ideas = USA_Revenue_Act_Of_1861
 		}
 	}
 	focus = {
-		id = USA_Focus_ACW_Martial_Lawa
-		icon = GFX_goal_focus_us_anaconda_plan
+		id = USA_Focus_ACW_Martial_Law
+		icon = GFX_focus_generic_military_mission
 		cost = 35
 
 		relative_position_id = USA_Focus_ACW_Defend_Washington
@@ -2078,24 +2046,23 @@ focus_tree = {
 
 		prerequisite = { focus = USA_Focus_ACW_Defend_Washington }
 		bypass = {
-			custom_trigger_tooltip = {
-				tooltip = ACW_American_Civil_War_Happened_tt
-				has_global_flag = ACW_American_Civil_War_Happened
-			}
+			has_global_flag = ACW_American_Civil_War_Happened
 		}
 		completion_reward = {
+			add_ideas = USA_Spirit_ACW_Martial_Law
 		}
 	}
 	focus = {
-		id = USA_Focus_Anacondra_Plan
-		icon = GFX_goal_focus_us_anaconda_plan
+		id = USA_Focus_ACW_Glory_Glory
+		icon = GFX_goal_generic_army_artillery
 		cost = 21
 
-		relative_position_id = USA_Focus_ACW_Defend_Washington
-		x = 0
-		y = 3
+		relative_position_id = USA_Focus_ACW_Martial_Law
+		x = -1
+		y = 1
 
-		prerequisite = { focus = USA_Focus_ACW_Defend_Washington }
+		prerequisite = { focus = USA_Focus_ACW_Martial_Law }
+		prerequisite = { focus = USA_Focus_ACW_Revenue_Act }
 		bypass = {
 			custom_trigger_tooltip = {
 				tooltip = ACW_American_Civil_War_Happened_tt
@@ -2103,7 +2070,151 @@ focus_tree = {
 			}
 		}
 		completion_reward = {
-			add_ideas = USA_Civil_War_Anaconda_Plan
+			random_owned_controlled_state = {
+				limit = { is_core_of = USA }
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			add_political_power = -25
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Hallelujah
+		icon = GFX_goal_generic_army_artillery
+		cost = 56
+
+		relative_position_id = USA_Focus_ACW_Glory_Glory
+		x = 0
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_Glory_Glory }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
+			add_ideas = USA_Spirit_American_Civil_War_Facto
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Army_Restructurement
+		icon = GFX_goal_focus_us_anaconda_plan
+		cost = 21
+
+		relative_position_id = USA_Focus_ACW_Defend_Washington
+		x = 0
+		y = 2
+
+		prerequisite = { focus = USA_Focus_ACW_Martial_Law }
+		prerequisite = { focus = USA_Focus_ACW_Revenue_Act }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
+			add_command_power = 50
+			swap_ideas = {
+				remove_idea = USA_Spirit_American_Civil_War_Army_Competency1
+				add_idea = USA_Spirit_American_Civil_War_Army_Competency2
+			}
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Anacondra_Plan
+		icon = GFX_goal_focus_us_anaconda_plan
+		cost = 56
+
+		relative_position_id = USA_Focus_ACW_Army_Restructurement
+		x = 0
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_Army_Restructurement }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
+			add_ideas = USA_Spirit_American_Civil_War_Anaconda_Plan
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Down_With_the_Traitor
+		icon = GFX_goal_focus_us_anaconda_plan
+		cost = 21
+
+		relative_position_id = USA_Focus_ACW_Revenue_Act
+		x = 1
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_Martial_Law }
+		prerequisite = { focus = USA_Focus_ACW_Revenue_Act }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
+			set_temp_variable = { acw_weapons_count_change = 5 }
+			ACW_Weapons_Count_Get = yes
+			set_temp_variable = { acw_draft_count_change = 5 }
+			ACW_Draft_Count_Get = yes
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_Up_With_the_Stars
+		icon = GFX_goal_focus_us_anaconda_plan
+		cost = 56
+
+		relative_position_id = USA_Focus_ACW_Down_With_the_Traitor
+		x = 0
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_Down_With_the_Traitor }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
+			add_command_power = 50
+			add_ideas = USA_Spirit_American_Civil_War_Cons
+			set_temp_variable = { acw_weapons_count_change = 12 }
+			ACW_Weapons_Count_Get = yes
+			set_temp_variable = { acw_draft_count_change = 5 }
+			ACW_Draft_Count_Get = yes
+		}
+	}
+	focus = {
+		id = USA_Focus_ACW_McClellan_Commands
+		icon = GFX_goal_focus_general_mcclellan
+		cost = 56
+
+		relative_position_id = USA_Focus_ACW_Hallelujah
+		x = -1
+		y = 1
+
+		prerequisite = { focus = USA_Focus_ACW_Hallelujah }
+		prerequisite = { focus = USA_Focus_ACW_Anacondra_Plan }
+		prerequisite = { focus = USA_Focus_ACW_Up_With_the_Stars }
+		bypass = {
+			custom_trigger_tooltip = {
+				tooltip = ACW_American_Civil_War_Happened_tt
+				has_global_flag = ACW_American_Civil_War_Happened
+			}
+		}
+		completion_reward = {
 		}
 	}
 	focus = {
@@ -2167,7 +2278,7 @@ focus_tree = {
 		}
 		completion_reward = {
 			add_political_power = 50
-			add_ideas = USA_martial_law_civil_war
+			add_ideas = USA_Spirit_ACW_Martial_Law
 		}
 
 	}
@@ -2285,7 +2396,7 @@ focus_tree = {
 						}
 				}
 			completion_reward = {
-					add_ideas = USA_Civil_War_Cons
+					add_ideas = USA_Spirit_American_Civil_War_Cons
 				}
 
 	}
@@ -2305,16 +2416,15 @@ focus_tree = {
 		relative_position_id = USA_temp_fix
 		x = -1
 		y = 2
-			bypass = {
-					OR = {
-							has_country_flag = USASoaring_Eagle
-							has_country_flag = USABroken_Eagle
-						}
-				}
-			completion_reward = {
-					add_ideas = USA_Civil_War_Indust_1
-				}
-
+		bypass = {
+			OR = {
+				has_country_flag = USASoaring_Eagle
+				has_country_flag = USABroken_Eagle
+			}
+		}
+		completion_reward = {
+			add_ideas = USA_Spirit_American_Civil_War_Indust_1
+		}
 	}
 	focus = {
 		id = USA_and_men_are_chattels
@@ -2366,8 +2476,8 @@ focus_tree = {
 				}
 			completion_reward = {
 					swap_ideas = {
-							remove_idea = USA_Civil_War_Indust_1
-							add_idea = USA_Civil_War_Indust_2
+							remove_idea = USA_Spirit_American_Civil_War_Indust_1
+							add_idea = USA_Spirit_American_Civil_War_Indust_2
 						}
 				}
 
@@ -2389,7 +2499,7 @@ focus_tree = {
 						}
 				}
 			completion_reward = {
-					add_ideas = USA_Civil_War_Facto
+					add_ideas = USA_Spirit_American_Civil_War_Facto
 				}
 
 	}
@@ -2410,11 +2520,11 @@ focus_tree = {
 		x = 3
 		y = 2
 			bypass = {
-					OR = {
-							has_country_flag = USASoaring_Eagle
-							has_country_flag = USABroken_Eagle
-						}
+				OR = {
+					has_country_flag = USASoaring_Eagle
+					has_country_flag = USABroken_Eagle
 				}
+			}
 			completion_reward = {
 					add_political_power = 100
 				}
@@ -2458,7 +2568,7 @@ focus_tree = {
 			focus = USA_hallelujah
 		}
 		available = {
-			NOT = { has_idea = USA_Civil_War_Army_Competency }
+			NOT = { has_idea = USA_Spirit_American_Civil_War_Army_Competency1 }
 		}
 		relative_position_id = USA_temp_fix
 		x = 1
@@ -3368,7 +3478,7 @@ focus_tree = {
 		x = 40
 		y = 3
 		completion_reward = {
-			remove_ideas = USA_martial_law_civil_war
+			remove_ideas = USA_Spirit_ACW_Martial_Law
 			country_event = { id = usa.85 }
 		}
 
@@ -4235,13 +4345,12 @@ focus_tree = {
 		relative_position_id = USA_civil_war_tactics
 		x = 2
 		y = 4
-			completion_reward = {
-					swap_ideas = {
-							remove_idea = civil_war_defend_2
-							add_idea = civil_war_defend_3
-						}
-				}
-
+		completion_reward = {
+			swap_ideas = {
+				remove_idea = civil_war_defend_2
+				add_idea = civil_war_defend_3
+			}
+		}
 	}
 	focus = {
 		id = USA_reform_the_union_army
@@ -4254,10 +4363,9 @@ focus_tree = {
 		relative_position_id = USA_civil_war_tactics
 		x = 0
 		y = 5
-			completion_reward = {
-					remove_ideas = USA_Civil_War_Army_Competency
-				}
-
+		completion_reward = {
+			remove_ideas = USA_Spirit_American_Civil_War_Army_Competency
+		}
 	}
 	focus = {
 		id = USA_win_rebuild_scarolina
