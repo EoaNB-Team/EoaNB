@@ -1,24 +1,271 @@
-setup_initial_legitimacy = {
+# Setup Legitimacy
+eoanb_political_legitimacy_setup = {
+	# Randomization
 	randomize_temp_variable = {
 		var = political_legitimacy_change
 		distribution = uniform
 		min = 0.6
 		max = 0.8
 	}
-	if = {
-		limit = { has_war = yes }
-		subtract_from_temp_variable = { political_legitimacy_change = 0.05 }
-	}
 	eoanb_political_legitimacy_change = yes
 	add_dynamic_modifier = { modifier = legitimacy_dynamic_modifier }
 }
+
+# Monthly Legitimacy Drift
+eoanb_political_legitimacy_drift = {
+	# Check if Legitimacy is a thing
+	if = {
+		limit = {
+			NOT = {
+				AND = {
+					has_variable = political_legitimacy
+					has_dynamic_modifier = {
+						modifier = legitimacy_dynamic_modifier
+					}
+				}
+			}
+		}
+		eoanb_political_legitimacy_setup = yes
+	}
+
+	# Base Value
+	set_variable = { political_legitimacy_equilibrium = 0.70 }
+	# Modifiers
+	if = {
+		limit = {
+			has_offensive_war = yes
+		}
+		add_to_variable = { political_legitimacy_equilibrium = -0.05 }
+	}
+	if = {
+		limit = {
+			has_defensive_war = yes
+		}
+		add_to_variable = { political_legitimacy_equilibrium = 0.03 }
+	}
+	if = {
+		limit = {
+			OR = {
+				has_government = anarchism
+				AND = {
+					has_government = autocracy
+					has_ideas = absolute_monarchy
+				}
+			}
+		}
+		if = {
+			limit = { has_government = anarchism }
+			add_to_variable = { political_legitimacy_equilibrium = -0.10 }
+		}
+		else_if = {
+			limit = { 
+				has_government = autocracy
+				has_ideas = no_heir
+			}
+			add_to_variable = { political_legitimacy_equilibrium = -0.10 }
+		}
+		else_if = {
+			limit = {
+				has_government = autocracy
+				OR = {
+					has_ideas = dethroned_heir
+					has_ideas = weak_heir
+				}
+			}
+			add_to_variable = { political_legitimacy_equilibrium = -0.05 }
+		}
+		else_if = {
+			limit = {
+				has_government = autocracy
+				has_ideas = nonfamily_heir
+			}
+			add_to_variable = { political_legitimacy_equilibrium = -0.02 }
+		}
+		else_if = {
+			limit = {
+				has_government = autocracy
+				has_ideas = has_heir
+			}
+			add_to_variable = { political_legitimacy_equilibrium = 0.05 }
+		}
+	}
+	else = {
+		if = {
+			limit = {
+				party_popularity@ruling_party < 0.35
+				highest_party_popularity@exclude_ruling_party > 0.49
+			}
+			add_to_variable = { political_legitimacy_equilibrium = -0.10 }
+		}
+		if = {
+			limit = { has_ideas = no_constitution }
+			add_to_variable = { political_legitimacy_equilibrium = -0.05 }
+		}
+		else_if = {
+			limit = { has_ideas = human_rights }
+			add_to_variable = { political_legitimacy_equilibrium = -0.01 }
+		}
+		else_if = {
+			limit = { has_ideas = constitution_adopted }
+			add_to_variable = { political_legitimacy_equilibrium = 0.01 }
+		}
+		else_if = {
+			limit = { has_ideas = limited_constitution }
+			add_to_variable = { political_legitimacy_equilibrium = 0.05 }
+		}
+		else_if = {
+			limit = {
+				has_ideas = sharia_constitution
+				OR = {
+					has_ideas = religion_sunni
+					has_ideas = religion_shiite
+					has_ideas = religion_ibadi
+				}
+			}
+			add_to_variable = { political_legitimacy_equilibrium = 0.07 }
+		}
+		else_if = {
+			limit = {
+				has_ideas = sharia_constitution
+				NOT = {
+					OR = {
+						has_ideas = religion_sunni
+						has_ideas = religion_shiite
+						has_ideas = religion_ibadi
+					}
+				}
+			}
+			add_to_variable = { political_legitimacy_equilibrium = -0.07 }
+		}
+	}
+	if = {
+		limit = { check_variable = { pol_stability < -2 } }
+		add_to_variable = { political_legitimacy_equilibrium = -0.09 }
+	}
+	else_if = {
+		limit = { check_variable = { pol_stability = -2 } }
+		add_to_variable = { political_legitimacy_equilibrium = -0.06 }
+	}
+	else_if = {
+		limit = { check_variable = { pol_stability = -1 } }
+		add_to_variable = { political_legitimacy_equilibrium = -0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { pol_stability = 1 } }
+		add_to_variable = { political_legitimacy_equilibrium = 0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { pol_stability = 2 } }
+		add_to_variable = { political_legitimacy_equilibrium = 0.06 }
+	}
+	else_if = {
+		limit = { check_variable = { pol_stability = 3 } }
+		add_to_variable = { political_legitimacy_equilibrium = 0.09 }
+	}
+	if = {
+		limit = { has_ideas = edc_bankrupt }
+		add_to_variable = { political_legitimacy_equilibrium = -0.30 }
+	}
+	else_if = {
+		limit = { has_ideas = edc_bankrupt_reduced }
+		add_to_variable = { political_legitimacy_equilibrium = -0.15 }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_ideas = egy_public_consered_debt_1
+				has_ideas = egy_public_consered_debt_2
+				has_ideas = egy_public_consered_debt_3
+				has_ideas = egy_public_consered_debt_4
+				has_ideas = egy_public_consered_debt_5
+				has_ideas = egy_vic_debt
+			}
+		}
+		if = {
+			limit = { has_ideas = egy_public_consered_debt_1 }
+			add_to_variable = { political_legitimacy_equilibrium = -0.01 }
+		}
+		if = {
+			limit = { has_ideas = egy_public_consered_debt_2 }
+			add_to_variable = { political_legitimacy_equilibrium = -0.02 }
+		}
+		if = {
+			limit = { has_ideas = egy_public_consered_debt_3 }
+			add_to_variable = { political_legitimacy_equilibrium = -0.03 }
+		}
+		if = {
+			limit = { has_ideas = egy_public_consered_debt_4 }
+			add_to_variable = { political_legitimacy_equilibrium = -0.04 }
+		}
+		if = {
+			limit = { has_ideas = egy_public_consered_debt_5 }
+			add_to_variable = { political_legitimacy_equilibrium = -0.05 }
+		}
+		if = {
+			limit = { has_ideas = egy_vic_debt }
+			if = {
+				limit = { check_variable = { debt_level > 19 } }
+				add_to_variable = { political_legitimacy_equilibrium = -0.05 }
+			}
+			else_if = {
+				limit = { check_variable = { debt_level > 14 } }
+				add_to_variable = { political_legitimacy_equilibrium = -0.04 }
+			}
+			else_if = {
+				limit = { check_variable = { debt_level > 9 } }
+				add_to_variable = { political_legitimacy_equilibrium = -0.03 }
+			}
+			else_if = {
+				limit = { check_variable = { debt_level > 4 } }
+				add_to_variable = { political_legitimacy_equilibrium = -0.02 }
+			}
+			else_if = {
+				limit = { check_variable = { debt_level < 5 } }
+				add_to_variable = { political_legitimacy_equilibrium = -0.01 }
+			}
+		}
+	}
+
+	###############
+	clamp_variable = {
+		var = political_legitimacy_equilibrium
+		min = 0.20
+		max = 0.99
+	}
+	set_temp_variable = { political_legitimacy_equilibrium_difference = political_legitimacy_equilibrium }
+	subtract_from_variable = { political_legitimacy_equilibrium_difference = political_legitimacy }
+	if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference < -0.19 } }
+		set_variable = { political_legitimacy_drift = -0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference < -0.09 } }
+		set_variable = { political_legitimacy_drift = -0.02 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference < 0 } }
+		set_variable = { political_legitimacy_drift = -0.01 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference > 0.19  } }
+		set_variable = { political_legitimacy_drift = 0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference > 0.09 } }
+		set_variable = { political_legitimacy_drift = 0.02 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy_equilibrium_difference > 0 } }
+		set_variable = { political_legitimacy_drift = 0.01 }
+	}
+	set_temp_variable = { political_legitimacy_change = political_legitimacy_drift }
+	eoanb_political_legitimacy_change = yes
+}		
 
 eoanb_political_legitimacy_change = {
 	custom_effect_tooltip = eoanb_political_legitimacy_change_tt
 	add_to_variable = { political_legitimacy = political_legitimacy_change }
 
-	set_temp_variable = { full_legitimacy_temp_value = -0.70 }
-	add_to_temp_variable = { full_legitimacy_temp_value = political_legitimacy }
 	clamp_variable = {
 		var = political_legitimacy
 		min = 0
@@ -27,45 +274,4 @@ eoanb_political_legitimacy_change = {
 	set_variable = { legitimacy_ppg = full_legitimacy_temp_value }
 	divide_temp_variable = { full_legitimacy_temp_value = 2 }
 	set_variable = { legitimacy_wsf = full_legitimacy_temp_value }
-
-	if = {
-		limit = { 
-			NOT = { has_country_flag =  LOW_LEGITIMACY_PS_DELAY }
-			OR = {
-				AND = {
-					check_variable = { political_legitimacy < 10 }
-					check_variable = { pol_stability > -3 }
-				}
-				AND = {
-					check_variable = { political_legitimacy < 25 }
-					check_variable = { pol_stability > -2 }
-				}
-				AND = {
-					check_variable = { political_legitimacy < 40 }
-					check_variable = { pol_stability > -1 }
-				}
-			}
-		}				
-		decrease_ps_by_one = yes
-		set_country_flag = LOW_LEGITIMACY_PS_DELAY
-		country_event = { id = pssystem_legitimacy_interaction.1 days = 365 }
-	}
-	else_if = {
-		limit = { 
-			NOT = { has_country_flag =  HIGH_LEGITIMACY_PS_DELAY }
-			OR = {
-				AND = {
-					check_variable = { political_legitimacy > 75 }
-					check_variable = { pol_stability < 1 }
-				}
-				AND = {
-					check_variable = { political_legitimacy >95 }
-					check_variable = { pol_stability > 2 }
-				}
-			}
-		}				
-		increase_ps_by_one = yes
-		set_country_flag = HIGH_LEGITIMACY_PS_DELAY
-		country_event = { id = pssystem_legitimacy_interaction.2 days = 365 }
-	}
 }
