@@ -83,6 +83,10 @@ Have more questions, comments or feedback? You can contact us by joining our dis
   <img src="https://cdn.discordapp.com/avatars/246957288881913857/09f0493f82af5544031208bf01afe898.png?size=256" width="120px;" alt="Kuba"/>
 </td>
 <td align="center">
+  <a href = "https://github.com/condor93"><strong>Lancer2201</strong></a>
+  <img src="https://cdn.discordapp.com/avatars/318886512869507072/652309426aa905288b6824d83f3a4715.png?size=256" width="120px;" alt="Lancer"/>
+</td>
+<td align="center">
   <a href = "https://github.com/TPS-Geronam"><strong>TPS-Geronam</strong></a>
   <img src="https://cdn.discordapp.com/avatars/212693204519223296/12c04fd0ebb1cde05159ae6c5c25e41c.png?size=256" width="120px;" alt="TPS-Geronam"/>
 </td>
