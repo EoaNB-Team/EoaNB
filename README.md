@@ -78,6 +78,8 @@ Have more questions, comments or feedback? You can contact us by joining our dis
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
   <img src="https://cdn.discordapp.com/avatars/320588200026308608/6109e4fcecf4e966d92545d72efdc332.png?size=256" width="120px;" alt="Kuba"/>
 </td>
+</tr>
+<tr>  
 <td align="center">
   <a href = "https://github.com/condor93"><strong>Lancer2201</strong></a>
   <img src="https://cdn.discordapp.com/avatars/318886512869507072/652309426aa905288b6824d83f3a4715.png?size=256" width="120px;" alt="Lancer"/>
