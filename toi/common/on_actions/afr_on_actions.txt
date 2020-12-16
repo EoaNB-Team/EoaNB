@@ -1,0 +1,799 @@
+on_actions = {
+
+	on_capitulation = {
+		effect = {
+			if = {
+				limit = {
+					AND = {
+						ROOT = { check_variable = { var = afr_regional_power_expansion_attacker@FROM value = 1 compare = greater_than_or_equals } }
+						FROM = { check_variable = { var = afr_regional_power_expansion_defender@ROOT value = 1 compare = greater_than_or_equals } }
+					}
+				}
+				ROOT = { country_event = { id = afr_regional_power_peace_treaty.1 } }
+				ROOT = { clear_variable = afr_regional_power_expansion_attacker@FROM }
+				FROM = { clear_variable = afr_regional_power_expansion_defender@ROOT }
+			}
+		}
+	}
+	
+	on_puppet = {
+		effect = {
+			if = { 
+				limit = { 
+					FROM = { afr_is_tribal = yes } #OVERLORD
+					ROOT = { afr_is_tribal = yes } #SUBJECT
+				}
+				ROOT = { 
+					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 3 } 
+					clamp_variable = {
+						var = ROOT.afr_empire_subject_loyalty_var
+						min = -1
+						max = 10
+					}
+				}
+			}
+		}
+	}
+	on_release_as_puppet = {
+		effect = {
+			if = { 
+				limit = { 
+					FROM = { afr_is_tribal = yes } #OVERLORD
+					ROOT = { afr_is_tribal = yes } #SUBJECT
+				}
+				ROOT = { 
+					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 3 } 
+					clamp_variable = {
+						var = ROOT.afr_empire_subject_loyalty_var
+						min = -1
+						max = 10
+					}
+				}
+			}
+		}
+	}
+	on_liberate = {
+		effect = {
+			if = {
+				limit = { ROOT = { has_variable = afr_empire_subject_loyalty_var } }
+				clear_variable = afr_empire_subject_loyalty_var
+				clear_variable = afr_empire_subject_overlord
+			}
+		}
+	}
+	on_subject_free = {
+		effect = {
+			if = {
+				limit = { ROOT = { has_variable = afr_empire_subject_loyalty_var } }
+				clear_variable = afr_empire_subject_loyalty_var
+				clear_variable = afr_empire_subject_overlord
+			}
+		}
+	}
+	on_subject_annexed = {
+		effect = {
+			if = {
+				limit = { ROOT = { has_variable = afr_empire_subject_loyalty_var } }
+				clear_variable = afr_empire_subject_loyalty_var
+				clear_variable = afr_empire_subject_overlord
+			}
+		}
+	}
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = { 
+					ROOT = { afr_is_tribal = yes } 
+					FROM.FROM = { OWNER = { ROOT = { TAG = PREV } } }
+					FROM.FROM = { OWNER = { NOT = { has_variable = PREV.afr_empire_state_loyalty_var@THIS } } }
+					FROM.FROM = { OWNER = { NOT = { has_variable = PREV.afr_empire_state_autonomy_var@THIS } } }
+				}
+				FROM.FROM = {
+					if = {
+						limit = { THIS = { is_capital = yes } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 30 } }
+					}
+					if = {
+						limit = { OWNER = { PREV = { is_core_of = PREV } } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 9 } }
+					}
+					else_if = {
+						limit = { OWNER = { PREV = { is_claimed_by = PREV } } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 6 } }
+					}
+					else = {
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 4 } }
+					}
+					if = {
+						limit = {
+							afr_state_has_multiple_cores = yes
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -3 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 30 } }
+					}
+					if = {
+						limit = { 
+							is_capital = no
+							OWNER = {
+								OR = {
+									has_idea = AF_T_unorganized_tribal_nation
+									has_idea = AF_T_unorganized_tribal_nation_2
+									has_idea = AF_T_unorganized_tribal_nation_3
+									has_idea = AF_T_unorganized_tribal_nation_4
+									has_idea = AF_T_unorganized_tribal_nation_5
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 60 } }
+					}
+					else_if = {
+						limit = { 
+							OWNER = {
+								OR = {
+									has_idea = AF_T_organized_tribal_nation
+									has_idea = AF_T_organized_tribal_nation_2
+									has_idea = AF_T_organized_tribal_nation_3
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 40 } }
+					}
+					else_if = {
+						limit = { 
+							OWNER = {
+								has_idea = AF_T_small_kingdom
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 20 } }
+					}
+					else_if = {
+						limit = { 
+							OWNER = {
+								OR = {
+									has_idea = afr_large_kingdom
+									has_idea = afr_reforming_kingdom
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 10 } }
+					}
+					if = {
+						limit = { OWNER = { has_variable = PREV.afr_empire_state_loyalty_var@THIS } }
+						OWNER = { 
+							clamp_variable = {
+								var = PREV.afr_empire_state_loyalty_var@THIS
+								min = -1
+								max = 10
+							}
+						}
+					}
+					if = {
+						limit = { OWNER = { has_variable = PREV.afr_empire_state_autonomy_var@THIS } }
+						OWNER = { 
+							clamp_variable = {
+								var = PREV.afr_empire_state_autonomy_var@THIS
+								min = 0
+								max = 100
+							}
+						}
+					}
+					hidden_effect = {
+						state_event = { id = afr_empire_politics_successful_remove_war_torn_event.1 days = 540 trigger_for = controller }
+						afr_empire_politics_state_gain_emigration = yes
+						afr_empire_politics_state_gain_war_torn = yes
+
+						clr_state_flag = afr_empire_politics_has_regional_development_boom_flag
+						clr_state_flag = afr_empire_politics_bountiful_harvest_boom_flag
+						clr_state_flag = afr_empire_politics_minor_economic_boom_event_flag
+					}
+				}
+			}
+		}
+	}
+	on_startup = {
+		effect = {
+			if = {
+                limit = {
+                    has_start_date < 1858.1.1
+                }
+				#Luxury Goods
+				1108 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 100 } }
+				847 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 100 } }
+				274 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 55 } }
+				846 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 32 } }
+				1383 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 12 } }
+				1219 = { set_variable = { afr_empire_politics_state_luxury_gold_acquisition_var = 12 } }
+				
+				816 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 100 } }
+				825 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 100 } }
+				864 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 73 } }
+				859 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 73 } }
+				544 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 17 } }
+				888 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 83 } }
+				833 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 100 } }
+				834 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 32 } }
+				832 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 32 } }
+				556 = { set_variable = { afr_empire_politics_state_luxury_ivory_acquisition_var = 17 } }
+				
+				#African Empire Mechanic
+				every_state = {
+					limit = { OWNER = { afr_is_tribal = yes } }
+					if = {
+						limit = { THIS = { is_capital = yes } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 10 } }
+					}
+					else_if = {
+						limit = { OWNER = { PREV = { is_core_of = PREV } } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 9 } }
+					}
+					else_if = {
+						limit = { OWNER = { PREV = { is_claimed_by = PREV } } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 6 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 10 } }
+					}
+					else = {
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = 4 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 20 } }
+					}
+					if = {
+						limit = {
+							afr_state_has_multiple_cores = yes
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -3 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 10 } }
+					}
+					if = {
+						limit = { 
+							is_capital = no
+							OWNER = {
+								OR = {
+									has_idea = AF_T_unorganized_tribal_nation
+									has_idea = AF_T_unorganized_tribal_nation_2
+									has_idea = AF_T_unorganized_tribal_nation_3
+									has_idea = AF_T_unorganized_tribal_nation_4
+									has_idea = AF_T_unorganized_tribal_nation_5
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 60 } }
+					}
+					else_if = {
+						limit = { 
+							is_capital = no
+							OWNER = {
+								OR = {
+									has_idea = AF_T_organized_tribal_nation
+									has_idea = AF_T_organized_tribal_nation_2
+									has_idea = AF_T_organized_tribal_nation_3
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 40 } }
+					}
+					else_if = {
+						limit = { 
+							is_capital = no
+							OWNER = {
+								has_idea = AF_T_small_kingdom
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 20 } }
+					}
+					else_if = {
+						limit = { 
+							is_capital = no
+							OWNER = {
+								OR = {
+									has_idea = afr_large_kingdom
+									has_idea = afr_reforming_kingdom
+								}
+							}
+						}
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 10 } }
+					}
+					if = {
+						limit = { OWNER = { has_variable = PREV.afr_empire_state_loyalty_var@THIS } }
+						OWNER = { 
+							clamp_variable = {
+								var = PREV.afr_empire_state_loyalty_var@THIS
+								min = -1
+								max = 10
+							}
+						}
+					}
+					if = {
+						limit = { OWNER = { has_variable = PREV.afr_empire_state_autonomy_var@THIS } }
+						OWNER = { 
+							clamp_variable = {
+								var = PREV.afr_empire_state_autonomy_var@THIS
+								min = 0
+								max = 100
+							}
+						}
+					}
+					#Default Prosperity From Luxury Goods
+					if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_gold_acquisition_var value = 100 compare = equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 3 }
+					}
+					else_if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_gold_acquisition_var value = 100 compare = less_than }
+							check_variable = { var = afr_empire_politics_state_luxury_gold_acquisition_var value = 50 compare = greater_than_or_equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 2 }
+					}
+					else_if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_gold_acquisition_var value = 50 compare = less_than }
+							check_variable = { var = afr_empire_politics_state_luxury_gold_acquisition_var value = 25 compare = greater_than_or_equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 1 }
+					}
+					if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_ivory_acquisition_var value = 100 compare = equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 2 }
+					}
+					else_if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_ivory_acquisition_var value = 100 compare = less_than }
+							check_variable = { var = afr_empire_politics_state_luxury_ivory_acquisition_var value = 25 compare = greater_than_or_equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 1 }
+					}
+					if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_spice_acquisition_var value = 100 compare = equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 2 }
+					}
+					else_if = {
+						limit = {  
+							check_variable = { var = afr_empire_politics_state_luxury_spice_acquisition_var value = 100 compare = less_than }
+							check_variable = { var = afr_empire_politics_state_luxury_spice_acquisition_var value = 25 compare = greater_than_or_equals }
+						}
+						add_to_variable = { var = afr_empire_politics_state_prosperity_var value = 1 }
+					}
+				}
+				UCT = {
+					random_list = {
+						10 = { country_event = { id = afr_empire_politics_subject_levy_mission_event_global.1 days = 260 } }
+						20 = { country_event = { id = afr_empire_politics_subject_levy_mission_event_global.1 days = 240 } }
+						40 = { country_event = { id = afr_empire_politics_subject_levy_mission_event_global.1 days = 220 } }
+						20 = { country_event = { id = afr_empire_politics_subject_levy_mission_event_global.1 days = 200 } }
+						10 = { country_event = { id = afr_empire_politics_subject_levy_mission_event_global.1 days = 180 } }
+					}
+				}
+				every_country = {
+					limit = { 
+						 OR = {
+							has_idea = AF_T_organized_tribal_nation
+							has_idea = AF_T_organized_tribal_nation_2
+							has_idea = AF_T_organized_tribal_nation_3
+						}
+						NOT = { TAG = MOS }
+					}
+					afr_tribal_cosmetic_tag_switch_2_scripted_effect = yes
+				}
+				every_country = {
+					limit = { 
+						OR = {
+							has_idea = AF_T_unorganized_tribal_nation
+							has_idea = AF_T_unorganized_tribal_nation_2
+							has_idea = AF_T_unorganized_tribal_nation_3
+							has_idea = AF_T_unorganized_tribal_nation_4
+							has_idea = AF_T_unorganized_tribal_nation_5
+						}
+					}
+					afr_tribal_cosmetic_tag_switch_1_scripted_effect = yes
+				}
+				every_country = {
+					limit = { 
+						 OR = {
+							has_idea = AF_T_unorganized_tribal_nation
+							has_idea = AF_T_unorganized_tribal_nation_2
+							has_idea = AF_T_unorganized_tribal_nation_3
+							has_idea = AF_T_unorganized_tribal_nation_4
+							has_idea = AF_T_unorganized_tribal_nation_5
+							has_idea = AF_T_small_kingdom
+							has_idea = afr_large_kingdom
+							has_idea = afr_reforming_kingdom
+							has_idea = Oceania_large_kingdom
+							has_idea = Oceania_small_kingdom
+						}
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_society } }
+						set_technology = { tribal_society = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_crop_planting } }
+						set_technology = { tribal_crop_planting = 1 popup = no }
+					}
+				}
+				every_country = {
+					limit = { 
+						 OR = {
+							has_idea = AF_T_small_kingdom
+							has_idea = afr_large_kingdom
+							has_idea = afr_reforming_kingdom
+							has_idea = Oceania_large_kingdom
+							has_idea = Oceania_small_kingdom
+						}
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_weapons } }
+						set_technology = { tribal_weapons = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_tatics } }
+						set_technology = { tribal_tatics = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_natral_economics } }
+						set_technology = { tribal_natral_economics = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_roads } }
+						set_technology = { tribal_roads = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_riding } }
+						set_technology = { tribal_riding = 1 popup = no }
+					}
+					if = {
+						limit = { NOT = { has_tech = tribal_irrigation } }
+						set_technology = { tribal_irrigation = 1 popup = no }
+					}
+				}
+				SKT = {
+					country_event = { id = skt_jihad_repair_ribats.1 days = 3}
+				}
+			
+				FTT = {
+					country_event = { id = afr_jihad_repair_ribats.1 days = 100 }
+				}
+				
+				FTJ = {
+					country_event = { id = afr_jihad_repair_ribats.1 days = 100 }
+				}
+				
+				TOU = {
+					country_event = { id = afr_jihad_repair_ribats.1 days = 100 }
+				}
+				
+				MSN = {
+					country_event = { id = afr_jihad_repair_ribats.1 days = 100 }
+				}
+				
+				ADM = {
+					#country_event = { id = afr_jihad_repair_ribats.1 days = 100 }
+				}
+				
+				SHO = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				NEZ = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}	
+
+				NAV = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				CRW = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				COM = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				CHY = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				BFT = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+				}
+				
+				APA = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+				}
+				
+				SIX = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+				}
+				
+				SEM = {
+					add_equipment_to_stockpile = { type = cavalry_equipment amount = 200 }
+					add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 500 }
+					add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 }
+					activate_decision = eoanb_decision_raise_tribal_army
+				}
+				
+				BAG = { 
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						autocracy = 100
+						fundamentalism = 0
+					}
+					set_province_name = {
+						id = 9152
+						name = "Bagirmi"
+					}
+				}
+				
+				ADM = {
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						autocracy = 0
+						fundamentalism = 100
+					}
+				}
+				
+				HRR = { 
+					set_popularities = {
+						anarchism = 0
+						vanguard_communism = 0
+						collectivist_socialism = 0
+						social_egalitarianism = 0
+						centrism = 0
+						traditional_conservatism = 0
+						radical_democracy = 0
+						chauvinist_populism = 0
+						autocracy = 100
+						fundamentalism = 0
+					}
+				}
+				GLD = {
+					add_timed_idea = {
+						idea = AF_T_great_harvest 
+						days = 120
+					}
+					every_owned_state = {
+						state_event = { id = afr_empire_politics_bountiful_harvest_boom_event.1 days = 120 }
+						set_state_flag = afr_empire_politics_bountiful_harvest_boom_flag
+						afr_empire_politics_state_gain_immigration = yes
+						afr_empire_politics_state_gain_boom = yes
+					}
+				}
+				MOR = {
+					699 = {
+						#OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -1 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 80 } }
+					}
+					836 = {
+						#OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -1 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 80 } }
+					}
+					837 = {
+						#OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -1 } }
+						OWNER = { add_to_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 80 } }
+					}
+				}
+			}
+			
+		} 
+		
+	}
+	
+	on_capitulation = {
+		effect = {
+			if = {
+				limit = {
+					OR = {
+						ROOT = { has_country_flag = SKT_WDD_Joint_War_KAN }
+						ROOT = { has_country_flag = SKT_WDD_Joint_War_BAG_Buffer }
+					}
+				}
+				if = {
+					limit = { 
+						ROOT = { tag = SKT }
+						FROM = { tag = KBO }
+						805 = { is_owned_by = ROOT }
+					}
+					KBO = { puppet = ADM }
+				}
+				ROOT = { clr_country_flag = SKT_WDD_Joint_War_KAN }
+				ROOT = { clr_country_flag = SKT_WDD_Joint_War_BAG_Buffer }
+			}
+			if = {
+				limit = {
+					OR = {
+						ROOT = { has_country_flag = SKT_WDD_Joint_War_Buffer }
+						ROOT = { has_country_flag = SKT_WDD_Joint_War_BAG }
+					}
+				}
+				if = {
+					limit = { 
+						ROOT = { tag = WDD }
+						FROM = { tag = KBO } 
+						660 = { is_owned_by = ROOT }
+					}
+					KBO = { transfer_state = 660 }
+				}
+				ROOT = { clr_country_flag = SKT_WDD_Joint_War_Buffer }
+				ROOT = { clr_country_flag = SKT_WDD_Joint_War_BAG }
+			}
+		}
+	}
+	
+	on_annex = {
+		effect = {
+			if = {
+				limit = { 
+					tag = LIB 
+					has_country_flag = LIB_adopted_ACS_policy_flag
+				}
+				country_event = { id = liberia.240 }
+			}
+		}
+	}
+	
+	on_capitulation = {
+		effect = {
+			if = {
+				limit = { 
+					FROM = { TAG = KBO } #KBO Winner
+					ROOT = {
+						OR = {
+							TAG = SKT
+							has_country_flag = SKT_WDD_Joint_War_KAN
+						}
+					}
+				}
+				SKT = { 
+					clr_country_flag = SKT_WDD_Joint_War_KAN 
+					clr_country_flag = SKT_WDD_Joint_War_BAG_Buffer
+				}
+			}
+			if = {
+				limit = { 
+					FROM = { TAG = KBO } #KBO Winner
+					ROOT = {
+						OR = {
+							TAG = WDD
+							has_country_flag = SKT_WDD_Joint_War_BAG
+						}
+					}
+				}
+				WDD = { 
+					clr_country_flag = SKT_WDD_Joint_War_BAG 
+					clr_country_flag = SKT_WDD_Joint_War_Buffer
+				}
+			}
+		}
+	}
+	
+	on_state_control_changed = {
+		effect = {
+			if = {
+				limit = {
+					FROM.FROM = {
+						OR = {
+							STATE = 1339
+							STATE = 1219
+							STATE = 660
+							STATE = 1340
+							STATE = 860
+							STATE = 805
+							STATE = 789
+							
+						}
+					}
+					SKT = { 
+						NOT = { has_war_with = KBO }
+						NOT = { has_war_with = BAG }
+					}
+					WDD = { 
+						NOT = { has_war_with = KBO }
+						NOT = { has_war_with = BAG }
+					}
+				}
+				if = {
+					limit = {
+						SKT = { has_country_flag = SKT_WDD_Joint_War_KAN }
+						any_country = {
+							OR = {
+								TAG = SKT
+								is_subject_of = WDD
+								is_subject_of = SKT
+							}
+							OR = {
+								has_full_control_of_state = 1339
+								has_full_control_of_state = 660
+							}
+						}
+					}
+					SKT = {
+						country_event = { id = SKT_joint_invasion_bagirmi.4 days = 2 }
+						clr_country_flag = SKT_WDD_Joint_War_KAN
+					}
+				}
+				if = {
+					limit = {
+						WDD = { has_country_flag = SKT_WDD_Joint_War_BAG }
+						any_country = {
+							OR = {
+								TAG = WDD
+								is_subject_of = WDD
+								is_subject_of = SKT
+							}
+							has_full_control_of_state = 1219
+						}
+					}
+					WDD = {
+						country_event = { id = SKT_joint_invasion_bagirmi.5 days = 2 }
+						clr_country_flag = SKT_WDD_Joint_War_BAG
+					}
+				}
+				if = {
+					limit = {
+						OR = {
+							SKT = { has_country_flag = SKT_WDD_Joint_War_BAG_Buffer }
+							WDD = { has_country_flag = SKT_WDD_Joint_War_Buffer }
+						}
+						any_country = {
+							OR = {
+								TAG = WDD
+								TAG = SKT
+								is_subject_of = WDD
+								is_subject_of = SKT
+							}
+							OR = {
+								has_full_control_of_state = 1340
+								has_full_control_of_state = 860
+								has_full_control_of_state = 805
+								has_full_control_of_state = 789
+							}
+						}
+					}
+					WDD = {
+						country_event = { id = SKT_joint_invasion_bagirmi.6 }
+						clr_country_flag = SKT_WDD_Joint_War_Buffer
+					}
+					SKT = {
+						country_event = { id = SKT_joint_invasion_bagirmi.6 }
+						clr_country_flag = SKT_WDD_Joint_War_BAG_Buffer
+					}
+				}
+			}
+		}
+	}
+}
