@@ -375,18 +375,79 @@ add_namespace = acw_first_nations_trigge
 	state_event = {
 		id = usa_slavery_debate.99
 		title = usa_slavery_debate.99.t
-		desc = usa_slavery_debate.99.d
-
-		is_triggered_only = yes
-
-		trigger = {
-			OWNER = { has_idea = usa_slavery_law }
+		desc = {
+			trigger = { NOT = { has_country_flag = USA_Slavery_Debate_Ongoing } }
+			text = usa_slavery_debate.99.d
 		}
+		desc = {
+			trigger = { has_country_flag = USA_Slavery_Debate_Ongoing }
+			text = usa_slavery_debate.99.d_slavery_debate
+		}
+		is_triggered_only = yes
 
 		option = {
 			name = usa_slavery_debate.99.a
-			ai_chance = { base = 100 }
-			OWNER = { add_to_variable = { prestige_score = 1 } }
+			trigger = { NOT = { has_country_flag = USA_Slavery_Debate_Ongoing } }
+			OWNER = { 
+				USA_admit_state_add_stars = yes
+				eoanb_add_1_prestige_score = yes
+			}
+		}
+
+		option = {
+			name = usa_slavery_debate.99.b
+			trigger = { has_country_flag = USA_Slavery_Debate_Ongoing }
+			ai_chance = { 
+				base = 100
+				modifier = {
+					has_government = social_egalitarianism
+					add = 75
+				}
+				modifier = {
+					has_government = centrism
+					add = 25
+				}
+				modifier = {
+					has_government = traditional_conservatism
+					add = -25
+				}
+				modifier = {
+					has_government = radical_democracy
+					add = -75
+				}
+			}
+			OWNER = { 
+				USA_admit_state_add_stars = yes
+				USA_Slavery_Debate_StateF_Count_Modify = yes
+				eoanb_add_1_prestige_score = yes
+			}
+		}
+		option = {
+			name = usa_slavery_debate.99.c
+			ai_chance = { 
+				base = 100
+				modifier = {
+					has_government = social_egalitarianism
+					add = -75
+				}
+				modifier = {
+					has_government = centrism
+					add = -25
+				}
+				modifier = {
+					has_government = traditional_conservatism
+					add = 25
+				}
+				modifier = {
+					has_government = radical_democracy
+					add = 75
+				}
+			}
+			OWNER = { 
+				USA_admit_state_add_stars = yes
+				USA_Slavery_Debate_StateS_Count_Modify = yes
+				eoanb_add_1_prestige_score = yes
+			}
 		}
 	}
 
@@ -548,7 +609,7 @@ add_namespace = acw_first_nations_trigge
 				if = {
 					limit = { tag = USA }
 					add_named_threat = {
-						name = usa_slavery_debate.101.t
+						name = "Election of 1860"
 						threat = 2
 					}
 				}
@@ -3516,6 +3577,7 @@ news_event = {
 				activate_mission = eoanb_decision_acw_brewing
 				add_ideas = {
 					USA_Spirit_American_Civil_War
+					CSA_Civil_War_Scout_Dependency
 				}
 			}
 		}
@@ -3734,7 +3796,7 @@ news_event = {
 		text = acw_generic.9.d_northrebels
 		trigger = {	country_exists = NEG }
 	}
-	picture = GFX_report_event_generic_riot
+	picture = GFX_news_event_fort_sumter
 
 	is_triggered_only = yes
 	major = yes
@@ -3769,6 +3831,7 @@ news_event = {
 				load_oob = USA_Standard_ACW
 				activate_mission = eoanb_decision_acw_csa_surrender_to_usa_union
 				activate_mission = eoanb_decision_acw_usa_surrender_to_csa_union
+				activate_decision = eoanb_decision_acw_reform_west_point1
 				
 				CSA = { 
 					load_oob = CSA_Standard_ACW
@@ -3782,7 +3845,7 @@ news_event = {
 				add_war_support = 0.10
 				set_temp_variable = { acw_weapons_count_change = 25 }
 				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 18 }
+				set_temp_variable = { acw_draft_count_change = 15 }
 				ACW_Draft_Count_Get = yes
 			}
 			if = {
@@ -3791,7 +3854,7 @@ news_event = {
 				add_war_support = 0.10
 				set_temp_variable = { acw_weapons_count_change = 25 }
 				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 18 }
+				set_temp_variable = { acw_draft_count_change = 15 }
 				ACW_Draft_Count_Get = yes
 			}
 			if = {
@@ -3800,7 +3863,7 @@ news_event = {
 				add_war_support = 0.10
 				set_temp_variable = { acw_weapons_count_change = 20 }
 				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 10 }
+				set_temp_variable = { acw_draft_count_change = 8 }
 				ACW_Draft_Count_Get = yes
 			}
 		}
@@ -3813,6 +3876,10 @@ news_event = {
 		add_popularity = {
 			ideology = traditional_conservatism
 			popularity = -0.15
+		}
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
 		}
 	}
 	option = {
@@ -3831,15 +3898,23 @@ news_event = {
 		USA = {
 			country_event = { id = acw_generic.10 days = 7 }
 		}
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
 	}
 	option = {
 		trigger = {
-		NOT = {
-			tag = USA
-			tag = CSA
-			tag = NEG
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = NEG
+			}
 		}
-	}
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
 	}
 }
 
@@ -4877,6 +4952,11 @@ country_event = {
 				hostility_reason = asked_to_join
 			}
 		}
+		746 = { 
+			reset_state_name = yes
+			clr_state_flag = NA_B_Disregardable_State 
+		}
+		USA = { add_to_variable = { usa_state_count = 1 } }
 	}
 }
 
@@ -5765,7 +5845,7 @@ country_event = {
 				#remove_idea = Generic_Shocked_Nation_3
 				#add_timed_idea = Generic_Shocked_Nation_4
 			#}
-			news_event = { id = usa_slavery_debate_secession.19 days = 3 } # CSA
+			news_event = { id = usa_slavery_debate_secession.119 days = 3 } # CSA
 			country_event = { id = acw_douglas.17 days = 10 random_days = 75 } # Oregon
 			country_event = { id = acw_douglas.18 days = 10 random_days = 75 } # California
 			country_event = { id = acw_douglas.19 days = 10 random_days = 75 } # Utah
@@ -9756,9 +9836,9 @@ news_event = {
 	}
 
 	option = {
-    name = acw_peace_deal.1.a
+		name = acw_peace_deal.1.a
 		trigger = { tag = USA }
-    custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
+		custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
 		hidden_effect = {
 			if = {
 				limit = { has_global_flag = ACW_American_Civil_War_Happened }
@@ -9795,8 +9875,8 @@ news_event = {
 			}
 		}
 
-    if = {
-      limit = {
+		if = {
+			limit = {
 				ENG = { has_war_together_with = CSA }
 			}
       custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
@@ -10079,14 +10159,6 @@ news_event = {
 					USAROD_reconstruction_zones_setup = yes
 				}
 			}
-			ENG = { news_event = { id = acw_peace_deal.1 } }
-			FRA = { news_event = { id = acw_peace_deal.1 } }
-			SPR = { news_event = { id = acw_peace_deal.1 } }
-			PRS = { news_event = { id = acw_peace_deal.1 } }
-			RUS = { news_event = { id = acw_peace_deal.1 } }
-			TSH = { news_event = { id = acw_peace_deal.1 } }
-			CAN = { news_event = { id = acw_peace_deal.1 } }
-			MEX = { news_event = { id = acw_peace_deal.1 } }
 		}
   }
   option = { # Reaction
