@@ -483,7 +483,7 @@ focus_tree = {
 
 	focus = {
 		id = PRS_krupp_arty
-		icon = GFX_goal_generic_allies_build_infantry
+		icon = GFX_focus_prussian_guns
 		relative_position_id = PRS_erfurt_rifles
 		x = 0
 		y = 1
@@ -645,7 +645,7 @@ focus_tree = {
 
 	focus = {
 		id = PRS_powerful_economy
-		icon = GFX_focus_research
+		icon = GFX_focus_generic_the_giant_wakes
 		x = 6
 		y = 6
 		cost = 70
@@ -673,15 +673,33 @@ focus_tree = {
 	}
 
 	focus = {
-		id = PRS_minister_moltke
-		icon = GFX_goal_focus_prussia_von_moltke
-		x = 19
+		id = PRS_army_with_state
+		icon = GFX_goal_focus_king_army_prs
+		x = 16
 		y = 0
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 100
 		}
+
+		completion_reward = {
+			add_political_power = 100
+		}
+	}
+
+	focus = {
+		id = PRS_king_army_prs
+		icon = GFX_goal_focus_prussia_von_moltke
+		x = 16
+		y = 1
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 100
+		}
+		
+		prerequisite = { focus = PRS_army_with_state }
 
 		completion_reward = {
 			custom_effect_tooltip = PRS_moltke_focus_tt
@@ -699,79 +717,100 @@ focus_tree = {
 					logistics_skill = 1
 				}
 			}
+			add_political_power = 50
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = infantry_weapons }
 		}
 	}
 
 	focus = {
-		id = PRS_king_army_prs
-		icon = GFX_goal_focus_king_army_prs
-		x = 17
-		y = 1
-		cost = 70
-		available_if_capitulated = no
-		available = { date > 1860.1.1 }
-		ai_will_do = {
-			factor = 100
-		}
-		prerequisite = { focus = PRS_minister_moltke }
-		mutually_exclusive = { focus = PRS_landwehr }
-
-		completion_reward = {
-			add_ideas = PRS_idea_centralized_army
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-				}
-				custom_effect_tooltip = historical_option
-			}
-		}
-	}
-
-	focus = {
-		id = PRS_landwehr
-		icon = GFX_goal_focus_traditional_army
-		x = 15
-		y = 1
-		cost = 70
-		available_if_capitulated = no
-		available = { date > 1860.1.1 }
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_minister_moltke }
-		mutually_exclusive = { focus = PRS_king_army_prs }
-
-		completion_reward = {
-			swap_ideas = {
-				remove_idea = PRS_landwehr
-				add_idea = PRS_landwehr_1
-			}
-		}
-	}
-
-
-	focus = {
-		id = PRS_manteuffel_reform
-		icon = GFX_goal_focus_prussia_reform
-		x = 19
+		id = PRS_heeresreform
+		icon = GFX_goal_focus_prussian_militarism
+		x = 16
 		y = 2
 		cost = 70
 		available_if_capitulated = no
+		available = { date > 1860.1.1 }
 		ai_will_do = {
 			factor = 100
 		}
+		
 		prerequisite = { focus = PRS_king_army_prs }
 
 		completion_reward = {
 			add_political_power = 100
 		}
 	}
+	
+	focus = {
+		id = PRS_parlamentsheer
+		icon = GFX_goal_SWE_victory
+		x = 14
+		y = 3
+		cost = 70
+		available_if_capitulated = no
+		available = {
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+			### Requires NOT Roon as SEC and Moltke as Chief ###
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_heeresreform }
+		mutually_exclusive = { focus = PRS_roon_reform_bill }
+
+		completion_reward = {
+		    add_political_power = 100
+			### Parliament Agrees ###
+			### The King Opposes ###
+		}
+	}
 
 	focus = {
-		id = PRS_minister_albrecht
+		id = PRS_roon_reform_bill
 		icon = GFX_goal_focus_prussia_war_ministers
-		x = 17
-		y = 2
+		x = 18
+		y = 3
+		cost = 70
+		available_if_capitulated = no
+		available = {
+			### Requires Roon as SEC and Moltke as Chief ###
+		}
+		ai_will_do = {
+			factor = 100
+		}
+		
+		prerequisite = { focus = PRS_heeresreform }
+		mutually_exclusive = { focus = PRS_parlamentsheer }
+
+		completion_reward = {
+			add_political_power = 100
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				custom_effect_tooltip = historical_option
+			}
+			### Event The King Approves ###
+			### Event Parliament Opposes ###
+		}
+	}
+
+	focus = {
+		id = PRS_strengthen_landwehr
+		icon = GFX_goal_focus_landwehr
+		x = 13
+		y = 4
 		cost = 70
 		available_if_capitulated = no
 		available = {
@@ -788,21 +827,44 @@ focus_tree = {
 			}
 		}
 		ai_will_do = {
-			factor = 100
+			factor = 1
 		}
-		prerequisite = { focus = PRS_landwehr focus = PRS_king_army_prs }
-		mutually_exclusive = { focus = PRS_candidate_of_parliament }
+		
+		prerequisite = { focus = PRS_parlamentsheer }
+		mutually_exclusive = { focus = PRS_demote_landwehr }
 
 		completion_reward = {
-			custom_effect_tooltip = PRS_albrecht_focus_tt
+			decrease_ps_by_one = yes
+			swap_ideas = {
+				remove_idea = PRS_landwehr
+				add_idea = PRS_landwehr_2
+			}
+			### Event Conservative Opposition ###
+		}
+	}
+	
+	focus = {
+		id = PRS_demote_landwehr
+		icon = GFX_goal_focus_traditional_army
+		x = 15
+		y = 4
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 100
+		}
+		
+		prerequisite = { 
+			focus = PRS_roon_reform_bill
+			focus = PRS_parlamentsheer
+		}
+		mutually_exclusive = { focus = PRS_strengthen_landwehr }
 
-			set_temp_variable = { temp_advisor_frame = 1 }
-			set_temp_variable = { temp_advisor_trait = 5 }
-			mhc_add_army_advisor = yes
-			mhc_add_mark_advisor_as_high_army_brass = yes
-
-			set_temp_variable = { mhc_add_sec_target = 1 }
-            mhc_add_sec = yes
+		completion_reward = {
+			swap_ideas = {
+				remove_idea = PRS_landwehr
+				add_idea = PRS_landwehr_3
+			}
 			if = {
 				limit = {
 					is_historical_focus_on = yes
@@ -811,59 +873,136 @@ focus_tree = {
 			}
 		}
 	}
-
+	
 	focus = {
-		id = PRS_candidate_of_parliament
-		icon = GFX_goal_focus_decentralisation_power
-		x = 15
-		y = 2
+		id = PRS_adjust_draft
+		icon = GFX_goal_focus_conscription
+		x = 17
+		y = 4
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		prerequisite = { focus = PRS_landwehr focus = PRS_king_army_prs }
-		mutually_exclusive = { focus = PRS_minister_albrecht }
+		
+		prerequisite = { 
+			focus = PRS_parlamentsheer
+			focus = PRS_roon_reform_bill
+		}
+		mutually_exclusive = { focus = PRS_expand_draft }
+
+		completion_reward = {
+			add_political_power = 100
+		}
+	}
+	
+	focus = {
+		id = PRS_expand_draft
+		icon = GFX_goal_focus_divide_unite_army
+		x = 19
+		y = 4
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_roon_reform_bill }
+		mutually_exclusive = { focus = PRS_adjust_draft }
 
 		completion_reward = {
             add_political_power = 100
+			decrease_ps_by_one = yes
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				custom_effect_tooltip = historical_option
+			}
+			### Event Foundation Deutsche Fortschrittspartei ###
 		}
 	}
 
 	focus = {
-		id = PRS_strengthen_parlimentary_control
-		icon = GFX_goal_SWE_victory
-		x = 13
-		y = 2
+		id = PRS_push_liberal_reform
+		icon = GFX_goal_focus_decentralisation_power
+		x = 14
+		y = 5
+		cost = 70
+		available_if_capitulated = no
+		available = {
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_strengthen_landwehr }
+		prerequisite = { focus = PRS_adjust_draft }
+		mutually_exclusive = { 
+			focus = PRS_find_compromise
+			focus = PRS_enforce_roon_reform 
+		}
+
+		completion_reward = {
+			swap_ideas = {
+				remove_idea = PRS_landwehr_2
+				add_idea = PRS_landwehr_4
+			}
+			### Event The King Rejects ###
+		}
+	}
+
+	focus = {
+		id = PRS_find_compromise
+		icon = GFX_goal_generic_major_alliance
+		x = 16
+		y = 5
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		prerequisite = { focus = PRS_landwehr }
-
+		prerequisite = { focus = PRS_demote_landwehr }
+		prerequisite = { focus = PRS_adjust_draft }
+		mutually_exclusive = { 
+			focus = PRS_push_liberal_reform
+			focus = PRS_enforce_roon_reform 
+		}
 
 		completion_reward = {
-		    swap_ideas = {
-				remove_idea = PRS_landwehr_1
-				add_idea = PRS_landwehr_2
-			}
+			add_political_power = 100
+			### Event The King Rejects (80%) ###
+			### Event Wilhelm Resigns, Friedrich Finds Compromis (20%) ###
 		}
 	}
 
 	focus = {
-		id = PRS_roon_reform_bill
-		icon = GFX_goal_focus_conscription
+		id = PRS_enforce_roon_reform
+		icon = GFX_goal_demand_sudetenland
 		x = 18
-		y = 3
+		y = 5
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 100
 		}
-		prerequisite = { focus = PRS_minister_albrecht }
-		prerequisite = { focus = PRS_manteuffel_reform }
-		mutually_exclusive = { focus = PRS_find_balance }
+		prerequisite = { focus = PRS_demote_landwehr }
+		prerequisite = { focus = PRS_expand_draft }
+		mutually_exclusive = { 
+			focus = PRS_push_liberal_reform
+			focus = PRS_find_compromise 
+		}
 
 		completion_reward = {
 			unlock_decision_tooltip = PRS_roons_reform_bill
@@ -873,230 +1012,37 @@ focus_tree = {
 				}
 				custom_effect_tooltip = historical_option
 			}
+			### Parliament Rejects ###
 		}
 	}
-
+	
 	focus = {
-		id = PRS_find_balance
-		icon = GFX_goal_generic_army_artillery
-		x = 16
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_candidate_of_parliament focus = PRS_minister_albrecht }
-		mutually_exclusive = { focus = PRS_landwehr_draft }
-		mutually_exclusive = { focus = PRS_roon_reform_bill }
-
-		completion_reward = {
-			swap_ideas = { remove_idea = limited_conscription add_idea = extensive_conscription }
-			if = {
-				limit = {
-					has_idea = PRS_landwehr
-				}
-				swap_ideas = {
-					remove_idea = PRS_landwehr
-					add_idea = PRS_landwehr_4
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = PRS_landwehr_2
-				}
-				swap_ideas = {
-					remove_idea = PRS_landwehr_2
-					add_idea = PRS_landwehr_4
-				}
-			}
-		}
-	}
-
-	focus = {
-		id = PRS_landwehr_draft
-		icon = GFX_goal_focus_landwehr
-		x = 14
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-
-		mutually_exclusive = { focus = PRS_find_balance }
-		prerequisite = { focus = PRS_candidate_of_parliament }
-		prerequisite = { focus = PRS_strengthen_parlimentary_control }
-
-		completion_reward = {
-			if = {
-				limit = {
-					has_idea = PRS_landwehr
-				}
-				swap_ideas = {
-					remove_idea = PRS_landwehr
-					add_idea = PRS_landwehr_3
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = PRS_landwehr_2
-				}
-				swap_ideas = {
-					remove_idea = PRS_landwehr_2
-					add_idea = PRS_landwehr_3
-				}
-			}
-		}
-	}
-
-	focus = {
-		id = PRS_dissolution_of_the_kabinett
-		icon = GFX_goal_generic_army_artillery
-		x = 14
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_strengthen_parlimentary_control }
-
-		completion_reward = {
-		   add_political_power = -100
-		}
-	}
-
-	focus = {
-		id = PRS_reform_troop_training
-		icon = GFX_goal_focus_divide_unite_army
-		x = 16
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		prerequisite = { focus = PRS_find_balance focus = PRS_roon_reform_bill }
-
-		completion_reward = {
-			army_experience = 50
-			add_political_power = 50
-		}
-	}
-
-	focus = {
-		id = PRS_officer_training
+		id = PRS_finish_reform
 		icon = GFX_goal_SWE_officer_reform
-		x = 18
-		y = 4
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		prerequisite = { focus = PRS_roon_reform_bill }
-
-		completion_reward = {
-			add_ideas = PRS_auftragstaktik
-		}
-	}
-
-	focus = {
-		id = PRS_krupp_guns_focus
-		icon = GFX_focus_prussian_guns
-		x = 14
-		y = 5
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		prerequisite = { focus = PRS_officer_training focus = PRS_reform_troop_training focus = PRS_dissolution_of_the_kabinett }
-
-		completion_reward = {
-			add_tech_bonus = { bonus = 0.25 uses = 2 category = artillery }
-		}
-	}
-
-	focus = {
-		id = PRS_war_theory
-		icon = GFX_goal_focus_prussian_militarism
 		x = 16
-		y = 5
+		y = 6
 		cost = 70
 		available_if_capitulated = no
+		available = { 
+			### Requires Completed Decisions for Army Reform ###
+			###	PRS_heeresrefrom_krupp_guns ###
+			###	PRS_heeresrefrom_improve_officer_training ###
+			###	PRS_heeresrefrom_army_logistics ###
+			###	PRS_heeresrefrom_war_games ###
+			###	PRS_heeresrefrom_new_tactics ###
+		}
 		ai_will_do = {
 			factor = 100
 		}
-
-		prerequisite = { focus = PRS_reform_troop_training focus = PRS_dissolution_of_the_kabinett focus = PRS_officer_training }
+		prerequisite = { 
+			focus = PRS_push_liberal_reform 
+			focus = PRS_find_compromise
+			focus = PRS_enforce_roon_reform
+		}
 
 		completion_reward = {
+			add_political_power = 100
 			remove_ideas = PRS_legacy_clausewitz
-		hidden_effect = {
-			if = { limit = { NOT = { has_completed_focus = PRS_officer_training }}
-            add_timed_idea = {
-			        idea = PRS_outdated_order_tactics
-					days = 3650 }
-		        }
-	        }
-		}
-	}
-
-	focus = {
-		id = PRS_kriegsspiel
-		icon = GFX_goal_generic_small_arms
-		x = 18
-		y = 5
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		prerequisite = { focus = PRS_officer_training focus = PRS_reform_troop_training }
-
-		completion_reward = {
-		   add_tech_bonus = { bonus = 0.1 uses = 1 category = land_doctrine }
-		}
-	}
-
-	focus = {
-		id = PRS_march_divided_fight_united
-		icon = GFX_goal_generic_propaganda
-		x = 15
-		y = 6
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		available = { NOT = { has_idea = PRS_outdated_order_tactics } }
-        prerequisite = { focus = PRS_war_theory }
-        prerequisite = { focus = PRS_krupp_guns_focus }
-
-		completion_reward = {
-		    add_tech_bonus = { bonus = 0.1 uses = 1 category = land_doctrine }
-		}
-	}
-
-	focus = {
-		id = PRS_prussian_army_mobility
-		icon = GFX_goal_generic_position_armies
-		x = 17
-		y = 6
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 100
-		}
-		available = { NOT = { has_idea = PRS_outdated_order_tactics } }
-		prerequisite = { focus = PRS_kriegsspiel }
-        prerequisite = { focus = PRS_war_theory }
-        prerequisite = { focus = PRS_krupp_guns_focus }
-
-		completion_reward = {
-		    add_tech_bonus = { bonus = 0.1 uses = 1 category = land_doctrine }
 		}
 	}
 
@@ -1104,13 +1050,14 @@ focus_tree = {
 		id = PRS_navy_king
 		icon = GFX_goal_generic_navy_doctrines_tactics
 		x = 22
-		y = 1
+		y = 0
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 100
 		}
-		prerequisite = { focus = PRS_minister_moltke }
+		
+		prerequisite = {  }
 
 		completion_reward = {
 			navy_experience = 25
@@ -1180,7 +1127,7 @@ focus_tree = {
 		id = PRS_high_seas
 		icon = GFX_goal_generic_construct_naval_dockyard
 		x = 21
-		y = 4
+		y = 6
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1216,7 +1163,7 @@ focus_tree = {
 		id = PRS_marine_minister
 		icon = GFX_goal_generic_cavalry
 		x = 23
-		y = 4
+		y = 6
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1234,8 +1181,8 @@ focus_tree = {
 
 	focus = {
 		id = PRS_mil_supreme
-		icon = GFX_focus_generic_the_giant_wakes
-		x = 19
+		icon = GFX_goal_focus_contain_prussia
+		x = 18
 		y = 7
 		cost = 70
 		available_if_capitulated = no
@@ -1244,8 +1191,7 @@ focus_tree = {
 		}
 		prerequisite = { focus = PRS_marine_minister }
 		prerequisite = { focus = PRS_high_seas }
-		prerequisite = { focus = PRS_prussian_army_mobility }
-		prerequisite = { focus = PRS_march_divided_fight_united }
+		prerequisite = { focus = PRS_finish_reform }
 
 		completion_reward = {
 			custom_effect_tooltip = eoanb_tt_PRS_focus_unlock_law_milspendage
@@ -1268,16 +1214,34 @@ focus_tree = {
 		prerequisite = {  }
 
 		completion_reward = {
-		   decrease_ps_by_one = yes
-		   add_ideas = PRS_idea_constitutional_crisis
+			decrease_ps_by_one = yes
+			add_ideas = PRS_idea_constitutional_crisis
 		}
-}
+	}
 
 	focus = {
-		id = PRS_focus_parliament_denies_support
-		icon = GFX_goal_focus_government_icon
+		id = PRS_focus_dissolve_parliament
+		icon = GFX_goal_focus_suppress_liberalism
 		x = 42
 		y = 1
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 100
+		}
+
+		prerequisite = { focus = PRS_focus_constitution_crisis }
+
+		completion_reward = {
+			### Event Progressive Cabinet Resigns ###
+		}
+	}
+	
+	focus = {
+		id = PRS_king_deposed
+		icon = GFX_focus_violent_revolution
+		x = 40
+		y = 2
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1286,41 +1250,46 @@ focus_tree = {
 		available = {
 			always = no
 		}
-		prerequisite = { focus = PRS_focus_constitution_crisis }
+		
+		prerequisite = { focus = PRS_focus_dissolve_parliament }
+		mutually_exclusive = { 
+			focus = PRS_king_abdicates
+			focus = PRS_focus_bismarck
+		}
 
 		completion_reward = {
-		   decrease_ps_by_one = yes
+			decrease_ps_by_one = yes
 		}
 	}
 
 	focus = {
-		id = PRS_focus_dissolve_parliament
-		icon = GFX_goal_focus_suppress_liberalism
-		x = 40
+		id = PRS_king_abdicates
+		icon = GFX_focus_Usurp_Throne
+		x = 42
 		y = 2
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
-			factor = 100
+			factor = 1
+		}
+		available = {
+			always = no
 		}
 
-		prerequisite = { focus = PRS_focus_parliament_denies_support }
-		mutually_exclusive = { focus = PRS_focus_try_to_negotiate }
+		prerequisite = { focus = PRS_focus_dissolve_parliament }
+		mutually_exclusive = { 
+			focus = PRS_king_deposed 
+			focus = PRS_focus_bismarck
+		}
 
 		completion_reward = {
-			PRS = { country_event = { days = 20 id = prussiaconscrisis.5 } }
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-				}
-				custom_effect_tooltip = historical_option
-			}
-			hidden_effect = { PRS = { country_event = { id = prussiaconscrisis.6 days = 3 } } }
+			decrease_ps_by_one = yes
 		}
 	}
 
+
 	focus = {
-		id = PRS_focus_try_to_negotiate
+		id = PRS_focus_bismarck
 		icon = GFX_goal_focus_reform_government
 		x = 44
 		y = 2
@@ -1329,31 +1298,15 @@ focus_tree = {
 		ai_will_do = {
 			factor = 1
 		}
-
-		prerequisite = { focus = PRS_focus_parliament_denies_support }
-		mutually_exclusive = { focus = PRS_focus_dissolve_parliament }
-
-		completion_reward = {
-		   PRS = { country_event = { days = 20 id = prussiaconscrisis.7 } }
-		}
-	}
-
-
-	focus = {
-		id = PRS_focus_bismarck
-		icon = GFX_goal_generic_consumer_goods
-		x = 39
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
 		available = {
 			always = no
 		}
+		
 		prerequisite = { focus = PRS_focus_dissolve_parliament }
-		mutually_exclusive = { focus = PRS_focus_keep_adolf_hohenlohe }
+		mutually_exclusive = { 
+			focus = PRS_king_deposed 
+			focus = PRS_king_abdicates
+		}
 
 		completion_reward = {
 			retire_country_leader = yes
@@ -1364,129 +1317,29 @@ focus_tree = {
 			expire = "1900.1.1"
 			ideology = conserv
 			traits = {
+				}
+			}
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				custom_effect_tooltip = historical_option
 			}
 		}
 	}
-}
-
-	focus = {
-		id = PRS_focus_keep_adolf_hohenlohe
-		icon = GFX_goal_generic_consumer_goods
-		x = 41
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		available = {
-			always = no
-		}
-		prerequisite = { focus = PRS_focus_dissolve_parliament }
-		mutually_exclusive = { focus = PRS_focus_bismarck }
-
-		completion_reward = {
-		    PRS = { country_event = { days = 3 id = prussiaconscrisis.9 } }
-		}
-	}
-
-	focus = {
-		id = PRS_focus_failed_abdication
-		icon = GFX_focus_violent_revolution
-		x = 43
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		available = {
-			always = no
-		}
-		prerequisite = { focus = PRS_focus_try_to_negotiate }
-		mutually_exclusive = { focus = PRS_focus_successfull }
-
-		completion_reward = {
-		    PRS = { country_event = { days = 20 id = prussiaconscrisis.14 } }
-		}
-	}
-
-	focus = {
-		id = PRS_focus_successfull
-		icon = GFX_focus_Usurp_Throne
-		x = 45
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		available = {
-			always = no
-		}
-		prerequisite = { focus = PRS_focus_try_to_negotiate }
-		mutually_exclusive = { focus = PRS_focus_failed_abdication }
-
-		completion_reward = {
-		    remove_ideas = PRS_idea_constitutional_crisis
-		}
-	}
-
-
-	focus = {
-		id = PRS_focus_blut_und_eisen
-		icon = GFX_focus_generic_treaty
-		x = 49
-		y = 0
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		available = {
-			has_country_leader = {
-               name = "Otto von Bismarck"
-               ruling_only = yes
-            }
-		}
-
-		completion_reward = {
-			add_political_power = 50
-			custom_effect_tooltip = PRS_focus_tt_blut_und_eisen
-		}
-	}
-
-	focus = {
-		id = PRS_focus_bismarck_cabinet
-		icon = GFX_focus_generic_support_the_left_right
-		x = 49
-		y = 2
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_focus_blut_und_eisen }
-
-		completion_reward = {
-			custom_effect_tooltip = PRS_focus_tt_bismarck_cabinet
-			hidden_effect = {
-				#
-			}
-		}
-	}
-
+	
 	focus = {
 		id = PRS_focus_luckentheorie
 		icon = GFX_focus_ger_revive_kaiserreich
-		x = 47
-		y = 1
+		x = 42
+		y = 4
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		prerequisite = { focus = PRS_focus_blut_und_eisen }
+		
+		prerequisite = { focus = PRS_focus_bismarck }
 
 		completion_reward = {
 			swap_ideas={
@@ -1497,58 +1350,17 @@ focus_tree = {
 	}
 
 	focus = {
-		id = PRS_focus_fight_liberals
-		icon = GFX_focus_generic_strike_at_democracy2
-		x = 47
-		y = 2
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_focus_luckentheorie }
-
-		completion_reward = {
-			add_political_power = 50
-			add_popularity = { ideology = centrism popularity = -0.1 }
-			swap_ideas = { remove_idea = free_press add_idea = state_controlled_press }
-		}
-	}
-
-	focus = {
-		id = PRS_focus_emphazise_foreign_threats
-		icon = GFX_focus_generic_strike_at_democracy3
-		x = 47
-		y = 3
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_focus_fight_liberals }
-		prerequisite = { focus = PRS_focus_bismarck_cabinet }
-
-		completion_reward = {
-			add_political_power = 100
-			add_popularity = { ideology = centrism popularity = -0.05 }
-			swap_ideas={
-				remove_idea = PRS_idea_constitutional_crisis_1
-				add_idea = PRS_idea_constitutional_crisis_2
-			}
-		}
-	}
-
-	focus = {
 		id = PRS_focus_realpolitik
 		icon = GFX_goal_focus_reform_administration
-		x = 51
-		y = 1
+		x = 40
+		y = 5
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		prerequisite = { focus = PRS_focus_blut_und_eisen }
+		
+		prerequisite = { focus = PRS_focus_luckentheorie }
 
 		completion_reward = {
 			add_stability = 0.05
@@ -1556,71 +1368,156 @@ focus_tree = {
 	}
 
 	focus = {
-		id = PRS_focus_isolate_austria
-		icon = GFX_focus_generic_self_management
-		x = 51
-		y = 2
+		id = PRS_befriend_russia
+		icon = GFX_goal_generic_improve_relations
+		x = 39
+		y = 6
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
+		
 		prerequisite = { focus = PRS_focus_realpolitik }
 
 		completion_reward = {
+			add_political_power = 100
 		}
 	}
 
 	focus = {
-		id = PRS_focus_peace_with_austria
-		icon = GFX_goal_focus_landwehr
-		x = 51
-		y = 3
+		id = PRS_contest_austria
+		icon = GFX_focus_generic_strike_at_democracy1
+		x = 41
+		y = 6
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		available = {
-			hidden_trigger = {
-				OR = {
-					has_cosmetic_tag = GER_north_confederation
-					AND = {
-						MCK = { is_subject_of = PRS }
-						LCK = { is_subject_of = PRS }
-						HAM = { is_subject_of = PRS }
-						BRE = { is_subject_of = PRS }
-						OLD = { is_subject_of = PRS }
-						MCK = { is_in_faction_with = PRS }
-						LCK = { is_in_faction_with = PRS }
-						HAM = { is_in_faction_with = PRS }
-						BRE = { is_in_faction_with = PRS }
-						OLD = { is_in_faction_with = PRS }
-					}
-				}
-			}
-		}
-		prerequisite = { focus = PRS_focus_isolate_austria }
-		prerequisite = { focus = PRS_focus_bismarck_cabinet }
+		
+		prerequisite = { focus = PRS_focus_realpolitik }
 
 		completion_reward = {
-			add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_focus_bismarck_foreign }
-			reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_focus_bismarck_foreign }
+			add_political_power = 50
+			swap_ideas={
+				remove_idea = PRS_idea_constitutional_crisis_1
+				add_idea = PRS_idea_constitutional_crisis_2
+			}
+		}
+	}
+	
+	focus = {
+		id = PRS_focus_fight_liberals
+		icon = GFX_focus_generic_strike_at_democracy2
+		x = 44
+		y = 5
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_focus_luckentheorie }
+
+		completion_reward = {
+			add_political_power = 50
+			add_popularity = { ideology = centrism popularity = -0.1 }
+		}
+	}
+
+	focus = {
+		id = PRS_focus_pressordonanz
+		icon = GFX_focus_generic_strike_at_democracy3
+		x = 43
+		y = 6
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_focus_fight_liberals }
+
+		completion_reward = {
+			add_political_power = 50
+			swap_ideas = { 
+				remove_idea = free_press 
+				add_idea = state_controlled_press 
+			}
+		}
+	}
+	
+	focus = {
+		id = PRS_focus_shut_parliament
+		icon = GFX_focus_generic_self_management
+		x = 45
+		y = 6
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_focus_fight_liberals }
+
+		completion_reward = {
+			add_political_power = 50
+			decrease_ps_by_one = yes
+		}
+	}
+	
+	focus = {
+		id = PRS_austria_no_zollverein
+		icon = GFX_focus_generic_coastal_fort
+		x = 40
+		y = 7
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_befriend_russia }
+		prerequisite = { focus = PRS_contest_austria }
+
+		completion_reward = {
+			add_political_power = 100
+		}
+	}
+	
+	focus = {
+		id = PRS_convenient_alliance
+		icon = GFX_goal_focus_popularize
+		x = 44
+		y = 7
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		
+		prerequisite = { focus = PRS_focus_pressordonanz }
+		prerequisite = { focus = PRS_focus_shut_parliament }
+
+		completion_reward = {
+			add_political_power = 100
 		}
 	}
 
 	focus = {
 		id = PRS_focus_ask_for_indemnitat
 		icon = GFX_focus_ger_return_of_the_kaiser
-		x = 49
-		y = 4
+		x = 42
+		y = 8
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
 			factor = 1
 		}
-		prerequisite = { focus = PRS_focus_peace_with_austria }
-		prerequisite = { focus = PRS_focus_emphazise_foreign_threats }
+		
+		prerequisite = { focus = PRS_austria_no_zollverein }
+		prerequisite = { focus = PRS_convenient_alliance }
 
 		completion_reward = {
 			add_stability = 0.05
@@ -1629,28 +1526,10 @@ focus_tree = {
 	}
 
 	focus = {
-		id = PRS_focus_bismarcksche_verfassung
-		icon = GFX_focus_ger_return_of_the_kaiser
-		x = 49
-		y = 5
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		prerequisite = { focus = PRS_focus_ask_for_indemnitat }
-
-		completion_reward = {
-			add_stability = 0.05
-			swap_ideas = { remove_idea = parliamentary_suffrage add_idea = universal_male_suffrage }
-		}
-	}
-
-	focus = {
 		id = PRS_focus_liberal_government
 		icon = GFX_goal_focus_support_conservatism
 		x = 35
-		y = 7
+		y = 8
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1671,7 +1550,7 @@ focus_tree = {
 		id = PRS_focus_nationalverein
 		icon = GFX_goal_focus_invite_prussian_diplomats
 		x = 35
-		y = 9
+		y = 10
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1689,7 +1568,7 @@ focus_tree = {
 		id = PRS_focus_liberal_kingdom
 		icon = GFX_goal_focus_enact_law
 		x = 38
-		y = 10
+		y = 11
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1715,7 +1594,7 @@ focus_tree = {
 		id = PRS_focus_audiatur_et_altera_pars
 		icon = GFX_goal_generic_neutrality_focus
 		x = 37
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1738,7 +1617,7 @@ focus_tree = {
 		id = PRS_focus_free_trade
 		icon = GFX_goal_generic_positive_trade_relations
 		x = 37
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1761,7 +1640,7 @@ focus_tree = {
 		id = PRS_focus_english_style_rule
 		icon = GFX_goal_focus_ally_ENG
 		x = 39
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1778,7 +1657,7 @@ focus_tree = {
 		id = PRS_focus_limit_king_power
 		icon = GFX_goal_demand_sudetenland
 		x = 38
-		y = 14
+		y = 15
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1796,7 +1675,7 @@ focus_tree = {
 		id = PRS_focus_bigger_role_chancellor
 		icon = GFX_goal_focus_invite_prussian_diplomats
 		x = 32
-		y = 14
+		y = 15
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1815,7 +1694,7 @@ focus_tree = {
 		id = PRS_focus_longer_landstag
 		icon = GFX_goal_focus_working_hours
 		x = 39
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1832,7 +1711,7 @@ focus_tree = {
 		id = PRS_focus_liberal_voting_law
 		icon = GFX_focus_generic_self_management
 		x = 39
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1855,7 +1734,7 @@ focus_tree = {
 		id = PRS_focus_prussian_republic
 		icon = GFX_goal_generic_propaganda
 		x = 32
-		y = 10
+		y = 11
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1878,7 +1757,7 @@ focus_tree = {
 		id = PRS_focus_rule_of_law
 		icon = GFX_goal_focus_enact_law
 		x = 31
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1895,7 +1774,7 @@ focus_tree = {
 		id = PRS_focus_religion_equal
 		icon = GFX_focus_generic_concessions
 		x = 37
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1912,7 +1791,7 @@ focus_tree = {
 		id = PRS_focus_seperate_state_church
 		icon = GFX_goal_focus_the_elite
 		x = 33
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1935,7 +1814,7 @@ focus_tree = {
 		id = PRS_focus_representative_democracy
 		icon = GFX_goal_focus_support_social_egalitarianism
 		x = 33
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1958,7 +1837,7 @@ focus_tree = {
 		id = PRS_focus_court_reforms
 		icon = GFX_focus_generic_treaty
 		x = 33
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1975,7 +1854,7 @@ focus_tree = {
 		id = PRS_focus_new_regional_system
 		icon = GFX_goal_generic_construct_civ_factory
 		x = 31
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -1992,7 +1871,7 @@ focus_tree = {
 		id = PRS_focus_new_trade_law
 		icon = GFX_goal_generic_trade
 		x = 31
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2015,7 +1894,7 @@ focus_tree = {
 		id = PRS_focus_king_abdicate
 		icon = GFX_goal_anti_comintern_pact
 		x = 29
-		y = 6
+		y = 7
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2042,7 +1921,7 @@ focus_tree = {
 		id = PRS_focus_socialism_rise
 		icon = GFX_goal_focus_the_workers
 		x = 23
-		y = 7
+		y = 8
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2063,7 +1942,7 @@ focus_tree = {
 		id = PRS_focus_socialist_rev
 		icon = GFX_goal_focus_revolutionary_council
 		x = 23
-		y = 8
+		y = 9
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2104,7 +1983,7 @@ focus_tree = {
 		id = PRS_focus_socialist_germany
 		icon = GFX_goal_focus_revolutionary_government
 		x = 23
-		y = 9
+		y = 10
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2121,7 +2000,7 @@ focus_tree = {
 		id = PRS_focus_adav
 		icon = GFX_goal_generic_soviet_construction
 		x = 26
-		y = 10
+		y = 11
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2140,7 +2019,7 @@ focus_tree = {
 		id = PRS_focus_state_socialism
 		icon = GFX_goal_generic_war_with_comintern
 		x = 27
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2158,7 +2037,7 @@ focus_tree = {
 		id = PRS_focus_new_constitution
 		icon = GFX_focus_generic_treaty
 		x = 27
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2181,7 +2060,7 @@ focus_tree = {
 		id = PRS_focus_universal_socialist_suff
 		icon = GFX_goal_focus_fund_partisans
 		x = 27
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2204,7 +2083,7 @@ focus_tree = {
 		id = PRS_focus_bronze_labor_law
 		icon = GFX_goal_focus_increase_wages
 		x = 25
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2221,7 +2100,7 @@ focus_tree = {
 		id = PRS_focus_social_reforms
 		icon = GFX_focus_generic_soviet_politics
 		x = 25
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2239,7 +2118,7 @@ focus_tree = {
 		id = PRS_focus_workers_law
 		icon = GFX_goal_focus_industrial_revolution
 		x = 25
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2256,7 +2135,7 @@ focus_tree = {
 		id = PRS_focus_secular_state
 		icon = GFX_focus_generic_concessions
 		x = 26
-		y = 14
+		y = 15
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2280,7 +2159,7 @@ focus_tree = {
 		id = PRS_focus_vdav
 		icon = GFX_focus_prc_agrarian_socialism
 		x = 20
-		y = 10
+		y = 11
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2299,7 +2178,7 @@ focus_tree = {
 		id = PRS_focus_labor_laws
 		icon = GFX_goal_focus_industrial_revolution
 		x = 21
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2316,7 +2195,7 @@ focus_tree = {
 		id = PRS_focus_altersversicherung
 		icon = GFX_focus_ger_great_red_menace
 		x = 19
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2333,7 +2212,7 @@ focus_tree = {
 		id = PRS_focus_arbeiterwohnungen
 		icon = GFX_focus_generic_join_comintern
 		x = 21
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2350,7 +2229,7 @@ focus_tree = {
 		id = PRS_focus_genossenschaftswesen
 		icon = GFX_focus_generic_socialist_science
 		x = 21
-		y = 13
+		y = 14
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2367,7 +2246,7 @@ focus_tree = {
 		id = PRS_focus_improve_public_schools
 		icon = GFX_focus_research2
 		x = 19
-		y = 11
+		y = 12
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2384,7 +2263,7 @@ focus_tree = {
 		id = PRS_focus_co_education
 		icon = GFX_focus_research
 		x = 19
-		y = 12
+		y = 13
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2401,7 +2280,7 @@ focus_tree = {
 		id = PRS_equality_first
 		icon = GFX_goal_molotov_ribbentrop_pact
 		x = 20
-		y = 14
+		y = 15
 		cost = 70
 		available_if_capitulated = no
 		ai_will_do = {
@@ -2434,7 +2313,7 @@ focus_tree = {
 				has_completed_focus = PRS_focus_adav
 				has_completed_focus = PRS_focus_liberal_kingdom
 				has_completed_focus = PRS_focus_prussian_republic
-				has_completed_focus = PRS_focus_blut_und_eisen
+				has_completed_focus = PRS_focus_luckentheorie
 			}
 		}
 
