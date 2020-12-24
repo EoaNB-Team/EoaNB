@@ -23,7 +23,338 @@ add_namespace = afr_empire_politics_bountiful_harvest_boom_event
 add_namespace = afr_empire_politics_minor_economic_boom_event
 add_namespace = afr_peacetime_state_prosperity_growth_event
 add_namespace = afr_empire_politics_successful_remove_war_torn_event
+add_namespace = afr_empire_politics_subject_demotion_demand
 
+
+	#Announce Demotion
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.1
+		title = afr_empire_politics_subject_demotion_demand.1.t
+		desc = afr_empire_politics_subject_demotion_demand.1.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		#accept demotion
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.1.a
+			ai_chance = {
+				base = 25
+				modifier = {
+					add = 50
+					check_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 6 compare = greater_than_or_equals }
+				}
+				modifier = {
+					add = 15
+					check_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 9 compare = greater_than_or_equals }
+				}
+			}
+			FROM = { country_event = { id = afr_empire_politics_subject_demotion_demand.2 days = 3 } }
+			#gain loyalty
+			custom_effect_tooltip = afr_empire_subject_loyalty_add_1
+			hidden_effect = {
+				add_to_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 1 }
+				clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
+			}
+			#Subject demoted
+			if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_4 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_3
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_3 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_2
+					}
+				}
+			}
+			else_if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_2 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_1
+					}
+				}
+			}
+			else_if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_1 }
+				}
+				hidden_effect = {
+					if = {
+						limit = { ROOT = { has_variable = Tribal_army_num } }
+						add_to_variable = { var = FROM.Tribal_army_num value = ROOT.Tribal_army_num }
+					}
+					if = {
+						limit = { ROOT = { has_variable = Tribal_horse_army_num } }
+						add_to_variable = { var = FROM.Tribal_horse_army_num value = ROOT.Tribal_horse_army_num }
+					}
+					if = {
+						limit = { ROOT = { has_variable = Tribal_camel_army_num } }
+						add_to_variable = { var = FROM.Tribal_camel_army_num value = ROOT.Tribal_camel_army_num }
+					}
+				}
+				FROM = {
+					annex_country = {
+						target = ROOT
+						transfer_troops = yes
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = { is_subject_of = FROM }
+					hidden_effect = {
+						if = {
+							limit = { ROOT = { has_variable = Tribal_army_num } }
+							add_to_variable = { var = FROM.Tribal_army_num value = ROOT.Tribal_army_num }
+						}
+						if = {
+							limit = { ROOT = { has_variable = Tribal_horse_army_num } }
+							add_to_variable = { var = FROM.Tribal_horse_army_num value = ROOT.Tribal_horse_army_num }
+						}
+						if = {
+							limit = { ROOT = { has_variable = Tribal_camel_army_num } }
+							add_to_variable = { var = FROM.Tribal_camel_army_num value = ROOT.Tribal_camel_army_num }
+						}
+					}
+					FROM = {
+						annex_country = {
+							target = ROOT
+							transfer_troops = yes
+						}
+					}
+				}
+			}
+		}
+		
+		#reject demotion
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.1.b
+			ai_chance = {
+				base = 25
+				modifier = {
+					add = 25
+					check_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 5 compare = less_than_or_equals }
+				}
+				modifier = {
+					add = 50
+					check_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 2 compare = less_than_or_equals }
+				}
+			}
+			FROM = { country_event = { id = afr_empire_politics_subject_demotion_demand.3 days = 3 } }
+		}
+	}
+	
+	#Subject Accepts Demotion
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.2
+		title = afr_empire_politics_subject_demotion_demand.2.t
+		desc = afr_empire_politics_subject_demotion_demand.2.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.2.a
+			
+		}
+		
+	}
+	
+	#Subject Rejects Demotion
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.3
+		title = afr_empire_politics_subject_demotion_demand.3.t
+		desc = afr_empire_politics_subject_demotion_demand.3.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		#Conceded Demotion Demand
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.3.a
+			FROM = { country_event = { id = afr_empire_politics_subject_demotion_demand.4 days = 3 } }
+			#subject gains autonomy
+			custom_effect_tooltip = afr_empire_politics_subject_demotion_demand_3_tooltip
+		}
+		
+		#Enforce Demotion Demand
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.3.b
+			FROM = { country_event = { id = afr_empire_politics_subject_demotion_demand.5 days = 3 } }
+			FROM = { custom_effect_tooltip = afr_empire_subject_loyalty_minus_2 }
+			hidden_effect = {
+				add_to_variable = { var = FROM.afr_empire_subject_loyalty_var@ROOT value = -2 }
+				clamp_variable = { var = FROM.afr_empire_subject_loyalty_var@ROOT min = -2 max = 10 }
+			}
+		}
+	}
+	
+	#Overlord Conceded Demotion Demand
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.4
+		title = afr_empire_politics_subject_demotion_demand.4.t
+		desc = afr_empire_politics_subject_demotion_demand.4.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.4.a
+			add_autonomy_score = {
+				value = 500
+				localization = afr_empire_politics_overlord_conceded_demotion_demand
+			}
+		}
+		
+	}
+	
+	#Overlord Enforces Demotion Demand
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.5
+		title = afr_empire_politics_subject_demotion_demand.5.t
+		desc = afr_empire_politics_subject_demotion_demand.5.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		#Accept Demotion
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.5.a
+			#Subject demoted
+			if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_4 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_3
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_3 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_2
+					}
+				}
+			}
+			else_if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_2 }
+				}
+				FROM = {
+					set_autonomy = {
+						target = ROOT
+						autonomy_state = autonomy_afr_empire_level_1
+					}
+				}
+			}
+			else_if = {
+				limit = { 
+					OR = { has_dlc = "Together for Victory" has_dlc = "Waking the Tiger" has_dlc = "Death or Dishonor" }
+					FROM = { has_autonomy_state = autonomy_afr_empire_level_1 }
+				}
+				hidden_effect = {
+					if = {
+						limit = { ROOT = { has_variable = Tribal_army_num } }
+						add_to_variable = { var = FROM.Tribal_army_num value = ROOT.Tribal_army_num }
+					}
+					if = {
+						limit = { ROOT = { has_variable = Tribal_horse_army_num } }
+						add_to_variable = { var = FROM.Tribal_horse_army_num value = ROOT.Tribal_horse_army_num }
+					}
+					if = {
+						limit = { ROOT = { has_variable = Tribal_camel_army_num } }
+						add_to_variable = { var = FROM.Tribal_camel_army_num value = ROOT.Tribal_camel_army_num }
+					}
+				}
+				FROM = {
+					annex_country = {
+						target = ROOT
+						transfer_troops = yes
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = { is_subject_of = FROM }
+					hidden_effect = {
+						if = {
+							limit = { ROOT = { has_variable = Tribal_army_num } }
+							add_to_variable = { var = FROM.Tribal_army_num value = ROOT.Tribal_army_num }
+						}
+						if = {
+							limit = { ROOT = { has_variable = Tribal_horse_army_num } }
+							add_to_variable = { var = FROM.Tribal_horse_army_num value = ROOT.Tribal_horse_army_num }
+						}
+						if = {
+							limit = { ROOT = { has_variable = Tribal_camel_army_num } }
+							add_to_variable = { var = FROM.Tribal_camel_army_num value = ROOT.Tribal_camel_army_num }
+						}
+					}
+					FROM = {
+						annex_country = {
+							target = ROOT
+							transfer_troops = yes
+						}
+					}
+				}
+			}
+		}
+		
+		#Resist through war
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.5.a
+			trigger = { 
+				check_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 2 compare = less_than_or_equals }
+			}
+			#Start Resistance War
+			FROM = { country_event = { id = afr_empire_politics_subject_demotion_demand.6 } }
+		}
+		
+	}
+	
+	country_event = {
+		id = afr_empire_politics_subject_demotion_demand.6
+		title = afr_empire_politics_subject_demotion_demand.6.t
+		desc = afr_empire_politics_subject_demotion_demand.6.d
+		picture = GFX_report_event_chinese_army_training
+		is_triggered_only = yes
+		
+		option = {
+			name = afr_empire_politics_subject_demotion_demand.6.a
+			
+		}
+		
+	}
+
+
+##################
+####State Economy#
+##################
 	country_event = {
 		id = afr_empire_politics_test_event.1
 		hidden = yes
@@ -2295,12 +2626,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 5 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 5 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -2388,12 +2719,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 5 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 5 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -2558,12 +2889,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 6 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 6 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -2648,12 +2979,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 6 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 6 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -2737,12 +3068,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 6 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 6 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -2916,12 +3247,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 5 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 5 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
@@ -3071,12 +3402,12 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 				limit = { 
 					FROM = { afr_is_tribal = yes } #OVERLORD
 					ROOT = { afr_is_tribal = yes } #SUBJECT
-					ROOT = { NOT = { has_variable = afr_empire_subject_loyalty_var } } 
+					ROOT = { NOT = { has_variable = ROOT.afr_empire_subject_loyalty_var@FROM } } 
 				}
 				ROOT = { 
 					set_variable = { var = afr_empire_subject_overlord value = FROM.id }
-					set_variable = { var = ROOT.afr_empire_subject_loyalty_var value = 6 }
-					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var min = -1 max = 10 }
+					set_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM value = 6 }
+					clamp_variable = { var = ROOT.afr_empire_subject_loyalty_var@FROM min = -1 max = 10 }
 				}
 			}
 		}
