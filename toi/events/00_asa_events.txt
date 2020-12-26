@@ -14,6 +14,7 @@ add_namespace = asa_mcclellan_personally_recruits_soldiers
 add_namespace = asa_mcclellan_seizes_power
 add_namespace = asa_mcclellan_declares_himself_emperor
 add_namespace = asa_the_mcclellan_cult_event
+add_namespace = asa_reunion_with_west_virginia
 add_namespace = asa_referendum_in_connecticut
 add_namespace = asa_referendum_in_ohio
 add_namespace = asa_reunion_with_kentucky
@@ -301,6 +302,58 @@ country_event = {
 	is_triggered_only = yes
 	option = {
 		name = asa_nap.3.a
+	}
+}
+
+country_event = { # Reunification proposal
+	id = asa_reunion_with_west_virginia.1
+	title = asa_reunion_with_west_virginia.1.t
+	desc = asa_reunion_with_west_virginia.1.desc
+	picture = placeholder
+	is_triggered_only = yes
+	option = { # Yes
+		name = asa_reunion_with_west_virginia.1.a
+		ASA = {
+			country_event = {
+				id = asa_reunion_with_west_virginia.2
+			}
+			annex_country = {
+				target = WVG
+				transfer_troops = yes
+			}
+		}
+	}
+	option = { # No
+		name = asa_reunion_with_west_virginia.1.b
+		ASA = {
+			country_event = asa_reunion_with_west_virginia.2
+		}
+	}
+}
+
+country_event = { # WVG Reunion Acceptance (ASA perspective)
+	id = asa_reunion_with_west_virginia.2
+	title = asa_reunion_with_west_virginia.2.t
+	desc = asa_reunion_with_west_virginia.2.desc
+	picture = placeholder
+	is_triggered_only = yes
+	option = {
+		name = asa_reunion_with_west_virginia.2.a
+	}
+}
+
+country_event = { # WVG Reunion Denial (ASA perspective)
+	id = asa_reunion_with_west_virginia.3
+	title = asa_reunion_with_west_virginia.3.t
+	desc = asa_reunion_with_west_virginia.3.desc
+	picture = placeholder
+	is_triggered_only = yes
+	option = {
+		name = asa_reunion_with_west_virginia.3.a
+		create_wargoal = {
+			type = annex_country
+			target = WVG
+		}
 	}
 }
 	
@@ -2406,16 +2459,31 @@ country_event = { #Meeting Starts
 	
 	is_triggered_only = yes
 
-	option = { #Issue of Politicy
+	option = { #Issue of Policy
 		name = asa_meeting_with_protestors.1.a
+		trigger = {
+			NOT = {
+				has_country_flag = asa_meeting_with_protestors_policy_discussed
+			}
+		}
 		country_event = asa_meeting_with_protestors.2
 	}
 	option = { #Issue of Economic Downturn
 		name = asa_meeting_with_protestors.1.b
+		trigger = {
+			NOT = {
+				has_country_flag = asa_meeting_with_protestors_economy_discussed
+			}
+		}
 		country_event = asa_meeting_with_protestors.3
 	}
 	option = { #Issue of National Security
 		name = asa_meeting_with_protestors.1.c
+		trigger = {
+			NOT = {
+				has_country_flag = asa_meeting_with_protestors_national_security_discussed
+			}
+		}
 		country_event = asa_meeting_with_protestors.4
 	}
 }
@@ -2454,6 +2522,7 @@ country_event = { #Issues of Policy
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_policy_discussed
 	}
 	option = { #Work With Them To Develop A Plan
 		name = asa_meeting_with_protestors.2.b
@@ -2483,6 +2552,8 @@ country_event = { #Issues of Policy
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_policy_discussed
+		set_country_flag = asa_meeting_with_protestors_policy_planning
 	}
 	option = { #Give Them Speaking Time In Congress
 		name = asa_meeting_with_protestors.2.c
@@ -2512,6 +2583,7 @@ country_event = { #Issues of Policy
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_policy_discussed
 	}
 }
 
@@ -2549,6 +2621,7 @@ country_event = { #Issues of Economic Downturn
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_economy_discussed
 	}
 	option = { #Work With Them To Develop A Plan
 		name = asa_meeting_with_protestors.3.b
@@ -2578,6 +2651,8 @@ country_event = { #Issues of Economic Downturn
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_economy_discussed
+		set_country_flag = asa_meeting_with_protestors_economy_planning
 	}
 	option = { #Give Them Speaking Time In Congress
 		name = asa_meeting_with_protestors.3.c
@@ -2607,7 +2682,99 @@ country_event = { #Issues of Economic Downturn
 			}
 			remove_ideas = ASA_Widespread_Protests_level_1
 		}
+		set_country_flag = asa_meeting_with_protestors_economy_discussed
 	}
+}
+
+country_event = { # Issues of National Security
+	id = asa_meeting_with_protestors.4
+	title = asa_meeting_with_protestors.4.t
+	desc = asa_meeting_with_protestors.4.desc
+	picture = placeholder
+	is_triggered_only = yes
+	hidden = yes
+	option = { # Give them our word
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_3
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_3
+				add_idea = ASA_Widespread_Protests_level_2
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_2
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_2
+				add_idea = ASA_Widespread_Protests_level_1
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_1
+			}
+			remove_ideas = ASA_Widespread_Protests_level_1
+		}
+		set_country_flag = asa_meeting_with_protestors_national_security_discussed
+	}
+	option = { # Work with them to develop a plan
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_3
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_3
+				add_idea = ASA_Widespread_Protests_level_2
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_2
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_2
+				add_idea = ASA_Widespread_Protests_level_1
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_1
+			}
+			remove_ideas = ASA_Widespread_Protests_level_1
+		}
+		set_country_flag = asa_meeting_with_protestors_national_security_discussed
+		set_country_flag = asa_meeting_with_protestors_national_security_planning
+	}
+	option = { # Give them speaking time in Congress
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_3
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_3
+				add_idea = ASA_Widespread_Protests_level_2
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_2
+			}
+			swap_ideas = {
+				remove_idea = ASA_Widespread_Protests_level_2
+				add_idea = ASA_Widespread_Protests_level_1
+			}
+		}
+		if = {
+			limit = {
+				has_idea = ASA_Widespread_Protests_level_1
+			}
+			remove_ideas = ASA_Widespread_Protests_level_1
+		}
+	}
+	set_country_flag = asa_meeting_with_protestors_national_security_discussed
 }
 
 country_event = { # Rumors of Revolt
@@ -3394,7 +3561,7 @@ country_event = { ### 1868 DEMOCRATIC NOMINEE NAMED ###
             desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
             picture = "Portrait_USA_Horatio_Seymour.dds"
             expire = 1885.8.25
-            ideology = traditional_conservatism
+            ideology = federal
             traits = { }
         }
     }
@@ -3485,7 +3652,7 @@ country_event = { ### 1868 REPUBLICAN NOMINEE NAMED ###
             desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
             picture = "Portrait_ASA_Reuben_Fenton.dds"
             expire = 1885.8.25
-            ideology = centrism
+            ideology = conserv_liberal
             traits = { }
         }
     }
