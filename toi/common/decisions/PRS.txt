@@ -3717,7 +3717,7 @@ eoanb_category_navy_expansion_PRS = {
 		
         complete_effect = {
 			remove_ideas = PRS_idea_build_high_fleet 
-			add_ideas = PRS_idea_high_fleet 
+			add_ideas = PRS_idea_high_fleet_1 
 			if = {
 				limit = { PRS = { owns_state = 1060 } }
 				1060 = { 
@@ -3812,6 +3812,7 @@ eoanb_category_navy_expansion_PRS = {
 		available = {
 			num_of_civilian_factories_available_for_projects > 5
 			NOT = { PRS = { has_country_flag = PRS_ordered_ships_domestically_flag } }
+			PRS = { has_tech = tech_naval_mtg_1860_gunboat }
 			date < 1864.1.1
 		}
 		
@@ -3855,6 +3856,7 @@ eoanb_category_navy_expansion_PRS = {
 		available = {
 			num_of_civilian_factories_available_for_projects > 3
 			NOT = { PRS = { has_country_flag = PRS_ordered_ships_domestically_flag } }
+			PRS = { has_tech = tech_naval_mtg_1860_gunboat }
 			date < 1865.1.1
 		}
 		
@@ -4268,6 +4270,7 @@ eoanb_category_navy_expansion_PRS = {
         }
 
 		available = {
+			tag = PRS
 		}
 		
 		visible = {
@@ -4282,6 +4285,16 @@ eoanb_category_navy_expansion_PRS = {
 		custom_cost_text = PRS_command_power_more_than_49
 		
         complete_effect = {
+			custom_effect_tooltip = PRS_adalbert_decision_tt
+			PRS = { 
+				set_temp_variable = { temp_advisor_frame = 9 }
+				set_temp_variable = { temp_advisor_trait = 110 }
+				mhc_add_army_advisor = yes
+				mhc_add_mark_advisor_as_high_army_brass = yes
+				
+				set_temp_variable = { mhc_add_ncs_target = 9 }
+				mhc_add_ncs = yes
+			}
 			add_command_power = -50
 		}
 
@@ -4300,9 +4313,10 @@ eoanb_category_navy_expansion_PRS = {
 
 		available = {
 			custom_trigger_tooltip = {
-				tooltip = PRS_navy_ministry_decision_tt
+				tooltip = PRS_navy_ministry_decision_trigger_tt
 				hidden_trigger = {
 					PRS = {
+						check_variable = { mhc_ncs_value = 9 }
 						check_variable = { mhc_sec_value = 1 }
 					}
 				}
@@ -4316,13 +4330,245 @@ eoanb_category_navy_expansion_PRS = {
 
 		fire_only_once = yes
 
-		cost = 100
+		cost = 50
 		
         complete_effect = {
+			custom_effect_tooltip = PRS_navy_ministry_decision_effect_tt
+			navy_experience = 50
+			add_ideas = PRS_idea_navy_ministry_1
+			if = {
+				limit = {
+					PRS = { has_idea = navinfra_no_naval_infrastructure }
+				}
+				swap_ideas = {
+					remove_idea = navinfra_no_naval_infrastructure
+					add_idea = navinfra_low_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					PRS = { has_idea = navinfra_low_naval_infrastructure }
+				}
+				swap_ideas = {
+					remove_idea = navinfra_low_naval_infrastructure
+					add_idea = navinfra_decent_naval_infrastructure
+				}
+			}
+			PRS = { 
+				set_temp_variable = { temp_advisor_frame = 10 }
+				set_temp_variable = { temp_advisor_trait = 129 }
+				mhc_add_navy_advisor = yes
+				mhc_add_mark_advisor_as_high_navy_brass = yes
+				
+				set_temp_variable = { mhc_add_nas_target = 9 }
+				mhc_add_nas = yes
+			}
 		}
 
 		ai_will_do = {
 			base = 100
+		}
+	}
+	
+	#Detach Marineministerium from military command - A.K.O. 29.06.1870
+	PRS_decision_detach_navy_ministry = {
+		icon = generic_naval
+
+        allowed = {
+			tag = PRS
+        }
+
+		available = {
+			tag = PRS
+		}
+		
+		visible = {
+			tag = PRS
+			PRS = { 
+				has_completed_focus = PRS_focus_ngc_navy
+				has_idea = PRS_idea_navy_ministry_1
+			}
+			date > 1870.1.1
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+		
+        complete_effect = {
+			custom_effect_tooltip = PRS_detach_navy_ministry_decision_tt
+			navy_experience = 25
+			swap_ideas = {
+				remove_idea = PRS_idea_navy_ministry_1
+				add_idea = PRS_idea_navy_ministry_2
+			}
+			if = {
+				limit = {
+					PRS = { has_idea = navinfra_no_naval_infrastructure }
+				}
+				swap_ideas = {
+					remove_idea = navinfra_no_naval_infrastructure
+					add_idea = navinfra_low_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					PRS = { has_idea = navinfra_low_naval_infrastructure }
+				}
+				swap_ideas = {
+					remove_idea = navinfra_low_naval_infrastructure
+					add_idea = navinfra_decent_naval_infrastructure
+				}
+			}
+			# Make Adalbert Navy Sec
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Issue Bonds to finance Bundesflotte NGC
+	PRS_decision_issue_bonds_for_ships_ngc = {
+		icon = generic_naval
+
+        allowed = {
+			tag = PRS
+        }
+
+		available = {
+			num_of_civilian_factories_available_for_projects > 3
+			date < 1870.7.1
+		}
+		
+		visible = {
+			tag = PRS
+			PRS = { has_completed_focus = PRS_focus_ngc_navy }
+		}
+
+		fire_only_once = yes
+
+		cost = 150
+		
+		modifier = {
+			civilian_factory_use = 3
+		}
+		
+		days_remove = 365
+		
+        complete_effect = {
+			add_stability = -0.02
+		}
+		
+		remove_effect = {
+			add_war_support = 0.02
+			if = {
+				limit = {
+					PRS = { has_idea = PRS_idea_high_fleet_1 }
+				}
+				swap_ideas = {
+					remove_idea = PRS_idea_high_fleet_1
+					add_idea = PRS_idea_high_fleet_2
+				}
+			}
+			else = { add_ideas = PRS_idea_high_fleet_2 }
+        }
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Ask Britain for Warships 3
+	PRS_decision_ask_ENG_for_ships_3 = {
+		icon = generic_naval
+
+        allowed = {
+			tag = PRS
+        }
+
+		available = {
+			num_of_civilian_factories_available_for_projects > 4
+			date > 1867.1.1
+			date < 1870.7.1
+			NOT = { PRS = { has_country_flag = PRS_ordered_ships_abroad_flag } }
+		}
+		
+		visible = {
+			tag = PRS
+			country_exists = ENG
+			PRS = {
+				NOT = { has_war_with = ENG }
+				has_completed_focus = PRS_focus_ngc_navy 
+			}
+			hidden_trigger = { has_dlc = "Man the Guns" }
+		}
+
+		fire_only_once = yes
+
+		cost = 0
+		custom_cost_trigger = { command_power > 49.99 }
+		custom_cost_text = PRS_command_power_more_than_49
+		
+        complete_effect = {
+			add_command_power = -50
+			custom_effect_tooltip = PRS_decision_ask_britain_for_warships_tt
+			hidden_effect = { ENG = { country_event = { id = prussiaforeign.6 } } }
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Order Ships from Britain 3
+	PRS_decision_order_ships_ENG_3 = {
+		icon = generic_naval
+
+        allowed = {
+			tag = PRS
+        }
+
+		available = {
+			num_of_civilian_factories_available_for_projects > 4
+			NOT = { PRS = { has_country_flag = PRS_ordered_ships_abroad_flag } }
+		}
+		
+		visible = {
+			tag = PRS
+			country_exists = ENG
+			PRS = {
+				NOT = { has_war_with = ENG }
+				has_country_flag = PRS_britain_agrees_navy_flag_3
+			}
+			hidden_trigger = { has_dlc = "Man the Guns" }
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		modifier = {
+			civilian_factory_use = 4
+		}
+		
+		days_remove = 365
+		
+        complete_effect = {
+			ENG = { country_event = { id = prussiaforeign.9 } }
+			PRS = { set_country_flag = PRS_ordered_ships_abroad_flag }
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = PRS_decision_order_ships_from_britain_3_tt
+			hidden_effect = {
+				ENG = { country_event = { id = prussiaforeign.10 } }
+				PRS = { country_event = { id = prussiaforeign.18 } }
+			}
+        }
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
 }
