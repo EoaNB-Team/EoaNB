@@ -28,6 +28,8 @@ add_namespace = afr_empire_politics_successful_remove_war_torn_event
 add_namespace = afr_empire_politics_subject_promotion_demand
 add_namespace = afr_empire_politics_subject_demotion_demand
 add_namespace = afr_state_setup_event
+add_namespace = afr_empire_mechanic_weekly_pulse_check_event
+add_namespace = afr_empire_mechanic_monthly_pulse_check_event
 
 	state_event = {
 		id = afr_state_setup_event.1
@@ -37,6 +39,29 @@ add_namespace = afr_state_setup_event
 			if = {
 				limit = { has_state_flag = afr_state_setup_1857 }
 				ROOT = { afr_state_setup_event_scripted_1857 = yes }
+			}
+		}
+	}
+	
+	state_event = {
+		id = afr_empire_mechanic_weekly_pulse_check_event.1
+		hidden = yes
+		is_triggered_only = yes
+		immediate = { 
+			random_state = { 
+				afr_empire_mechanic_weekly_pulse_check = yes 
+				state_event = { id = afr_empire_mechanic_weekly_pulse_check_event.1 days = 7 trigger_for = controller }
+			}
+		}
+	}
+	state_event = {
+		id = afr_empire_mechanic_monthly_pulse_check_event.1
+		hidden = yes
+		is_triggered_only = yes
+		immediate = { 
+			random_state = { 
+				afr_empire_mechanic_monthly_pulse_check = yes 
+				state_event = { id = afr_empire_mechanic_monthly_pulse_check_event.1 days = 30 trigger_for = controller }
 			}
 		}
 	}
@@ -1484,34 +1509,31 @@ add_namespace = afr_state_setup_event
 		option = {
 			name = afr_empire_politics_state_manager_local_politics_event.2.aa
 			trigger = { 
-				check_variable = { var = FROM.afr_empire_state_loyalty_var@ROOT value = 10 compare = less_than }
-				NOT = { has_variable = FROM.afr_empire_politics_state_manager_sent_loyalty_gift_var@ROOT }
-				check_variable = { var = afr_prosperity_mechanic_value value = 10 compare = greater_than_or_equals }
+				FROM = { NOT = { has_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag } }
+				check_variable = { var = afr_prosperity_mechanic_value value = 5 compare = greater_than_or_equals }
 			}
 			hidden_effect = { ROOT = { clr_country_flag = afr_empire_politics_state_management_in_event_flag } }
-			custom_effect_tooltip = afr_prosperity_mechanic_minus_10_tooltip
-			FROM = { afr_empire_state_loyalty_var_increase_by_1 = yes } 
+			custom_effect_tooltip = afr_prosperity_mechanic_minus_5_tooltip
+			FROM = { custom_effect_tooltip = afr_empire_state_public_opinion_var_increase_tooltip }
 			hidden_effect = {
-				set_variable = { var = FROM.afr_empire_politics_state_manager_sent_loyalty_gift_var@ROOT value = 1 }
-				FROM = { state_event = { id = afr_empire_politics_state_manager_sent_loyalty_gift_event.1 days = 360 trigger_for = controller } }
-				add_to_variable = { var = afr_prosperity_mechanic_value value = -10 }
+				FROM = { set_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag }
+				FROM = { state_event = { id = afr_empire_politics_state_manager_sent_loyalty_gift_event.1 days = 180 trigger_for = controller } }
+				add_to_variable = { var = afr_prosperity_mechanic_value value = -5 }
 			}
 			
 		}
 		option = {
 			name = afr_empire_politics_state_manager_local_politics_event.2.ab
 			trigger = { 
-				check_variable = { var = FROM.afr_empire_state_loyalty_var@ROOT value = 10 compare = less_than }
-				check_variable = { var = FROM.afr_empire_politics_state_manager_sent_loyalty_gift_var@ROOT value = 1 compare = equals }
+				FROM = { has_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag }
 			}
 			hidden_effect = { ROOT = { clr_country_flag = afr_empire_politics_state_management_in_event_flag } }
 		}
 		option = {
 			name = afr_empire_politics_state_manager_local_politics_event.2.ac
 			trigger = { 
-				check_variable = { var = FROM.afr_empire_state_loyalty_var@ROOT value = 10 compare = less_than }
-				NOT = { has_variable = FROM.afr_empire_politics_state_manager_sent_loyalty_gift_var@ROOT }
-				NOT = { check_variable = { var = afr_prosperity_mechanic_value value = 10 compare = greater_than_or_equals } }
+				FROM = { NOT = { has_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag } }
+				NOT = { check_variable = { var = afr_prosperity_mechanic_value value = 5 compare = greater_than_or_equals } }
 			}
 			hidden_effect = { ROOT = { clr_country_flag = afr_empire_politics_state_management_in_event_flag } }
 		}
@@ -1533,12 +1555,8 @@ add_namespace = afr_state_setup_event
 				random_owned_state = {
 					limit = { STATE = ROOT }
 					if = {
-						limit = { FROM = { check_variable = { var = PREV.afr_empire_politics_state_manager_sent_loyalty_gift_var@THIS value = 1 compare = equals } } }
-						if = {
-							limit = { OWNER = { check_variable = { var = PREV.afr_empire_politics_state_manager_sent_loyalty_gift_var@THIS value = 1 compare = equals } } }
-							OWNER = { add_to_variable = { var = PREV.afr_empire_state_loyalty_var@THIS value = -1 } }
-						}
-						FROM = { clear_variable = PREV.afr_empire_politics_state_manager_sent_loyalty_gift_var@THIS }
+						limit = { has_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag }
+						clr_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag
 					}
 				}
 			}
@@ -1977,15 +1995,21 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_priest_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_priest }
-					remove_ideas_with_trait = afr_empire_politics_trait_priest
+					#remove_ideas_with_trait = afr_empire_politics_trait_priest
+					activate_decision = afr_empire_politics_resign_advisor_priest
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_priest_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_shaman }
-					remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					#remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					activate_decision = afr_empire_politics_resign_advisor_shaman
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_shaman_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_dawah }
-					remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					#remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					activate_decision = afr_empire_politics_resign_advisor_dawah
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_dawah_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2010,15 +2034,21 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_shaman_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_shaman }
-					remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					#remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					activate_decision = afr_empire_politics_resign_advisor_shaman
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_shaman_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_dawah }
-					remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					#remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					activate_decision = afr_empire_politics_resign_advisor_dawah
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_dawah_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_priest }
-					remove_ideas_with_trait = afr_empire_politics_trait_priest
+					#remove_ideas_with_trait = afr_empire_politics_trait_priest
+					activate_decision = afr_empire_politics_resign_advisor_priest
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_priest_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2043,7 +2073,9 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_warlord_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_warlord }
-					remove_ideas_with_trait = afr_empire_politics_trait_warlord
+					#remove_ideas_with_trait = afr_empire_politics_trait_warlord
+					activate_decision = afr_empire_politics_resign_advisor_warlord
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_warlord_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2068,7 +2100,9 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_noble_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_noble }
-					remove_ideas_with_trait = afr_empire_politics_trait_noble
+					#remove_ideas_with_trait = afr_empire_politics_trait_noble
+					activate_decision = afr_empire_politics_resign_advisor_noble
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_noble_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2093,7 +2127,9 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_merchant_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_merchant }
-					remove_ideas_with_trait = afr_empire_politics_trait_merchant
+					#remove_ideas_with_trait = afr_empire_politics_trait_merchant
+					activate_decision = afr_empire_politics_resign_advisor_merchant
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_merchant_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2118,7 +2154,9 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_jihadist_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_jihadist }
-					remove_ideas_with_trait = afr_empire_politics_trait_jihadist
+					#remove_ideas_with_trait = afr_empire_politics_trait_jihadist
+					activate_decision = afr_empire_politics_resign_advisor_jihadist
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_jihadist_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
@@ -2143,15 +2181,21 @@ add_namespace = afr_state_setup_event
 				limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_dawah_flag_1 } }
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_dawah }
-					remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					#remove_ideas_with_trait = afr_empire_politics_trait_dawah
+					activate_decision = afr_empire_politics_resign_advisor_dawah
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_dawah_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_priest }
-					remove_ideas_with_trait = afr_empire_politics_trait_priest
+					#remove_ideas_with_trait = afr_empire_politics_trait_priest
+					activate_decision = afr_empire_politics_resign_advisor_priest
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_priest_cost_tooltip
 				}
 				if = {
 					limit = { has_idea_with_trait = afr_empire_politics_trait_shaman }
-					remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					#remove_ideas_with_trait = afr_empire_politics_trait_shaman
+					activate_decision = afr_empire_politics_resign_advisor_shaman
+					custom_effect_tooltip = afr_empire_politics_resign_advisor_shaman_cost_tooltip
 				}
 				if = {
 					limit = { FROM = { has_state_flag = afr_empire_politics_local_rumor_true_advisor_1 } }
