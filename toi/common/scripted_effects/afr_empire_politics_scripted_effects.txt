@@ -114,9 +114,42 @@ afr_empire_mechanic_monthly_pulse_check = {
 		}
 	}
 }
-######################################
-########State Public Opinion START####
-######################################
+####################################
+########State Public Opinion END####
+####################################
+afr_empire_politics_state_manager_martial_law_idea_effect = {
+	hidden_effect = {
+		if = {
+			limit = { has_variable = PREV.afr_empire_politics_state_manager_martial_law_enabled@THIS }
+			add_to_variable = { var = afr_empire_politics_state_manager_martial_law_var value = -0.33 }
+		}
+		else = {
+			add_to_variable = { var = afr_empire_politics_state_manager_martial_law_var value = 0.33 }
+		}
+		if = {
+			limit = { check_variable = { var = afr_empire_politics_state_manager_martial_law_var value = 0 compare = less_than} }
+			set_variable = {
+				var = afr_empire_politics_state_manager_martial_law_idea_var
+				value = afr_empire_politics_state_manager_martial_law_var
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { var = afr_empire_politics_state_manager_martial_law_var value = 0 compare = less_than}
+				NOT = { has_dynamic_modifier = { modifier = afr_empire_politics_state_manager_martial_law_idea } }
+			}
+			add_dynamic_modifier = { modifier = afr_empire_politics_state_manager_martial_law_idea } 
+		}
+		else_if = {
+			limit = {
+				check_variable = { var = afr_empire_politics_state_manager_martial_law_var value = 0 compare = equals }
+				has_dynamic_modifier = { modifier = afr_empire_politics_state_manager_martial_law_idea }
+			}
+			remove_dynamic_modifier = { modifier = afr_empire_politics_state_manager_martial_law_idea } 
+		}
+	}
+}
+
 afr_state_setup_scripted_effect= {
 	if = {
 		limit = { has_start_date < 1858.1.1 }
@@ -705,11 +738,11 @@ afr_empire_politics_state_modifier_scripted_effect= {
 
 afr_empire_politics_decentralized_authority_on_state_set = {
 	OWNER = { set_variable = { var = PREV.afr_empire_politics_decentralized_authority@THIS value = 1 } }
-	OWNER = { set_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 80 } }
+	OWNER = { set_variable = { var = PREV.afr_empire_state_autonomy_var@THIS value = 75 } }
 	OWNER = {
 		clamp_variable = {
 			var = PREV.afr_empire_state_autonomy_var@THIS
-			min = 80
+			min = 75
 			max = 100
 		}
 	}
@@ -732,7 +765,7 @@ afr_empire_state_autonomy_var_check_and_clamp = {
 		OWNER = {
 			clamp_variable = {
 				var = PREV.afr_empire_state_autonomy_var@THIS
-				min = 80
+				min = 75
 				max = 100
 			}
 		}
@@ -760,6 +793,10 @@ afr_empire_state_public_opinion_var_weekly_calculation = {
 	if = {
 		limit = { has_state_flag = afr_empire_politics_state_manager_sent_loyalty_gift_flag }
 		add_to_variable = { var = afr_empire_state_public_opinion_var value = 2 }
+	}
+	if = {
+		limit = { OWNER = { has_variable = PREV.afr_empire_politics_state_manager_martial_law_enabled@THIS } }
+		add_to_variable = { var = afr_empire_state_public_opinion_var value = -2 }
 	}
 	if = {
 		limit = { has_state_flag = afr_empire_politics_state_economy_status_boom_flag }
