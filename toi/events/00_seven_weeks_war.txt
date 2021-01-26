@@ -1,1101 +1,722 @@
 ﻿add_namespace = sevenweekswar
 
-#Financial Preparations for War
+#Biarritz Meeting
 country_event = {
 	id = sevenweekswar.1
 	title = sevenweekswar.1.t
 	desc = sevenweekswar.1.d
-	picture = GFX_report_event_china_infiltration
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = sevenweekswar.1.a
-		ai_chance = { factor = 100 }
-		add_political_power = 50
-		random_owned_controlled_state = {
-			limit = {
-				free_building_slots = {
-					building = industrial_complex
-					size > 0
-					include_locked = yes
-				}
-				OR = {
-					is_in_home_area = yes
-					NOT = {
-						owner = {
-							any_owned_state = {
-								free_building_slots = {
-									building = industrial_complex
-									size > 0
-									include_locked = yes
-								}
-								is_in_home_area = yes
-							}
-						}
-					}
-				}
-			}
-			add_extra_state_shared_building_slots = 1
-			add_building_construction = {
-			type = industrial_complex
-			level = 1
-			instant_build = yes
-			}
-		}
-	}
-	
-}
-
-#Privatize the Railways?
-country_event = {
-	id = sevenweekswar.2
-	title = sevenweekswar.2.t
-	desc = sevenweekswar.2.d
-	picture = GFX_report_event_generic_train
-	
-	fire_only_once = yes
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = sevenweekswar.2.a
-		ai_chance = { factor = 90 }
-		add_political_power = 100
-		add_timed_idea = { idea = PRS_idea_privatized_railways days = 365 }
-	}
-	
-	option = {
-		name = sevenweekswar.2.b
-		ai_chance = { factor = 10 }
-		add_political_power = -50
-	}
-	
-}
-
-#Austrian Maneuvers
-country_event = {
-	id = sevenweekswar.3
-	title = sevenweekswar.3.t
-	desc = sevenweekswar.3.d
-	picture = GFX_report_event_saf_soldiers
+	picture = GFX_report_event_hitler_handshake
 	
 	fire_only_once = yes
 	
 	trigger = {
 		OR = {
 			AND = {
-				TAG = PRS
-				has_country_flag = eoanb_flag_PRS_made_reforms
-				date > 1866.3.20
-				PRS = { owns_state = 66 }
-				PRS = { owns_state = 67 }
-				NOT = { has_country_flag = eoanb_flag_won_7_weeks_war }
+				tag = PRS
+				PRS = { has_country_flag = PRS_gastein_convetion }
+				PRS = { has_war = no }
+				date > 1865.8.1
 			}
 			AND = {
-				TAG = PRS
-				date > 1866.6.20
-				PRS = { owns_state = 66 }
-				PRS = { owns_state = 67 }
-				NOT = { has_country_flag = eoanb_flag_PRS_made_reforms }
-				NOT = { has_country_flag = eoanb_flag_won_7_weeks_war }
+				tag = PRS
+				PRS = { NOT = { has_country_flag = PRS_gastein_convetion } }
+				PRS = { has_war = no }
+				date > 1867.1.1
 			}
 		}
 	}
+	
+	mean_time_to_happen = { days = 20 }
+	
+	option = {
+		name = sevenweekswar.1.a
+		ai_chance = { factor = 100 }
+		add_political_power = 50
+		add_opinion_modifier = { target = FRA modifier = PRS_FRA_ARRANGEMENTS_REL }
+		reverse_add_opinion_modifier = { target = FRA modifier = PRS_FRA_ARRANGEMENTS_REL }
+		hidden_effect = {
+			PRS = { country_event = { days = 150 id = sevenweekswar.2 } }
+			AUS = { country_event = { days = 150 id = sevenweekswar.3 } }
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					NOT = { tag = PRS }
+					NOT = { tag = AUS }
+				}
+				country_event = { days = 150 id = sevenweekswar.4 } 
+			}
+		}
+	}
+}
+
+#Prussia – Signs of War 
+country_event = {
+	id = sevenweekswar.2
+	title = sevenweekswar.2.t
+	desc = sevenweekswar.2.d
+	picture = GFX_report_event_ger_civil_war
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = sevenweekswar.2.a
+		ai_chance = { factor = 100 }
+		custom_effect_tooltip = eoanb_PRS_signs_of_war_tt
+		add_war_support = 0.05
+		add_stability = -0.02
+		PRS = { set_country_flag = PRS_signs_of_war_GC_flag }
+		hidden_effect = {
+			PRS = { country_event = { days = 15 id = sevenweekswar.5 } }
+		}
+	}
+}
+
+#Austria – Signs of War 
+country_event = {
+	id = sevenweekswar.3
+	title = sevenweekswar.3.t
+	desc = sevenweekswar.3.d
+	picture = GFX_report_event_ger_civil_war
+	
+	fire_only_once = yes
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.3.a
 		ai_chance = { factor = 100 }
+		add_war_support = 0.05
 		add_stability = -0.02
-		add_war_support = 0.02
 		hidden_effect = {
-			PRS = { country_event = { days = 7 id = sevenweekswar.4 } }
-			clr_country_flag = eoanb_flag_PRS_made_reforms
+			AUS = { country_event = { days = 15 id = sevenweekswar.6 } }
 		}
 	}
-	
 }
 
-#Prussia prepares for War with Austria
+#GC – Signs of War 
 country_event = {
 	id = sevenweekswar.4
 	title = sevenweekswar.4.t
 	desc = sevenweekswar.4.d
-	picture = GFX_report_event_albanian_partisans
+	picture = GFX_report_event_ger_civil_war
 	
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.4.a
 		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_prepares_against_AUS
-		hidden_effect = {
-			PRS = { country_event = { days = 1 id = sevenweekswar.5 } }
-			PRS = { country_event = { days = 3 id = sevenweekswar.6 } }
-			PRS = { country_event = { days = 7 id = sevenweekswar.8 } }
-			PRS = { country_event = { days = 9 id = sevenweekswar.9 } }
-		}
+		add_war_support = 0.05
+		add_stability = -0.02
 	}
-	
-	option = {
-		name = sevenweekswar.4.b
-		ai_chance = { factor = 0 }
-		add_stability = -0.1
-		add_political_power = -200
-		custom_effect_tooltip = eoanb_tt_PRS_cant_unify
-	}
-	
 }
 
-#Nationalizing the Military Industry
+#Prussia – Financial Preparations  
 country_event = {
 	id = sevenweekswar.5
 	title = sevenweekswar.5.t
 	desc = sevenweekswar.5.d
-	picture = GFX_report_event_long_march
+	picture = GFX_report_event_german_reichstag_gathering
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.5.a
 		ai_chance = { factor = 100 }
-		66 = { add_extra_state_shared_building_slots = 1 }
-		66 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
-		67 = { add_extra_state_shared_building_slots = 1 }
-		67 = { add_building_construction = { type = arms_factory level = 1 instant_build = yes } }
+		add_ideas = PRS_war_preparations_1
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = sevenweekswar.7 } }
+		}
 	}
-	
 }
 
-#Support Austrian Socialism?
+#Austria – Financial Crisis   
 country_event = {
 	id = sevenweekswar.6
 	title = sevenweekswar.6.t
 	desc = sevenweekswar.6.d
-	picture = GFX_report_event_spain_civil_war_volunteers_02
+	picture = GFX_report_event_AUS_wien_1
 	
+	fire_only_once = yes
 	is_triggered_only = yes
+	
+	timeout_days = 2
 	
 	option = {
 		name = sevenweekswar.6.a
-		ai_chance = { factor = 95 }
-		add_political_power = -40
-		AUS = { add_timed_idea = { idea = PRS_idea_boost_AUS_socialism days = 180 } }
-		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_AUS_socialism }
+		ai_chance = { factor = 100 }
+		add_timed_idea = { idea = AUS_idea_financial_crisis  days = 365 }
+		hidden_effect = {
+			AUS = { country_event = { days = 21 id = sevenweekswar.8 } }
+		}
+	}
+}
+
+#Prussia - Partial Privatization of Railways?
+country_event = {
+	id = sevenweekswar.7
+	title = sevenweekswar.7.t
+	desc = sevenweekswar.7.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 2
+	
+	option = {
+		name = sevenweekswar.7.a
+		ai_chance = { factor = 90 }
+		add_political_power = 50
+		swap_ideas = { remove_idea = PRS_war_preparations_1 add_idea = PRS_war_preparations_2 }
+		hidden_effect = {
+			PRS = { country_event = { days = 14 id = sevenweekswar.9 } }
+		}
 	}
 	
 	option = {
-		name= sevenweekswar.6.b
-		ai_chance = { factor = 5 }
-		add_political_power = 20
+		name = sevenweekswar.7.b
+		ai_chance = { 
+			factor = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -50
+		hidden_effect = {
+			PRS = { country_event = { days = 14 id = sevenweekswar.9 } }
+		}
 	}
-	
 }
 
-#Support Hungarian Seperatists?
+#Austria - Austrian Maneuvers
 country_event = {
 	id = sevenweekswar.8
 	title = sevenweekswar.8.t
 	desc = sevenweekswar.8.d
-	picture = GFX_report_event_generic_rally_3
+	picture = GFX_report_event_soldiers_marching
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.8.a
-		ai_chance = { factor = 90 }
-		add_political_power = -50
-		AUS = { add_stability = -0.05 }
-		AUS = { add_war_support = -0.05 }
-		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_AUS_hungary_seperatist }
+		ai_chance = { factor = 100 }
+		add_stability = -0.02
+		add_war_support = 0.05
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = sevenweekswar.10 } }
+		}
 	}
-	
-	option = {
-		name = sevenweekswar.8.b
-		ai_chance = { factor = 10 }
-	}
-	
 }
 
-#Founding the Prussian Faction
+#Prussia - Increase Arms Production 
 country_event = {
 	id = sevenweekswar.9
 	title = sevenweekswar.9.t
 	desc = sevenweekswar.9.d
-	picture = GFX_report_event_generic_army
+	picture = GFX_report_event_soldiers_marching
 	
+	fire_only_once = yes
 	is_triggered_only = yes
+	
+	timeout_days = 2
 	
 	option = {
 		name = sevenweekswar.9.a
 		ai_chance = { factor = 100 }
-		create_faction = faction_prussian_allies
-		custom_effect_tooltip = eoanb_tt_PRS_invites_allies
-		hidden_effect = {	
-			#MCK = { country_event = { days = 1 id = sevenweekswar.10 } }
-			#LCK = { country_event = { days = 2 id = sevenweekswar.10 } }
-			#OLD = { country_event = { days = 3 id = sevenweekswar.10 } }
-			#BRE = { country_event = { days = 4 id = sevenweekswar.10 } }
-			#HAM = { country_event = { days = 5 id = sevenweekswar.10 } }
-			#ITA = { country_event = { days = 7 id = sevenweekswar.10 } }
-			#PRS = { country_event = { days = 11 id = sevenweekswar.11 } }
-			every_country = {
-				limit = {
-					has_country_flag = eoanb_flag_sww_side_prs
-				}
-				country_event = { days = 5 id = sevenweekswar.10 }
-			}
-			ITA = { country_event = { days = 7 id = sevenweekswar.10 } }
-			PRS = { country_event = { days = 11 id = sevenweekswar.11 } }
-			set_global_flag = eoanb_flag_bundestag_meeting_pending
-		}
-	}
-}
-
-country_event = {
-	id = sevenweekswar.99
-	title = sevenweekswar.99.t
-	desc = sevenweekswar.99.d
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = sevenweekswar.99.a
-		
-		PRS = {
-			create_faction = faction_prussian_allies
-			custom_effect_tooltip = eoanb_tt_PRS_invites_allies	
-			#MCK = { country_event = { days = 1 id = sevenweekswar.10 } }
-			#LCK = { country_event = { days = 2 id = sevenweekswar.10 } }
-			#OLD = { country_event = { days = 3 id = sevenweekswar.10 } }
-			#BRE = { country_event = { days = 4 id = sevenweekswar.10 } }
-			#HAM = { country_event = { days = 5 id = sevenweekswar.10 } }
-			#ITA = { country_event = { days = 7 id = sevenweekswar.10 } }
-			#PRS = { country_event = { days = 11 id = sevenweekswar.11 } }
-			every_country = {
-				limit = {
-					has_country_flag = eoanb_flag_sww_side_prs
-				}
-				country_event = { days = 5 id = sevenweekswar.10 }
-			}
+		PRS = { 
 			if = {
 				limit = {
-					country_exists = ITA
+					PRS = { has_idea = PRS_war_preparations_1 }
 				}
-				ITA = { country_event = { days = 7 id = sevenweekswar.10 } }
+				swap_ideas = { remove_idea = PRS_war_preparations_1 add_idea = PRS_war_preparations_3 }
 			}
-			PRS = { country_event = { days = 11 id = sevenweekswar.11 } }
-			set_global_flag = eoanb_flag_bundestag_meeting_pending
-		}
-		
-		AUS = {
-			create_faction = faction_austrian_allies
-			custom_effect_tooltip = eoanb_tt_AUS_invites_allies
-			#BAV = { country_event = { days = 1 id = sevenweekswar.13 } }
-			#BAD = { country_event = { days = 2 id = sevenweekswar.13 } }
-			#WUR = { country_event = { days = 3 id = sevenweekswar.13 } }
-			#HSD = { country_event = { days = 4 id = sevenweekswar.13 } }
-			#FRK = { country_event = { days = 5 id = sevenweekswar.13 } }
-			#HAN = { country_event = { days = 7 id = sevenweekswar.13 } }
-			#AUS = { country_event = { days = 12 id = sevenweekswar.14 } }
-			every_country = {
+			else_if = {
 				limit = {
-					has_country_flag = eoanb_flag_sww_side_aus
-					if = {
-						limit = {
-							TAG = HLS
-						}
-						NOT = {
-							is_puppet_of = PRS
-						}
-						owns_state = 949
-					}
+					PRS = { has_idea = PRS_war_preparations_2 }
 				}
-				country_event = { days = 5 id = sevenweekswar.13 }
+				swap_ideas = { remove_idea = PRS_war_preparations_2 add_idea = PRS_war_preparations_4 }
 			}
-			AUS = { country_event = { days = 12 id = sevenweekswar.14 } }
-			#if = {
-			#	limit = {
-			#		not = {
-			#			HLS =  { is_puppet_of = PRS }
-			#		}
-			#		HLS = { owns_state = 949 }
-			#	}
-			#	HLS = { country_event = { days = 8 id = sevenweekswar.13 } }
-			#}
 		}
 	}
 }
 
-#Invited by Prussia
+#Prussia - Prussian Army Preparations 
 country_event = {
 	id = sevenweekswar.10
 	title = sevenweekswar.10.t
 	desc = sevenweekswar.10.d
-	picture = GFX_report_event_soviet_finnish_pact
+	picture = GFX_report_event_soldiers_marching
 	
+	fire_only_once = yes
 	is_triggered_only = yes
+	
+	timeout_days = 2
 	
 	option = {
 		name = sevenweekswar.10.a
 		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_can_call
-		PRS = {
-			add_to_faction = ROOT
-		}
-		hidden_effect = {
-			set_country_flag = eoanb_flag_PRS_ally_sww
+		add_stability = -0.02
+		add_war_support = 0.05
+		PRS = { 
+			if = {
+				limit = {
+					PRS = { has_idea = PRS_war_preparations_3 }
+				}
+				swap_ideas = { remove_idea = PRS_war_preparations_3 add_idea = PRS_war_preparations_5 }
+			}
+			else_if = {
+				limit = {
+					PRS = { has_idea = PRS_war_preparations_4 }
+				}
+				swap_ideas = { remove_idea = PRS_war_preparations_4 add_idea = PRS_war_preparations_6 }
+			}
 		}
 	}
-	
-	option = {
-		name = sevenweekswar.10.b
-		ai_chance = { factor = 0 }
-	}
-	
 }
 
-#Austrian Letter to Prussia
+#Italy/Sardinia-Piedmont - Alliance with Prussia?
 country_event = {
 	id = sevenweekswar.11
 	title = sevenweekswar.11.t
 	desc = sevenweekswar.11.d
-	picture = GFX_report_event_generic_read_write
+	picture = GFX_report_event_hitler_handshake
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.11.a
-		ai_chance = { factor = 100 }
+		ai_chance = { factor = 90 }
 		hidden_effect = {
-			AUS = { country_event = { days = 15 id = sevenweekswar.12 } }
+			PRS = { country_event = { days = 1 id = sevenweekswar.12 } }
 		}
 	}
 	
+	option = {
+		name = sevenweekswar.11.b
+		ai_chance = { factor = 5 }
+		hidden_effect = {
+			PRS = { country_event = { days = 1 id = sevenweekswar.13 } }
+		}
+	}
+	
+	option = {
+		name = sevenweekswar.11.c
+		ai_chance = { factor = 5 }
+		hidden_effect = {
+			PRS = { country_event = { days = 1 id = sevenweekswar.14 } }
+		}
+	}
 }
 
-#Founding the Austrian Faction
+#Prussia - Accept Italian Demands?
 country_event = {
 	id = sevenweekswar.12
 	title = sevenweekswar.12.t
 	desc = sevenweekswar.12.d
-	picture = GFX_report_event_generic_sign_treaty2
+	picture = GFX_report_event_generic_read_write
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.12.a
-		ai_chance = { factor = 100 }
-		create_faction = faction_austrian_allies
-		custom_effect_tooltip = eoanb_tt_AUS_invites_allies
-		hidden_effect = {	
-			#BAV = { country_event = { days = 1 id = sevenweekswar.13 } }
-			#BAD = { country_event = { days = 2 id = sevenweekswar.13 } }
-			#WUR = { country_event = { days = 3 id = sevenweekswar.13 } }
-			#HSD = { country_event = { days = 4 id = sevenweekswar.13 } }
-			#FRK = { country_event = { days = 5 id = sevenweekswar.13 } }
-			#HAN = { country_event = { days = 7 id = sevenweekswar.13 } }
-			#AUS = { country_event = { days = 12 id = sevenweekswar.14 } }
-			every_country = {
-				limit = {
-					has_country_flag = eoanb_flag_sww_side_aus
-					if = {
-						limit = {
-							TAG = HLS
-						}
-						NOT = {
-							is_puppet_of = PRS
-						}
-						owns_state = 949
-					}
-				}
-				country_event = { days = 5 id = sevenweekswar.13 }
-			}
-			AUS = { country_event = { days = 12 id = sevenweekswar.14 } }
-			#if = {
-			#	limit = {
-			#		not = {
-			#			HLS =  { is_puppet_of = PRS }
-			#		}
-			#		HLS = { owns_state = 949 }
-			#	}
-			#	HLS = { country_event = { days = 8 id = sevenweekswar.13 } }
-			#}
+		ai_chance = { factor = 95 }
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_ITA_alliance_1866 }
+		}
+	}
+	
+	option = {
+		name = sevenweekswar.12.b
+		ai_chance = { factor = 5 }
+		hidden_effect = {
+			PIE = { country_event = { days = 1 id = sevenweekswar.15 } }
 		}
 	}
 }
 
-#Invited by Austria
+#Prussia - Accept Italian Demands?
 country_event = {
 	id = sevenweekswar.13
 	title = sevenweekswar.13.t
 	desc = sevenweekswar.13.d
-	picture = GFX_report_event_canada_treaty
+	picture = GFX_report_event_generic_read_write
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.13.a
-		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_AUS_can_call
-		AUS = {
-			add_to_faction = ROOT
-		}
+		ai_chance = { factor = 50 }
 		hidden_effect = {
-			set_country_flag = eoanb_flag_AUS_ally_sww
+			PRS = { set_country_flag = PRS_ITA_alliance_1866 }
 		}
 	}
 	
 	option = {
 		name = sevenweekswar.13.b
-		ai_chance = { factor = 0 }
+		ai_chance = { factor = 50 }
+		hidden_effect = {
+			PIE = { country_event = { days = 1 id = sevenweekswar.15 } }
+		}
 	}
-	
 }
 
-#Prussian Letter to Austria
+#Prussia – No Italian Alliance 
 country_event = {
 	id = sevenweekswar.14
 	title = sevenweekswar.14.t
 	desc = sevenweekswar.14.d
-	picture = GFX_report_event_generic_read_write
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.14.a
 		ai_chance = { factor = 100 }
-		hidden_effect = {
-			AUS = { country_event = { days = 7 id = sevenweekswar.18 } }
-			PRS = { country_event = { days = 7 id = sevenweekswar.19 } }
-		}
 	}
-	
 }
 
-#Bundestag Meeting
+#Italy/Sardinia-Piedmont – No Prussian Alliance 
 country_event = {
 	id = sevenweekswar.15
 	title = sevenweekswar.15.t
 	desc = sevenweekswar.15.d
-	picture = GFX_report_event_generic_peaceful_annexation
 	
-	trigger = {
-		has_idea = GER_general_idea_ger_confed
-		has_global_flag = eoanb_flag_bundestag_meeting_pending
-		NOT = { has_country_flag = eoanb_flag_participated_in_bundestag }
-	}
-	
-	mean_time_to_happen = {
-		days = 12
-	}
+	fire_only_once = yes
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.15.a
 		ai_chance = { factor = 100 }
-		add_political_power = -10
-		hidden_effect = {
-			set_country_flag = eoanb_flag_participated_in_bundestag
-		}
 	}
-	
 }
 
-#The German Confederation fails
+#Prussia – Bundesreformplan 
 country_event = {
 	id = sevenweekswar.16
 	title = sevenweekswar.16.t
 	desc = sevenweekswar.16.d
-	picture = GFX_report_event_hungary_parliament
+	picture = GFX_report_event_german_reichstag_gathering
 	
-	trigger = {
-		has_idea = GER_general_idea_ger_confed
-		has_country_flag = eoanb_flag_participated_in_bundestag
-	}
-	
-	mean_time_to_happen = {
-		days = 12
-	}
+	fire_only_once = yes
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.16.a
 		ai_chance = { factor = 100 }
-		remove_ideas = GER_general_idea_ger_confed
+		add_war_support = 0.02
+		add_popularity = {
+		    ideology = centrism
+			popularity = 0.02
+		}
 		hidden_effect = {
-			clr_country_flag = eoanb_flag_participated_in_bundestag
+			AUS = { country_event = { days = 1 id = sevenweekswar.17 } }
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					NOT = { tag = PRS }
+					NOT = { tag = AUS }
+				}
+				country_event = { days = 1 id = sevenweekswar.18 } 
+			}
+			PRS = { country_event = { days = 7 id = sevenweekswar.19 } }
+			PRS = { country_event = { days = 14 id = sevenweekswar.20 } }
+			PRS = { country_event = { days = 30 id = sevenweekswar.21 } }
 		}
 	}
-	
 }
 
-#The End of the German Confederation
+#Austria – Prussian Bundesreformplan 
 country_event = {
 	id = sevenweekswar.17
 	title = sevenweekswar.17.t
 	desc = sevenweekswar.17.d
-	picture = GFX_report_event_generic_parliament
+	picture = GFX_report_event_german_reichstag_gathering
 	
 	fire_only_once = yes
-	
-	trigger = {
-		has_global_flag = eoanb_flag_bundestag_meeting_pending
-		TAG = PRS
-		NOT = {
-			any_country = {
-				has_idea = GER_general_idea_ger_confed
-			}
-		}
-	}
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.17.a
 		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_gerconfed_over
+		add_war_support = 0.02
+		add_political_power = -25
+		add_stability = -0.02
 		hidden_effect = {
-			clr_global_flag = eoanb_flag_bundestag_meeting_pending
-			news_event = news.8
+			AUS = { country_event = { days = 30 id = sevenweekswar.24 } }
 		}
 	}
-	
 }
 
-#Austria embargoes Prussia
+#GC – Prussian Bundesreformplan 
 country_event = {
 	id = sevenweekswar.18
 	title = sevenweekswar.18.t
 	desc = sevenweekswar.18.d
-	picture = GFX_report_event_merchant_ship_01
+	picture = GFX_report_event_german_reichstag_gathering
 	
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.18.a
 		ai_chance = { factor = 100 }
-		PRS = { 
-			add_opinion_modifier = { target = AUS modifier = embargo } 
-		}
-		hidden_effect = {
-			AUS = { country_event = { days = 3 id = sevenweekswar.20 } }
-		}
+		add_political_power = 10
 	}
-	
-	option = {
-		name = sevenweekswar.18.b
-		ai_chance = { factor = 0 }
-		hidden_effect = {
-			AUS = { country_event = { days = 3 id = sevenweekswar.20 } }
-		}
-	}
-	
 }
 
-#Prussia embargoes Austria
+#Prussia – Support Austrian Socialists?  
 country_event = {
 	id = sevenweekswar.19
 	title = sevenweekswar.19.t
 	desc = sevenweekswar.19.d
-	picture = GFX_report_event_merchant_ship_01
+	picture = GFX_report_event_spain_civil_war_volunteers_02
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.19.a
-		ai_chance = { factor = 100 }
-		AUS = { 
-			add_opinion_modifier = { target = PRS modifier = embargo } 
-		}
-		hidden_effect = {
-			PRS = { country_event = { days = 5 id = sevenweekswar.23 } }
-		}
+		ai_chance = { factor = 95 }
+		add_political_power = -50
+		AUS = { add_timed_idea = { idea = PRS_idea_boost_AUS_socialism days = 180 } }
+		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_AUS_socialism }
 	}
 	
 	option = {
 		name = sevenweekswar.19.b
-		ai_chance = { factor = 0 }
-		hidden_effect = {
-			PRS = { country_event = { days = 5 id = sevenweekswar.23 } }
-		}
+		ai_chance = { factor = 5 }
+		add_political_power = 25
 	}
-	
 }
 
-#Austria proposes a Pact to France
+#Prussia – Support Hungarian Separatists? 
 country_event = {
 	id = sevenweekswar.20
 	title = sevenweekswar.20.t
 	desc = sevenweekswar.20.d
-	picture = GFX_report_event_second_vienna_award_pact
+	picture = GFX_report_event_hungary_parliament
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.20.a
-		ai_chance = { factor = 100 }
-		FRA = { country_event = { days = 1 id = sevenweekswar.21 } }
+		ai_chance = { factor = 90 }
+		add_political_power = -50
+		AUS = { add_stability = -0.05 }
+		AUS = { add_war_support = -0.1 }
+		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_PRS_AUS_hungary_seperatist }
 	}
 	
 	option = {
 		name = sevenweekswar.20.b
-		ai_chance = { factor = 0 }
+		ai_chance = { factor = 10 }
+		add_political_power = 25
 	}
-	
 }
 
-#France gets the Proposal
+#Prussia – Assassination Attempt on Bismarck
 country_event = {
 	id = sevenweekswar.21
 	title = sevenweekswar.21.t
 	desc = sevenweekswar.21.d
-	picture = GFX_report_event_generic_sign_treaty2
+	#picture = GFX_report_event_hungary_parliament
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.21.a
-		ai_chance = { factor = 90 }
-		diplomatic_relation = { country = AUS relation = non_aggression_pact active = no }
+		ai_chance = { factor = 100 }
+		add_political_power = -25
+		add_stability = -0.03
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					NOT = { tag = PRS }
+				}
+				country_event = { days = 1 id = sevenweekswar.22 } 
+			}
+			PRS = { country_event = { days = 2 id = sevenweekswar.23 } }
+		}
 	}
-	
-	option = {
-		name = sevenweekswar.21.b
-		ai_chance = { factor = 10 }
-		AUS = { country_event = { days = 1 id = sevenweekswar.22 } }
-	}
-	
 }
 
-#France says no
+#GC – Assassination Attempt on Bismarck  
 country_event = {
 	id = sevenweekswar.22
 	title = sevenweekswar.22.t
 	desc = sevenweekswar.22.d
-	picture = GFX_report_event_usa_election_generic
+	#picture = GFX_report_event_hungary_parliament
 	
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.22.a
 		ai_chance = { factor = 100 }
+		add_stability = -0.01
 	}
-	
 }
 
-#Prussian Act of War against Saxony
+#Prussia – Parliament Dissolution 
 country_event = {
 	id = sevenweekswar.23
 	title = sevenweekswar.23.t
 	desc = sevenweekswar.23.d
-	picture = GFX_report_event_military_planning
+	picture = GFX_report_event_generic_parliament
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.23.a
 		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_declares_saxony
-		declare_war_on = { target = SAX type = annex_everything }
-		hidden_effect = {
-			SAX = { country_event = { id = sevenweekswar.24 } }
-			add_named_threat = { 
-				threat = 2
-				name = eoanb_threat_sww_war
-			}
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-				}
-				AUS = { add_ideas = PRS_idea_weakened_sww }
-				SAX = { add_ideas = PRS_idea_weakened_sww }
-			}
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-					PRS = { is_ai = yes }
-					AUS = { is_ai = yes }
-				}
-				PRS = { add_ideas = hidden_idea_historical_PRS_victory }
-			}
-			else_if = {
-				limit = {
-					is_historical_focus_on = no
-				}
-				random_list = {
-					50 = {
-						AUS = { add_ideas = PRS_idea_weakened_sww }
-						SAX = { add_ideas = PRS_idea_weakened_sww }
-					}
-					50 = {
-						#
-					}
-				}
-			}
-		}
+		add_political_power = 50
+		add_stability = -0.02
 	}
-	
 }
 
-#Saxony seeks Protection
+#Austria – Block Prussian Reform Plan 
 country_event = {
 	id = sevenweekswar.24
 	title = sevenweekswar.24.t
 	desc = sevenweekswar.24.d
-	picture = GFX_report_event_generic_military_parade
+	picture = GFX_report_event_german_reichstag_gathering
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.24.a
 		ai_chance = { factor = 100 }
-		AUS = { add_to_war = { targeted_alliance = SAX enemy = PRS } }
+		add_political_power = -50
+		add_war_support = 0.02
 		hidden_effect = {
-			news_event = news.7
-			set_global_flag = eoanb_flag_seven_weeks_war_ongoing
-			SAX = { set_country_flag = eoanb_flag_AUS_ally_sww }
-			every_country = {
-				limit = {	
-					has_country_flag = eoanb_flag_PRS_ally_sww
-				}
-				country_event = { id = sevenweekswar.30 }
-			}
-			every_country = {
-				limit = {	
-					has_country_flag = eoanb_flag_AUS_ally_sww
-				}
-				country_event = { id = sevenweekswar.31 }
-			}
+			PRS = { country_event = { days = 1 id = sevenweekswar.25 } }
+			AUS = { country_event = { days = 24 id = sevenweekswar.26 } }
 		}
 	}
-	
 }
 
-#Prussia loses the War
+#Prussia – Austria Blocks Reform Plan 
 country_event = {
 	id = sevenweekswar.25
 	title = sevenweekswar.25.t
 	desc = sevenweekswar.25.d
-	picture = GFX_report_event_generic_rally2
+	picture = GFX_report_event_german_reichstag_gathering
 	
 	fire_only_once = yes
-	
-	trigger = {
-		TAG = AUS 
-		has_global_flag = eoanb_flag_seven_weeks_war_ongoing
-		66 = { is_controlled_by = AUS }
-		67 = { is_controlled_by = AUS }
-		PRS = { surrender_progress > 0.4 }
-	}
+	is_triggered_only = yes
 	
 	option = {
-		name = sevenweekswar.25.a #Normal Peace
-		ai_chance = { factor = 85 }
-		custom_effect_tooltip = eoanb_tt_PRS_lost_sww
-		hidden_effect = {
-			white_peace = PRS
-			PRS = { dismantle_faction = yes }
-			clr_global_flag = eoanb_flag_seven_weeks_war_ongoing
-			HAN = { annex_country = { target = OLD transfer_troops = no } }
-			WUR = { transfer_state = 1033 }
-			AUS = {
-			    dismantle_faction = yes
-			    set_country_flag = AUS_flag_won_sww
-				remove_ideas = PRS_idea_weakened_sww
-			}
-			SAX = {
-				remove_ideas = PRS_idea_weakened_sww
-			}
-			if = {
-				limit = {
-					PRS = { has_idea = hidden_idea_historical_PRS_victory }
-				}
-				PRS = { remove_ideas = hidden_idea_historical_PRS_victory }
-			}
-		}
+		name = sevenweekswar.25.a
+		ai_chance = { factor = 100 }
+		add_political_power = -25
+		add_war_support = 0.02
 	}
-	
-	option = {
-		name = sevenweekswar.25.b #Austria annexes Silesia
-		ai_chance = { factor = 15 }
-		custom_effect_tooltip = eoanb_tt_PRS_lost_sww_2 
-		hidden_effect = {
-			white_peace = PRS 
-			PRS = { dismantle_faction = yes }
-			clr_global_flag = eoanb_flag_seven_weeks_war_ongoing
-			HAN = { annex_country = { target = OLD transfer_troops = no } }
-			WUR = { transfer_state = 1033 }
-			AUS = {
-			    dismantle_faction = yes
-			    set_country_flag = AUS_flag_won_sww
-				remove_ideas = PRS_idea_weakened_sww
-			    transfer_state = 1107 
-			    transfer_state = 67
-				transfer_state = 66
-			}
-			SAX = {
-				remove_ideas = PRS_idea_weakened_sww
-			}
-			if = {
-				limit = {
-					PRS = { has_idea = hidden_idea_historical_PRS_victory }
-				}
-				PRS = { remove_ideas = hidden_idea_historical_PRS_victory }
-			}
-		}
-	}
-	
 }
 
-#Prussia wins the War
+#Austria – Ask Bundestag to Settle Schleswig-Holstein Question 
 country_event = {
 	id = sevenweekswar.26
 	title = sevenweekswar.26.t
 	desc = sevenweekswar.26.d
-	picture = GFX_report_event_royal_parade
+	picture = GFX_report_event_german_reichstag_gathering
 	
 	fire_only_once = yes
-	
-	trigger = {
-		TAG = PRS
-		has_global_flag = eoanb_flag_seven_weeks_war_ongoing
-		OR = {
-			AND = {
-				NOT = { 65 = { is_controlled_by = SAX } }
-				NOT = { 69 = { is_controlled_by = AUS } }
-				NOT = { 74 = { is_controlled_by = AUS } }
-			}
-			AND = {
-				AUS = { surrender_progress > 0.15 }
-			}
-			AND = {
-				AUS = { surrender_progress > 0.1 }
-				9 = { is_controlled_by = PRS }
-			}
-		}
-	}
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.26.a
 		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_won_sww
+		add_political_power = -25
+		add_war_support = 0.05
 		hidden_effect = {
-			white_peace = AUS
-			PRS = { dismantle_faction = yes }
-			AUS = { dismantle_faction = yes }
-			clr_global_flag = eoanb_flag_seven_weeks_war_ongoing
-			PRS = { annex_country = { target = HAN transfer_troops = no } }
-			PRS = { annex_country = { target = HLS transfer_troops = no } }
-			PRS = { annex_country = { target = SCH transfer_troops = no } }
-			PRS = { transfer_state = 1061 }
-			PRS = { set_country_flag = eoanb_flag_PRS_can_form_ngc }
-			PRS = { set_country_flag = eoanb_flag_won_7_weeks_war }
-			AUS = {
-				remove_ideas = PRS_idea_weakened_sww
-                    add_to_variable = {
-                        var = HUN_REVOLT_RISK
-                        value = 2  
-                    }
-                    add_to_variable = {
-                        var = SLA_REVOLT_RISK
-                        value = 1 
-                    }
-			}
-			SAX = {
-				remove_ideas = PRS_idea_weakened_sww
-			}
-			if = {
+			PRS = { country_event = { days = 1 id = sevenweekswar.27 } }
+			every_other_country = {
 				limit = {
-					PRS = { has_idea = hidden_idea_historical_PRS_victory }
+					has_idea = GER_general_idea_ger_confed
+					NOT = { tag = PRS }
+					NOT = { tag = AUS }
 				}
-				PRS = { remove_ideas = hidden_idea_historical_PRS_victory }
-			}
-			if = {
-				limit={
-					AUS = {has_war_with = PIE}
-				}
-				#PIE={
-					#white_peace = AUS
-					#transfer_state = 160
-				#}
+				country_event = { days = 1 id = sevenweekswar.28 } 
 			}
 		}
 	}
-	
 }
 
-#The Formation of the NGC
+#Prussia – Austria Invokes Bundestag in Schleswig-Holstein Question 
 country_event = {
 	id = sevenweekswar.27
 	title = sevenweekswar.27.t
 	desc = sevenweekswar.27.d
-	picture = GFX_report_event_generic_sign_treaty1
+	picture = GFX_report_event_german_reichstag_gathering
 	
 	fire_only_once = yes
-	
-	trigger = {
-		TAG = PRS
-		has_country_flag = eoanb_flag_PRS_can_form_ngc
-	}
-	
-	mean_time_to_happen = {
-		days = 20
-	}
+	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.27.a
-		ai_chance = { 
-			factor = 20
-			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
-			}
-		}
-		custom_effect_tooltip = eoanb_tt_PRS_ngc_historical
-		add_ideas = PRS_idea_anti_ngc_sentiment
+		ai_chance = { factor = 100 }
+		add_political_power = -25
+		add_war_support = 0.05
 		hidden_effect = {
-			clr_country_flag = eoanb_flag_PRS_can_form_ngc
-			set_country_flag = eoanb_flag_PRS_decentralized_ngc
-			PRS = { country_event = { days = 3 id = sevenweekswar.28 } }
-			PRS = { puppet = MCK }
-			PRS = { puppet = LCK }
-			PRS = { puppet = HAM }
-			PRS = { puppet = BRE }
-			PRS = { puppet = OLD }
-			PRS = {
-				add_ideas = PRS_idea_rapid_expansion
-			}
-			create_faction = faction_ngc
-			MCK = { add_to_faction = faction_ngc }
-			LCK = { add_to_faction = faction_ngc }
-			HAM = { add_to_faction = faction_ngc }
-			BRE = { add_to_faction = faction_ngc }
-			OLD = { add_to_faction = faction_ngc }
+			PRS = { country_event = { days = 7 id = sevenweekswar.29 } }
 		}
 	}
-	
-	option = {
-		name = sevenweekswar.27.b
-		ai_chance = { 
-			factor = 80
-		}
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			custom_effect_tooltip = eoanb_tt_option_is_historical
-		}
-		custom_effect_tooltip = eoanb_tt_PRS_ngc_united
-		add_ideas = PRS_idea_anti_ngc_sentiment
-		hidden_effect = {
-			clr_country_flag = eoanb_flag_PRS_can_form_ngc
-			PRS = { country_event = { days = 3 id = sevenweekswar.29 } }
-			PRS = { annex_country = { target = MCK transfer_troops = no } }
-			PRS = { annex_country = { target = LCK transfer_troops = no } }
-			PRS = { annex_country = { target = HAM transfer_troops = no } }
-			PRS = { annex_country = { target = BRE transfer_troops = no } }
-			PRS = { annex_country = { target = OLD transfer_troops = no } }
-			PRS = { set_cosmetic_tag = GER_north_confederation }
-			PRS = {
-				add_ideas = PRS_idea_rapid_expansion
-			}
-		}
-	}	
 }
 
-#SAX, THU, HES, FRK join the Historical Confederation
+#GC – Austria Invokes Bundestag in Schleswig-Holstein Question 
 country_event = {
 	id = sevenweekswar.28
 	title = sevenweekswar.28.t
 	desc = sevenweekswar.28.d
-	picture = GFX_report_event_generic_peaceful_annexation
+	#picture = GFX_report_event_hungary_parliament
 	
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.28.a
 		ai_chance = { factor = 100 }
-		complete_national_focus = PRS_focus_north_german_confederation
-		custom_effect_tooltip = eoanb_tt_PRS_ngc_historical_joiners
-		hidden_effect = {
-			PRS = { puppet = SAX }
-			PRS = { puppet = THU }
-			PRS = { puppet = HES }
-			PRS = { puppet = FRK }
-			SAX = { add_to_faction = faction_ngc }
-			THU = { add_to_faction = faction_ngc }
-			HES = { add_to_faction = faction_ngc }
-			FRK = { add_to_faction = faction_ngc }
-			PRS = { set_variable = { rival_country = FRA.id } }
-		}
+		add_political_power = 10
+		add_war_support = 0.05
 	}
-	
 }
 
-#SAX, THU, HES, FRK join the United Confederation
+#Prussia – Occupation of Holstein?
 country_event = {
 	id = sevenweekswar.29
 	title = sevenweekswar.29.t
 	desc = sevenweekswar.29.d
-	picture = GFX_report_event_generic_peaceful_annexation
+	picture = GFX_report_event_german_reichstag_gathering
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = sevenweekswar.29.a
 		ai_chance = { factor = 100 }
-		complete_national_focus = PRS_focus_north_german_confederation
-		custom_effect_tooltip = eoanb_tt_PRS_ngc_united_joiners
+		add_political_power = -25
+		add_war_support = 0.05
+		PRS = { transfer_state = 949 }
 		hidden_effect = {
-			PRS = { annex_country = { target = SAX transfer_troops = no } }
-			PRS = { annex_country = { target = THU transfer_troops = no } }
-			PRS = { annex_country = { target = HES transfer_troops = no } }
-			PRS = { annex_country = { target = FRK transfer_troops = no } }
-			PRS = { set_variable = { rival_country = FRA.id } }
+			PRS = { country_event = { days = 1 id = sevenweekswar.32 } }
 		}
 	}
-	
-}
-
-#Called to arms into the Seven Weeks War by Prussia
-country_event = {
-	id = sevenweekswar.30
-	title = sevenweekswar.30.t
-	desc = sevenweekswar.30.d
-	picture = GFX_report_event_election_vote
-	
-	is_triggered_only = yes
 	
 	option = {
-		name = sevenweekswar.30.a
-		ai_chance = { factor = 100 }
-		#add_to_war = { targeted_alliance = PRS enemy = AUS }
-		PRS = {
-			add_to_faction = ROOT
-		}
+		name = sevenweekswar.29.b
+		ai_chance = { factor = 0 }
+		add_political_power = 25
+		add_war_support = -0.05
 		hidden_effect = {
-			#clr_country_flag = eoanb_flag_PRS_ally_sww
+			PRS = { country_event = { days = 1 id = sevenweekswar.32 } }
 		}
 	}
-	
-}
-
-#Called to arms into the Seven Weeks War by Austria
-country_event = {
-	id = sevenweekswar.31
-	title = sevenweekswar.31.t
-	desc = sevenweekswar.31.d
-	picture = GFX_report_event_election_vote
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = sevenweekswar.31.a
-		ai_chance = { factor = 100 }
-		#add_to_war = { targeted_alliance = AUS enemy = PRS }
-		AUS = {
-			add_to_faction = ROOT
-		}
-		hidden_effect = {
-			#clr_country_flag = eoanb_flag_AUS_ally_sww
-		}
-	}
-	
 }
