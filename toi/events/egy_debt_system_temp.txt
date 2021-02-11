@@ -1,6 +1,7 @@
 ﻿add_namespace = egy_debt_system
 add_namespace = egy_debt_system_test
 add_namespace = egy_debt_system_managed
+add_namespace = SPR_bankruptcy_events
 
 
 country_event = { 
@@ -274,7 +275,13 @@ country_event = { #the national debt hits unpayable high, we are forced to decla
 		
 	option = {#SHIT
 		name = egy_debt_system.7.a
-		ai_chance = { factor = 100 }
+		ai_chance = { 
+			base = 100 
+			modifier = {
+				factor = 0 
+				TAG = SPR
+			}
+		}
 		#add_ideas = edc_bankrupt
 		add_timed_idea = {
 			idea = edc_bankrupt
@@ -298,6 +305,42 @@ country_event = { #the national debt hits unpayable high, we are forced to decla
 			#egy_public_consered_debt_5
 			#egy_industry_cuts
 		}
+	}
+	
+	option = {#Spain's Option
+		name = egy_debt_system.7.b
+		trigger = { 
+			TAG = SPR 
+			owns_state = 169
+			169 = { NOT = { has_state_flag = SPR_sold_andalusia_mining_rights_flag } }
+		}
+		ai_chance = { 
+			base = 0 
+			modifier = {
+				add = 100 
+				TAG = SPR
+			}
+		}
+		add_timed_idea = {
+			idea = edc_bankrupt
+			days = 2555
+		}
+		set_variable = {debt_level = 0}
+		hidden_effect = {
+			country_event = { id = egy_debt_system_managed.1 days = 1277 }
+			remove_ideas = egy_vic_debt
+			if = {
+				limit = { has_idea = egy_vic_debt_payments }
+				remove_ideas = egy_vic_debt_payments
+			}
+			country_event = { id = egy_debt_system.10 days = 5 }
+		}
+		if = {
+			limit = { has_dlc = "Man the Guns" }
+			ENG = { custom_effect_tooltip = SPR_sell_andalusia_mining_rights_tooltip }
+		}
+		else = { add_political_power = -200 }
+		ENG = { country_event = { id = SPR_bankruptcy_events.1 days = 15 } }
 	}
 	#mean_time_to_happen = {
 	#	days = 100
