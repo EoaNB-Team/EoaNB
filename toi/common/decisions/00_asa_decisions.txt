@@ -1852,6 +1852,9 @@ internal_politics_eoanb = {
 			has_war = yes
 			has_civil_war = no
 			has_completed_focus = ASA_Establish_The_Free_Corps
+			NOT = {
+				has_country_flag = in_civil_war_flag
+			}
 		}
 		visible = {
 			has_completed_focus = ASA_Establish_The_Free_Corps
@@ -1878,10 +1881,12 @@ internal_politics_eoanb = {
 		available = {
 			has_civil_war = yes
 			has_completed_focus = ASA_Establish_The_Free_Corps
+			has_country_flag = in_civil_war_flag
 		}
 		visible = {
 			has_civil_war = yes
 			has_completed_focus = ASA_Establish_The_Free_Corps
+			has_country_flag = in_civil_war_flag
 		}
 		cost = 0
 		custom_cost_trigger = {
@@ -1904,6 +1909,13 @@ internal_politics_eoanb = {
 	}
 	ASA_Set_Up_Meeting_With_Protest_Leaders = {
 		allowed = { tag = ASA }
+		available = {
+			NOT = {
+				has_country_flag = asa_meeting_with_protestors_economy_discussed
+				has_country_flag = asa_meeting_with_protestors_policy_discussed
+				has_country_flag = asa_meeting_with_protestors_national_security_discussed
+			}
+		}
 		cost = 50
 		days_remove = 14
 		remove_effect = {
@@ -1931,7 +1943,10 @@ internal_politics_eoanb = {
 		allowed = { tag = ASA }
 		available = {
 			has_completed_focus = ASA_Domestic_Interstate_Railroad
-		} 
+		}
+		visible = {
+			has_completed_focus = ASA_Domestic_Interstate_Railroad
+		}
 		cost = 0
 		days_remove = 365
 		remove_effect = {
@@ -1947,6 +1962,9 @@ internal_politics_eoanb = {
 	ASA_Construct_Trans_Continental_Railroad = {
 		allowed = { tag = ASA }
 		available = {
+			has_completed_focus = ASA_Trans_Continental_Railroad
+		}
+		visible = {
 			has_completed_focus = ASA_Trans_Continental_Railroad
 		}
 		cost = 0
@@ -2050,6 +2068,9 @@ internal_politics_eoanb = {
 		available = {
 			has_completed_focus = ASA_Defend_Railroads
 		}
+		visible = {
+			has_completed_focus = ASA_Defend_Railroads
+		}
 		fire_only_once = yes
 		custom_cost_trigger = {
 			has_manpower > 999
@@ -2115,11 +2136,12 @@ internal_politics_eoanb = {
 	}
 	ASA_military_coup = {
 		allowed = { tag = ASA }
-
 		available = {
 			has_completed_focus = ASA_Faux_Republic
 		}
-
+		visible = {
+			has_completed_focus = ASA_Faux_Republic
+		}
 		fire_only_once = yes
 
 		cost = 100
@@ -2335,13 +2357,36 @@ ASA_Construct_The_Imperial_Palace = {
 
 ASA_Take_Back_Ohio = {
 	asa_retake_ohio = {
-		activation = {
-			has_idea = ASA_Taking_Back_Ohio
-			has_offensive_war_with = GRL
+		activation = { always = no }
+		allowed = {
+			OR = {
+				tag = ASA
+				tag = GRL
+			}
 		}
-		allowed = { tag = ASA }
 		available = {
-			controls_state = 261
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				OR = {
+					GRL = { surrender_progress > 0.7 }
+					ASA = { controls_state = 261 }
+				}
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = GRL
+					}
+				}
+				OR = {
+					ASA = { surrender_progress > 0.7 }
+					GRL = { controls_state = 261 }
+				}
+			}
 		}
 		is_good = yes
 		days_mission_timeout = 365
@@ -2349,6 +2394,142 @@ ASA_Take_Back_Ohio = {
 			country_event = asa_referendum_in_ohio.10
 		}
 		complete_effect = {
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_ohio.8
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_ohio.9
+			}
+			add_political_power = 100
+		}
+	}
+}
+
+ASA_Take_Back_Connecticut = {
+	asa_retake_connecticut = {
+		activation = { always = no }
+		allowed = { 
+			OR = {
+				tag = ASA
+				tag = NEG
+			}
+		}
+		available = {
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				OR = {
+					NEG = { surrender_progress > 0.7 }
+					ASA = { controls_state = 958 }
+				}
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = NEG
+					}
+				}
+				OR = {
+					ASA = { surrender_progress > 0.7 }
+					NEG = { controls_state = 958 }
+				}
+			}
+		}
+		is_good = yes
+		days_mission_timeout = 365
+		timeout_effect = {
+			country_event = asa_referendum_in_connecticut.10
+		}
+		complete_effect = {
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_connecticut.8
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_connecticut.9
+			}
+			add_political_power = 100
+		}
+	}
+}
+
+ASA_Take_Back_West_Virginia = {
+	asa_retake_west_virginia = {
+		activation = { always = no }
+		allowed = { 
+			OR = {
+				tag = ASA
+				tag = CSA
+			}
+		}
+		available = {
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				OR = {
+					CSA = { surrender_progress > 0.7 }
+					ASA = { controls_state = 746 }
+				}
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = CSA
+					}
+				}
+				OR = {
+					ASA = { surrender_progress > 0.7 }
+					CSA = { controls_state = 746 }
+				}
+			}
+		}
+		is_good = yes
+		days_mission_timeout = 365
+		timeout_effect = {
+			country_event = asa_referendum_in_west_virginia.10
+		}
+		complete_effect = {
+			IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_west_virginia.8
+			}
+			ELSE_IF = {
+				limit = {
+					ROOT = {
+						tag = ASA
+					}
+				}
+				country_event = asa_referendum_in_west_virginia.9
+			}
 			add_political_power = 100
 		}
 	}
@@ -2470,10 +2651,10 @@ ASA_Aggressive_Reunion_With_Kentucky = {
 }
 
 ASA_Put_Down_Revolt = {
-	asa_put_down_revolt = {
+	asa_put_down_philadelphia_revolt = {
 		activation = {
 			AND = {
-				has_country_flag = asa_philadelphia_uprising
+				has_country_flag = asa_philidelphia_crisis_flag
 				has_defensive_war_with = PHL
 			}
 		}
@@ -2481,14 +2662,14 @@ ASA_Put_Down_Revolt = {
 			controls_state = 1385
 		}
 		allowed = { tag = ASA }
-		days_mission_timeout = 365
+		days_mission_timeout = 180
 		timeout_effect = {
 			white_peace = PHL
-			clr_country_flag = asa_philadelphia_uprising
+			clr_country_flag = asa_philidelphia_crisis_flag
 		}
 		complete_effect = {
 			transfer_state = 1385
-			clr_country_flag = asa_philadelphia_uprising
+			clr_country_flag = asa_philidelphia_crisis_flag
 		}
 	}
 }
@@ -2967,6 +3148,7 @@ ASA_Make_Good_On_Promises = {
 			set_temp_variable = { asa_promises_to_protestors_failure = var:asa_promises_to_protestors }
 			multiply_temp_variable = { asa_promises_to_protestors_failure = -1 }
 			add_political_power = var:asa_promises_to_protestors_failure
+			add_ideas = ASA_Widespread_Protests_level_3
 		}
 	}
 }
