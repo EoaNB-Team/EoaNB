@@ -1,4 +1,4 @@
-name="End of a New Beginning (Development)"
+name="End of a New Beginning"
 path="mod/toi"
 version="0.2.5 Pax Orientalis"
 tags={
