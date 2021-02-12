@@ -1,5 +1,6 @@
-name="End of a New Beginning"
-path="mod/toi/"
+name="End of a New Beginning (Development)"
+path="mod/toi"
+version="0.2.5 Pax Orientalis"
 tags={
 	"Alternative History"
 	"Balance"
@@ -30,5 +31,5 @@ replace_path = "history/countries"
 replace_path = "history/states"
 replace_path = "map/supplyareas"
 
-supported_version="1.9.3"
+supported_version="1.10.*"
 picture="toi.jpg"

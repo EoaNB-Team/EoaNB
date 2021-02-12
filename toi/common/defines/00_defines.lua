@@ -1,4 +1,3 @@
-
 NDefines = {
 
 NGame = {
@@ -9,7 +8,7 @@ NGame = {
 	CHECKSUM_SALT = "zwOdv5d9wm9uDSOT",				-- Data to modify generated checksum when game binaries have changed but not any content files.	LAG_DAYS_FOR_LOWER_SPEED = 10,					-- Days of client lag for decrease of gamespeed
 	LAG_DAYS_FOR_LOWER_SPEED = 10,					-- Days of client lag for decrease of gamespeed
 	LAG_DAYS_FOR_PAUSE = 25,						-- Days of client lag for pause of gamespeed.
-	GAME_SPEED_SECONDS = { 2.0, 0.5, 0.2, 0.1, 0.0 }, -- game speeds for each level. Must be 5 entries with last one 0 for unbound	MAJOR_PARTICIPANTS_FOR_MAJOR_WAR = 3,			-- Minimum number of major countries involved in a war to consider it major enough to not end the game even though the enddate has been reached.
+	GAME_SPEED_SECONDS = { 2.0, 0.5, 0.2, 0.1, 0.0 }, -- game speeds for each level. Must be 5 entries with last one 0 for unbound	
 	MAJOR_PARTICIPANTS_FOR_MAJOR_WAR = 3,			-- Minimum number of major countries involved in a war to consider it major enough to not end the game even though the enddate has been reached.
 	COMBAT_LOG_MAX_MONTHS = 12,
 	MESSAGE_TIMEOUT_DAYS = 60,						-- Useful if running the handsoff game. The popup messages that doesn't require the player respond will automatically hide after some timeout.	
@@ -174,7 +173,7 @@ NCountry = {
 	SUPPLY_BASE_MULT = 1,							-- multiplier on supply base values
 	SUPPLY_BONUS_FROM_INPUT = 0.25,					-- % of supply bonus from input area.
 	SUPPLY_PATH_MAX_DISTANCE = 15,					-- When supply route reach more than X nodes, the manpower+equipment delivery speed reach 100% penalty.
-	POPULATION_YEARLY_GROWTH_BASE = 0.015,			-- basic population growth per year, used for monthly manpower gain
+	POPULATION_YEARLY_GROWTH_BASE = 0.0082,			-- basic population growth per year, used for monthly manpower gain
 	RESISTANCE_STRENGTH_FROM_VP = 0.001,			-- How much strength ticking speed gives each VP score.
 	RESISTANCE_STRENGTH_FROM_NEIGHBORS = 0.5, 		-- Multiplies how much resistance can spread from one state to its neighbors, a state will spread whatever is highest of its victorypoints resistance increase or half of any of its neighbors spread, multiplied by this
 	RESISTANCE_DECAY_WHEN_NO_GROWTH = 0.005,		-- Resistance will fall by this much each day if there is nothing increasing it ( no VPs and no spread from neighbors )
@@ -725,9 +724,9 @@ NMilitary = {
 	TRAINING_MIN_STRENGTH = 0.1,					-- if strength is less than this, the unit will pause training until it's been reinforced
 	AIR_SUPPORT_BASE = 0.3,                        -- base ground bonus to troops when active planes helping them
 	LOW_SUPPLY = 0.99,							   -- When the supply status of an unit becomes low.
-	BORDER_WAR_ATTRITION_FACTOR = 0.1,			   -- How much of borderwar balance of power makes it into attrition
-	BORDER_WAR_VICTORY = 0.8,					   -- At wich border war balance of power is victory declared
-	REINFORCE_CHANCE = 0.01,                 	   -- base chance to join combat from back line when empty
+	BORDER_WAR_ATTRITION_FACTOR = 0.01,			   -- How much of borderwar balance of power makes it into attrition
+	BORDER_WAR_VICTORY = 1.0,					   -- At wich border war balance of power is victory declared
+	REINFORCE_CHANCE = 0.03,                 	   -- base chance to join combat from back line when empty
 	SPEED_REINFORCEMENT_BONUS = 0.01,              -- chance to join combat bonus by each 100% larger than infantry base (up to 200%)
 	OVERSEAS_LOSE_EQUIPMENT_FACTOR = 0.75,		   -- percentage of equipment lost disbanded overseas
 	ENCIRCLED_DISBAND_MANPOWER_FACTOR = 0.2,       -- percentage of manpower returned when an encircled unit is disbanded
@@ -864,7 +863,7 @@ NMilitary = {
 		0.0, -- operative	
 	}, 
 	
-	HOURS_REQ_REJOIN_BORDER_WAR_FOR_INJURED_UNITS = 336, -- minimum hours required for units to rejoin border wars
+	HOURS_REQ_REJOIN_BORDER_WAR_FOR_INJURED_UNITS = 36, -- minimum hours required for units to rejoin border wars
 	
 	NEW_COMMANDER_RANDOM_PERSONALITY_TRAIT_CHANCES = {  -- chances to gain a personality trait for new generals
 		0.5, -- 50% for first trait
@@ -899,7 +898,7 @@ NMilitary = {
 	UNIT_LEADER_ASSIGN_TRAIT_COST = 15.0,					-- cost to assign a new trait to a unit leader
 	ATTACHED_WINGS_ORDER_UPDATE_DAYS = 5,					-- Days untill the attached wing will update the order
 	
-	BORDER_WAR_WIN_DAYS_AGAINST_EMPTY_OPPONENTS = 14,		-- border wars will be automatically won if no opponent shows up for this duration
+	BORDER_WAR_WIN_DAYS_AGAINST_EMPTY_OPPONENTS = 30,		-- border wars will be automatically won if no opponent shows up for this duration
 	
 	
 	MAX_RELATIVE_COMBAT_DAMAGE_TO_MODIFY_XP = 4.0,			-- you gain more XP if you are doing more damage relative to enemy, this is the max relative amount to gain following RATe
@@ -1065,6 +1064,7 @@ NAir = {
 	DISRUPTION_DEFENCE_SPEED_FACTOR = 1.0,
 	DISRUPTION_DEFENCE_ATTACK_FACTOR = 0.5,
 	
+	CARRIER_PLANES_AMOUNT_FOR_POSITIONING = 50,         -- below this amount of planes on a carrier we no longer get max benefit on enemy positioning 
 	CAS_NIGHT_ATTACK_FACTOR = 0.1,                      -- CAS damaged get multiplied by this in land combats at night
 	
 	MISSION_COMMAND_POWER_COSTS = {  -- command power cost per plane to create a mission
@@ -1242,6 +1242,11 @@ NNavy = {
 	NAVY_REPAIR_BASE_SEARCH_SCORE_PER_SLOT = 1.0,					-- while searching for a naval base for repairs, the bases gets a bonus to their scores per empty slot they have
 	NAVY_REPAIR_BASE_SEARCH_BOOST_FOR_SAME_COUNTRY = 5,				-- while searching for a naval base for repairs, your own bases gets a bonus
 	
+
+	CONVOY_SPOTTING_COOLDOWN = 0.3,  -- % of travel time 
+	CONVOY_SPOTTING_COOLDOWN_MIN = 36, -- minimum cooldown time
+	CONVOY_SPOTTING_COOLDOWN_MAX = 168, -- maximum cooldown time
+	CONVOY_SPOTTING_COOLDOWN_MIN_FROM_EFFICIENCY = 15, -- clamped min value after screening efficiency has been applied
 	MISSION_FUEL_COSTS = {  -- fuel cost for each mission
 		0.0, -- HOLD (consumes fuel HOLD_MISSION_MOVEMENT_COST fuel while moving)
 		1.0, -- PATROL		
@@ -1487,6 +1492,9 @@ NNavy = {
 	
 	HIGHER_SHIP_RATIO_POSITIONING_PENALTY_FACTOR					= 0.25, -- if one side has more ships than the other, that side will get this penalty for each +100% ship ratio it has
 	MAX_POSITIONING_PENALTY_FROM_HIGHER_SHIP_RATIO					= 0.5,  -- maximum penalty to get from larger fleets
+
+	HIGHER_CARRIER_RATIO_POSITIONING_PENALTY_FACTOR					= 0.2;  -- penalty if other side has stronger carrier air force 
+	MAX_CARRIER_RATIO_POSITIONING_PENALTY_FACTOR 					= 0.2;  -- max penalty from stronger carrier air force
 	
 	POSITIONING_PENALTY_FOR_SHIPS_JOINED_COMBAT_AFTER_IT_STARTS		= 0.05, -- each ship that joins the combat will have this penalty to be added into positioning
 	MAX_POSITIONING_PENALTY_FOR_NEWLY_JOINED_SHIPS 					= 0.5,  -- the accumulated penalty from new ships will be clamped to this value
@@ -1624,6 +1632,12 @@ NNavy = {
 	NAVAL_COMBAT_AIR_SUB_DETECTION_DECAY_RATE = 1.0,					-- Factor to decay the value of sub detection contributed by planes on the last hour. Note: the maximum value between the decayed value and the newly computed one is taken into account. A decay rate of 1 means that nothing is carried over, the previous value is zerod out. A decay rate of 0 means that the previous value is carried over as is.
 	NAVAL_COMBAT_AIR_SUB_DETECTION_FACTOR = 0.0,						-- A global factor that applies after all others, right before the sub detection contributed by plane is added to the global sub detection of a combatant
 
+	NAVAL_COMBAT_AIR_SUB_TARGET_SCORE = 10,                             -- scoring for target picking for planes inside naval combat, one define per ship typ
+	NAVAL_COMBAT_AIR_CAPITAL_TARGET_SCORE = 50,
+	NAVAL_COMBAT_AIR_CARRIER_TARGET_SCORE = 200,
+	NAVAL_COMBAT_AIR_CONVOY_TARGET_SCORE = 1.0,
+	NAVAL_COMBAT_AIR_STRENGTH_TARGET_SCORE = 5,                         -- how much score factor from low health (scales between 0->this number)
+	NAVAL_COMBAT_AIR_LOW_AA_TARGET_SCORE = 5,                           -- how much score factor from low AA guns (scales between 0->this number)
 },
 
 NTrade = {
@@ -2893,6 +2907,8 @@ NIntel = {
 	ARMY_INTEL_COMBAT_BONUS_MAX_INTEL_FOR_BONUS = 50, -- intel needed to fully apply ARMY_INTEL_COMBAT_BONUS_MAX_BONUS
 
 	NAVAL_SUPREMACY_INTEL_LOW = 0.3,								-- we need more intel than this to get any supremacy
+	NAVAL_SUPREMACY_INTEL_LOW_SUPREMACY_PENALTY_START = 0.1,		-- supremacy is reduced to NAVAL_SUPREMACY_INTEL_LOW_SUPREMACY_MIN_PENALTY at or below this intel
+	NAVAL_SUPREMACY_INTEL_LOW_SUPREMACY_MIN_PENALTY = 0.5, -- you get this much supremacy at NAVAL_SUPREMACY_INTEL_LOW_SUPREMACY_PENALTY_START and scales up to 1 at NAVAL_SUPREMACY_INTEL_LOW
 
 	NAVY_FLEET_COUNT_INTEL_MIN = 0.1,
 	NAVY_FLEET_COUNT_INTEL_MAX = 0.3,

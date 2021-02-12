@@ -1,0 +1,149 @@
+############################
+# Spanish National Militia #
+############################
+#
+# How To Enable:
+#
+#	TAG = { every_owned_state = { limit = { SPR_homeland_states = yes } SPR_call_national_militia_units = yes } }
+#
+# How To Disable:
+#
+#	TAG = { SPR_dismiss_national_militia_units = yes }
+#
+SPR_call_national_militia_units={
+	#if = {
+		#limit = {
+		#}
+		if = {
+			limit = {
+				THIS = { state_population > 2400000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 12000 }
+		}
+		else_if = {
+			limit = {
+				THIS = { state_population < 2400000 }
+				THIS = { state_population > 2000000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 10000 }
+		}
+		else_if = {
+			limit = {
+				THIS = { state_population < 2000000 }
+				THIS = { state_population > 1600000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 8000 }
+		}
+		else_if = {
+			limit = {
+				THIS = { state_population < 1600000 }
+				THIS = { state_population > 1200000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 6000 }
+		}
+		else_if = {
+			limit = {
+				THIS = { state_population < 1200000 }
+				THIS = { state_population > 800000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 4000 }
+		}
+		else_if = {
+			limit = {
+				THIS = { state_population < 800000 }
+				THIS = { state_population > 400000 }
+			}
+			add_to_temp_variable = { Spanish_militia_army_num = 2000 }
+		}
+		if = {
+			limit = {
+				check_variable = {
+					var = Spanish_militia_army_num
+					value = 12000
+					compare = greater_than
+				}
+			}
+			set_temp_variable = { Spanish_militia_army_num = 12000 }
+		}
+		subtract_from_temp_variable = { Spanish_militia_army_num = Spanish_militia_army_used }
+		if = {
+			limit = { 
+				check_variable = {
+					var = Spanish_militia_army_num
+					value = 2000
+					compare = greater_than_or_equals
+				}
+			}
+			set_temp_variable = {temp_spanish_militia_army = Spanish_militia_army_num}
+			divide_temp_variable = {temp_spanish_militia_army = 2000}
+			round_variable = temp_spanish_militia_army
+			add_to_temp_array={
+				array = num_of_state_militia_divisions_to_raise
+				value = 1
+				index = 1
+			}
+			resize_temp_array = {num_of_state_militia_divisions_to_raise = temp_spanish_militia_army}
+			if = {
+				limit = { PREV = { NOT = { has_template = "National Militia" } } }
+				PREV = {
+					division_template = {
+						name = "National Militia"
+						priority = 0
+						division_names_group = SPR_STATE_MILITIA_01
+						regiments = {
+							spanish_militia_infantry = { x = 0 y = 0 }
+							spanish_militia_infantry = { x = 1 y = 0 }
+						}
+						is_locked = yes
+					}
+				}
+			}
+			for_each_loop={
+				array = num_of_state_militia_divisions_to_raise
+				create_unit = {
+					division = "name = \"National Militia\" division_template = \"National Militia\" start_experience_factor = 0.25 start_equipment_factor = 1" 
+					owner = PREV
+				}
+				subtract_from_temp_variable = { Spanish_militia_army_num = 2000 }
+				clamp_variable = {
+					var = Spanish_militia_army_num
+					min = 0
+					max = 12000
+				}
+				add_to_variable = { Spanish_militia_army_used = 2000 }
+				clamp_variable = {
+					var = Spanish_militia_army_used
+					min = 0
+					max = 12000
+				}
+			}
+		}
+	#}
+}
+
+SPR_dismiss_national_militia_units={
+	delete_unit_template_and_units = { division_template = "National Militia" }
+	every_owned_state = {
+		limit = {
+			check_variable = {
+				var = Spanish_militia_army_used
+				value = 0
+				compare = greater_than
+			}
+		}
+		set_variable = { Spanish_militia_army_used = 0 }
+    }
+	if = {
+		limit = { NOT = { has_template = "National Militia" } }
+		division_template = {
+			name = "National Militia"
+			priority = 0
+			division_names_group = SPR_STATE_MILITIA_01
+			regiments = {
+				spanish_militia_infantry = { x = 0 y = 0 }
+				spanish_militia_infantry = { x = 1 y = 0 }
+			}
+			is_locked = yes
+		}
+	}
+}

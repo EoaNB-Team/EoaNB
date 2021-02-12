@@ -6,6 +6,7 @@ add_namespace = nap_france
 add_namespace = fraprswar_france
 add_namespace = third_rep_france
 add_namespace = latin_monetary_union
+add_namespace = paris_commune
 
 #----------------------------------------------------------------------------------------------
 # FOCUS TREE EVENTS - 1857 TO 1870
@@ -21,8 +22,15 @@ country_event = { # Future of the Empire
 
   option = { # Authoritarian Empire
     name = nap_france.1.a
+    ai_chance = {
+      factor = 25
+      modifier = {
+        is_historical_focus_on = yes
+        factor = 0
+      }
+	 }
     add_political_power = -50
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.15
     }
@@ -31,12 +39,19 @@ country_event = { # Future of the Empire
 
   option = { # Liberal Empire
     name = nap_france.1.b
+    ai_chance = {
+      factor = 75
+      modifier = {
+        is_historical_focus_on = yes
+        factor = 100
+      }
+	 }
     add_political_power = 50
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = traditional_conservatism
       popularity = 0.05
     }
@@ -56,15 +71,15 @@ country_event = { # Redrawing of the Cantons
   option = { # Assure our political hegemony
     name = nap_france.2.a
     add_political_power = -50
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = traditional_conservatism
       popularity = -0.05
     }
@@ -73,15 +88,15 @@ country_event = { # Redrawing of the Cantons
   option = { # Fair cut
     name = nap_france.2.b
     add_political_power = 50
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = traditional_conservatism
       popularity = 0.05
     }
@@ -126,48 +141,42 @@ country_event = { # Orsini Letter
 }
 
 country_event = { # French supporting anti-Sardinian revolutionaries
-  id = nap_france.5
-  title = nap_france.5.t
-  desc = nap_france.5.d
-  picture = GFX_report_event_nap_france_carbonari
+	id = nap_france.5
+	title = nap_france.5.t
+	desc = nap_france.5.d
+	picture = GFX_report_event_nap_france_carbonari
 
-  is_triggered_only = yes
+	is_triggered_only = yes
 
-  option = { # This is a serious offense !
-    name = nap_france.5.a
-    FRA = {
-      set_country_flag = fra_carbonari_supported
-    }
-    add_opinion_modifier = {
-      target = FRA
-      modifier = fra_carbonari_revolutionary_ita
-    }
-    add_political_power = -50
-  }
+	option = { # This is a serious offense !
+		name = nap_france.5.a
+		hidden_effect = {
+			FRA = {
+				country_event = { id = nap_france.6 days = 30 random_days = 30 }
+			}
+		}
+		add_opinion_modifier = {
+			target = FRA
+			modifier = fra_carbonari_revolutionary_ita
+		}
+		add_political_power = -50
+	}
 }
 
 country_event = { # Carbonari are ready
-  id = nap_france.6
-  title = nap_france.6.t
-  desc = nap_france.6.d
-  picture = GFX_report_event_nap_france_carbonari
+	id = nap_france.6
+	title = nap_france.6.t
+	desc = nap_france.6.d
+	picture = GFX_report_event_nap_france_carbonari
 
-  trigger = {
-    tag = FRA
-    has_country_flag = fra_carbonari_supported
-  }
+	is_triggered_only = yes
 
-  fire_only_once = yes
+	fire_only_once = yes
 
-  mean_time_to_happen = {
-      days = 45
-  }
-
-  option = { # They are waiting for our signal
-    name = nap_france.6.a
-    clr_country_flag = fra_carbonari_supported
-    set_country_flag = fra_carbonari_ready
-  }
+	option = { # They are waiting for our signal
+		name = nap_france.6.a
+		set_country_flag = fra_carbonari_ready
+	}
 }
 
 country_event = { # The Carbonari Revolt
@@ -216,16 +225,20 @@ country_event = { # The Carbonari Revolt
       clr_country_flag = fra_carbonari_ready
       if = {
         limit = {
-          has_dlc = "Together for Victory"
+          OR = {
+            has_dlc = "Together for Victory"
+            has_dlc = "Waking the Tiger"
+            has_dlc = "Death or Dishonor"
+          }
         }
         set_autonomy = {
           target = CBI
           autonomous_state = autonomy_imperial_protectorate
           freedom_level = 0.1
         }
-        else = {
-          puppet = CBI
-        }
+      }
+      else = {
+        puppet = CBI
       }
     }
     CBI = {
@@ -257,16 +270,20 @@ country_event = { # The Carbonari Revolt
     FRA = {
       if = {
         limit = {
-          has_dlc = "Together for Victory"
+          OR = {
+            has_dlc = "Together for Victory"
+            has_dlc = "Waking the Tiger"
+            has_dlc = "Death or Dishonor"
+          }
         }
         set_autonomy = {
           target = CBI
           autonomous_state = autonomy_imperial_protectorate
           freedom_level = 0.1
         }
-        else = {
-          puppet = CBI
-        }
+      }
+      else = {
+        puppet = CBI
       }
     }
   }
@@ -374,19 +391,20 @@ country_event = { # Savoy Rebellion
 
   fire_only_once = yes
 
-  immediate = {
-    SAV = {
-      transfer_state = 735
-      add_state_core = 735
-      load_oob = SAV_REVOLT
-    }
-    declare_war_on= {
-      target = SAV
-      type = annex_everything
-    }
-    set_country_flag = FRA_savoy_revolt
-    hidden_effect = { news_event = { id = nap_france_flavor.12 } }
-  }
+	immediate = {
+		SAV = {
+			transfer_state = 735
+			add_state_core = 735
+			load_oob = SAV_REVOLT
+		}
+		declare_war_on= {
+			target = SAV
+			type = annex_everything
+		}
+		set_country_flag = FRA_savoy_revolt
+		hidden_effect = { news_event = { id = nap_france_flavor.12 } }
+		hidden_effect = { country_event = { id = nap_france.14 days = 60 random_days = 120 } }
+	}
 
   option = { # They are gonna be crushed in a second
     name = nap_france.13.a
@@ -402,28 +420,25 @@ country_event = { # Savoy Rebellion
 }
 
 country_event = { # Savoy Independance
-  id = nap_france.14
-  title = nap_france.14.t
-  desc = nap_france.14.d
-  picture = GFX_report_event_paris_commune
+	id = nap_france.14
+	title = nap_france.14.t
+	desc = nap_france.14.d
+	picture = GFX_report_event_paris_commune
+	
+	fire_only_once = yes
 
-  fire_only_once = yes
+	trigger = {
+		country_exists = SAV
+	}
 
-  trigger = {
-    tag = FRA
-    country_exists = SAV
-  }
-
-  mean_time_to_happen = {
-      days = 120
-  }
-
-  option = { # We cannot fight anymore
-    name = nap_france.14.a
-    white_peace = {
-      tag = SAV
-    }
-  }
+	is_triggered_only = yes
+	
+	option = { # We cannot fight anymore
+		name = nap_france.14.a
+		white_peace = {
+			tag = SAV
+		}
+	}
 }
 
 country_event = { # Franco-Monegasque Treaty
@@ -576,15 +591,13 @@ country_event = { # Monaco votes to join France
   picture = GFX_report_event_franco_monegasque_treaty
 
   trigger = {
-    date > 1860.1.1
+    #date > 1860.1.1
     tag = FRA
   }
 
-  mean_time_to_happen = {
-    days = 100
-  }
-
   fire_only_once = yes
+  is_triggered_only = yes
+  
 
   option = { # As small as it is, Monaco will be a great partner!
     name = nap_france.15.a
@@ -592,62 +605,6 @@ country_event = { # Monaco votes to join France
   }
 }
 
-country_event = { # Kabyle startup event
-  id = nap_france.21
-  title = nap_france.21.t
-  desc = nap_france.21.d
-  
-  hidden = yes
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  immediate = {
-	if = {
-		limit = {
-			is_ai = yes
-			BAB = { is_ai = yes }
-			ALG = { is_ai = yes }
-			FRA = { is_ai = yes }
-		}
-		# France Algeria will annex Beni Abbas by event
-		BAB = {
-			set_equipment_fraction = 0
-		}
-		country_event = { id = nap_france.22 days = 10 }
-	}
-	else = {
-		# Get wargoal to play the Grand Kabyle campaign
-		create_wargoal = {
-			type = annex_everything
-			target = BAB
-		}
-	}
-  }
-}
-
-country_event = { # Kabyle startup event
-  id = nap_france.22
-  title = nap_france.22.t
-  desc = nap_france.22.d
-  
-  hidden = yes
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  immediate = { # Simulate the end of the Grand Kabyle campaign
-	FRA = {
-		army_experience = 10
-	}
-    ALG = {
-		annex_country = { target = BAB }
-	}
-	news_event = { id = nap_france_flavor.22 }
-  }
-}
 
 #----------------------------------------------------------------------------------------------
 # FLAVOR EVENTS - 1857 TO 1870
@@ -660,15 +617,12 @@ country_event = { # 1867 Universal Exposition
   picture = GFX_report_event_nap_france_exposition_universelle_1867
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   trigger = {
-    date > 1867.4.1
+    #date > 1867.4.1
     tag = FRA
   }
-
-    mean_time_to_happen = {
-      days = 10
-    }
 
     option = { # The Greatest Exposition
       name = nap_france.100.a
@@ -683,14 +637,11 @@ country_event = { # Henri Mouhot's death
   picture = GFX_report_event_henri_mouhot
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   trigger = {
-    date > 1861.11.10
+    #date > 1861.11.10
     tag = FRA
-  }
-
-  mean_time_to_happen = {
-    days = 5
   }
 
   option = { # We mourn the death of a great explorator
@@ -706,23 +657,20 @@ country_event = { # Manifeste des Soixante
   picture = GFX_report_event_manifeste_des_soixantes
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   trigger = {
-    date > 1864.1.1
+    #date > 1864.1.1
     tag = FRA
-  }
-
-  mean_time_to_happen = {
-    days = 80
   }
 
   option = { # Socialism, in my Empire ?
     name = nap_france.104.a
-    add_popularity = { 
+    add_popularity = {
       ideology = anarchism
       popularity = 0.01
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.05
     }
@@ -737,14 +685,11 @@ country_event = { # Association internationale des travailleurs - Première Inte
   picture = GFX_report_event_association_internationale_des_travailleurs
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   trigger = {
-    date > 1864.9.24
+    #date > 1864.9.24
     tag = FRA
-  }
-
-  mean_time_to_happen = {
-    days = 4
   }
 
   immediate = {
@@ -759,11 +704,11 @@ country_event = { # Association internationale des travailleurs - Première Inte
       }
       add_political_power = -50
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = vanguard_communism
       popularity = 0.02
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.08
     }
@@ -793,7 +738,7 @@ country_event = { # Protests in Paris
 
   option = { # Give them the right to come back
     name = nap_france.106.a
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.05
     }
@@ -804,11 +749,11 @@ country_event = { # Protests in Paris
 
   option = { # Crackdown on all socialists activities!
     name = nap_france.106.b
-    add_popularity = { 
+    add_popularity = {
       ideology = vanguard_communism
       popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = -0.1
     }
@@ -831,7 +776,7 @@ country_event = { # Strikes in the Nord Mining Bassin
 
   option = { # Negotiate with the strikers
     name = nap_france.107.a
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.05
     }
@@ -845,7 +790,7 @@ country_event = { # Strikes in the Nord Mining Bassin
 
   option = { # Send in the army
     name = nap_france.107.b
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = -0.1
     }
@@ -869,7 +814,7 @@ country_event = { # Publication of the Blanquist Manifesto
 
   option = { # A spectre is haunting the Empire
     name = nap_france.108.a
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.05
     }
@@ -892,7 +837,7 @@ country_event = { # Red Evening
 
   option = { # A dark evening indeed
     name = nap_france.109.a
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.05
     }
@@ -919,11 +864,11 @@ country_event = { # Republican senators around the country joins the revolt !
 
   option = { # Who can trust the honor of a senator?
     name = nap_france.110.a
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = social_egalitarianism
       popularity = 0.05
     }
@@ -997,27 +942,27 @@ country_event = { # The Rise of the French Socialist Republic
 
   option = { # France need change, here it is!
     name = nap_france.113.a
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = -0.45
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = traditional_conservatism
       popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = vanguard_communism
       popularity = 0.08
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = collectivist_socialism
       popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = social_egalitarianism
       popularity = 0.15
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.1
     }
@@ -1044,8 +989,8 @@ country_event = { # Choose the leader of the revolt
   is_triggered_only = yes
 
   immediate = {
-    hidden_effect = { 
-      news_event = { id = nap_france_flavor.18 } 
+    hidden_effect = {
+      news_event = { id = nap_france_flavor.18 }
     }
   }
 
@@ -1084,8 +1029,8 @@ country_event = { # Start of the Suez Canal construction
   option = {
     name = nap_france.115.a
     set_country_flag = FRA_suez_canal_0
-    hidden_effect = { 
-      news_event = { id = nap_france_flavor.9 } 
+    hidden_effect = {
+      news_event = { id = nap_france_flavor.9 }
     }
   }
 }
@@ -1362,18 +1307,19 @@ country_event = { # The French Empire crowns Napoleon-Giuseppe as our King
 # Algerian governors#
 #####################
 #https://fr.wikipedia.org/wiki/Liste_des_gouverneurs_d%27Alg%C3%A9rie
-country_event = { # ALG : Randon to Mac-Mahon
+country_event = { # EPD : Randon to Mac-Mahon
   id = nap_france.131
   title = nap_france.131.t
   desc = nap_france.131.d
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1858.8.31
-    tag = ALG
+    #date > 1858.8.31
+    tag = EPD
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.131.a
@@ -1392,11 +1338,12 @@ country_event = { # ALG : Mac-Mahon to Gues-Viller
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1859.4.24
-    tag = ALG
+    #date > 1859.4.24
+    tag = EPD
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.132.a
@@ -1415,11 +1362,12 @@ country_event = { # ALG : Gues-Viller to de Martimprey
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1859.8.17
-    tag = ALG
+    #date > 1859.8.17
+    tag = EPD
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.133.a
@@ -1438,11 +1386,12 @@ country_event = { # ALG : de Martimprey to Pélissier
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1860.11.24
-    tag = ALG
+    #date > 1860.11.24
+    tag = EPD
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.134.a
@@ -1461,11 +1410,12 @@ country_event = { # ALG : Pélissier to Mac-Mahon
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1864.5.22
-    tag = ALG
+    #date > 1864.5.22
+    tag = EPD
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.135.a
@@ -1488,11 +1438,12 @@ country_event = { # SNG : Faidherbe to Jauréguiberry
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1861.1.1
+    #date > 1861.1.1
     tag = SNG
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.136.a
@@ -1511,11 +1462,12 @@ country_event = { # SNG : Jauréguiberry to Faidherbe
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1863.7.14
+    #date > 1863.7.14
     tag = SNG
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.137.a
@@ -1534,11 +1486,12 @@ country_event = { # SNG : Faidherbe to Pinet-Laprade
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1865.5.1
+    #date > 1865.5.1
     tag = SNG
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.138.a
@@ -1609,7 +1562,7 @@ country_event = { # The French Empire reforms us into a Consitutional Monarchy
   is_triggered_only = yes
   fire_only_once = yes
 
-  option = { # 
+  option = { #
     name = nap_france.142.a
     CBI = {
       set_politics = {
@@ -1625,225 +1578,6 @@ country_event = { # The French Empire reforms us into a Consitutional Monarchy
   }
 }
 
-country_event = { # Algerian natives discontent with their situation (FRA vision)
-  id = nap_france.143
-  title = nap_france.143.t
-  desc = nap_france.143.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  trigger = {
-    tag = FRA
-    has_completed_focus = FRA_keep_authoritarian_empire
-    ALG = {
-		controls_state = 513
-	}
-  }
-
-  mean_time_to_happen = {
-    days = 230
-  }
-
-  immediate = {
-    hidden_effect = {
-      ALG = {
-        country_event = { id = nap_france.144 }
-      }
-    }
-  }
-
-  fire_only_once = yes
-
-  option = { # We need to react properly
-    name = nap_france.143.a
-	ALG = {
-	  custom_effect_tooltip = afr_colonial_effect_tooltip
-	  custom_effect_tooltip = AFR_Racial_Tension_minus_1
-	  
-    }
-	hidden_effect = {
-		ALG = {
-			country_event = {id = afr_rrp_racial_tension_decrease.1}
-		}
-	}
-  }
-
-  option = { # We don't care about the natives
-    name = nap_france.143.b
-    ALG = {
-      set_country_flag = ALG_france_dont_care
-	  custom_effect_tooltip = afr_colonial_effect_tooltip
-	  custom_effect_tooltip = AFR_Racial_Tension_add_2
-	  
-    }
-	hidden_effect = {
-		ALG = {
-			country_event = {id = afr_rrp_racial_tension_increase.2}
-		}
-	}
-  }
-}
-
-country_event = { # Algerian natives discontent with their situation (ALG vision)
-  id = nap_france.144
-  title = nap_france.144.t
-  desc = nap_france.144.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  option = { # We are waiting for the government's input
-    name = nap_france.114.a
-  }
-}
-
-country_event = { # Skirmishes in the Algerian desert (ALG Vision)
-  id = nap_france.145
-  title = nap_france.145.t
-  desc = nap_france.145.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  trigger = {
-    tag = ALG
-    FRA = {
-      has_completed_focus = FRA_keep_authoritarian_empire
-      NOT = {
-        has_completed_focus = FRA_assimilation_colonial_model_algeria
-      }
-    }
-  }
-
-  mean_time_to_happen = {
-    days = 240
-    modifier = {
-      factor = 0.4
-      has_country_flag = ALG_france_dont_care
-    }
-  }
-
-  immediate = {
-    hidden_effect = {
-      FRA = {
-        country_event = { id = nap_france.146 }
-      }
-    }
-  }
-
-  fire_only_once = yes
-
-  option = { # We cannot go back now
-    name = nap_france.145.a
-    hidden_effect = {
-      country_event = { 
-        id = nap_france.147 
-        days = 20
-      }
-    }
-  }
-}
-
-country_event = { # Skirmishes in the Algerian desert (FRA Vision)
-  id = nap_france.146
-  title = nap_france.146.t
-  desc = nap_france.146.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  option = { # Trouble is brewing in Algeria
-    name = nap_france.146.a
-  }
-}
-
-country_event = { # Abdelkader ibn Muhieddine has put an end to his exile
-  id = nap_france.147
-  title = nap_france.147.t
-  desc = nap_france.147.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  option = { # It's only a matter of days now...
-    name = nap_france.147.a
-    hidden_effect = {
-      country_event = { 
-        id = nap_france.148 
-        days = 20
-      }
-    }
-  }
-}
-
-country_event = { # The Kabyle Revolt (ALG version)
-  id = nap_france.148
-  title = nap_france.148.t
-  desc = nap_france.148.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  immediate = {
-    hidden_effect = {
-      #ALG = {
-      #  declare_war_on = { target = ALG type = annex_everything }
-      #}
-      KBY = {
-		create_country_leader = {
-          name = "Abdelkader ibn Muhieddine"
-          desc = ""
-          picture = "Portrait_KBY_Abdelkader_ibn_Muhieddine.dds"
-          expire = "2100.1.1"
-          ideology = despotism
-          traits = {
-          }
-        }
-        transfer_state = 460
-        load_oob = "KBY_REVOLT"
-        declare_war_on= {
-          target = ALG
-          type = annex_everything
-        }
-      }
-      FRA = {
-        country_event = { id = nap_france.149 }
-      }
-    }
-    hidden_effect = { news_event = { id = nap_france_flavor.13 } }
-  }
-
-  option = { # Français, to arms !
-    name = nap_france.148.a
-  }
-
-  option = { # Kabyles, to arms !
-    name = nap_france.148.b
-    KBY = {
-      change_tag_from = ALG
-    }
-  }
-}
-
-country_event = { # The Kabyle Revolt
-  id = nap_france.149
-  title = nap_france.149.t
-  desc = nap_france.149.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  option = { # Algeria is rightfully ours, to arms !
-    name = nap_france.149.a
-  }
-}
 
 country_event = { # The Kabyle manage to hold their lands
   id = nap_france.150
@@ -1852,11 +1586,10 @@ country_event = { # The Kabyle manage to hold their lands
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    tag = ALG
-    has_war_with = KBY
-    NOT = {
-      controls_state = 459
-      controls_state = 460
+    KBY = {
+    controls_state = 1384 
+    controls_state = 460
+
     }
   }
 
@@ -1870,7 +1603,7 @@ country_event = { # The Kabyle manage to hold their lands
     KBY = {
       country_event = { id = nap_france.152 }
       white_peace = {
-        tag = ALG
+        tag = EPD
       }
       if = {
         limit = {
@@ -1880,6 +1613,7 @@ country_event = { # The Kabyle manage to hold their lands
           tag = FRA
         }
       }
+      transfer_state = 1384
       transfer_state = 459
       transfer_state = 460
       transfer_state = 513
@@ -1917,27 +1651,6 @@ country_event = { # The Kabyles are finally free
   }
 }
 
-country_event = { # The integration of Southern Algeria into our colony
-  id = nap_france.153
-  title = nap_france.153.t
-  desc = nap_france.153.d
-  picture = GFX_report_event_nap_france_carbonari
-
-  trigger = {
-    tag = FRA
-    owns_state = 513
-  }
-
-  fire_only_once = yes
-
-  option = { # As it should be
-    name = nap_france.153.a
-    ALG = {
-      transfer_state = 513
-    }
-  }
-}
-
 country_event = { # Constantine come back to Algerian colony after victory in Kabyle revolt
   id = nap_france.154
   title = nap_france.154.t
@@ -1945,15 +1658,17 @@ country_event = { # Constantine come back to Algerian colony after victory in Ka
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
+  	tag = EPD
+		exists = yes
     tag = FRA
-    owns_state = 460
+    owns_state = 1382
   }
 
   fire_only_once = yes
 
   option = { # As it should be
     name = nap_france.154.a
-    ALG = {
+    EPD = {
       transfer_state = 460
     }
   }
@@ -1966,7 +1681,7 @@ country_event = { # Cochinchina war simulation
   picture = GFX_report_event_nap_france_carbonari
 
   is_triggered_only = yes
-  
+
   trigger = {
 	has_idea = FRA_VIN_war
   }
@@ -1986,20 +1701,30 @@ country_event = { # Cochinchina war simulation
 	}
 	add_manpower = -50
 	country_event = { id = nap_france.160 days = 30 }
+	custom_effect_tooltip = afr_colonial_effect_tooltip
+	998 = {
+		custom_effect_tooltip = AFR_Racial_Tension_plus_2
+		hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 } }
+	}
   }
   option = { # Stop the war
     name = nap_france.160.b
 	ai_chance = { factor = 0 }
     add_stability = -0.10
-	remove_ideas = FRA_VIN_war
-	VIN = {
-	  add_stability = 0.10
-	  remove_ideas = VIN_FRA_war
-	}
-	SPR = {
-	  add_stability = -0.01
-	  remove_ideas = SPR_VIN_war
-	}
+    VIN_Cochinchina_Campaign_Investment_Remove = yes
+    VIN = {
+      add_stability = 0.10
+      remove_ideas = VIN_Cochinchina_Campaign_Defense
+    }
+    SPR = {
+      add_stability = -0.01
+      VIN_Cochinchina_Campaign_Investment_Remove = yes
+    }
+    custom_effect_tooltip = afr_colonial_effect_tooltip
+    998 = {
+      custom_effect_tooltip = AFR_Racial_Tension_minus_1
+      hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
+    }
   }
 }
 
@@ -2010,62 +1735,59 @@ country_event = { # Cochinchina war FRA victory
   picture = GFX_report_event_nap_france_carbonari
 
   is_triggered_only = yes
-  
+
   trigger = {
-	has_idea = FRA_VIN_war
+	  has_idea = FRA_VIN_war
   }
 
   option = { # Get gold and territory reparations
     name = nap_france.161.a
-	ai_chance = { factor = 100 }
-	CCH = {
-		transfer_state = 998
-	}
-	VIN = {
-		set_variable = { rival_country = CCH.id }
-		add_opinion_modifier = { target = CCH modifier = AFR_colonial_conflict }
-	}
+    ai_chance = { factor = 100 }
+    CCH = {
+      transfer_state = 998
+    }
+    VIN = {
+      set_variable = { rival_country = CCH.id }
+      add_opinion_modifier = { target = CCH modifier = AFR_colonial_conflict }
+    }
     if = {
       limit = {
-        has_dlc = "Together for Victory"
+        OR = {
+          has_dlc = "Together for Victory"
+          has_dlc = "Waking the Tiger"
+          has_dlc = "Death or Dishonor"
+        }
       }
       set_autonomy = {
         target = CCH
         autonomous_state = autonomy_colony
         freedom_level = 0.01
       }
-      else = {
-        puppet = CCH
-      }
     }
-    add_timed_idea = {
-	  idea = FRA_VIN_victory
-	  days = 300
-	}
-	SPR = {
-      add_timed_idea = {
-	    idea = SPR_VIN_victory
-		days = 300
+    else = {
+      puppet = CCH
+    }
+    VIN_Cochinchina_Campaign_Investment_Remove = yes
+    SPR = {
+      VIN_Cochinchina_Campaign_Investment_Remove = yes
 	  }
-	}
-	hidden_effect = { news_event = { id = nap_france_flavor.23 } }
-	hidden_effect = { country_event = { id = nap_france.162 days = 10 } }
+    hidden_effect = { news_event = { id = nap_france_flavor.23 } }
+    hidden_effect = { country_event = { id = nap_france.162 days = 10 } }
   }
 
   option = { # Get only gold reparations
     name = nap_france.161.b
-	ai_chance = { factor = 0 }
-    add_timed_idea = {
-	  idea = FRA_VIN_victory
-	  days = 300
-	}
-	SPR = {
-      add_timed_idea = {
-	    idea = SPR_VIN_victory
-		days = 300
-	  }
-	}
-	hidden_effect = { news_event = { id = nap_france_flavor.24 } }
+	  ai_chance = { factor = 0 }
+    VIN_Cochinchina_Campaign_Investment_Remove = yes
+    SPR = {
+      VIN_Cochinchina_Campaign_Investment_Remove = yes
+    }
+    custom_effect_tooltip = afr_colonial_effect_tooltip
+    998 = {
+      custom_effect_tooltip = AFR_Racial_Tension_plus_2
+      hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.2 } }
+    }
+    hidden_effect = { news_event = { id = nap_france_flavor.24 } }
   }
 }
 
@@ -2238,11 +1960,13 @@ country_event = { # CCH : Bonard to La Grandière
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1863.5.1
+    #date > 1863.5.1
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.171.a
@@ -2261,11 +1985,13 @@ country_event = { # CCH : La Grandière to Ohier
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1868.4.4
+    #date > 1868.4.4
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.172.a
@@ -2284,11 +2010,13 @@ country_event = { # CCH : Ohier to Cornulier
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1870.1.9
+    #date > 1870.1.9
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.173.a
@@ -2307,11 +2035,13 @@ country_event = { # CCH : Cornulier to Dupré
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1871.4.1
+    #date > 1871.4.1
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.174.a
@@ -2330,11 +2060,13 @@ country_event = { # CCH : Dupré to Duperré
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1874.11.30
+    #date > 1874.11.30
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.175.a
@@ -2353,11 +2085,13 @@ country_event = { # CCH : Duperré to Lafont
   picture = GFX_report_event_nap_france_carbonari
 
   trigger = {
-    date > 1877.10.16
+    #date > 1877.10.16
     tag = CCH
+	country_exists = CCH
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # We welcome our new governor
     name = nap_france.176.a
@@ -2783,11 +2517,12 @@ country_event = { # Treaty of Luxemburg - Victory
   trigger = {
     tag = FRA
     FRA = {
-      controls_state = 64
+      controls_state = 1009
     }
   }
-  
+
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # France fully annex Luxemburg
       name = nap_france.320.a
@@ -2893,7 +2628,7 @@ country_event = { # Buy Luxemburg - Netherland answer
   option = {
       name = nap_france.330.a # Accept
       ai_chance = { factor = 100 }
-      PRS = { 
+      PRS = {
       country_event = { days = 1 id = nap_france.332 }
     }
     }
@@ -2901,7 +2636,7 @@ country_event = { # Buy Luxemburg - Netherland answer
       name = nap_france.330.b # Refuse
       ai_chance = { factor = 0 }
       add_political_power = -300
-      FRA = { 
+      FRA = {
       country_event = { days = 1 id = nap_france.331 }
     }
     }
@@ -2929,7 +2664,7 @@ country_event = { # Buy Luxemburg - Prussia interpose
   option = {
       name = nap_france.332.a # Wait no !
       ai_chance = { factor = 100 }
-      FRA = { 
+      FRA = {
       country_event = { days = 1 id = nap_france.333 }
     }
     }
@@ -2937,7 +2672,7 @@ country_event = { # Buy Luxemburg - Prussia interpose
       name = nap_france.332.b # I don't care
       ai_chance = { factor = 0 }
       add_political_power = -300
-      FRA = { 
+      FRA = {
       country_event = { days = 1 id = nap_france.334 }
     }
     }
@@ -2960,7 +2695,7 @@ country_event = { # Buy Luxemburg - France answer
       ai_chance = { factor = 0 }
       add_political_power = -150
       annex_country = { target = LUX }
-      PRS = { 
+      PRS = {
       country_event = { days = 1 id = nap_france.335 }
     }
     }
@@ -2989,9 +2724,9 @@ country_event = { # Buy Luxemburg - Prussia threathened
   option = {
       name = nap_france.335.a # War
       ai_chance = { factor = 100 }
-      declare_war_on= { 
+      declare_war_on= {
       target = FRA
-      type = annex_everything 
+      type = annex_everything
     }
     set_country_flag = fra_lux_crisis_exploded
 	hidden_effect = {
@@ -3020,9 +2755,9 @@ country_event = { # France - Treaty of Turin
   picture = GFX_report_event_nap_france_savoy
 
   option = { # Ask for our due
-    name = nap_france.340.a 
+    name = nap_france.340.a
     ai_chance = { factor = 100 }
-    PIE = { 
+    PIE = {
       country_event = { days = 1 id = nap_france.341 }
     }
   }
@@ -3036,14 +2771,14 @@ country_event = { # Italy - Treaty of Turin
   picture = GFX_report_event_nap_france_savoy
 
   option = { # Accept
-    name = nap_france.341.a 
+    name = nap_france.341.a
     ai_chance = { factor = 95 }
-    FRA = { 
+    FRA = {
       country_event = { days = 1 id = nap_france.342 }
     }
   }
   option = { # Refuse
-    name = nap_france.341.b 
+    name = nap_france.341.b
     ai_chance = {
 		factor = 5
 		modifier = {
@@ -3051,7 +2786,7 @@ country_event = { # Italy - Treaty of Turin
 			factor = 0
 		}
 	}
-    FRA = { 
+    FRA = {
       country_event = { days = 1 id = nap_france.343 }
     }
   }
@@ -3065,9 +2800,9 @@ country_event = { # France - Answer Yes - Treaty of Turin
   picture = GFX_report_event_nap_france_savoy
 
   option = {
-    name = nap_france.342.a 
-    FRA = { 
-      transfer_state = 735 
+    name = nap_france.342.a
+    FRA = {
+      transfer_state = 735
       transfer_state = 822
     }
   }
@@ -3081,18 +2816,18 @@ country_event = { # France - Answer No - Treaty of Turin
   picture = GFX_report_event_nap_france_savoy
 
   option = { # It's treason then
-    name = nap_france.345.a 
+    name = nap_france.345.a
     ai_chance = { factor = 95 }
       add_state_claim = 735
-      add_state_claim = 812
-      declare_war_on= { 
+      add_state_claim = 822
+      declare_war_on= {
         target = PIE
-        type = take_claimed_state 
+        type = take_claimed_state
       }
   }
 
-  option = { # Abandon our claims 
-    name = nap_france.345.a 
+  option = { # Abandon our claims
+    name = nap_france.345.a
     ai_chance = { factor = 5 }
     add_political_power = -100
   }
@@ -3179,17 +2914,29 @@ country_event = { # Treaty of London
     	tag = FRA
     }
     hidden_effect = {
-    	MEX = {
-	    	country_event = { 
-	    		id = nap_france.361
-	    		days = 10
-	    	}
-	    }
+      if = {
+        limit = { country_exists = MEC }
+        MEC = {
+          country_event = {
+            id = nap_france.361
+            days = 10
+          }
+        }
+      }
+      if = {
+        limit = { country_exists = MEX }
+      	MEX = {
+  	    	country_event = {
+  	    		id = nap_france.361
+  	    		days = 10
+  	    	}
+  	    }
+      }
     }
   }
 
   option = { # Seen by ENG and SPR
-    name = nap_france.360.b
+    name = nap_france.360.a
     trigger = {
     	OR = {
     		tag = ENG
@@ -3210,33 +2957,29 @@ country_event = { # European Powers asks for repayments
   option = { # Accept
     name = nap_france.361.a
     ai_chance = { factor = 0 }
-	trigger = {
-	OR = {
-    		MEX = { has_government = traditional_conservatism } 
-			MEX = { has_government = fundamentalism }
-    	}
-	OR = {
-    		MEC = { has_government = traditional_conservatism } 
-			MEC = { has_government = fundamentalism }
-    	}
+	  trigger = {
+	    OR = {
+    		ROOT = { has_government = traditional_conservatism }
+			  ROOT = { has_government = fundamentalism }
+      }
     }
-	hidden_effect = {
-    	MXE = {
-    	    annex_country = {
-            target = MEX
-            transfer_troops = no
-                } 
-			set_country_flag = MXE_empire_without_war
-		    create_country_leader = {
-		        name = "Maximilian I"
-		        desc = "POLITICS_EMPEROR_MAXIMILIAN_DESC"
-		        picture = "Portrait_MXE_Maximilian_I.dds"
-		        expire = "1965.1.1"
-		        ideology = constit_monarch
-		         traits = {
-		        }
+  	hidden_effect = {
+      MXE = {
+  	    annex_country = {
+          target = ROOT
+          transfer_troops = no
+        }
+		    set_country_flag = MXE_empire_without_war
+	      create_country_leader = {
+	        name = "Maximilian I"
+	        desc = "POLITICS_EMPEROR_MAXIMILIAN_DESC"
+	        picture = "Portrait_MXE_Maximilian_I.dds"
+	        expire = "1965.1.1"
+	        ideology = constit_monarch
+	        traits = {
 	        }
-			add_to_array = { # position 0 is null value
+        }
+		    add_to_array = { # position 0 is null value
 				array = local_mhc_army_available_traits_array
 				index = 0
 				value = 0
@@ -3246,51 +2989,50 @@ country_event = { # European Powers asks for repayments
 			set_temp_variable = { temp_advisor_frame = 1 }
 			set_temp_variable = { temp_advisor_trait = 17 }
 			mhc_add_army_advisor = yes
-			
+
 			set_temp_variable = { temp_advisor_frame = 2 }
 			set_temp_variable = { temp_advisor_trait = 7 }
 			mhc_add_army_advisor = yes
-			
+
 			set_temp_variable = { temp_advisor_frame = 3 }
 			set_temp_variable = { temp_advisor_trait = 53 }
 			mhc_add_army_advisor = yes
-        }
     }
+  }
 }
 
   option = { # Refuse
     name = nap_france.361.b
     ai_chance = { factor = 100 }
-	add_stability = 0.15 # Add stability to avoid Vanilla Peace Conference
+
+    add_stability = 0.15 # Add stability to avoid Vanilla Peace Conference
     hidden_effect = {
     	FRA = {
-	    	country_event = { 
+	    	country_event = {
 	    		id = nap_france.362
-	    		days = 10 
+	    		days = 10
 	    	}
 	    }
-
 	    ENG = {
-	    	country_event = { 
+	    	country_event = {
 	    		id = nap_france.362
-	    		days = 10 
+	    		days = 10
 	    	}
 	    }
-
 	    SPR = {
-	    	country_event = { 
+	    	country_event = {
 	    		id = nap_france.362
-	    		days = 10 
+	    		days = 10
 	    	}
 	    }
-        USA = {
+      USA = {
 	    	diplomatic_relation = {
-			    country = MEX
+			    country = ROOT
 			    relation = guarantee
 			    active = no
-			}
+			  }
 	    }
-	}
+	  }
   }
 }
 
@@ -3304,49 +3046,52 @@ country_event = { # Mexico refuses!
 
   option = { # Seen by the player in any of the three country
     name = nap_france.362.a
+    custom_effect_tooltip = FRA_Veracruz_landing
+
     trigger = {
-    	is_ai = no
-    	NOT = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+      OR = {
+        is_ai = no
+        NOT = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+      }
+      OR = {
+        is_ai = yes
+        OR = {
+          FRA = { is_ai = no }
+          ENG = { is_ai = no }
+          SPR = { is_ai = no }
+        }
+      }
     }
-    FRA = {
-    	set_country_flag = FRA_mexican_intervention_flag
-    	hidden_effect = {
-    		country_event = { 
-		    	id = nap_france.36200
-		    }
-    	}
+    hidden_effect = {
+      FRA = {
+        set_country_flag = FRA_mexican_intervention_flag
+        country_event = { id = nap.france.36200 }
+        country_event = { id = nap.france.364  days = 42 }
+      }
     }
-	hidden_effect = {
-		FRA = {
-			country_event = { 
-				id = nap_france.364
-				days = 42
-			}
-		}
-	}
-	custom_effect_tooltip = FRA_Veracruz_landing
-	FRA = {
-		add_equipment_to_stockpile = {
-			type = uniform_equipment
-			amount = -855 # 100 * 2 line_infantry + 100 * 3 early_marine + 75 * 3 light_infantry + 100 * 1 light_cavalry + 30 * 1 cannon_artillery_support
-			producer = FRA
-		}
-		add_equipment_to_stockpile = {
-			type = infantry_equipment
-			amount = -840 # 100 * 2 line_infantry + 100 * 3 early_marine + 75 * 3 light_infantry + 100 * 1 light_cavalry + 15 * 1 cannon_artillery_support
-			producer = FRA
-		}
-		add_equipment_to_stockpile = {
-			type = cavalry_equipment
-			amount = -100 # 100 * 1 light_cavalry
-			producer = FRA
-		}
-		add_equipment_to_stockpile = {
-			type = cannon_equipment
-			amount = -24 # 24 * 1 cannon_artillery_support
-			producer = FRA
-		}
-	}
+
+  	FRA = {
+  		add_equipment_to_stockpile = {
+  			type = uniform_equipment
+  			amount = -855 # 100 * 2 line_infantry + 100 * 3 early_marine + 75 * 3 light_infantry + 100 * 1 light_cavalry + 30 * 1 cannon_artillery_support
+  			producer = FRA
+  		}
+  		add_equipment_to_stockpile = {
+  			type = infantry_equipment
+  			amount = -840 # 100 * 2 line_infantry + 100 * 3 early_marine + 75 * 3 light_infantry + 100 * 1 light_cavalry + 15 * 1 cannon_artillery_support
+  			producer = FRA
+  		}
+  		add_equipment_to_stockpile = {
+  			type = cavalry_equipment
+  			amount = -100 # 100 * 1 light_cavalry
+  			producer = FRA
+  		}
+  		add_equipment_to_stockpile = {
+  			type = cannon_equipment
+  			amount = -24 # 24 * 1 cannon_artillery_support
+  			producer = FRA
+  		}
+  	}
   }
 
   option = { # Seen by the AI if one of the nation is player controlled
@@ -3361,7 +3106,7 @@ country_event = { # Mexico refuses!
     }
     FRA = {
     	hidden_effect = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.36200
 		    }
     	}
@@ -3382,7 +3127,7 @@ country_event = { # Mexico refuses!
     }
     FRA = {
     	hidden_effect = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.36200
 		    }
     	}
@@ -3403,9 +3148,56 @@ country_event = { # Hidden event for war
 
   option = {
     name = nap_france.36200.a
-    FRA = { declare_war_on = { target = MEX type = annex_everything } }
-    ENG = { declare_war_on = { target = MEX type = annex_everything } }
-    SPR = { declare_war_on = { target = MEX type = annex_everything } }
+    if = {
+      limit = { country_exists = MEX }
+      MEX = { set_country_flag = MEX_Debt_Intervention_Flag }
+      FRA = { declare_war_on = { target = MEX type = annex_everything } }
+      ENG = { declare_war_on = { target = MEX type = annex_everything } }
+      SPR = { declare_war_on = { target = MEX type = annex_everything } }
+    }
+    if = {
+      limit = { country_exists = MEC }
+      MEC = { set_country_flag = MEX_Debt_Intervention_Flag }
+      FRA = { declare_war_on = { target = MEC type = annex_everything } }
+      ENG = { declare_war_on = { target = MEC type = annex_everything } }
+      SPR = { declare_war_on = { target = MEC type = annex_everything } }
+    }
+  }
+}
+
+country_event = {
+  id = nap_france.36201
+  title = nap_france.36201.t
+  desc = nap_france.36201.d
+  picture = GFX_report_event_nap_france_peace_prussia
+
+  is_triggered_only = yes
+
+  option = {
+    trigger = {
+      AND = {
+        tag = ENG
+        NOT = { ENG = { owns_state = 311 } }
+      }
+    }
+    name = nap_france.36201.a
+    add_political_power = -15
+    custom_effect_tooltip = nap_france.36201.c
+  }
+
+  option = {
+    trigger = {
+      OR = {
+        tag = FRA
+        tag = SPR
+        AND = {
+          tag = ENG
+          ENG = { owns_state = 311 }
+        }
+      }
+    }
+    add_political_power = -15
+    name = nap_france.36201.b
   }
 }
 
@@ -3457,9 +3249,9 @@ country_event = { # Proposal to end the Mexican Intervention
   option = {
     name = nap_france.365.a
     MEX = {
-	    country_event = { 
+	    country_event = {
 	    	id = nap_france.366
-	    	days = 1 
+	    	days = 1
 	    }
 	}
   }
@@ -3477,11 +3269,11 @@ country_event = { # Proposal to end the Mexican Intervention (MEX view)
     name = nap_france.366.a
 	ai_chance = { factor = 100 }
     FRA = {
-	    country_event = { 
+	    country_event = {
 	    	id = nap_france.367
-	    	days = 1 
+	    	days = 1
 	    }
-		
+
 	}
   }
 
@@ -3502,24 +3294,24 @@ country_event = { # The Soledad Convention
   option = {
     name = nap_france.367.a
     FRA = {
-	    country_event = { 
+	    country_event = {
 	    	id = nap_france.368
-	    	days = 1 
+	    	days = 1
 	    }
 	hidden_effect = { complete_national_focus = FRA_mexico_british_spanish_help }
 	}
 
 	ENG = {
-	    country_event = { 
+	    country_event = {
 	    	id = nap_france.369
-	    	days = 1 
+	    	days = 1
 	    }
 	}
 
 	SPR = {
-	    country_event = { 
+	    country_event = {
 	    	id = nap_france.3610
-	    	days = 1 
+	    	days = 1
 	    }
 	}
   }
@@ -3651,9 +3443,9 @@ country_event = { # Mexico City in our hands!
     name = nap_france.3612.a
     hidden_effect = {
     	FRA = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3613
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3671,7 +3463,7 @@ country_event = { # Mexico City in our hands!
     	    # annex_country = {
             # target = MEX
             # transfer_troops = no
-                # } 
+                # }
 	        # }
         # }
     # }
@@ -3699,20 +3491,20 @@ country_event = { # Juan Nepomuceno Almonte named president of Mexico
 		set_temp_variable = { temp_advisor_frame = 1 }
 		set_temp_variable = { temp_advisor_trait = 17 }
 		mhc_add_army_advisor = yes
-		
+
 		set_temp_variable = { temp_advisor_frame = 2 }
 		set_temp_variable = { temp_advisor_trait = 7 }
 		mhc_add_army_advisor = yes
-		
+
 		set_temp_variable = { temp_advisor_frame = 3 }
 		set_temp_variable = { temp_advisor_trait = 53 }
 		mhc_add_army_advisor = yes
     }
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3614
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3736,14 +3528,14 @@ country_event = { # Appointment of the Junta Superior de Gobierno
 		expire = "1965.1.1"
 		ideology = conserv
 		traits = {
-			
+
 		}
 	}
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3615
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3763,12 +3555,12 @@ country_event = { # Proclamation of the Second Mexican Empire
 	set_country_flag = MXE_empire_proclamation
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3616
-		    	days = 7 
+		    	days = 7
 		        }
 			add_state_core = 277
-	        }   
+	        }
 	     }
     }
 }
@@ -3785,9 +3577,9 @@ country_event = { # The Comisiòn Mexicana meets Maximilian in Austria
     name = nap_france.3616.a
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3617
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3807,9 +3599,9 @@ country_event = { # The Emperor's referundum
     ai_chance = { factor = 100 }
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3618
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3833,9 +3625,9 @@ country_event = { # Maximilian sets sail for Mexico
     name = nap_france.3618.a
     hidden_effect = {
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3619
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3854,15 +3646,15 @@ country_event = { # Maximilian signs the Treaty of Miramar
     name = nap_france.3619.a
     hidden_effect = {
     	FRA = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3620
-		    	days = 7 
+		    	days = 7
 		    }
     	}
     	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3620
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	}
@@ -3899,7 +3691,7 @@ country_event = { # The coronation of Emperor Maximilian
 		expire = "1965.1.1"
 		ideology = constit_monarch
 		traits = {
-			
+
 		}
 	}
   }
@@ -3910,48 +3702,51 @@ country_event = { #Spanish expeditionares arrives
   title = nap_france.3621.t
   desc = nap_france.3621.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   trigger = {
-	has_country_flag = FRA_mexican_intervention_flag
+	 has_country_flag = FRA_mexican_intervention_flag
   	tag = FRA
-	477 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	OR = {
-		has_war_with = MEX
-		has_war_with = MEC
-	}
-	date > 1862.1.1
+  	477 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+  		is_controlled_by = FRA
+  	}
+  	OR = {
+  		has_war_with = MEX
+  		has_war_with = MEC
+  	}
+  	date > 1862.1.1
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3621.a
-	477 = {
-		create_unit = {
-			division = "name = \"1st Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"2nd Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"3rd Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"4th Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"5th Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
+	  477 = {
+		  create_unit = {
+			  division = "name = \"1st Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+			  owner = FRA
+	    }
+		  create_unit = {
+  			division = "name = \"2nd Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+		  create_unit = {
+    		division = "name = \"3rd Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+    		owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"4th Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"5th Spanish Regiment\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+  			owner = FRA
 	    }
     }
+  }
 }
 
 country_event = { #Egyptian expeditionares arrives
@@ -3959,36 +3754,35 @@ country_event = { #Egyptian expeditionares arrives
   title = nap_france.3622.t
   desc = nap_france.3622.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   trigger = {
-	has_country_flag = FRA_mexican_intervention_flag
+    has_country_flag = FRA_mexican_intervention_flag
   	tag = FRA
-	476 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	477 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	OR = {
-		has_war_with = MEX
-		has_war_with = MEC
-	}
-	date > 1863.1.1 
+  	477 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+      is_controlled_by = FRA
+  	}
+  	OR = {
+  		has_war_with = MEX
+  		has_war_with = MEC
+  	}
+  	date > 1863.1.1
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3622.a
-	477 = {
-		create_unit = {
-			division = "name = \"Egyptian Battalion\" division_template = \"Zouaves\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
+  	477 = {
+  		create_unit = {
+  			division = "name = \"Egyptian Battalion\" division_template = \"Zouaves\"  start_experience_factor = 0.3"
+  			owner = FRA
 	    }
     }
+  }
 }
 
 country_event = { #Belgian Grenadier Battalion arrives
@@ -3997,35 +3791,34 @@ country_event = { #Belgian Grenadier Battalion arrives
   desc = nap_france.3623.d
   picture = GFX_report_event_nap_france_peace_prussia
   trigger = {
-	has_country_flag = FRA_mexican_intervention_flag
+  	has_country_flag = FRA_mexican_intervention_flag
   	tag = FRA
-	476 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	477 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	OR = {
-		has_war_with = MEX
-		has_war_with = MEC
-	}
-	date > 1864.10.1 
+  	477 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+      is_controlled_by = FRA
+  	}
+  	OR = {
+  		has_war_with = MEX
+  		has_war_with = MEC
+  	}
+  	date > 1864.10.1
   }
-  
-  fire_only_once = yes 
-  
+
+  fire_only_once = yes
+
 
   option = {
     name = nap_france.3623.a
-	477 = {
+  	477 = {
 		create_unit = {
 			division = "name = \"Belgian Grenadier Battalion\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
 			owner = FRA
-		    }
 	    }
     }
+  }
 }
 
 country_event = { #Austrian Voluntary Corps Arrive arrives
@@ -4033,101 +3826,99 @@ country_event = { #Austrian Voluntary Corps Arrive arrives
   title = nap_france.3624.t
   desc = nap_france.3624.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   trigger = {
-	has_country_flag = FRA_mexican_intervention_flag
+	  has_country_flag = FRA_mexican_intervention_flag
   	tag = FRA
-	476 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	477 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	OR = {
-		has_war_with = MEX
-		has_war_with = MEC
-	}
-	date > 1864.12.1 
+  	477 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+      is_controlled_by = FRA
+  	}
+  	OR = {
+  		has_war_with = MEX
+  		has_war_with = MEC
+  	}
+  	date > 1864.12.1
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3624.a
-	477 = {
-		create_unit = {
-			division = "name = \"1st Polish Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"2nd Polish Uhlans Regiment\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"1st Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"2nd Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"3rd Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"1st Austrian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"2nd Austria Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-		create_unit = {
-			division = "name = \"1st Austrian Hussars\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
-	      }
-        }
+  	477 = {
+  		create_unit = {
+  			division = "name = \"1st Polish Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"2nd Polish Uhlans Regiment\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"1st Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"2nd Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"3rd Hungarian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"1st Austrian Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+	    }
+  		create_unit = {
+  			division = "name = \"2nd Austria Uhlans\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+      }
+  		create_unit = {
+  			division = "name = \"1st Austrian Hussars\" division_template = \"gendarmes a cheval\"  start_experience_factor = 0.3"
+  			owner = FRA
+      }
     }
+  }
+}
 
 country_event = { #Belgian Battalion arrives
   id = nap_france.3625
   title = nap_france.3625.t
   desc = nap_france.3625.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   trigger = {
-	has_country_flag = FRA_mexican_intervention_flag
+    has_country_flag = FRA_mexican_intervention_flag
   	tag = FRA
-	476 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	477 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	OR = {
-		has_war_with = MEX
-		has_war_with = MEC
-	}
-	date > 1866.04.1
+  	477 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+  		is_controlled_by = FRA
+  	}
+  	OR = {
+  		has_war_with = MEX
+  		has_war_with = MEC
+  	}
+	  date > 1866.04.1
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3625.a
-	477 = {
-		create_unit = {
-			division = "name = \"Belgian Battalion\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
-			owner = FRA
-		    }
+  	477 = {
+  		create_unit = {
+  			division = "name = \"Belgian Battalion\" division_template = \"French Fusiliers\"  start_experience_factor = 0.3"
+  			owner = FRA
 	    }
     }
+  }
 }
 
 country_event = { #Imperial Mexican Army is Formed
@@ -4135,18 +3926,18 @@ country_event = { #Imperial Mexican Army is Formed
   title = nap_france.3626.t
   desc = nap_france.3626.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   trigger = {
-    tag = MXE  
-	has_country_flag = MXE_empire_proclamation
+    tag = MXE
+	  has_country_flag = MXE_empire_proclamation
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3626.a
-	load_oob = MXE_imperial_army
-	create_corps_commander = {
+  	load_oob = MXE_imperial_army
+  	create_corps_commander = {
 	    name = "Karl Graf Metsch"
 	    picture = "Portrait_MXE_Karl_Graf_Metsch.dds"
 	    traits = { cavalry_officer }
@@ -4155,8 +3946,8 @@ country_event = { #Imperial Mexican Army is Formed
 	    defense_skill = 1
 	    planning_skill = 1
 	    logistics_skill = 3
-	}
-	create_corps_commander = {
+    }
+  	create_corps_commander = {
 	    name = "Juan Nepomuceno Almonte"
 	    picture = "Portrait_MXE_Juan_Nepomuceno_Almonte.dds"
 	    traits = { eoanb_conservative_tendencies eoanb_mexican_general }
@@ -4165,30 +3956,27 @@ country_event = { #Imperial Mexican Army is Formed
 	    defense_skill = 1
 	    planning_skill = 2
 	    logistics_skill = 3
-	}
-	create_corps_commander = {
+	  }
+	  create_corps_commander = {
   		name = "Leonardo Márquez"
- 		picture = "Portrait_MEC_Leonard_Marquez.dds"
-		traits = { harsh_leader eoanb_conservative_tendencies eoanb_mexican_general }
- 		skill = 4
-		id = 18634
+   		picture = "Portrait_MEC_Leonard_Marquez.dds"
+  		traits = { harsh_leader eoanb_conservative_tendencies eoanb_mexican_general }
+   		skill = 4
+  		id = 18634
   		attack_skill = 4
-		defense_skill = 3
-		planning_skill = 3
-		logistics_skill = 2
-	}
-	country_event = { 
-		id = nap_france.3627
-		days = 7 
-	}
-	MEX= {
-		country_event = { 
-			id = nap_france.3628
-			days = 7 
-		}
-	}
+  		defense_skill = 3
+  		planning_skill = 3
+  		logistics_skill = 2
+	  }
+	  country_event = { id = nap_france.3627 days = 7 }
+  	MEX= {
+  		country_event = {
+  			id = nap_france.3628
+  			days = 7
+  		}
+  	}
   }
-} 
+}
 
 
 country_event = { # Empire of Mexico declare war on liberals
@@ -4201,7 +3989,7 @@ country_event = { # Empire of Mexico declare war on liberals
 
   option = {
     name = nap_france.3627.a
-	MXE = { 
+	MXE = {
 		declare_war_on= {
             target = MEX
             type = annex_everything
@@ -4231,7 +4019,7 @@ country_event = { # Defection of conservative generals
                     OR = {
                         has_trait = eoanb_conservative_tendencies
                     }
-                } 
+                }
                 set_nationality = MXE
             }
         }
@@ -4243,7 +4031,7 @@ country_event = { #The Republicans take Chiuhaha and Guadalajara
   title = nap_france.3629.t
   desc = nap_france.3629.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
  trigger = {
   	tag = MEX
 	has_war_with = MXE
@@ -4252,21 +4040,21 @@ country_event = { #The Republicans take Chiuhaha and Guadalajara
 	controls_state = 482
 	date > 1865.1.1
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3629.a
 	FRA = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3630
-		    	days = 7 
+		    	days = 7
 		    }
     	}
 	MXE = {
-    		country_event = { 
+    		country_event = {
 		    	id = nap_france.3631
-		    	days = 7 
+		    	days = 7
 		    }
     	}
     }
@@ -4286,7 +4074,7 @@ country_event = { #French Withdrawal - event for France
 	complete_national_focus = FRA_mexico_failure
             }
         }
-		
+
 country_event = { #French Withdrawal - event for Imperial Mexico
   id = nap_france.3631
   title = nap_france.3631.t
@@ -4303,40 +4091,52 @@ country_event = { #French Withdrawal - event for Imperial Mexico
 	decrease_ps_by_one = yes
         }
     }
-	
+
 country_event = { #The Imperials take the North
   id = nap_france.3632
   title = nap_france.3632.t
   desc = nap_france.3632.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
  trigger = {
   	tag = MXE
-	has_war_with = MEX
-	479 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	480 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
-	482 = {
-		is_controlled_by = MXE
-		is_controlled_by = FRA
-	}
+  	OR ={ 
+has_war_with = MEX
+has_war_with = MEC
+}
+  	479 = {
+      OR = {
+        is_owned_by = MEX
+        is_owned_by = MEC
+      }
+  		is_controlled_by = FRA
+  	}
+  	480 = {
+      OR = {
+        is_owned_by = MXE
+        is_owned_by = MEC
+      }
+  		is_controlled_by = FRA
+  	}
+  	482 = {
+      OR = {
+        is_owned_by = MXE
+        is_owned_by = MEC
+      }
+  		is_controlled_by = FRA
+  	}
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3632.a
-	MEX = {
-		country_event = { 
-			id = nap_france.3633
-			days = 7 
-		}
-	}
+  	MEX = {
+  		country_event = {
+  			id = nap_france.3633
+  			days = 7
+  		}
+  	}
   }
 }
 
@@ -4351,11 +4151,11 @@ country_event = { #American Withdrawal - event for Liberal Mexico
   option = {
     name = nap_france.3633.a
     remove_ideas = MEX_american_support
-	USA = {
-	   add_political_power = -100
-	   add_war_support = -0.05
-        }
+	  USA = {
+	    add_political_power = -100
+	    add_war_support = -0.05
     }
+  }
 }
 
 country_event = { #Republican Triumph
@@ -4363,7 +4163,7 @@ country_event = { #Republican Triumph
   title = nap_france.3634.t
   desc = nap_france.3634.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
  trigger = {
   	tag = MEX
   	MEX = {
@@ -4383,8 +4183,8 @@ country_event = { #Republican Triumph
     }
 	MXE = { surrender_progress > 0.7 }
   }
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
     name = nap_france.3634.a
@@ -4394,60 +4194,66 @@ country_event = { #Republican Triumph
              }
 		}
     }
-	
+
 country_event = { #Imperial Triumph (called by on_peaceconference_ended on_action)
   id = nap_france.3635
   title = nap_france.3635.t
   desc = nap_france.3635.d
   picture = GFX_report_event_nap_france_peace_prussia
-  
+
   is_triggered_only = yes
-  
-  fire_only_once = yes 
+
+  fire_only_once = yes
 
   option = {
-	name = nap_france.3635.a
-	add_ideas = MXE_liberal_hates
-	add_ideas = MXE_no_internal_support
-	set_country_flag = MXE_empire_with_war
-	add_state_core = 474
-	add_state_core = 475
-	add_state_core = 476
-	add_state_core = 477
-	add_state_core = 478
-	add_state_core = 479
-	add_state_core = 480
-	add_state_core = 481
-	add_state_core = 482
-	add_state_core = 483
-	add_state_core = 484
-	add_state_core = 485
-	add_state_core = 1112
-	add_state_core = 1113
-	add_state_core = 1114
-	add_state_core = 1124
-	add_state_core = 1125
-	transfer_state = 474
-	transfer_state = 475
-	transfer_state = 476
-	transfer_state = 477
-	transfer_state = 478
-	transfer_state = 479
-	transfer_state = 480
-	transfer_state = 481
-	transfer_state = 482
-	transfer_state = 483
-	transfer_state = 484
-	transfer_state = 485
-	transfer_state = 1112
-	transfer_state = 1113
-	transfer_state = 1114
-	transfer_state = 1124
-	transfer_state = 1125
-	FRA = { complete_national_focus = FRA_mexico_victory }
+    name = nap_france.3635.a
+    add_ideas = MXE_liberal_hates
+    add_ideas = MXE_no_internal_support
+    set_country_flag = MXE_empire_with_war
+    MEX = {
+      every_owned_state = {
+        add_core_of = MXE
+        MXE = { transfer_state = PREV }
+      }
+    }
+    # add_state_core = 474
+    # add_state_core = 475
+    # add_state_core = 476
+    # add_state_core = 477
+    # add_state_core = 478
+    # add_state_core = 479
+    # add_state_core = 480
+    # add_state_core = 481
+    # add_state_core = 482
+    # add_state_core = 483
+    # add_state_core = 484
+    # add_state_core = 485
+    # add_state_core = 1112
+    # add_state_core = 1113
+    # add_state_core = 1114
+    # add_state_core = 1124
+    # add_state_core = 1125
+    # transfer_state = 474
+    # transfer_state = 475
+    # transfer_state = 476
+    # transfer_state = 477
+    # transfer_state = 478
+    # transfer_state = 479
+    # transfer_state = 480
+    # transfer_state = 481
+    # transfer_state = 482
+    # transfer_state = 483
+    # transfer_state = 484
+    # transfer_state = 485
+    # transfer_state = 1112
+    # transfer_state = 1113
+    # transfer_state = 1114
+    # transfer_state = 1124
+    # transfer_state = 1125
+	  FRA = { complete_national_focus = FRA_mexico_victory }
   }
 }
- 
+
 
 #----------------------------------------------------------------------------------------------
 # LEGISLATIVE ELECTIONS AND POLITICAL DECITIONS
@@ -4458,17 +4264,14 @@ country_event = { # France - Legislative Elections 1857
   title = nap_france.370.t
   desc = nap_france.370.d
   picture = GFX_report_event_nap_france_legislative_elections
-  
+
   trigger = {
     tag = FRA
-    date > 1857.5.11
-  }
-
-  mean_time_to_happen = {
-    days = 5
+    #date > 1857.5.11
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # Power to the Official Candidate, Charles de Morny
     name = nap_france.370.a
@@ -4491,7 +4294,7 @@ country_event = { # France - Legislative Elections 1857
       }
       add_political_power = 40
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.05
     }
@@ -4520,11 +4323,11 @@ country_event = { # France - Legislative Elections 1857
       }
       add_political_power = -25
     }
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.025 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.025
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.025
     }
@@ -4546,14 +4349,11 @@ country_event = { # France - Legislative Elections 1863
 
   trigger = {
     tag = FRA
-    date > 1863.5.1
-  }
-
-  mean_time_to_happen = {
-    days = 15
+    #date > 1863.5.1
   }
 
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # Power to the Official Candidate, Charles de Morny
     name = nap_france.371.a
@@ -4576,7 +4376,7 @@ country_event = { # France - Legislative Elections 1863
       }
       add_political_power = -75
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.125
     }
@@ -4615,11 +4415,11 @@ country_event = { # France - Legislative Elections 1863
       }
       add_political_power = 50
     }
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.05 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.05
     }
@@ -4667,11 +4467,11 @@ country_event = { # France - Legislative Elections 1863
       }
       add_political_power = -100
     }
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.05 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.125
     }
@@ -4704,18 +4504,15 @@ country_event = { # France - Legislative Elections 1869
   title = nap_france.372.t
   desc = nap_france.372.d
   picture = GFX_report_event_nap_france_legislative_elections
-  
+
   trigger = {
     tag = FRA
-    date > 1869.5.1
+    #date > 1869.5.1
     has_government = autocracy
   }
 
-  mean_time_to_happen = {
-    days = 15
-  }
-
   fire_only_once = yes
+  is_triggered_only = yes
 
   option = { # Power to the Liberal Official Candidate, Émile Ollivier
     name = nap_france.372.a
@@ -4738,11 +4535,11 @@ country_event = { # France - Legislative Elections 1869
       }
       add_political_power = -125
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.2
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.05
     }
@@ -4790,11 +4587,11 @@ country_event = { # France - Legislative Elections 1869
       }
       add_political_power = -125
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
       popularity = 0.2
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = traditional_conservatism
       popularity = 0.05
     }
@@ -4842,13 +4639,13 @@ country_event = { # France - Legislative Elections 1869
       }
       add_political_power = 100
     }
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.1 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.1 
+      popularity = 0.1
     }
 
     if = {
@@ -4894,17 +4691,17 @@ country_event = { # France - Legislative Elections 1869
       }
       add_political_power = 100
     }
-    add_popularity = { 
-      ideology = social_egalitarianism 
-      popularity = 0.1 
+    add_popularity = {
+      ideology = social_egalitarianism
+      popularity = 0.1
     }
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.05 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.1 
+      popularity = 0.1
     }
 
     if = {
@@ -4935,7 +4732,7 @@ country_event = { # General Amnesty
   title = nap_france.373.t
   desc = nap_france.373.d
   picture = GFX_report_event_nap_france_amnesty
-  
+
   trigger = {
     tag = FRA
     date > 1859.1.1
@@ -4957,13 +4754,13 @@ country_event = { # General Amnesty
 
   option = { # Full Amnesty
     name = nap_france.373.a
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.08 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.08
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.08 
+      popularity = 0.08
     }
     add_political_power = 50
     hidden_effect = {
@@ -4976,11 +4773,11 @@ country_event = { # General Amnesty
 
   option = { # Partial Amnesty
     name = nap_france.373.b
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.02 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.02
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
       popularity = 0.02
     }
@@ -4999,7 +4796,7 @@ country_event = { # Victor Hugo and Pierre-Joseph Proudhon refuses to come back
   title = nap_france.374.t
   desc = nap_france.374.d
   picture = GFX_report_event_nap_france_victor_hugo
-  
+
   is_triggered_only = yes
 
   fire_only_once = yes
@@ -5015,7 +4812,7 @@ country_event = { # Victor Hugo denouces the government
   title = nap_france.375.t
   desc = nap_france.375.d
   picture = GFX_report_event_nap_france_victor_hugo
-  
+
   is_triggered_only = yes
 
   fire_only_once = yes
@@ -5034,7 +4831,7 @@ country_event = { # Republicans demands more liberties
   id = nap_france.380
   title = nap_france.380.t
   desc = nap_france.380.d
-  
+
   trigger = {
     tag = FRA
     autocracy > 0.8
@@ -5049,13 +4846,13 @@ country_event = { # Republicans demands more liberties
   option = { # Side with the Republicans
     name = nap_france.380.a
     add_political_power = 20
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.1 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.1 
+      popularity = 0.1
     }
     set_country_flag = fra_demanded_more_liberty
   }
@@ -5063,13 +4860,13 @@ country_event = { # Republicans demands more liberties
   option = { # Oppose the Republicans
     name = nap_france.380.b
     add_political_power = -40
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = -0.1 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = -0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = -0.1 
+      popularity = -0.1
     }
     set_country_flag = fra_demanded_more_liberty
   }
@@ -5079,7 +4876,7 @@ country_event = { # Legitimist worries
   id = nap_france.381
   title = nap_france.381.t
   desc = nap_france.381.d
-  
+
   trigger = {
     tag = FRA
     OR = {
@@ -5097,9 +4894,9 @@ country_event = { # Legitimist worries
   option = { # Side with the Legitimists
     name = nap_france.381.a
     add_political_power = 20
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
-      popularity = 0.2 
+      popularity = 0.2
     }
     hidden_effect = {
       country_event = {
@@ -5112,9 +4909,9 @@ country_event = { # Legitimist worries
   option = { # Oppose the Legitimists
     name = nap_france.381.b
     add_political_power = -40
-    add_popularity = { 
+    add_popularity = {
       ideology = autocracy
-      popularity = -0.1 
+      popularity = -0.1
     }
   }
 }
@@ -5123,7 +4920,7 @@ country_event = { # Republican Uprising
   id = nap_france.382
   title = nap_france.382.t
   desc = nap_france.382.d
-  
+
   is_triggered_only = yes
 
   #trigger = {
@@ -5141,13 +4938,13 @@ country_event = { # Republican Uprising
   option = { # Send the Army
     name = nap_france.382.a
     add_political_power = 20
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = -0.05 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = -0.05 
+      popularity = -0.05
     }
     add_political_power = 100
   }
@@ -5155,13 +4952,13 @@ country_event = { # Republican Uprising
   option = { # Give in the Republican
     name = nap_france.382.b
     add_political_power = -40
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.1 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.1 
+      popularity = 0.1
     }
     add_political_power = -100
   }
@@ -5171,7 +4968,7 @@ country_event = { # Legitimist Uprising
   id = nap_france.383
   title = nap_france.383.t
   desc = nap_france.383.d
-  
+
   is_triggered_only = yes
 
   #mean_time_to_happen = {
@@ -5191,13 +4988,13 @@ country_event = { # Legitimist Uprising
   option = { # Send the Army
     name = nap_france.383.a
     add_political_power = 20
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = -0.05 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = -0.05
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = -0.05 
+      popularity = -0.05
     }
     add_political_power = 100
   }
@@ -5205,1437 +5002,21 @@ country_event = { # Legitimist Uprising
   option = { # Give in the Republican
     name = nap_france.383.b
     add_political_power = -40
-    add_popularity = { 
-      ideology = traditional_conservatism 
-      popularity = 0.1 
+    add_popularity = {
+      ideology = traditional_conservatism
+      popularity = 0.1
     }
-    add_popularity = { 
+    add_popularity = {
       ideology = centrism
-      popularity = 0.1 
+      popularity = 0.1
     }
     add_political_power = -100
   }
 }
 
 #----------------------------------------------------------------------------------------------
-# NAPOLEON III DEATH AND DISHONOR EVENTS
+# NAPELEONIAN RENOVATIONS & LATIN MONETARY UNION
 #----------------------------------------------------------------------------------------------
-
-country_event = { # Napoleon III in exile
-  id = nap_france.397
-  title = nap_france.397.t
-  desc = nap_france.397.d
-  picture = GFX_report_event_nap_france_exile_napoleon_iii
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    NOT = {
-      has_country_flag = fra_nap_iii_captured
-    }
-    PRS = {
-      controls_state = 18
-    }
-  }
-
-    mean_time_to_happen = {
-    days = 5
-    }
-
-  option = { # Napoleon III captured
-      name = nap_france.397.a
-      add_political_power = -100
-      set_country_flag = fra_nap_iii_captured
-      hidden_effect = { 
-        country_event = { 
-          id = nap_france.3971 
-          days = 2
-        } 
-      }
-  }
-}
-
-country_event = { # Empire is collapsing
-  id = nap_france.3971
-  title = nap_france.3971.t
-  desc = nap_france.3971.d
-  picture = GFX_report_event_nap_france_exile_napoleon_iii
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # Napoleon III captured
-    name = nap_france.3971.a
-    set_politics = {
-      ruling_party = traditional_conservatism
-      elections_allowed = no
-    }
-    create_country_leader = {
-      name = "Louis-Jules Trochu"
-      picture = "Portrait_FRA_Louis_Jules_Trochu.dds"
-      ideology = conserv
-    }
-    set_cosmetic_tag = FRA_TRANSITION_EMPIRE
-    hidden_effect = {
-      country_event = { days = 5 id = third_rep_france.1 }
-    }
-    hidden_effect = { news_event = { id = nap_france_flavor.16 } }
-  }
-}
-
-country_event = { # Orsini Affair
-  id = nap_france.398
-  title = nap_france.398.t
-  desc = nap_france.398.d
-  picture = GFX_report_event_nap_france_orsini_affair
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    date > 1858.1.14
-  }
-
-  option = { # Emperor Dead
-    name = nap_france.398.a
-    ai_chance = {
-		factor = 5 
-		modifier = {
-			is_historical_focus_on = yes
-			factor = 0
-		}
-	}
-    kill_country_leader = yes
-    add_stability = -0.1
-    create_country_leader = {
-      name = "Eugénie I"
-      picture = "Portrait_FRA_Eugenie_de_Montijo.dds"
-      ideology = despotism
-    }
-    add_political_power = -100
-    set_country_flag = fra_orsini_success
-    add_ideas = FRA_idea_orsini_regency_empress
-    clr_country_flag = FRA_has_colonial_ambitions
-    hidden_effect = { 
-      news_event = { id = nap_france_flavor.19 } 
-    }
-  }
-  option = { # Emperor Alive
-    name = nap_france.398.b
-    ai_chance = { factor = 80 }
-    add_stability = -0.05
-    set_country_flag = fra_orsini_failure
-    hidden_effect = { 
-      news_event = { id = nap_france_flavor.21 } 
-    }
-  }
-  option = { # Sacrebleu
-    name = nap_france.398.c
-    ai_chance = { 
-		factor = 15 
-		modifier = {
-			is_historical_focus_on = yes
-			factor = 0
-		}
-	}
-    add_stability = -0.15
-    create_country_leader = {
-      name = "Regency Council"
-      picture = "Portrait_FRA_Regency_Council.dds"
-      ideology = despotism
-    }
-    set_country_flag = fra_orsini_success
-    clr_country_flag = FRA_has_colonial_ambitions
-    add_ideas = FRA_idea_orsini_tragedy
-    complete_national_focus = FRA_the_unthinkable
-    hidden_effect = { 
-      news_event = { id = nap_france_flavor.20 } 
-    }
-  }
-}
-
-country_event = { # Death of Napoleon III
-  id = nap_france.399
-  title = nap_france.399.t
-  desc = nap_france.399.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    date > 1873.1.1
-    NOT = {
-      OR = {
-        has_country_flag = fra_orsini_success
-        has_country_flag = fra_orsini_tragedy_flag
-      }
-    }
-    date < 1875.1.1
-  }
-
-  mean_time_to_happen = {
-    days = 60
-  }
-
-  option = {
-      name = nap_france.399.a
-      kill_country_leader = yes
-      create_country_leader = {
-        name = "Napoleon IV"
-        picture = "Portrait_FRA_Napoleon_IV.dds"
-        ideology = despotism
-      }
-      hidden_effect = {
-          news_event = { days = 10 id = nap_france.399 }
-      }
-      set_country_flag = fra_nap_iv
-    }
-}
-
-country_event = { # It's ya boi
-  id = nap_france.314159
-  title = nap_france.314159.t
-  desc = nap_france.314159.d
-  picture = GFX_report_event_nap_france_tuilleries
-
-  is_triggered_only = yes
-
-  option = { # o shit
-    name = nap_france.314159.a
-    create_country_leader = {
-      name = "Atomic Soviet"
-      picture = "Portrait_FRA_Atomic_Soviet.dds"
-      ideology = stalinism
-      traits = {
-        ingenious_scientist
-      }
-    }
-    set_politics = {
-      ruling_party = vanguard_communism
-    }
-  }
-}
-
-#================================================================================================
-#================================================================================================
-#     EVENTS OF THE THIRD REPUBLIC
-#================================================================================================
-#================================================================================================
-
-#----------------------------------------------------------------------------------------------
-# THIRD REPUBLIC EVENTS
-#----------------------------------------------------------------------------------------------
-
-country_event = { # The Establishment of the Gouvernement Provisoire
-  id = third_rep_france.1
-  title = third_rep_france.1.t
-  desc = third_rep_france.1.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.1.a
-    drop_cosmetic_tag = yes
-    #load_focus_tree = france_republic
-  }
-}
-
-country_event = { # The Siege of Paris
-  id = third_rep_france.2
-  title = third_rep_france.2.t
-  desc = third_rep_france.2.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    16 = {
-      is_controlled_by = PRS
-    }
-    has_cosmetic_tag = FRA_TRANSITION_EMPIRE
-  }
-
-  option = {
-    name = third_rep_france.2.a
-    hidden_effect = {
-      country_event = { days = 1 id = third_rep_france.3 }
-    }
-  }
-}
-
-country_event = { # Entrevue de Ferrières
-  id = third_rep_france.3
-  title = third_rep_france.3.t
-  desc = third_rep_france.3.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.3.a
-    hidden_effect = {
-      PRS = { country_event = { id = third_rep_france.4 } }
-    }
-  }
-}
-
-country_event = { # Entrevue de Ferrières - Bismarck reponse
-  id = third_rep_france.4
-  title = third_rep_france.4.t
-  desc = third_rep_france.4.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.4.a
-    hidden_effect = {
-      FRA = { country_event = { id = third_rep_france.5 } }
-    }
-  }
-}
-
-country_event = { # Entrevue de Ferrières - Peace conditions
-  id = third_rep_france.5
-  title = third_rep_france.5.t
-  desc = third_rep_france.5.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.5.a
-    hidden_effect = {
-      country_event = { days = 18 id = third_rep_france.6 }
-    }
-  }
-}
-
-country_event = { # Gambetta's balloon adventures
-  id = third_rep_france.6
-  title = third_rep_france.6.t
-  desc = third_rep_france.6.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.6.a
-    hidden_effect = {
-      country_event = { days = 24 id = third_rep_france.7 }
-    }
-  }
-}
-
-country_event = { # Insurrections in Paris
-  id = third_rep_france.7
-  title = third_rep_france.7.t
-  desc = third_rep_france.7.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # Let them be
-    name = third_rep_france.7.a
-    hidden_effect = {
-      country_event = { days = 4 id = third_rep_france.8 }
-    }
-  }
-
-  option = { # Put down this insurrection
-    name = third_rep_france.7.b
-    hidden_effect = {
-      country_event = { days = 2 id = third_rep_france.12 }
-    }
-  }
-}
-
-country_event = { # Plebiscite in Paris
-  id = third_rep_france.8
-  title = third_rep_france.8.t
-  desc = third_rep_france.8.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # We support the plebicite
-    name = third_rep_france.8.a
-    hidden_effect = {
-      country_event = { days = 69 id = third_rep_france.11 }
-    }
-    hidden_effect = {
-      country_event = { days = 60 id = third_rep_france.9 }
-    }
-  }
-
-  option = { # The plebicite will be held, but we won't promise anything
-    name = third_rep_france.8.b
-    hidden_effect = {
-      country_event = { days = 60 id = third_rep_france.9 }
-    }
-  }
-}
-
-country_event = { # Trochu steps down
-  id = third_rep_france.9
-  title = third_rep_france.9.t
-  desc = third_rep_france.9.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.9.a
-    hidden_effect = {
-      country_event = { days = 4 id = third_rep_france.10 }
-    }
-    create_country_leader = {
-      name = "Gouvernement Provisoire"
-      picture = "Portrait_FRA_Gouvernement_Provisoire.dds"
-      ideology = conserv
-    }
-  }
-}
-
-country_event = { # Armistice
-  id = third_rep_france.10
-  title = third_rep_france.10.t
-  desc = third_rep_france.10.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.10.a
-    hidden_effect = {
-      country_event = { days = 13 id = third_rep_france.13 }
-    }
-  }
-}
-
-country_event = { # Léon Gambetta quits the government
-  id = third_rep_france.11
-  title = third_rep_france.11.t
-  desc = third_rep_france.11.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.11.a
-    set_country_flag = FRA_gambetta_out
-  }
-}
-
-country_event = { # Henri Rochefort quits the government
-  id = third_rep_france.12
-  title = third_rep_france.12.t
-  desc = third_rep_france.12.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = {
-    name = third_rep_france.12.a
-    set_country_flag = FRA_rochefort_out
-  }
-}
-
-country_event = { # First Legislative Election of the Republic
-  id = third_rep_france.13
-  title = third_rep_france.13.t
-  desc = third_rep_france.13.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # Legitimist victory (Thiers)
-    name = third_rep_france.13.a
-    set_country_flag = FRA_republic_first_legitimist_victory
-    hidden_effect = {
-      country_event = { days = 9 id = third_rep_france.14 }
-    }
-  }
-
-  option = { # Modérés victory (Thiers and Favre)
-    name = third_rep_france.13.b
-    set_country_flag = FRA_republic_first_modere_victory
-    hidden_effect = {
-      country_event = { days = 9 id = third_rep_france.14 }
-    }
-  }
-
-  option = { # Liberal victory (Gambetta and Favre)
-    name = third_rep_france.13.c
-    set_country_flag = FRA_republic_first_liberal_victory
-    hidden_effect = {
-      country_event = { days = 9 id = third_rep_france.14 }
-    }
-  }
-
-  option = { # Radical victory (Gambetta and Rochefort)
-    name = third_rep_france.13.e
-    set_country_flag = FRA_republic_first_radical_victory
-    hidden_effect = {
-      country_event = { days = 9 id = third_rep_france.14 }
-    }
-  }
-}
-
-country_event = { # Election of the First President
-  id = third_rep_france.14
-  title = third_rep_france.14.t
-  desc = third_rep_france.14.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # Adolphe Theirs
-    name = third_rep_france.14.a
-    trigger = {
-      OR = {
-        has_country_flag = FRA_republic_first_legitimist_victory
-        has_country_flag = FRA_republic_first_modere_victory
-      }
-    }
-    set_politics = {
-      ruling_party = centrism
-      elections_allowed = no
-    }
-    create_country_leader = {
-      name = "Adolphe Thiers"
-      picture = "Portrait_FRA_Adolphe_Thiers.dds"
-      ideology = conserv_liberal
-    }
-    create_country_leader = {
-      name = "Léon Gambetta"
-      picture = "Portrait_FRA_Leon_Gambetta.dds"
-      ideology = liberal_social
-    }
-  }
-
-  option = { # Léon Gambetta
-    name = third_rep_france.14.b
-    trigger = {
-      OR = {
-        has_country_flag = FRA_republic_first_liberal_victory
-        has_country_flag = FRA_republic_first_radical_victory
-      }
-      NOT = { has_country_flag = FRA_gambetta_out }
-    }
-    set_politics = {
-      ruling_party = social_egalitarianism
-      elections_allowed = no
-    }
-    create_country_leader = {
-      name = "Adolphe Thiers"
-      picture = "Portrait_FRA_Adolphe_Thiers.dds"
-      ideology = conserv_liberal
-    }
-    create_country_leader = {
-      name = "Léon Gambetta"
-      picture = "Portrait_FRA_Leon_Gambetta.dds"
-      ideology = liberal_social
-    }
-  }
-
-  option = { # Jules Favre
-    name = third_rep_france.14.c
-    trigger = {
-      OR = {
-        has_country_flag = FRA_republic_first_modere_victory
-        has_country_flag = FRA_republic_first_liberal_victory
-      }
-    }
-    set_politics = {
-      ruling_party = social_egalitarianism
-      elections_allowed = no
-    }
-    create_country_leader = {
-      name = "Adolphe Thiers"
-      picture = "Portrait_FRA_Adolphe_Thiers.dds"
-      ideology = conserv_liberal
-    }
-    create_country_leader = {
-      name = "Jules Favre"
-      picture = "Portrait_FRA_Jules_Favre.dds"
-      ideology = liberal_social
-    }
-  }
-
-  option = { # Henri Rochefort
-    name = third_rep_france.14.e
-    trigger = {
-      has_country_flag = FRA_republic_first_radical_victory
-      NOT = { has_country_flag = FRA_rochefort_out }
-    }
-    set_politics = {
-      ruling_party = collectivist_socialism
-      elections_allowed = no
-    }
-    create_country_leader = {
-      name = "Adolphe Thiers"
-      picture = "Portrait_FRA_Adolphe_Thiers.dds"
-      ideology = conserv_liberal
-    }
-    create_country_leader = {
-      name = "Léon Gambetta"
-      picture = "Portrait_FRA_Leon_Gambetta.dds"
-      ideology = liberal_social
-    }
-    create_country_leader = {
-      name = "Henri Rochefort"
-      picture = "Portrait_FRA_Henri_Rochefort.dds"
-      ideology = anti_revisionism
-    }
-  }
-}
-
-country_event = { # Resentment in Paris
-  id = third_rep_france.15
-  title = third_rep_france.15.t
-  desc = third_rep_france.15.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    OR = {
-      has_country_leader = {
-        name = "Adolphe Thiers"
-        ruling_only = yes
-      }
-      has_country_leader = {
-        name = "Léon Gambetta"
-        ruling_only = yes
-      }
-      has_country_leader = {
-        name = "Henri Rochefort"
-        ruling_only = yes
-      }
-    }
-  }
-
-  mean_time_to_happen = {
-    days = 50
-  }
-
-  desc = {
-    text = third_rep_france.1.d_thiers
-    trigger = {
-      has_country_leader = {
-        name = "Adolphe Thiers"
-        ruling_only = yes
-      }
-    }
-  }
-  desc = {
-    text = third_rep_france.1.d_gambetta
-    trigger = {
-      has_country_leader = {
-        name = "Léon Gambetta"
-        ruling_only = yes
-      }
-    }
-  }
-  desc = {
-    text = third_rep_france.1.d_rochefort
-    trigger = {
-      has_country_leader = {
-        name = "Henri Rochefort"
-        ruling_only = yes
-      }
-    }
-  }
-
-  option = { # Confiscate the National Guard's cannons
-    name = third_rep_france.15.a
-    trigger = {
-      has_country_leader = {
-        name = "Adolphe Thiers"
-        ruling_only = yes
-      }
-    }
-    hidden_effect = {
-      country_event = { days = 1 id = third_rep_france.16 }
-    }
-  }
-
-  option = { # Let's meet both of them
-    name = third_rep_france.15.b
-    trigger = {
-      OR = {
-        has_country_leader = {
-          name = "Léon Gambetta"
-          ruling_only = yes
-        }
-        has_country_leader = {
-          name = "Jules Favre"
-          ruling_only = yes
-        }
-      }
-    }
-    set_variable = {
-      var = FRA_flag_socialist_thoughts
-      value = 0
-    }
-    set_variable = {
-      var = FRA_flag_army_thoughts
-      value = 0
-    }
-    hidden_effect = {
-      country_event = { days = 1 id = third_rep_france.20 }
-      country_event = { days = 1 id = third_rep_france.21 }
-    }
-  }
-
-  option = { # Talk with the Blanquists
-    name = third_rep_france.15.c
-    trigger = {
-      has_country_leader = {
-        name = "Henri Rochefort"
-        ruling_only = yes
-      }
-    }
-    hidden_effect = {
-      country_event = { days = 1 id = third_rep_france.18 }
-    }
-  }
-
-  option = { # Everything's fine
-    name = third_rep_france.15.e
-    hidden_effect = {
-      if = {
-        limit = {
-          has_country_leader = {
-            name = "Adolphe Thiers"
-            ruling_only = yes
-          }
-        }
-      }
-      else_if = {
-        limit = {
-          OR = {
-            has_country_leader = {
-              name = "Léon Gambetta"
-              ruling_only = yes
-            }
-            has_country_leader = {
-              name = "Jules Favre"
-              ruling_only = yes
-            }
-          }
-        }
-      }
-      else_if = {
-        limit = {
-          has_country_leader = {
-            name = "Henri Rochefort"
-            ruling_only = yes
-          }
-        }
-        hidden_effect = {
-          country_event = { days = 10 id = third_rep_france.19 }
-        }
-      }
-    }
-  }
-}
-
-country_event = { # The [GetDateText] Uprising
-  id = third_rep_france.16
-  title = third_rep_france.16.t
-  desc = third_rep_france.16.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # It has begun
-    name = third_rep_france.16.a
-    hidden_effect = {
-      country_event = { days = 1 id = third_rep_france.100 }
-    }
-  }
-}
-
-country_event = { # The [GetDateText] Military Uprising
-  id = third_rep_france.17
-  title = third_rep_france.17.t
-  desc = third_rep_france.17.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  immediate = {
-    hidden_effect = {
-      AQU = {
-        set_politics = {
-          ruling_party = radical_democracy
-  }
-
-      set_popularities = {
-          anarchism = 0
-          vanguard_communism = 0
-          collectivist_socialism = 0
-          social_egalitarianism = 0
-          centrism = 0
-          traditional_conservatism = 0
-          radical_democracy = 100
-          chauvinist_populism = 0
-          autocracy = 0
-          fundamentalism = 0
-      }
-
-        transfer_state = 19
-        transfer_state = 31
-        transfer_state = 25
-        transfer_state = 971
-
-        load_oob = FRA_MILITARY_UPRISING
-        
-        create_country_leader = {
-          name = "Patrice de Mac-Mahon"
-          picture = "Portrait_AQU_Patrice_de_Mac_Mahon.dds"
-          ideology = military_junta
-        }
-
-        set_cosmetic_tag = AQU_FRA_MILITARY_TEMP
-
-        declare_war_on= {
-          target = FRA
-          type = civil_war
-        }
-
-        if = {
-          limit = {
-            country_exists = CPR
-          }
-          declare_war_on= {
-            target = CPR
-            type = civil_war
-          }
-        }
-      }
-      every_unit_leader = {
-        limit = { 
-          OR = {
-            has_id = 178902
-			has_id = 178904
-            has_id = 178906
-            has_id = 178909 
-            has_id = 178912
-			has_id = 178913
-          }
-        }
-        set_nationality = AQU
-      }
-    }
-    hidden_effect = { news_event = { id = nap_france_flavor.15 } }
-  }
-
-  option = { # France cannot escape war it seems
-    name = third_rep_france.17.a
-  }
-
-  option = { # We cannot let the Socialists take over!
-    name = third_rep_france.17.b
-    AQU = { change_tag_from = FRA }
-    add_stability = -0.2
-  }
-}
-
-country_event = { # The Meeting
-  id = third_rep_france.18
-  title = third_rep_france.18.t
-  desc = third_rep_france.18.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # We'll be sure to put Mac-Mahon aside
-    name = third_rep_france.18.a
-    hidden_effect = {
-      country_event = { days = 4 id = third_rep_france.17 }
-    }
-  }
-
-  option = { # We don't want to make our military weaker than it already is
-    name = third_rep_france.18.a
-    hidden_effect = {
-      country_event = { days = 10 id = third_rep_france.19 }
-    }
-  }
-}
-
-country_event = { # The [GetDateText] Military Coup
-  id = third_rep_france.19
-  title = third_rep_france.19.t
-  desc = third_rep_france.19.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  immediate = {
-    set_politics = {
-      ruling_party = radical_democracy
-    }
-    create_country_leader = {
-      name = "Patrice de Mac-Mahon"
-      picture = "Portrait_FRA_Patrice_de_Mac_Mahon.dds"
-      ideology = military_junta
-    }
-    hidden_effect = { news_event = { id = nap_france_flavor.14 } }
-  }
-
-  option = { # Rochefort has seen it coming
-    name = third_rep_france.17.a
-    add_stability = -0.2
-  }
-}
-
-country_event = { # The Worries of the Socialists
-  id = third_rep_france.20
-  title = third_rep_france.20.t
-  desc = third_rep_france.20.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # Of course, we'll stay true to our beliefs
-    name = third_rep_france.20.a
-    custom_effect_tooltip = FRA_socialist_happy_tt
-    custom_effect_tooltip = FRA_army_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = 10
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = -15
-    }
-  }
-
-  option = { # Some sacrifices are needed to create a strong nation
-    name = third_rep_france.20.b
-    custom_effect_tooltip = FRA_socialist_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = -5
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = 5
-    }
-  }
-
-  option = { # The future of France is not socialist
-    name = third_rep_france.20.c
-    custom_effect_tooltip = FRA_army_happy_tt
-    custom_effect_tooltip = FRA_socialist_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = -20
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = 15
-    }
-  }
-}
-
-country_event = { # The Worries of the Army
-  id = third_rep_france.21
-  title = third_rep_france.21.t
-  desc = third_rep_france.21.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  is_triggered_only = yes
-
-  option = { # We won't forget about our values and tradition
-    name = third_rep_france.21.a
-    custom_effect_tooltip = FRA_army_happy_tt
-    custom_effect_tooltip = FRA_socialist_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = -20
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = 15
-    }
-  }
-
-  option = { # We trust the democratic process
-    name = third_rep_france.21.b
-    custom_effect_tooltip = FRA_army_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = 10
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = -10
-    }
-  }
-
-  option = { # We must march forward towards progress
-    name = third_rep_france.21.c
-    custom_effect_tooltip = FRA_socialist_happy_tt
-    custom_effect_tooltip = FRA_army_mad_tt
-    add_to_variable  = {
-      var = FRA_flag_socialist_thoughts
-      value = 20
-    }
-    add_to_variable  = {
-      var = FRA_flag_army_thoughts
-      value = -30
-    }
-  }
-}
-
-country_event = { # The Socialists are happy with our decisions
-  id = third_rep_france.22
-  title = third_rep_france.22.t
-  desc = third_rep_france.22.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    check_variable = {
-      var = FRA_flag_socialist_thoughts
-      value = 0
-      compare = greater_than_or_equals
-    }
-  }
-
-  option = { # Wonderful, we were able to reassure them
-    name = third_rep_france.22.a
-    add_stability = 0.1
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-  }
-}
-
-country_event = { # The Socialists are worried about our decisions
-  id = third_rep_france.23
-  title = third_rep_france.23.t
-  desc = third_rep_france.23.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    check_variable = {
-      var = FRA_flag_socialist_thoughts
-      value = 0
-      compare = less_than
-    }
-    check_variable = {
-      var = FRA_flag_socialist_thoughts
-      value = -15
-      compare = greater_than_or_equals
-    }
-  }
-
-  option = { # We cannot please everyone
-    name = third_rep_france.23.a
-    add_stability = -0.1
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-  }
-}
-
-country_event = { # General strike in Paris
-  id = third_rep_france.24
-  title = third_rep_france.24.t
-  desc = third_rep_france.24.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    check_variable = {
-      var = FRA_flag_socialist_thoughts
-      value = -15
-      compare = less_than
-    }
-  }
-
-  option = { # Worrying
-    name = third_rep_france.24.a
-    add_stability = -0.2
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-    hidden_effect = {
-      country_event = { days = 10 id = third_rep_france.100 }
-    }
-  }
-}
-
-country_event = { # The Army is happy with our decisions
-  id = third_rep_france.25
-  title = third_rep_france.25.t
-  desc = third_rep_france.25.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    check_variable = {
-      var = FRA_flag_army_thoughts
-      value = 0
-      compare = greater_than_or_equals
-    }
-  }
-
-  option = { # Wonderful, we were able to reassure them
-    name = third_rep_france.25.a
-    add_stability = 0.1
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-  }
-}
-
-country_event = { # The Army is worried about our decisions
-  id = third_rep_france.26
-  title = third_rep_france.26.t
-  desc = third_rep_france.26.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    check_variable = {
-      var = FRA_flag_army_thoughts
-      value = 0
-      compare = less_than
-    }
-  }
-
-  option = { # We cannot please everyone
-    name = third_rep_france.26.a
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-    add_stability = -0.1
-  }
-}
-
-country_event = { # Military demonstrations in Paris
-  id = third_rep_france.27
-  title = third_rep_france.27.t
-  desc = third_rep_france.27.d
-  picture = GFX_report_event_napoleon_iii_death
-
-  fire_only_once = yes
-  
-  trigger = {
-    tag = FRA
-    has_country_flag = FRA_socialist_voice
-    has_country_flag = FRA_army_voice
-    NOT= {
-      has_country_flag = FRA_grande_discord_flag
-    }
-    check_variable = {
-      var = FRA_flag_army_thoughts
-      value = -15
-      compare = less_than
-    }
-  }
-
-  option = { # Worrying
-    name = third_rep_france.27.a
-    add_stability = -0.2
-    set_country_flag = FRA_grande_discord_flag
-    clr_country_flag = FRA_socialist_voice
-    clr_country_flag = FRA_army_voice
-    clear_variable = FRA_flag_army_thoughts
-    clear_variable = FRA_flag_socialist_thoughts
-    hidden_effect = {
-      country_event = { days = 10 id = third_rep_france.19 }
-    }
-  }
-}
-
-#----------------------------------------------------------------------------------------------
-# PARIS COMMUNE EVENTS
-#----------------------------------------------------------------------------------------------
-
-country_event = { # Paris Commune rises up
-  id = third_rep_france.100
-  title = third_rep_france.100.t
-  desc = third_rep_france.100.d
-
-  is_triggered_only = yes
-
-  fire_only_once = yes
-
-  immediate = {
-    CPR = {
-      transfer_state = 814
-      add_state_core = 814
-      load_oob = CPR_REVOLT
-      create_faction = CPR_front_communard_uni
-    }
-    declare_war_on= {
-      target = CPR
-      type = civil_war
-    }
-    if = {
-      limit = {
-        country_exists = AQU
-        AQU = {
-          has_cosmetic_tag = AQU_FRA_MILITARY_TEMP
-        }
-      }
-      declare_war_on= {
-        target = AQU
-        type = civil_war
-      }
-    }
-    set_capital = 24
-    set_global_flag = paris_commune
-    hidden_effect = { news_event = { id = nap_france_flavor.11 } }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.100.a
-  }
-
-  option = { # Proletariat of Paris, rise up !
-    name = third_rep_france.100.b
-    trigger = {
-      is_ai = no
-    }
-    CPR = { change_tag_from = FRA }
-  }
-}
-
-country_event = { # Marseille Commune rises up
-  id = third_rep_france.101
-  title = third_rep_france.101.t
-  desc = third_rep_france.101.d
-
-  fire_only_once = yes
-
-  is_triggered_only = yes
-
-  immediate = {
-    OCC = {
-      transfer_state = 21
-      transfer_state = 22
-      add_state_core = 21
-      add_state_core = 22
-      load_oob = OCC_REVOLT
-      add_to_war = { targeted_alliance = CPR enemy = FRA }
-    }
-    CPR = {
-      add_to_faction = OCC
-    }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.101.a
-  }
-
-  option = { # Proletariat of Marseille, rise up !
-    name = third_rep_france.101.b
-    trigger = {
-      is_ai = no
-    }
-    OCC = { change_tag_from = FRA }
-  }
-}
-
-country_event = { # Bordeaux Commune rises up
-  id = third_rep_france.102
-  title = third_rep_france.102.t
-  desc = third_rep_france.102.d
-
-  fire_only_once = yes
-
-  is_triggered_only = yes
-
-  immediate = {
-    AQU = {
-      transfer_state = 19
-      add_state_core = 19
-      load_oob = AQU_REVOLT
-      add_to_war = { targeted_alliance = CPR enemy = FRA }
-    }
-    CPR = {
-      add_to_faction = AQU
-    }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.102.a
-  }
-
-  option = { # Proletariat of Bordeaux, rise up !
-    name = third_rep_france.102.b
-    trigger = {
-      is_ai = no
-    }
-    AQU = { change_tag_from = FRA }
-  }
-}
-
-country_event = { # Caen Commune rises up
-  id = third_rep_france.103
-  title = third_rep_france.103.t
-  desc = third_rep_france.103.d
-
-  fire_only_once = yes
-
-  is_triggered_only = yes
-
-  immediate = {
-    NMD = {
-      transfer_state = 15
-      add_state_core = 15
-      load_oob = NMD_REVOLT
-      add_to_war = { targeted_alliance = CPR enemy = FRA }
-    }
-    CPR = {
-      add_to_faction = NMD
-    }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.103.a
-  }
-
-  option = { # Proletariat of Caen, rise up !
-    name = third_rep_france.103.b
-    trigger = {
-      is_ai = no
-    }
-    NMD = { change_tag_from = FRA }
-  }
-}
-
-country_event = { # Brest Commune rises up
-  id = third_rep_france.104
-  title = third_rep_france.104.t
-  desc = third_rep_france.104.d
-
-  fire_only_once = yes
-
-  is_triggered_only = yes
-
-  immediate = {
-    BRI = {
-      transfer_state = 14
-      add_state_core = 14
-      load_oob = BRI_REVOLT
-      add_to_war = { targeted_alliance = CPR enemy = FRA }
-    }
-    CPR = {
-      add_to_faction = BRI
-    }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.104.a
-  }
-
-  option = { # Proletariat of Brest, rise up !
-    name = third_rep_france.104.b
-    trigger = {
-      is_ai = no
-    }
-    BRI = { change_tag_from = FRA }
-  }
-}
-
-country_event = { # Lyon Commune rises up
-  id = third_rep_france.105
-  title = third_rep_france.105.t
-  desc = third_rep_france.105.d
-
-  fire_only_once = yes
-
-  is_triggered_only = yes
-
-  immediate = {
-    RHN = {
-      transfer_state = 20
-      add_state_core = 20
-      load_oob = RHN_REVOLT
-      add_to_war = { targeted_alliance = CPR enemy = FRA }
-    }
-    CPR = {
-      add_to_faction = RHN
-    }
-  }
-
-  option = { # Fight the Commune
-    name = third_rep_france.105.a
-  }
-
-  option = { # Proletariat of Lyon, rise up !
-    name = third_rep_france.105.b
-    trigger = {
-      is_ai = no
-    }
-    RHN = { change_tag_from = FRA }
-  }
-}
 
 country_event = { # Renovation of Lyon
   id = nap_france.400
@@ -6647,7 +5028,7 @@ country_event = { # Renovation of Lyon
   is_triggered_only = yes
 
   option = {
-    name = nap_france.340.a 
+    name = nap_france.340.a
 	20 = {
 		    add_building_construction = {
 		        type = infrastructure
@@ -6684,33 +5065,33 @@ country_event = { #Latin Monetary Union Treaty
 	id = latin_monetary_union.1
 	title = latin_monetary_union.1.t
 	desc = latin_monetary_union.1.d
-	
+
 	is_triggered_only = yes
 
 
-	option = { 
+	option = {
 		name = latin_monetary_union.1.a
 		add_ideas = FRA_member_monetary_union
 		}
     }
-	
+
 country_event = { #Latin Monetary Union Treaty - Greece
 
 	id = latin_monetary_union.2
 	title = latin_monetary_union.2.t
 	desc = latin_monetary_union.2.d
-	
+
 	is_triggered_only = yes
 
 
-	option = { 
+	option = {
 		name = latin_monetary_union.2.a
 		ai_chance = { factor = 80 }
 		add_ideas = FRA_member_monetary_union
 		FRA = { add_political_power = 75 }
 		}
-		
-	option = { 	
+
+	option = {
 		name = latin_monetary_union.2.b
 		ai_chance = { factor = 20 }
 		add_stability = -0.05
@@ -6723,18 +5104,18 @@ country_event = { #Latin Monetary Union Treaty - BILATERAL AGREEMENT - Romania, 
 	id = latin_monetary_union.3
 	title = latin_monetary_union.3.t
 	desc = latin_monetary_union.3.d
-	
+
 	is_triggered_only = yes
 
 
-	option = { 
+	option = {
 		name = latin_monetary_union.3.a
 		ai_chance = { factor = 80 }
 		add_ideas = FRA_monetary_union_bilateral_agreement
 		FRA = { add_political_power = 75 }
 		}
-		
-	option = { 	
+
+	option = {
 		name = latin_monetary_union.3.b
 		ai_chance = { factor = 20 }
 		add_stability = -0.05
@@ -6747,21 +5128,957 @@ country_event = { #Latin Monetary Union Treaty - UNILATERAL AGREEMENT - Serbia, 
 	id = latin_monetary_union.4
 	title = latin_monetary_union.4.t
 	desc = latin_monetary_union.4.d
-	
+
 	is_triggered_only = yes
 
 
-	option = { 
+	option = {
 		name = latin_monetary_union.4.a
 		ai_chance = { factor = 80 }
 		add_ideas = FRA_monetary_union_unilateral_agreement
 		FRA = { add_political_power = 75 }
 		}
-		
-	option = { 	
+
+	option = {
 		name = latin_monetary_union.4.b
 		ai_chance = { factor = 20 }
 		add_stability = -0.05
 		add_political_power = -50
     }
 }
+
+
+#----------------------------------------------------------------------------------------------
+# NAPOLEON III DEATH AND DISHONOR EVENTS
+#----------------------------------------------------------------------------------------------
+
+
+country_event = { # Orsini Affair
+  id = nap_france.398
+  title = nap_france.398.t
+  desc = nap_france.398.d
+  picture = GFX_report_event_nap_france_orsini_affair
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  trigger = {
+    tag = FRA
+    #date > 1858.1.14
+  }
+
+  option = { # Emperor Dead
+    name = nap_france.398.a
+    complete_national_focus = FRA_the_unthinkable
+    ai_chance = {
+      factor = 25
+      modifier = {
+        is_historical_focus_on = yes
+        factor = 0
+      }
+    }
+    if = {
+      limit = {
+        AND = {
+          PIE = {
+            has_completed_focus = PIE_Go_with_Garibaldi
+          }
+          NOT = {
+            PIE = {
+              has_completed_focus = PIE_Aftermath_of_Orsini
+            }
+          }
+        }
+        
+      }
+      PIE = {
+        complete_national_focus = PIE_Aftermath_of_Orsini
+      }
+    }
+    kill_country_leader = yes
+    add_stability = -0.1
+    create_country_leader = {
+      name = "Eugénie I"
+      picture = "Portrait_FRA_Eugenie_de_Montijo.dds"
+      ideology = despotism
+    }
+    add_political_power = -100
+    set_country_flag = fra_orsini_success
+    add_ideas = FRA_idea_orsini_regency_empress
+    clr_country_flag = FRA_has_colonial_ambitions
+    hidden_effect = {
+      news_event = { id = nap_france_flavor.19 }
+    }
+  }
+  option = { # Emperor Alive
+    name = nap_france.398.b
+    ai_chance = { factor = 50 }
+    add_stability = -0.05
+    set_country_flag = fra_orsini_failure
+    complete_national_focus = FRA_the_orsini_letter
+    hidden_effect = {
+      news_event = { id = nap_france_flavor.21 }
+    }
+    if = {
+      limit = {
+        AND = {
+          PIE = {
+            has_completed_focus = PIE_Go_with_Garibaldi
+          }
+          NOT = {
+            PIE = {
+              has_completed_focus = PIE_Aftermath_of_Orsini
+            }
+          }
+        }
+        
+      }
+      PIE = {
+        complete_national_focus = PIE_Aftermath_of_Orsini
+      }
+    }
+  }
+  option = { # Sacrebleu
+    name = nap_france.398.c
+    ai_chance = {
+      factor = 25
+      modifier = {
+        is_historical_focus_on = yes
+        factor = 0
+      }
+    }
+    add_stability = -0.15
+    create_country_leader = {
+      name = "Regency Council"
+      picture = "Portrait_FRA_Regency_Council.dds"
+      ideology = despotism
+    }
+    set_country_flag = fra_orsini_success
+    clr_country_flag = FRA_has_colonial_ambitions
+    add_ideas = FRA_idea_orsini_tragedy
+    complete_national_focus = FRA_the_unthinkable
+    complete_national_focus = FRA_orsini_tragedy
+    hidden_effect = {
+      news_event = { id = nap_france_flavor.20 }
+    }
+    if = {
+      limit = {
+        AND = {
+          PIE = {
+            has_completed_focus = PIE_Go_with_Garibaldi
+          }
+          NOT = {
+            PIE = {
+              has_completed_focus = PIE_Aftermath_of_Orsini
+            }
+          }
+        }
+        
+      }
+      PIE = {
+        complete_national_focus = PIE_Aftermath_of_Orsini
+      }
+    }
+  }
+}
+
+country_event = { # Death of Napoleon III
+	id = nap_france.399
+	title = nap_france.399.t
+	desc = nap_france.399.d
+	picture = GFX_report_event_napoleon_iii_death
+
+	fire_only_once = yes
+
+	trigger = {
+		NOT = {
+			OR = {
+				has_country_flag = fra_orsini_success
+				has_country_flag = fra_orsini_tragedy_flag
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	option = {
+		name = nap_france.399.a
+		if = {
+			limit = {
+				has_country_leader = {
+					id = 00505
+					ruling_only = no
+				}
+			}
+			kill_ideology_leader = autocracy
+			create_country_leader = {
+				name = "Napoleon IV"
+				picture = "Portrait_FRA_Napoleon_IV.dds"
+				ideology = despotism
+			}
+		}
+		hidden_effect = {
+			news_event = { days = 10 id = nap_france.399 }
+		}
+		set_country_flag = fra_nap_iv
+		remove_ideas = FRA_napoleon_illness_3
+    }
+}
+
+
+
+#----------------------------------------------------------------------------------------------
+# 1870 FRANCO PRUSSIAN WAR - IMPERIAL PART
+#----------------------------------------------------------------------------------------------
+
+
+
+country_event = { # Napoleon III captured in Sedan
+	id = nap_france.397
+	title = nap_france.397.t
+	desc = nap_france.397.d
+	picture = GFX_report_event_nap_france_exile_napoleon_iii
+
+	fire_only_once = yes
+  is_triggered_only = yes
+
+	option = { # Napoleon III captured
+		name = nap_france.397.a
+		add_political_power = -100
+		set_country_flag = fra_nap_iii_captured
+		hidden_effect = {
+			country_event = { days = 3 id = nap_france.3971 }
+		}
+    }
+}
+
+country_event = { # Empire is collapsing
+  id = nap_france.3971
+  title = nap_france.3971.t
+  desc = nap_france.3971.d
+  picture = GFX_report_event_nap_france_exile_napoleon_iii
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = { # Napoleon III captured
+    name = nap_france.3971.a
+    retire_country_leader = yes
+    create_country_leader = {
+      name = "Council"
+      picture = ""
+      ideology = absolutism
+    }
+    hidden_effect = {
+      country_event = { days = 3 id = third_rep_france.001 }
+      drop_cosmetic_tag = yes
+    }
+  }
+}
+
+#================================================================================================
+#================================================================================================
+#     EVENTS OF THE THIRD REPUBLIC
+#================================================================================================
+#================================================================================================
+
+#----------------------------------------------------------------------------------------------
+# 1870 FRANCO PRUSSIAN WAR - REPUBLICAN PART
+#----------------------------------------------------------------------------------------------
+
+country_event = { # Proclamation of the Republic
+  id = third_rep_france.001
+  title = third_rep_france.001.t
+  desc = third_rep_france.001.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.001.a
+    load_focus_tree = france_republic
+    set_cosmetic_tag = FRA_TRANSITION_EMPIRE
+    set_politics = { ruling_party = traditional_conservatism elections_allowed = no }
+    complete_national_focus = FRA_end_french_empire
+    create_country_leader = {
+      name = "Provisional Government"
+      picture = "Portrait_FRA_Gouvernement_Provisoire.dds"
+      ideology = conserv
+    }
+   
+    hidden_effect = {
+      set_party_name = {
+        ideology = vanguard_communism
+        long_name = FRA_iii_vanguard_communism_party
+        name = FRA_iii_vanguard_communism_party
+      }
+      set_party_name = {
+        ideology = collectivist_socialism
+        long_name = FRA_iii_collectivist_socialism_party
+        name = FRA_iii_collectivist_socialism_party
+      }
+      set_party_name = {
+        ideology = social_egalitarianism
+        long_name = FRA_iii_social_egalitarianism_party
+        name = FRA_iii_social_egalitarianism_party
+      }
+      set_party_name = {
+        ideology = centrism
+        long_name = FRA_iii_centrism_party
+        name = FRA_iii_centrism_party
+      }
+      set_party_name = {
+        ideology = radical_democracy
+        long_name =  FRA_iii_radical_democracy_party
+        name =  FRA_iii_radical_democracy_party
+      }
+      set_party_name = {
+        ideology = traditional_conservatism
+        long_name = FRA_iii_traditional_conservatism_party
+        name = FRA_iii_traditional_conservatism_party
+      }
+      set_party_name = {
+        ideology = chauvinist_populism
+        long_name = FRA_iii_chauvinist_populism_party
+        name = FRA_iii_chauvinist_populism_party
+      }
+      set_party_name = {
+        ideology = anarchism
+        long_name = FRA_anarchism_party
+        name = FRA_anarchism_party
+      }
+      add_popularity = { ideology = anarchism popularity = 0.10 }
+      add_popularity = { ideology = collectivist_socialism popularity = 0.05 }
+      add_popularity = { ideology = social_egalitarianism popularity = 0.10 }
+      add_popularity = { ideology = traditional_conservatism popularity = 0.25 }
+      add_popularity = { ideology = radical_democracy popularity = 0.20 }
+      add_popularity = { ideology = autocracy popularity = -0.20 }
+      add_ideas = FRA_idea_deorganized_army_4
+      }
+    }
+  }
+
+country_event = { # Esthablishment of the Provisional Government 
+  id = third_rep_france.002
+  title = third_rep_france.002.t
+  desc = third_rep_france.002.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.002.a
+    retire_country_leader = yes
+    add_popularity = { ideology = traditional_conservatism popularity = 0.05 }
+    create_country_leader = {
+      name = "Louis Jules Trochu"
+      picture = "Portrait_FRA_Louis_Jules_Trochu.dds"
+      ideology = conserv
+    }
+    country_event = { days = 4 id = third_rep_france.0021}
+  }
+}
+
+country_event = { # Socialist influence is growing
+  id = third_rep_france.0021
+  title = third_rep_france.0021.t
+  desc = third_rep_france.0021.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0021.a
+    add_ideas = FRA_idea_socialist_influence_2
+  }
+}
+
+country_event = { # Prepare the défence of Paris.
+  id = third_rep_france.003
+  title = third_rep_france.003.t
+  desc = third_rep_france.003.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.003.a
+    hidden_effect = {
+      country_event = { days = 6 id = third_rep_france.004 }
+    }
+  }
+}
+
+country_event = { # Buy Canons for Parisians
+  id = third_rep_france.004
+  title = third_rep_france.004.t
+  desc = third_rep_france.004.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = { name = third_rep_france.004.a
+    add_equipment_to_stockpile = { type = cannon_equipment amount = 200 producer = FRA }
+    add_popularity = { ideology = anarchism popularity = 0.05 }
+  }
+}
+
+country_event = { # Call the National Guard
+  id = third_rep_france.005
+  title = third_rep_france.005.t
+  desc = third_rep_france.005.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.005.a
+    814 = {
+      create_unit = {
+        division = "name = \"1.Régiment Garde Nationale\" division_template = \"Garde Nationale\"  start_experience_factor = 0.0"
+        owner = FRA
+      }
+      create_unit = {
+        division = "name = \"2.Régiment Garde Nationale\" division_template = \"Garde Nationale\"  start_experience_factor = 0.0"
+        owner = FRA
+      }
+      create_unit = {
+        division = "name = \"3.Régiment Garde Nationale\" division_template = \"Garde Nationale\"  start_experience_factor = 0.0"
+        owner = FRA
+      }
+      create_unit = {
+        division = "name = \"4.Régiment Garde Nationale\" division_template = \"Garde Nationale\"  start_experience_factor = 0.0"
+        owner = FRA
+      }
+    }
+  }
+}
+
+country_event = { # The Siege of Paris
+  id = third_rep_france.006
+  title = third_rep_france.006.t
+  desc = third_rep_france.006.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+
+  trigger = {
+    PRS = { controls_state = 16 }
+    has_cosmetic_tag = FRA_TRANSITION_EMPIRE
+  }
+
+  option = {
+    name = third_rep_france.006.a
+    hidden_effect = {
+      set_country_flag = FRA_paris_besieged
+      country_event = { days = 12 id = third_rep_france.007 }
+      country_event = { days = 55 id = third_rep_france.009 }
+      country_event = { days = 1 id = third_rep_france.0081 }
+    }
+  }
+}
+
+country_event = { # Entrevue de Ferrières
+  id = third_rep_france.007
+  title = third_rep_france.007.t
+  desc = third_rep_france.007.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.007.a
+    hidden_effect = {
+      PRS = { country_event = { days = 1 id = third_rep_france.0071 } }
+    }
+  }
+}
+
+country_event = { # Entrevue de Ferrières - Bismarck reponse
+  id = third_rep_france.0071
+  title = third_rep_france.0071.t
+  desc = third_rep_france.0071.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0071.a
+    hidden_effect = {
+      FRA = { country_event = { days = 1 id = third_rep_france.0072 } }
+    }
+  }
+}
+
+country_event = { # Entrevue de Ferrières - Peace conditions
+  id = third_rep_france.0072
+  title = third_rep_france.0072.t
+  desc = third_rep_france.0072.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0072.a
+    hidden_effect = {
+      FRA = { country_event = { days = 8 id = third_rep_france.011 } }
+    }
+  }
+  option = {
+    ai_chance = { factor = 100 } 
+    name = third_rep_france.0072.b
+  }
+}
+
+country_event = { # Gambetta's balloon adventures
+  id = third_rep_france.008
+  title = third_rep_france.008.t
+  desc = third_rep_france.008.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  trigger = {
+    AND = {
+      has_country_flag = FRA_paris_besieged
+      has_country_flag = FRA_military_baloon_tag
+    }
+  }
+
+  option = {
+    name = third_rep_france.008.a
+    hidden_effect = {
+      set_country_flag = Gambetta_Trip
+    }
+  }
+}
+
+country_event = { # War delegation siege in Tours.
+  id = third_rep_france.0081
+  title = third_rep_france.0081.t
+  desc = third_rep_france.0081.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0081.a
+    hidden_effect = {
+      set_capital = 24
+    }
+  }
+}
+
+country_event = { # War delegation retreat to Bordeaux
+  id = third_rep_france.0082
+  title = third_rep_france.0082.t
+  desc = third_rep_france.0082.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  trigger = {
+    PRS = { controls_state = 24 }  
+  } 
+
+  option = {
+    name = third_rep_france.0082.a
+    hidden_effect = {
+      set_capital = 19
+    }
+  }
+}
+
+country_event = { # War delegation captured in Bordeaux
+  id = third_rep_france.0083
+  title = third_rep_france.0083.t
+  desc = third_rep_france.0083.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  trigger = {
+    PRS = { controls_state = 19 }  
+  } 
+
+  option = {
+    name = third_rep_france.0083.a
+    hidden_effect = {
+      country_event = { days = 2 id = third_rep_france.011 }
+    }
+  }
+}
+
+country_event = { # Insurrections in Paris
+  id = third_rep_france.009
+  title = third_rep_france.009.t
+  desc = third_rep_france.009.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = { # Put down this insurrection
+    name = third_rep_france.009.a
+    add_political_power = -20
+    hidden_effect = {
+      if = { 
+				limit = { 
+					surrender_progress < 0.65 
+				}
+				country_event = { id = third_rep_france.0101 days = 2 }
+			}
+			else = { 
+				country_event = { id = third_rep_france.0102 days = 2 } 
+			}
+    }
+  }
+}
+
+country_event = { # Plebiscite Result in Paris : WIN
+	id = third_rep_france.0101
+	title = third_rep_france.0101.t
+	desc = third_rep_france.0101.d
+	picture = GFX_report_event_napoleon_iii_death
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = third_rep_france.0101.a
+		complete_national_focus = FRA_plebicite
+	}
+}
+
+country_event = { # Plebiscite Result in Paris : LOOSE
+  id = third_rep_france.0102
+  title = third_rep_france.0102.t
+  desc = third_rep_france.0102.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0102.a
+    country_event = { days = 1 id = third_rep_france.0103 }
+  }
+}
+
+country_event = { # Trochu steps down
+  id = third_rep_france.0103
+  title = third_rep_france.0103.t
+  desc = third_rep_france.0103.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0103.a
+    hidden_effect = {
+      country_event = { days = 1 id = third_rep_france.011 }
+    }
+    create_country_leader = {
+      name = "Gouvernement Provisoire"
+      picture = "Portrait_FRA_Gouvernement_Provisoire.dds"
+      ideology = conserv
+    }
+  }
+}
+
+country_event = { # French Army Defeated
+  id = third_rep_france.0104
+  title = third_rep_france.0104.t
+  desc = third_rep_france.0104.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+
+  trigger = {
+    AND = {
+      FRA = { 
+        surrender_progress > 0.75
+        has_global_flag = eoanb_flag_franco_prussian_war_ongoing
+      }
+    }
+  }
+
+  option = {
+    name = third_rep_france.0104.a
+    hidden_effect = {
+      country_event = { id = third_rep_france.011 }
+    }
+  }
+}
+
+country_event = { # Paris Captured by Prussians 
+  id = third_rep_france.0105
+  title = third_rep_france.0105.t
+  desc = third_rep_france.0105.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+
+  trigger = {
+    PRS = { 
+      controls_state = 814
+    }
+  }
+
+  option = {
+    name = third_rep_france.0104.a
+    hidden_effect = {
+      country_event = { id = third_rep_france.011 }
+    }
+  }
+}
+
+country_event = { # Armistice
+  id = third_rep_france.011
+  title = third_rep_france.011.t
+  desc = third_rep_france.011.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+	option = {
+		name = third_rep_france.011.a
+		hidden_effect = {
+			FRA = { 
+        country_event = { days = 2 id = third_rep_france.012 } 
+			  country_event = { days = 3 id = third_rep_france.013 } 
+        country_event = { days = 5 id = third_rep_france.014 }
+        country_event = { days = 1 id = third_rep_france.0111 }
+        give_military_access = PRS
+        white_peace = PRS
+      }
+			PRS = { 
+				transfer_state = 28 
+				transfer_state = 972
+				transfer_state = 18 
+				transfer_state = 976 
+				transfer_state = 29 
+				transfer_state = 1151 
+				country_event = { id = fraprswar.13 days = 10 }
+				country_event = { days = 1 id = third_rep_france.0112 }
+			} 
+			clr_country_flag = Gambetta_Trip
+			clr_country_flag = FRA_paris_besieged
+			clr_global_flag = eoanb_flag_franco_prussian_war_ongoing
+			set_global_flag = GER_Winner_of_FPW
+		}
+	}
+}
+
+country_event = { # German Army March in Paris (France)
+  id = third_rep_france.0111
+  title = third_rep_france.0111.t
+  desc = third_rep_france.0111.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0111.a
+  }
+}
+
+country_event = { # German Army March in Paris (Germany)
+  id = third_rep_france.0112
+  title = third_rep_france.0112.t
+  desc = third_rep_france.0112.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0112.a
+  }
+}
+
+country_event = { # Léon Gambetta quits the government
+  id = third_rep_france.012
+  title = third_rep_france.012.t
+  desc = third_rep_france.012.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.012.a
+    set_country_flag = FRA_gambetta_out
+  }
+}
+
+country_event = { # Henri Rochefort quits the government
+  id = third_rep_france.013
+  title = third_rep_france.013.t
+  desc = third_rep_france.013.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.013.a
+    set_country_flag = FRA_rochefort_out
+  }
+}
+
+#----------------------------------------------------------------------------------------------
+# 1871 LEGISLATIVE ELECTION - MONARCHIST PART
+#----------------------------------------------------------------------------------------------
+
+country_event = { # First Legislative Election of the Republic
+	id = third_rep_france.014
+	title = third_rep_france.014.t
+	desc = third_rep_france.014.d 
+	picture = GFX_report_event_napoleon_iii_death
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = third_rep_france.014.a
+		hidden_effect = {
+			FRA = { country_event = { days = 2 id = third_rep_france.0141 } }
+			set_party_name = {
+				ideology = traditional_conservatism
+				long_name = FRA_iii_1871_traditional_conservatism_party
+				name = FRA_iii_1871_traditional_conservatism_party
+			}
+			set_party_name = {
+				ideology = traditional_conservatism
+				long_name = FRA_iii_1871_radical_democracy_party
+				name = FRA_iii_1871_radical_democracy_party
+			}
+			create_country_leader = {
+				name = "Jules Dufaure"
+				picture = ""
+				ideology = liberal_social
+			}
+			create_country_leader = {
+				name = "Léon Gambetta"
+				picture = "Portrait_FRA_Leon_Gambetta.dds"
+				ideology = liberal_social
+			}    
+			create_country_leader = {
+				name = "Henri Rochefort"
+				picture = "Portrait_FRA_Henri_Rochefort.dds"
+				ideology = social_liberal
+			}
+		}
+	}
+}
+
+country_event = { # Monarchist Won the Election
+  id = third_rep_france.0141
+  title = third_rep_france.0141.t
+  desc = third_rep_france.0141.d 
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.0141.a
+    set_country_flag = FRA_1871_Monarchist
+    mark_focus_tree_layout_dirty = yes
+    set_politics = { ruling_party = traditional_conservatism elections_allowed = yes }
+    complete_national_focus = FRA_monarchist_victory
+    FRA = { country_event = { days = 2 id = third_rep_france.015 } }
+  }
+}
+
+country_event = { # Adolphe Tiers elected President
+  id = third_rep_france.015
+  title = third_rep_france.015.t
+  desc = third_rep_france.015.d
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = { # Adolphe Theirs
+    name = third_rep_france.015.a
+    trigger = {
+        has_country_flag = FRA_1871_Monarchist
+    } 
+    retire_country_leader = yes
+    set_politics = {
+      ruling_party = traditional_conservatism
+      elections_allowed = yes
+    }
+    create_country_leader = {
+      name = "Adolphe Thiers"
+      picture = "Portrait_FRA_Adolphe_Thiers.dds"
+      ideology = conserv
+    }
+  }
+}
+
+country_event = { # The Frankfurt Pact Signed Beetween France And The Prussian Alliance
+  id = third_rep_france.016
+  title = third_rep_france.016.t
+  desc = third_rep_france.016.d 
+  picture = GFX_report_event_napoleon_iii_death
+
+  fire_only_once = yes
+  is_triggered_only = yes
+
+  option = {
+    name = third_rep_france.016.a
+    FRA = { transfer_state = 972 } 
+    FRA = { transfer_state = 18 } 
+    FRA = { transfer_state = 976 } 
+    FRA = { transfer_state = 29 } 
+    FRA = { transfer_state = 1151 } 
+    17 = { set_demilitarized_zone = yes }
+    972 = { set_demilitarized_zone = yes }
+    18 = { set_demilitarized_zone = yes }
+    29 = { set_demilitarized_zone = yes }
+    FRA = { add_ideas = FRA_idea_loss_of_alsace	}
+  }
+}
+
+country_event = { #German Troops withdraw from France 
+	id = third_rep_france.017
+	title = third_rep_france.017.t
+	desc = third_rep_france.017.d
+	picture = GFX_report_event_romania_parliament
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = third_rep_france.017.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+      17 = { set_demilitarized_zone = no }
+      972 = { set_demilitarized_zone = no }
+      18 = { set_demilitarized_zone = no }
+      29 = { set_demilitarized_zone = no }
+      1151 = { set_demilitarized_zone = no }
+		}
+	}
+}
+
+

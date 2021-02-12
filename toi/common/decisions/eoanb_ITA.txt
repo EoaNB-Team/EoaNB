@@ -1,18 +1,20 @@
 
 
 ITA_Culture_category_decisions = {
-	
+
+
+
 	ITA_decision_invest_in_opera = {
+		ai_will_do = {
+			base = 1
+		}
 
 		icon = ita_culture
 
 		available = {
-			has_war = no
-			has_cosmetic_tag = ITA
+			original_tag = PIE
 		}
-		visible = {
-			always = yes
-		}
+
 		remove_trigger = {
 			has_war = yes
 		}
@@ -22,22 +24,22 @@ ITA_Culture_category_decisions = {
 		}
 
 		days_remove = 100
-		
+
 
 		cost = 100
 
 	}
-	
+
 	ITA_decision_spread_new_songs = {
+		ai_will_do = {
+			base = 1
+		}
 
 		icon = ita_culture
 
 		available = {
 			has_war = no
-			has_cosmetic_tag = ITA
-		}
-		visible = {
-			always = yes
+			has_cosmetic_tag = PIE_focus_ITA
 		}
 		remove_trigger = {
 			has_war = yes
@@ -47,19 +49,265 @@ ITA_Culture_category_decisions = {
 			political_power_gain = 0.4
 		}
 		complete_effect = {
-			every_neighbor_country = { add_opinion_modifier = { target = PREV modifier = italian_music_popular } }	
+			every_neighbor_country = { add_opinion_modifier = { target = PREV modifier = italian_music_popular } }
 		}
 
 		days_remove = 90
-		
+
 
 		cost = 100
 
 	}
 
 }
+ITA_decisions_category_wars_and_conflicts = {
+
+	###activate_mission = ITA_Mission_AUS_PIE_Peace_Treaty_1860
+	ITA_Mission_AUS_PIE_Peace_Treaty_1860 = {
+        allowed = { always = no } # MEANS NO ONE SEES IT AT GAMESTART
+        icon = generic_political_actions
+
+        is_good = no # AI is smarter with conditions/achieving them if it is no, trust me.
+        days_mission_timeout = 200 # Arbitrary number, but I recommend a time of 1.5x expected time to finish war, max 1000
+        activation = { always = no } # MEANS THIS MISSION WILL BE MANUALLY ENABLED (~400x Optimized)
+
+        available = {
+            # Conditions to trigger peace treaty
+            OR = {
+                custom_trigger_tooltip = {
+                    tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_ITA_VICTORY_tt
+						tag = PIE
+						PIE = {
+							if = {
+								limit = {
+									has_completed_focus = PIE_Path_of_the_Carbonari
+								}
+								LVN = {
+									has_capitulated = yes
+								}
+							}
+							if = {
+								limit = {
+									NOT = {
+										has_completed_focus = PIE_Path_of_the_Carbonari
+									}
+								}
+								divisions_in_state = {
+									type = infantry
+									size > 5
+									state = 159
+								}
+							}
+						}# SardiniaPiedmont's Victory Conditions
+               	 	}
+                custom_trigger_tooltip = {
+                    tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_AUS_VICTORY_tt
+						tag = AUS
+                        PIE = {
+							surrender_progress > 0.3	# Austria's Victory Conditions
+                    }
+           		}
+        	}
+		}
+        complete_effect = {
+            # Peace Treaty (Simple form, you can customize it later for various outcomes)
+            if = {
+                limit = { 
+					# INSERT PIEDMONT'S VICTORY CONDITIONS HERE
+					AND = { 
+						tag = PIE 
+							PIE = {
+								if = {
+									limit = {
+										has_completed_focus = PIE_Path_of_the_Carbonari
+									}
+									LVN = {
+										has_capitulated = yes
+									}
+								}
+								if = {
+									limit = {
+										NOT = {
+											has_completed_focus = PIE_Path_of_the_Carbonari
+										}
+									}
+									divisions_in_state = {
+										type = infantry
+										size > 5
+										state = 159
+									}
+								}
+							}
+						} 
+					} 
+					# Insert Sardinia's Victory Here (Recommended you also check for tag so it only fires for Sardinia)
+				PIE = {
+					if = {
+						limit = {
+						  has_completed_focus = PIE_Path_of_the_Carbonari
+						  tag = PIE
+						}
+						PIE = { 
+						  transfer_state = 159
+						  transfer_state = 982 
+						  transfer_state = 160
+					  }
+					  custom_effect_tooltip = PIE_2I_Peace
+					  hidden_effect = {
+						  white_peace = LVN
+						  white_peace = AUS
+						  news_event = sardinia_news.1
+						  clr_global_flag = FRA_PIE_OneCall
+						  set_global_flag = PIE_2IW_Victory
+						  CBI = {
+							  white_peace = LVN
+							  white_peace = AUS
+						  }
+						  AUS = {
+							  add_to_variable = {
+								  var = HUN_REVOLT_RISK
+								  value = 2  
+							  }
+							  add_to_variable = {
+								  var = SLA_REVOLT_RISK
+								  value = 1 
+							  }
+							  white_peace = CBI
+						  }
+					  }
+				  } 
+				  if = {
+					  limit = {
+						  tag = PIE
+						  NOT = {
+							  has_completed_focus = PIE_Path_of_the_Carbonari
+						  }
+					  }
+					  PIE = { 
+						  transfer_state = 159
+						  transfer_state = 982 
+					  }
+					  custom_effect_tooltip = PIE_2I_Peace
+					  hidden_effect = {
+						  white_peace = LVN
+						  white_peace = AUS
+						  news_event = sardinia_news.1
+						  clr_global_flag = FRA_PIE_OneCall
+						  set_global_flag = PIE_2IW_Victory
+						  AUS = {
+							  add_to_variable = {
+								  var = HUN_REVOLT_RISK
+								  value = 2  
+							  }
+							  add_to_variable = {
+								  var = SLA_REVOLT_RISK
+								  value = 1 
+							  }
+						  }
+						  release_puppet = PRM
+						  release_puppet = MOD
+						  release_puppet = TUS
+						  TUS = { white_peace = AUS }
+						  TUS = { white_peace = LVN }
+						  MOD = { white_peace = AUS }
+						  MOD = { white_peace = LVN }
+						  PRM = { white_peace = AUS }
+						  PRM = { white_peace = LVN }
+						  # France and puppets peace
+						  FRA = {
+							  if = {
+								  limit = { has_offensive_war_with = AUS }
+								  white_peace = AUS
+							  }
+							  if = {
+								  limit = { has_offensive_war_with = LVN }
+								  white_peace = LVN
+							  }
+						  }
+						  EPD = {
+							  if = {
+								  limit = { has_offensive_war_with = AUS }
+								  white_peace = AUS
+							  }
+							  if = {
+								  limit = { has_offensive_war_with = LVN }
+								  white_peace = LVN
+							  }
+						  }
+						  GBS = {
+							  if = {
+								  limit = { has_offensive_war_with = AUS }
+								  white_peace = AUS
+							  }
+							  if = {
+								  limit = { has_offensive_war_with = LVN }
+								  white_peace = LVN
+							  }
+						  }
+						  SNG = {
+							  if = {
+								  limit = { has_offensive_war_with = AUS }
+								  white_peace = AUS
+							  }
+							  if = {
+								  limit = { has_offensive_war_with = LVN }
+								  white_peace = LVN
+							  	}
+						  	}
+					  	}
+				  	}
+				}   
+			}
+            else_if = {
+				# INSERT AUSTRIA'S VICTORY CONDITIONS HERE
+                limit = {  
+					tag = AUS
+					PIE = {
+						surrender_progress > 0.3	# Austria's Victory Conditions
+					}
+				} 
+
+				# Insert Austria's Victory Here (Recommended you also check for tag so it only fires for Austria)
+				AUS = {
+					country_event = {
+						id = ita_confederation.6
+					}
+					annex_country = {
+						target = PIE
+					}
+					set_country_flag = ITA_AUS_Divide_Italy_Yes
+					set_country_flag = ITA_AUS_won_2I_Divide_Italy
+				}
+            }
+            else = {
+                ## IMPORTANT, IF YOU USE 'ELSE' IT WILL ALWAYS BE SEEN BY AI/PLAYER
+                # Optional: could be used for a custom_effect_tooltip to say simply 'will fire peace conference'
+                custom_effect_tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_tt
+            }
+        }
+        timeout_effect = {
+            if = {
+                limit = { date > 1890.1.1 } # Optional Trigger in case war lasting too long
+				AUS = {
+					country_event = {
+						id = ita_confederation.6
+					}
+					annex_country = {
+						target = PIE
+					}
+					set_country_flag = ITA_AUS_Divide_Italy_Yes
+					set_country_flag = ITA_AUS_won_2I_Divide_Italy
+				} # Stalemate if it is lasting too long
+            }
+            else_if = {
+                limit = { AUS = { has_war_with = PIE } } # Check if they are still at war
+                activate_mission = ITA_Mission_AUS_PIE_Peace_Treaty_1860 # Loops the mission if they are still at war.
+            	}
+        	}
+   	 	}
+	}
 #ITA_Referendum_category_decisions = {
-	
+
 	#ITA_decision_ticino_referendum = {
 
 	#icon = generic_political_actions
@@ -74,7 +322,7 @@ ITA_Culture_category_decisions = {
    			 #id = ita.10
    			 #hours = 1
 			#}
-				
+
 		#}
 
 		#cost = 100
@@ -86,27 +334,111 @@ ITA_Culture_category_decisions = {
 #}
 
 ITA_brigindage_category_decisions = {
-	
+
 	ITA_decision_deal_with_brigindage = {
+
+		ai_will_do = {
+			base = 1
+		}
 
 	icon = generic_political_actions
 
+	allowed = {
+		OR = {
+			original_tag = PIE
+			original_tag = TUS
+			original_tag = PAP
+		}
+		
+	}
+	activation = {
+		custom_trigger_tooltip = {
+			tooltip = ITA_decision_tooltip_activation
+			has_country_flag = is_literally_italy
+		}
+	}
 	available = {
-			has_completed_focus = ITA_Deal_with_Brigandage
+		custom_trigger_tooltip = {
+            tooltip = ITA_brigandage_mission_active
+            has_country_flag = ITA_brigandage_mission_over #REMEMBER THIS
+        }
+	}
+	days_mission_timeout = 1500
+
+	timeout_effect = {                      # What happens when we fail the mission?
+              country_event = {
+				  id = ita.36
+				  days = 10
+			  }             # Eat shit and die
+		  }
+		  complete_effect = {                    # What happens when we activate the mission i.e. mission success?
+			   add_political_power = 50
+			   remove_ideas = ITA_Brigandage
+			   clear_variable = southern_revolt_risk               # VITORIA
+          }
+
 	}
 
-	visible = {
-		always = yes
+	ITA_Brigandage_government_debate = {
+
+		ai_will_do = {
+			base = 1
+		}
+
+
+		icon = generic_political_actions
+
+
+		cost = 50
+		fire_only_once = yes
+		available = {
+			AND = {
+				original_tag = PIE
+				has_completed_focus = ITA_Deal_with_Brigandage
+				has_active_mission = ITA_decision_deal_with_brigindage
+				has_completed_focus = ITA_1861_elections
+			}
+		}
+
+		cost = 50
+		fire_only_once = yes
+
+		complete_effect = {
+			country_event = {
+				id = ita.39
+				days = 1
+			}
+			complete_national_focus = ITA_The_Southern_Question
+		}
+
 	}
+	ITA_Increase_Military_Presence = {
 
-	fire_only_once = yes
+		ai_will_do = {
+			base = 1
+		}
+
+		icon = generic_political_actions
+
+		cost = 50 
+		days_re_enable = 180
+		available = {
+			has_active_mission = ITA_decision_deal_with_brigindage
+		}
 
 
-
-	cost = 25
-
-	}	
-
+		complete_effect = {
+			custom_effect_tooltip = ITA_Increase_Military_Presence_tooltip
+			add_to_variable = {
+				var = southern_revolt_risk
+				value = -2
+			}
+			add_timed_idea = {
+				idea = ITA_Military_Crackdown_Southern
+				days = 180
+			}
+		}
+	}
 
 }
 ITA_decisions_category_influence_minor_states = {
@@ -117,8 +449,9 @@ ITA_decisions_category_influence_minor_states = {
 
 		available = {
 			has_completed_focus = PIE_Handle_the_Central_States
+			country_exists = PRM
 		}
-	
+
 		visible = {
 			has_completed_focus = PIE_Handle_the_Central_States
 		}
@@ -131,15 +464,15 @@ ITA_decisions_category_influence_minor_states = {
 
 		custom_cost_text = PIE_Manpower_Minor_States
 
-		cost = 50
+		cost = 20
 
-		days_remove = 30
+		days_remove = 10
 		remove_effect = {
 			set_country_flag = PIE_Central_States_Handle_PRM
 			add_manpower = -1000
 		}
 		ai_will_do = {
-			base = 1
+			base = 2
 		}
 
 }
@@ -150,6 +483,7 @@ ITA_decision_influence_Modena = {
 
 	available = {
 		has_completed_focus = PIE_Handle_the_Central_States
+		country_exists = MOD
 	}
 
 	visible = {
@@ -164,15 +498,15 @@ ITA_decision_influence_Modena = {
 
 	custom_cost_text = PIE_Manpower_Minor_States
 
-	cost = 50
+	cost = 20
 
-	days_remove = 30
+	days_remove = 10
 	remove_effect = {
 		set_country_flag = PIE_Central_States_Handle_MOD
 		add_manpower = -1000
 	}
 	ai_will_do = {
-		base = 1
+		base = 2
 	}
 
 }
@@ -198,9 +532,9 @@ ITA_decision_influence_parma2 = {
 
 	custom_cost_text = PIE_Manpower_Minor_States
 
-	cost = 100
+	cost = 50
 
-	days_remove = 30
+	days_remove = 10
 	remove_effect = {
 		clr_country_flag = PIE_Central_States_Handle_PRM
 		PIE = {
@@ -213,7 +547,7 @@ ITA_decision_influence_parma2 = {
 	}
 
 	ai_will_do = {
-		base = 1
+		base = 2
 	}
 }
 
@@ -239,9 +573,9 @@ ITA_decision_influence_modena2 = {
 
 	custom_cost_text = PIE_Manpower_Minor_States
 
-	cost = 100
+	cost = 50
 
-	days_remove = 30
+	days_remove = 10
 	remove_effect = {
 		clr_country_flag = PIE_Central_States_Handle_MOD
 		PIE = {
@@ -253,7 +587,7 @@ ITA_decision_influence_modena2 = {
 		}
 	}
 	ai_will_do = {
-		base = 1
+		base = 2
 	}
 
 }
@@ -279,6 +613,9 @@ ITA_decision_influence_tuscany = {
 		hidden_effect = {
 			set_country_flag = ITA_decisions_unlock_tuscan_negociations
 		}
+	}
+	ai_will_do = {
+		base = 1
 	}
 
 }
@@ -308,11 +645,14 @@ ITA_decision_influence_tuscany1 = {
 			add_timed_idea = {
 				idea = PIE_Tuscan_Politicians_Corruption
 				days = 180
-		}
+				}
 		set_country_flag = ITA_decision_influence_tuscany_negotion_continue2
-	}
+			}		
 
-}
+		}
+	ai_will_do = {
+	base = 1
+	}
 }
 
 
@@ -341,6 +681,9 @@ ITA_decision_influence_tuscany2 = {
 		}
 		set_country_flag = ITA_decision_influence_tuscany2_continuetime
 	}
+	ai_will_do = {
+		base = 1
+	}
 
 }
 
@@ -351,11 +694,11 @@ ITA_decision_influence_tuscany3 = {
 	available = {
 		has_completed_focus = PIE_A_Deal_with_Tuscany
 		has_completed_focus = PIE_Convince_Leopold
-		
+
 		custom_trigger_tooltip = {
-			tooltip = ITA_Decisions_Tuscan_Complete	
+			tooltip = ITA_Decisions_Tuscan_Complete
 			has_country_flag = ITA_decision_influence_tuscany2_continuetime
-			has_country_flag = ITA_decisions_unlock_tuscan_negociations	
+			has_country_flag = ITA_decisions_unlock_tuscan_negociations
 
 		}
 
@@ -377,9 +720,173 @@ ITA_decision_influence_tuscany3 = {
 			clr_country_flag = ITA_decisions_unlock_tuscan_negociations
 		}
 	}
+	ai_will_do = {
+		base = 1
+	}
 
 }
 
 
+
+}
+
+ITA_decisions_category_papal_influence = {
+
+	ITA_decision_spread_papal_influence = {
+
+		icon = generic_political_actions
+		
+		target_trigger = {
+               FROM = {
+                    OR = {
+                         tag = TUS
+                         tag = PIE
+                         tag = LVN
+						 tag = PRM
+						 tag = MOD
+						 tag = NSC
+						 tag = CBI
+                    }
+               }
+          }
+
+		available = {
+			has_completed_focus = PAP_Step_Towards_Confederations
+		}
+
+		visible = {
+			has_completed_focus = PAP_Step_Towards_Confederations
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		days_remove = 15
+		remove_effect = {
+			FROM={
+				add_popularity = { 
+					ideology = fundamentalism
+					popularity = 0.05
+				}
+			}
+		}
+		ai_will_do = {
+			base = 1
+		}
+
+	}
+	
+	neoguelphism_failing = {
+          allowed = { tag = PAP }                 
+          available = {# Available here means as much as goal because:
+               
+          }
+          activation = {                          
+               has_war = yes                      
+          }
+          is_good = no
+          days_mission_timeout = 100              # How many days before the mission fails?
+          timeout_effect = {                      # What happens when we fail the mission?
+               add_political_power = -50               # Lose 50 PP
+          }
+          complete_effect = {                    # What happens when we activate the mission i.e. mission success?
+               add_political_power = 50               # Gain 50 PP
+          }
+     }
+}
+
+ITA_decisions_category_roman_republicanism={
+	ITA_decision_spread_roman_republicanism = {
+
+		icon = generic_political_actions
+		
+		target_trigger = {
+               FROM = {
+                    OR = {
+                         tag = TUS
+                         tag = PIE
+                         tag = LVN
+						 tag = PRM
+						 tag = MOD
+						 tag = NSC
+						 tag = CBI
+                    }
+               }
+          }
+
+		available = {
+			has_completed_focus = PAP_rally_peninsula
+		}
+
+		visible = {
+			has_completed_focus = PAP_rally_peninsula
+		}
+
+		fire_only_once = yes
+
+		cost = 25
+
+		days_remove = 15
+		remove_effect = {
+			FROM={
+				add_popularity = { 
+					ideology = radical_democracy
+					popularity = 0.05
+				}
+			}
+		}
+		ai_will_do = {
+			base = 1
+		}
+
+	}
+	ITA_decision_incite_republican_revolt = {
+
+		icon = generic_political_actions
+		
+		target_trigger = {
+               FROM = {
+                    OR = {
+                         tag = TUS
+                         tag = PIE
+                         tag = LVN
+						 tag = PRM
+						 tag = MOD
+						 tag = NSC
+						 tag = CBI
+                    }
+               }
+          }
+
+		available = {
+			has_completed_focus = PAP_Unify_With_Italy
+		}
+
+		visible = {
+			has_completed_focus = PAP_Unify_With_Italy
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			declare_war_on = {
+				target = FROM
+				type = annex_everything
+			}
+			# FROM={
+				# if={
+					# limit={radical_democracy>0.25}
+					
+				# }
+			# }
+		}
+		ai_will_do = {
+			base = 1
+		}
+
+	}
 
 }

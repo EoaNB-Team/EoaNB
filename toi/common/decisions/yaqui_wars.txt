@@ -6,15 +6,39 @@ MEX_yaqui_wars = {
 			483 = {
 				custom_trigger_tooltip = {
 					tooltip = MEX_yaqui_wars_in_sonora_counter_tooltip
-					483 = { check_variable = { yaqui_resistance_in_sonora < 1 } }
+					OR = {
+						483 = { check_variable = { yaqui_resistance_in_sonora < 1 } }
+						AND = {
+							483 = { check_variable = { yaqui_resistance_in_sonora < 4 } }
+							483 = { is_core_of = YAQ }
+							OWNER = { NOT = { TAG = YAQ } }
+						}
+					}
 				}
 			}
 		}
 		visible = {
 			483 = { check_variable = { yaqui_resistance_in_sonora > 0 } }
+			OR = { 
+				AND = {
+					owns_state = 483
+					NOT = { TAG = YAQ }
+				}
+				if = { 
+					limit = { TAG = YAQ }
+					NOT = { owns_state = 483 }
+				}
+			}
 		}
 		complete_effect = {
-			
+			if = {
+				limit = {
+					483 = { check_variable = { yaqui_resistance_in_sonora < 4 } }
+					483 = { is_core_of = YAQ }
+					NOT = { TAG = YAQ }
+				}
+				483 = { remove_core_of = YAQ }
+			}
 		}
 		ai_will_do = {
 			factor = 0
@@ -22,12 +46,18 @@ MEX_yaqui_wars = {
 	}
 
 	MEX_fortify_sonora = {
-		allowed = { owns_state = 483 }                 
-		available = {                          
+		#allowed = {
+		#	owns_state = 483
+		#	hidden_trigger = { NOT = { TAG = YAQ } }
+		#}            
+		available = {      
 			483 = { bunker > 0 }
+			hidden_trigger = { ROOT = { NOT = { TAG = YAQ } } }
 		}
-		activation = {                  
+		activation = {  
+			owns_state = 483
 			has_country_flag = yaqui_wars_sonora_defense_flag
+			hidden_trigger = { ROOT = { NOT = { TAG = YAQ } } }
 		}
 		
 		highlight_states = {
@@ -54,7 +84,6 @@ MEX_yaqui_wars = {
 						id = yaqui_wars_sonora.4
 						days = 5
 						random = 50
-						trigger_for = controller
 					}
 				}
 				add_command_power = -100
@@ -75,7 +104,6 @@ MEX_yaqui_wars = {
 						id = yaqui_wars_sonora.3
 						days = 5
 						random = 7
-						trigger_for = controller
 					}
 				}
 				add_ai_strategy = {
@@ -99,13 +127,19 @@ MEX_yaqui_wars = {
 			command_power > 100
 			has_political_power > 100
 			owns_state = 483
+			hidden_trigger = { ROOT = { NOT = { TAG = YAQ } } }
 		}
 		activation = {                  
 			AND = {
 				ROOT = { owns_state = 483 }
-				483 = { check_variable = { yaqui_resistance_in_sonora > 4 } }
+				OR = {
+					483 = { check_variable = { yaqui_resistance_in_sonora > 4 } }
+					date > 1892.3.1
+					date < 1917.6.1
+				}
 			}
 			NOT = { has_global_flag = yaqui_resistance_stopped_flag }
+			hidden_trigger = { ROOT = { NOT = { TAG = YAQ } } }
 		}
 		
 		highlight_states = {
@@ -114,6 +148,7 @@ MEX_yaqui_wars = {
 		
 		visible = {
 			ROOT = { owns_state = 483 }
+			ROOT = { NOT = { TAG = YAQ } }
 		}
 
 		fire_only_once = no
@@ -129,20 +164,40 @@ MEX_yaqui_wars = {
 		days_mission_timeout = 100
 	 
 		complete_effect = {
-			set_global_flag = yaqui_resistance_stopped_sonora_flag
+			
 			set_global_flag = yaqui_resistance_stopped_flag
 			custom_effect_tooltip = yaqui_resistance_temp_stopped_sonora_tooltip
 			hidden_effect = {
 				add_command_power = -100
 				add_political_power = -100
+				483 = { state_event = { id = yaqui_resistance_sonora.2 days = 300 } }
+				country_event = { id = yaqui_resistance_sonora.1 days = 300 }
 			}
 		}
 		
 		timeout_effect = {
-			483 = {
-				damage_building = {
-					type = infrastructure
-					damage = 1.7
+			if = {
+				limit = {
+					483 = { check_variable = { yaqui_resistance_in_sonora > 4 } }
+					483 = { check_variable = { yaqui_resistance_in_sonora < 11 } }
+				}
+				483 = {
+					damage_building = {
+						type = infrastructure
+						damage = 1.7
+					}
+				}
+			}
+			if = {
+				limit = {
+					483 = { NOT = { is_core_of = YAQ } }
+					OR = {
+						483 = { check_variable = { yaqui_resistance_in_sonora > 10 } }
+						date > 1892.3.1
+					}
+				}
+				483 = {
+					add_core_of = YAQ
 				}
 			}
 			
