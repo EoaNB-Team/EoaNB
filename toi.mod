@@ -10,7 +10,7 @@ tags={
 	"National Focuses"
 	"Technologies"
 }
-name="End of a New Beginning - Test Version"
+name="End of a New Beginning - Official Version"
 picture="thumbnail.png"
 replace_path="common/ai_equipment"
 replace_path="common/ai_templates"
