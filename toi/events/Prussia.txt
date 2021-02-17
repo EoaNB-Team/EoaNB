@@ -2055,17 +2055,17 @@ country_event = {
 	
 	option = {
 		name = prussiaconscrisis.1.a 
-		ai_chance = { factor = 100 }
+		ai_chance = { factor = 75 }
 		PRS = { add_ideas = PRS_army_reform }
 		add_stability = -0.02
 	}
 	
 	option = {
 		name = prussiaconscrisis.1.b 
-		ai_chance = { factor = 100 }
+		ai_chance = { factor = 25 }
 		add_political_power = -50
 		PRS = { add_ideas = PRS_army_reform }
-		add_stability = -0.03
+		add_stability = -0.05
 		PRS = { 
 			add_equipment_to_stockpile = {
 				type = infantry_equipment
@@ -2957,6 +2957,7 @@ country_event = {
 		hidden_effect = {
 			add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
 			reverse_add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
+			PRS = { country_event = { days = 1 id = prussiaforeign.36 } }
 		}
 	}
 }
@@ -3617,6 +3618,201 @@ country_event = {
 		hidden_effect = {
 			PRS = { clr_country_flag = PRS_zollverein_trade_treaty_negotiating }
 		}
+	}
+}
+
+#Prussia - Which Side to Approach?
+country_event = {
+	id = prussiaforeign.31
+	title = prussiaforeign.31.t
+	desc = prussiaforeign.31.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = prussiaforeign.31.a
+		trigger = {
+			PRS = { NOT = { has_country_flag = PRS_USA_sell_guns_rejected_flag } }
+		}
+		ai_chance = { factor = 80 }
+		add_political_power = -10
+		hidden_effect = {
+			USA = { country_event = { days = 7 id = prussiaforeign.32 } }
+		}
+	}
+	
+	option = {
+		name = prussiaforeign.31.b
+		trigger = {
+			PRS = { NOT = { has_country_flag = PRS_CSA_sell_guns_rejected_flag } }
+		}
+		ai_chance = { 
+			factor = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -10
+		hidden_effect = {
+			CSA = { country_event = { days = 7 id = prussiaforeign.32 } }
+		}
+	}
+}
+
+#USA/CSA - Buy Guns Offered by Prussia?
+country_event = {
+	id = prussiaforeign.32
+	title = prussiaforeign.32.t
+	desc = prussiaforeign.32.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = prussiaforeign.32.a
+		ai_chance = { factor = 80 }
+		add_political_power = -10
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = prussiaforeign.33 } }
+		}
+	}
+	
+	option = {
+		name = prussiaforeign.32.b
+		ai_chance = { 
+			factor = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = 10
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = prussiaforeign.34 } }
+		}
+	}
+}
+
+#Prussia - The Americans Agree to Buy Our Guns
+country_event = {
+	id = prussiaforeign.33
+	title = prussiaforeign.33.t
+	desc = prussiaforeign.33.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = prussiaforeign.33.a
+		ai_chance = { factor = 100 }
+		unlock_decision_tooltip = PRS_decision_sell_guns_USA
+		hidden_effect = {
+			if = {
+				limit = {
+					FROM = USA
+				}
+				PRS = { set_country_flag = PRS_USA_sell_guns_flag }
+			}
+			else_if = {
+				limit = {
+					FROM = CSA
+				}
+				PRS = { set_country_flag = PRS_CSA_sell_guns_flag }
+			}
+			PRS = { clr_country_flag = PRS_weapons_deal_proposed }
+		}
+	}
+}
+
+#Prussia - The Americans Don't Want Our Guns
+country_event = {
+	id = prussiaforeign.34
+	title = prussiaforeign.34.t
+	desc = prussiaforeign.34.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = prussiaforeign.34.a
+		ai_chance = { factor = 100 }
+		add_political_power = -10
+		hidden_effect = {
+			if = {
+				limit = {
+					FROM = USA
+				}
+				PRS = { set_country_flag = PRS_USA_sell_guns_rejected_flag }
+			}
+			else_if = {
+				limit = {
+					FROM = CSA
+				}
+				PRS = { set_country_flag = PRS_CSA_sell_guns_rejected_flag }
+			}
+			PRS = { clr_country_flag = PRS_weapons_deal_proposed }
+		}
+	}
+}
+
+#USA/CSA - Prussian Guns Have Arrived
+country_event = {
+	id = prussiaforeign.35
+	title = prussiaforeign.35.t
+	desc = prussiaforeign.35.d
+	picture = GFX_report_event_soldiers_marching
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussiaforeign.35.a
+		ai_chance = { factor = 100 }
+		add_timed_idea = {
+			idea = PRS_USA_guns_deal_ACW
+			days = 365
+		}
+		if = {
+			limit = {
+				FROM = {
+					is_ai = yes
+				}
+			}
+			ROOT = {	
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 3000
+					producer = PRS
+				}
+			}
+		}
+		else = {
+			ROOT = {
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = 5000
+					producer = PRS
+				}
+			}
+		}
+	}
+}
+
+#Prussia - Inquiry for Foreign Ships Rejected
+country_event = {
+	id = prussiaforeign.36
+	title = prussiaforeign.36.t
+	desc = prussiaforeign.36.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = prussiaforeign.36.a
+		ai_chance = { factor = 100 }
+		add_political_power = -10
 	}
 }
 
@@ -5223,7 +5419,7 @@ country_event = {
 			create_country_leader = {
 				name = "Georg von Vincke"
 				desc = "POLITICS_GENERIC_EOANB_DESC"
-				#picture = "Portrait_PRS_Georg_von_Vincke.dds"
+				picture = "Portrait_PRS_Georg_von_Vincke.dds"
 				expire = "1900.1.1"
 				ideology = moderatism
 				traits = { }
