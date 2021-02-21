@@ -8,8 +8,60 @@ add_namespace = EDC_afr_machine_parts_factory	#10%
 add_namespace = EDC_afr_focus_path_change_clr
 add_namespace = EDC_afr_focus_path_change
 add_namespace = EDC_afr_focus_path_jihadist_coup
+add_namespace = afr_empire_state_industrialized_fully_event
 
+state_event = {
+	id = afr_empire_state_industrialized_fully_event.1
+	hidden = yes
+	is_triggered_only = yes
+	trigger = { NOT = { has_state_flag = afr_empire_state_industrialized_fully_once_flag } }
+	
+	immediate = { 
+		set_state_flag = afr_empire_state_industrialized_fully_once_flag 
+		OWNER = {
+			random_state = {
+				limit = { STATE = ROOT }
+				state_event = { id = afr_empire_state_industrialized_fully_event.2 }
+			}
+		}
+	}
+}
 
+state_event = {
+	id = afr_empire_state_industrialized_fully_event.2
+	hidden = yes
+	is_triggered_only = yes
+	
+	immediate = {  
+		OWNER = { country_event = { id = afr_empire_state_industrialized_fully_event.3 } }
+	}
+}
+
+country_event = {
+	id = afr_empire_state_industrialized_fully_event.3
+	title = afr_empire_state_industrialized_fully_event.3.t
+	desc = afr_empire_state_industrialized_fully_event.3.d
+	picture = GFX_report_event_chinese_army_training
+	is_triggered_only = yes
+	
+	option = {
+		name = afr_empire_state_industrialized_fully_event.3.a
+		ai_chance = { base = 100 }
+		hidden_effect = {
+			country_event = { id = EDC_afr.6 }
+		}
+		custom_effect_tooltip = EDC_afr.6.t
+	}
+	
+	option = {
+		name = afr_empire_state_industrialized_fully_event.3.b
+		ai_chance = { base = 0 }
+		FROM = { 
+			afr_empire_state_industrisation_progress_decrease_by_15 = yes
+			hidden_effect = { clr_state_flag = afr_empire_state_industrialized_fully_once_flag }
+		}
+	}
+}
 
 country_event = {
 	id = EDC_afr_focus_path_jihadist_coup.1
@@ -2609,6 +2661,12 @@ news_event = { #the scramble begins
 				}
 			}
 		}
+		if={
+			limit={
+				is_ai = no
+			}
+			set_variable = {super_event_displayed = 2}
+		}
 	}
 	option = {
 		name = EDC_afr.42.b#We must exploit the continent before the other powers get to it
@@ -2632,6 +2690,12 @@ news_event = { #the scramble begins
 			}
 		}
 		set_country_flag = is_historical_colonial_power
+		if={
+			limit={
+				is_ai = no
+			}
+			set_variable = {super_event_displayed = 2}
+		}
 	}
 	option = {#The Hordes of Europe do decend apon us
 		name = EDC_afr.42.c
@@ -2641,12 +2705,24 @@ news_event = { #the scramble begins
 				has_idea = afr_post_tribal
 			}
 		}
+		if={
+			limit={
+				is_ai = no
+			}
+			set_variable = {super_event_displayed = 2}
+		}
 	}
 	option = {#The Hordes of Europe do decend apon us, And we are Ready
 		name = EDC_afr.42.c2
 		trigger={
 			is_in_colonial_region = yes
 			has_idea = afr_post_tribal
+		}
+		if={
+			limit={
+				is_ai = no
+			}
+			set_variable = {super_event_displayed = 2}
 		}
 	}
 }
@@ -4170,23 +4246,24 @@ country_event = {###ping for the scramble
 		#hidden_effect={
 			every_country={
 				limit={
-					capital_scope = {is_on_continent = europe}
 					OR={
-						is_great_power = yes
-						is_secondary_power = yes
 						tag = BEL
 						tag = POR
 						tag = FRA
 						tag = ENG
+						AND={
+							capital_scope = {is_on_continent = europe}
+							OR={
+								is_great_power = yes
+								is_secondary_power = yes
+							}
+						}
 					}
 				}
 				set_country_flag = is_historical_colonial_power
 				if= {
 					limit = {
 						is_ai = yes
-						NOT = {
-							has_tech = tech_humanities_colonialism
-						}
 						OR  = {
 							tag = ENG
 							tag = FRA
@@ -4215,7 +4292,7 @@ country_event = {###ping for the scramble
 						}
 					}
 					set_technology = {
-							tech_humanities_colonialism = 1
+						tech_humanities_colonialism = 1
 					}
 				}
 			}

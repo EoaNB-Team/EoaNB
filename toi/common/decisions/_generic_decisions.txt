@@ -1,9 +1,6 @@
 #Everything that has to do with advancing scientific research and the infrastructure required for it
 
 scientific_advancement_decisions = {
-	
-	
-
 	eoanb_decision_westernisation = {
 
 		icon = generic_decision
@@ -445,6 +442,11 @@ scientific_advancement_decisions = {
 
 		ai_will_do = {
 			base = 1
+			modifier = {
+				factor = 0 
+				tag = PRS
+				NOT = { PRS = { has_completed_focus = PRS_unlock_germany } }
+			}
 		}
 		
 	}
@@ -609,6 +611,7 @@ economic_decisions = {
 				limit = { has_idea = egy_vic_debt }
 				debt_level_increase_by_1 = yes
 			}
+			else = { add_political_power = -100 }
 		}
 		
 		remove_effect = {
@@ -626,6 +629,11 @@ economic_decisions = {
 				factor = 0 
 				has_idea = egy_vic_debt
 				check_variable = { debt_level > 10 }
+			}
+			modifier = {
+				factor = 0 
+				tag = PRS
+				NOT = { PRS_trigger_formed_germany = yes }
 			}
 		}
 	}
@@ -690,6 +698,11 @@ economic_decisions = {
 				factor = 0 
 				has_idea = egy_vic_debt
 				check_variable = { debt_level > 10 }
+			}
+			modifier = {
+				factor = 0 
+				tag = PRS
+				NOT = { PRS = { has_completed_focus = PRS_unlock_germany } }
 			}
 		}
 	}
@@ -917,6 +930,14 @@ internal_politics_eoanb = {
 		
 		ai_will_do = {
 			base = 1
+			modifier = {
+				factor = 0 
+				tag = PRS
+				OR = {
+					has_idea = PRS_Friedrich_Wilhelm_IV
+					has_idea = PRS_Wilhelm_I
+				}
+			}
 		}
 	}
 	
@@ -1082,6 +1103,27 @@ internal_politics_eoanb = {
 			}
 			NOT = {
 				TAG = SPR
+				TAG = DOM
+				TAG = HAI
+				TAG = MEX
+				TAG = GUA
+				TAG = HON
+				TAG = ELS
+				TAG = NIC
+				TAG = GUA
+				TAG = COS
+				TAG = COL
+				TAG = VEN
+				TAG = ECU
+				TAG = PRU
+				TAG = PRR
+				TAG = BOL
+				TAG = ARG
+				TAG = CHL
+				TAG = BUE
+				TAG = URG
+				TAG = PAR
+				TAG = BRA
 			}
 		}
 		
@@ -1124,6 +1166,7 @@ internal_politics_eoanb = {
 			}
 			NOT = {
 				TAG = SPR
+				TAG = ETH
 			}
 		}
 		
@@ -1577,7 +1620,6 @@ eoanb_religious_affairs = {
 
 #Political Actions
 political_actions = {
-	
 	eoanb_decision_generic_independence_struggle = {
 		
 		icon = generic_independence
@@ -1712,14 +1754,126 @@ political_actions = {
 		}
 		
 		remove_effect = {
-			add_stability = -0.02
+			add_stability = -0.05
 		}
 		
 		ai_will_do = {
 			base = 0
 		}
 	}
-	
+
+	eoanb_decision_generic_arrest_opposition_leaders = {
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+
+		days_remove = 7
+
+		cost = 75
+
+		visible = {
+			NOT = { has_country_flag = eoanb_decision_generic_arrest_opposition_leaders_is_prohibited  }
+			NOT = { afr_is_tribal = yes }
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = eoanb_decision_generic_arrest_opposition_leaders_tt
+			set_country_flag = parl_political_action_in_progress
+		}
+
+		modifier = {
+			political_power_gain = -0.25
+		}
+
+		remove_effect = {
+			clr_country_flag = parl_political_action_in_progress
+
+			for_each_loop = {
+				array = seats_count_array
+				value = parl_v
+				index = parl_i
+
+				if = {
+					limit = {
+						check_variable = { parl_coalitions^parl_i = 2 }
+					}
+
+					set_temp_variable = { parl_r = random }
+					multiply_temp_variable = { parl_r = -5 }
+					round_variable = parl_r
+					add_to_temp_variable = { parl_r = -1 }
+					add_to_variable = { seats_count_array^parl_i = parl_r }
+				}
+			}
+
+			add_to_variable = { political_legitimacy = -0.15 }
+			clamp_variable = {
+				var = political_legitimacy
+				min = 0
+				max = 1
+			}
+
+			compute_number_seats_tot = yes
+			compute_number_seats_approve_est = yes
+		}
+	}
+
+	eoanb_decision_generic_ban_opposition_party = {
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+
+		days_remove = 7
+
+		cost = 100
+
+		visible = {
+			NOT = { has_country_flag = eoanb_decision_generic_ban_opposition_party_is_prohibited  }
+			NOT = { afr_is_tribal = yes }
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = eoanb_decision_generic_ban_opposition_party_tt
+			set_country_flag = parl_political_action_in_progress
+		}
+
+		modifier = {
+			political_power_gain = -0.25
+		}
+
+		remove_effect = {
+			clr_country_flag = parl_political_action_in_progress
+
+			for_each_loop = {
+				array = seats_count_array
+				value = parl_v
+				index = parl_i
+
+				if = {
+					limit = {
+						check_variable = { parl_coalitions^parl_i = 2 }
+					}
+
+					set_variable = { seats_count_array^parl_i = 0 }
+					set_variable = { parl_coalitions^parl_i = 3 }
+				}
+			}
+
+			add_to_variable = { political_legitimacy = -0.25 }
+			clamp_variable = {
+				var = political_legitimacy
+				min = 0
+				max = 1
+			}
+
+			apply_coalition_modifier = yes
+			compute_weights = yes
+			draw_seats = yes
+
+			compute_number_seats_tot = yes
+			compute_number_seats_approve_est = yes
+		}
+	}
 }
 
 #Foreign Politics

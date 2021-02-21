@@ -477,6 +477,23 @@ add_namespace = acw_first_nations_trigger
 				news_event = usa_slavery_debate.101
 			}
 		}
+		option = { # Buchanan
+			name = usa_slavery_debate.100.f
+			ai_chance = {
+				base = 10
+				modifier = { factor = 0 is_historical_focus_on = yes }
+			}
+			# trigger = { check_variable = { USA_Slavery_Debate_Leaning > -35 } }
+			trigger = { always = no }
+
+			add_popularity = { ideology = radical_democracy popularity = 0.03 }
+
+			hidden_effect = {
+				set_country_flag = USA_BuchananElected
+				country_event = { id = acw_buchanan.1 days = 21 }
+				news_event = usa_slavery_debate.101
+			}
+		}
 	}
 
 	# US 1860 Election News Event
@@ -505,6 +522,12 @@ add_namespace = acw_first_nations_trigger
 			text = usa_slavery_debate.101.d_beckenridge
 			trigger = {
 				USA = { has_country_flag = USA_BeckenridgeElected }
+			}
+		}
+		desc = {
+			text = usa_slavery_debate.101.d_buchanan
+			trigger = {
+				USA = { has_country_flag = USA_BuchananElected }
 			}
 		}
 		picture = GFX_report_event_election_vote
@@ -546,6 +569,7 @@ add_namespace = acw_first_nations_trigger
 			ai_chance = {
 				base = 100
 				modifier = { factor = 0 USA = { has_country_flag = USA_BeckenridgeElected } }
+				modifier = { factor = 0 USA = { has_country_flag = USA_BuchananElected } }
 			}
 			complete_national_focus = SNM_Honor_Abraham_Lincoln
 			add_opinion_modifier = {
@@ -609,7 +633,7 @@ add_namespace = acw_first_nations_trigger
 
 		immediate = {
 			if = {
-				limit = { owns_state = 386 }
+				limit = { owns_state = 383 }
 				383 = {
 					add_manpower = 2500
 				}
@@ -848,14 +872,16 @@ add_namespace = acw_first_nations_trigger
 			name = usa_slavery_debate_kansas.7.a
 			ai_chance = { base = 100 }
 			hidden_effect = {
-				country_event = { id = usa_slavery_debate_kansas.11 days = 90 }
+				#country_event = { id = usa_slavery_debate_kansas.11 days = 90 }
+				set_country_flag = Kansas_halfway
 			}
 		}
 		option = {
 			name = usa_slavery_debate_kansas.7.b
 			ai_chance = { base = 0 }
-			383 = { set_state_flag = NA_B_Slave_Kansas }
-			activate_mission = USA_Slavery_Debate_Kansas_Statehood_Mission
+			set_country_flag = Kansas_slave
+			# 383 = { set_state_flag = NA_B_Slave_Kansas }
+			# activate_mission = USA_Slavery_Debate_Kansas_Statehood_Mission
 		}
 	}
 
@@ -1076,7 +1102,7 @@ add_namespace = acw_first_nations_trigger
 			ai_chance = { base = 0 }
 			add_political_power = -25
 			country_event = { id = usa_slavery_debate_kansas.23 days = 3 }
-			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 5 }
+			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -5 }
 			USA_Slavery_Debate_Leaning_Modify = yes
 		}
 	}
@@ -1133,7 +1159,25 @@ add_namespace = acw_first_nations_trigger
 			name = usa_slavery_debate_kansas.22.e
 		}
 	}
+	#Pardon For John Brown event 
+	country_event = {
+		id = usa_slavery_debate_kansas.23
+		title = usa_slavery_debate_kansas.23.t
+		desc = usa_slavery_debate_kansas.23.d
+		picture = GFX_report_event_generic_riot
 
+		is_triggered_only = yes
+		fire_only_once = yes
+
+		immediate = {
+			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 2 }
+			USA_Slavery_Debate_Leaning_Modify = yes
+		}
+
+		option = {
+			name = usa_slavery_debate_kansas.23.a
+		}
+	}
 ################################ SECESSION #################################
 
 	# Hidden Setup for Confederacy
@@ -1449,6 +1493,10 @@ add_namespace = acw_first_nations_trigger
 					if = {
 						limit = { owns_state = 373 }
 						373 = { set_demilitarized_zone = yes }
+					}
+					if = {
+						limit = { owns_state = 1410 }
+						1410 = { set_demilitarized_zone = yes }
 					}
 					if = {
 						limit = { owns_state = 374 }
@@ -1860,8 +1908,16 @@ add_namespace = acw_first_nations_trigger
 		trigger = {
 			country_exists = USA
 			country_exists = CSA
-			373 = { has_state_flag = NA_B_Slave_Kansas }
-			373 = { is_owned_by = USA }
+			OR = {
+				AND = {
+					373 = { has_state_flag = NA_B_Slave_Kansas }
+					373 = { is_owned_by = USA }
+				}
+				AND = {
+					1410 = { has_state_flag = NA_B_Slave_Kansas }
+					1410 = { is_owned_by = USA }
+				}
+			}
 		}
 
 		immediate = {
@@ -1883,6 +1939,24 @@ add_namespace = acw_first_nations_trigger
 				}
 				else = { add_state_claim = 373 }
 			}
+			if = {
+				limit = { tag = USA }
+				if = {
+					limit = { USA = { owns_state = 1410 } }
+					remove_state_core = 1410
+					add_state_claim = 1410
+				}
+			}
+			else_if = {
+				limit = { tag = CSA }
+				if = {
+					limit = { USA = { owns_state = 1410 } }
+					1410 = { set_demilitarized_zone = no }
+					transfer_state = 1410
+					add_state_core = 1410
+				}
+				else = { add_state_claim = 1410 }
+			}
 		}
 
 		option = {
@@ -1896,6 +1970,7 @@ add_namespace = acw_first_nations_trigger
 			name = usa_slavery_debate_secession.102.b
 			trigger = { tag = CSA }
 			373 = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
+			1410 = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
 			eoanb_add_1_prestige_score = yes
 		}
 	}
@@ -2369,7 +2444,7 @@ add_namespace = acw_first_nations_trigger
 					ideology = traditional_conservatism
 					popularity = -0.19
 				}
-				ROOT = {
+				USA = {
 					remove_ideas = USA_Spirit_Southern_Secession_Crisis
 					if = {
 						limit = { NOT = { has_country_flag = USA_LincolnorDouglas_Moderate_Appeal } }
@@ -2405,12 +2480,12 @@ add_namespace = acw_first_nations_trigger
 					remove_state_core = 372
 					add_state_claim = 372
 					if = {
-						limit = {	owns_state = 315 }
+						limit = { owns_state = 315 }
 						remove_state_core = 315
 						add_state_claim = 315
 					}
 					if = {
-						limit = {	owns_state = 1022 }
+						limit = { owns_state = 1022 }
 						remove_state_core = 1022
 						add_state_claim = 1022
 					}
@@ -2439,12 +2514,12 @@ add_namespace = acw_first_nations_trigger
 					transfer_state = 365
 					add_state_core = 365
 					if = {
-						limit = { ROOT = { owns_state = 366 } }
+						limit = { USA = { owns_state = 366 } }
 						transfer_state = 366
 						add_state_core = 366
 					}
 					if = {
-						limit = { ROOT = { owns_state = 1211 } }
+						limit = { USA = { owns_state = 1211 } }
 						transfer_state = 1211
 						add_state_core = 1211
 					}
@@ -2463,26 +2538,26 @@ add_namespace = acw_first_nations_trigger
 					if = {
 						limit = { NOT = { has_global_flag = NA_B_test_cuba_free } }
 						if = {
-							limit = {	ROOT = { owns_state = 315 } }
+							limit = { USA = { owns_state = 315 } }
 							transfer_state = 315
 							add_state_core = 315
 						}
 						if = {
-							limit = {	ROOT = { owns_state = 1022 } }
+							limit = { USA = { owns_state = 1022 } }
 							transfer_state = 1022
 							add_state_core 1022
 						}
 					}
 					else = {
 						if = {
-							limit = {	ROOT = { owns_state = 315 } }
+							limit = { USA = { owns_state = 315 } }
 							CUB = {
 								transfer_state = 315
 								add_state_core = 315
 							}
 						}
 						if = {
-							limit = {	ROOT = { owns_state = 1022 } }
+							limit = { USA = { owns_state = 1022 } }
 							CUB = {
 								transfer_state = 1022
 								add_state_core 1022
@@ -4166,9 +4241,9 @@ country_event = {
     create_corps_commander = {
       name = "Ulysses S. Grant"
       picture = "Portrait_USA_Ulysses_grant.dds"
-      traits = { old_guard ranger butcher }
+      traits = { old_guard ranger butcher brilliant_strategist }
       skill = 4
-      id = 5001
+      id = 5029
       attack_skill = 6
       defense_skill = 4
       planning_skill = 5
@@ -4177,9 +4252,9 @@ country_event = {
     create_corps_commander = {
         name = "William T. Sherman"
         picture = "Portrait_USA_William_Sherman.dds"
-        traits = { swamp_fox commando }
+        traits = { trickster swamp_fox commando brilliant_strategist }
         skill = 4
-        id = 5002
+        id = 5030
         attack_skill = 7
         defense_skill = 4
         planning_skill = 3
@@ -7523,6 +7598,28 @@ country_event = {
 
 	immediate = {
 		hidden_effect = {
+			create_corps_commander = {
+			name = "Ulysses S. Grant"
+			picture = "Portrait_USA_Ulysses_grant.dds"
+			traits = { old_guard ranger butcher }
+			skill = 4
+			id = 5029
+			attack_skill = 6
+			defense_skill = 4
+			planning_skill = 5
+			logistics_skill = 4
+			}
+			create_corps_commander = {
+				name = "William T. Sherman"
+				picture = "Portrait_USA_William_Sherman.dds"
+				traits = { swamp_fox commando }
+				skill = 4
+				id = 5030
+				attack_skill = 7
+				defense_skill = 4
+				planning_skill = 3
+				logistics_skill = 3
+			}
 			if = {
 				limit = { has_war_with = CAL }
 				every_owned_state = {
@@ -7701,6 +7798,7 @@ country_event = {
 	trigger = {
 		OR = {
 			owns_state = 373
+			owns_state = 1410
 		}
 	}
 
@@ -7725,6 +7823,15 @@ country_event = {
 			if = {
 				limit = { owns_state = 373 }
 				373 = {
+					remove_core_of = USA
+					add_claim_by = USA
+					MIO = { transfer_state = PREV }
+					add_core_of = MIO
+				}
+			}
+			if = {
+				limit = { owns_state = 1410 }
+				1410 = {
 					remove_core_of = USA
 					add_claim_by = USA
 					MIO = { transfer_state = PREV }
@@ -7869,7 +7976,7 @@ country_event = {
 			    desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
 			    picture = "Portrait_CSA_John_Breckinridge.dds"
 			    expire = "1894.1.6"
-			    ideology = moderatism
+			    ideology = reactionary
 			    traits = {
 			    }
 			  }
@@ -8477,6 +8584,8 @@ country_event = {
 			every_unit_leader = {
 				limit = {
 					OR = {
+						has_id = 5001
+						has_id = 5002
 						has_id = 5003
 						has_id = 5004
 						has_id = 5005 
@@ -8493,6 +8602,12 @@ country_event = {
 				set_variable = { var = ASA.NA_B_idea_working_class_exploitation_score_var@ASA value = USA.NA_B_idea_working_class_exploitation_score_var@USA }
 				set_variable = { var = ASA.NA_B_idea_working_class_organization_score_var@ASA value = USA.NA_B_idea_working_class_organization_score_var@USA }
 				country_event = { id = NA_B_idea_working_class_exploitation_calculator.1 }
+				every_unit_leader = {
+					limit = {
+						has_id = 5003
+					}
+					promote_leader = yes
+				}
 			}
 			set_politics = {
 				ruling_party = social_egalitarianism
@@ -8521,6 +8636,11 @@ country_event = {
 					set_variable = { most_favoured_country = WVG.id }
 				}
 			}
+			setup_initial_coalitions = yes
+			set_initial_weights = yes
+			compute_seats = yes
+			draw_seats = yes
+			set_generic_party_issues = yes
 		}
 	}
 }
@@ -8857,6 +8977,7 @@ country_event = {
       372 = { set_demilitarized_zone = yes }
       369 = { set_demilitarized_zone = yes }
       373 = { set_demilitarized_zone = yes }
+	  1410 = { set_demilitarized_zone = yes }
       374 = { set_demilitarized_zone = yes }
       746 = { set_demilitarized_zone = yes }
     }
@@ -8876,6 +8997,7 @@ country_event = {
       372 = { set_demilitarized_zone = yes }
       369 = { set_demilitarized_zone = yes }
       373 = { set_demilitarized_zone = yes }
+	  1410 = { set_demilitarized_zone = yes }
       374 = { set_demilitarized_zone = yes }
       746 = { set_demilitarized_zone = yes }
     }
@@ -8901,6 +9023,7 @@ country_event = {
       369 = { set_demilitarized_zone = no }
       372 = { set_demilitarized_zone = no }
       373 = { set_demilitarized_zone = no }
+	  1410 = { set_demilitarized_zone = no }
       374 = { set_demilitarized_zone = no }
       746 = { set_demilitarized_zone = no }
 
@@ -9204,6 +9327,9 @@ country_event = {
     }
   }
 }
+
+################################# Buchanan ##############################
+#copy BReckenridge stuff basically
 
 
 ################################# BELL #################################
@@ -10189,6 +10315,12 @@ news_event = {
 			limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
 			clr_global_flag = ACW_American_Civil_War
 			set_global_flag = ACW_American_Civil_War_Happened
+			PRS = {
+    				clr_country_flag = PRS_USA_sell_guns_flag
+    				clr_country_flag = PRS_CSA_sell_guns_flag
+    				clr_country_flag = PRS_USA_sell_guns_rejected_flag
+    				clr_country_flag = PRS_CSA_sell_guns_rejected_flag
+			}
 		}
 		set_global_flag = ACW_CSA_Lost
 		if = {
@@ -10556,6 +10688,12 @@ news_event = {
 				limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
 				clr_global_flag = ACW_American_Civil_War
 				set_global_flag = ACW_American_Civil_War_Happened
+				PRS = {
+    					clr_country_flag = PRS_USA_sell_guns_flag
+    					clr_country_flag = PRS_CSA_sell_guns_flag
+    					clr_country_flag = PRS_USA_sell_guns_rejected_flag
+    					clr_country_flag = PRS_CSA_sell_guns_rejected_flag
+				}
 			}
 			set_global_flag = ACW_CSA_Independence
 			CSA = {
@@ -10569,6 +10707,8 @@ news_event = {
 				add_state_core = 369
 				transfer_state = 373
 				add_state_core = 373
+				transfer_state = 1410
+				add_state_core = 1410
 				transfer_state = 1285
 				add_state_claim = 1285
 				transfer_state = 1300

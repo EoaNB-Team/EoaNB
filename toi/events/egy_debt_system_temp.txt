@@ -1,4 +1,22 @@
-﻿add_namespace =egy_debt_system
+﻿add_namespace = egy_debt_system
+add_namespace = egy_debt_system_test
+add_namespace = egy_debt_system_managed
+add_namespace = SPR_bankruptcy_events
+
+
+country_event = { 
+	id = egy_debt_system_test.1
+	title = egy_debt_system_test.1.t
+	desc = egy_debt_system_test.1.d 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = egy_debt_system_test.1.a
+		ai_chance = { factor = 100 }
+		debt_level_increase_by_10 = yes
+	}
+}
 
 country_event = { #national debt hits conserning levels, public confedence starts to drop
 	id = egy_debt_system.1
@@ -6,6 +24,10 @@ country_event = { #national debt hits conserning levels, public confedence start
 	desc = egy_debt_system.1.d
 	
 	trigger = {
+		NOT = {
+			TAG = SPR
+		}
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 19}
 		check_variable = {ROOT.debt_level < 26}
@@ -37,6 +59,10 @@ country_event = { #national debt hits worrying levels, public confedence starts 
 	desc = egy_debt_system.2.d 
 	
 	trigger = {
+		NOT = {
+			TAG = SPR
+		}
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 25}
 		check_variable = {ROOT.debt_level < 30}
@@ -67,6 +93,10 @@ country_event = { #national debt hits very conserning levels, public confedence 
 	desc = egy_debt_system.3.d 
 	
 	trigger = {
+		NOT = {
+			TAG = SPR
+		}
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 29}
 		check_variable = {ROOT.debt_level < 35}
@@ -97,6 +127,10 @@ country_event = { #national debt hits majorly conserning levels, public confeden
 	desc = egy_debt_system.4.d 
 	
 	trigger = {
+		NOT = {
+			TAG = SPR
+		}
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 34}
 		check_variable = {ROOT.debt_level < 40}
@@ -127,6 +161,10 @@ country_event = { #national debt hits majorly conserning levels, public confeden
 	desc = egy_debt_system.5.d 
 	
 	trigger = {
+		NOT = {
+			TAG = SPR
+		}
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 39}
 		NOT = {
@@ -156,14 +194,9 @@ country_event = { #a creditor demands payment
 	desc = egy_debt_system.6.d 
 	
 	trigger = {
+		NOT = { has_country_flag = debt_declared_bankruptcy_flag }
 		has_idea = egy_vic_debt
 		check_variable = {ROOT.debt_level > 24}
-		NOT = { 
-			has_idea = one_percent
-			has_idea = egy_industry_cuts
-			has_idea = very_high_taxes
-			has_country_flag = paying_debt
-		}
 	}
 		
 	option = {#yes
@@ -200,7 +233,7 @@ country_event = { #a creditor demands payment
 		afr_decrease_military_spending = yes	
 		debt_level_decrease_by_1 = yes	
 	}
-	option = {#Default to payment mission
+	option = {#if laws can't change by payment is not being made, do the payment mission
 		name = egy_debt_system.6.e
 		ai_chance = { factor = 100 }
 		trigger = {
@@ -211,8 +244,21 @@ country_event = { #a creditor demands payment
 		}
 		if = {
 			limit = { NOT = { has_country_flag = paying_debt } }
-			activate_mission = eoanb_decision_debt_repayments
+			activate_decision = eoanb_decision_debt_repayments
 		}
+	}
+	option = {#Default to more debt
+		name = egy_debt_system.6.f
+		ai_chance = { factor = 100 }
+		trigger = {
+			NOT = { 
+				has_idea = one_percent
+				has_idea = egy_industry_cuts
+				has_idea = very_high_taxes
+				has_country_flag = paying_debt 
+			}
+		}
+		debt_level_increase_by_2 = yes	
 	}
 	mean_time_to_happen = {
 		days = 500
@@ -224,38 +270,130 @@ country_event = { #the national debt hits unpayable high, we are forced to decla
 	title = egy_debt_system.7.t
 	desc = egy_debt_system.7.d 
 	
+	is_triggered_only = yes
+	
 	trigger = {
-		has_idea = egy_vic_debt
+		#has_idea = egy_vic_debt
+		NOT = { has_idea = edc_bankrupt }
+		NOT = { has_idea = edc_bankrupt_reduced }
+		has_country_flag = debt_declared_bankruptcy_flag
 		check_variable = {ROOT.debt_level > 49}
 	}
 		
 	option = {#SHIT
 		name = egy_debt_system.7.a
-		ai_chance = { factor = 100 }
+		ai_chance = { 
+			base = 100 
+			modifier = {
+				factor = 0 
+				TAG = SPR
+			}
+		}
+		#add_ideas = edc_bankrupt
 		add_timed_idea = {
 			idea = edc_bankrupt
 			days = 2555
 		}
 		set_variable = {debt_level = 0}
-		custom_effect_tooltip = remove_debt_effects
+		#custom_effect_tooltip = remove_debt_effects
 		#BROKEN
 		hidden_effect = {
-			remove_ideas = {
-				egy_vic_debt
+			country_event = { id = egy_debt_system_managed.1 days = 1277 }
+			remove_ideas = egy_vic_debt
+			if = {
+				limit = { has_idea = egy_vic_debt_payments }
+				remove_ideas = egy_vic_debt_payments
 			}
-			country_event={id=egy_debt_system.10}
-		#		egy_public_consered_debt_1
-		#		egy_public_consered_debt_2
-		#		egy_public_consered_debt_3
-		#		egy_public_consered_debt_4
-		#		egy_public_consered_debt_5
-		#		egy_industry_cuts
-		#	}
+			country_event = { id = egy_debt_system.10 days = 5 }
+			if = {
+				limit = { has_idea = egy_public_consered_debt_1 }
+				remove_ideas = egy_public_consered_debt_1
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_2 }
+				remove_ideas = egy_public_consered_debt_2
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_3 }
+				remove_ideas = egy_public_consered_debt_3
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_4 }
+				remove_ideas = egy_public_consered_debt_4
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_5 }
+				remove_ideas = egy_public_consered_debt_5
+			}
+			if = {
+				limit = { has_idea = egy_industry_cuts }
+				remove_ideas = egy_industry_cuts
+			}
 		}
 	}
-	mean_time_to_happen = {
-		days = 100
+	
+	option = {#Spain's Option
+		name = egy_debt_system.7.b
+		trigger = { 
+			TAG = SPR 
+			owns_state = 169
+			169 = { NOT = { has_state_flag = SPR_sold_andalusia_mining_rights_flag } }
+		}
+		ai_chance = { 
+			base = 0 
+			modifier = {
+				add = 100 
+				TAG = SPR
+			}
+		}
+		add_timed_idea = {
+			idea = edc_bankrupt
+			days = 2555
+		}
+		set_variable = {debt_level = 0}
+		hidden_effect = {
+			country_event = { id = egy_debt_system_managed.1 days = 1277 }
+			remove_ideas = egy_vic_debt
+			if = {
+				limit = { has_idea = egy_vic_debt_payments }
+				remove_ideas = egy_vic_debt_payments
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_1 }
+				remove_ideas = egy_public_consered_debt_1
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_2 }
+				remove_ideas = egy_public_consered_debt_2
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_3 }
+				remove_ideas = egy_public_consered_debt_3
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_4 }
+				remove_ideas = egy_public_consered_debt_4
+			}
+			if = {
+				limit = { has_idea = egy_public_consered_debt_5 }
+				remove_ideas = egy_public_consered_debt_5
+			}
+			if = {
+				limit = { has_idea = egy_industry_cuts }
+				remove_ideas = egy_industry_cuts
+			}
+			country_event = { id = egy_debt_system.10 days = 5 }
+		}
+		if = {
+			limit = { has_dlc = "Man the Guns" }
+			ENG = { custom_effect_tooltip = SPR_sell_andalusia_mining_rights_tooltip }
+		}
+		else = { add_political_power = -200 }
+		ENG = { country_event = { id = SPR_bankruptcy_events.1 days = 15 } }
 	}
+	#mean_time_to_happen = {
+	#	days = 100
+	#}
 }
 country_event = { #country has debt but no idea, give idea
 	id = egy_debt_system.8
@@ -283,25 +421,84 @@ country_event = { #national debt is payed off
 	title = egy_debt_system.9.t
 	desc = egy_debt_system.9.d
 	
-	trigger = {
-		has_idea = egy_vic_debt
-		check_variable = {ROOT.debt_level < 1}
-	}
-	hidden = yes
-	immediate={
-		remove_debt_effects = yes
-	}
+	is_triggered_only = yes
+	
+	#trigger = {
+	#	has_idea = egy_vic_debt
+	#	check_variable = {debt_level < 1}
+	#}
+	#hidden = yes
+	#immediate={
+	#	remove_debt_effects = yes
+	#}
 		
 	option = {#great
 		name = egy_debt_system.9.a
 		ai_chance = { factor = 100 }
-		remove_ideas = {
-			egy_vic_debt
+		if = {
+			limit = { has_idea = edc_bankrupt }
+			remove_ideas = edc_bankrupt
 		}
-		clear_variable = ROOT.debt_level
+		else_if = {
+			limit = { has_idea = edc_bankrupt_reduced }
+			remove_ideas = edc_bankrupt_reduced
+		}
+		else = {
+			add_political_power = 100
+		}
+		hidden_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				remove_ideas = egy_vic_debt
+			}
+			if = {
+				limit = { has_country_flag = debt_declared_bankruptcy_flag }
+				clr_country_flag = debt_declared_bankruptcy_flag
+			}
+			clear_variable = debt_level
+		}
 	}
-	mean_time_to_happen = {
-		days = 7
+	#mean_time_to_happen = {
+	#	days = 7
+	#}
+}
+
+country_event = { 
+	id = egy_debt_system_managed.1
+	title = egy_debt_system_managed.1.t
+	desc = egy_debt_system_managed.1.d 
+	
+	is_triggered_only = yes
+	
+	trigger = { has_idea = edc_bankrupt }
+	
+	option = {
+		name = egy_debt_system_managed.1.a
+		ai_chance = { factor = 100 }
+		swap_ideas={
+			remove_idea = edc_bankrupt
+			add_idea = edc_bankrupt_reduced
+		}
+	}
+}
+
+country_event = { 
+	id = egy_debt_system_managed.2
+	title = egy_debt_system_managed.2.t
+	desc = egy_debt_system_managed.2.d 
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = egy_debt_system_managed.2.a
+		ai_chance = { factor = 100 }
+		if = {
+			limit = { has_idea = edc_bankrupt_reduced }
+			swap_ideas={
+				remove_idea = edc_bankrupt_reduced
+				add_idea = edc_bankrupt
+			}
+		}
 	}
 }
 
@@ -314,6 +511,12 @@ news_event = { #bankrupcy news event
 	major = yes
 	option = {#ok
 		name = egy_debt_system.10.a
+		trigger = { NOT = { TAG = FROM } }
+		ai_chance = { factor = 100 }
+	}
+	option = {#ok
+		name = egy_debt_system.10.b
+		trigger = { TAG = FROM }
 		ai_chance = { factor = 100 }
 	}
 }
