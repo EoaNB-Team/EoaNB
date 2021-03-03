@@ -78,7 +78,7 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 </td>
 <td align="center">
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/320588200026308608/6109e4fcecf4e966d92545d72efdc332.png?size=256" width="120px;" alt="Kuba"/>
+  <img src="https://media.discordapp.net/attachments/733406104243011687/816435452373893140/clown_generation.jpg" width="120px;" alt="Kuba"/>
 </td>
 <td align="center">
   <a href = "https://github.com/condor93"><strong>Lancer2201</strong></a>
