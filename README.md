@@ -90,7 +90,7 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 </td>
 <td align="center">
   <a href = "https://github.com/Vanadium-GITHUB"><strong>Vanadium</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/260139598972321793/936e61461f6e82564be9a2b29d3d2f14.png?size=256" width="120px;" alt="Vanadium"/>
+  <img src="https://media.discordapp.net/attachments/520351376963010560/816811068693282856/kaede_pfp-removebg.png?width=499&height=553" width="120px;" alt="Vanadium"/>
 </td>
 </tr>
 </table>
