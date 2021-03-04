@@ -14,7 +14,7 @@
 [youtube-badge]: https://img.shields.io/static/v1?label=Youtube&message=Videos&color=red&logo=youtube
 [youtube-link]: https://www.youtube.com/channel/UCR6n-pjZ4ain9hhUESuhZNw
 
-[discord-badge]: https://img.shields.io/discord/318668421719916545
+[discord-badge]: https://img.shields.io/static/v1?label=Discord&message=Chat&color=blue&logo=discord
 [discord-link]: https://discord.gg/VgufEME
 
 
@@ -70,7 +70,7 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 
 Have more questions, comments or feedback? You can contact us by joining our discord:
 
-<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>
+<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>    [![Discord][discord-badge1]][discord-link]
 
 ## Join the Team
 
