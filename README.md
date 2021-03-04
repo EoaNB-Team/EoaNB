@@ -14,28 +14,28 @@
 [discord-badge]: https://img.shields.io/discord/318668421719916545
 [discord-link]: https://discord.gg/VgufEME
 
-## Contents
-* [What is this?](#What is this?)
-* [Installation/Download](#Installation/Download)
-* [Usage](#Usage)
+##Contents
+* [What is this?](#what-is-this?)
+* [Installation/Download](#installing-the-mod)
+* [Usage](#usage)
 * [Troubleshooting](#Crash Troubleshooting)
 * [Join the Discussion](#Meet the Team; Join the Discussion)
 
 
-### What is this?
+###What is this?
 
 This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, End of a New Beginning. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
-<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" alt="End of a New Beginning — Pax Orientalis Banner"/>
+<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
-### Installation/Download
+###Installing the Mod
 
 Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our lead developers: 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Qr6l2DEneNY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-- https://youtu.be/Qr6l2DEneNY
+- <a href="https://youtu.be/Qr6l2DEneNY">https://youtu.be/Qr6l2DEneNY</a>
 
-### Usage
+###Usage
 
 End of a New Beginning is a `free to play, open source mod`.
 
