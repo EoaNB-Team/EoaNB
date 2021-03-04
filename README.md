@@ -1,4 +1,4 @@
-# End of a New Beginning Github Repository ![github-size]  ![github-stars]
+# Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
 
 ### Media      [![Patreon][patreon-badge]][patreon-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
 
@@ -14,24 +14,25 @@
 [discord-badge]: https://img.shields.io/discord/318668421719916545
 [discord-link]: https://discord.gg/VgufEME
 
-## What is this?
+## Contents
+* [What is this?](#What is this?)
+* [Installation/Download](#Installation/Download)
+* [Usage](#Usage)
+* [Troubleshooting](#Crash Troubleshooting)
+* [Join the Discussion](#Meet the Team; Join the Discussion)
 
-This repository is for sharing and cooperating in the development process of the Hearts of Iron IV mod: End of a New Beginning. 
 
-### Development
+### What is this?
 
-If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
+This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, End of a New Beginning. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
-Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `experimental` branch.
-- All code should be error-checked before pushed onto the Github
-- Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
-- If procedural pushing (including incomplete content) is crucial to development, request a new branch.
-- Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
+<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
-### Installation
+### Installation/Download
 
+Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our lead developers: 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Qr6l2DEneNY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 - https://youtu.be/Qr6l2DEneNY
 
 ### Usage
@@ -42,7 +43,8 @@ If you would like to work on the mod but do not wish to apply for the team, you 
 
 We do not tolerate using content developed for EoaNB for other purposes. Any other source doing such things without our explicit permision and/or are claiming ownership/profiting from our work may be liable to legal disputes.
 
-### Crash Troubleshooting
+### Troubleshooting
+#### Crashes
 
 `Recalculating Naval Distances Crash`: The current build of our mod crashes during the game-booting process between the launcher window and the main menu for some users with incompatible graphics cards. A good fix for most users has been to enter the Steam Library and enter the option `-opengl` into Hearts of Iron 4's launch settings.
 
@@ -50,7 +52,7 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 
 `Railgun Crash`: There is a railgun tech in our mod that crashes the user when they hover over the tech icon. We are still unsure what is causing this crash and are looking for a fix.
 
-### Other notable issues
+#### Other notable issues
 
 `Save Game Load Times`: It is a notable issue of how long save games take to load. Our average developer notices it takes them 5-10 minutes to load a save; longer as the game progresses past 1880. After the Pax Orientalis update, we will work to improving on this issue.
 
@@ -60,25 +62,36 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 
 - https://discord.gg/VgufEME
 
+### Join the Team
+
+If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
+
+#### Rules for Developers
+- Current General Development for EoaNB shall be pushed onto the `experimental` branch.
+- All code should be error-checked before pushed onto the Github
+- Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
+- If procedural pushing (including incomplete content) is crucial to development, request a new branch.
+- Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
+
 ## Meet the Lead-Developers
 *aka Centurions*
 <table>
 <tr>
 <td align="center">
   <a href = "https://github.com/Coggernaut"><strong>Coggernaut</strong></a>
-  <img src="https://media.discordapp.net/attachments/729456479651758220/796211077573640253/Battlemaster_Profile_Pic.jpg" width="120px;" alt="Coggernaut"/>
+  <img src="https://media.discordapp.net/attachments/729456479651758220/796211077573640253/Battlemaster_Profile_Pic.jpg" height="120px;" alt="Coggernaut"/>
 </td>
 <td align="center">
   <a href = "https://github.com/Garion132"><strong>Garion132</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/118877444542300164/ee0bac252d2038b1cf77d1b382618918.png?size=256" width="120px;" alt="Garion132"/>
+  <img src="https://cdn.discordapp.com/avatars/118877444542300164/ee0bac252d2038b1cf77d1b382618918.png?size=256" height="120px;" alt="Garion132"/>
 </td>
 <td align="center">
   <a href = "https://github.com/Imperialism1"><strong>Imperialism</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/254066709252669440/dbe57d4081757cc0aa36ae256e106284.png?size=256" width="120px;" alt="Imperialism"/>
+  <img src="https://cdn.discordapp.com/avatars/254066709252669440/dbe57d4081757cc0aa36ae256e106284.png?size=256" height="120px;" alt="Imperialism"/>
 </td>
 <td align="center">
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
-  <img src="https://media.discordapp.net/attachments/733406104243011687/816435452373893140/clown_generation.jpg" width="120px;" alt="Kuba"/>
+  <img src="https://media.discordapp.net/attachments/733406104243011687/816435452373893140/clown_generation.jpg" height="120px;" alt="Kuba"/>
 </td>
 <td align="center">
   <a href = "https://github.com/condor93"><strong>Lancer2201</strong></a>
