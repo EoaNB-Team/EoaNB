@@ -79,7 +79,7 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 
 Have more questions, comments or feedback? You can contact us by joining our discord:
 
-<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>    [![Discord][discord-badge1]][discord-link]
+<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>
 
 <hr>
 
