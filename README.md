@@ -1,3 +1,5 @@
+<hr>
+
 # Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
 
 ### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
@@ -14,9 +16,10 @@
 [youtube-badge]: https://img.shields.io/static/v1?label=Youtube&message=Videos&color=red&logo=youtube
 [youtube-link]: https://www.youtube.com/channel/UCR6n-pjZ4ain9hhUESuhZNw
 
-[discord-badge]: https://img.shields.io/discord/318668421719916545
+[discord-badge]: https://img.shields.io/static/v1?label=Discord&message=Chat&color=blue&logo=discord
 [discord-link]: https://discord.gg/VgufEME
 
+<hr>
 
 ## Navigation
 * [What is this?](#what-is-this?)
@@ -25,6 +28,7 @@
 * [Troubleshooting](#troubleshooting)
 * [Join the Discussion](#meet-the-team;-join-the-discussion)
 
+<hr>
 
 ## What is this?
 
@@ -32,6 +36,7 @@ This site is the official respository (cloud) for sharing and cooperating in the
 
 <img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
+<hr>
 
 ## Installing the Mod
 
@@ -44,15 +49,17 @@ Here's a useful installation video by one of our lead developers:
 * <a href="https://desktop.github.com/">Github Desktop App: https://desktop.github.com/</a>
 * <a href="https://github.com/team-eoanb/EoaNB">Github Repo URL: https://github.com/team-eoanb/EoaNB</a>
 
+<hr>
 
 ## Usage
 
-End of a New Beginning is a `free to play, open source mod`.
+**End of a New Beginning** is a `free to play, open source mod`.
 
 If you would like to work on the mod but do not wish to apply for the team, you are free to fork the repository and modify it, and redistribute it for private use. Content of EoaNB is licensed under the `GNU General Public License 3.0`, which means you have to alert users you are redistributing a modified, unofficial version of EoaNB.
 
 We do not tolerate using content developed for EoaNB for other purposes. Any other source doing such things without our explicit permision and/or are claiming ownership/profiting from our work may be liable to legal disputes.
 
+<hr>
 
 ## Troubleshooting
 
@@ -66,11 +73,15 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 ### Other notable issues
 `Save Game Load Times`: It is a notable issue of how long save games take to load. Our average developer notices it takes them 5-10 minutes to load a save; longer as the game progresses past 1880. After the Pax Orientalis update, we will work to improving on this issue.
 
+<hr>
+
 ## Meet the Team; Join the Discussion
 
 Have more questions, comments or feedback? You can contact us by joining our discord:
 
-<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>
+<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>    [![Discord][discord-badge1]][discord-link]
+
+<hr>
 
 ## Join the Team
 
@@ -82,6 +93,7 @@ If you wish to contribute to the development of the mod, supprt us on Patreon or
 - Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
 - If procedural pushing (including incomplete content) is crucial to development, request a new branch.
 - Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
+- Additional rules in the **Developer Bible**
 
 ### Meet the Lead-Developers
 *aka Centurions*
