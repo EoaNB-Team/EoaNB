@@ -15,33 +15,34 @@
 [discord-link]: https://discord.gg/VgufEME
 
 
-##Navigation
+## Navigation
 * [What is this?](#what-is-this?)
 * [Installation/Download](#installing-the-mod)
 * [Usage](#usage)
-* [Troubleshooting](#Crash Troubleshooting)
-* [Join the Discussion](#Meet the Team; Join the Discussion)
+* [Troubleshooting](#troubleshooting)
+* [Join the Discussion](#meet-the-team;-join-the-discussion)
 
 
-##What is this?
+## What is this?
 
 This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, `End of a New Beginning`. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
 <img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
 
-##Installing the Mod
+## Installing the Mod
 
 Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our lead developers: 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Qr6l2DEneNY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-####Useful Links
+
+#### Useful Links
 <a href="https://youtu.be/Qr6l2DEneNY">- Video Link: https://youtu.be/Qr6l2DEneNY</a>
 <a href="https://desktop.github.com/">- Github Desktop App: https://desktop.github.com/</a>
 <a href="https://github.com/team-eoanb/EoaNB">- Github Link: https://github.com/team-eoanb/EoaNB</a>
 
 
-##Usage
+## Usage
 
 End of a New Beginning is a `free to play, open source mod`.
 
@@ -50,9 +51,9 @@ If you would like to work on the mod but do not wish to apply for the team, you 
 We do not tolerate using content developed for EoaNB for other purposes. Any other source doing such things without our explicit permision and/or are claiming ownership/profiting from our work may be liable to legal disputes.
 
 
-##Troubleshooting
+## Troubleshooting
 
-###Crashes
+### Crashes
 `Recalculating Naval Distances Crash`: The current build of our mod crashes during the game-booting process between the launcher window and the main menu for some users with incompatible graphics cards. A good fix for most users has been to enter the Steam Library and enter the option `-opengl` into Hearts of Iron 4's launch settings.
 
 `Multiplayer Chat Crash`: The current build of our mod crashes during Multiplayer games when any individual tries to open the *multiplayer chat function* located at the bottom-left of the screen. We are working to fix this, for now please regulate all communication in MP games to voice-calls or other chat platforms.
