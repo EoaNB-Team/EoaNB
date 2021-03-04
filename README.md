@@ -1,6 +1,6 @@
 # Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
 
-### Media      [![Patreon][patreon-badge]][patreon-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
+### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
 
 [github-size]: https://img.shields.io/github/languages/code-size/team-eoanb/EoaNB
 [github-stars]: https://img.shields.io/github/stars/team-eoanb/EoaNB?style=social
@@ -10,6 +10,9 @@
 
 [steam-badge]: https://img.shields.io/static/v1?label=Steam&message=Download&color=lightgrey&logo=steam	
 [steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2114093692
+
+[youtube-badge]: https://img.shields.io/static/v1?label=Youtube&message=Videos&color=red&logo=youtube
+[youtube-link]: https://www.youtube.com/channel/UCR6n-pjZ4ain9hhUESuhZNw
 
 [discord-badge]: https://img.shields.io/discord/318668421719916545
 [discord-link]: https://discord.gg/VgufEME
@@ -25,7 +28,7 @@
 
 ## What is this?
 
-This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, `End of a New Beginning`. Here, you can learn how to join our community, install our mod, and join/support the development team.
+This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, **End of a New Beginning**. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
 <img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
@@ -36,7 +39,7 @@ Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our lead developers: 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Qr6l2DEneNY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-### Useful Links
+### Links from the Video 
 * <a href="https://youtu.be/Qr6l2DEneNY">Video Link: https://youtu.be/Qr6l2DEneNY</a>
 * <a href="https://desktop.github.com/">Github Desktop App: https://desktop.github.com/</a>
 * <a href="https://github.com/team-eoanb/EoaNB">Github Repo URL: https://github.com/team-eoanb/EoaNB</a>
