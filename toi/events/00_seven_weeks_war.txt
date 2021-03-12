@@ -8,6 +8,7 @@ country_event = {
 	picture = GFX_report_event_hitler_handshake
 	
 	fire_only_once = yes
+	#is_triggered_only = yes  ###Change once Friedrich III's German War is done
 	
 	trigger = {
 		OR = {
@@ -2472,3 +2473,564 @@ country_event = {
 }
 
 #sevenweekswar.85 - Placeholder - Peace of Vienna - Italian Defeat
+
+
+### FRIEDRICH III 7WW PATH ###
+
+#The Coburger Plan 
+country_event = {
+	id = sevenweekswar.100
+	title = sevenweekswar.100.t
+	desc = sevenweekswar.100.d
+	picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = sevenweekswar.100.a
+		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				has_government = centrism
+			}
+			if = {
+				limit = {
+					has_idea = PRS_idea_rule_of_law
+					has_idea = constitution_adopted
+					has_idea = constitutional_monarchy
+					NOT = { has_idea = PRS_idea_three_class_franchise }
+					OR = {
+						has_idea = parliamentary_suffrage
+						has_idea = universal_male_suffrage
+						has_idea = universal_suffrage
+					}
+					has_idea = free_trade
+					has_idea = PRS_idea_british_style_rule_2
+				}
+				PRS = { country_event = { days = 120 id = sevenweekswar.104 } }
+			}
+			else = {
+				PRS = { country_event = { days = 1 id = sevenweekswar.101 } } #Testing - Should be 14 days
+			}
+		}
+		else_if = {
+			limit = {
+				NOT = { has_government = centrism }
+			}
+			if = {
+				limit = {
+					has_idea = PRS_idea_prussian_constitutionalism
+					OR = {
+						has_idea = limited_constitution
+						has_idea = human_rights
+						has_idea = constitution_adopted
+					}
+					has_idea = constitutional_monarchy
+					NOT = { has_idea = PRS_idea_three_class_franchise }
+					OR = {
+						has_idea = parliamentary_suffrage
+						has_idea = universal_male_suffrage
+						has_idea = universal_suffrage
+					}
+					OR = {
+						has_idea = free_trade
+						has_idea = export_focus
+					}
+				}
+				PRS = { country_event = { days = 120 id = sevenweekswar.104 } }
+			}
+			else = {
+				PRS = { country_event = { days = 1 id = sevenweekswar.101 } } #Testing - Should be 14 days
+			}
+		}
+	}
+}
+
+#Liberalize the Kingdom of Prussia 
+country_event = {
+	id = sevenweekswar.101
+	title = sevenweekswar.101.t
+	desc = sevenweekswar.101.d
+	picture = GFX_event_prussian_parliament_king
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.101.a
+		ai_chance = { base = 100 }
+		activate_mission_tooltip = PRS_mission_liberalize_prussia
+		hidden_effect = {
+			activate_mission = PRS_mission_liberalize_prussia
+		}
+	}
+}
+
+#Liberalization Successful
+country_event = {
+	id = sevenweekswar.102
+	title = sevenweekswar.102.t
+	desc = sevenweekswar.102.d
+	picture = GFX_event_prussian_parliament_king
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.102.a
+		ai_chance = { base = 100 }
+		add_political_power = 100
+		increase_ps_by_one = yes
+	}
+}
+
+#Liberalization Unsuccessful 
+country_event = {
+	id = sevenweekswar.103
+	title = sevenweekswar.103.t
+	desc = sevenweekswar.103.d
+	picture = GFX_event_prussian_parliament_king
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.103.a
+		ai_chance = { base = 100 }
+		PRS = { country_event = { days = 90 id = sevenweekswar.1 } }
+		#PM resigns - Bismarck?
+	}
+}
+
+#Prussia - Try to Get Bavarian Support 
+country_event = {
+	id = sevenweekswar.104
+	title = sevenweekswar.104.t
+	desc = sevenweekswar.104.d
+	picture = GFX_report_event_hitler_handshake
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #No need
+		name = sevenweekswar.104.a
+		ai_chance = { base = 0 }
+		add_political_power = 10
+		hidden_effect = {
+			PRS = { country_event = { days = 21 id = sevenweekswar.109 } }
+		}
+	}
+	
+	option = { #SGC without Austria
+		name = sevenweekswar.104.b
+		ai_chance = { base = 90 }
+		custom_effect_tooltip = PRS_SGC_smaller_Germany_proposal_effect_tt
+		add_political_power = -20
+		add_war_support = 0.02
+		hidden_effect = {
+			set_country_flag = PRS_BAV_propose_smaller_Germany_flag
+			BAV = { country_event = { days = 14 id = sevenweekswar.105 } }
+		}
+	}
+	
+	option = { #SGC with Austria
+		name = sevenweekswar.104.c
+		ai_chance = { base = 10 }
+		custom_effect_tooltip = PRS_SGC_greater_Germany_proposal_effect_tt
+		add_political_power = -10
+		add_war_support = -0.01
+		hidden_effect = {
+			set_country_flag = PRS_BAV_propose_greater_Germany_flag
+			BAV = { country_event = { days = 14 id = sevenweekswar.106 } }
+		}
+	}
+}
+
+#Bavaria - Prussia Asks for Our Support - No Austria
+country_event = {
+	id = sevenweekswar.105
+	title = sevenweekswar.105.t
+	desc = sevenweekswar.105.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.105.a
+		ai_chance = { base = 25 }
+		PRS = { country_event = { days = 1 id = sevenweekswar.107 } }
+	}
+	
+	option = {
+		name = sevenweekswar.105.b
+		ai_chance = { base = 75 }
+		PRS = { country_event = { days = 1 id = sevenweekswar.108 } }
+	}
+}
+
+#Bavaria - Prussia Asks for Our Support - With Austria
+country_event = {
+	id = sevenweekswar.106
+	title = sevenweekswar.106.t
+	desc = sevenweekswar.106.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.106.a
+		ai_chance = { base = 50 }
+		PRS = { country_event = { days = 1 id = sevenweekswar.107 } }
+	}
+	
+	option = {
+		name = sevenweekswar.106.b
+		ai_chance = { base = 50 }
+		PRS = { country_event = { days = 1 id = sevenweekswar.108 } }
+	}
+}
+
+#Prussia - Bavaria Agrees to Our Proposal
+country_event = {
+	id = sevenweekswar.107
+	title = sevenweekswar.107.t
+	desc = sevenweekswar.107.d
+	picture = GFX_report_event_hitler_handshake
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.107.a
+		ai_chance = { base = 100 }
+		add_political_power = 20
+		hidden_effect = {
+			PRS = { country_event = { days = 3 id = sevenweekswar.109 } }
+		}
+	}
+}
+
+#Prussia - Bavaria Refuses Our Proposal
+country_event = {
+	id = sevenweekswar.108
+	title = sevenweekswar.108.t
+	desc = sevenweekswar.108.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.108.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		hidden_effect = {
+			PRS = { country_event = { days = 3 id = sevenweekswar.109 } }
+			if = {
+				limit = {
+					has_country_flag = PRS_BAV_propose_smaller_Germany_flag
+				}
+				clr_country_flag = PRS_BAV_propose_smaller_Germany_flag
+			}
+			else = { clr_country_flag = PRS_BAV_propose_greater_Germany_flag }
+		}
+	}
+}
+
+#Prussia - Ask Grand Duke Carl Alexander for a Neutral Venue
+country_event = {
+	id = sevenweekswar.109
+	title = sevenweekswar.109.t
+	desc = sevenweekswar.109.d
+	picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.109.a
+		ai_chance = { base = 100 }
+		THU = { country_event = { days = 3 id = sevenweekswar.110 } }
+	}
+}
+
+#Thuringia - Prussia Asks Us to Host a Diet of the Heads of State
+country_event = {
+	id = sevenweekswar.110
+	title = sevenweekswar.110.t
+	desc = sevenweekswar.110.d
+	picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #Yes
+		name = sevenweekswar.110.a
+		ai_chance = { base = 100 }
+		hidden_effect = {
+			PRS = { country_event = { days = 1 id = sevenweekswar.111 } }
+		}
+	}
+	
+	option = { #No
+		name = sevenweekswar.110.b
+		ai_chance = { base = 0 }
+		hidden_effect = {
+			PRS = { country_event = { days = 1 id = sevenweekswar.112 } }
+		}
+	}
+}
+
+#Prussia - The Grand Duke Agrees 
+country_event = {
+	id = sevenweekswar.111
+	title = sevenweekswar.111.t
+	desc = sevenweekswar.111.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.111.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		hidden_effect = {
+			set_country_flag = PRS_THU_venue_accepted_flag
+			PRS = { country_event = { days = 14 id = sevenweekswar.113 } }
+		}
+	}
+}
+
+#Prussia - The Grand Duke Refuses 
+country_event = {
+	id = sevenweekswar.112
+	title = sevenweekswar.112.t
+	desc = sevenweekswar.112.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.112.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		hidden_effect = {
+			PRS = { country_event = { days = 14 id = sevenweekswar.113 } }
+		}
+	}
+}
+
+#Prussia - Early Preparations for Fürstentag Completed
+country_event = {
+	id = sevenweekswar.113
+	title = sevenweekswar.113.t
+	desc = sevenweekswar.113.d
+	picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.113.a
+		ai_chance = { base = 100 }
+		#custom_effect_tooltip = 
+		hidden_effect = {
+			set_country_flag = PRS_furstentag_preparations_ready_flag
+		}
+	}
+}
+
+#GC (without Austria, Luxembourg, Liechtenstein) – Prussia Invites Us to Fürstentag 
+country_event = {
+	id = sevenweekswar.114
+	title = sevenweekswar.114.t
+	desc = sevenweekswar.114.d
+	picture = GFX_event_berliner_schloss
+	
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = { #Accept
+		name = sevenweekswar.114.a
+		ai_chance = { 
+			base = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		#custom_effect_tooltip = GC_german_war_ultimatum_yes
+		hidden_effect = {
+			PRS = { country_event = { days = 3 id = sevenweekswar.116 } }
+			ROOT = { set_country_flag = PRS_furstentag_attending_flag }
+		}
+	}
+	
+	option = { #Decline
+		name = sevenweekswar.114.b
+		ai_chance = { base = 90 }
+		#custom_effect_tooltip = GC_german_war_ultimatum_no
+		hidden_effect = {
+			PRS = { country_event = { days = 3 id = sevenweekswar.117 } }
+		}
+	}
+}
+
+#Austria – Prussia Invites Us to Fürstentag 
+country_event = {
+	id = sevenweekswar.115
+	title = sevenweekswar.115.t
+	desc = sevenweekswar.115.d
+	picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = { #Accept
+		name = sevenweekswar.115.a
+		ai_chance = { 
+			base = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		#custom_effect_tooltip = GC_german_war_ultimatum_yes
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = sevenweekswar.118 } }
+			ROOT = { set_country_flag = PRS_furstentag_attending_flag }
+		}
+	}
+	
+	option = { #Decline
+		name = sevenweekswar.115.b
+		ai_chance = { base = 90 }
+		#custom_effect_tooltip = GC_german_war_ultimatum_no
+		hidden_effect = {
+			PRS = { country_event = { days = 7 id = sevenweekswar.119 } }
+		}
+	}
+}
+
+#Prussia – XYZ Accepts Our Invitation 
+country_event = {
+	id = sevenweekswar.116
+	title = sevenweekswar.116.t
+	desc = sevenweekswar.116.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = {
+		name = sevenweekswar.116.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+	}
+}
+
+#Prussia – XYZ Declined Our Invitation 
+country_event = {
+	id = sevenweekswar.117
+	title = sevenweekswar.117.t
+	desc = sevenweekswar.117.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = {
+		name = sevenweekswar.117.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+	}
+}
+
+#Prussia – Austria Accepts Our Invitation 
+country_event = {
+	id = sevenweekswar.118
+	title = sevenweekswar.118.t
+	desc = sevenweekswar.118.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = sevenweekswar.118.a
+		ai_chance = { base = 100 }
+		add_political_power = 20
+		hidden_effect = {
+			set_global_flag = PRS_AUS_attends_furstentag_flag
+		}
+	}
+}
+
+#Prussia – Austria Declined Our Invitation 
+country_event = {
+	id = sevenweekswar.119
+	title = sevenweekswar.119.t
+	desc = sevenweekswar.119.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = sevenweekswar.119.a
+		ai_chance = { base = 100 }
+		add_political_power = -20
+		hidden_effect = {
+			set_global_flag = PRS_AUS_declines_furstentag_flag
+		}
+	}
+}
+
+#Prussia - The Coburger Fürstentag Begins
+country_event = {
+	id = sevenweekswar.120
+	title = {
+		trigger = { has_country_flag = PRS_THU_venue_accepted_flag }
+		text = sevenweekswar.120.t_coburg
+	}
+	title = {
+		trigger = { NOT = { has_country_flag = PRS_THU_venue_accepted_flag } }
+		text = sevenweekswar.120.t_koblenz
+	}
+	desc = {
+		trigger = { has_country_flag = PRS_THU_venue_accepted_flag }
+		text = sevenweekswar.120.d_coburg
+	}
+	desc = {
+		trigger = { NOT = { has_country_flag = PRS_THU_venue_accepted_flag } }
+		text = sevenweekswar.120.d_koblenz
+	}
+	#picture = GFX_event_berliner_schloss
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.120.a
+		ai_chance = { base = 100 }
+		#custom_effect_tooltip = 
+		#activate_mission_tooltip = 
+		hidden_effect = {
+			#activate_mission = 
+		}
+	}
+}
