@@ -100,6 +100,10 @@ If you wish to contribute to the development of the mod, supprt us on Patreon or
 <table>
 <tr>
 <td align="center">
+  <a href = "https://github.com/ChrisSGD"><strong>ChrisSGD</strong></a>
+  <img src="https://cdn.discordapp.com/attachments/364411028546781184/824705070745518111/Otto_Weddigen.jpg" width="120px;" alt="ChrisSGD"/>
+</td>
+<td align="center">
   <a href = "https://github.com/Coggernaut"><strong>Coggernaut</strong></a>
   <img src="https://media.discordapp.net/attachments/729456479651758220/796211077573640253/Battlemaster_Profile_Pic.jpg" width="120px;" alt="Coggernaut"/>
 </td>
