@@ -20,6 +20,10 @@ def dc(e_y, e_m, e_d, random_days = 100, s_y = 1857, s_m = 5, s_d = 11):
         print("random_days =",random_days-c)
     else:
         print()
+
+
+print ("This is deprecated. Use KDE_calculator.py instead.")
+
 while True:
     vl = [int(x) for x in input("Enter the date around which you want to receive the event (YYYY MM DD, separated by spaces):").split()]
     r = input("Enter the range in which the event can fire in days:")
