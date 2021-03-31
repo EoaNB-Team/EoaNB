@@ -2935,7 +2935,7 @@ country_event = {
 		add_political_power = -20
 		add_war_support = 0.02
 		hidden_effect = {
-			set_country_flag = PRS_BAV_propose_smaller_Germany_flag
+			set_global_flag = PRS_propose_smaller_Germany_flag
 			BAV = { country_event = { days = 14 id = sevenweekswar.105 } }
 		}
 	}
@@ -2947,7 +2947,7 @@ country_event = {
 		add_political_power = -10
 		add_war_support = -0.01
 		hidden_effect = {
-			set_country_flag = PRS_BAV_propose_greater_Germany_flag
+			set_global_flag = PRS_propose_greater_Germany_flag
 			BAV = { country_event = { days = 14 id = sevenweekswar.106 } }
 		}
 	}
@@ -3182,26 +3182,38 @@ country_event = {
 country_event = {
 	id = sevenweekswar.115
 	title = sevenweekswar.115.t
-	desc = sevenweekswar.115.d
-	picture = GFX_event_berliner_schloss
+	desc =  {
+		trigger = { has_global_flag = PRS_propose_smaller_Germany_flag }
+		text = sevenweekswar.115.d_smaller_Germany
+	}
+	desc =  {
+		trigger = { has_global_flag = PRS_propose_greater_Germany_flag }
+		text = sevenweekswar.115.d_greater_Germany
+	}
+	picture = GFX_report_event_AUS_wien_1
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	timeout_days = 7
 	
+	#Option a only appears when PRS proposed a Greater German Solution
 	option = { #Accept
 		name = sevenweekswar.115.a
-		ai_chance = { base = 100 } #Testing
+		trigger = {
+			has_global_flag = PRS_propose_greater_Germany_flag
+		}
+		ai_chance = { base = 50 } #Testing
 		hidden_effect = {
 			PRS = { country_event = { days = 7 id = sevenweekswar.118 } }
 			ROOT = { set_country_flag = PRS_furstentag_attending_flag }
 		}
 	}
 	
+	#Option b always appears
 	option = { #Decline
 		name = sevenweekswar.115.b
-		ai_chance = { base = 0 } #Testing
+		ai_chance = { base = 50 } #Testing
 		hidden_effect = {
 			PRS = { country_event = { days = 7 id = sevenweekswar.119 } }
 		}
@@ -3461,11 +3473,11 @@ country_event = {
 	id = sevenweekswar.126
 	title = sevenweekswar.126.t
 	desc =  {
-		trigger = { has_country_flag = PRS_BAV_propose_smaller_Germany_flag }
+		trigger = { has_global_flag = PRS_propose_smaller_Germany_flag }
 		text = sevenweekswar.126.d_smaller_Germany
 	}
 	desc =  {
-		trigger = { has_country_flag = PRS_BAV_propose_greater_Germany_flag }
+		trigger = { has_global_flag = PRS_propose_greater_Germany_flag }
 		text = sevenweekswar.126.d_greater_Germany
 	}
 	#picture = GFX_event_stolzenfels_castle
@@ -3479,7 +3491,7 @@ country_event = {
 		hidden_effect = {
 			if = {
 				limit = {
-					has_country_flag = PRS_BAV_propose_smaller_Germany_flag
+					has_global_flag = PRS_propose_smaller_Germany_flag
 				}
 				every_other_country = {
 					limit = {
@@ -3576,7 +3588,7 @@ country_event = {
 	
 	option = {
 		name = sevenweekswar.130.a
-		ai_chance = { base = 100 } #Testing
+		ai_chance = { base = 75 } #Testing
 		add_political_power = 10
 		hidden_effect = {
 			PRS = { add_to_variable = { var = PRS_bundesreform_furstentag_yes_votes value = 1 } }
@@ -3586,7 +3598,7 @@ country_event = {
 	
 	option = {
 		name = sevenweekswar.130.b
-		ai_chance = { base = 0 } #Testing
+		ai_chance = { base = 25 } #Testing
 		add_political_power = -10
 		hidden_effect = {
 			set_country_flag = PRS_furstentag_voting_no_flag
@@ -3743,6 +3755,46 @@ country_event = {
 	option = {
 		name = sevenweekswar.132.a
 		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				has_global_flag = PRS_propose_smaller_Germany_flag
+			}
+			custom_effect_tooltip = PRS_reform_vote_unanimous_smaller_effect_tt
+			hidden_effect = {
+				PRS = { country_event = { days = 5 id = sevenweekswar.141 } }
+				if = {
+					limit = {
+						BAV = { has_country_flag = BAV_support_PRS_reformplan_flag }
+					}
+					BAV = { country_event = { days = 8 id = sevenweekswar.144 } }
+				}
+				AUS = { country_event = { days = 10 id = sevenweekswar.148 } }
+			}
+		}
+		else_if = {
+			limit = {
+				has_global_flag = PRS_propose_greater_Germany_flag
+			}
+			custom_effect_tooltip = PRS_reform_vote_unanimous_greater_effect_tt
+			hidden_effect = {
+				PRS = { country_event = { days = 5 id = sevenweekswar.141 } }
+				if = {
+					limit = {
+						BAV = { has_country_flag = BAV_support_PRS_reformplan_flag }
+					}
+					BAV = { country_event = { days = 8 id = sevenweekswar.144 } }
+				}
+				if = {
+					limit = {
+						has_global_flag = PRS_AUS_attends_furstentag_flag
+					}
+					AUS = { country_event = { days = 10 id = sevenweekswar.150 } }
+				}
+				else = {
+					AUS = { country_event = { days = 10 id = sevenweekswar.152 } }
+				}
+			}
+		}
 	}
 }
 
@@ -3756,9 +3808,21 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes	
 	
-	option = {
+	option = { #Try to make it work
 		name = sevenweekswar.133.a
-		ai_chance = { base = 100 }
+		ai_chance = { base = 100 } #Testing
+		hidden_effect = {
+			PRS = { country_event = { days = 5 id = sevenweekswar.141 } }
+		}
+	}
+	
+	option = { #Bury it
+		name = sevenweekswar.133.b
+		ai_chance = { base = 0 } #Testing
+		hidden_effect = {
+			PRS = { country_event = { days = 60 id = sevenweekswar.1 } }
+			###News Event
+		}
 	}
 }
 
@@ -3777,7 +3841,7 @@ country_event = {
 		ai_chance = { base = 100 }
 		if = {
 			limit = {
-				has_country_flag = PRS_BAV_propose_smaller_Germany_flag
+				has_global_flag = PRS_propose_smaller_Germany_flag
 			}
 			custom_effect_tooltip = PRS_reform_vote_unanimous_smaller_effect_tt
 			hidden_effect = {
@@ -3788,17 +3852,12 @@ country_event = {
 					}
 					BAV = { country_event = { days = 8 id = sevenweekswar.138 } }
 				}
-				if = {
-					limit = {
-						has_global_flag = PRS_AUS_attends_furstentag_flag
-					}
-					#AUS = { country_event = { days = 7 id = sevenweekswar.135 } }
-				}
+				AUS = { country_event = { days = 10 id = sevenweekswar.147 } }
 			}
 		}
 		else_if = {
 			limit = {
-				has_country_flag = PRS_BAV_propose_greater_Germany_flag
+				has_global_flag = PRS_propose_greater_Germany_flag
 			}
 			custom_effect_tooltip = PRS_reform_vote_unanimous_greater_effect_tt
 			hidden_effect = {
@@ -3813,7 +3872,10 @@ country_event = {
 					limit = {
 						has_global_flag = PRS_AUS_attends_furstentag_flag
 					}
-					#AUS = { country_event = { days = 7 id = sevenweekswar.135 } }
+					AUS = { country_event = { days = 10 id = sevenweekswar.149 } }
+				}
+				else = {
+					AUS = { country_event = { days = 10 id = sevenweekswar.151 } }
 				}
 			}
 		}
@@ -3862,9 +3924,14 @@ country_event = {
 				}
 				country_event = { id = sevenweekswar.137 }
 			}
-			PRS = { transfer_state = 1061 }
-			ROOT = { give_guarantee = BAV }
-			BAV = { give_guarantee = ROOT }
+			if = {
+				limit = {
+					BAV = { has_country_flag = BAV_support_PRS_reformplan_flag }
+				}
+				PRS = { transfer_state = 1061 }
+				ROOT = { give_guarantee = BAV }
+				BAV = { give_guarantee = ROOT }
+			}
 			complete_national_focus = PRS_focus_north_german_confederation
 		}
 	}
@@ -3892,7 +3959,7 @@ country_event = {
 	}
 }
 
-#NGC Repudiators – Decide Whether to Join North German Confederation
+#NGC Repudiators – Should We Join the North German Confederation?
 country_event = {
 	id = sevenweekswar.137
 	title = sevenweekswar.137.t
@@ -3997,7 +4064,7 @@ country_event = {
 	}
 }
 
-#SGC Repudiators – Decide Whether to Join South German Confederation
+#SGC Repudiators – Should We Join the South German Confederation?
 country_event = {
 	id = sevenweekswar.140
 	title = sevenweekswar.140.t
@@ -4024,6 +4091,439 @@ country_event = {
 		custom_effect_tooltip = BAV_sgc_alliance_treaties_repudiate_effect_tt
 		hidden_effect = {
 			set_country_flag = GC_repudiate_Bundesreform
+		}
+	}
+}
+
+#Prussia - North German Confederation Treaties
+country_event = {
+	id = sevenweekswar.141
+	title = sevenweekswar.141.t
+	desc = sevenweekswar.141.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.141.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		create_faction = faction_ngc
+		hidden_effect = {
+			set_country_flag = eoanb_flag_PRS_decentralized_ngc
+			every_other_country = { 
+				limit = {
+					has_country_flag = PRS_furstentag_attending_flag
+					has_country_flag = PRS_furstentag_voting_yes_flag
+					NOT = { tag = AUS }
+					NOT = { tag = BAV }
+					NOT = { tag = BAD }
+					NOT = { tag = WUR }
+					NOT = { tag = HSD }
+				}
+				country_event = { id = sevenweekswar.142 }
+			}
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					OR = {
+						NOT = { has_country_flag = PRS_furstentag_attending_flag }
+						has_country_flag = PRS_furstentag_voting_no_flag
+					}
+					NOT = { tag = AUS }
+					NOT = { tag = BAV }
+					NOT = { tag = BAD }
+					NOT = { tag = WUR }
+					NOT = { tag = HSD }
+					NOT = { tag = LUX }
+					NOT = { tag = LIE }
+				}
+				country_event = { id = sevenweekswar.143 }
+			}
+			if = {
+				limit = {
+					BAV = { has_country_flag = BAV_support_PRS_reformplan_flag }
+				}
+				PRS = { transfer_state = 1061 }
+				ROOT = { give_guarantee = BAV }
+				BAV = { give_guarantee = ROOT }
+			}
+			complete_national_focus = PRS_focus_north_german_confederation
+		}
+	}
+}
+
+#NGC Agreers – North German Confederation Treaties
+country_event = {
+	id = sevenweekswar.142
+	title = sevenweekswar.142.t
+	desc = sevenweekswar.142.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	timeout_days = 3
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = sevenweekswar.142.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			PRS = { puppet = ROOT }
+			ROOT = { add_to_faction = faction_ngc }
+		}
+	}
+}
+
+#NGC Repudiators and No Voters – Should We Join the North German Confederation?
+country_event = {
+	id = sevenweekswar.143
+	title = sevenweekswar.143.t
+	desc = sevenweekswar.143.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	timeout_days = 3
+	
+	is_triggered_only = yes
+	
+	option = { #Join
+		name = sevenweekswar.143.a
+		ai_chance = { base = 50 }
+		custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			PRS = { puppet = ROOT }
+			ROOT = { add_to_faction = faction_ngc }
+		}
+	}
+	
+	option = { #Repudiate
+		name = sevenweekswar.143.b
+		ai_chance = { base = 50 }
+		custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_repudiate_effect_tt
+		hidden_effect = {
+			set_country_flag = GC_repudiate_Bundesreform
+		}
+	}
+}
+
+#Bavaria - South German Confederation Treaties
+country_event = {
+	id = sevenweekswar.144
+	title = sevenweekswar.144.t
+	desc = sevenweekswar.144.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.144.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = BAV_sgc_alliance_treaties_effect_tt
+		create_faction = faction_sgc
+		hidden_effect = {
+			if = { 
+				limit = {
+					tag = BAD
+					has_country_flag = PRS_furstentag_attending_flag
+					has_country_flag = PRS_furstentag_voting_yes_flag
+				}
+				BAD = { country_event = { id = sevenweekswar.145 } }
+			}
+			else = { 
+				BAD = { country_event = { id = sevenweekswar.146 } }
+			}
+			if = { 
+				limit = {
+					tag = HSD
+					has_country_flag = PRS_furstentag_attending_flag
+					has_country_flag = PRS_furstentag_voting_yes_flag
+				}
+				HSD = { country_event = { id = sevenweekswar.145 } }
+			}
+			else = { 
+				HSD = { country_event = { id = sevenweekswar.146 } }
+			}
+			if = { 
+				limit = {
+					tag = WUR
+					has_country_flag = PRS_furstentag_attending_flag
+					has_country_flag = PRS_furstentag_voting_yes_flag
+				}
+				WUR = { country_event = { id = sevenweekswar.145 } }
+			}
+			else = { 
+				WUR = { country_event = { id = sevenweekswar.146 } }
+			}
+			ROOT = { give_guarantee = PRS }
+			PRS = { give_guarantee = ROOT }
+		}
+	}
+}
+
+#SGC Agreers – South German Confederation Treaties
+country_event = {
+	id = sevenweekswar.145
+	title = sevenweekswar.145.t
+	desc = sevenweekswar.145.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	timeout_days = 3
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = sevenweekswar.145.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = BAV_sgc_alliance_treaties_effect_tt
+		hidden_effect = {
+			BAV = { puppet = ROOT }
+			ROOT = { add_to_faction = faction_sgc }
+		}
+	}
+}
+
+#SGC Repudiators and No-Voters – Should We Join the South German Confederation?
+country_event = {
+	id = sevenweekswar.146
+	title = sevenweekswar.146.t
+	desc = sevenweekswar.146.d
+	picture = GFX_event_north_german_confederation_gathering
+	
+	timeout_days = 3
+	
+	is_triggered_only = yes
+	
+	option = { #Join
+		name = sevenweekswar.146.a
+		ai_chance = { base = 50 }
+		custom_effect_tooltip = BAV_sgc_alliance_treaties_effect_tt
+		hidden_effect = {
+			BAV = { puppet = ROOT }
+			ROOT = { add_to_faction = faction_sgc }
+		}
+	}
+	
+	option = { #Repudiate
+		name = sevenweekswar.146.b
+		ai_chance = { base = 50 }
+		custom_effect_tooltip = BAV_sgc_alliance_treaties_repudiate_effect_tt
+		hidden_effect = {
+			set_country_flag = GC_repudiate_Bundesreform
+		}
+	}
+}
+
+#Austria - Bundesreformplan Carried Unanimously - Smaller Germany (not present)
+country_event = {
+	id = sevenweekswar.147
+	title = sevenweekswar.147.t
+	desc = sevenweekswar.147.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #Accept
+		name = sevenweekswar.147.a
+		ai_chance = { base = 75 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		add_political_power = -150
+		add_stability = -0.1
+	}
+	
+	option = { #Resist
+		name = sevenweekswar.147.b
+		ai_chance = { base = 25 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					has_country_flag = GC_repudiate_Bundesreform
+				}
+				#country_event = { days = 2 id = sevenweekswar.153 } 
+			}
+		}
+	}
+}
+
+#Austria - Bundesreformplan Carried - Smaller Germany (not present)
+country_event = {
+	id = sevenweekswar.148
+	title = sevenweekswar.148.t
+	desc = sevenweekswar.148.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #Accept
+		name = sevenweekswar.148.a
+		ai_chance = { base = 50 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		add_political_power = -125
+		add_stability = -0.1
+	}
+	
+	option = { #Resist
+		name = sevenweekswar.148.b
+		ai_chance = { base = 50 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					has_country_flag = GC_repudiate_Bundesreform
+				}
+				#country_event = { days = 2 id = sevenweekswar.153 } 
+			}
+		}
+	}
+}
+
+#Austria - Bundesreformplan Carried Unanimously - Greater Germany (present)
+country_event = {
+	id = sevenweekswar.149
+	title = sevenweekswar.149.t
+	desc = sevenweekswar.149.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = {
+		name = sevenweekswar.149.a
+		ai_chance = { base = 100 }
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			ROOT = { give_guarantee = PRS }
+			PRS = { give_guarantee = ROOT }
+			ROOT = { give_guarantee = BAV }
+			BAV = { give_guarantee = ROOT }
+		}
+	}
+}
+
+#Austria - Bundesreformplan Accepted - Greater Germany (present)
+country_event = {
+	id = sevenweekswar.150
+	title = sevenweekswar.150.t
+	desc = sevenweekswar.150.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	#Option a only triggers when AUS did vote in favor of the reform
+	option = { #Accept
+		name = sevenweekswar.150.a
+		trigger = {
+			has_country_flag = PRS_furstentag_voting_yes_flag
+		}
+		ai_chance = { base = 100 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			ROOT = { give_guarantee = PRS }
+			PRS = { give_guarantee = ROOT }
+			ROOT = { give_guarantee = BAV }
+			BAV = { give_guarantee = ROOT }
+		}
+	}
+	
+	#Option b only triggers when AUS did vote against the reform
+	option = { #Resist
+		name = sevenweekswar.150.b
+		trigger = {
+			has_country_flag = PRS_furstentag_voting_no_flag
+		}
+		ai_chance = { base = 100 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					has_country_flag = GC_repudiate_Bundesreform
+				}
+				#country_event = { days = 2 id = sevenweekswar.153 } 
+			}
+		}
+	}
+}
+
+#Austria - Bundesreformplan Carried Unanimously - Greater Germany (not present)
+country_event = {
+	id = sevenweekswar.151
+	title = sevenweekswar.151.t
+	desc = sevenweekswar.151.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #Accept
+		name = sevenweekswar.151.a
+		ai_chance = { base = 75 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			ROOT = { give_guarantee = PRS }
+			PRS = { give_guarantee = ROOT }
+			ROOT = { give_guarantee = BAV }
+			BAV = { give_guarantee = ROOT }
+		}
+	}
+	
+	option = { #Resist
+		name = sevenweekswar.151.b
+		ai_chance = { base = 25 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					has_country_flag = GC_repudiate_Bundesreform
+				}
+				#country_event = { days = 2 id = sevenweekswar.153 } 
+			}
+		}
+	}
+}
+
+#Austria - Bundesreformplan Accepted - Greater Germany (not present)
+country_event = {
+	id = sevenweekswar.152
+	title = sevenweekswar.152.t
+	desc = sevenweekswar.152.d
+	#picture = GFX_event_north_german_confederation_gathering
+	
+	fire_only_once = yes
+	is_triggered_only = yes	
+	
+	option = { #Accept
+		name = sevenweekswar.152.a
+		ai_chance = { base = 60 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			ROOT = { give_guarantee = PRS }
+			PRS = { give_guarantee = ROOT }
+			ROOT = { give_guarantee = BAV }
+			BAV = { give_guarantee = ROOT }
+		}
+	}
+
+	option = { #Resist
+		name = sevenweekswar.152.b
+		ai_chance = { base = 40 } #Testing
+		#custom_effect_tooltip = PRS_ngc_alliance_treaties_friedrich_effect_tt
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_idea = GER_general_idea_ger_confed
+					has_country_flag = GC_repudiate_Bundesreform
+				}
+				#country_event = { days = 2 id = sevenweekswar.153 } 
+			}
 		}
 	}
 }
