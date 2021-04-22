@@ -1,11 +1,8 @@
 <hr>
 
-# Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
+# Official End of a New Beginning Website
 
 ### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
-
-[github-size]: https://img.shields.io/github/languages/code-size/team-eoanb/EoaNB
-[github-stars]: https://img.shields.io/github/stars/team-eoanb/EoaNB?style=social
 
 [patreon-badge]: https://img.shields.io/static/v1?label=Patreon&message=Donate&color=orange&logo=patreon
 [patreon-link]: https://www.patreon.com/mod_eoanb
@@ -32,7 +29,7 @@
 
 ## What is this?
 
-This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, **End of a New Beginning**. Here, you can learn how to join our community, install our mod, and join/support the development team.
+This is the official website for EoaNB. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
 <img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
@@ -45,9 +42,9 @@ Here's a useful installation video by one of our lead developers:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/Qr6l2DEneNY" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ### Links from the Video 
-* <a href="https://youtu.be/Qr6l2DEneNY">Video Link: https://youtu.be/Qr6l2DEneNY</a>
-* <a href="https://desktop.github.com/">Github Desktop App: https://desktop.github.com/</a>
-* <a href="https://github.com/team-eoanb/EoaNB">Github Repo URL: https://github.com/team-eoanb/EoaNB</a>
+* Video Link: [https://youtu.be/Qr6l2DEneNY]
+* Github Desktop App: [https://desktop.github.com/]
+* Github Repo URL: [https://github.com/team-eoanb/EoaNB]
 
 <hr>
 
@@ -77,23 +74,12 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 
 ## Meet the Team; Join the Discussion
 
-Have more questions, comments or feedback? You can contact us by joining our discord:
-
-<a href="https://discord.gg/VgufEME">- Discord Link: https://discord.gg/VgufEME</a>
+Have more questions, comments or feedback? You can contact us by joining our [discord](https://discord.gg/VgufEME). There is almost always a developer active on the server.
 
 <hr>
 
 ## Join the Team
-
-If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
-
-### Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `experimental` branch.
-- All code should be error-checked before pushed onto the Github
-- Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
-- If procedural pushing (including incomplete content) is crucial to development, request a new branch.
-- Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
-- Additional rules in the **Developer Bible**
+If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable. If you want to learn more, check out [Joining the Team](https://github.com/team-eoanb/EoaNB/wiki/Joining-the-Team).
 
 ### Meet the Lead-Developers
 *aka Centurions*
