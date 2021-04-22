@@ -1,4 +1,4 @@
-add_namespace = usa
+﻿add_namespace = usa
 add_namespace = usa_panic
 add_namespace = USA_utah_war
 add_namespace = USA_utah_war_start
@@ -63,71 +63,7 @@ country_event = {
 	}
 }
 
-# Crash of the SS Central America
-country_event = {
-	id = usa_flavor.1
-	title = usa_flavor.1.t
-	desc = usa_flavor.1.d
-	picture = GFX_report_event_merchant_ship_01
 
-	is_triggered_only = yes
-	fire_only_once = yes
-
-	option = {
-		name = usa_flavor.1.a
-		add_political_power = -20
-	}
-}
-
-# Oil Creek Pennsylvania
-state_event = {
-	id = usa_flavor.2
-	title = usa_flavor.2.t
-	desc = usa_flavor.2.d
-	picture = GFX_report_event_oil_creek
-
-	is_triggered_only = yes
-	fire_only_once = yes
-
-
-	option = {
-		name = usa_flavor.2.a
-		OWNER = {
-			if = {
-				limit = { tag = USA }
-				complete_national_focus = USA_pennsylvanian_oil
-			}
-		}
-		360 = { 
-			add_resource = {
-				type = oil
-				amount = 16
-			}
-		}
-		hidden_effect = {
-			OWNER = { news_event = usa_flavor.3 }
-		}
-	}
-}
-
-# Oil Creek Pennsylvania News
-news_event = {
-	id = usa_flavor.3
-	title = usa_flavor.2.t
-	desc = usa_flavor.2.d
-	picture = GFX_report_event_royal_visit
-
-	is_triggered_only = yes
-	major = yes
-
-	option = {
-		name = usa_flavor.2.b
-		if = {
-			limit = { owns_state = 360 }
-			# Nothing yet
-		}
-	}
-}
 
 ####################### Panic of 1857 ##########################
 
@@ -1404,6 +1340,50 @@ country_event = {#ongoing event which adds mormon unrest forcing the player to d
 				}
 			}
 		}
+		if = {
+			limit = {
+				check_variable = {
+					variable = USA_mormon_unrest
+					value = 18
+					compare = greater_than_or_equals
+				}
+			}
+			USA = {
+				declare_war_on = {
+					target = UTA
+					type = annex_everything
+				}
+				activate_mission = utahWar90
+				clr_country_flag = utahWarOngoing
+				remove_mission = utahWar0
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { USA_mormon_unrest < 18 }
+			}
+			if = {
+				limit = {
+					USA = {
+						has_border_war_with = UTA
+					}
+				}
+				cancel_border_war = {
+					attacker = 1291
+					defender = 380
+				}
+			}
+			USA = {#annex UT
+				annex_country = {
+					target = UTA
+					transfer_troops = no
+				}
+				clr_country_flag = utahWarOngoing
+				remove_mission = utahWar0
+				unlock_national_focus = USA_utah_peace
+				remove_ideas = USA_utahwar
+			}
+		}
 		add_political_power = 75
 	}
 }
@@ -1434,6 +1414,53 @@ country_event = {#Utah War Conclusion
 	is_triggered_only = yes
 	fire_only_once = yes
 
+	immediate = {
+		if = {
+			limit = {
+				check_variable = {
+					variable = USA_mormon_unrest
+					value = 18
+					compare = greater_than_or_equals
+				}
+			}
+			USA = {
+				declare_war_on = {
+					target = UTA
+					type = annex_everything
+				}
+				activate_mission = utahWar90
+				clr_country_flag = utahWarOngoing
+				remove_mission = utahWar0
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { USA_mormon_unrest < 18 }
+			}
+			if = {
+				limit = {
+					USA = {
+						has_border_war_with = UTA
+					}
+				}
+				cancel_border_war = {
+					attacker = 1291
+					defender = 380
+				}
+			}
+			USA = {#annex UT
+				annex_country = {
+					target = UTA
+					transfer_troops = no
+				}
+				clr_country_flag = utahWarOngoing
+				remove_mission = utahWar0
+				unlock_national_focus = USA_utah_peace
+				remove_ideas = USA_utahwar
+			}
+		}
+	}
+
 	option = {
 		trigger = {
 			check_variable = {
@@ -1443,7 +1470,14 @@ country_event = {#Utah War Conclusion
 			}
 		}
 		name = USA_utah_war.99.a
-		USA = {
+		if = {
+			limit = {
+				USA = {
+					NOT = {
+						has_war_with = UTA
+					}
+				}
+			}
 			declare_war_on = {
 				target = UTA
 				type = annex_everything
@@ -1451,10 +1485,11 @@ country_event = {#Utah War Conclusion
 			activate_mission = utahWar90
 			clr_country_flag = utahWarOngoing
 			remove_mission = utahWar0
+			remove_ideas = USA_utahwar
 		}
-		remove_ideas = USA_utahwar
 		#transfer state 1291
 	}
+
 	option = {
 		trigger = {
 			check_variable = { USA_mormon_unrest < 18 }
@@ -1478,9 +1513,10 @@ country_event = {#Utah War Conclusion
 			}
 			clr_country_flag = utahWarOngoing
 			remove_mission = utahWar0
+			unlock_national_focus = USA_utah_peace
+			remove_ideas = USA_utahwar
 		}
-		unlock_national_focus = USA_utah_peace
-		remove_ideas = USA_utahwar
+		
 		# country_event = {
 		# 	id = usa.
 		# }
@@ -5751,12 +5787,6 @@ country_event = {
 			}
 			if = {
 				limit = {
-					CSA = { owns_state = 1294 }
-				}
-				transfer_state = 1294
-			}
-			if = {
-				limit = {
 					CSA = { owns_state = 1286 }
 				}
 				transfer_state = 1286
@@ -7879,16 +7909,6 @@ country_event = {
 			}
 			if = {
 				limit = {
-					USA = { owns_state = 1294 }
-				}
-				transfer_state = 1294
-				add_state_core = 1294
-			}
-			else = {
-				add_state_claim = 1294
-			}
-			if = {
-				limit = {
 					USA = { owns_state = 1287 }
 				}
 				transfer_state = 1287
@@ -8044,16 +8064,6 @@ country_event = {
 			}
 			else = {
 				add_state_claim = 1302
-			}
-			if = {
-				limit = {
-					USA = { owns_state = 1294 }
-				}
-				transfer_state = 1294
-				add_state_core = 1294
-			}
-			else = {
-				add_state_claim = 1294
 			}
 			if = {
 				limit = {
@@ -8216,16 +8226,6 @@ country_event = {
 			}
 			if = {
 				limit = {
-					USA = { owns_state = 1294 }
-				}
-				transfer_state = 1294
-				add_state_core = 1294
-			}
-			else = {
-				add_state_claim = 1294
-			}
-			if = {
-				limit = {
 					USA = { owns_state = 1287 }
 				}
 				transfer_state = 1287
@@ -8382,16 +8382,6 @@ country_event = {
 			}
 			else = {
 				add_state_claim = 1302
-			}
-			if = {
-				limit = {
-					USA = { owns_state = 1294 }
-				}
-				transfer_state = 1294
-				add_state_core = 1294
-			}
-			else = {
-				add_state_claim = 1294
 			}
 			if = {
 				limit = {
@@ -13733,7 +13723,6 @@ country_event = {
 	trigger = {
 		TAG = USA
 	}
-	mean_time_to_happen = { days = 60 }
 	option = {
 		name = usa.228.c
 	}
@@ -13746,7 +13735,6 @@ country_event = {
 	picture = GFX_report_event_a_republica
 	is_triggered_only = yes
 	
-	mean_time_to_happen = { days = 45 }
 	fire_only_once = yes
 	option = {
 		name = usa.229.c
