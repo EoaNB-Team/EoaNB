@@ -35,6 +35,65 @@ economic_decisions = {
 
 SPR_debt_management_category = {
 
+	MEX_declare_bankruptcy_mission = {
+		icon = generic_political_discourse
+		allowed = { 
+			OR = {
+				TAG = MEX 
+				TAG = MEC 
+				TAG = MXE
+			}
+		}
+		available = {
+			hidden_trigger = {
+				OR = { 
+					check_variable = {ROOT.debt_level > 49}
+					has_country_flag = debt_declared_bankruptcy_flag
+				}
+			}
+		}
+		
+		cancel_trigger = {
+			custom_trigger_tooltip = { 
+				tooltip = egy_vic_debt_paid_tooltip
+				always = no
+			}
+		}
+
+		activation = {
+			check_variable = {ROOT.debt_level > 19}
+			hidden_trigger = {
+				OR = {
+					TAG = MEX 
+					TAG = MEC 
+					TAG = MXE
+				}
+				NOT = { has_country_flag = debt_declared_bankruptcy_flag }
+				NOT = { has_global_flag = MEX_cease_foreign_debt_repayments_flag }
+			}
+		}
+		
+		is_good = no 
+		selectable_mission = no
+		days_mission_timeout = 360
+
+		timeout_effect = {
+			hidden_effect = { activate_mission = MEX_declare_bankruptcy_mission }
+			debt_level_increase_by_1 = yes
+			custom_effect_tooltip = MEX_declare_bankruptcy_mission_complete_effect
+		}
+		complete_effect = {
+			hidden_effect = { 
+				country_event = { id = mexico_debt.1 days = 16 } 
+				set_country_flag = debt_declared_bankruptcy_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 0
+		}
+	}
+
 	DOM_declare_bankruptcy_mission = {
 
 		icon = generic_political_discourse
@@ -869,6 +928,60 @@ SPR_colonial_affairs_category = {
 			1318 = { add_colonial_profits_in_state_by_25 = yes }
 		}
 	}
+	
+	SPR_develop_la_habana_port_decision = {
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SPR_cuba_has_infrastructure_investments_trigger
+				has_country_flag = SPR_cuba_has_infrastructure_investments_flag
+			}
+			custom_trigger_tooltip = {
+				tooltip = SPR_owns_havana_tooltip
+				OR = { 
+					owns_state = 1350
+					1350 = { OWNER = { is_subject_of = ROOT } }
+				}
+			}
+			debt_not_bankrupt_trigger = yes
+		}
+		visible = {
+			debt_not_bankrupt_trigger = yes
+			has_country_flag = SPR_prepare_the_invasion_flag
+		}
+		allowed = { tag = SPR }
+		#cost = 100
+		custom_cost_trigger = { check_variable = { debt_level < 50 } }
+		custom_cost_text = eoanb_decision_cost_2_debt_loc
+		days_remove = 90
+		fire_only_once = yes
+		
+		cancel_trigger = {
+			custom_trigger_tooltip = {
+				tooltip = SPR_does_not_own_havana_tooltip
+				AND = { 
+					NOT = { owns_state = 1350 }
+					NOT = { 1350 = { OWNER = { is_subject_of = ROOT } } }
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = SPR_has_declared_bankruptcy_tooltip
+				always = no
+			}
+		}
+		
+		complete_effect = {
+			#initial debt
+			debt_level_increase_by_1 = yes
+		}
+		remove_effect = {
+			#finishing debt
+			debt_level_increase_by_1 = yes
+			1350 = {
+				add_building_construction = { type = infrastructure level = 1 instant_build = yes }
+				add_building_construction = { type = naval_base level = 2 instant_build = yes province = 7622 }
+			}
+		}
+	}
 }
 
 SPR_FLAVOUR = {
@@ -934,5 +1047,6 @@ SPR_FLAVOUR = {
 		
 		fire_only_once = yes
 	}
+	
 }
 
