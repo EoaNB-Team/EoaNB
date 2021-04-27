@@ -6655,6 +6655,7 @@ PRS_decision_category_german_war = {
 									}
 									AND = {
 										NOT = { 64 = { is_controlled_by = PRS } }
+										NOT = { 950 = { is_controlled_by = PRS } }
 										NOT = { 951 = { is_controlled_by = PRS } }
 										NOT = { 1003 = { is_controlled_by = PRS } }
 									}
@@ -6711,6 +6712,7 @@ PRS_decision_category_german_war = {
 								}
 								AND = {
 									NOT = { 64 = { is_controlled_by = PRS } }
+									NOT = { 950 = { is_controlled_by = PRS } }
 									NOT = { 951 = { is_controlled_by = PRS } }
 									NOT = { 1003 = { is_controlled_by = PRS } }
 								}
@@ -7558,14 +7560,13 @@ PRS_decision_category_NGC_politics = {
 				ideology = traditional_conservatism
 				popularity = 0.03
 			}
-			#if = {
-			#	limit = {
-			#		has_dlc = "La Resistance"
-			#		PRS = { has_intelligence_agency = no }
-			#	}
-			#	create_intelligence_agency = yes
-			#	upgrade_intelligence_agency = upgrade_form_department
-			#}
+			if = {
+				limit = {
+					has_dlc = "La Resistance"
+					PRS = { has_intelligence_agency = yes }
+				}
+				upgrade_intelligence_agency = upgrade_passive_defense
+			}
 			hidden_effect = {
 				clr_country_flag = PRS_constitutional_change_in_progress_flag
 				clr_country_flag = PRS_passports_needed_flag
@@ -7799,7 +7800,7 @@ PRS_decision_category_NGC_politics = {
 	
 	#Establish Auswärtiges Amt
 	PRS_decision_establish_foreign_office = {
-		icon = recruit_operative
+		icon = generic_political_discourse
 
         allowed = { tag = PRS }
 
@@ -7825,8 +7826,64 @@ PRS_decision_category_NGC_politics = {
 		
 		remove_effect = {
 			add_ideas = PRS_idea_foreign_ministry_1
+			if = {
+				limit = {
+					has_dlc = "La Resistance"
+					PRS = { has_intelligence_agency = no }
+				}
+				unlock_decision_tooltip = PRS_decision_create_intelligence_agency
+			}
+			else_if = {
+				limit = {
+					has_dlc = "La Resistance"
+					PRS = { has_intelligence_agency = yes }
+				}
+				custom_effect_tooltip = PRS_decision_create_intelligence_agency_effect_tt
+				hidden_effect = {
+					PRS = { country_event = { days = 14 id = prussia.33 } }
+				}
+			}
 			hidden_effect = {
 				clr_country_flag = PRS_constitutional_change_in_progress_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Create Intelligence Agency
+	PRS_decision_create_intelligence_agency = {
+		icon = recruit_operative
+
+        allowed = { tag = PRS }
+
+		available = {
+			has_stability > 0.4
+		}
+		
+		visible = {
+			has_idea = PRS_idea_foreign_ministry_1
+			has_dlc = "La Resistance"
+			PRS = { has_intelligence_agency = no }
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+		
+		days_remove = 30
+		
+		modifier = {
+			civilian_factory_use = 1
+		}
+		
+		remove_effect = {
+			create_intelligence_agency = yes
+			custom_effect_tooltip = PRS_decision_create_intelligence_agency_effect_tt
+			hidden_effect = {
+				PRS = { country_event = { days = 14 id = prussia.33 } }
 			}
 		}
 
