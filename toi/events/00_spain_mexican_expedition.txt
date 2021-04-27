@@ -122,15 +122,28 @@ country_event = {
 		ai_chance = { 
 			base = 50
 		}
+		set_global_flag = MEX_cease_foreign_debt_repayments_flag
+		if = {
+			limit = { has_country_flag = MEX_cease_foreign_debt_repayments_decision_flag }
+			clr_country_flag = MEX_cease_foreign_debt_repayments_decision_flag
+		}
+		if = {
+			limit = { has_country_flag = MEX_foreign_debt_repayments_flag }
+			clr_country_flag = MEX_foreign_debt_repayments_flag
+		}
+		if = {
+			limit = {
+				OR = { 
+					TAG = MEX
+					TAG = MXE
+					TAG = MEC
+				}
+			}
+			
+			remove_mission = MEX_foreign_debt_repayments_mission
+		}
 		hidden_effect = { 
 			SPR = { country_event = { id = SPR_mexican_expedition.5 days = 3 } } 
-			remove_mission = MEX_foreign_debt_repayments_mission
-			set_global_flag = MEX_cease_foreign_debt_repayments_flag
-			clr_country_flag = MEX_foreign_debt_repayments_flag
-			if = { 
-				limit = { has_country_flag = MEX_cease_foreign_debt_repayments_decision_flag }
-				clr_country_flag = MEX_cease_foreign_debt_repayments_decision_flag
-			}
 		}
 	}
 	
@@ -180,9 +193,18 @@ country_event = {
 				check_variable = {ROOT.debt_level > 39}
 			}
 		}
+		set_global_flag = SPR_mexican_intervention_global_flag
 		complete_national_focus = SPR_mexico_expedition
+		set_country_flag = SPR_mexican_expedition_initial_yes
 		set_country_flag = SPR_mexican_intervention_flag
 		set_global_flag = SPR_mexican_intervention_flag
+		hidden_effect = {
+			add_ai_strategy = {
+				type = invade
+				id = MEX
+				value = 50
+			}
+		}
 	}
 	
 	option = {
@@ -257,29 +279,36 @@ country_event = {
 		name = SPR_mexican_expedition.7.a
 		#YES
 		ai_chance = { 
-			base = 50
-			modifier = {
-				add = 50
-				TAG = FRA
-				has_country_flag = FRA_has_colonial_ambitions
-			}
+			base = 100
+			#modifier = {
+			#	add = 20
+			#	TAG = FRA
+			#	has_country_flag = FRA_has_colonial_ambitions
+			#}
 		}
 		complete_national_focus = FRA_mexican_intervention
 		SPR = { country_event = { id = SPR_mexican_expedition.8 days = 3 } }
 		set_country_flag = FRA_mexican_intervention_flag
 		set_global_flag = FRA_mexican_intervention_flag
+		hidden_effect = {
+			add_ai_strategy = {
+				type = invade
+				id = MEX
+				value = 50
+			}
+		}
 	}
 	
 	option = {
 		name = SPR_mexican_expedition.7.b
 		#NO
 		ai_chance = { 
-			base = 50
-			modifier = {
-				add = -50
-				TAG = FRA
-				has_country_flag = FRA_has_colonial_ambitions
-			}
+			base = 0
+			#modifier = {
+			#	add = -20
+			#	TAG = FRA
+			#	has_country_flag = FRA_has_colonial_ambitions
+			#}
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
@@ -300,7 +329,7 @@ country_event = {
 		ai_chance = { 
 			base = 50
 		}
-		
+		set_country_flag = SPR_mexican_expedition_initial_yes
 	}
 }
 #Ask France (NO)
@@ -328,10 +357,6 @@ country_event = {
 
 	is_triggered_only = yes
 	
-	immediate = {
-		hidden_effect = { ENG = { country_event = { id = SPR_mexican_expedition.14 days = 7 } } }
-	}
-	
 	option = {
 		name = SPR_mexican_expedition.10.a
 		#YES
@@ -339,6 +364,7 @@ country_event = {
 			base = 100
 		}
 		ENG = { country_event = { id = SPR_mexican_expedition.11 days = 3 } }
+		hidden_effect = { USA = { country_event = { id = SPR_mexican_expedition.14 days = 7 } } }
 	}
 	
 	option = {
@@ -351,6 +377,7 @@ country_event = {
 				is_historical_focus_on = yes
 			}
 		}
+		hidden_effect = { USA = { country_event = { id = SPR_mexican_expedition.14 days = 7 } } }
 	}
 }
 country_event = {
@@ -364,19 +391,26 @@ country_event = {
 		name = SPR_mexican_expedition.11.a
 		#YES
 		ai_chance = { 
-			base = 90
+			base = 100
 			
 		}
 		SPR = { country_event = { id = SPR_mexican_expedition.12 days = 3 } }
 		set_country_flag = ENG_mexican_intervention_flag
 		set_global_flag = ENG_mexican_intervention_flag
+		hidden_effect = {
+			add_ai_strategy = {
+				type = prepare_for_war
+				id = MEX
+				value = 50
+			}
+		}
 	}
 	
 	option = {
 		name = SPR_mexican_expedition.11.b
 		#NO
 		ai_chance = { 
-			base = 10
+			base = 0
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
@@ -397,6 +431,7 @@ country_event = {
 		ai_chance = { 
 			base = 50
 		}
+		set_country_flag = SPR_mexican_expedition_initial_yes
 	}
 }
 #Ask Britain (NO)
@@ -431,6 +466,23 @@ country_event = {
 		ai_chance = { 
 			base = 10
 			modifier = {
+				add = -10
+				any_country = {
+					has_war_with = USA
+					is_major = yes
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_war_with = CSA
+					any_country = {
+						has_war_with = USA
+						has_cosmetic_tag = USA_free_states_of_america
+					}
+				}
+			}
+			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
 			}
@@ -439,6 +491,27 @@ country_event = {
 		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = yes } } 
 		set_country_flag = USA_mexican_intervention_flag
 		set_global_flag = USA_mexican_intervention_flag
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.15 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.15 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.15 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+			USA = { diplomatic_relation = { country = MEX relation = military_access active = yes } }
+			USA = { diplomatic_relation = { country = MEX relation = non_aggression_pact active = yes } }
+			#if = {
+				#limit = { has_dlc = "Man the Guns" } 
+				#USA = { diplomatic_relation = { country = MEX relation = docking_rights active = yes } }
+			#}
+		}
 	}
 	option = {
 		name = SPR_mexican_expedition.14.b
@@ -446,21 +519,75 @@ country_event = {
 		ai_chance = { 
 			base = 25
 			modifier = {
+				add = 10
+				any_country = {
+					has_war_with = USA
+					is_major = no
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_war_with = CSA
+					any_country = {
+						has_war_with = USA
+						has_cosmetic_tag = USA_free_states_of_america
+					}
+				}
+			}
+			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
 		MEX = { country_event = { id = SPR_mexican_expedition.16 days = 3 } }
 		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } }
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.16 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.16 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.16 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+		}
 	}
 	option = {
 		name = SPR_mexican_expedition.14.c
 		#NO
 		ai_chance = { 
 			base = 65
+			modifier = {
+				add = 10
+				any_country = {
+					has_war_with = USA
+					is_major = yes
+				}
+			}
 		}
 		MEX = { country_event = { id = SPR_mexican_expedition.17 days = 3 } }
 		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } }
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.17 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.17 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.17 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+		}
 	}
 }
 #YES Military
@@ -473,8 +600,111 @@ country_event = {
 	
 	option = {
 		name = SPR_mexican_expedition.15.a
+		trigger = { TAG = MEX }
 		ai_chance = { 
 			base = 50
+		}
+		add_war_support = 0.07
+		hidden_effect = {
+			MEX = { diplomatic_relation = { country = USA relation = military_access active = yes } }
+			MEX = { diplomatic_relation = { country = USA relation = non_aggression_pact active = yes } }
+			#if = { 
+				#limit = { has_dlc = "Man the Guns" } 
+				#MEX = { diplomatic_relation = { country = USA relation = docking_rights active = yes } }
+			#}
+		}
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.15.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = 25
+				TAG = FRA
+			}
+			modifier = {
+				factor = 0
+				TAG = SPR
+				check_variable = { debt_level < 20 }
+			}
+			modifier = {
+				factor = 0
+				TAG = ENG
+			}
+		}
+		add_war_support = -0.07
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.15.c
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = -25
+				TAG = FRA
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = { TAG = SPR }
+				SPR = { 
+					clr_country_flag = SPR_mexican_intervention_flag 
+					clr_global_flag = SPR_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			if = {
+				limit = { TAG = FRA }
+				FRA = { 
+					clr_country_flag = FRA_mexican_intervention_flag 
+					clr_global_flag = FRA_mexican_intervention_flag 
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			if = {
+				limit = { TAG = ENG }
+				ENG = { 
+					clr_country_flag = ENG_mexican_intervention_flag 
+					clr_global_flag = ENG_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag 
 		}
 	}
 }
@@ -488,8 +718,113 @@ country_event = {
 	
 	option = {
 		name = SPR_mexican_expedition.16.a
+		trigger = { TAG = MEX }
 		ai_chance = { 
 			base = 50
+		}
+		add_war_support = 0.05
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.16.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 75
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level < 30 }
+			}
+			modifier = {
+				add = 20
+				TAG = FRA
+			}
+			modifier = {
+				factor = 0
+				TAG = SPR
+				check_variable = { debt_level < 20 }
+			}
+			modifier = {
+				factor = 0
+				TAG = ENG
+			}
+		}
+		add_war_support = -0.02
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.16.c
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 25
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level < 30 }
+			}
+			modifier = {
+				add = -20
+				TAG = FRA
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = { TAG = SPR }
+				SPR = { 
+					clr_country_flag = SPR_mexican_intervention_flag 
+					clr_global_flag = SPR_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			if = {
+				limit = { TAG = FRA }
+				FRA = { 
+					clr_country_flag = FRA_mexican_intervention_flag 
+					clr_global_flag = FRA_mexican_intervention_flag 
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			if = {
+				limit = { TAG = ENG }
+				ENG = { 
+					clr_country_flag = ENG_mexican_intervention_flag 
+					clr_global_flag = ENG_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.30 } }
+				}
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
 		}
 	}
 }
@@ -503,11 +838,41 @@ country_event = {
 	
 	option = {
 		name = SPR_mexican_expedition.17.a
+		trigger = { TAG = MEX }
 		ai_chance = { 
 			base = 50
 		}
-		
+		add_war_support = -0.07
 	}
+	
+	option = {
+		name = SPR_mexican_expedition.17.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = 0.03
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+}
+
+#European Power Backs Out
+country_event = {
+	id = SPR_mexican_expedition.30
+	title = SPR_mexican_expedition.30.t
+	desc = SPR_mexican_expedition.30.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.30.b
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = -0.01
+	}
+	
 }
 #----------------------------------------------------
 #Declare the War!
@@ -560,6 +925,71 @@ country_event = {
 			if = {
 				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
 				ENG = { declare_war_on = { target = MEC type = annex_everything } }
+			}
+		}
+		hidden_effect = {
+			if = { 
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				if = { 
+					limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+					SPR = { diplomatic_relation = { country = FRA relation = military_access active = yes } }
+					SPR = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#SPR = { diplomatic_relation = { country = FRA relation = docking_rights active = yes } }
+					#}
+				}	
+				if = { 
+					limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+					SPR = { diplomatic_relation = { country = ENG relation = military_access active = yes } }	
+					SPR = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#SPR = { diplomatic_relation = { country = ENG relation = docking_rights active = yes } }
+					#}
+				}
+			}
+			if = { 
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				if = { 
+					limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+					FRA = { diplomatic_relation = { country = SPR relation = military_access active = yes } }
+					FRA = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#FRA = { diplomatic_relation = { country = SPR relation = docking_rights active = yes } }
+					#}
+				}	
+				if = { 
+					limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+					FRA = { diplomatic_relation = { country = ENG relation = military_access active = yes } }	
+					FRA = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#FRA = { diplomatic_relation = { country = ENG relation = docking_rights active = yes } }
+					#}
+				}
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				if = { 
+					limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+					ENG = { diplomatic_relation = { country = SPR relation = military_access active = yes } }
+					ENG = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#ENG = { diplomatic_relation = { country = SPR relation = docking_rights active = yes } }
+					#}
+				}	
+				if = { 
+					limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+					ENG = { diplomatic_relation = { country = FRA relation = military_access active = yes } }	
+					ENG = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = yes } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#ENG = { diplomatic_relation = { country = FRA relation = docking_rights active = yes } }
+					#}
+				}
 			}
 		}
 	}
@@ -775,7 +1205,7 @@ country_event = {
 		ai_chance = { 
 			base = 50
 			modifier = {
-				add = 25
+				add = -25
 				TAG = SPR
 				check_variable = {ROOT.debt_level > 19}
 				check_variable = {ROOT.debt_level < 30}
@@ -785,6 +1215,10 @@ country_event = {
 				TAG = SPR
 				check_variable = {ROOT.debt_level > 29}
 				check_variable = {ROOT.debt_level < 40}
+			}
+			modifier = {
+				add = -45
+				TAG = FRA
 			}
 			modifier = {
 				factor = 0
@@ -854,6 +1288,7 @@ country_event = {
 				SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 				FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 				ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+				country_event = { id = SPR_mexican_expedition.31 days = 1 }
 			}
 			else = { add_to_variable = { var = SPR.SPR_soledad_conv_participants@SPR value = 1 } }
 		}
@@ -872,6 +1307,7 @@ country_event = {
 				SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 				FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 				ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+				country_event = { id = SPR_mexican_expedition.31 days = 1 }
 			}
 			else = { add_to_variable = { var = SPR.SPR_soledad_conv_participants@SPR value = 1 } }
 		}
@@ -880,6 +1316,7 @@ country_event = {
 			SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 			FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 			ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+			country_event = { id = SPR_mexican_expedition.31 days = 1 }
 		}
 	}
 	
@@ -894,7 +1331,7 @@ country_event = {
 				check_variable = {ROOT.debt_level < 20}
 			}
 			modifier = {
-				add = -25
+				add = 25
 				TAG = SPR
 				check_variable = {ROOT.debt_level > 19}
 				check_variable = {ROOT.debt_level < 30}
@@ -904,6 +1341,10 @@ country_event = {
 				TAG = SPR
 				check_variable = {ROOT.debt_level > 29}
 				check_variable = {ROOT.debt_level < 40}
+			}
+			modifier = {
+				add = 45
+				TAG = FRA
 			}
 			modifier = {
 				factor = 0
@@ -947,6 +1388,7 @@ country_event = {
 				SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 				FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 				ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+				country_event = { id = SPR_mexican_expedition.31 days = 1 }
 			}
 			else = { add_to_variable = { var = SPR.SPR_soledad_conv_participants@SPR value = 1 } }
 		}
@@ -965,6 +1407,7 @@ country_event = {
 				SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 				FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 				ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+				country_event = { id = SPR_mexican_expedition.31 days = 1 }
 			}
 			else = { add_to_variable = { var = SPR.SPR_soledad_conv_participants@SPR value = 1 } }
 		}
@@ -973,6 +1416,7 @@ country_event = {
 			SPR = { country_event = { id = SPR_mexican_expedition.22 } }
 			FRA = { country_event = { id = SPR_mexican_expedition.22 } }
 			ENG = { country_event = { id = SPR_mexican_expedition.22 } }
+			country_event = { id = SPR_mexican_expedition.31 days = 1 }
 		}
 	}
 }
@@ -1001,6 +1445,126 @@ country_event = {
 		}
 		clr_country_flag = leave_mexican_intervention_temp_flag
 		clear_variable = SPR.SPR_soledad_conv_participants@SPR
+		
+	}
+}
+country_event = {
+	id = SPR_mexican_expedition.31
+	hidden = yes
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				if = { 
+					limit = { FRA = { NOT = { has_country_flag = FRA_mexican_intervention_flag } } }
+					SPR = { diplomatic_relation = { country = FRA relation = military_access active = no } }
+					SPR = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#SPR = { diplomatic_relation = { country = FRA relation = docking_rights active = no } }
+					#}
+				}	
+				if = { 
+					limit = { ENG = { NOT = { has_country_flag = ENG_mexican_intervention_flag } } }
+					SPR = { diplomatic_relation = { country = ENG relation = military_access active = no } }	
+					SPR = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#SPR = { diplomatic_relation = { country = ENG relation = docking_rights active = no } }
+					#}
+				}
+			}
+			else_if = {
+				limit = { SPR = { NOT = { has_country_flag = SPR_mexican_intervention_flag } } }
+				SPR = { diplomatic_relation = { country = FRA relation = military_access active = no } }
+				SPR = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = no } }
+				#if = { 
+					#limit = { has_dlc = "Man the Guns" } 
+					#SPR = { diplomatic_relation = { country = FRA relation = docking_rights active = no } }
+				#}
+				SPR = { diplomatic_relation = { country = ENG relation = military_access active = no } }	
+				SPR = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = no } }
+				#if = {
+					#limit = { has_dlc = "Man the Guns" } 
+					#SPR = { diplomatic_relation = { country = ENG relation = docking_rights active = no } }
+				#}
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				if = { 
+					limit = { SPR = { NOT = { has_country_flag = SPR_mexican_intervention_flag } } }
+					FRA = { diplomatic_relation = { country = SPR relation = military_access active = no } }
+					FRA = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#FRA = { diplomatic_relation = { country = SPR relation = docking_rights active = no } }
+					#}
+				}	
+				if = { 
+					limit = { ENG = { NOT = { has_country_flag = ENG_mexican_intervention_flag } } }
+					FRA = { diplomatic_relation = { country = ENG relation = military_access active = no } }
+					FRA = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#FRA = { diplomatic_relation = { country = ENG relation = docking_rights active = no } }
+					#}
+				}
+			}
+			else_if = {
+				limit = { FRA = { NOT = { has_country_flag = FRA_mexican_intervention_flag } } }
+				FRA = { diplomatic_relation = { country = SPR relation = military_access active = no } }
+				FRA = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = no } }
+				#if = { 
+					#limit = { has_dlc = "Man the Guns" } 
+					#FRA = { diplomatic_relation = { country = SPR relation = docking_rights active = no } }
+				#}	
+				FRA = { diplomatic_relation = { country = ENG relation = military_access active = no } }
+				FRA = { diplomatic_relation = { country = ENG relation = non_aggression_pact active = no } }
+				#if = { 
+					#limit = { has_dlc = "Man the Guns" } 
+					#FRA = { diplomatic_relation = { country = ENG relation = docking_rights active = no } }
+				#}
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				if = { 
+					limit = { SPR = { NOT = { has_country_flag = SPR_mexican_intervention_flag } } }
+					ENG = { diplomatic_relation = { country = SPR relation = military_access active = no } }
+					ENG = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#ENG = { diplomatic_relation = { country = SPR relation = docking_rights active = no } }
+					#}
+				}	
+				if = { 
+					limit = { FRA = { NOT = { has_country_flag = FRA_mexican_intervention_flag } } }
+					ENG = { diplomatic_relation = { country = FRA relation = military_access active = no } }
+					ENG = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = no } }
+					#if = { 
+						#limit = { has_dlc = "Man the Guns" } 
+						#ENG = { diplomatic_relation = { country = FRA relation = docking_rights active = no } }
+					#}
+				}
+			}
+			else_if = {
+				limit = { ENG = { NOT = { has_country_flag = ENG_mexican_intervention_flag } } }
+				ENG = { diplomatic_relation = { country = SPR relation = military_access active = no } }
+				ENG = { diplomatic_relation = { country = SPR relation = non_aggression_pact active = no } }
+				#if = {
+					#limit = { has_dlc = "Man the Guns" } 
+					#ENG = { diplomatic_relation = { country = SPR relation = docking_rights active = no } }
+				#}
+				ENG = { diplomatic_relation = { country = FRA relation = military_access active = no } }
+				ENG = { diplomatic_relation = { country = FRA relation = non_aggression_pact active = no } }
+				#if = { 
+					#limit = { has_dlc = "Man the Guns" } 
+					#ENG = { diplomatic_relation = { country = FRA relation = docking_rights active = no } }
+				#}
+			}
+		}
 	}
 }
 #----------------------------------------------------
@@ -1019,6 +1583,430 @@ news_event = {
 	option = {
 		name = SPR_mexican_expedition.3611.a
 	}
+}
+#----------------------------------------------------
+#USA To Back Mexico?
+#----------------------------------------------------
+country_event = {
+	id = SPR_mexican_expedition.32
+	title = SPR_mexican_expedition.32.t
+	desc = SPR_mexican_expedition.32.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.32.a
+		#Military
+		ai_chance = { 
+			base = 10
+			modifier = {
+				add = -10
+				any_country = {
+					has_war_with = USA
+					is_major = yes
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_war_with = CSA
+					any_country = {
+						has_war_with = USA
+						has_cosmetic_tag = USA_free_states_of_america
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		MEX = { country_event = { id = SPR_mexican_expedition.33 days = 3 } }
+		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = yes } } 
+		set_country_flag = USA_mexican_intervention_flag
+		set_global_flag = USA_mexican_intervention_flag
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.33 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.33 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.33 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+			USA = { diplomatic_relation = { country = MEX relation = military_access active = yes } }
+			USA = { diplomatic_relation = { country = MEX relation = non_aggression_pact active = yes } }
+			#if = {
+				#limit = { has_dlc = "Man the Guns" } 
+				#USA = { diplomatic_relation = { country = MEX relation = docking_rights active = yes } }
+			#}
+		}
+	}
+	option = {
+		name = SPR_mexican_expedition.32.b
+		#Economic
+		ai_chance = { 
+			base = 25
+			modifier = {
+				add = 10
+				any_country = {
+					has_war_with = USA
+					is_major = no
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					has_war_with = CSA
+					any_country = {
+						has_war_with = USA
+						has_cosmetic_tag = USA_free_states_of_america
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		MEX = { country_event = { id = SPR_mexican_expedition.34 days = 3 } }
+		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } }
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.34 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.34 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.34 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+		}
+	}
+	option = {
+		name = SPR_mexican_expedition.32.c
+		#NO
+		ai_chance = { 
+			base = 65
+			modifier = {
+				add = 10
+				any_country = {
+					has_war_with = USA
+					is_major = yes
+				}
+			}
+		}
+		MEX = { country_event = { id = SPR_mexican_expedition.35 days = 3 } }
+		USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } }
+		hidden_effect = {
+			if = {
+				limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
+				SPR = { country_event = { id = SPR_mexican_expedition.35 days = 3 } }
+			}
+			if = {
+				limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
+				FRA = { country_event = { id = SPR_mexican_expedition.35 days = 3 } }
+			}
+			if = {
+				limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
+				ENG = { country_event = { id = SPR_mexican_expedition.35 days = 3 } }
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+		}
+	}
+}
+#YES Military
+country_event = {
+	id = SPR_mexican_expedition.33
+	title = SPR_mexican_expedition.33.t
+	desc = SPR_mexican_expedition.33.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.33.a
+		trigger = { TAG = MEX }
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = 0.07
+		hidden_effect = {
+			MEX = { diplomatic_relation = { country = USA relation = military_access active = yes } }
+			MEX = { diplomatic_relation = { country = USA relation = non_aggression_pact active = yes } }
+			#if = { 
+				#limit = { has_dlc = "Man the Guns" } 
+				#MEX = { diplomatic_relation = { country = USA relation = docking_rights active = yes } }
+			#}
+		}
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.33.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = 25
+				TAG = FRA
+			}
+			modifier = {
+				factor = 0
+				TAG = SPR
+				check_variable = { debt_level < 20 }
+			}
+			modifier = {
+				factor = 0
+				TAG = ENG
+			}
+		}
+		add_war_support = -0.07
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.33.c
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = -25
+				TAG = FRA
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = { TAG = SPR }
+				SPR = { 
+					clr_country_flag = SPR_mexican_intervention_flag 
+					clr_global_flag = SPR_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			if = {
+				limit = { TAG = FRA }
+				FRA = { 
+					clr_country_flag = FRA_mexican_intervention_flag 
+					clr_global_flag = FRA_mexican_intervention_flag 
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			if = {
+				limit = { TAG = ENG }
+				ENG = { 
+					clr_country_flag = ENG_mexican_intervention_flag 
+					clr_global_flag = ENG_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag 
+		}
+	}
+}
+#YES Economic
+country_event = {
+	id = SPR_mexican_expedition.34
+	title = SPR_mexican_expedition.34.t
+	desc = SPR_mexican_expedition.34.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.34.a
+		trigger = { TAG = MEX }
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = 0.05
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.34.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 75
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level < 30 }
+			}
+			modifier = {
+				add = 20
+				TAG = FRA
+			}
+			modifier = {
+				factor = 0
+				TAG = SPR
+				check_variable = { debt_level < 20 }
+			}
+			modifier = {
+				factor = 0
+				TAG = ENG
+			}
+		}
+		add_war_support = -0.02
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.34.c
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 25
+			modifier = {
+				add = -25
+				TAG = SPR
+				check_variable = { debt_level > 39 }
+			}
+			modifier = {
+				add = 25
+				TAG = SPR
+				check_variable = { debt_level < 30 }
+			}
+			modifier = {
+				add = -20
+				TAG = FRA
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = { TAG = SPR }
+				SPR = { 
+					clr_country_flag = SPR_mexican_intervention_flag 
+					clr_global_flag = SPR_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			if = {
+				limit = { TAG = FRA }
+				FRA = { 
+					clr_country_flag = FRA_mexican_intervention_flag 
+					clr_global_flag = FRA_mexican_intervention_flag 
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { ENG = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					ENG = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			if = {
+				limit = { TAG = ENG }
+				ENG = { 
+					clr_country_flag = ENG_mexican_intervention_flag 
+					clr_global_flag = ENG_mexican_intervention_flag 
+				}
+				if = {
+					limit = { FRA = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					FRA = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+				if = {
+					limit = { SPR = { has_country_flag = SPR_mexican_expedition_initial_yes } }
+					SPR = { country_event = { id = SPR_mexican_expedition.36 } }
+				}
+			}
+			set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag
+		}
+	}
+}
+#NO
+country_event = {
+	id = SPR_mexican_expedition.35
+	title = SPR_mexican_expedition.35.t
+	desc = SPR_mexican_expedition.35.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.35.a
+		trigger = { TAG = MEX }
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = -0.07
+	}
+	
+	option = {
+		name = SPR_mexican_expedition.35.b
+		trigger = { NOT = { TAG = MEX } }
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = 0.03
+		hidden_effect = { set_country_flag = SPR_mexican_expedition_begin_invasion_ready_flag }
+	}
+	
+}
+
+#European Power Backs Out
+country_event = {
+	id = SPR_mexican_expedition.36
+	title = SPR_mexican_expedition.36.t
+	desc = SPR_mexican_expedition.36.d
+
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_mexican_expedition.36.b
+		ai_chance = { 
+			base = 50
+		}
+		add_war_support = -0.01
+	}
+	
 }
 #----------------------------------------------------
 # Mexico City in our hands!
@@ -1156,17 +2144,29 @@ country_event = { # Juan Nepomuceno Almonte named president of Mexico
 		MXE = { 
 			if = {
 				limit = { TAG = SPR }
-				give_military_access = SPR
+				diplomatic_relation = { country = SPR relation = military_access active = yes }
 			}
 			if = {
 				limit = { TAG = FRA }
-				give_military_access = FRA
+				diplomatic_relation = { country = FRA relation = military_access active = yes }
 			}
 			if = {
 				limit = { TAG = ENG }
-				give_military_access = ENG
+				diplomatic_relation = { country = ENG relation = military_access active = yes }
 			}
 			country_event = { id = SPR_mexican_expedition.3614 days = 7 }
+		}
+		hidden_effect = {
+			add_ai_strategy = {
+				type = protect
+				id = MXE
+				value = 50
+			}
+			add_ai_strategy = {
+				type = conquer
+				id = MEX
+				value = 50
+			}
 		}
 	}
 }
@@ -1667,18 +2667,18 @@ country_event = {
 		}
 		if = {
 			limit = { SPR = { has_country_flag = SPR_mexican_intervention_flag } }
-			MXE = { give_military_access = SPR }
+			MXE = { diplomatic_relation = { country = SPR relation = military_access active = yes } }
 			SPR = {
-				give_military_access = MXE
+				diplomatic_relation = { country = MXE relation = military_access active = yes }
 				give_guarantee = MXE
 				hidden_effect = { country_event = { id = SPR_mexican_expedition.25 days = 15 } }
 			}
 		}
 		if = {
 			limit = { FRA = { has_country_flag = FRA_mexican_intervention_flag } }
-			MXE = { give_military_access = FRA }
+			MXE = { diplomatic_relation = { country = FRA relation = military_access active = yes } }
 			FRA = {
-				give_military_access = MXE
+				diplomatic_relation = { country = MXE relation = military_access active = yes }
 				give_guarantee = MXE
 				hidden_effect = { country_event = { id = SPR_mexican_expedition.3630 days = 15 } }
 				#if = {
@@ -1711,9 +2711,9 @@ country_event = {
 		}
 		if = {
 			limit = { ENG = { has_country_flag = ENG_mexican_intervention_flag } }
-			MXE = { give_military_access = ENG }
+			MXE = { diplomatic_relation = { country = ENG relation = military_access active = yes } }
 			ENG = {
-				give_military_access = MXE
+				diplomatic_relation = { country = MXE relation = military_access active = yes }
 				give_guarantee = MXE
 				hidden_effect = { country_event = { id = SPR_mexican_expedition.27 days = 15 } }
 			}
