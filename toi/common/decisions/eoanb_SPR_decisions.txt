@@ -35,7 +35,55 @@ economic_decisions = {
 
 SPR_debt_management_category = {
 
-	MEX_declare_bankruptcy_mission = {
+	MEX_cease_foreign_debt_repayments_decision = {
+		available = {
+			if = { 
+				limit = { has_country_leader = { name = "Ignacio Comonfort" ruling_only = yes } }
+				NOT = { has_country_leader = { name = "Ignacio Comonfort" ruling_only = yes } }
+			}
+			else = { has_government = centrism }
+		}
+		visible = {
+			has_country_flag = MEX_foreign_debt_repayments_flag
+			has_war = no
+			NOT = { country_exists = MEC }
+			NOT = { country_exists = MXE }
+		}
+		allowed = { TAG = MEX }
+		fire_only_once = yes
+		cost = 25
+		complete_effect = {
+			custom_effect_tooltip = MEX_cease_foreign_debt_repayments_decision_tooltip
+			hidden_effect = { 
+				set_country_flag = MEX_cease_foreign_debt_repayments_decision_flag
+				country_event = { id = SPR_mexican_expedition.4 } 
+			}
+		}
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 5
+				check_variable = { debt_level > 19 }
+				date > 1861.1.1
+			}
+			modifier = {
+				add = 25
+				check_variable = { debt_level > 29 }
+				date > 1861.1.1
+			}
+			modifier = {
+				add = 50
+				date > 1861.1.1
+				is_historical_focus_on = yes
+			}
+			modifier = {
+				factor = 0
+				check_variable = { debt_level < 20 }
+			}
+		}
+	}
+	
+	MEX_foreign_debt_repayments_mission = {
 		icon = generic_political_discourse
 		allowed = { 
 			OR = {
@@ -63,8 +111,8 @@ SPR_debt_management_category = {
 		activation = {
 			check_variable = {ROOT.debt_level > 19}
 			hidden_trigger = {
+				has_country_flag = MEX_foreign_debt_repayments_flag
 				NOT = { has_country_flag = debt_declared_bankruptcy_flag }
-				NOT = { has_global_flag = MEX_cease_foreign_debt_repayments_flag }
 			}
 		}
 		
@@ -73,9 +121,9 @@ SPR_debt_management_category = {
 		days_mission_timeout = 360
 
 		timeout_effect = {
-			hidden_effect = { activate_mission = MEX_declare_bankruptcy_mission }
+			hidden_effect = { activate_mission = MEX_foreign_debt_repayments_mission }
 			#debt_level_increase_by_1 = yes
-			custom_effect_tooltip = MEX_declare_bankruptcy_mission_complete_effect
+			custom_effect_tooltip = MEX_foreign_debt_repayments_mission_complete_effect
 		}
 		complete_effect = {
 			hidden_effect = { 

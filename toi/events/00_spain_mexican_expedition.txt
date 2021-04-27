@@ -53,6 +53,11 @@ country_event = {
 					target = ROOT
 					transfer_troops = no
 				}
+				set_variable = { MXE.debt_level = MEX.debt_level }
+				if = {
+					limit = { MXE = { NOT = { has_idea = egy_vic_debt } } }
+					MXE = { add_ideas = egy_vic_debt }
+				}
 				set_country_flag = MXE_empire_without_war
 				create_country_leader = {
 					name = "Maximilian I"
@@ -117,13 +122,22 @@ country_event = {
 		ai_chance = { 
 			base = 50
 		}
-		hidden_effect = { SPR = { country_event = { id = SPR_mexican_expedition.5 days = 3 } } }
-		set_global_flag = MEX_cease_foreign_debt_repayments_flag
+		hidden_effect = { 
+			SPR = { country_event = { id = SPR_mexican_expedition.5 days = 3 } } 
+			remove_mission = MEX_foreign_debt_repayments_mission
+			set_global_flag = MEX_cease_foreign_debt_repayments_flag
+			clr_country_flag = MEX_foreign_debt_repayments_flag
+			if = { 
+				limit = { has_country_flag = MEX_cease_foreign_debt_repayments_decision_flag }
+				clr_country_flag = MEX_cease_foreign_debt_repayments_decision_flag
+			}
+		}
 	}
 	
 	option = {
 		name = SPR_mexican_expedition.4.b
 		#Continue Debt payments
+		trigger = { NOT = { has_country_flag = MEX_cease_foreign_debt_repayments_decision_flag } }
 		ai_chance = { 
 			base = 50
 			modifier = {
@@ -675,6 +689,10 @@ country_event = {
 		ai_chance = {
 			base = 50
 		}
+		activate_mission = MEX_foreign_debt_repayments_mission
+		hidden_effect = {
+			set_country_flag = MEX_foreign_debt_repayments_flag
+		}
 		if = {
 			limit = {
 				SPR = { has_country_flag = SPR_mexican_intervention_flag }
@@ -1122,6 +1140,11 @@ country_event = { # Juan Nepomuceno Almonte named president of Mexico
 							}
 						}
 						MXE = { transfer_state = PREV }
+						set_variable = { MXE.debt_level = MEX.debt_level }
+						if = {
+							limit = { MXE = { NOT = { has_idea = egy_vic_debt } } }
+							MXE = { add_ideas = egy_vic_debt }
+						}
 					}
 				}
 			}
