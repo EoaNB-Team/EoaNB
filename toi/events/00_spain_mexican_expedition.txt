@@ -115,6 +115,7 @@ country_event = {
 	desc = SPR_mexican_expedition.4.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 	
 	option = {
 		name = SPR_mexican_expedition.4.a
@@ -185,6 +186,7 @@ country_event = {
 	desc = SPR_mexican_expedition.5.d
 
 	is_triggered_only = yes
+	fire_only_once = yes
 	
 	option = {
 		name = SPR_mexican_expedition.5.a
@@ -514,7 +516,7 @@ country_event = {
 			}
 		}
 		MEX = { country_event = { id = SPR_mexican_expedition.15 days = 3 } }
-		hidden_effect = { USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } } }
+		hidden_effect = { USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = yes } } }
 		set_country_flag = USA_mexican_intervention_flag
 		set_global_flag = USA_mexican_intervention_flag
 		hidden_effect = {
@@ -1787,7 +1789,7 @@ country_event = {
 			}
 		}
 		MEX = { country_event = { id = SPR_mexican_expedition.33 days = 3 } }
-		hidden_effect = { USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = no } } }
+		hidden_effect = { USA = {	diplomatic_relation = { country = MEX	relation = guarantee	active = yes } } }
 		set_country_flag = USA_mexican_intervention_flag
 		set_global_flag = USA_mexican_intervention_flag
 		hidden_effect = {
@@ -3599,67 +3601,88 @@ country_event = { #Republican Triumph
 	immediate = {
 		hidden_effect = {
 			if = {
-				limit = { TAG = MXE }
+				limit = { TAG = MEX }
 				MEX = { clr_country_flag = MXE_empire_civil_war }
 				MEC = { clr_country_flag = MXE_empire_civil_war }
 				MXE = { clr_country_flag = MXE_empire_civil_war }
+				if = {
+					limit = { MXE = { exists = yes } }
+					MEX = {
+						annex_country = {
+							target = MXE
+							transfer_troops = no
+						}
+					}
+				}
+				country_event = { id = SPR_mexican_expedition.31 days = 7 }
 			}
 			if = {
-				limit = { MEX = { exists = yes } }
-				MEX = {
-					annex_country = {
-						target = MXE
-						transfer_troops = no
+				limit = { USA = { has_country_flag = USA_mexican_intervention_flag } }
+				every_country = {
+					limit = {
+						OR = {
+							AND = {
+								is_subject = yes
+								OR = {
+									OVERLORD = {
+										OR = {
+											has_country_flag = SPR_mexican_intervention_flag
+											has_country_flag = FRA_mexican_intervention_flag
+											has_country_flag = ENG_mexican_intervention_flag
+										}
+									}
+									has_country_flag = SPR_mexican_intervention_flag
+									has_country_flag = FRA_mexican_intervention_flag
+									has_country_flag = ENG_mexican_intervention_flag
+								}
+							}
+							has_country_flag = SPR_mexican_intervention_flag
+							has_country_flag = FRA_mexican_intervention_flag
+							has_country_flag = ENG_mexican_intervention_flag
+						}
 					}
-				}
-			}
-			else_if = {
-				limit = { MEC = { exists = yes } }
-				MEC = {
-					annex_country = {
-						target = MXE
-						transfer_troops = no
-					}
-				}
-			}
-			every_country = { 
-				limit = {
-					has_war_with = ROOT
-				}
-				if = {
-					limit = { is_subject = yes }
-					if = {
+					every_country = {
 						limit = { 
 							OR = {
-								OVERLORD = {
-									OR = {
-										has_country_flag = SPR_mexican_intervention_flag
-										has_country_flag = FRA_mexican_intervention_flag
-										has_country_flag = ENG_mexican_intervention_flag
-									}
-								}
-								has_country_flag = SPR_mexican_intervention_flag
-								has_country_flag = FRA_mexican_intervention_flag
-								has_country_flag = ENG_mexican_intervention_flag
+								TAG = USA 
+								is_subject_of = USA 
+								TAG = MEX
+								is_subject_of MEX
 							}
 						}
-						white_peace = ROOT 
-					}
-				}
-				else = {
-					if = {
-						limit = {
-							OR = {
-								has_country_flag = SPR_mexican_intervention_flag
-								has_country_flag = FRA_mexican_intervention_flag
-								has_country_flag = ENG_mexican_intervention_flag
-							}
-						}
-						white_peace = ROOT 
+						white_peace = PREV
 					}
 				}
 			}
-			FRA = { complete_national_focus = FRA_mexico_failure }
+			if = {
+				limit = {
+					SPR = { has_country_flag = SPR_mexican_intervention_flag } 
+				}
+				SPR = { clr_country_flag = SPR_mexican_intervention_flag }
+				SPR = { clr_global_flag = SPR_mexican_intervention_flag }
+			}
+			if = {
+				limit = {
+					FRA = { has_country_flag = FRA_mexican_intervention_flag } 
+				}
+				FRA = { complete_national_focus = FRA_mexico_failure }
+				FRA = { clr_country_flag = FRA_mexican_intervention_flag } 
+				FRA = { clr_global_flag = FRA_mexican_intervention_flag } 
+			}
+			if = {
+				limit = {
+					ENG = { has_country_flag = ENG_mexican_intervention_flag } 
+				}
+				ENG = { clr_country_flag = ENG_mexican_intervention_flag } 
+				ENG = { clr_global_flag = ENG_mexican_intervention_flag } 
+			}
+			if = {
+				limit = {
+					USA = { has_country_flag = USA_mexican_intervention_flag } 
+				}
+				USA = { clr_country_flag = USA_mexican_intervention_flag }
+				USA = { clr_global_flag = USA_mexican_intervention_flag }
+			}
 		}
 	}
 
@@ -3709,26 +3732,91 @@ country_event = { #Imperial Triumph (called by on_peaceconference_ended on_actio
 				MEX = { clr_country_flag = MXE_empire_civil_war }
 				MEC = { clr_country_flag = MXE_empire_civil_war }
 				MXE = { clr_country_flag = MXE_empire_civil_war }
+				MXE = {
+					every_owned_state = {
+						add_core_of = MXE
+					}
+				}
+				country_event = { id = SPR_mexican_expedition.31 days = 7 }
+			}
+			every_country = {
+				limit = {
+					has_war_with = MXE
+				}
+				white_peace = MXE 
 			}
 			if = {
-				limit = { MEX = { exists = yes } }
-				MEX = {
-					every_owned_state = {
-						add_core_of = MXE
-						MXE = { transfer_state = PREV }
+				limit = { USA = { has_country_flag = USA_mexican_intervention_flag } }
+				every_country = {
+					limit = {
+						OR = {
+							AND = {
+								is_subject = yes
+								OR = {
+									OVERLORD = {
+										OR = {
+											has_country_flag = SPR_mexican_intervention_flag
+											has_country_flag = FRA_mexican_intervention_flag
+											has_country_flag = ENG_mexican_intervention_flag
+											TAG = MXE
+										}
+									}
+									has_country_flag = SPR_mexican_intervention_flag
+									has_country_flag = FRA_mexican_intervention_flag
+									has_country_flag = ENG_mexican_intervention_flag
+									TAG = MXE
+								}
+							}
+							has_country_flag = SPR_mexican_intervention_flag
+							has_country_flag = FRA_mexican_intervention_flag
+							has_country_flag = ENG_mexican_intervention_flag
+							TAG = MXE
+						}
+					}
+					every_country = {
+						limit = { 
+							OR = {
+								TAG = USA 
+								is_subject_of = USA 
+							}
+						}
+						white_peace = PREV
 					}
 				}
 			}
-			else_if = {
-				limit = { MEC = { exists = yes } }
-				MEC = {
-					every_owned_state = {
-						add_core_of = MXE
-						MXE = { transfer_state = PREV }
-					}
+			if = {
+				limit = {
+					SPR = { has_country_flag = SPR_mexican_intervention_flag } 
+				}
+				SPR = { clr_country_flag = SPR_mexican_intervention_flag }
+				if = {
+					limit = { FRA = { has_global_flag = FRA_mexican_intervention_flag } }
+					SPR = { complete_national_focus = SPR_european_victory_mex }
+				}
+				else = { 
+					SPR = { complete_national_focus = SPR_spanish_victory_mex }
 				}
 			}
-			FRA = { complete_national_focus = FRA_mexico_victory }
+			if = {
+				limit = {
+					FRA = { has_country_flag = FRA_mexican_intervention_flag } 
+				}
+				FRA = { complete_national_focus = FRA_mexico_victory }
+				FRA = { clr_country_flag = FRA_mexican_intervention_flag } 
+			}
+			if = {
+				limit = {
+					ENG = { has_country_flag = ENG_mexican_intervention_flag } 
+				}
+				ENG = { clr_country_flag = ENG_mexican_intervention_flag } 
+			}
+			if = {
+				limit = {
+					USA = { has_country_flag = USA_mexican_intervention_flag } 
+				}
+				USA = { clr_country_flag = USA_mexican_intervention_flag }
+				USA = { clr_global_flag = USA_mexican_intervention_flag }
+			}
 		}
 	}
 
@@ -3748,13 +3836,21 @@ country_event = { #Imperial Triumph (called by on_peaceconference_ended on_actio
 	
 	option = {
 		name = SPR_mexican_expedition.3635.b
+		trigger = { NOT = { TAG = MXE } }
 		hidden_effect = {
 			if = {
 				limit = { has_global_flag = SPR_mexican_intervention_mission_end_flag }
 				clr_global_flag = SPR_mexican_intervention_mission_end_flag
 			}
+			ROOT = { diplomatic_relation = { country = MXE relation = military_access active = no } }
+			ROOT = { diplomatic_relation = { country = MXE relation = non_aggression_pact active = yes } }
+			if = { 
+				limit = { has_dlc = "Man the Guns" } 
+				ROOT = { diplomatic_relation = { country = MXE relation = docking_rights active = yes } }
+			}
 		}
-		trigger = { NOT = { TAG = MXE } }
+		add_stability = 0.075
+		add_political_power = 150
 	}
 }
 #----------------------------------------------------
