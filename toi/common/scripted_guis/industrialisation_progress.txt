@@ -1165,12 +1165,56 @@ scripted_gui = {
 		visible = {
 			has_country_flag = NMC_opened
 		}
+		effects={
+			nmissle_container_escape_click={
+				clr_country_flag = NMC_opened
+			}
+			nmissle_toggle_production_click={
+				if={
+					limit = {check_variable = {NMC_production_active > 0}}
+					set_variable = {NMC_production_active = 0}
+				}
+				else={set_variable = {NMC_production_active = 2}}
+			}
+			nmissle_r_and_d_tab_button_click={
+				set_variable = {NMC_opened_tab = 0}
+			}
+			nmissle_production_tab_button_click={
+				set_variable = {NMC_opened_tab = 2}
+			}
+			nmissle_targeting_tab_button_click={
+				set_variable = {NMC_opened_tab = 1}
+			}
+		}
+		properties = {
+			nmissle_toggle_production = { frame = NMC_production_active}
+			nmissle_r_and_d_tab_button= { image = "[GetMissileGetTabRDStatus]"}
+			nmissle_production_tab_button= { image = "[MISSILE_GET_TAB_PRODUCTION_STATUS]"}
+			nmissle_targeting_tab_button= { image = "[MISSILE_GET_TAB_TARGETING_STATUS]"}
+		}
+		triggers={
+			nmissle_toggle_production_click_enabled={
+				always = no#change to check if nmc production is enabled
+			}
+		}
+	}
+	nuclear_missile_targeting_tab = {
+		window_name = "nmissle_targeting_tab"
+		
+		context_type = country_context
+		parent_window_name = nmissle_container
+	    ai_enabled={
+			always = no
+		}
+ 
+		visible = {
+			has_country_flag = NMC_opened
+			check_variable = { NMC_opened_tab = 1 }
+		}
 		properties = {
 			nmissle_target_country = { image = "[GET_CURRENT_MISSILE_TARGETED_NATION]"}
 			missile_target_owner_flag = { image = "[?zmissile_targeted_states_country_array^i.GetFlag]" }
 			missile_current_target_country = { image = "[?zmissile_current_nuke_target.GetFlag]" }
-			deployment_nukes_2 = { image = "[MISSILE_GET_CURRENT_NUKE_COUNT]" }
-			deployment_nukes_1 = { image = "[MISSILE_GET_CURRENT_STORED_MISSILE_COUNT]" }
 		}
         effects = {
 			launch_strike_click={#the big red button
@@ -1248,23 +1292,11 @@ scripted_gui = {
 				#unassign nuked target
 				set_variable = { ROOT.zmissile_current_nuke_target=0 }
 			}
-			missile_build_missile_click={
-				#subtract_from_variable={ROOT.num_equipment@icbm_3 = 1}
-				add_equipment_to_stockpile = {
-					type = icbm_equipment
-					amount = -1
-				}
-				add_nuclear_bombs = -1
-				add_to_variable = { num_prepared_nuclear_missiles = 1}
-			}
 			launch_pad_switch_cover_open_click={
 				clr_country_flag = launch_ready
 			}
 			launch_pad_switch_cover_click={
 				set_country_flag = launch_ready
-			}
-			nmissle_container_escape_click={
-				clr_country_flag = NMC_opened
 			}
 			nmissle_target_country_click={
 				set_variable = {zmissile_current_nuke_target = zmissile_targeted_states_country_array^i}
@@ -1361,12 +1393,6 @@ scripted_gui = {
 			nmissle_targeted_list_move_up_visible={
 				check_variable = {i > 0}
 			}
-			missile_build_missile_click_enabled={
-				has_equipment = {
-					icbm_equipment > 0
-				}
-				num_of_nukes > 0
-			}
         }
 		dynamic_lists = {
 			nmissle_targeted_list = {
@@ -1375,17 +1401,101 @@ scripted_gui = {
 			}
 		}
 	}
+	nuclear_missile_r_and_d_tab = {
+		window_name = "nmissle_r_and_d_tab"
+		
+		context_type = country_context
+		parent_window_name = nmissle_container
+	    ai_enabled={
+			always = no
+		}
+ 
+		visible = {
+			has_country_flag = NMC_opened
+			check_variable = { NMC_opened_tab = 0 }
+		}
+		
+		effects={
+			nmissle_rd_research_1_1_click={
+				set_variable = {NMC_research_array^0 = 2}
+			}
+			nmissle_rd_research_1_2_click={
+				set_variable = {NMC_research_array^1 = 2}
+			}
+			nmissle_rd_research_2_1_click={
+				set_variable = {NMC_research_array^2 = 2}
+			}
+			nmissle_rd_research_2_2_click={
+				set_variable = {NMC_research_array^3 = 2}
+			}
+			nmissle_rd_extraction_1_click={
+				set_variable = {NMC_research_array^4 = 2}
+			}
+			nmissle_rd_extraction_2_click={
+				set_variable = {NMC_research_array^5 = 2}
+			}
+		}
+		triggers={
+			nmissle_rd_research_1_1_click_enabled = {
+				has_political_power > 20
+			}
+			nmissle_rd_research_1_1_visible = {
+				check_variable = {NMC_research_array^0 = 0}
+			}
+			nmissle_rd_research_1_2_click_enabled = {
+				has_political_power > 20
+				check_variable = {NMC_research_array^0 = 2}
+			}
+			nmissle_rd_research_1_2_visible = {
+				check_variable = {NMC_research_array^1 = 0}
+			}
+			nmissle_rd_research_2_1_click_enabled = {
+				has_political_power > 20
+			}
+			nmissle_rd_research_2_1_visible = {
+				check_variable = {NMC_research_array^2 = 0}
+			}
+			nmissle_rd_research_2_2_click_enabled = {
+				has_political_power > 20
+				check_variable = {NMC_research_array^2 = 2}
+			}
+			nmissle_rd_research_2_2_visible = {
+				check_variable = {NMC_research_array^3 = 0}
+			}
+			nmissle_rd_extraction_1_click_enabled = {
+				has_political_power > 20
+			}
+			nmissle_rd_extraction_1_visible = {
+				check_variable = {NMC_research_array^4 = 0}
+			}
+			nmissle_rd_extraction_2_click_enabled = {
+				has_political_power > 20
+				check_variable = {NMC_research_array^4 = 2}
+			}
+			nmissle_rd_extraction_2_visible = {
+				check_variable = {NMC_research_array^5 = 0}
+			}
+		}
+		properties = {
+			nmc_research_1_light = { frame = NMC_research_array^1}
+			nmc_research_2_light = { frame = NMC_research_array^3}
+			nmc_extraction_light = { frame = NMC_research_array^5}
+		}
+	}
 	nuclear_missile_targeting = {
        window_name = "nuclear_missile_targeting_container"
  
        context_type = selected_state_context
 	   parent_window_token = selected_state_view 
 		
-		 ai_enabled={
+		ai_enabled={
 			always = no
 		}
 		visible = {
-			ROOT={has_country_flag = NMC_opened}
+			ROOT={
+				has_country_flag = NMC_opened
+				check_variable = { NMC_opened_tab = 1 }
+			}
 		}
  
         effects = {
