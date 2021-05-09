@@ -380,3 +380,180 @@ NA_B_Trans_Continental_Railroad_category = {
 		}
 	}
 }
+
+NA_B_economic_panic_category = {
+	
+	na_b_economic_panic_industry_bankruptcy_protections = {
+		available = {
+			if = {
+				limit = { 
+					TAG = USA 
+					has_country_leader = { name = "James Buchanan" ruling_only = yes }
+				}
+				NOT = { has_country_leader = { name = "James Buchanan" ruling_only = yes } }
+			}
+			NOT = { has_idea = low_taxes }
+			NOT = { has_idea = very_low_taxes }
+		}
+		visible = {
+			has_country_flag = na_b_monthly_economic_panic_countdown_flag 
+		}
+		cost = 25
+		days_remove = 90
+		fire_only_once = no
+		modifier = {
+			custom_modifier_tooltip = na_b_economic_panic_chance_of_industry_closing_reduced_10
+			political_power_cost = 0.10
+			consumer_goods_factor = 0.15
+			stability_weekly_factor = 0.12
+			production_speed_buildings_factor = 0.07
+		}
+		complete_effect = {
+			add_stability = 0.025
+			hidden_effect = { set_country_flag = na_b_economic_panic_industry_bankruptcy_protections_flag }
+		}
+		remove_effect = { 
+			hidden_effect = { clr_country_flag = na_b_economic_panic_industry_bankruptcy_protections_flag }
+		}
+		ai_will_do = {
+			factor = 500
+		}
+	}
+	
+	na_b_economic_panic_temporary_tax_relief = {
+		available = {
+			if = {
+				limit = { 
+					TAG = USA 
+					OR = {
+						has_idea = USA_1857Panic0
+						has_idea = USA_1857Panic1
+					}
+				}
+				has_completed_focus = USA_reduced_public_works
+			}
+			NOT = { has_idea = very_low_taxes }
+			custom_trigger_tooltip = {
+				tooltip = na_b_economic_panic_has_low_debt
+				check_variable = { debt_level < 20 }
+			}
+		}
+		visible = {
+			has_country_flag = na_b_monthly_economic_panic_countdown_flag 
+		}
+		cost = 75
+		days_remove = 275
+		days_re_enable = 720
+		fire_only_once = no
+		modifier = {
+			custom_modifier_tooltip = na_b_economic_panic_chance_of_industry_closing_reduced_5
+			political_power_gain = -0.15
+			drift_defence_factor = 0.12
+			stability_weekly_factor = 0.15
+			production_speed_buildings_factor = 0.05
+		}
+		complete_effect = {
+			set_country_flag = na_b_economic_panic_temporary_tax_relief_flag
+			add_stability = 0.05
+			if = {
+				limit = { NOT = { has_country_flag = na_b_economic_panic_temporary_tax_relief_flag } }
+				if = { 
+					limit = { has_idea = low_taxes }
+					swap_ideas = {
+						remove_idea = low_taxes
+						add_idea = very_low_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = normal_taxes }
+					swap_ideas = {
+						remove_idea = normal_taxes
+						add_idea = low_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = high_taxes }
+					swap_ideas = {
+						remove_idea = high_taxes
+						add_idea = normal_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = very_high_taxes }
+					swap_ideas = {
+						remove_idea = very_high_taxes
+						add_idea = high_taxes
+					}
+				}
+			}
+		}
+		remove_effect = {
+			if = {
+				limit = { has_country_flag = na_b_economic_panic_temporary_tax_relief_flag }
+				if = { 
+					limit = { has_idea = very_low_taxes }
+					swap_ideas = {
+						remove_idea = very_low_taxes
+						add_idea = low_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = low_taxes }
+					swap_ideas = {
+						remove_idea = low_taxes
+						add_idea = normal_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = normal_taxes }
+					swap_ideas = {
+						remove_idea = normal_taxes
+						add_idea = high_taxes
+					}
+				}
+				else_if = { 
+					limit = { has_idea = high_taxes }
+					swap_ideas = {
+						remove_idea = high_taxes
+						add_idea = very_high_taxes
+					}
+				}
+				clr_country_flag = na_b_economic_panic_temporary_tax_relief_flag
+			}
+			else = { custom_effect_tooltip = na_b_economic_panic_temporary_tax_relief_tooltip }
+		}
+		ai_will_do = {
+			factor = 500
+		}
+	}
+	
+	na_b_monthly_economic_panic_countdown = {
+		available = { 
+			hidden_trigger = { always = no }
+		}
+		visible = { has_country_flag = na_b_monthly_economic_panic_countdown_flag }
+		fire_only_once = no
+		days_remove = 30
+		modifier = { 
+			drift_defence_factor = -0.35
+			stability_weekly_factor = -0.50
+			production_speed_buildings_factor = -0.25 
+		}
+		cancel_trigger = { 
+			custom_trigger_tooltip = {
+				tooltip = na_b_economic_panic_addressed
+				NOT = { has_country_flag = na_b_monthly_economic_panic_countdown_flag }
+			}
+		}
+		complete_effect = {
+			#Event in egy_debt_system_temp file
+			country_event = { id = na_b_monthly_economic_panic_report.1 }
+        }
+		remove_effect = {
+			custom_effect_tooltip = na_b_monthly_economic_panic_countdown_timeout_tooltip
+			hidden_effect = {
+				ROOT = { activate_decision = na_b_monthly_economic_panic_countdown }
+			}
+        }
+	}
+}
