@@ -3061,10 +3061,10 @@ add_namespace = acw_first_nations_trigger
 						limit = { owns_state = 383 }
 						383 = { set_demilitarized_zone = yes }
 					}
-					news_event = { id = usa_slavery_debate_secession.21 days = 1 random_days = 99 }
-					news_event = { id = usa_slavery_debate_secession.22 days = 1 random_days = 99 }
-					news_event = { id = usa_slavery_debate_secession.24 days = 1 random_days = 99 }
-					news_event = { id = usa_slavery_debate_secession.25 days = 1 random_days = 99 }
+					news_event = { id = usa_slavery_debate_secession.21 days = 1 random_days = 30 }
+					news_event = { id = usa_slavery_debate_secession.22 days = 1 random_days = 30 }
+					news_event = { id = usa_slavery_debate_secession.24 days = 1 random_days = 30 }
+					news_event = { id = usa_slavery_debate_secession.25 days = 1 random_days = 30 }
 					if = {
 						limit = {
 							USA = {
@@ -3226,10 +3226,11 @@ add_namespace = acw_first_nations_trigger
 					add_state_core = 357
 					357 = { set_demilitarized_zone = no }
 					eoanb_add_1_prestige_score = yes
+					activate_mission = eoanb_decision_acw_brewing
 					create_country_leader = {
-						name = "Thaddeus Stevens"
+						name = "Congress Of Free States"
 						desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
-						picture = "Portrait_USA_Thaddeus_Stevens.dds"
+						picture = "Portrait_NEG_Congress_Of_Free_States.dds"
 						expire = "1947.1.1"
 						ideology = liberal_social
 					}
@@ -3293,6 +3294,7 @@ add_namespace = acw_first_nations_trigger
 				}
 				USA = {
 					set_variable = { rival_country = NEG.id }
+					activate_mission = eoanb_decision_acw_brewing
 				}
 				if = {
 					limit = { tag = USA }
@@ -4038,6 +4040,12 @@ news_event = {
 
 	immediate = { 
 		hidden_effect = {
+			USA = {
+				add_days_mission_timeout = {
+					mission = eoanb_decision_acw_brewing
+					days = -100
+				}
+			}
 			if = {
 				limit = { tag = USA }
 				set_global_flag = ACW_American_Civil_War_Start
@@ -4483,27 +4491,25 @@ country_event = {
 
 	option = {
 		name = acw_generic.11.a
-
 		add_political_power = 120
 		add_war_support = 0.8
-    add_stability = 0.6
-
-    if = {
-      limit = { tag = USA }
-			# hidden_effect = {
-	    #   if = {
-	    #     limit = { is_historical_focus_on = yes }
-      #     add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
-	    #   }
-	    # }
-    }
-    if = {
-      limit = { tag = CSA }
-      add_timed_idea = {
-        idea = CSA_civil_war_cotton_dismay
-        days = 240
-      }
-    }
+    	add_stability = 0.6
+		if = {
+		limit = { tag = USA }
+				# hidden_effect = {
+			#   if = {
+			#     limit = { is_historical_focus_on = yes }
+			#     add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
+			#   }
+			# }
+		}
+		if = {
+			limit = { tag = CSA }
+			add_timed_idea = {
+				idea = CSA_civil_war_cotton_dismay
+				days = 240
+			}
+		}
 	}
 }
 
@@ -9454,18 +9460,6 @@ country_event = {
     hidden_effect = {
       if = {
         limit = {
-          NOT = {
-            USA = {
-              has_idea = USA_Spirit_Civil_War_Initial_Disorganize
-            }
-          }
-        }
-        USA = { country_event = { id = acw.6 } }
-      }
-    }
-    hidden_effect = {
-      if = {
-        limit = {
           has_global_flag = ACW_Norton_Marked
         }
         country_event = { id = acw.52 days = 1 }
@@ -9675,6 +9669,15 @@ country_event = { # Stevens resigns from Congress, Jan 21
 				id = acw_breckinridge.17
 				days = 5
 			}
+			NEG = {
+				create_country_leader = {
+					name = "Thaddeus Stevens"
+					desc = "POLITICS_FRANKLIN_DELANO_ROOSEVELT_DESC"
+					picture = "Portrait_USA_Thaddeus_Stevens.dds"
+					expire = "1947.1.1"
+					ideology = liberal_social
+				}
+			}
 		}
 	}
 
@@ -9773,7 +9776,6 @@ country_event = { # Boston Harbor Incident (ACW Starts!)
 				country_event = { id = acw_generic.6 days = 20 }
 				country_event = { id = acw_generic.7 days = 40 }
 				country_event = { id = acw_generic.8 days = 60 }
-				activate_mission = eoanb_decision_acw_brewing
 				add_ideas = {
 					USA_Spirit_American_Civil_War
 				}
@@ -9786,7 +9788,6 @@ country_event = { # Boston Harbor Incident (ACW Starts!)
 				country_event = { id = acw_generic.6 days = 20 }
 				country_event = { id = acw_generic.7 days = 40 }
 				country_event = { id = acw_generic.8 days = 60 }
-				activate_mission = eoanb_decision_acw_brewing
 				add_ideas = {
 					USA_Spirit_American_Civil_War
 				}
@@ -9877,6 +9878,64 @@ country_event = {
 	option = {
 		name = acw_breckinridge.20.b
 		add_political_power = 75
+	}
+}
+
+country_event = { # Major Northern Generals join FSA (USA perspective)
+	id = acw_breckinridge.21
+	title = acw_breckinridge.21.t
+	desc = acw_breckinridge.21.desc
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			USA = {
+				every_unit_leader = {
+					limit = {
+						OR = {
+							has_id = 5004
+							has_id = 5005
+							has_id = 5006
+							has_id = 5007
+							has_id = 5008
+							has_id = 5009
+							has_id = 5010
+							has_id = 5011
+							has_id = 5012
+							has_id = 5013
+							has_id = 5014
+							has_id = 5015
+							has_id = 5016
+							has_id = 5017
+							has_id = 5018
+							has_id = 5019
+						}
+					}
+					set_nationality = NEG
+				}
+			}
+			NEG = {
+				country_event = acw_breckinridge.22
+			}
+		}
+	}
+
+	option = {
+		name = acw_breckinridge.21.a
+		custom_effect_tooltip = acw_breckinridge_21_tt
+	}
+}
+
+country_event = { # Major Northern Generals join FSA (FSA perspective)
+	id = acw_breckinridge.22
+	title = acw_breckinridge.22.t
+	desc = acw_breckinridge.22.desc
+
+	is_triggered_only = yes
+
+	option = {
+		name = acw_breckinridge.22.a
 	}
 }
 
