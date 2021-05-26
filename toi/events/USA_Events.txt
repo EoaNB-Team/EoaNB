@@ -1616,6 +1616,28 @@ country_event = {
 	}
 }
 
+country_event = { # Congressional Elections (Put scripted effects for Congressional elections here)
+	id = usaPolitics.2
+	title = usaPolitics.2.t
+	desc = usaPolitics.2.desc
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			compute_national_vote = yes
+			country_event = {
+				id = usaPolitics.2
+				days = 730
+			}
+		}
+	}
+
+	option = {
+		name = usaPolitics.2.a
+	}
+}
+
 # #Election of 1860
 # country_event = {
 # 	id = usa.10
@@ -2081,14 +2103,13 @@ country_event = {
 	}
 }
 
-#Persecute Confederates
+#Persecute Rebels
 country_event = {
 	id = usa.25
 	title = usa.25.t
 	desc = usa.25.d
 	picture = GFX_report_event_worker_protests
 
-	fire_only_once = yes
 	is_triggered_only = yes
 
 	option = {
@@ -2101,10 +2122,23 @@ country_event = {
 		if = {
 			limit = {
 				NOT = { has_global_flag = Davis_Flees }
+				NOT = { has_country_flag = usa_acw_northern_revolt }
 			}
 			hidden_effect = { USA = { country_event = { id = usa.47 days = 20 } } }
 		}
-		set_country_flag = USA_Confederate_Investigation
+		if = {
+			limit = {
+				has_country_flag = usa_acw_northern_revolt
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = usa_acw_northern_revolt
+				}
+			}
+			set_country_flag = USA_Confederate_Investigation
+		}
 	}
 	option = {
 		name = usa.25.c
@@ -2115,7 +2149,19 @@ country_event = {
 			}
 			hidden_effect = { USA = { country_event = { id = usa.47 days = 10 } } }
 		}
-		set_country_flag = USA_Confederate_Investigation
+		if = {
+			limit = {
+				has_country_flag = usa_acw_northern_revolt
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = usa_acw_northern_revolt
+				}
+			}
+			set_country_flag = USA_Confederate_Investigation
+		}
 	}
 }
 
@@ -3010,7 +3056,7 @@ country_event = {
 	}
 }
 
-#Jefferson Davis captured
+#Jefferson Davis captured / Thaddeus Stevens Captured
 country_event = {
 	id = usa.47
 	title = usa.47.t
@@ -3022,6 +3068,12 @@ country_event = {
 	option = {
 		name = usa.47.a
 		add_political_power = 25
+		if = {
+			limit = {
+				has_country_flag = usa_acw_northern_revolt
+			}
+			set_country_flag = Stevens_Captured
+		}
 		set_country_flag = Davis_Captured
 		add_to_variable = {
 			var = reconstruction_points
@@ -3966,11 +4018,18 @@ country_event = {
 			var = reconstruction_points
 			value = 5
 		}
-		add_popularity = {
-			ideology = traditional_conservatism
-			popularity = -0.03
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = usa_acw_northern_revolt
+				}
+			}
+			add_popularity = {
+				ideology = traditional_conservatism
+				popularity = -0.03
+			}
+			add_ideas = USA_freedman_bureau
 		}
-		add_ideas = USA_freedman_bureau
 		custom_effect_tooltip = USA_reconstruction_add_5
 		add_political_power = -50
 		ai_chance = {
@@ -4023,7 +4082,7 @@ country_event = {
 		}
 	}
 }
-#Seizing Plantations
+#Seizing Plantations / Establish New Plantations
 country_event = {
 	id = usa.80
 	title = usa.80.t
@@ -4056,12 +4115,28 @@ country_event = {
 				level = 1
 			}
 		}
-		add_timed_idea = {
-			idea = USA_seize_plantations
-			days = 400
+		if = {
+			limit = {
+				has_country_flag = usa_acw_northern_revolt
+			}
+			add_timed_idea = {
+				idea = USA_incentivizing_plantations
+				days = 400
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = usa_acw_northern_revolt
+				}
+			}
+			add_timed_idea = {
+				idea = USA_seize_plantations
+				days = 400
+			}
 		}
 		add_popularity = {
-			ideology = traditional_conservatism
+			ideology = centrism
 			popularity = 0.04
 		}
 		add_political_power = -50
@@ -4090,23 +4165,39 @@ country_event = {
 				level = 1
 			}
 		}
-		add_timed_idea = {
-			idea = USA_seize_plantations
-			days = 400
+		if = {
+			limit = {
+				has_country_flag = usa_acw_northern_revolt
+			}
+			add_timed_idea = {
+				idea = USA_incentivizing_plantations
+				days = 400
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					has_country_flag = usa_acw_northern_revolt
+				}
+			}
+			add_timed_idea = {
+				idea = USA_seize_plantations
+				days = 400
+			}
 		}
 		add_popularity = {
-			ideology = traditional_conservatism
+			ideology = centrism
 			popularity = 0.02
 		}
 		custom_effect_tooltip = USA_reconstruction_add_1
 		ai_chance = {
 			factor = 0
 			modifier = {
-				factor = 100
+				factor = 50
 				has_government = centrism
 			}
 			modifier = {
-				factor = 50
+				factor = 100
 				has_government = traditional_conservatism
 			}
 		}
@@ -4116,11 +4207,11 @@ country_event = {
 		ai_chance = {
 			factor = 0
 			modifier = {
-				factor = 100
+				factor = 50
 				has_government = social_egalitarianism
 			}
 			modifier = {
-				factor = 50
+				factor = 100
 				has_government = traditional_conservatism
 			}
 		}
@@ -4237,7 +4328,7 @@ country_event = {
 			value = 3
 		}
 		add_popularity = {
-			ideology = traditional_conservatism
+			ideology = social_egalitarianism
 			popularity = 0.05
 		}
 		ai_chance = {
@@ -4257,7 +4348,7 @@ country_event = {
 		name = usa.82.b
 		add_political_power = 10
 		add_popularity = {
-			ideology = traditional_conservatism
+			ideology = centrism
 			popularity = 0.04
 		}
 		ai_chance = {
@@ -4277,7 +4368,7 @@ country_event = {
 			value = 3
 		}
 		add_popularity = {
-			ideology = traditional_conservatism
+			ideology = centrism
 			popularity = 0.03
 		}
 		ai_chance = {
@@ -13958,6 +14049,22 @@ country_event = {
 			has_completed_focus = USA_covode_committee
 		}
 		set_country_flag = breckinridge_sucessor
+		add_political_power = 100
+		if = {
+			limit = {
+				has_completed_focus = USA_covode_committee
+			}
+			add_popularity = {
+				ideology = radical_democracy
+				popularity = -0.05
+			}
+		}
+		else = {
+			add_popularity = {
+				ideology = radical_democracy
+				popularity = -0.025
+			}
+		}
 	}
 	option = {
 		name = usa.219.b
@@ -13965,6 +14072,22 @@ country_event = {
 			has_completed_focus = USA_close_ranks
 		}
 		set_country_flag = douglas_successor
+		add_political_power = 100
+		if = {
+			limit = {
+				has_completed_focus = USA_covode_committee
+			}
+			add_popularity = {
+				ideology = traditional_conservatism
+				popularity = 0.05
+			}
+		}
+		else = {
+			add_popularity = {
+				ideology = traditional_conservatism
+				popularity = 0.025
+			}
+		}
 	}
 	option = {
 		name = usa.219.c
@@ -14276,7 +14399,7 @@ country_event = {
 }
 
 ##Walker gets stopped by the navy
-country_event = {	
+country_event = {
 	id = usa.232
 	title = usa.232.a
 	desc = usa.232.b
