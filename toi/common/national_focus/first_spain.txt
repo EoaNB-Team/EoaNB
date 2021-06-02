@@ -96,39 +96,40 @@ focus_tree = {
 		relative_position_id = SPR_insure_the_goverment
 		x = 1
 		y = 1
-		cost = 60
+		cost = 30
 		available_if_capitulated = no
 		available = {
-			AND = {
-				date < 1858.01.01
-				has_government = traditional_conservatism
-			}
+			date < 1858.01.01
+			has_government = traditional_conservatism
+			controls_state = 166
+			controls_state = 175
+			controls_state = 804
 		}
 		ai_will_do = { base = 100 }
+		bypass = {
+			OR = {
+				NOT = {
+					owns_state = 166
+					owns_state = 175
+					owns_state = 804
+				}
+			}
+		}
 
 		prerequisite = { focus = SPR_insure_the_goverment }
 
 		completion_reward = {
-			804 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
+			custom_effect_tooltip = SPR_customeffect_infra_bonus_three
+			activate_mission_tooltip = SPR_mission_madrid_zaragoza_railway_concession
+			hidden_effect = {
+				set_variable = { infra_total = 0 }
+				every_owned_state = {
+					add_to_variable = { ROOT.infra_total = infrastructure_level }
 				}
-			}
-			41 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
-				}
-			}
-			166 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
-				}
+				set_variable = { infra_total_bonus = infra_total }
+				add_to_variable = { infra_total_bonus = 3 }
+				activate_mission = SPR_mission_madrid_zaragoza_railway_concession
+				add_ideas = SPR_idea_boost_infra_1
 			}
 		}
 	}
@@ -165,7 +166,7 @@ focus_tree = {
 		relative_position_id = SPR_stop_confiscation
 		x = 1
 		y = 1
-		cost = 60
+		cost = 30
 		available_if_capitulated = no
 		available = {
 			AND = {
@@ -613,10 +614,16 @@ focus = {
 		y = 1
 		cost = 60
 		available_if_capitulated = no
+		available = {
+			OR = {
+				has_completed_focus = SPR_the_president
+				has_completed_focus = SPR_the_queen
+			}
+		}
 		ai_will_do = { base = 100 }
 
 		completion_reward = {
-			#add_ideas = SPR_national_roads_expansion
+			add_ideas = SPR_idea_national_roads_plan
 		}
 	}
 	
@@ -633,7 +640,8 @@ focus = {
 		prerequisite = { focus = SPR_national_roads_plan }
 
 		completion_reward = {
-			#give idea that boost resource output
+			unlock_decision_tooltip = SPR_decision_coal_mines
+			add_ideas = SPR_idea_mining_revolution_1
 		}
 	}
 	
@@ -650,7 +658,19 @@ focus = {
 		prerequisite = { focus = SPR_mining_revolution }
 
 		completion_reward = {
-			#iron in basque county
+			unlock_decision_tooltip = SPR_decision_develop_basque_iron
+			if = {
+				limit = {
+					has_idea = SPR_idea_mining_revolution_1
+				}
+				swap_ideas = { remove_idea = SPR_idea_mining_revolution_1 add_idea = SPR_idea_mining_revolution_2 }
+			}
+			else_if = {
+				limit = {
+					has_idea = SPR_idea_mining_revolution_3
+				}
+				swap_ideas = { remove_idea = SPR_idea_mining_revolution_3 add_idea = SPR_idea_mining_revolution_4 }
+			}
 		}
 	}
 
@@ -662,13 +682,38 @@ focus = {
 		y = 1
 		cost = 60
 		available_if_capitulated = no
+		available = {
+			has_tech = industrial_blast_furnace
+		}
 		ai_will_do = { base = 100 }
 		
 		prerequisite = { focus = SPR_mining_revolution }
 
 		completion_reward = {
-			#steel mill production bonus?
-			#mission to finish the mill in the Toledo region and if successful add an idea?
+			custom_effect_tooltip = SPR_customeffect_steel_bonus_one
+			activate_mission_tooltip = SPR_mission_acero_toledano
+			hidden_effect = {
+				set_variable = { steel_total = 0 }
+				every_owned_state = {
+					add_to_variable = { ROOT.steel_total = building_level@steel_mill }
+				}
+				set_variable = { steel_total_bonus = steel_total }
+				add_to_variable = { steel_total_bonus = 1 }
+				add_ideas = SPR_idea_boost_steel
+				activate_mission = SPR_mission_acero_toledano
+			}
+			if = {
+				limit = {
+					has_idea = SPR_idea_mining_revolution_1
+				}
+				swap_ideas = { remove_idea = SPR_idea_mining_revolution_1 add_idea = SPR_idea_mining_revolution_3 }
+			}
+			else_if = {
+				limit = {
+					has_idea = SPR_idea_mining_revolution_2
+				}
+				swap_ideas = { remove_idea = SPR_idea_mining_revolution_2 add_idea = SPR_idea_mining_revolution_4 }
+			}
 		}
 	}
 
@@ -685,8 +730,9 @@ focus = {
 		prerequisite = { focus = SPR_national_roads_plan }
 		
 		completion_reward = {
-			#research bonus
-			#pp
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = humanities_tech }
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = electronics_devices_tech }
+			add_political_power = 75
 		}
 	}
 	
@@ -703,7 +749,8 @@ focus = {
 		prerequisite = { focus = SPR_telegraph_network }
 
 		completion_reward = {
-			#
+			add_tech_bonus = { bonus = 0.25 uses = 2 category = humanities_tech }
+			add_political_power = 75
 		}
 	}
 
@@ -715,12 +762,19 @@ focus = {
 		y = 2
 		cost = 60
 		available_if_capitulated = no
+		available = {
+			date > 1864.1.1
+		}
 		ai_will_do = { base = 100 }
 		
 		prerequisite = { focus = SPR_banking_investments }
 
 		completion_reward = {
-			#
+			increase_ps_by_one = yes
+			add_timed_idea = {
+				idea = SPR_idea_currency_reform
+				days = 365
+			}
 		}
 	}
 
@@ -737,8 +791,17 @@ focus = {
 		prerequisite = { focus = SPR_reforming_the_escudo }
 
 		completion_reward = {
-			#research bonus
-			#change state laws regarding research funding?
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = humanities_tech }
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
+			if = {
+				limit = {
+					has_idea = sfund_private_ventures_only
+				}
+				swap_ideas = { remove_idea = sfund_private_ventures_only add_idea = sfund_limited_state_sponsorship }
+			}
+			else = {
+				add_political_power = 75
+			}
 		}
 	}
 
@@ -755,8 +818,17 @@ focus = {
 		prerequisite = { focus = SPR_reforming_the_escudo }
 
 		completion_reward = {
-			#research bonus
-			#change state laws regarding research funding?
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = electronics_devices_tech }
+			if = {
+				limit = {
+					has_idea = sfund_private_ventures_only
+				}
+				swap_ideas = { remove_idea = sfund_private_ventures_only add_idea = sfund_limited_state_sponsorship }
+			}
+			else = {
+				add_political_power = 75
+			}
 		}
 	}
 
@@ -768,12 +840,36 @@ focus = {
 		y = 1
 		cost = 60
 		available_if_capitulated = no
+		available = {
+			controls_state = 176
+			controls_state = 804
+			NOT = { has_idea = SPR_idea_boost_infra_1 }
+		}
 		ai_will_do = { base = 100 }
+		bypass = {
+			OR = {
+				NOT = {
+					owns_state = 176
+					owns_state = 804
+				}
+			}
+		}
 		
 		prerequisite = { focus = SPR_national_roads_plan }
 		
 		completion_reward = {
-			#infrastructure build bonus
+			custom_effect_tooltip = SPR_customeffect_infra_bonus_two
+			activate_mission_tooltip = SPR_mission_valladolid_burgos_railway_concession
+			hidden_effect = {
+				set_variable = { infra_total = 0 }
+				every_owned_state = {
+					add_to_variable = { ROOT.infra_total = infrastructure_level }
+				}
+				set_variable = { infra_total_bonus = infra_total }
+				add_to_variable = { infra_total_bonus = 2 }
+				activate_mission = SPR_mission_valladolid_burgos_railway_concession
+				add_ideas = SPR_idea_boost_infra_2
+			}
 		}		
 	}
 	
@@ -1165,6 +1261,7 @@ focus = {
 		x = 1
 		y = 2
 		cost = 60
+		available = { always = no }
 		available_if_capitulated = no
 		ai_will_do = { base = 100 }
 		
@@ -1408,7 +1505,7 @@ focus = {
 			owns_state = 686
 			owns_state = 1350
 		}
-		ai_will_do = { base = 100 }
+		ai_will_do = { base = 10 }
 		
 		prerequisite = { focus = SPR_the_international_policy }
 
@@ -1432,13 +1529,17 @@ focus = {
 		cost = 60
 		available_if_capitulated = no
 		available = {
-			always = no
+			custom_trigger_tooltip = {
+				tooltip = SPR_mexico_expedition_tooltip
+				has_global_flag = SPR_mexican_intervention_global_flag
+			}
 		}
 		ai_will_do = { base = 100 }
 
 		prerequisite = { focus = SPR_america }
 
 		completion_reward = {
+			
 		}
 	}
 
@@ -1448,13 +1549,15 @@ focus = {
 		relative_position_id = SPR_mexico_expedition
 		x = -1
 		y = 1
-		cost = 60
+		cost = 25
 		available_if_capitulated = no
-		ai_will_do = { base = 100 }
+		ai_will_do = { base = 1000 }
 		
 		prerequisite = { focus = SPR_mexico_expedition }
 
 		completion_reward = {
+			custom_effect_tooltip = SPR_prepare_the_invasion_effect_tooltip
+			set_country_flag = SPR_prepare_the_invasion_flag
 		}		
 	}
 	
@@ -1464,13 +1567,14 @@ focus = {
 		relative_position_id = SPR_mexico_expedition
 		x = 1
 		y = 1
-		cost = 60
+		cost = 25
 		available_if_capitulated = no
-		ai_will_do = { base = 100 }
+		ai_will_do = { base = 1000 }
 		
 		prerequisite = { focus = SPR_mexico_expedition }
 
 		completion_reward = {
+			country_event = { id = SPR_mexican_expedition.6 }
 		}	
 	}
 	
@@ -1480,13 +1584,14 @@ focus = {
 		relative_position_id = SPR_mexico_expedition
 		x = 1
 		y = 2
-		cost = 60
+		cost = 25
 		available_if_capitulated = no
-		ai_will_do = { base = 100 }
+		ai_will_do = { base = 1000 }
 		
 		prerequisite = { focus = SPR_ask_france_to_join }
 
 		completion_reward = {
+			country_event = { id = SPR_mexican_expedition.10 }
 		}
 	}
 
@@ -1499,7 +1604,12 @@ focus = {
 		cost = 60
 		available_if_capitulated = no
 		ai_will_do = { base = 100 }
-		
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SPR_stay_in_the_war_tooltip
+				always = no
+			}
+		}
 		prerequisite = { focus = SPR_prepare_the_invasion }
 		prerequisite = { focus = SPR_ask_gb_to_join }
 
@@ -1509,13 +1619,13 @@ focus = {
 
 	focus = {
 		id = SPR_send_guns_to_mexico
-		#icon = GFX_goal_focus_fra_new_guns
+		icon = GFX_focus_fra_new_guns
 		relative_position_id = SPR_mexico_expedition
 		x = 0
 		y = 4
 		cost = 60
 		available_if_capitulated = no
-		ai_will_do = { base = 100 }
+		ai_will_do = { base = 10 }
 		
 		prerequisite = { focus = SPR_stay_in_the_war }
 
@@ -1584,15 +1694,11 @@ focus = {
 	focus = {
 		id = SPR_develop_cuba_and_puerto_rico
 		icon = GFX_focus_SPR_develop_cuba_and_puerto_rico
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_america
-		}
 		relative_position_id = SPR_america
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1613,31 +1719,24 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
-		
+		ai_will_do = { base = 100 }
 
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_america }
 
 		completion_reward = {
 			custom_effect_tooltip = SPR_develop_cuba_and_puerto_rico_effect_tooltip
 			set_country_flag = SPR_develop_cuba_and_puerto_rico_flag
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_invest_in_sugar_trade
 		icon = GFX_focus_SPR_invest_in_sugar_trade
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_develop_cuba_and_puerto_rico
-		}
 		relative_position_id = SPR_develop_cuba_and_puerto_rico
 		x = -2
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = SPR_owns_all_of_cuba_tooltip
@@ -1656,32 +1755,25 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_develop_cuba_and_puerto_rico }
 
 		completion_reward = {
 			custom_effect_tooltip = SPR_invest_in_sugar_trade_effect_tooltip
 			set_country_flag = SPR_invest_in_sugar_trade_flag
 			country_event = { id = spain_caribbean.1 }
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_expand_tobacco_plantations
 		icon = GFX_focus_SPR_expand_tobacco_plantations
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_develop_cuba_and_puerto_rico
-		}
 		relative_position_id = SPR_develop_cuba_and_puerto_rico
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = SPR_owns_all_of_cuba_tooltip
@@ -1700,32 +1792,25 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_develop_cuba_and_puerto_rico }
 
 		completion_reward = {
 			custom_effect_tooltip = SPR_expand_tobacco_plantations_effect_tooltip
 			set_country_flag = SPR_expand_tobacco_plantations_flag
 			country_event = { id = spain_caribbean.2 }
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_increase_cattle_land
 		icon = GFX_focus_SPR_increase_cattle_land
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_develop_cuba_and_puerto_rico
-		}
 		relative_position_id = SPR_develop_cuba_and_puerto_rico
 		x = 2
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1754,38 +1839,25 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_develop_cuba_and_puerto_rico }
 
 		completion_reward = {
 			custom_effect_tooltip = SPR_increase_cattle_land_effect_tooltip
 			set_country_flag = SPR_increase_cattle_land_flag
 			country_event = { id = spain_caribbean.3 }
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_modernize_plantations
 		icon = GFX_focus_SPR_modernize_plantations
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_invest_in_sugar_trade
-		}
-		prerequisite = {
-			focus = SPR_expand_tobacco_plantations
-		}
-		prerequisite = {
-			focus = SPR_increase_cattle_land
-		}
 		relative_position_id = SPR_expand_tobacco_plantations
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1819,10 +1891,11 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_invest_in_sugar_trade }
+		prerequisite = { focus = SPR_expand_tobacco_plantations }
+		prerequisite = { focus = SPR_increase_cattle_land }
 
 		completion_reward = {
 			add_tech_bonus = {
@@ -1831,25 +1904,16 @@ focus = {
 				category = farming_tech
 			}
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_give_power_to_the_landowners
 		icon = GFX_focus_SPR_give_power_to_the_landowners
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_modernize_plantations
-		}
-		mutually_exclusive = {
-			focus = SPR_expand_the_telegraph_in_the_caribbean
-		}
 		relative_position_id = SPR_modernize_plantations
 		x = -1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1870,34 +1934,26 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
+		prerequisite = { focus = SPR_modernize_plantations }
 
-		
-		available_if_capitulated = no
+		mutually_exclusive = { focus = SPR_expand_telegraph_lines_in_the_caribbean }
 
 		completion_reward = {
 			add_political_power = 200
 			remove_ideas = SPR_cuban_trading_boom
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
-		id = SPR_expand_the_telegraph_in_the_caribbean
-		icon = GFX_focus_SPR_expand_the_telegraph_in_the_caribbean
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_modernize_plantations
-		}
-		mutually_exclusive = {
-			focus = SPR_give_power_to_the_landowners
-		}
+		id = SPR_expand_telegraph_lines_in_the_caribbean
+		icon = GFX_focus_SPR_expand_telegraph_lines_in_the_caribbean
 		relative_position_id = SPR_modernize_plantations
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1918,10 +1974,11 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
+		prerequisite = { focus = SPR_modernize_plantations }
 
-		
-		available_if_capitulated = no
+		mutually_exclusive = { focus = SPR_give_power_to_the_landowners }
 
 		completion_reward = {
 			315 = {
@@ -1952,23 +2009,17 @@ focus = {
 					instant_build = yes
 				}
 			}
-		}
-
-		ai_will_do = { base = 100 }
+		}		
 	}
 	
 	focus = {
 		id = SPR_absorb_caribbean_institutions
 		icon = GFX_focus_SPR_absorb_caribbean_institutions
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_expand_the_telegraph_in_the_caribbean
-		}
-		relative_position_id = SPR_expand_the_telegraph_in_the_caribbean
+		relative_position_id = SPR_expand_telegraph_lines_in_the_caribbean
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -1989,30 +2040,23 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
+		prerequisite = { focus = SPR_expand_telegraph_lines_in_the_caribbean }
 		
-		available_if_capitulated = no
-
 		completion_reward = {
 			add_state_core = 686
-		}
-
-		ai_will_do = { base = 100 }
+		}	
 	}
 	
 	focus = {
-		id = SPR_create_the_capitaincy
-		icon = GFX_focus_SPR_create_the_capitaincy
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_give_power_to_the_landowners
-		}
+		id = SPR_recreate_the_capitaincy
+		icon = GFX_focus_SPR_recreate_the_capitaincy
 		relative_position_id = SPR_give_power_to_the_landowners
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			OR = {
 				custom_trigger_tooltip = {
@@ -2033,10 +2077,9 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_give_power_to_the_landowners }
 
 		completion_reward = {
 			release_puppet = SPC
@@ -2052,8 +2095,6 @@ focus = {
 				}
 			}
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 ###################################################
@@ -2064,125 +2105,95 @@ focus = {
 
 	focus = {
 		id = SPR_welcome_back_la_hispaniola
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_america
-		}
+		icon = GFX_Focus_Globe_Colonial_SPA
 		relative_position_id = SPR_america
 		x = 4
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			custom_trigger_tooltip = {
 				tooltip = SPR_welcome_back_la_hispaniola_trigger
 				has_country_flag = SPR_welcome_back_la_hispaniola_flag
 			}
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_america }
 
 		completion_reward = {
 			country_event = { id = spain_hispaniola.1 }
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_enforce_catholic_morals
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_welcome_back_la_hispaniola
-		}
+		icon = GFX_Focus_Catholism_Cross_1
 		relative_position_id = SPR_welcome_back_la_hispaniola
 		x = 0
 		y = 1
-		
-		available = {
-			#debt_not_bankrupt_trigger = yes
-		}
-		
-
-		
+		cost = 60
 		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_welcome_back_la_hispaniola }
 
 		completion_reward = {
 			country_event = { id = spain_hispaniola_catholic_morals.1 }
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_persecute_protestants
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_enforce_catholic_morals
-		}
+		icon = GFX_Focus_Crush_Protestant
 		relative_position_id = SPR_enforce_catholic_morals
 		x = -1
 		y = 1
-		
-		available = {
-			#debt_not_bankrupt_trigger = yes
-		}
-		
-
-		
+		cost = 60
 		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_enforce_catholic_morals }
 
 		completion_reward = {
 			country_event = { id = spain_hispaniola_persecute_protestants.1 }
-		}
-
-		ai_will_do = { base = 100 }
+		}	
 	}
 	
 	focus = {
 		id = SPR_persecute_masonry
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_enforce_catholic_morals
-		}
+		icon = GFX_Focus_Elite_Arrested
 		relative_position_id = SPR_enforce_catholic_morals
 		x = 1
 		y = 1
-		
-		available = {
-			#debt_not_bankrupt_trigger = yes
-		}
-		
-
-		
+		cost = 60
 		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_enforce_catholic_morals }
 
 		completion_reward = {
 			country_event = { id = spain_hispaniola_persecute_masonry.1 }
-		}
-
-		ai_will_do = { base = 100 }
+		}	
 	}
 	
 	focus = {
 		id = SPR_invest_in_dominican_cattle
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_persecute_masonry
-		}
-		prerequisite = {
-			focus = SPR_persecute_protestants
-		}
+		icon = GFX_Focus_Agriculture
 		relative_position_id = SPR_enforce_catholic_morals
 		x = 0
 		y = 2
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			debt_not_bankrupt_trigger = yes
 			custom_trigger_tooltip = {
@@ -2197,18 +2208,16 @@ focus = {
 				}
 			}
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_persecute_masonry }
+		prerequisite = { focus = SPR_persecute_protestants }
 
 		completion_reward = {
 			custom_effect_tooltip = SPR_invest_in_dominican_cattle_effect_tooltip
 			country_event = { id = spain_caribbean.4 }
 			set_country_flag = SPR_invest_in_dominican_cattle_flag
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 ###################################################
@@ -2219,71 +2228,54 @@ focus = {
 	
 	focus = {
 		id = SPR_asia
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_the_international_policy
-		}
+		icon = GFX_Focus_Continent_Asia
 		relative_position_id = SPR_the_international_policy
 		x = 10
 		y = 1
-		
-		available = {
-		}
-		
-
-		
+		cost = 60
 		available_if_capitulated = no
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_the_international_policy }
 
 		completion_reward = {
 			add_political_power = 100
 		}
-
-		ai_will_do = { base = 100 }
 	}
 
 ###################################################
 #
-#	Conchinchina Expedition
+#	Cochinchina Expedition
 #
 ###################################################
 
 	focus = {
-		id = SPR_conchinchina_expedition
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_asia
-		}
+		id = SPR_cochinchina_expedition
+		icon = GFX_focus_secure_cochichina
 		relative_position_id = SPR_asia
 		x = -3
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			always = no
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_asia }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_prepare_at_manila
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_conchinchina_expedition
-		}
-		relative_position_id = SPR_conchinchina_expedition
+		icon = GFX_focus_na_n_prepare_for_the_invaders
+		relative_position_id = SPR_cochinchina_expedition
 		x = -1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2299,33 +2291,23 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 1000 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_cochinchina_expedition }
 
 		completion_reward = {
-			327 = {
-				add_building_construction = { type = infrastructure level = 1 instant_build = yes }
-				add_building_construction = { type = naval_base level = 1 instant_build = yes province = 10265 }
-			}
-			debt_level_increase_by_1 = yes
+			set_country_flag = SPR_prepare_cochinchina_invasion_flag
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_patriotic_call
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_conchinchina_expedition
-		}
-		relative_position_id = SPR_conchinchina_expedition
+		icon = GFX_goal_focus_one_people_one_nation
+		relative_position_id = SPR_cochinchina_expedition
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2340,114 +2322,86 @@ focus = {
 				owns_state = 684
 			}
 		}
+		ai_will_do = { base = 1000 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_cochinchina_expedition }
 
 		completion_reward = {
 			add_stability = 0.05
 			add_manpower = 6000
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
-		id = SPR_champa_campaing
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_prepare_at_manila
-		}
-		prerequisite = {
-			focus = SPR_patriotic_call
-		}
+		id = SPR_champa_campaign
+		icon = GFX_focus_SPR_absorb_caribbean_institutions
 		relative_position_id = SPR_prepare_at_manila
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			always = no
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_prepare_at_manila }
+		prerequisite = { focus = SPR_patriotic_call }
 
 		completion_reward = {
-		}
-
-		ai_will_do = { base = 100 }
+		}	
 	}
 	
 	focus = {
 		id = SPR_obey_france
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_champa_campaing
-		}
-		mutually_exclusive = {
-			focus = SPR_spanish_victory
-		}
-		relative_position_id = SPR_champa_campaing
+		icon = GFX_goal_focus_colonize_vietnam
+		relative_position_id = SPR_champa_campaign
 		x = -1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			always = no
 		}
+		ai_will_do = { base = 100 }
 		
+		prerequisite = { focus = SPR_champa_campaign }
 
-		
-		available_if_capitulated = no
+		mutually_exclusive = { focus = SPR_spanish_victory_cochinchina }
 
 		completion_reward = {
-		}
-
-		ai_will_do = { base = 100 }
+		}		
 	}
 	
 	focus = {
-		id = SPR_spanish_victory
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_champa_campaing
-		}
-		mutually_exclusive = {
-			focus = SPR_obey_france
-		}
-		relative_position_id = SPR_champa_campaing
+		id = SPR_spanish_victory_cochinchina
+		icon = GFX_Focus_Exploration
+		relative_position_id = SPR_champa_campaign
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			always = no
 		}
+		ai_will_do = { base = 100 }
 		
+		prerequisite = { focus = SPR_champa_campaign }
 
-		
-		available_if_capitulated = no
+		mutually_exclusive = { focus = SPR_obey_france }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_continue_up_the_mekong
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_spanish_victory
-		}
-		relative_position_id = SPR_spanish_victory
+		icon = GFX_Focus_Exploration
+		relative_position_id = SPR_spanish_victory_cochinchina
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2462,28 +2416,22 @@ focus = {
 				owns_state = 684
 			}
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_spanish_victory_cochinchina }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
-		id = SPR_send_coolies_to_cuba
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_continue_up_the_mekong
-		}
+		id = SPR_send_culis_to_cuba
+		icon = GFX_Focus_Colony_Cuba
 		relative_position_id = SPR_continue_up_the_mekong
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2498,15 +2446,12 @@ focus = {
 				owns_state = 684
 			}
 		}
+		ai_will_do = { base = 100 }
 		
-
+		prerequisite = { focus = SPR_continue_up_the_mekong }
 		
-		available_if_capitulated = no
-
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 ###################################################
@@ -2517,15 +2462,12 @@ focus = {
 	
 	focus = {
 		id = SPR_found_new_cities_in_the_philippines
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_asia
-		}
+		icon = GFX_Focus_Urbanization
 		relative_position_id = SPR_asia
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2541,28 +2483,22 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_asia }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_improve_infrastructure
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_found_new_cities_in_the_philippines
-		}
+		icon = GFX_focus_na_n_invest_in_roads
 		relative_position_id = SPR_found_new_cities_in_the_philippines
 		x = -1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2578,28 +2514,22 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_found_new_cities_in_the_philippines }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_christianize_the_region
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_found_new_cities_in_the_philippines
-		}
+		icon = GFX_Focus_Catholic_Religion
 		relative_position_id = SPR_found_new_cities_in_the_philippines
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2615,31 +2545,22 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_found_new_cities_in_the_philippines }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_found_new_schools
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_improve_infrastructure
-		}
-		prerequisite = {
-			focus = SPR_christianize_the_region
-		}
+		icon = GFX_Focus_Elementary_School_0
 		relative_position_id = SPR_improve_infrastructure
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2655,28 +2576,23 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_improve_infrastructure }
+		prerequisite = { focus = SPR_christianize_the_region }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_expand_the_pacific_net
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_found_new_schools
-		}
+		icon = GFX_Focus_Globe_Colonial_SPA
 		relative_position_id = SPR_found_new_schools
 		x = -1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2692,30 +2608,24 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_found_new_schools }
 
 		completion_reward = {
 			set_country_flag = SPR_unclaimed_territory_colonize_decisions
 			custom_effect_tooltip = SPR_unclaimed_territory_claim_decisions_unlocked
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
 		id = SPR_spanish_ocean
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_expand_the_pacific_net
-		}
+		icon = GFX_focus_na_b_the_sea
 		relative_position_id = SPR_expand_the_pacific_net
 		x = 0
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2742,28 +2652,22 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_expand_the_pacific_net }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 	
 	focus = {
-		id = SPR_retake_formosa
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_found_new_schools
-		}
+		id = SPR_reconquer_formosa
+		icon = GFX_focus_SPR_tropical_expedition
 		relative_position_id = SPR_found_new_schools
 		x = 1
 		y = 1
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2782,28 +2686,22 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_found_new_schools }
 
 		completion_reward = {
 		}
-
-		ai_will_do = { base = 100 }
 	}
 
 	focus = {
-		id = SPR_ask_dutch_to_join
-		cost = 60
-		
-		prerequisite = {
-			focus = SPR_retake_formosa
-		}
+		id = SPR_focus_ask_dutch_to_join
+		icon = GFX_goal_focus_dutch_invite
 		relative_position_id = SPR_found_new_schools
 		x = 1
 		y = 2
-		
+		cost = 60
+		available_if_capitulated = no
 		available = {
 			SPH = {
 				is_subject_of = SPR
@@ -2822,14 +2720,91 @@ focus = {
 			}
 			debt_not_bankrupt_trigger = yes
 		}
+		ai_will_do = { base = 100 }
 		
-
-		
-		available_if_capitulated = no
+		prerequisite = { focus = SPR_reconquer_formosa }
 
 		completion_reward = {
 		}
+	}
 
+	focus = {
+		id = SPR_keep_formosa
+		icon = GFX_focus_na_n_consolidate_power
+		relative_position_id = SPR_found_new_schools
+		x = 0
+		y = 3
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
 		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_focus_ask_dutch_to_join }
+
+		mutually_exclusive = { focus = SPR_let_the_captaincy_rule_it }
+		
+		completion_reward = {
+		}
+	}
+
+	focus = {
+		id = SPR_send_culis_to_the_caribbean
+		icon = GFX_focus_mobilise_a_slave_economy
+		relative_position_id = SPR_found_new_schools
+		x = 0
+		y = 4
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_keep_formosa }
+
+		completion_reward = {
+		}
+	}
+
+	focus = {
+		id = SPR_let_the_captaincy_rule_it
+		icon = GFX_goal_focus_decentralisation_power
+		relative_position_id = SPR_found_new_schools
+		x = 2
+		y = 3
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_focus_ask_dutch_to_join }
+
+		mutually_exclusive = { focus = SPR_keep_formosa }
+		
+		completion_reward = {
+		}
+	}
+
+	focus = {
+		id = SPR_give_them_more_authority
+		icon = GFX_Focus_Government_Decentralized
+		relative_position_id = SPR_found_new_schools
+		x = 2
+		y = 4
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_will_do = { base = 100 }
+		
+		prerequisite = { focus = SPR_let_the_captaincy_rule_it }
+
+		completion_reward = {
+		}
 	}
 }

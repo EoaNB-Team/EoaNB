@@ -6,16 +6,117 @@ NOR_scripted_effect_christiania_repairing = {
 				limit = {
 					has_idea = NOR_idea_christiania_repairing
 				}
-			
+
 				if = {
 					limit = {
 						check_variable = { NOR_var_christiania_repairing > 9.9 }
 					}
-				
+
 					country_event = eoanb_norway.16
 					clear_variable = NOR_var_christiania_repairing
-				
+
 					remove_ideas = NOR_idea_christiania_repairing
+				}
+			}
+		}
+	}
+}
+
+NOR_scripted_effect_loyalty_check = { # Changes the variable by checking the a
+	hidden_effect = {
+		NOR = {
+			if = {
+				limit = {
+					OR = {
+						has_idea = NOR_idea_norwegian_loyalty_0
+						has_idea = NOR_idea_norwegian_loyalty_1
+						has_idea = NOR_idea_norwegian_loyalty_2
+					}
+				}
+
+				if = { # If loyalty is less than 100 and more than 69, add the high loyalty idea.
+					limit = {
+						check_variable = { NOR_var_loyalty < 100 }
+						check_variable = { NOR_var_loyalty > 69 }
+					}
+
+					swap_ideas = {
+						remove_idea = NOR_idea_norwegian_loyalty_1
+						add_idea = NOR_idea_norwegian_loyalty_2
+					}
+					swap_ideas = {
+						remove_idea = NOR_idea_norwegian_loyalty_0
+						add_idea = NOR_idea_norwegian_loyalty_2
+					}
+
+					else_if = { # If loyalty is less than 70 and more than 39, add the medium loyalty idea.
+						limit = {
+							check_variable = { NOR_var_loyalty < 70 }
+							check_variable = { NOR_var_loyalty > 39 }
+						}
+
+						swap_ideas = {
+							remove_idea = NOR_idea_norwegian_loyalty_2
+							add_idea = NOR_idea_norwegian_loyalty_1
+						}
+						swap_ideas = {
+							remove_idea = NOR_idea_norwegian_loyalty_0
+							add_idea = NOR_idea_norwegian_loyalty_1
+						}
+
+						else_if = { # If loyalty is less than 40 and more than -1, add the low loyalty idea.
+							limit = {
+								check_variable = { NOR_var_loyalty < 40 }
+								check_variable = { NOR_var_loyalty > -1 }
+							}
+
+							swap_ideas = {
+								remove_idea = NOR_idea_norwegian_loyalty_2
+								add_idea = NOR_idea_norwegian_loyalty_0
+							}
+							swap_ideas = {
+								remove_idea = NOR_idea_norwegian_loyalty_1
+								add_idea = NOR_idea_norwegian_loyalty_0
+							}
+
+							else_if = { # Set to 0 if it is under 0. Civil war?
+								limit = {
+									check_variable = { NOR_var_loyalty < 0 }
+								}
+
+								set_variable = { NOR_var_loyalty = 0 }
+								remove_ideas = NOR_idea_norwegian_loyalty_2
+								remove_ideas = NOR_idea_norwegian_loyalty_1
+								remove_ideas = NOR_idea_norwegian_loyalty_0
+
+								if = {
+									limit = {
+										eoanb_enable_autonomy = yes
+									}
+
+									add_autonomy_score = {
+										value = 250
+									}
+								}
+
+								else = { # It has to be more than 100 since it hasn't passed any of the previous checks.
+									remove_ideas = NOR_idea_norwegian_loyalty_2
+									remove_ideas = NOR_idea_norwegian_loyalty_1
+									remove_ideas = NOR_idea_norwegian_loyalty_0
+
+									if = {
+										limit = {
+											eoanb_enable_autonomy = yes
+										}
+	
+										add_autonomy_score = {
+											value = -250
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
