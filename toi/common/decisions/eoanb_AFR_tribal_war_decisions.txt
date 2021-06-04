@@ -1634,12 +1634,18 @@ unidustrialized_warfare = {
 					check_variable = { var = FROM.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
 					check_variable = { var = ROOT.afr_regional_power_peace_treaty@FROM value = 1 compare = greater_than_or_equals }
 				}
+				if = {
+					limit = { has_idea = WDD_KBO_TRUCE }
+					FROM = { NOT = { has_idea = WDD_KBO_TRUCE } }
+				}
 			}
 			custom_trigger_tooltip = {
 				tooltip = afr_raid_neighbor_at_peace_trigger
 				has_war = no
 				has_border_war = no
-				NOT = { has_country_flag = raiding_neighbour }
+				NOT = { has_country_flag = set_border_war_data_first_nations_tribal_raid_neighbor_flag }
+				NOT = { has_country_flag = set_border_war_data_first_nations_tribal_raid_colonial_neighbor_flag }
+				NOT = { has_country_flag = raiding_neighbour }	
 			}
 			custom_trigger_tooltip={
 				tooltip = EDC_Any_Tribal_Army_over_1000
@@ -1657,21 +1663,27 @@ unidustrialized_warfare = {
 				}
 			}
 			hidden_trigger = {
-				any_state = {
-					is_owned_and_controlled_by = FROM
-					any_neighbor_state = {
-						is_fully_controlled_by = ROOT
-					}
-				}
-				afr_is_tribal = yes
+				#any_state = {
+				#	is_owned_and_controlled_by = FROM
+				#	any_neighbor_state = {
+				#		is_fully_controlled_by = ROOT
+				#	}
+				#}
+				#afr_is_tribal = yes
 			}
 		}
 		allowed = { 
-			afr_is_tribal_allowed = yes
+			OR = {
+				afr_is_tribal_allowed = yes
+				is_first_nations_tribe_allowed = yes
+			}
 		}
 		visible = {
 			NOT = { has_country_flag = first_nations_tribe_recently_raided_flag }
-			afr_is_tribal = yes
+			OR = {
+				afr_is_tribal = yes
+				is_first_nations_tribe = yes
+			}
 			NOT = { has_war_with = FROM }
 			NOT = { is_in_faction_with = FROM }
 			any_state = {
@@ -1680,25 +1692,11 @@ unidustrialized_warfare = {
 					is_fully_controlled_by = ROOT
 				}
 			}
+			NOT = { has_idea = FN_T_settled_regional_power }
+			NOT = { has_idea = FN_T_nomadic_regional_power }
 			NOT = { has_idea = afr_large_kingdom }
 			NOT = { has_idea = afr_reforming_kingdom }
-		}
-		
-		target_trigger = {
-			if = {
-				limit = { has_idea = WDD_KBO_TRUCE }
-				FROM = {
-					is_neighbor_of = ROOT
-					NOT = { has_idea = WDD_KBO_TRUCE }
-					afr_is_tribal = yes
-				}
-			}
-			else = {
-				FROM = {
-					is_neighbor_of = ROOT
-					afr_is_tribal = yes
-				}
-			}
+			
 			ROOT = {
 				NOT = { is_subject_of = FROM }
 				NOT = { is_in_faction_with = FROM }
@@ -1709,6 +1707,13 @@ unidustrialized_warfare = {
 			}
 			FROM = {
 				NOT = { is_subject_of = OVERLORD }
+			}
+		}
+		
+		target_trigger = {
+			FROM = {
+				is_neighbor_of = ROOT
+				has_variable = has_afr_empire_mechanic_system
 			}
 		}
 		days_remove = 30
@@ -1750,6 +1755,7 @@ unidustrialized_warfare = {
 			clr_country_flag = raiding_neighbour
 			##raiding result based on numbers sent, defenders numbers
 			country_event = { id = EDC_afr.44 }
+			reverse_add_opinion_modifier = { target = FROM modifier = afr_recently_raided_opinion }
 		}
 
 		ai_will_do = {
