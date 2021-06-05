@@ -12,113 +12,179 @@ focus_tree = {
 	default = no
 
 ### FOREIGN POLICY ###
-	#Political Sphere
+	#Saxony's Place in Germany
     focus = {
-		id = SAX_focus_political_sphere
+		id = SAX_focus_our_place_in_germany
 		icon = GFX_goal_focus_sway_sachsen 
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
-		x = 2
+		x = 6
 		y = 0
 		ai_will_do = { base = 100 }
 
 		completion_reward = {
-		     add_political_power = 30
+			add_political_power = 150
+			unlock_decision_category_tooltip = SAX_decision_category_foreign_policy
 		}
 	}
 
-	#Draw Closer to Bavaria
+	#Prusso-Saxon Relationship
 	focus = {
-		id = SAX_focus_draw_closer_to_bav
-		icon = GFX_
-		cost = 70
-		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_political_sphere }
-		mutually_exclusive = { focus = SAX_focus_align_with_austria focus = SAX_focus_remain_neutral }
-		x = 0
+		id = SAX_focus_prusso_saxon_relationship
+		icon = GFX_Focus_Diplomatic_Invitation_PRS
+		relative_position_id = SAX_focus_our_place_in_germany
+		x = -4
 		y = 1
-		ai_will_do = { base = 25 }
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			PRS = { 
+				exists = yes
+				is_puppet = no
+				has_war = no
+			}
+			SAX = { 
+				exists = yes
+				is_puppet = no 
+				has_war = no
+			}
+		}
+		prerequisite = { focus = SAX_focus_our_place_in_germany }
+		ai_will_do = { base = 50 }
 
 		completion_reward = {
-		    #country_event
-		    #      id = saxony.1
-		     #     tag = SAX
-			#	  days = 1
-			#	  random = 1
+			SAX = { country_event = { days = 1 id = saxonyforeign.2 } }
 		}
 	}
 
-	#Ask Bavaria's Intentions
+	#Deepen the Rift
 	focus = {
-		id = SAX_focus_ask_bav_intentions
+		id = SAX_focus_deepen_rift
 		icon = GFX_
-		cost = 70
-		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_draw_closer_to_bav }
-		x = 0
-		y = 2
-		ai_will_do = { base = 100 }
-
-		completion_reward = {
-		    #country_event
-		     #     id = saxony.4
-		      #    tag = BAV
-				#  days = 1
-				 # random = 1
-		}
-	}
-
-	#Propose Four Way Trias
-	focus = {
-		id = SAX_focus_propose_four_way_trias
-		icon = GFX_
-		cost = 70
-		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_ask_bav_intentions }
-		x = 0
+		relative_position_id = SAX_focus_prusso_saxon_relationship
+		x = -1
 		y = 3
-		ai_will_do = { base = 100 }
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SAX_focus_deepen_rift_trigger_tt
+				hidden_trigger = {
+					has_country_flag = SAX_PRS_relation_bad_flag
+				}
+			}
+		}
+		prerequisite = { focus = SAX_focus_prusso_saxon_relationship }
+		mutually_exclusive = { focus = SAX_focus_mend_divide }
+		ai_will_do = { base = 90 }
 
 		completion_reward = {
-		   # country_event
-		    #      id = saxony.5
-		     #     tag = SAX
-			#	  days = 1
-			#	  random = 1
+			add_opinion_modifier = { target = PRS modifier = medium_decrease }
+			reverse_add_opinion_modifier = { target = PRS modifier = medium_decrease }
 		}
 	}
 	
-	#Süddeutscher Bund
+	#Claim Former Saxon Lands
 	focus = {
-		id = SAX_focus_sueddeutscher_bund
+		id = SAX_focus_claim_former_saxon_lands
 		icon = GFX_
-		cost = 70
+		relative_position_id = SAX_focus_prusso_saxon_relationship
+		x = -1
+		y = 7
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_propose_four_way_trias }
-		x = 0
-		y = 4
+		prerequisite = { focus = SAX_focus_deepen_rift }
 		ai_will_do = { base = 100 }
 
 		completion_reward = {
-		   # country_event
-		    #      id = saxony.5
-		     #     tag = SAX
-			#	  days = 1
-			#	  random = 1
+			SAX = { add_state_claim = 950 }
 		}
 	}
 
-	#Align With Austria
+	#Mend the Divide
 	focus = {
-		id = SAX_focus_align_with_austria
-		icon = GFX_
-		cost = 70
+		id = SAX_focus_mend_divide
+		icon = GFX_Focus_Diplomatic_Ally_PRS
+		relative_position_id = SAX_focus_prusso_saxon_relationship
+		x = 1
+		y = 3
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_political_sphere }
-		mutually_exclusive = { focus = SAX_focus_draw_closer_to_bav focus = SAX_focus_remain_neutral }
-		x = 2
+		available = {
+			PRS = { 
+				exists = yes
+				is_puppet = no
+				has_war = no
+			}
+			SAX = { 
+				exists = yes
+				is_puppet = no 
+				has_war = no
+			}
+			custom_trigger_tooltip = {
+				tooltip = SAX_focus_mend_divide_trigger_tt
+				hidden_trigger = {
+					has_country_flag = SAX_PRS_relation_good_flag
+				}
+			}
+		}
+		prerequisite = { focus = SAX_focus_prusso_saxon_relationship }
+		mutually_exclusive = { focus = SAX_focus_deepen_rift }
+		ai_will_do = { base = 10 }
+
+		completion_reward = {
+			remove_idea = SAX_idea_anti_prussian_sentiments
+			unlock_decision_tooltip = SAX_decision_prusso_saxon_rapprochement
+		}
+	}
+	
+	#Improve Relations with Prussia
+	focus = {
+		id = SAX_focus_improve_relations_prs
+		icon = GFX_
+		relative_position_id = SAX_focus_prusso_saxon_relationship
+		x = 1
+		y = 7
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			PRS = { 
+				exists = yes
+				is_puppet = no
+				has_war = no
+			}
+			SAX = { 
+				exists = yes
+				is_puppet = no 
+				has_war = no
+			}
+		}
+		prerequisite = { focus = SAX_focus_mend_divide }
+		ai_will_do = { base = 100 }
+
+		completion_reward = {
+			add_opinion_modifier = { target = PRS modifier = medium_increase }
+			reverse_add_opinion_modifier = { target = PRS modifier = medium_increase }
+		}
+	}
+
+	#Attempt to Reform the Confederation
+	focus = {
+		id = SAX_focus_attempt_to_reform_confederation
+		icon = GFX_Focus_Government_Reform_4
+		relative_position_id = SAX_focus_our_place_in_germany
+		x = 0
 		y = 1
-		ai_will_do = { base = 65 }
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			has_country_leader = {
+				name = "Friedrich Ferdinand von Beust"
+				ruling_only = yes
+			}
+		}
+		prerequisite = { focus = SAX_focus_our_place_in_germany }
+		ai_will_do = { base = 500 }
 
 		completion_reward = {
 		   # country_event
@@ -129,53 +195,199 @@ focus_tree = {
 		}
 	}
 
-	#Anti-Prussian Diplomacy
+	#Legacy of the Bamberg Conference
 	focus = {
-		id = SAX_focus_anti_prussian_diplomacy
-		icon = GFX_
-		cost = 70
+		id = SAX_focus_legacy_of_bamberg_conference
+		icon = GFX_Focus_Government_Reform_2
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 0
+		y = 1
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_align_with_austria }
-		x = 2
-		y = 2
-		ai_will_do = { base = 100 }
+		prerequisite = { focus = SAX_focus_attempt_to_reform_confederation }
+		ai_will_do = { base = 400 }
 
 		completion_reward = {
-		    add_opinion_modifier = { target = AUS modifier = medium_increase }
-
-		    add_opinion_modifier = { target = PRS modifier = medium_decrease }
+		    
 		}
 	}
 
-	#Promote Von Buest ____FIX____
+	#The Idea of the German Trias
 	focus = {
-		id = SAX_focus_promote_von_beust
-		icon = GFX_
-		cost = 70
+		id = SAX_focus_idea_of_german_trias
+		icon = GFX_goal_focus_extend_trias
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 0
+		y = 2
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_anti_prussian_diplomacy }
-		x = 2
-		y = 3
-		ai_will_do = { base = 100 }
+		prerequisite = { focus = SAX_focus_legacy_of_bamberg_conference }
+		ai_will_do = { base = 400 }
 
 		completion_reward = {
 		   
 		}
 	}
 
-	#Promise Austria Aid
+	#The Würzburg Conference
 	focus = {
-		id = SAX_focus_promise_austria_aid
-		icon = GFX_
-		cost = 70
+		id = SAX_focus_wurzburg_conference
+		icon = GFX_Focus_Government_Reform
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 0
+		y = 3
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_promote_von_beust }
-		x = 2
-		y = 4
-		ai_will_do = { base = 100 }
+		prerequisite = { focus = SAX_focus_idea_of_german_trias }
+		ai_will_do = { base = 400 }
 
 		completion_reward = {
-		add_war_support = 0.05
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#The Schleswig-Holstein Question
+	focus = {
+		id = SAX_focus_schleswig_holstein_question
+		icon = GFX_goal_focus_the_german_question
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 0
+		y = 4
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GENERIC_Triggered_By_Event_tt
+				always = no
+			}
+		}
+		prerequisite = { focus = SAX_focus_wurzburg_conference }
+		ai_will_do = { base = 1 }
+
+		completion_reward = {
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#Support the Augustenburger
+	focus = {
+		id = SAX_focus_support_augustenburger
+		icon = GFX_Focus_Monarchy_Usurp_Throne
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 0
+		y = 5
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_schleswig_holstein_question }
+		ai_will_do = { base = 400 }
+
+		completion_reward = {
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#The Trias Succeeds
+	focus = {
+		id = SAX_focus_trias_succeeds
+		icon = GFX_
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = -1
+		y = 6
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GENERIC_Triggered_By_Event_tt
+				always = no
+			}
+		}
+		prerequisite = { focus = SAX_focus_support_augustenburger }
+		mutually_exclusive = { focus = SAX_focus_trias_fails }
+		ai_will_do = { base = 1 }
+
+		completion_reward = {
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#A Common Goal
+	focus = {
+		id = SAX_focus_common_goal
+		icon = GFX_
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = -1
+		y = 7
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_trias_succeeds }
+		ai_will_do = { base = 300 }
+
+		completion_reward = {
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#The Trias Fails
+	focus = {
+		id = SAX_focus_trias_fails
+		icon = GFX_
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 1
+		y = 6
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GENERIC_Triggered_By_Event_tt
+				always = no
+			}
+		}
+		prerequisite = { focus = SAX_focus_support_augustenburger }
+		mutually_exclusive = { focus = SAX_focus_trias_succeeds }
+		ai_will_do = { base = 1 }
+
+		completion_reward = {
+		    #country_event
+		     #     id = saxony.11
+		      #    tag = AUS
+				#  days = 1
+				 # random = 1
+		}
+	}
+	
+	#Pick a Side
+	focus = {
+		id = SAX_focus_pick_side
+		icon = GFX_
+		relative_position_id = SAX_focus_attempt_to_reform_confederation
+		x = 1
+		y = 7
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_trias_fails }
+		ai_will_do = { base = 300 }
+
+		completion_reward = {
 		    #country_event
 		     #     id = saxony.11
 		      #    tag = AUS
@@ -184,37 +396,60 @@ focus_tree = {
 		}
 	}
 
-	#Remain Neutral
+	#Austro-Saxon Relationship
 	focus = {
-		id = SAX_focus_remain_neutral
+		id = SAX_focus_austro_saxon_relationship
 		icon = GFX_
-		cost = 70
-		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_political_sphere }
-		mutually_exclusive = { focus = SAX_focus_align_with_austria focus = SAX_focus_draw_closer_to_bav }
+		relative_position_id = SAX_focus_our_place_in_germany
 		x = 4
 		y = 1
-		ai_will_do = { base = 10 }
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_our_place_in_germany }
+		ai_will_do = { base = 75 }
 
 		completion_reward = {
-			add_stability = 0.05
-		   # country_event
-		    #      id = saxony.4
-		     #     tag = SAX
-			#	  days = 1
-			#	  random = 1
+			SAX = { country_event = { days = 1 id = saxonyforeign.3 } }
 		}
 	}
 
-	#Enforce The Bamberg Conference
+	#Strengthen the Bond
 	focus = {
-		id = SAX_focus_enforce_bamberg_conference
-		icon = GFX_
-		cost = 70
+		id = SAX_focus_strengthen_bond
+		icon = GFX_Focus_Diplomatic_Ally_AUS
+		relative_position_id = SAX_focus_austro_saxon_relationship
+		x = -1
+		y = 3
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_remain_neutral }
-		x = 4
-		y = 2
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SAX_focus_strengthen_bond_trigger_tt
+				hidden_trigger = {
+					has_country_flag = SAX_AUS_relation_good_flag
+				}
+			}
+		}
+		prerequisite = { focus = SAX_focus_austro_saxon_relationship }
+		mutually_exclusive = { focus = SAX_focus_loosen_ties }
+		ai_will_do = { base = 90 }
+
+		completion_reward = {
+		   add_political_power = 50
+		   add_command_power = 5
+		}
+	}
+	
+	#Improve Relations with Austria
+	focus = {
+		id = SAX_focus_improve_relations_aus
+		icon = GFX_
+		relative_position_id = SAX_focus_austro_saxon_relationship
+		x = -1
+		y = 7
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_strengthen_bond }
 		ai_will_do = { base = 100 }
 
 		completion_reward = {
@@ -223,16 +458,26 @@ focus_tree = {
 		}
 	}
 
-	#Establish relations with Denmark
+	#Loosen the Ties
 	focus = {
-		id = SAX_focus_establish_relations_with_denmark
+		id = SAX_focus_loosen_ties
 		icon = GFX_
-		cost = 70
-		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_enforce_bamberg_conference }
-		x = 4
+		relative_position_id = SAX_focus_austro_saxon_relationship
+		x = 1
 		y = 3
-		ai_will_do = { base = 100 }
+		cost = 60
+		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SAX_focus_loosen_ties_trigger_tt
+				hidden_trigger = {
+					has_country_flag = SAX_AUS_relation_neutral_flag
+				}
+			}
+		}
+		prerequisite = { focus = SAX_focus_austro_saxon_relationship }
+		mutually_exclusive = { focus = SAX_focus_strengthen_bond }
+		ai_will_do = { base = 10 }
 
 		completion_reward = {
 		  #  country_event
@@ -243,16 +488,37 @@ focus_tree = {
 			add_opinion_modifier = { target = DEN modifier = medium_increase }
 		}
 	}
-
-	#Violate Neutrality. ______FIX______
+	
+	#A Neutral Stance
 	focus = {
-		id = SAX_focus_violate_neutrality
+		id = SAX_focus_neutral_stance
 		icon = GFX_
-		cost = 70
+		relative_position_id = SAX_focus_austro_saxon_relationship
+		x = 1
+		y = 7
+		cost = 60
 		available_if_capitulated = no
-		prerequisite = { focus = SAX_focus_establish_relations_with_denmark }
-		x = 4
-		y = 4
+		prerequisite = { focus = SAX_focus_loosen_ties }
+		ai_will_do = { base = 100 }
+
+		completion_reward = {
+		   add_political_power = 50
+		   add_command_power = 5
+		}
+	}
+
+	#Conflict in the German Confederation
+	focus = {
+		id = SAX_focus_conflict_in_german_confederation
+		icon = GFX_
+		relative_position_id = SAX_focus_our_place_in_germany
+		x = 0
+		y = 9
+		cost = 60
+		available_if_capitulated = no
+		prerequisite = { focus = SAX_focus_claim_former_saxon_lands focus = SAX_focus_improve_relations_prs }
+		prerequisite = { focus = SAX_focus_common_goal focus = SAX_focus_pick_side }
+		prerequisite = { focus = SAX_focus_improve_relations_aus focus = SAX_focus_neutral_stance }
 		ai_will_do = { base = 100 }
 
 		completion_reward = {
@@ -271,7 +537,7 @@ focus_tree = {
 		icon = GFX_Focus_Johnnys_Saxony
 		cost = 35
 		available_if_capitulated = no
-		x = 13
+		x = 22
 		y = 0
 		ai_will_do = { base = 100 }
 
@@ -287,7 +553,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_johann_of_saxony
 		x = -2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_johann_of_saxony }
 		mutually_exclusive = { focus = SAX_focus_support_the_catholics }
@@ -305,7 +571,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_johann_of_saxony
 		x = 2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_johann_of_saxony }
 		mutually_exclusive = { focus = SAX_focus_support_the_protestants }
@@ -323,7 +589,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_johann_of_saxony
 		x = 0
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_johann_of_saxony }
 		ai_will_do = { base = 100 }
@@ -341,7 +607,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_work_with_the_landtag
 		x = -5
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_work_with_the_landtag }
 		mutually_exclusive = { focus = SAX_focus_revoke_1848_reforms }
@@ -378,7 +644,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_liberal_reforms
 		x = -2
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_people }
 		ai_will_do = { base = 100 }
@@ -395,7 +661,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_liberal_reforms
 		x = -2
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_to_represent_us }
 		ai_will_do = { base = 100 }
@@ -414,7 +680,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_liberal_reforms
 		x = -2
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_anti_Beust_riots }
 		ai_will_do = { base = 100 }
@@ -431,7 +697,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_st_pauls_church_meetings
 		x = -2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_st_pauls_church_meetings }
 		mutually_exclusive = { focus = SAX_focus_demand_the_republic }
@@ -449,7 +715,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_st_pauls_church_meetings
 		x = 2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_st_pauls_church_meetings }
 		mutually_exclusive = { focus = SAX_focus_demand_the_constitution }
@@ -484,7 +750,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_a_party_for_the_workers
 		x = 0
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_workers }
 		ai_will_do = { base = 100 }
@@ -499,7 +765,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_a_party_for_the_workers
 		x = -2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_workers }
 		ai_will_do = { base = 100 }
@@ -514,7 +780,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_a_party_for_the_workers
 		x = -1
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_der_sozialdemokrat }
 		prerequisite = { focus = SAX_focus_lassales_duel }
@@ -530,7 +796,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_a_party_for_the_workers
 		x = 2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_workers }
 		mutually_exclusive = { focus = SAX_focus_oust_marx }
@@ -546,7 +812,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_a_party_for_the_workers
 		x = 4
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_workers }
 		mutually_exclusive = { focus = SAX_focus_support_the_international }
@@ -562,7 +828,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_work_with_the_landtag
 		x = 5
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_work_with_the_landtag }
 		mutually_exclusive = { focus = SAX_focus_liberal_reforms }
@@ -599,7 +865,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = -2
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_party_for_the_elite }
 		ai_will_do = { base = 100 }
@@ -615,7 +881,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = -2
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_bismarck_style_system }
 		ai_will_do = { base = 100 }
@@ -631,7 +897,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_ensure_the_rights_of_the_nobility
 		x = -2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_ensure_the_rights_of_the_nobility }
 		mutually_exclusive = { focus = SAX_focus_maintain_the_social_order }
@@ -648,7 +914,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_ensure_the_rights_of_the_nobility
 		x = 2
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_ensure_the_rights_of_the_nobility }
 		mutually_exclusive = { focus = SAX_focus_reform_thaw }
@@ -683,7 +949,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = 2
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_House_Wettin_Forever }
 		ai_will_do = { base = 100 }
@@ -699,7 +965,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = 2
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_enforce_the_succession }
 		ai_will_do = { base = 100 }
@@ -720,7 +986,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = 2
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_public_works }
 		ai_will_do = { base = 100 }
@@ -736,7 +1002,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_revoke_1848_reforms
 		x = 2
 		y = 5
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_Hannoverian_Ceremony }
 		ai_will_do = { base = 100 }
@@ -750,9 +1016,9 @@ focus_tree = {
  	focus = {
 		id = SAX_focus_the_saxon_army
 		icon = GFX_
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
-		x = 24
+		x = 34
 		y = 0
 		ai_will_do = { base = 100 }
 		completion_reward = {
@@ -767,7 +1033,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -3
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_the_saxon_army }
 		mutually_exclusive = { focus = SAX_focus_a_new_method }
@@ -783,7 +1049,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -3
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_refine_traditional_doctrine }
 		ai_will_do = { base = 100 }
@@ -799,7 +1065,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -3
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_reestablish_the_home_guard }
 		ai_will_do = { base = 100 }
@@ -814,7 +1080,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -1
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_the_saxon_army }
 		mutually_exclusive = { focus = SAX_focus_refine_traditional_doctrine }
@@ -830,7 +1096,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -1
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_a_new_method }
 		ai_will_do = { base = 100 }
@@ -845,7 +1111,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -1
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_integrate_artillery }
 		ai_will_do = { base = 100 }
@@ -860,7 +1126,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = -2
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { 
 			focus = SAX_focus_officer_academies
@@ -878,7 +1144,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = 1
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_the_saxon_army }
 		ai_will_do = { base = 100 }
@@ -895,7 +1161,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = 3
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		prerequisite = { focus = SAX_focus_the_saxon_army }
 		ai_will_do = { base = 100 }
@@ -910,7 +1176,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = 2
 		y = 4
-		cost = 70
+		cost = 60
 		#available = { year > 1860}
 		prerequisite = { focus = SAX_focus_coordination_with_the_leipziger_kommunalgarde }
 		prerequisite = { focus = SAX_focus_encourage_banner_membership }
@@ -927,7 +1193,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = 1
 		y = 5
-		cost = 70
+		cost = 60
 		prerequisite = { focus = SAX_focus_1860_rifle_distribution }
 		mutually_exclusive = { focus = SAX_focus_give_george_reins }
 		ai_will_do = { base = 100 }
@@ -942,7 +1208,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_the_saxon_army
 		x = 3
 		y = 5
-		cost = 70
+		cost = 60
 		prerequisite = { focus = SAX_focus_1860_rifle_distribution }
 		mutually_exclusive = { focus = SAX_focus_give_albert_reins }
 		ai_will_do = { base = 100 }
@@ -955,9 +1221,9 @@ focus_tree = {
 	focus = {
 		id = SAX_focus_saxonys_economy
 		icon = GFX_Focus_Industry
-		x = 34
+		x = 42
 		y = 0
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		ai_will_do = { base = 100 }
 		completion_reward = {
@@ -973,7 +1239,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxonys_economy
 		x = -3
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -982,7 +1248,18 @@ focus_tree = {
 		ai_will_do = { base = 100 }
 		completion_reward = {
 			add_ideas = SAX_idea_state_railways_1
-			#const bonus
+			custom_effect_tooltip = SAX_customeffect_infra_bonus_one
+			activate_mission_tooltip = SAX_mission_railway_expansion
+			hidden_effect = {
+				set_variable = { infra_total = 0 }
+				every_owned_state = {
+					add_to_variable = { ROOT.infra_total = infrastructure_level }
+				}
+				set_variable = { infra_total_bonus = infra_total }
+				add_to_variable = { infra_total_bonus = 1 }
+				activate_mission = SAX_mission_railway_expansion
+				add_ideas = SAX_idea_boost_infra
+			}
 		}
 	}
 
@@ -993,16 +1270,18 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxon_state_railway
 		x = 0
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
+			date > 1858.1.1
 		}
 		prerequisite = { focus = SAX_focus_saxon_state_railway }
 		ai_will_do = { base = 100 }
 		completion_reward = {
 			swap_ideas = { remove_idea = SAX_idea_state_railways_1 add_idea = SAX_idea_state_railways_2 }
-			#opinion modifier
+			add_opinion_modifier = { target = BAV modifier = medium_increase }
+			reverse_add_opinion_modifier = { target = BAV modifier = medium_increase }
 		}
 	}
 
@@ -1013,16 +1292,22 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxon_state_railway
 		x = 0
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
+			date > 1861.1.1
 		}
 		prerequisite = { focus = SAX_focus_railway_bavaria }
 		ai_will_do = { base = 100 }
 		completion_reward = {
 			swap_ideas = { remove_idea = SAX_idea_state_railways_2 add_idea = SAX_idea_state_railways_3 }
-			#add resource after mission?
+			if = {
+				limit = {
+					65 = { infrastructure > 6 }
+				}
+				unlock_decision_tooltip = SAX_decision_expand_resource_output
+			}
 		}
 	}
 
@@ -1033,16 +1318,19 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxon_state_railway
 		x = 0
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
+			date > 1864.1.1
+			65 = { infrastructure > 6 }
 		}
 		prerequisite = { focus = SAX_focus_railway_ore_mountains }
 		ai_will_do = { base = 100 }
 		completion_reward = {
 			swap_ideas = { remove_idea = SAX_idea_state_railways_3 add_idea = SAX_idea_state_railways_4 }
-			#opinion modifier
+			add_opinion_modifier = { target = PRS modifier = small_increase }
+			reverse_add_opinion_modifier = { target = PRS modifier = small_increase }
 		}
 	}
 
@@ -1053,7 +1341,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxon_state_railway
 		x = 0
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1061,6 +1349,7 @@ focus_tree = {
 		prerequisite = { focus = SAX_focus_railway_prussia }
 		ai_will_do = { base = 100 }
 		completion_reward = {
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = transport_tech }
 			unlock_decision_tooltip = SAX_decision_railway_upgrade
 		}
 	}
@@ -1072,7 +1361,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxonys_economy
 		x = -1
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1092,7 +1381,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_mining_and_metallurgy
 		x = 0
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1126,7 +1415,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_mining_and_metallurgy
 		x = 0
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1145,7 +1434,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_mining_and_metallurgy
 		x = 0
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1165,7 +1454,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_mining_and_metallurgy
 		x = 0
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1184,7 +1473,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxonys_economy
 		x = 1
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1204,7 +1493,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_factory_industry
 		x = 0
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1236,7 +1525,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_factory_industry
 		x = 0
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1272,7 +1561,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_factory_industry
 		x = 0
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1292,7 +1581,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_factory_industry
 		x = 0
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1312,7 +1601,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxonys_economy
 		x = 3
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1333,7 +1622,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_trade_and_commerce
 		x = 0
 		y = 1
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1352,7 +1641,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_trade_and_commerce
 		x = 0
 		y = 2
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1372,7 +1661,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_trade_and_commerce
 		x = 0
 		y = 3
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1392,7 +1681,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_trade_and_commerce
 		x = 0
 		y = 4
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
@@ -1420,7 +1709,7 @@ focus_tree = {
 		relative_position_id = SAX_focus_saxonys_economy
 		x = 0
 		y = 6
-		cost = 70
+		cost = 60
 		available_if_capitulated = no
 		available = {
 			controls_state = 65
