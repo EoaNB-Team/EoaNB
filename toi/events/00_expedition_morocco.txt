@@ -1,0 +1,550 @@
+add_namespace = SPR_morocco_expedition
+
+###########################
+# Moroccan Events
+###########################
+
+#Spaniards look for an agreement
+country_event = {
+	id = SPR_morocco_expedition.1
+	title = SPR_morocco_expedition.1.t
+	desc = SPR_morocco_expedition.1.d
+	fire_only_once = yes
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.1.a
+		trigger = { 
+			OR = {
+				owns_state = 1029
+				owns_state = 1030
+			}
+			debt_not_bankrupt_trigger = yes
+		}
+		ai_chance = { 
+			base = 100 
+		}
+		MOR = { country_event = { id = SPR_morocco_expedition.2 days = 5 } }
+	}
+	option = {
+		name = SPR_morocco_expedition.1.b
+		ai_chance = { 
+			base = 0 
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		
+	}
+}
+
+#The Tribe Complain
+country_event = {
+	id = SPR_morocco_expedition.2
+	title = SPR_morocco_expedition.2.t
+	desc = SPR_morocco_expedition.2.d
+	fire_only_once = yes
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.2.a #Let the tribes keep raiding 
+		ai_chance = { 
+			base = 75
+		}
+		hidden_effect = { MOR = { country_event = { id = SPR_morocco_expedition.5 days = 90 } } }
+	}
+	option = {
+		name = SPR_morocco_expedition.2.b #I am the Sultan
+		ai_chance = { 
+			base = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		SPR = { custom_effect_tooltip = afr_has_unsanctioned_raid_against_colonial_neighbor_absolved_tooltip }
+		hidden_effect = {
+			clear_variable = MOR.afr_has_unsanctioned_raid_against_colonial_neighbor@SPR
+			set_variable = { var = MOR.afr_has_special_diplomacy@SPR value = 1 }
+		}
+		290 = { afr_empire_state_loyalty_var_decrease_by_4 = yes }
+	}
+}
+
+#Event that Triggers Unsanctioned Raid
+country_event = {
+	id = SPR_morocco_expedition.5
+	title = SPR_morocco_expedition.5.t
+	desc = SPR_morocco_expedition.5.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_morocco_expedition.5.a
+		ai_chance = { base = 100}
+		MOR = {
+			activate_targeted_decision = {
+				target = SPR
+				decision = afr_tribal_raid_colonial_neighbor
+			}
+		}
+		hidden_effect = {
+			SPR = { country_event = { id = SPR_morocco_expedition.3 } }
+		}
+	}
+}
+
+#The Raids continue
+country_event = {
+	id = SPR_morocco_expedition.3
+	title = SPR_morocco_expedition.3.t
+	desc = SPR_morocco_expedition.3.d
+	fire_only_once = yes
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.3.a
+		ai_chance = { base = 100}
+		#complete_national_focus = SPR_denounce_raiders
+		hidden_effect = { SPR = { set_country_flag = SPR_denounce_raiders_flag } }
+		ENG = { country_event = { id = SPR_morocco_expedition.20 } }
+	}
+}
+
+#Spain prepares for war
+country_event = {
+	id = SPR_morocco_expedition.4
+	title = SPR_morocco_expedition.4.t
+	desc = SPR_morocco_expedition.4.d
+	fire_only_once = yes
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.4.a #Let's hope they change their minds
+		ai_chance = { 
+			base = 100
+		}
+		
+	}
+	option = {
+		name = SPR_morocco_expedition.4.a #Declare war before they prepare
+		ai_chance = { 
+			base = 0
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		declare_war_on = {
+			target = SPR
+			type = annex_everything
+		}
+		hidden_effect = {
+			SPR = { country_event = { id = SPR_morocco_expedition.7 } }
+			SPR = { 
+				set_country_flag = SPR_morocco_intervention_flag 
+				clr_country_flag = SPR_morocco_expedition_flag
+			}
+			MOR = { set_country_flag = MOR_morocco_intervention_flag }
+		}
+	}
+}
+
+#Spain Declares War!
+country_event = {
+	id = SPR_morocco_expedition.6
+	title = SPR_morocco_expedition.6.t
+	desc = SPR_morocco_expedition.6.d
+	fire_only_once = yes
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.6.a
+		ai_chance = { base = 100}
+		
+	}
+}
+
+#Morocco Declares War!
+country_event = {
+	id = SPR_morocco_expedition.7
+	title = SPR_morocco_expedition.7.t
+	desc = SPR_morocco_expedition.7.d
+	fire_only_once = yes
+	
+	immediate = {
+		hidden_effect = {
+			SPR = {
+				if = { 
+					limit = { has_country_flag = SPR_fortify_ceuta_flag }
+					clr_country_flag = SPR_fortify_ceuta_flag
+				}
+				if = { 
+					limit = { has_country_flag = SPR_fortify_melilla_flag }
+					clr_country_flag = SPR_fortify_melilla_flag
+				}
+				set_country_flag = SPR_morocco_expedition_morocco_invades
+			}
+		}
+	}
+
+	is_triggered_only = yes
+	option = {
+		name = SPR_morocco_expedition.7.a
+		ai_chance = { base = 100}
+		
+	}
+}
+
+#Morocco Loses Er Rif
+country_event = {
+	id = SPR_morocco_expedition.8
+	title = SPR_morocco_expedition.8.t
+	desc = SPR_morocco_expedition.8.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.8.a
+		ai_chance = { base = 75 }
+		every_country = {
+			limit = {
+				OR = {
+					TAG = SPR
+					is_subject_of = SPR
+				}
+			}
+			if = {
+				limit = { is_subject = yes }
+				if = {
+					limit = { 
+						OR = {
+							OVERLORD = { has_country_flag = SPR_cochinchina_intervention_flag }
+							has_country_flag = SPR_cochinchina_intervention_flag
+						}
+					}
+					every_country = {
+						limit = { 
+							OR = {
+								is_subject_of = MOR 
+								TAG = MOR
+							}
+						}
+						white_peace = PREV
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = { has_country_flag = SPR_cochinchina_intervention_flag }
+					every_country = {
+						limit = { 
+							OR = {
+								is_subject_of = MOR 
+								TAG = MOR
+							}
+						}
+						white_peace = PREV
+					}
+				}
+			}
+		}
+		hidden_effect = { SPR = { country_event = { id = SPR_morocco_expedition.11 } } }
+	}
+	
+	option = { #Keep Fighting
+		name = SPR_morocco_expedition.8.a
+		ai_chance = { 
+			base = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		hidden_effect = { 
+			set_global_flag = MOR_morocco_intervention_continues_flag
+			SPR = { country_event = { id = SPR_morocco_expedition.9 } } 
+		}
+	}
+}
+
+#Morocco Keeps Fighting!
+country_event = {
+	id = SPR_morocco_expedition.9
+	title = SPR_morocco_expedition.9.t
+	desc = SPR_morocco_expedition.9.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = SPR_morocco_expedition.9.a
+		ai_chance = { base = 100}
+		
+	}
+}
+
+#Morocco Loses Morocco
+country_event = {
+	id = SPR_morocco_expedition.10
+	title = SPR_morocco_expedition.10.t
+	desc = SPR_morocco_expedition.10.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.10.a
+		ai_chance = { base = 100}
+		every_country = {
+			limit = {
+				OR = {
+					TAG = SPR
+					is_subject_of = SPR
+				}
+			}
+			if = {
+				limit = { is_subject = yes }
+				if = {
+					limit = { 
+						OR = {
+							OVERLORD = { has_country_flag = SPR_cochinchina_intervention_flag }
+							has_country_flag = SPR_cochinchina_intervention_flag
+						}
+					}
+					every_country = {
+						limit = { 
+							OR = {
+								is_subject_of = MOR 
+								TAG = MOR
+							}
+						}
+						white_peace = PREV
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = { has_country_flag = SPR_cochinchina_intervention_flag }
+					every_country = {
+						limit = { 
+							OR = {
+								is_subject_of = MOR 
+								TAG = MOR
+							}
+						}
+						white_peace = PREV
+					}
+				}
+			}
+		}
+		hidden_effect = { SPR = { country_event = { id = SPR_morocco_expedition.11 } } }
+	}
+}
+
+#Morocco Surrenders Completion
+country_event = {
+	id = SPR_morocco_expedition.11
+	title = SPR_morocco_expedition.11.t
+	desc = SPR_morocco_expedition.11.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.11.a
+		ai_chance = { base = 100}
+		hidden_effect = { SPR = { country_event = { id = SPR_morocco_expedition.15 days = 2 } } }
+	}
+}
+
+#Both Surrender Timeout
+country_event = {
+	id = SPR_morocco_expedition.12
+	title = SPR_morocco_expedition.12.t
+	desc = SPR_morocco_expedition.12.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.12.a
+		ai_chance = { base = 100}
+	}
+}
+
+#Morocco Holds Cities! SPR
+country_event = {
+	id = SPR_morocco_expedition.13
+	title = SPR_morocco_expedition.13.t
+	desc = SPR_morocco_expedition.13.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.13.a
+		ai_chance = { base = 100}
+		MOR = {
+			transfer_state = 1029
+			transfer_state = 1030
+		}
+	}
+}
+
+#Morocco Holds Cities! MOR
+country_event = {
+	id = SPR_morocco_expedition.14
+	title = SPR_morocco_expedition.14.t
+	desc = SPR_morocco_expedition.14.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Surrender
+		name = SPR_morocco_expedition.14.a
+		ai_chance = { base = 100}
+		MOR = {
+			transfer_state = 1029
+			transfer_state = 1030
+		}
+	}
+}
+
+#Peace Negotiations SPR
+country_event = {
+	id = SPR_morocco_expedition.15
+	title = SPR_morocco_expedition.15.t
+	desc = SPR_morocco_expedition.15.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = { hidden_effect = { MOR = { country_event = { id = SPR_morocco_expedition.16 } } } }
+	
+	option = { 
+		name = SPR_morocco_expedition.15.a
+		ai_chance = { base = 100}
+		debt_level_decrease_by_6 = yes
+		if = {
+			limit = { 
+				OR = {
+					SPR = { owns_state = 1327 }
+					MOR = { owns_state = 1327 }
+				}
+			}
+			SPR = { transfer_state = 1327 }
+		}
+		hidden_effect = { SPR = { set_country_flag = SPR_morocco_expedition_success_flag } }
+	}
+}
+
+#Peace Negotiations MOR
+country_event = {
+	id = SPR_morocco_expedition.16
+	title = SPR_morocco_expedition.16.t
+	desc = SPR_morocco_expedition.16.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = SPR_morocco_expedition.16.a
+		ai_chance = { base = 100}
+		custom_effect_tooltip = afr_prosperity_mechanic_minus_200
+		hidden_effect = {
+			add_to_variable = {
+				var = afr_prosperity_mechanic_value
+				value = -200
+			}
+		}
+		if = {
+			limit = { 
+				OR = {
+					SPR = { owns_state = 1327 }
+					MOR = { owns_state = 1327 }
+				}
+			}
+			SPR = { transfer_state = 1327 }
+		}
+		if = {
+			limit = { check_variable = { var = MOR.afr_has_unsanctioned_raid_against_colonial_neighbor@SPR value = 1 compare = greater_than_or_equals } }
+			hidden_effect = { clear_variable = MOR.afr_has_unsanctioned_raid_against_colonial_neighbor@SPR }
+		}
+		hidden_effect = { set_variable = { var = MOR.afr_has_special_diplomacy@SPR value = 1 } }
+	}
+}
+
+#Trade Demands SPR
+country_event = {
+	id = SPR_morocco_expedition.17
+	title = SPR_morocco_expedition.17.t
+	desc = SPR_morocco_expedition.17.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = SPR_morocco_expedition.17.a
+		ai_chance = { base = 100}
+		MOR = { country_event = { id = SPR_morocco_expedition.18 days = 1 } }
+	}
+	option = { 
+		name = SPR_morocco_expedition.17.b
+		ai_chance = { base = 100}
+		add_political_power = -25
+	}
+}
+
+#Trade Demands MOR
+country_event = {
+	id = SPR_morocco_expedition.18
+	title = SPR_morocco_expedition.18.t
+	desc = SPR_morocco_expedition.18.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = SPR_morocco_expedition.18.a
+		ai_chance = { base = 100}
+		hidden_effect = { SPR = { country_event = { id = SPR_morocco_expedition.19 days = 1 } } }
+	}
+}
+
+#Trade Demands SPR
+country_event = {
+	id = SPR_morocco_expedition.19
+	title = SPR_morocco_expedition.19.t
+	desc = SPR_morocco_expedition.19.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = SPR_morocco_expedition.19.a
+		ai_chance = { base = 100}
+		1029 = { add_colonial_profits_in_state_by_50 = yes }
+		1030 = { add_colonial_profits_in_state_by_50 = yes }
+	}
+}
+
+#ENG Stops guarantee for MOR
+country_event = {
+	id = SPR_morocco_expedition.20
+	title = SPR_morocco_expedition.20.t
+	desc = SPR_morocco_expedition.20.d
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { 
+		name = SPR_morocco_expedition.20.a
+		ai_chance = { base = 100}
+		hidden_effect = {
+			ENG = {
+				diplomatic_relation = {
+					country = MOR
+					relation = guarantee
+					active = no
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
+
