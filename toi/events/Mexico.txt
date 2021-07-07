@@ -64,7 +64,7 @@ add_namespace = mexico_civil_war
 			name = mexico_politics.3.a
 			swap_ideas = {
 				remove_idea = MEX_idea_uncontrolled_catholic_church_1
-				add_idea = MEX_idea_uncontrolled_catholic_church_4
+				add_idea = MEX_idea_uncontrolled_catholic_church_2
 			}
 		}
 	}
@@ -155,6 +155,78 @@ add_namespace = mexico_civil_war
 			declare_war_on = {
 				target = MEC
 				type = annex_everything
+			}
+		}
+	}
+	
+	#Liberal or Conservative Resistance
+	state_event = {
+		id = mexico_politics.8
+		hidden = yes
+		is_triggered_only = yes
+		
+		immediate = {
+			hidden_effect = { 
+				OWNER = {
+					random_state = {
+						limit = { STATE = ROOT }
+						OWNER = { PREV = { state_event = { id = mexico_politics.9 } } }
+					}
+				}
+			}
+		}
+	}
+	state_event = {
+		id = mexico_politics.9
+		hidden = yes
+		is_triggered_only = yes
+		
+		immediate = { hidden_effect = { OWNER = { country_event = { id = mexico_politics.10 } } } }
+	}
+	country_event = {
+		id = mexico_politics.10
+		title = mexico_politics.10.t
+		desc = {
+			text = mexico_politics.10.d
+			trigger = { TAG = MEX }
+		}
+		desc = {
+			text = mexico_politics.10.e
+			trigger = { TAG = MEC }
+		}
+		picture = GFX_report_event_reform_war_end
+		is_triggered_only = yes
+		trigger = { 
+			OR = {
+				TAG = MEX
+				TAG = MEC
+			}
+		}
+		
+		option = {
+			name = mexico_politics.10.a
+			trigger = { TAG = MEX }
+			FROM = { 
+				force_enable_resistance = {
+					clear = no
+					occupier = MEX
+					occupied = MEC
+				}
+				start_resistance = MEC
+				add_resistance = 35 
+			}
+		}
+		option = {
+			name = mexico_politics.10.b
+			trigger = { TAG = MEC }
+			FROM = { 
+				force_enable_resistance = {
+					clear = no
+					occupier = MEC
+					occupied = MEX
+				}
+				start_resistance = MEX
+				add_resistance = 35 
 			}
 		}
 	}
@@ -265,11 +337,11 @@ country_event = { #Debt system initial announcement
 						}
 						set_nationality = MEC
 					}
-					load_oob = "Mex_civil_war_liberals"
+					load_oob = "MEX_civil_war_liberals"
 					country_event = { id = mexico.15 days = 2 }
 				}
 				MEC = {
-					load_oob = "Mex_civil_war_conservatives"
+					load_oob = "MEX_civil_war_conservatives"
 					MEX = { country_event = { id = mexico.14 days = 2 } }
 					news_event = news.4
 					if = {
@@ -351,12 +423,12 @@ country_event = { #Debt system initial announcement
 						}
 						set_nationality = MEC
 					}
-					load_oob = "Mex_civil_war_liberals"
+					load_oob = "MEX_civil_war_liberals"
 					country_event = { id = mexico.15 days = 2  }
 					set_war_support = 0.6
 				}
 				MEC = {
-					load_oob = "Mex_civil_war_conservatives"
+					load_oob = "MEX_civil_war_conservatives"
 					country_event = { id = mexico.14 days = 2 }
 					news_event = news.4
 				}
@@ -465,6 +537,16 @@ country_event = { #Debt system initial announcement
 			name = mexico_civil_war.4.b
 			trigger = { TAG = MEC }
 			add_war_support = 0.015
+			FROM = {
+				create_unit = {
+					division = "name = \"Local Militia\" division_template = \"Local Militia\" start_experience_factor = 0.1 start_equipment_factor = 0.70"
+					owner = ROOT
+				}
+				create_unit = {
+					division = "name = \"Local Militia\" division_template = \"Local Militia\" start_experience_factor = 0.1 start_equipment_factor = 0.70"
+					owner = ROOT
+				}
+			}
 		}
 	}
 	
@@ -771,7 +853,7 @@ country_event = { #Debt system initial announcement
 			SPR = {
 				add_opinion_modifier = {
 					target = USA
-					modifier = medium_decrease
+					modifier = large_decrease
 				}
 			}
 			hidden_effect = { SPR = { country_event = { id = mexico_civil_war.18 days = 3 } } }
@@ -1526,6 +1608,25 @@ country_event = {
 		fire_only_once = yes
 		is_triggered_only = yes
 		
+		immediate = { 
+			hidden_effect = { 
+				USA = { clr_country_flag = USA_mexican_reform_war_loans_flag }
+				MEX = { remove_ideas = MEX_reform_war_itinerant_government }
+				MEC = {
+					set_division_template_lock = {
+						division_template = "Local Militia"
+						is_locked = no
+					}
+				}
+				MEX = {
+					set_division_template_lock = {
+						division_template = "Local Militia"
+						is_locked = no
+					}
+				}
+			}
+		}
+		
 		trigger = {
 			has_global_flag = MEX_MEC_CIVIL_WAR_side_chosen
 			has_global_flag = MEX_MEC_CIVIL_WAR
@@ -1542,11 +1643,12 @@ country_event = {
 			name = mexico.12.a
 			add_stability = 0.1
 			add_ideas = MEX_idea_scars_of_the_civil_war
-			load_focus_tree = mexico_liberal_tree
 			hidden_effect = {
+				load_focus_tree = mexico_liberal_tree
 				set_country_flag = MEX_civ_ended_liberals
 				clr_global_flag = MEX_MEC_CIVIL_WAR
 			}	
+			complete_national_focus = MEX_rep_secure_reform_war_victory
 		}
 }
 #Leonardo Márquez
@@ -1770,7 +1872,24 @@ country_event = {
 		
 		is_triggered_only = yes
 		
-		immediate = { USA = { clr_country_flag = USA_mexican_reform_war_loans_flag } }
+		immediate = { 
+			hidden_effect = { 
+				USA = { clr_country_flag = USA_mexican_reform_war_loans_flag }
+				MEX = { remove_ideas = MEX_reform_war_itinerant_government }
+				MEC = {
+					set_division_template_lock = {
+						division_template = "Local Militia"
+						is_locked = no
+					}
+				}
+				MEX = {
+					set_division_template_lock = {
+						division_template = "Local Militia"
+						is_locked = no
+					}
+				}
+			}
+		}
 		
 		trigger = {
 			original_tag = MEC 
