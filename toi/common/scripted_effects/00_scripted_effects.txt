@@ -1,5 +1,5 @@
 #	Example:
-# 
+#
 #	example_effect = {
 #		add_political_power = 66
 #		add_popularity = {
@@ -18,31 +18,31 @@
 
 add_1_infra_random_state = {
 	random_owned_controlled_state = {
-			limit = {
-				free_building_slots = {
-					building = infrastructure
-					size > 0
-				}
-				OR = {
-					is_in_home_area = yes
-					NOT = {
-						owner = {
-							any_owned_state = {
-								free_building_slots = {
-									building = infrastructure
-									size > 0
-								}
-								is_in_home_area = yes
+		limit = {
+			free_building_slots = {
+				building = infrastructure
+				size > 0
+			}
+			OR = {
+				is_in_home_area = yes
+				NOT = {
+					owner = {
+						any_owned_state = {
+							free_building_slots = {
+								building = infrastructure
+								size > 0
 							}
+							is_in_home_area = yes
 						}
 					}
 				}
 			}
-			add_building_construction = {
-				type = infrastructure
-				level = 1
-				instant_build = yes
-			}
+		}
+		add_building_construction = {
+			type = infrastructure
+			level = 1
+			instant_build = yes
+		}
 	}
 }
 
@@ -112,7 +112,7 @@ add_1_milfac_random_state = {
 	}
 }
 
-replace_civ_with_arms_factories = {	
+replace_civ_with_arms_factories = {
 
 	random_owned_controlled_state = {
 		limit = {
@@ -129,7 +129,7 @@ replace_civ_with_arms_factories = {
 			instant_build = yes
 		}
 	}
-	
+
 	random_owned_controlled_state = {
 		limit = {
 			is_fully_controlled_by = ROOT
@@ -195,12 +195,15 @@ replace_civ_with_arms_factories = {
 	}
 }
 
+
+#### Italy/Italian Peninsula
+
 ITA_Division_of_italy_variable = {
 	hidden_effect = {
 		add_to_variable = { var = UCT.ITA_FRA_Divide_Italy_Variable value = 1 }
 		if = {
-			limit = {	
-					UCT = {
+			limit = {
+				UCT = {
 					check_variable = { ITA_FRA_Divide_Italy_Variable = 6 }
 				}
 			}
@@ -213,12 +216,248 @@ ITA_Division_of_italy_variable = {
 
 	}
 }
+ITA_Formation_of_Italy = {
+	custom_effect_tooltip = ITA_Formation_of_Italy_Scripted
+	hidden_effect = {
+		#####For every nation
+		##Unification Event
+		country_event = {
+			id = ita.8
+			hours = 1
+		}
+		###Sardinia Piedmont Historical and alternate centrist path
+		if = {
+			limit = {
+				AND = {
+					tag = PIE
+					OR = {
+						has_completed_focus = PIE_Napoleon3_Help
+						has_completed_focus = PIE_Provoke_Austria
+					}
+				}
+			}
+			###Setting Cosmetic Tag and Flag for tag alias
+			set_cosmetic_tag = PIE_focus_ITA
+			set_country_flag = is_literally_italy
+
+			####Country Events for Unification
+			##Elections
+			country_event = {
+				id = ita.41
+				days = 25
+			}
+			###Remove puppets
+			if = {
+				limit = {
+					NSC = {
+						exists = yes
+						is_subject_of = ROOT
+					}
+				}
+				annex_country = {
+					target = NSC
+					transfer_troops = yes
+				}
+			}
+			###core land
+			every_owned_state = {
+				if = {
+					limit = {
+						NOT = {
+							is_core_of = PIE
+						}
+					}
+					add_core_of = PIE
+				}
+				remove_core_of = NSC
+				remove_core_of = LVN
+				remove_core_of = PRM
+				remove_core_of = MOD
+				remove_core_of = TUS
+				remove_core_of = PAP
+			}
+			hidden_effect = {
+				remove_state_core = 812
+				remove_state_core = 117
+				remove_state_core = 997
+				remove_state_core = 156
+				remove_state_core = 115
+			}
+			####Focus Tree
+			load_focus_tree = italy_focus
+			###Politics and related things
+			hidden_effect = {
+				FRA = {
+					mark_focus_tree_layout_dirty = yes
+				}
+				set_variable = {
+					southern_revolt_risk = 10
+				}
+				add_ideas = ITA_Southern_Revolt_Risk_Idea
+				create_country_leader = {
+					name = "Camillo Cavour"
+					desc = "POLITICS_LEOPOLDO_O_DONNELL_Y_JORRIS_DESC"
+					picture = "Portrait_PIE_Camillo_Cavour.dds"
+					expire = "1965.1.1"
+					ideology = conserv_liberal
+					traits = {
+						#
+					}
+				}
+				set_popularities = {
+					anarchism = 8
+					vanguard_communism = 1
+					collectivist_socialism = 1
+					social_egalitarianism = 1
+					centrism = 52
+					traditional_conservatism = 25
+					radical_democracy = 2
+					chauvinist_populism = 0
+					autocracy = 10
+					fundamentalism = 0
+				}
+				set_politics = {
+					ruling_party = centrism
+				}
+				add_ideas = {
+					ITA_Unorganized_Army
+					ITA_Unorganized_Navy
+					ITA_Brigandage
+					ITA_Different_Naval_Doctorines
+					ITA_Reliance_on_Farming
+				}
+				remove_ideas = {
+					PIE_National_Society
+					ITA_AI_Boost_War
+					PIE_Resistance_Go_Away
+				}
+				LVN = {
+					remove_ideas = {
+						LVN_National_Society
+					}
+				}
+				activate_mission = ITA_decision_deal_with_brigindage
+			}
+		}
+		if = {
+			limit = {
+				tag = PIE
+				has_completed_focus = PIE_Path_of_the_Carbonari
+			}
+			###set cosmetic tag and country flag
+			set_cosmetic_tag = PIE_focus_ITA
+			set_country_flag = is_literally_italy
+
+			###evemts
+			country_event = {
+				id = ita.40
+				days = 1
+			}
+			country_event = {
+				id = ita.41
+				days = 25
+			}
+			###cleaning up puppets
+			if = {
+				limit = {
+					NSC = {
+						exists = yes
+						is_subject_of = ROOT
+					}
+				}
+				annex_country = {
+					target = NSC
+					transfer_troops = yes
+				}
+			}
+			if = {
+				limit = {
+					country_exists = CBI
+				}
+				annex_country = {
+					target = CBI
+					transfer_troops = yes
+				}
+			}
+			every_owned_state = {
+				if = {
+					limit = {
+						NOT = {
+							is_core_of = PIE
+						}
+					}
+					add_core_of = PIE
+				}
+				remove_core_of = NSC
+				remove_core_of = LVN
+				remove_core_of = PRM
+				remove_core_of = MOD
+				remove_core_of = TUS
+				remove_core_of = PAP
+				remove_core_of = CBI
+			}
+			hidden_effect = {
+				remove_state_core = 812
+				remove_state_core = 117
+				remove_state_core = 997
+				remove_state_core = 156
+				remove_state_core = 115
+			}
+			hidden_effect = {
+				FRA = {
+					mark_focus_tree_layout_dirty = yes
+				}
+				set_variable = {
+					southern_revolt_risk = 10
+				}
+				add_ideas = ITA_Southern_Revolt_Risk_Idea
+				delete_unit_template_and_units = {
+					division_template = "French Infantry"
+				}
+				delete_unit_template_and_units = {
+					division_template = "French Howitzers"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Italian Nationalists"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Tuscan Infantry"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Italian Infantry"
+				}
+				clr_country_flag = PIE_2I_war_active
+			}
+			load_focus_tree = italy_focus
+			add_ideas = {
+				ITA_Unorganized_Army
+				ITA_Unorganized_Navy
+				ITA_Brigandage
+				ITA_Different_Naval_Doctorines
+				ITA_Reliance_on_Farming
+			}
+			remove_ideas = {
+				PIE_National_Society
+				ITA_Planning_For_Invasion
+				ITA_AI_Boost_War
+				PIE_Resistance_Go_Away
+			}
+			LVN = {
+				remove_ideas = {
+					LVN_National_Society
+				}
+			}
+			activate_mission = ITA_decision_deal_with_brigindage
+		}
+
+	}
+}
 
 
 #Country scope
 ROOT_inherit_current_scope_wars_effect = {
 	custom_effect_tooltip = ROOT_inherit_current_scope_wars_effect
-	hidden_effect = {	
+	hidden_effect = {
 		every_country = {
 			limit = {
 				has_defensive_war_with = PREV
@@ -1170,7 +1409,7 @@ clear_sabotaged_resources_if_necesary = {
 				}
 			}
 		}
-		
+
 		clear_variable = sabotaged_oil
 		clear_variable = sabotaged_aluminium
 		clear_variable = sabotaged_rubber
@@ -1185,10 +1424,10 @@ instantiate_collaboration_government = {
 	custom_effect_tooltip = compliance_80_effect_tooltip
 	hidden_effect = {
 		set_variable = { collaboration_formed@var:country_to_initiate = 1 }
-		
+
 		if = {
 			# if country_to_initiate does not exist, simply release it as a puppet
-			limit = { 
+			limit = {
 				var:country_to_initiate = {
 					exists = no
 				}
@@ -1202,24 +1441,24 @@ instantiate_collaboration_government = {
 		}
 		else = {
 			# if country_to_initiate exists, create a dynamic country as our new puppet
-			
+
 			create_dynamic_country = {
 				original_tag = country_to_initiate
-			
+
 				set_variable = { collaboration_formed_by = PREV }
 				set_temp_variable = { new_country = this }
-				
+
 				PREV = {
 					every_controlled_state = {
 						limit = { occupied_country_tag = country_to_initiate }
-						
+
 						var:new_country = {
 							transfer_state = PREV
 						}
 					}
-					
+
 					puppet = new_country
-					
+
 					set_autonomy = {
 						target = new_country
 						autonomy_state = autonomy_collaboration_government
@@ -1240,7 +1479,7 @@ abandon_colony_tag = {
 			limit = {
 				original_tag = CAN
 			}
-			if = { 
+			if = {
 				limit = { NOT = { OR = {
 					has_dlc = "Together for Victory"
 					has_dlc = "Waking the Tiger"
