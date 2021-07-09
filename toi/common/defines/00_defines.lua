@@ -5,7 +5,7 @@ NGame = {
 	END_DATE = "2100.1.1.1",
 	MAP_SCALE_PIXEL_TO_KM = 7.114,					-- Yes, we did the math
 	SAVE_VERSION = 7,
-	CHECKSUM_SALT = "zwOdv5d9wm9uDSOT",				-- Data to modify generated checksum when game binaries have changed but not any content files.	LAG_DAYS_FOR_LOWER_SPEED = 10,					-- Days of client lag for decrease of gamespeed
+	CHECKSUM_SALT = "zwOdv5d9wm9uDSOT",				-- Data to modify generated checksum when game binaries have changed but not any content files.
 	LAG_DAYS_FOR_LOWER_SPEED = 10,					-- Days of client lag for decrease of gamespeed
 	LAG_DAYS_FOR_PAUSE = 25,						-- Days of client lag for pause of gamespeed.
 	GAME_SPEED_SECONDS = { 2.0, 0.5, 0.2, 0.1, 0.0 }, -- game speeds for each level. Must be 5 entries with last one 0 for unbound	
@@ -20,6 +20,7 @@ NGame = {
 	MAX_EFFECT_ITERATION = 1000,					-- maximum allowed iteration for loop effects
 	MAX_SCRIPTED_LOC_RECURSION = 30,				-- max recursion for scripted localizations
 	HANDS_OFF_START_TAG = "UCT",					-- tag for player country for -hands_off runs. use an existing tag that is less likely to affect the game
+	ALERT_SFX_COOLDOWN_DAYS = 14,					-- After playing an alert sound, don't play the same sound for XXX days, even if it fires again.
 },
 
 NDiplomacy = {
@@ -1694,10 +1695,10 @@ NAI = {
 	RESEARCH_LAND_DOCTRINE_NEED_GAIN_FACTOR = 0.15, -- Multiplies value based on relative military industry size / country size.
 	RESEARCH_NAVAL_DOCTRINE_NEED_GAIN_FACTOR = 0.05, -- Multiplies value based on relative naval industry size / country size.
 	RESEARCH_AIR_DOCTRINE_NEED_GAIN_FACTOR = 0.07, -- Multiplies value based on relative number of air base / country size.
-	RESEARCH_NEW_WEIGHT_FACTOR = 0.3, 			-- Impact of previously unexplored tech weights. Higher means more random exploration.
+	RESEARCH_NEW_WEIGHT_FACTOR = 0.4, 			-- Impact of previously unexplored tech weights. Higher means more random exploration.
 	RESEARCH_AHEAD_BONUS_FACTOR = 2.0,          -- To which extent AI should care about ahead of time bonuses to research
 	RESEARCH_BONUS_FACTOR = 0.9, 				-- To which extent AI should care about bonuses to research
-	MAX_AHEAD_RESEARCH_PENALTY = 2,             -- max ahead of tiem penalty ai will pick ever
+	MAX_AHEAD_RESEARCH_PENALTY = 2,             -- max ahead of time penalty ai will pick ever
 	RESEARCH_AHEAD_OF_TIME_FACTOR = 4.0, 		-- To which extent AI should care about ahead of time penalties to research
 	RESEARCH_BASE_DAYS = 60,					-- AI adds a base number of days when weighting completion time for techs to ensure it doesn't only research quick techs
 	DECLARE_WAR_RELATIVE_FORCE_FACTOR = 0.5,	-- Weight of relative force between nations that consider going to war

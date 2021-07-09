@@ -993,6 +993,28 @@ focus_tree = {
 	}
 	
 	focus = {
+		id = LIB_ships_for_freed_people
+		icon = GFX_focus_gunboat_basic
+		relative_position_id = LIB_adopt_strong_ACS_policies
+		x = 0
+		y = 1
+		cost = 70
+		available_if_capitulated = no
+		ai_will_do = {
+			factor = 1
+		}
+		available = {
+			
+		}
+		prerequisite = { 
+			focus = LIB_adopt_strong_ACS_policies
+		}
+		completion_reward = {
+			add_equipment_to_stockpile = { type = convoy_1 amount = 10 producer = USA }
+		}
+	}
+	
+	focus = {
 		id = LIB_american_liberian_superiority 
 		icon = GFX_goal_focus_imperialism
 		relative_position_id = LIB_adopt_strong_ACS_policies
@@ -1536,14 +1558,10 @@ focus_tree = {
 					modifier = medium_decrease
 				}
 			}
-			activate_decision = AFR_interstate_slave_trade_consumer
-			debt_level_decrease_by_3 = yes
-			custom_effect_tooltip = LIB_arms_for_slaves_trade_tooltip	
-			
 			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = {
-				custom_effect_tooltip = AFR_Racial_Tension_plus_1
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_increase.1 trigger_for = controller } }
+			every_owned_state = {
+				limit = { is_coastal = yes }
+				DCI_increase_by_1 = yes
 			}
 		}
 	}
@@ -1563,13 +1581,13 @@ focus_tree = {
 		available = {
 			
 		}
+		mutually_exclusive = {
+			focus = LIB_arms_for_slaves_trade
+		}
 		prerequisite = { 
 			focus = LIB_collaboration_with_native_tribes
 			focus = LIB_limited_interactions_with_native_tribes
 			focus = LIB_adopt_strong_ACS_policies
-		}
-		mutually_exclusive = {
-			focus = LIB_arms_for_slaves_trade
 		}
 		completion_reward = {
 			ENG = {
@@ -1578,16 +1596,19 @@ focus_tree = {
 						modifier = small_increase
 					}
 			}	
-				
+			custom_effect_tooltip = afr_colonial_effect_tooltip
+			every_owned_state = {
+				limit = { is_coastal = yes }
+				DCI_decrease_by_2 = yes
+			}
 		}
 	}
-
-		
+	
 	focus = {
 		id = LIB_liberian_enforecment_of_british_slavery_ban
 		icon = GFX_goal_focus_british_colonial_empire
 		relative_position_id = LIB_end_slave_trade
-		x = 0
+		x = 1
 		y = 1
 		cost = 70
 		available_if_capitulated = no
@@ -1596,188 +1617,145 @@ focus_tree = {
 		}
 		available = {
 			command_power > 50
-			custom_trigger_tooltip = {
-				tooltip = AFR_has_no_slavery_tooltip
-				NOT = {	
-					has_idea = slavery
-					has_idea = usa_slavery_law
-					has_idea = tribal_slavery
-				}
-			}
 		}
 		prerequisite = { 
 			focus = LIB_end_slave_trade
 		}
+		prerequisite = { 
+			focus = LIB_ships_for_freed_people
+		}
 		completion_reward = {
 			add_command_power = -50
-			if = {
-				limit = { has_idea = AFR_illegal_transatlantic }
-				swap_ideas = {
-					remove_idea = AFR_illegal_transatlantic
-					add_idea = LIB_shining_example_transatlantic
-				}
-			}
-			else_if = {
-				limit = { has_idea = AFR_transatlantic_consumer }
-				swap_ideas = {
-					remove_idea = AFR_transatlantic_consumer
-					add_idea = LIB_shining_example_transatlantic
-				}
-			}
+			add_ideas = LIB_shining_example_transatlantic
 			ENG = {
 					add_opinion_modifier = {
 						target = LIB
 						modifier = large_increase
 					}
 			}
+			
 			custom_effect_tooltip = afr_colonial_effect_tooltip
-			capital_scope = {
-				custom_effect_tooltip = AFR_Racial_Tension_minus_1
-				hidden_effect = { state_event = { id = afr_rrp_racial_tension_decrease.1 trigger_for = controller } }
-			}
-			hidden_effect = {
-				every_country = {
-					if = { 
-						limit = {
-							OR = {
-								has_idea = tribal_slavery
-								has_idea = usa_slavery_law
-							}
-						}
-						add_opinion_modifier = {
-							target = LIB
-							modifier = small_decrease
-						}
-					}
+			every_state = {
+				limit = { 
+					any_neighbor_state = { OWNER = { TAG = LIB } }
+					is_coastal = yes 
+					NOT = { OWNER = { TAG = LIB } }
 				}
+				DCI_decrease_by_1 = yes
 			}
-		}
-	}
-	
-	focus = {
-		id = LIB_it_was_unavoidable
-		icon = GFX_goal_focus_enact_law
-		relative_position_id = LIB_social_reforms
-		x = -2
-		y = 1
-		cost = 70
-		available_if_capitulated = no
-		available = {
-			if = {
+			every_neighbor_country = {
 				limit = {
 					OR = {
-						USA = {
-							OR = {	
-								has_idea = slavery
-								has_idea = usa_slavery_law
-								has_idea = tribal_slavery
-							}
-							exists = yes
-							NOT = { has_global_flag = ACW_American_Civil_War_Avoided }
-						}
-						USA = { exists = no }
+						has_idea = tribal_slavery
+						has_idea = slavery
 					}
 				}
-				custom_trigger_tooltip = {
-					tooltip = LIB_civil_war_state_requirement_tooltip
-					LIB = {
-						owns_state = 298
-						owns_state = 1346
-					}
+				add_opinion_modifier = {
+					target = LIB
+					modifier = small_decrease
 				}
-				custom_trigger_tooltip = {
-					tooltip = LIB_it_was_unavoidable_trigger_tooltip
-					OR = {
-						has_government = fundamentalism
-						has_government = chauvinist_populism
-						has_government = anarchism
-						has_government = vanguard_communism
-						has_government = collectivist_socialism
-						has_government = social_egalitarianism
-					}
-				}
-				custom_trigger_tooltip = {
-					tooltip = LIB_civil_war_abolitionists_control_senate_tooltip
-					check_variable = { var = LIB.NA_B_pro_abolitionist_senate_seats@LIB value = LIB.NA_B_anti_abolitionist_senate_seats@LIB compare = greater_than }
-				}
-				#custom_trigger_tooltip = {
-				#	tooltip = LIB_civil_war_abolitionists_control_house_tooltip
-				#	check_variable = { var = LIB.NA_B_pro_abolitionist_house_seats@LIB value = LIB.NA_B_anti_abolitionist_house_seats@LIB compare = greater_than }
-				#}
-				custom_trigger_tooltip = {
-					tooltip = LIB_civil_war_ended_interstate_slave_trade_tooltip
-					has_completed_focus = LIB_end_slave_trade
-				}
-				
-			}
-			else = {
-				if = {
-					limit = {
-						USA = { 
-							has_global_flag = ACW_American_Civil_War_Avoided
-							OR = {
-								has_idea = USA_thirty_year_plan_1
-								has_idea = USA_thirty_year_plan_2
-								has_idea = USA_thirty_year_plan_3
-							}
-						}
-					}
-					custom_trigger_tooltip = {
-						tooltip = LIB_USA_not_finished_thirty_year_plan_tooltip
-						always = no
-					}
-				}
-				else = {
-					custom_trigger_tooltip = {
-						tooltip = LIB_USA_banned_slavery_tooltip
-						always = yes
-					}
-				}
-			}
-		}
-		prerequisite = { 
-			focus = LIB_social_reforms
-		}
-		completion_reward = {
-			custom_effect_tooltip = LIB_it_was_unavoidable_tooltip
-			hidden_effect = { country_event = { id = LIB_it_was_unavoidable.1 days = 3 } }
-		}
-		ai_will_do = {
-			factor = 1
-		}
-		bypass={
-			USA = {
-				has_country_flag = USASoaring_Eagle
 			}
 		}
 	}
 	
-	focus = {
-		id = LIB_reconstruction
-		icon = GFX_goal_continuous_repairments
-		relative_position_id = LIB_social_reforms
-		x = -2
-		y = 2
-		cost = 70
-		available_if_capitulated = no
-		ai_will_do = {
-			factor = 1
-		}
-		available = {
-			has_civil_war = no
-			has_political_power > 50
-		}
-		prerequisite = { 
-			focus = LIB_it_was_unavoidable
-		}
-		completion_reward = {
-			add_political_power = -50
-				
-		}
-		allow_branch = {
-			has_country_flag = LIB_abolition_civil_war_started
-		}
-	}
+	#focus = {
+	#	id = LIB_it_was_unavoidable
+	#	icon = GFX_goal_focus_enact_law
+	#	relative_position_id = LIB_social_reforms
+	#	x = -2
+	#	y = 1
+	#	cost = 70
+	#	available_if_capitulated = no
+	#	available = {
+	#		if = {
+	#			limit = {
+	#				OR = {
+	#					USA = {
+	#						OR = {	
+	#							has_idea = slavery
+	#							has_idea = usa_slavery_law
+	#							has_idea = tribal_slavery
+	#						}
+	#						exists = yes
+	#						NOT = { has_global_flag = ACW_American_Civil_War_Avoided }
+	#					}
+	#					USA = { exists = no }
+	#				}
+	#			}
+	#			custom_trigger_tooltip = {
+	#				tooltip = LIB_civil_war_state_requirement_tooltip
+	#				LIB = {
+	#					owns_state = 298
+	#					owns_state = 1346
+	#				}
+	#			}
+	#			custom_trigger_tooltip = {
+	#				tooltip = LIB_it_was_unavoidable_trigger_tooltip
+	#				OR = {
+	#					has_government = fundamentalism
+	#					has_government = chauvinist_populism
+	#					has_government = anarchism
+	#					has_government = vanguard_communism
+	#					has_government = collectivist_socialism
+	#					has_government = social_egalitarianism
+	#				}
+	#			}
+	#			custom_trigger_tooltip = {
+	#				tooltip = LIB_civil_war_abolitionists_control_senate_tooltip
+	#				check_variable = { var = LIB.NA_B_pro_abolitionist_senate_seats@LIB value = LIB.NA_B_anti_abolitionist_senate_seats@LIB compare = greater_than }
+	#			}
+	#			#custom_trigger_tooltip = {
+	#			#	tooltip = LIB_civil_war_abolitionists_control_house_tooltip
+	#			#	check_variable = { var = LIB.NA_B_pro_abolitionist_house_seats@LIB value = LIB.NA_B_anti_abolitionist_house_seats@LIB compare = greater_than }
+	#			#}
+	#			custom_trigger_tooltip = {
+	#				tooltip = LIB_civil_war_ended_interstate_slave_trade_tooltip
+	#				has_completed_focus = LIB_end_slave_trade
+	#			}
+	#			
+	#		}
+	#		else = {
+	#			if = {
+	#				limit = {
+	#					USA = { 
+	#						has_global_flag = ACW_American_Civil_War_Avoided
+	#						OR = {
+	#							has_idea = USA_thirty_year_plan_1
+	#							has_idea = USA_thirty_year_plan_2
+	#							has_idea = USA_thirty_year_plan_3
+	#						}
+	#					}
+	#				}
+	#				custom_trigger_tooltip = {
+	#					tooltip = LIB_USA_not_finished_thirty_year_plan_tooltip
+	#					always = no
+	#				}
+	#			}
+	#			else = {
+	#				custom_trigger_tooltip = {
+	#					tooltip = LIB_USA_banned_slavery_tooltip
+	#					always = yes
+	#				}
+	#			}
+	#		}
+	#	}
+	#	prerequisite = { 
+	#		focus = LIB_social_reforms
+	#	}
+	#	completion_reward = {
+	#		custom_effect_tooltip = LIB_it_was_unavoidable_tooltip
+	#		hidden_effect = { country_event = { id = LIB_it_was_unavoidable.1 days = 3 } }
+	#	}
+	#	ai_will_do = {
+	#		factor = 1
+	#	}
+	#	bypass={
+	#		USA = {
+	#			has_country_flag = USASoaring_Eagle
+	#		}
+	#	}
+	#}
+	#
 	
 	#focus = {
 	#	id = LIB_keep_slavery
@@ -1839,7 +1817,8 @@ focus_tree = {
 			focus = LIB_home_of_the_free
 		}
 		prerequisite = { 
-			focus = LIB_liberian_enforecment_of_british_slavery_ban
+			focus = LIB_end_slave_trade
+			focus = LIB_arms_for_slaves_trade
 		}
 		completion_reward = {
 			custom_effect_tooltip = LIB_gem_of_africa_temp

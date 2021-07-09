@@ -9,7 +9,6 @@ SAX_decision_category_foreign_policy = {
 
 		available = {
 			has_completed_focus = SAX_focus_mend_divide
-			NOT = { has_idea = SAX_idea_anti_prussian_sentiments }
 		}
 
 		visible = {
@@ -21,6 +20,7 @@ SAX_decision_category_foreign_policy = {
 				exists = yes
 				is_puppet = no 
 			}
+			has_country_flag = SAX_PRS_relation_good_flag
 		}
 
 		fire_only_once = yes
@@ -34,29 +34,2311 @@ SAX_decision_category_foreign_policy = {
         }
 		
 		complete_effect = {
-			add_opinion_modifier = { target = PRS modifier = small_increase }
-			reverse_add_opinion_modifier = { target = PRS modifier = small_increase }
+			add_stability = -0.03
 		}
        
         remove_effect = {
 			PRS = {
 				remove_opinion_modifier = {
 					target = SAX
-					modifier = small_increase
+					modifier = SAX_PRS_EARLY_RAPPROCHEMENT_REL
 				}
 			}
 			SAX = {
 				remove_opinion_modifier = {
 					target = PRS
-					modifier = small_increase
+					modifier = SAX_PRS_EARLY_RAPPROCHEMENT_REL
 				}
 			}
-			add_opinion_modifier = { target = PRS modifier = large_increase }
-			reverse_add_opinion_modifier = { target = PRS modifier = large_increase }
+			add_opinion_modifier = { target = PRS modifier = SAX_PRS_MEDIUM_RAPPROCHEMENT_REL }
+			reverse_add_opinion_modifier = { target = PRS modifier = SAX_PRS_MEDIUM_RAPPROCHEMENT_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_PRS_relation_good_flag
+			}
 	    }
        
 		ai_will_do = {
 			base = 1000
+		}
+	}
+	
+	#Convince the People
+	SAX_decision_convince_the_people = {
+
+		icon = generic_civil_support
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+		}
+
+		visible = {
+			PRS = { 
+				exists = yes
+				is_puppet = no 
+			}
+			SAX = { 
+				exists = yes
+				is_puppet = no 
+			}
+			has_opinion_modifier = SAX_PRS_FULL_RAPPROCHEMENT_REL
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 365
+         
+        modifier = {
+            political_power_gain = -0.02
+        }
+		
+		complete_effect = {
+			add_stability = -0.04
+		}
+       
+        remove_effect = {
+			PRS = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_PRS_ANTI_PRUSSIAN_SENTIMENT_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = PRS
+					modifier = SAX_PRS_ANTI_PRUSSIAN_SENTIMENT_REL
+				}
+			}
+			remove_ideas = SAX_idea_anti_prussian_sentiments
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+}
+
+SAX_decision_category_trias_policy = {
+	
+	#Notify the German Middle States
+	SAX_decision_notify_the_middle_states = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_attempt_to_reform_confederation
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+        days_remove = 30
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			custom_effect_tooltip = SAX_decision_notify_the_middle_states_complete_effect_tt
+			BAD = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			BAV = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			HAN = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			HES = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			HSD = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			WUR = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			if = {
+				limit = {
+					SCH = { 
+						exists = yes
+						is_subject = no 
+					}
+					NOT = {
+						HLS = { 
+							exists = yes
+							is_subject = no 
+						}
+					}
+				}
+				SCH = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			}
+			else_if = {
+				limit = {
+					HLS = { 
+						exists = yes
+						is_subject = no 
+					}
+				}
+				HLS = { country_event = { id = saxonyforeign.4 days = 7 random_days = 10 } }
+			}
+			hidden_effect = {
+				set_variable = { var = SAX_bundesreform_positive_votes value = 1 }
+			}
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_tt
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							SCH = { 
+								exists = yes
+								is_subject = no 
+							}
+							NOT = {
+								HLS = { 
+									exists = yes
+									is_subject = no 
+								}
+							}
+						}
+						HLS = { 
+							exists = yes
+							is_subject = no 
+						}
+					}
+				}
+				if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 4 compare = less_than_or_equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_failure_tt
+					add_political_power = -100
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_failure_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 5 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_small_majority_tt
+					add_political_power = 25
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_small_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 6 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_decent_majority_tt
+					add_political_power = 50
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_small_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 7 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_big_majority_tt
+					add_political_power = 75
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_large_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 8 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_unanimity_tt
+					add_political_power = 100
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_unanimity_flag
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 3 compare = less_than_or_equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_failure_tt
+					add_political_power = -100
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_failure_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 4 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_small_majority_tt
+					add_political_power = 25
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_small_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 5 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_decent_majority_tt
+					add_political_power = 50
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_small_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 6 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_big_majority_tt
+					add_political_power = 75
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_large_majority_flag
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { var = SAX_bundesreform_positive_votes value = 7 compare = equals }
+					}
+					custom_effect_tooltip = SAX_decision_notify_the_middle_states_remove_effect_unanimity_tt
+					add_political_power = 100
+					hidden_effect = {
+						set_country_flag = SAX_decision_notify_the_middle_states_unanimity_flag
+					}
+				}
+			}
+			hidden_effect = {
+				clear_variable = SAX_bundesreform_positive_votes
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Baden
+	SAX_decision_tighten_bonds_BAD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAD
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Bayern
+	SAX_decision_tighten_bonds_BAV = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAV = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAV = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAV
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Hanover
+	SAX_decision_tighten_bonds_HAN = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HAN = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HAN = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HAN
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Hesse-Kassel
+	SAX_decision_tighten_bonds_HES = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HES = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HES = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HES
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Hesse-Darmstadt
+	SAX_decision_tighten_bonds_HSD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HSD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HSD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HSD
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Wurttemberg
+	SAX_decision_tighten_bonds_WUR = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			WUR = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			WUR = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = WUR
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Schleswig-Holstein
+	SAX_decision_tighten_bonds_SCH = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			SCH = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			SCH = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = SCH
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Tighten the Bonds with Holstein
+	SAX_decision_tighten_bonds_HLS = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HLS = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HLS = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HLS
+					modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			reverse_add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Baden of Our Reform Plans
+	SAX_decision_convince_BAD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAD
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Bavaria of Our Reform Plans
+	SAX_decision_convince_BAV = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAV = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAV = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAV
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Hanover of Our Reform Plans
+	SAX_decision_convince_HAN = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HAN = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HAN = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HAN
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Hesse-Kassel of Our Reform Plans
+	SAX_decision_convince_HES = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HES = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HES = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HES
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Hesse-Darmstadt of Our Reform Plans
+	SAX_decision_convince_HSD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HSD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HSD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HSD
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Wurttemberg of Our Reform Plans
+	SAX_decision_convince_WUR = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			WUR = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			WUR = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = WUR
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Schleswig-Holstein of Our Reform Plans
+	SAX_decision_convince_SCH = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			SCH = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			SCH = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = SCH
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Persuade Holstein of Our Reform Plans
+	SAX_decision_convince_HLS = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HLS = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HLS = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HLS
+					modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL
+				}
+			}
+			add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			reverse_add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Baden
+	SAX_decision_sway_BAD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAD
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Bavaria
+	SAX_decision_sway_BAV = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			BAV = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			BAV = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = BAV
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Hanover
+	SAX_decision_sway_HAN = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HAN = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HAN = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HAN
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Hesse-Kassel
+	SAX_decision_sway_HES = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HES = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HES = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HES
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Hesse-Darmstadt
+	SAX_decision_sway_HSD = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HSD = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HSD = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HSD
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Wurttemberg
+	SAX_decision_sway_WUR = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			WUR = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			WUR = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = WUR
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Schleswig-Holstein
+	SAX_decision_sway_SCH = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			SCH = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			SCH = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = SCH
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = SCH modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Sway Holstein
+	SAX_decision_sway_HLS = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			NOT = { has_country_flag = SAX_decision_trias_diplomatic_mission_flag }
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_legacy_of_bamberg_conference
+			HLS = { 
+				has_opinion_modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				exists = yes
+				is_subject = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+		}
+       
+        remove_effect = {
+			HLS = {
+				remove_opinion_modifier = {
+					target = SAX
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			SAX = {
+				remove_opinion_modifier = {
+					target = HLS
+					modifier = SAX_GC_BUNDESREFORM_NEGATIVE_REL
+				}
+			}
+			add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			reverse_add_opinion_modifier = { target = HLS modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			hidden_effect = {
+				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Develop the Trias Idea
+	SAX_decision_develop_trias_idea = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			has_war = no
+		}
+
+		visible = {
+			has_completed_focus = SAX_focus_idea_of_german_trias
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			custom_effect_tooltip = SAX_decision_develop_trias_idea_complete_effect_tt
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = SAX_decision_develop_trias_idea_remove_effect_tt
+			hidden_effect = {
+				set_country_flag = SAX_decision_develop_trias_idea_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Refine the Trias Idea
+	SAX_decision_refine_trias_idea = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			has_war = no
+		}
+
+		visible = {
+			has_country_flag = SAX_decision_develop_trias_idea_flag
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			custom_effect_tooltip = SAX_decision_refine_trias_idea_complete_effect_tt
+		}
+       
+        remove_effect = {
+			if = {
+				limit = {
+					has_country_flag = SAX_decision_notify_the_middle_states_unanimity_flag
+					BAD = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					BAV = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					HAN = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					HES = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					HSD = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					WUR = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					if = {
+						limit = {
+							SCH = { 
+								exists = yes
+								is_subject = no 
+							}
+							NOT = {
+								HLS = { 
+									exists = yes
+									is_subject = no 
+								}
+							}
+						}
+						SCH = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					}
+					else_if = {
+						limit = {
+							HLS = { 
+								exists = yes
+								is_subject = no 
+							}
+						}
+						HLS = { has_opinion_modifier = SAX_GC_BUNDESREFORM_FAVORABLY_REL }
+					}
+				}
+				custom_effect_tooltip = SAX_decision_trias_conference_ready_effect_tt
+				set_country_flag = SAX_decision_refine_trias_idea_unanimity_flag
+			}
+			else = {
+				custom_effect_tooltip = SAX_decision_refine_trias_idea_remove_effect_tt
+				set_country_flag = SAX_decision_refine_trias_idea_flag
+			}
+			hidden_effect = {
+				clr_country_flag = SAX_decision_develop_trias_idea_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Make Amendments to Appease Skeptics
+	SAX_decision_appease_skeptics = {
+
+		icon = generic_political_discourse
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.35
+			PS_pol_positive = yes
+			has_war = no
+		}
+
+		visible = {
+			has_country_flag = SAX_decision_refine_trias_idea_flag
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+        days_remove = 90
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			custom_effect_tooltip = SAX_decision_appease_skeptics_complete_effect_tt
+			add_stability = -0.03
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = SAX_decision_trias_conference_ready_effect_tt
+			hidden_effect = {
+				clr_country_flag = SAX_decision_refine_trias_idea_flag
+				set_country_flag = SAX_decision_trias_conference_ready_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+}
+
+SAX_decision_category_obtain_foreign_equipment = {
+	
+	#Buy Rifles from Liège Factories
+	SAX_decision_buy_rifles_from_liege_factories = {
+
+		icon = generic_industry
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_completed_focus = SAX_focus_buy_rifles_from_liege_factories
+			num_of_civilian_factories_available_for_projects > 0
+			#debt condition
+		}
+
+		visible = {
+			country_exists = BEL
+			BEL = { owns_state = 977 }
+			BEL = { has_war = no }
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+        days_remove = 180
+         
+        modifier = {
+            consumer_goods_factor = 0.2
+        }
+		
+		complete_effect = {
+			#increase debt
+		}
+       
+        remove_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 500
+				producer = BEL
+			}
+	    }
+       
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	#Buy Rifles from Austria
+	SAX_decision_buy_austrian_rifles = {
+
+		icon = generic_industry
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_completed_focus = SAX_focus_buy_austrian_rifles
+			num_of_civilian_factories_available_for_projects > 0
+			#debt condition
+		}
+
+		visible = {
+			country_exists = AUS
+			AUS = { has_war = no }
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+        days_remove = 180
+         
+        modifier = {
+            consumer_goods_factor = 0.2
+        }
+		
+		complete_effect = {
+			#increase debt
+		}
+       
+        remove_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 500
+				producer = AUS
+			}
+	    }
+       
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	#Buy Cannons from Prussia
+	SAX_decision_buy_prussian_cannons = {
+
+		icon = artillery
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_completed_focus = SAX_focus_buy_prussian_cannons
+			num_of_civilian_factories_available_for_projects > 0
+			#debt condition
+		}
+
+		visible = {
+			country_exists = PRS
+			PRS = { has_war = no }
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+        days_remove = 180
+         
+        modifier = {
+            consumer_goods_factor = 0.2
+        }
+		
+		complete_effect = {
+			#increase debt
+		}
+       
+        remove_effect = {
+			add_equipment_to_stockpile = {
+				type = cannon_equipment
+				amount = 30
+				producer = PRS
+			}
+	    }
+       
+		ai_will_do = {
+			base = 500
+		}
+	}
+}
+
+SAX_decision_category_military_convention = {
+
+	#Ask for Military Convention with Prussia
+	SAX_decision_convention_with_prussia = {
+
+		icon = generic_military
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_completed_focus = SAX_focus_convention_with_prussia
+		}
+
+		visible = {
+			country_exists = PRS
+			NOT = { has_war_with = PRS }
+			NOT = { has_completed_focus = SAX_focus_deepen_rift }
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 150
+		
+		complete_effect = {
+			PRS = { country_event = { days = 1 id = saxonymilitary.1 } }
+		}
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Ask for Military Convention with Austria
+	SAX_decision_convention_with_austria = {
+
+		icon = generic_military
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_completed_focus = SAX_focus_convention_with_austria
+		}
+
+		visible = {
+			country_exists = AUS
+			NOT = { has_war_with = AUS }
+			NOT = { has_completed_focus = SAX_focus_loosen_ties }
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 150
+		
+		complete_effect = {
+			AUS = { country_event = { days = 1 id = saxonymilitary.1 } }
+		}
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Intensify the Military Convention
+	SAX_decision_intensify_convention = {
+
+		icon = generic_military
+		
+		allowed = { tag = SAX }
+
+		available = {
+			if = {
+				limit = {
+					has_idea = SAX_idea_PRS_military_convention_1
+				}
+				PRS = { has_war = no }
+			}
+			if = {
+				limit = {
+					has_idea = SAX_idea_AUS_military_convention_1
+				}
+				AUS = { has_war = no }
+			}
+			has_stability > 0.35
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				centrism > 0.45
+			}
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
+				}
+				traditional_conservatism > 0.45
+			}
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				autocracy > 0.45
+			}
+		}
+
+		visible = {
+			OR = {
+				has_idea = SAX_idea_PRS_military_convention_1
+				has_idea = SAX_idea_AUS_military_convention_1
+			}
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 180
+		
+		remove_effect = {
+			if = {
+				limit = {
+					has_idea = SAX_idea_PRS_military_convention_1
+				}
+				swap_ideas = { remove_idea = SAX_idea_PRS_military_convention_1 add_idea = SAX_idea_PRS_military_convention_2 }
+				PRS = {
+					remove_opinion_modifier = {
+						target = SAX
+						modifier = SAX_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				SAX = {
+					remove_opinion_modifier = {
+						target = PRS
+						modifier = SAX_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				add_opinion_modifier = { target = PRS modifier = SAX_MILITARY_CONVENTION_MEDIUM_REL }
+				reverse_add_opinion_modifier = { target = PRS modifier = SAX_MILITARY_CONVENTION_MEDIUM_REL }
+			}
+			else_if = {
+				limit = {
+					has_idea = SAX_idea_AUS_military_convention_1
+				}
+				swap_ideas = { remove_idea = SAX_idea_AUS_military_convention_1 add_idea = SAX_idea_AUS_military_convention_2 }
+				AUS = {
+					remove_opinion_modifier = {
+						target = SAX
+						modifier = SAX_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				SAX = {
+					remove_opinion_modifier = {
+						target = AUS
+						modifier = SAX_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				add_opinion_modifier = { target = AUS modifier = SAX_MILITARY_CONVENTION_MEDIUM_REL }
+				reverse_add_opinion_modifier = { target = AUS modifier = SAX_MILITARY_CONVENTION_MEDIUM_REL }
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
 		}
 	}
 }
@@ -311,7 +2593,7 @@ SAX_decision_category_economy = {
 			65 = { add_manpower = 5000 }
 			set_victory_points = {
 				province = 3535
-				value = 5
+				value = 20
 			}
 			add_tech_bonus = { bonus = 0.5 uses = 1 category = mechanical_engineering_tech }
 		}
@@ -331,7 +2613,6 @@ SAX_decision_category_economy = {
 		available = {
 			has_completed_focus = SAX_focus_proto_industrialization
 			has_stability > 0.3
-			NOT = { has_country_flag = SAX_industry_development_ongoing_flag }
 		}
 
 		visible = {
@@ -358,17 +2639,12 @@ SAX_decision_category_economy = {
 		
 		complete_effect = {
 			custom_effect_tooltip = SAX_industry_development_ongoing_effect_tt
-			hidden_effect = { 
-				set_country_flag = SAX_industry_development_ongoing_flag 
-			}
 		}
 
 		remove_effect = {
-			eoanb_add_3_prestige_score = yes
+			set_temp_variable = { eoanb_prestige_change = 3 }
+			eoanb_change_prestige_score = yes
 			add_tech_bonus = { bonus = 0.25 uses = 1 category = humanities_tech }
-			hidden_effect = {
-				clr_country_flag = SAX_industry_development_ongoing_flag
-			}
 		}
 
 		ai_will_do = {
@@ -386,7 +2662,6 @@ SAX_decision_category_economy = {
 		available = {
 			has_completed_focus = SAX_focus_proto_industrialization
 			has_stability > 0.3
-			NOT = { has_country_flag = SAX_industry_development_ongoing_flag }
 		}
 
 		visible = {
@@ -405,17 +2680,12 @@ SAX_decision_category_economy = {
 		
 		complete_effect = {
 			custom_effect_tooltip = SAX_industry_development_ongoing_effect_tt
-			hidden_effect = { 
-				set_country_flag = SAX_industry_development_ongoing_flag 
-			}
 		}
 
 		remove_effect = {
-			eoanb_add_1_prestige_score = yes
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
 			add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
-			hidden_effect = {
-				clr_country_flag = SAX_industry_development_ongoing_flag
-			}
 		}
 
 		ai_will_do = {
@@ -851,7 +3121,8 @@ SAX_decision_category_economy = {
 		}
 		
 		remove_effect = {
-			eoanb_add_3_prestige_score = yes
+			set_temp_variable = { eoanb_prestige_change = 3 }
+			eoanb_change_prestige_score = yes
 			add_stability = 0.02
 			if = {
 				limit = {

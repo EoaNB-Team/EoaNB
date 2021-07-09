@@ -4,51 +4,67 @@ world_fair_decisions = {
 	
 	#Hold a World Fair 
 	eoanb_decision_hold_world_fair = {
-
-		icon = generic_decision
+		icon = generic_form_nation
 
 		available = {
-			NOT = {
-			    has_global_flag = eoanb_world_fair_held_flag 
-			}
+			NOT = { has_global_flag = eoanb_world_fair_held_flag }
+			NOT = { has_idea = pre_industrial_era }
+			NOT = { has_idea = closed_economy }
 			OR = {
-			    AND = {
-				    is_great_power = yes 
+				AND = {
+					is_great_power = yes
 					has_political_power > 200
 				}
-			    AND = {
-				    is_secondary_power = yes 
-				    has_political_power > 300 
+				AND = {
+					is_secondary_power = yes 
+					has_political_power > 300
 				}
 			}
-		}
-
-		visible = {
-			NOT = {
-			    has_global_flag = eoanb_world_fair_held_flag 
-			}
-			OR = {
-				is_great_power = yes 
-				is_secondary_power = yes 
-			}
-			NOT = { TAG = UCT }
 		}
 
 		fire_only_once = no
 
-		cost = 300 
+		custom_cost_trigger = {
+			if = {
+				limit = { is_great_power = yes }
+				has_political_power > 199.9
+			}
+			else = {
+				has_political_power > 299.9
+			}
+		}
+
+		custom_cost_text = eoanb_decision_hold_world_fair_cost_tt
 
 		complete_effect = {
 			custom_effect_tooltip = eoanb_tt_hold_world_fair
 			hidden_effect = {
-			    country_event = eoanbworldfair.1 
+				country_event = eoanbworldfair.1
 				set_variable = { world_fair_preparation_var = 0 }
-				set_global_flag = eoanb_world_fair_held_flag
+				set_global_flag = {
+					flag = eoanb_world_fair_held_flag
+					days = 360
+				}
+				if = {
+					limit = { is_great_power = yes }
+					add_political_power = -200
+				}
+				else = {
+					add_political_power = -300
+				}
 			}
 		}
 
 		ai_will_do = {
 			base = 1
+			modifier = {
+				factor = 0.1
+				has_political_power < 500
+			}
+			modifier = {
+				factor = 0
+				has_national_crisis = yes
+			}
 			modifier = {
 				factor = 0 
 				tag = PRS
@@ -67,12 +83,12 @@ world_fair_decisions = {
 		}
 		
 		available = {
-	       custom_trigger_tooltip = {
-	        	tooltip = eoanb_tt_world_fair_preparation_done 
-                has_country_flag = eoanb_flag_hold_world_fair_preparations_reviewbudget
+			custom_trigger_tooltip = {
+				tooltip = eoanb_tt_world_fair_preparation_done 
+				has_country_flag = eoanb_flag_hold_world_fair_preparations_reviewbudget
 				has_country_flag = eoanb_flag_hold_world_fair_preparations_invite_participants
 				has_country_flag = eoanb_flag_hold_world_fair_preparations_mainbuildings
-	        }		    
+			}		    
 		}
 		
         days_mission_timeout = 150    
