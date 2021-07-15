@@ -1,4 +1,4 @@
-# GENERIC SETUP
+# Constants for Pandemics System
 	EOANBSYS_pandemics_constants_setup = {
 		UCT = {
 			# Death Rates
@@ -11,92 +11,146 @@
 			set_variable = { EOANBSYS_pandemics_ebola_constant = -0.0013 }
 			set_variable = { EOANBSYS_pandemics_corona_constant = -0.001 }
 
+			# Name of Spanish Flu
 			set_variable = { EOANBSYS_pandemics_spanish_flu_spark = UCT.id }
 		}
 	}
 
-	EOANBSYS_pandemics_setup = {
-		ROOT = {
-			add_ideas = EOANBSYS_spirit_pandemics
-			set_variable = { EOANBSYS_pandemics_progress_var = 0 }
-			activate_mission = EOANBSYS_pandemics_progress_counter
+# Global
+	# Enable Spread
+	EOANBSYS_pandemics_global_setup = {
+		if = {
+			limit = { NOT = { has_global_flag = EOANBSYS_pandemic_global_recent_flag } }
+			set_global_flag = EOANBSYS_pandemics_global_flag
+			set_global_flag = {
+				flag = EOANBSYS_pandemics_global_recent_flag
+				days = 22000
+			}
+			news_event = eoanbsys_pandemics.1
+		}
+		else = {
+			country_event = { id = eoanbsys_pandemics.100 days = 1825 }
 		}
 	}
 
+	EOANBSYS_pandemics_global_clear = {
+		clr_global_flag = EOANBSYS_pandemics_global_flag
+		every_country = {
+			limit = { has_pandemic = yes }
+			EOANBSYS_pandemics_clear = yes
+		}
+	}
+	
+
+# National
+	EOANBSYS_pandemics_setup = {
+		add_ideas = EOANBSYS_spirit_pandemics
+		set_variable = { EOANBSYS_pandemics_progress_var = 0 }
+		activate_mission = EOANBSYS_pandemics_progress_counter
+	}
+
 	EOANBSYS_pandemics_clear = {
-		ROOT = {
-			remove_ideas = EOANBSYS_spirit_pandemics
+		remove_ideas = EOANBSYS_spirit_pandemics
+		clear_variable = EOANBSYS_pandemics_progress_var
+		increase_ps_by_one = yes
+
+		set_country_flag = {
+			flag = EOANBSYS_pandemics_immune_flag
+			days = 7300
+		}
+
+		hidden_effect = {
 			clear_variable = EOANBSYS_pandemics_progress_var
-			increase_ps_by_one = yes
-			hidden_effect = {
-				clear_variable = EOANBSYS_pandemics_progress_var
-				remove_mission = EOANBSYS_pandemics_progress_counter
-			}
+			remove_mission = EOANBSYS_pandemics_progress_counter
+
+			clr_country_flag = EOANBSYS_pandemics_cholera_flag
+			clr_country_flag = EOANBSYS_pandemics_bubonic_flag
+			clr_country_flag = EOANBSYS_pandemics_spanish_flu_flag
+			clr_country_flag = EOANBSYS_pandemics_influenza_flag
+			clr_country_flag = EOANBSYS_pandemics_typhus_flag
+			clr_country_flag = EOANBSYS_pandemics_ebola_flag
+			clr_country_flag = EOANBSYS_pandemics_corona_flag
 		}
 	}
 
 	EOANBSYS_pandemics_wave = {
-		ROOT = {
-			if = {
-				limit = {  has_country_flag = EOANBSYS_pandemics_cholera_flag }
-				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_cholera_constant }
-			}
-			# has_country_flag = EOANBSYS_pandemics_bubonic_flag
-			# has_country_flag = EOANBSYS_pandemics_spanish_flu_flag
-			# has_country_flag = EOANBSYS_pandemics_influenza_flag
-			# has_country_flag = EOANBSYS_pandemics_typhus_flag
-			# has_country_flag = EOANBSYS_pandemics_ebola_flag
-			# has_country_flag = EOANBSYS_pandemics_corona_flag
-			every_owned_state = {
-				random_list = {
-					10 = {
-						modifier = { factor = 0.95 OWNER = { has_tech = hygiene } }
-						modifier = { factor = 0.9 OWNER = { has_tech = antiseptics } }
-						modifier = { factor = 0.9 OWNER = { has_tech = early_vaccination } }
-						modifier = { factor = 0.95 OWNER = { has_tech = virology } }
-						modifier = { factor = 0.80 OWNER = { has_tech = advanced_vaccine } }
+		if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_cholera_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_cholera_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_bubonic_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_bubonic_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_spanish_flu_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_spanish_flu_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_influenza_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_influenza_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_typhus_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_typhus_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_ebola_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_ebola_constant }
+		}
+		else_if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_corona_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_corona_constant }
+		}
+		every_owned_state = {
+			random_list = {
+				10 = {
+					modifier = { factor = 0.95 OWNER = { has_tech = hygiene } }
+					modifier = { factor = 0.9 OWNER = { has_tech = antiseptics } }
+					modifier = { factor = 0.9 OWNER = { has_tech = early_vaccination } }
+					modifier = { factor = 0.95 OWNER = { has_tech = virology } }
+					modifier = { factor = 0.80 OWNER = { has_tech = advanced_vaccine } }
 
-						randomize_temp_variable = {
-							var = EOANBSYS_pandemics_state_death_temp
-							min = 0
-							max = EOANBSYS_pandemics_death_temp
-						}
+					randomize_temp_variable = {
+						var = EOANBSYS_pandemics_state_death_temp
+						min = 0
+						max = EOANBSYS_pandemics_death_temp
+					}
 
-						set_temp_variable = { EOANBSYS_pandemics_state_population_temp = state_population }
-						multiply_temp_variable = { EOANBSYS_pandemics_state_population_temp = EOANBSYS_pandemics_state_death_temp }
+					set_temp_variable = { EOANBSYS_pandemics_state_population_temp = state_population }
+					multiply_temp_variable = { EOANBSYS_pandemics_state_population_temp = EOANBSYS_pandemics_state_death_temp }
 
-						if = {
-							limit = { check_variable = { EOANBSYS_pandemics_state_population_temp = 0 } }
-							custom_effect_tooltip = EOANBSYS_pandemics_wave_tt
-							hidden_effect = {
-								add_manpower = EOANBSYS_pandemics_state_population_temp
-							}
-						}
-						else = {
+					if = {
+						limit = { check_variable = { EOANBSYS_pandemics_state_population_temp = 0 } }
+						custom_effect_tooltip = EOANBSYS_pandemics_wave_tt
+						hidden_effect = {
 							add_manpower = EOANBSYS_pandemics_state_population_temp
 						}
 					}
-					1 = {
-						modifier = {
-							factor = 0.5
-							OWNER = { has_idea = hc_no_healthcare }
-						}
-						modifier = {
-							factor = 0.8
-							OWNER = { has_idea = hc_low_healthcare }
-						}
-						modifier = {
-							factor = 1.5
-							OWNER = { has_idea = hc_good_healthcare }
-						}
-						modifier = {
-							factor = 2
-							OWNER = { has_idea = hc_excellent_healthcare }
-						}
-						modifier = {
-							factor = 2.5
-							has_idea = hc_excellent_healthcare
-						}
+					else = {
+						add_manpower = EOANBSYS_pandemics_state_population_temp
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0.5
+						OWNER = { has_idea = hc_no_healthcare }
+					}
+					modifier = {
+						factor = 0.8
+						OWNER = { has_idea = hc_low_healthcare }
+					}
+					modifier = {
+						factor = 1.5
+						OWNER = { has_idea = hc_good_healthcare }
+					}
+					modifier = {
+						factor = 2
+						OWNER = { has_idea = hc_excellent_healthcare }
+					}
+					modifier = {
+						factor = 2.5
+						has_idea = hc_excellent_healthcare
 					}
 				}
 			}
@@ -106,7 +160,7 @@
 # Pandemic Progress
 	EOANBSYS_pandemics_progress_add_half = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_half_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.005 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
@@ -117,7 +171,7 @@
 	}
 	EOANBSYS_pandemics_progress_add_one = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_one_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.010 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
@@ -128,7 +182,7 @@
 	}
 	EOANBSYS_pandemics_progress_add_two = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_two_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.020 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
@@ -139,7 +193,7 @@
 	}
 	EOANBSYS_pandemics_progress_add_five = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_five_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.050 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
@@ -150,7 +204,7 @@
 	}
 	EOANBSYS_pandemics_progress_add_ten = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_ten_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.100 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
@@ -161,7 +215,7 @@
 	}
 	EOANBSYS_pandemics_progress_add_twenty = {
 		if = {
-			limit = { has_pandemics = yes }
+			limit = { has_pandemic = yes }
 			custom_effect_tooltip = EOANBSYS_pandemics_progress_add_twenty_tt
 			add_to_variable = { EOANBSYS_pandemics_progress_var = 0.200 }
 			clamp_variable = { var = EOANBSYS_pandemics_progress_var min = 0 max = 1 }
