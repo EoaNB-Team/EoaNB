@@ -23,12 +23,12 @@
 			set_variable = { EOANBSYS_pandemics_quarintine_strong_constant = 0.4 }
 		}
 	}
-
+ 
 # Global
 	# Enable Spread
 	EOANBSYS_pandemics_global_setup = {
 		if = {
-			limit = { NOT = { has_global_flag = EOANBSYS_pandemic_global_recent_flag } }
+			limit = { NOT = { has_global_flag = EOANBSYS_pandemics_global_recent_flag } }
 			if = {
 				limit = { has_country_flag = EOANBSYS_pandemics_malaria_flag }
 				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 1 }
@@ -69,17 +69,14 @@
 			news_event = eoanbsys_pandemics.1
 		}
 		else = {
-			country_event = { id = eoanbsys_pandemics.100 days = 1825 }
+			# country_event = { id = eoanbsys_pandemics.100 days = 1825 }
 		}
 	}
 
 	EOANBSYS_pandemics_global_clear = {
 		clr_global_flag = EOANBSYS_pandemics_global_flag
 		set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = -1 }
-		every_country = {
-			limit = { has_pandemic = yes }
-			EOANBSYS_pandemics_clear = yes
-		}
+		news_event = eoanbsys_pandemics.2
 	}
 	
 
@@ -114,106 +111,172 @@
 		}
 	}
 
-	EOANBSYS_pandemics_wave = {
-		if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_malaria_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_malaria_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_cholera_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_cholera_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_bubonic_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_bubonic_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_spanish_flu_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_spanish_flu_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_influenza_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_influenza_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_typhus_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_typhus_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_ebola_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_ebola_constant }
-		}
-		else_if = {
-			limit = { has_country_flag = EOANBSYS_pandemics_corona_flag }
-			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_corona_constant }
-		}
-		if = {
-			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_soft }
-			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_soft_constant }
-		}
-		else_if = {
-			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_medium }
-			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemicsquarintine_medium_constant }
-		}
-		else_if = {
-			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_strong }
-			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_strong_constant }
-		}
-		every_owned_state = {
-			random_list = {
-				10 = {
-					modifier = { factor = 0.95 OWNER = { has_tech = hygiene } }
-					modifier = { factor = 0.9 OWNER = { has_tech = antiseptics } }
-					modifier = { factor = 0.9 OWNER = { has_tech = early_vaccination } }
-					modifier = { factor = 0.95 OWNER = { has_tech = virology } }
-					modifier = { factor = 0.80 OWNER = { has_tech = advanced_vaccine } }
+# Wave of Death Through Country
+	EOANBSYS_pandemics_country_wave = {
+		EOANBSYS_pandemics_country_wave_calculate = yes
 
-					randomize_temp_variable = {
-						var = EOANBSYS_pandemics_state_death_temp
-						min = 0
-						max = EOANBSYS_pandemics_death_temp
-					}
+		set_temp_variable = { EOANBSYS_pandemics_country_wave_count = 0 }
+    set_temp_variable = { EOANBSYS_pandemics_country_wave_states = num_core_states } 
+		multiply_temp_variable = { EOANBSYS_pandemics_initial_count_var = 0.25 }
+    
+    while_loop_effect = {
+			limit = { EOANBSYS_pandemics_initial_loop_var > EOANBSYS_pandemics_initial_count_var }
+			random_owned_controlled_state = {
+				EOANBSYS_pandemics_state_initial = yes
+			}
+    }
+	}
 
-					set_temp_variable = { EOANBSYS_pandemics_state_population_temp = state_population }
-					multiply_temp_variable = { EOANBSYS_pandemics_state_population_temp = EOANBSYS_pandemics_state_death_temp }
+	EOANBSYS_pandemics_state_wave = {
+		randomize_temp_variable = {
+			var = EOANBSYS_pandemics_state_death_temp
+			min = 0
+			max = EOANBSYS_pandemics_death_temp
+		}
 
-					if = {
-						limit = { check_variable = { EOANBSYS_pandemics_state_population_temp = 0 } }
-						custom_effect_tooltip = EOANBSYS_pandemics_wave_tt
-						hidden_effect = {
-							add_manpower = EOANBSYS_pandemics_state_population_temp
-						}
-					}
-					else = {
+		set_temp_variable = { EOANBSYS_pandemics_state_population_temp = state_population }
+		multiply_temp_variable = { EOANBSYS_pandemics_state_population_temp = EOANBSYS_pandemics_state_death_temp }
+		multiply_temp_variable ={ EOANBSYS_pandemics_state_population_temp = 0.01 }
+
+		add_manpower = EOANBSYS_pandemics_state_population_temp
+	}
+
+		random_list = {
+			99 = {
+
+				
+
+				if = {
+					limit = { check_variable = { EOANBSYS_pandemics_state_population_temp = 0 } }
+					custom_effect_tooltip = EOANBSYS_pandemics_wave_tt
+					hidden_effect = {
 						add_manpower = EOANBSYS_pandemics_state_population_temp
 					}
 				}
-				1 = {
-					modifier = {
-						factor = 0.5
-						OWNER = { has_idea = hc_no_healthcare }
-					}
-					modifier = {
-						factor = 0.8
-						OWNER = { has_idea = hc_low_healthcare }
-					}
-					modifier = {
-						factor = 1.5
-						OWNER = { has_idea = hc_good_healthcare }
-					}
-					modifier = {
-						factor = 2
-						OWNER = { has_idea = hc_excellent_healthcare }
-					}
-					modifier = {
-						factor = 2.5
-						OWNER = { has_idea = hc_excellent_healthcare }
-					}
+				else = {
+					add_manpower = EOANBSYS_pandemics_state_population_temp
+				}
+			}
+			1 = {
+				modifier = {
+					factor = 0.5
+					OWNER = { has_idea = hc_no_healthcare }
+				}
+				modifier = {
+					factor = 0.8
+					OWNER = { has_idea = hc_low_healthcare }
+				}
+				modifier = {
+					factor = 1.5
+					OWNER = { has_idea = hc_good_healthcare }
+				}
+				modifier = {
+					factor = 2
+					OWNER = { has_idea = hc_excellent_healthcare }
+				}
+				modifier = {
+					factor = 2.5
+					OWNER = { has_idea = hc_excellent_healthcare }
 				}
 			}
 		}
 	}
 
+# Calculate Death Rates
+	EOANBSYS_pandemics_country_wave_calculate = {
+		# Base Rate
+			if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_malaria_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_malaria_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_cholera_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_cholera_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_bubonic_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_bubonic_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_spanish_flu_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_spanish_flu_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_influenza_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_influenza_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_typhus_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_typhus_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_ebola_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_ebola_constant }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_corona_flag }
+				set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_corona_constant }
+			}
+			# Transmission
+				if = {
+					limit = { has_idea = hc_no_healthcare }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = 1.1 }
+				}
+				else_if = {
+					limit = { has_idea = hc_low_healtcare }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = 1 }
+				}
+				else_if = {
+					limit = { has_idea = hc_decent_healtcare }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = 0.90 }
+				}
+				else_if = {
+					limit = { has_idea = hc_good_healtcare }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = 0.80 }
+				}
+				else_if = {
+					limit = { has_idea = hc_excellent_healtcare }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = 0.70 }
+				}
+				if = {
+					limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_soft }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_soft_constant }
+				}
+				else_if = {
+					limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_medium }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_medium_constant }
+				}
+				else_if = {
+					limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_strong }
+					multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_strong_constant }
+				}
+			# Infectivity Technologies Adjustment
+				set_temp_variable = { EOANBSYS_pandemics_death_adjustment = 100 }
+				if = { limit = { has_tech = hygiene } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 10 } }
+				if = { limit = { has_tech = antiseptics } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 3 } }
+				if = { limit = { has_tech = food_canning } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 3 } }
+				if = {
+					limit = { has_pandemic_bacterial = yes }
+					if = { limit = { has_tech = early_vaccination } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 5 } }
+					if = { limit = { has_tech = advanced_vaccination } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 5 } }
+					if = { limit = { has_tech = food_preserving_icebox } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 2 } }
+					if = { limit = { has_tech = pasteurization } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 2 } }
+				}
+				else_if = {
+					limit = { has_pandemic_viral = yes }
+					if = { limit = { has_tech = early_vaccination } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 10 } }
+					if = { limit = { has_tech = advanced_vaccination } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 3 } }
+					if = { limit = { has_tech = food_preserving_icebox } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 02 } }
+				}
+				else_if = {
+					limit = { has_pandemic_parasytic = yes }
+					if = { limit = { has_tech = food_preserving_icebox } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 5 } }
+					if = { limit = { has_tech = tech_infantry_quinine } subtract_from_temp_variable = { EOANBSYS_pandemics_death_adjustment = 20 } }
+				}
+		# Finalizie
+			clamp_variable = { var = EOANBSYS_pandemics_death_adjustment min = 3 max = 200 }
+			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_death_adjustment }
+	}
 # Pandemic Progress
 	EOANBSYS_pandemics_progress_add_half = {
 		if = {
