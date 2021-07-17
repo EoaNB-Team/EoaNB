@@ -2,7 +2,7 @@
 	EOANBSYS_pandemics_constants_setup = {
 		UCT = {
 			# Death Rates
-			set_variable = { EOANBSYS_pandemics_cholera_constant = -0.008 }
+			set_variable = { EOANBSYS_pandemics_malaria_constant = -0.008 }
 			set_variable = { EOANBSYS_pandemics_cholera_constant = -0.005 }
 			set_variable = { EOANBSYS_pandemics_bubonic_constant = -0.021 }
 			set_variable = { EOANBSYS_pandemics_spanish_flu_constant = -0.008 }
@@ -13,6 +13,14 @@
 
 			# Name of Spanish Flu
 			set_variable = { EOANBSYS_pandemics_spanish_flu_spark = UCT.id }
+
+			# Type
+			set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 2 }
+
+			# Quarintine Efficacy
+			set_variable = { EOANBSYS_pandemics_quarintine_soft_constant = 0.2 }
+			set_variable = { EOANBSYS_pandemics_quarintine_medium_constant = 0.3 }
+			set_variable = { EOANBSYS_pandemics_quarintine_strong_constant = 0.4 }
 		}
 	}
 
@@ -21,6 +29,38 @@
 	EOANBSYS_pandemics_global_setup = {
 		if = {
 			limit = { NOT = { has_global_flag = EOANBSYS_pandemic_global_recent_flag } }
+			if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_malaria_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 1 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_cholera_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 2 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_bubonic_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 3 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_spanish_flu_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 4 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_typhus_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 5 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_ebola_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 6 }
+			}
+			else_if = {
+				limit = { has_country_flag = EOANBSYS_pandemics_corona_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 7 }
+			}
+			else = {
+				# limit = { has_country_flag = EOANBSYS_pandemics_influenza_flag }
+				set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = 0 }
+			}
 			set_global_flag = EOANBSYS_pandemics_global_flag
 			set_global_flag = {
 				flag = EOANBSYS_pandemics_global_recent_flag
@@ -35,6 +75,7 @@
 
 	EOANBSYS_pandemics_global_clear = {
 		clr_global_flag = EOANBSYS_pandemics_global_flag
+		set_variable = { EOANBSYS_pandemics_global_pandemic_type_var = -1 }
 		every_country = {
 			limit = { has_pandemic = yes }
 			EOANBSYS_pandemics_clear = yes
@@ -75,6 +116,10 @@
 
 	EOANBSYS_pandemics_wave = {
 		if = {
+			limit = { has_country_flag = EOANBSYS_pandemics_malaria_flag }
+			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_malaria_constant }
+		}
+		else_if = {
 			limit = { has_country_flag = EOANBSYS_pandemics_cholera_flag }
 			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_cholera_constant }
 		}
@@ -101,6 +146,18 @@
 		else_if = {
 			limit = { has_country_flag = EOANBSYS_pandemics_corona_flag }
 			set_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_corona_constant }
+		}
+		if = {
+			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_soft }
+			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_soft_constant }
+		}
+		else_if = {
+			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_medium }
+			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemicsquarintine_medium_constant }
+		}
+		else_if = {
+			limit = { has_idea = EOANBSYS_spirit_pandemics_quarintine_strong }
+			multiply_temp_variable = { EOANBSYS_pandemics_death_temp = EOANBSYS_pandemics_quarintine_strong_constant }
 		}
 		every_owned_state = {
 			random_list = {
