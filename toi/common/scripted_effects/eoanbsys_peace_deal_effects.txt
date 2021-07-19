@@ -1,0 +1,550 @@
+#	Example:
+# 
+#	example_effect = {
+#		add_political_power = 66
+#		add_popularity = {
+#			ideology = fascism
+#			popularity = 0.33
+#		}
+#	}
+#
+#
+#	In a script file:
+#
+#	effect = {
+#		example_effect = yes
+#	}
+#
+
+calculate_war_reparations_cost = {
+	set_temp_variable = { action_cost = 0 }
+	
+	for_each_scope_loop  = {
+		array = THIS.owned_states
+		
+		set_temp_variable = { pts = THIS.state_strategic_value }
+		round_temp_variable = pts
+		clamp_temp_variable = {
+			var = pts
+			min = 1
+		}
+		add_to_temp_variable = { action_cost = pts } 
+	}
+	
+	divide_temp_variable = { action_cost = 10 }
+	round_temp_variable = action_cost
+	clamp_temp_variable = {
+		var = action_cost
+		min = 1
+	}
+	set_variable = { ROOT.eoanb_wr_cost = action_cost }
+}
+
+calculate_disarm_cost = {
+	set_temp_variable = { action_cost = 0 }
+	
+	for_each_scope_loop  = {
+		array = THIS.owned_states
+		
+		set_temp_variable = { pts = THIS.state_strategic_value }
+		round_temp_variable = pts
+		clamp_temp_variable = {
+			var = pts
+			min = 1
+		}
+		add_to_temp_variable = { action_cost = pts } 
+	}
+	
+	divide_temp_variable = { action_cost = 5 }
+	round_temp_variable = action_cost
+	clamp_temp_variable = {
+		var = action_cost
+		min = 1
+	}
+	set_variable = { ROOT.eoanb_disarm_cost = action_cost }
+}
+
+reset_peace_deal_proposal = {
+	if = {
+		limit = {		
+			ROOT = { NOT = { has_country_flag = eoanb_waiting_response } }
+		}
+		ROOT = { 
+			set_variable = { eoanb_selected = 1 }
+			set_variable = { eoanb_total_cost = 0 }
+			clr_country_flag = eoanb_disarm
+			clr_country_flag = eoanb_war_reparations
+			clear_array = eoanb_take_array
+			clear_array = eoanb_puppet_array
+			clear_array = eoanb_demilitarize_array
+			clear_array = eoanb_liberate_array
+			clear_array = eoanb_state_list
+		}
+		if = {
+			limit = {
+				ROOT = { has_country_flag = eoanb_root_gives }
+			} 
+			ROOT = {
+				calculate_war_reparations_cost = yes
+				calculate_disarm_cost = yes
+			}
+			every_country = {
+				limit = {
+					has_war_with = PREV
+					OR = {
+						tag = ROOT
+						is_subject_of = ROOT
+						AND = {
+							ROOT = { is_faction_leader = yes }
+							is_in_faction_with = ROOT
+						}
+					}
+				}
+				for_each_loop = {
+					array = owned_states
+					if = {
+						limit = {
+							OR = {
+								controls_state = v
+								ROOT = { controls_state = v }
+								any_country = {
+									is_in_faction_with = THIS
+									has_war_with = ROOT
+									controls_state = v
+								}
+							}
+						}
+						ROOT = { add_to_array = { eoanb_state_list = v } }
+					}
+				}
+			}
+		}
+		else = {
+			calculate_war_reparations_cost = yes
+			calculate_disarm_cost = yes
+			every_country = {
+				limit = {
+					has_war_with = ROOT
+					OR = {
+						tag = PREV
+						is_subject_of = PREV
+						AND = {
+							PREV = { is_faction_leader = yes }
+							is_in_faction_with = PREV
+						}
+					}
+				}
+				for_each_loop = {
+					array = owned_states
+					if = {
+						limit = {
+							OR = {
+								controls_state = v
+								ROOT = { controls_state = v }
+								any_country = {
+									is_in_faction_with = ROOT
+									has_war_with = PREV
+									controls_state = v
+								}
+							}
+						}
+						ROOT = { add_to_array = { eoanb_state_list = v } }
+					}
+				}
+			}
+		}
+	}
+}
+
+add_state_to_list = {
+	if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 1 }
+		}
+		ROOT = { 
+			add_to_array = { eoanb_take_array = PREV } 
+		}
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 2 }
+		}
+		ROOT = { add_to_array = { eoanb_puppet_array = PREV } }
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 3 }
+		}
+		ROOT = { add_to_array = { eoanb_demilitarize_array = PREV } }
+		
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 4 }
+		}
+		ROOT = { add_to_array = { eoanb_liberate_array = PREV } }
+	}
+
+	if = {
+		limit = { 
+			eoanb_calculate_province_cost = yes
+			ROOT = { has_country_flag = eoanb_root_gives } 
+		}
+		subtract_from_variable = { ROOT.eoanb_total_cost = pts } 
+	}
+	else = {
+		add_to_variable = { ROOT.eoanb_total_cost = pts } 
+	}
+}
+
+remove_state_from_list = {
+	if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 1 }
+			ROOT = { 
+				is_in_array = {
+					array = eoanb_take_array
+					value = PREV
+				}
+			}
+		}
+		ROOT = { remove_from_array  = { eoanb_take_array = PREV } }
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 2 }
+			ROOT = { 
+				is_in_array = {
+					array = eoanb_puppet_array
+					value = PREV
+				}
+			}
+		}
+		ROOT = { remove_from_array  = { eoanb_puppet_array = PREV } }
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 3 }
+			ROOT = { 
+				is_in_array = {
+					array = eoanb_demilitarize_array
+					value = PREV
+				}
+			}
+		}
+		ROOT = { remove_from_array  = { eoanb_demilitarize_array = PREV } }
+	}
+	else_if = {
+		limit = {
+			check_variable = { ROOT.eoanb_selected = 4 }
+			ROOT = { 
+				is_in_array = {
+					array = eoanb_liberate_array
+					value = PREV
+				}
+			}
+		}
+		ROOT = { remove_from_array  = { eoanb_liberate_array = PREV } }
+	}
+	
+	if = {
+		limit = { 
+			eoanb_calculate_province_cost = yes
+			ROOT = { has_country_flag = eoanb_root_gives } 
+		}
+		add_to_variable = { ROOT.eoanb_total_cost = pts } 
+	}
+	else = {
+		subtract_from_variable = { ROOT.eoanb_total_cost = pts } 
+	} 
+}
+
+clear_vp = {
+	set_temp_variable = { root_this_pts = ROOT.vp@THIS }
+	set_temp_variable = { this_root_pts = THIS.vp@ROOT }
+	# Substract from faction leader in case of seperate peace deal
+	if = {
+		limit = {
+			ROOT = { 
+				has_country_flag = eoanb_root_gives 
+				is_in_faction = yes
+				NOT = { is_faction_leader = yes }
+			}
+		}
+		random_country = {
+			limit = {
+				is_in_faction_with = ROOT
+				is_faction_leader = yes
+			}
+			divide_temp_variable = { this_root_pts = 2 }
+			round_temp_variable = this_root_pts
+			subtract_from_variable = { PREV.vp@THIS = this_root_pts }
+		}
+	}
+	else_if = {
+		limit = {
+			is_in_faction = yes
+			NOT = { is_faction_leader = yes }
+		}
+		random_country = {
+			limit = {
+				is_in_faction_with = PREV
+				is_faction_leader = yes
+			}
+			divide_temp_variable = { root_this_pts = 2 }
+			round_temp_variable = root_this_pts
+			subtract_from_variable = { ROOT.vp@THIS = root_this_pts }
+		}
+	}
+	# Clear vps
+	clear_variable = ROOT.vp@THIS
+	clear_variable = THIS.vp@ROOT
+}
+
+execute_peace_deal = {
+	# Set up scopes
+	if = {
+		limit = {
+			ROOT = { has_country_flag = eoanb_root_gives }
+		}
+		set_temp_variable = { taker = THIS }
+		set_temp_variable = { giver = ROOT }
+	}
+	else = {
+		set_temp_variable = { taker = ROOT }
+		set_temp_variable = { giver = THIS }
+	}
+	# White peace
+	var:giver = {
+		if = {
+			limit = {
+				var:taker = { is_faction_leader = no }
+			}
+			white_peace = var:taker
+			
+			# Can't use vars in set_truce target
+			var:taker = { 
+				var:giver = {
+					set_truce = {
+						target = PREV
+						days = 720
+					}
+				}
+			}
+		}
+		else = {
+			every_enemy_country = {
+				limit = {
+					is_in_faction_with = var:taker
+				}
+				white_peace = PREV
+				set_truce = {
+					target = PREV
+					days = 720
+				}
+			}
+		}
+		if = {
+			limit = {
+				is_faction_leader = no
+			}
+			leave_faction = yes
+			add_timed_idea = {
+				idea = conditional_surrender
+				days = 720
+			}
+		}
+		else = {
+			every_other_country = {
+				limit = {
+					is_in_faction_with = var:giver
+				}
+				white_peace = var:taker
+			}
+		}
+	}
+	# Deal take an effect
+	ROOT = { 
+		# Take
+		for_each_scope_loop = {
+			array = eoanb_take_array
+			
+			var:taker = { transfer_state = PREV }
+		}
+		# Demilitarize
+		for_each_scope_loop = {
+			array = eoanb_demilitarize_array
+			
+			set_demilitarized_zone = yes
+		}
+		# Liberate
+		for_each_scope_loop = {
+			array = eoanb_liberate_array
+			
+			set_temp_variable = { victim = THIS.owner }
+			set_temp_variable = { s = THIS }
+			
+			if = {
+				limit = {
+					any_country = {
+						NOT = {	original_tag = var:victim }
+						NOT = { tag = var:taker }
+						var:s = {
+							is_core_of = PREV
+						}
+					}
+				}
+				random_country = {
+					limit = {
+						NOT = {	original_tag = var:victim }
+						var:s = {
+							is_core_of = PREV
+						}
+					}
+					transfer_state = var:s
+				}
+			}
+			else = {
+				random_scope_in_array = {
+					array = var:global.countries
+					limit = {
+						exists = no
+						var:s = {
+							is_core_of = PREV
+						}
+					}
+					transfer_state = var:s
+					if = {
+						limit = {
+							var:taker = {
+								has_rule = can_puppet
+							}
+						}
+						var:taker = {
+							puppet = PREV
+						}
+					}
+					if = {
+						limit = {
+							var:taker = {
+								has_elections = yes
+							}
+						}
+						set_politics = {
+							ruling_party = var:var:taker.current_party_ideology_group
+							elections_allowed = yes
+						}
+					}
+					else = {
+						set_politics = {
+							ruling_party = var:var:taker.current_party_ideology_group
+							elections_allowed = no
+						}
+					}
+				}
+			}
+		}
+		# Full puppet
+		every_country = {
+			limit = {
+				all_of = {
+					array = owned_states
+					is_in_array = {
+						array = ROOT.eoanb_puppet_array
+						value = v
+					}
+				}
+			}
+			for_each_loop = {
+				array = owned_states
+				remove_from_array = { ROOT.eoanb_puppet_array = v }
+			}
+			var:taker = {
+				puppet = PREV
+			}
+		}
+		# Puppet
+		for_each_scope_loop = {
+			array = eoanb_puppet_array
+			
+			set_temp_variable = { victim = THIS.owner }
+			set_temp_variable = { s = THIS }
+			
+			if = {
+                limit = {
+                    any_country = {
+                        original_tag = var:victim
+                        is_puppet_of = var:taker
+                    }
+                }
+                random_country = {
+                    limit = {
+                        original_tag = var:victim
+                        is_puppet_of = var:taker
+                    }
+                    transfer_state = var:s
+                }
+            }
+            else = {
+                create_dynamic_country = {
+                    original_tag = THIS.owner
+                    if = {
+                        limit = {
+                            var:taker = {
+                                has_elections = yes
+                            }
+                        }
+                        set_politics = {
+                            ruling_party = var:var:taker.current_party_ideology_group
+                            elections_allowed = yes
+                        }
+                    }
+                    else = {
+                        set_politics = {
+                            ruling_party = var:var:taker.current_party_ideology_group
+                            elections_allowed = no
+                        }
+                    }
+                    set_political_party = {
+                        ideology = var:var:taker.current_party_ideology_group
+                        popularity = 60
+                    }
+                    set_cosmetic_tag = THIS.owner
+                    reserve_dynamic_country = yes
+                    var:taker = { puppet = PREV }
+					transfer_state = PREV
+                }
+            }
+		}
+	}
+	# War reparations
+	if = {
+		limit = { 
+			ROOT = { has_country_flag = eoanb_war_reparations }
+		}
+		
+		var:giver = {
+			add_to_variable = { wr_payments = 1 }
+			activate_targeted_decision = {
+				target = var:taker
+				decision = eoanb_pay_war_reparations
+			}
+		}
+	}
+	# Disarm nation
+	if = {
+		limit = { 
+			ROOT = { has_country_flag = eoanb_disarm }
+		}
+		var:giver = {
+			add_timed_idea = {
+				idea = peace_disarmed_nation
+				days = 720
+			}
+			add_timed_idea = {
+				idea = peace_civilian_economy
+				days = 720
+			}
+		}
+	}
+}

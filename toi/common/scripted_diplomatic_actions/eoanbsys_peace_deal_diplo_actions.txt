@@ -1,0 +1,207 @@
+scripted_diplomatic_actions = {
+
+	offer_peace_deal = {
+	
+		# root is the initiator of action and this is the target country
+		allowed = {
+			always = yes
+		}
+		visible = {
+			has_war_with = ROOT
+		}
+		selectable = { 
+			ROOT = { 
+				NOT = { civilwar_target = PREV }
+			}
+            
+			OR = {
+				AND = {
+					is_in_faction = yes
+					is_major = yes
+				}
+				is_in_faction = no
+			}
+			is_puppet = no
+		}
+
+		requires_acceptance = yes
+		show_acceptance_on_action_button = yes # set to no if acceptance shouldn't be displayed on the action button
+		cost = 0
+
+		icon = 1
+
+		on_sent_effect = {
+			ROOT = { set_country_flag = eoanb_waiting_response }
+		}
+
+		complete_effect = {
+			clear_vp = yes
+			execute_peace_deal = yes
+			ROOT = { 
+				clr_country_flag = eoanb_waiting_response
+				clr_country_flag = eoanb_ai_want_peace
+				clear_variable = eoanb_ai_want_peace_with 
+			}
+		}
+		
+		reject_effect = {
+			ROOT = { 
+				clr_country_flag = eoanb_waiting_response
+				clr_country_flag = eoanb_ai_want_peace
+				clear_variable = eoanb_ai_want_peace_with 
+			}
+		}
+		
+		send_scripted_gui = eoanb_offer_peace_deal
+		reset_send_effect = {
+			ROOT = { clr_country_flag = eoanb_root_gives }
+			reset_peace_deal_proposal = yes
+		}
+		
+		can_be_sent = { # send button will be disabled if no
+			OR = {
+				check_variable = { ROOT.vp@PREV > ROOT.eoanb_total_cost }
+				check_variable = { ROOT.vp@PREV = ROOT.eoanb_total_cost }
+			}
+			ROOT = {
+				NOT = { 
+					has_country_flag = eoanb_waiting_response 
+					
+					# Can't give away all states!
+					all_of = {
+						array = ROOT.owned_states
+
+						OR = {
+							is_in_array = {
+								array = eoanb_take_array
+								value = v
+							}
+							is_in_array = {
+								array = eoanb_puppet_array
+								value = v
+							}
+							is_in_array = {
+								array = eoanb_liberate_array
+								value = v
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		receive_scripted_gui = eoanb_offer_peace_deal_receive
+
+		ai_desire = {
+			base = -100
+			modifier = {
+				add = 200
+				ROOT = { has_country_flag = eoanb_ai_want_peace }
+				check_variable = { ROOT.eoanb_ai_want_peace_with = THIS }
+			}
+		}
+		
+		ai_acceptance = {
+			base_reluctance = {
+				base = -100
+			}
+			
+			close_to_surrender = {
+				base = 0
+				modifier = {
+					set_temp_variable = { sp = var:THIS.surrender_progress }
+					multiply_temp_variable = { sp = 200 }
+					round_temp_variable = sp
+					subtract_from_temp_variable = { sp = 100 }
+					clamp_temp_variable = {
+						var = sp
+						min = 0
+						max = 100
+					}
+					add = var:sp
+				}
+			}
+			
+			war_support = {
+				base = 0
+				modifier = {
+					set_temp_variable = { ws = var:THIS.has_war_support }
+					multiply_temp_variable = { ws = -200 }
+					round_temp_variable = ws
+					add_to_temp_variable = { ws = 100 }
+					add = var:ws
+				}
+			}
+			
+			stability = {
+				base = 0
+				modifier = {
+					set_temp_variable = { s = var:THIS.has_stability }
+					multiply_temp_variable = { s = -200 }
+					round_temp_variable = s
+					add_to_temp_variable = { s = 100 }
+					add = var:s
+				}
+			}
+			
+			relative_war_score = {
+				base = 0
+				modifier = {
+					set_temp_variable = { rvp = ROOT.vp@PREV }
+					set_temp_variable = { tvp = THIS.vp@ROOT }
+					subtract_from_temp_variable = { rvp = tvp }
+					round_temp_variable = rvp
+					add = var:rvp
+				}
+			}
+			
+			strength_ratio = {
+				base = 0
+				modifier = {
+					set_temp_variable = { str = THIS.enemies_strength_ratio@ROOT }
+					multiply_temp_variable = { str = 100 }
+					round_temp_variable = str
+					subtract_from_temp_variable = { str = 100 }
+					clamp_temp_variable = {
+						var = str
+						max = 1000
+					}
+					add = var:str
+				}
+			}
+			
+			proposal_cost = {
+				base = 0
+				modifier = {
+					set_temp_variable = { tc = ROOT.eoanb_total_cost }
+					multiply_temp_variable = { tc = -1 }
+					add = tc
+				}
+			}
+			
+			geopolitical_situation = {
+				base = 0
+				modifier = {
+					add = -100
+					is_major = yes
+				}
+				modifier = {
+					add = -200
+					is_in_faction = yes
+				}
+				modifier = {
+					# while threat < 0.2 -> 0, later -100 for each 0.1
+					set_temp_variable = { wt = global.threat }
+					multiply_temp_variable = { wt = -1000 }
+					round_temp_variable = wt
+					add_to_temp_variable = { wt = 200 }
+					clamp_temp_variable = {
+						var = wt
+						max = 0
+					}
+					add = var:wt
+				}
+			}
+		}
+	}
+}
