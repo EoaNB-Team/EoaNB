@@ -9,4 +9,4 @@ Event_date_calculation.py allows you to easily calculate the amount of days betw
 To speed the progress up, just pressing enter without entering a number in the range prompt will assume a range of 100 days.
 
 Reverse_date_calculation.py does the reverse - Given the start date and the amount of days, it allows you to get the end date.
-To speed the progress up, just pressing enter without entering the start date will assume the start date of 1857.5.1, the End of a New Beginning bookmark.
+To speed the progress up, just pressing enter without entering the start date will assume the start date of 1857.5.11, the End of a New Beginning bookmark.

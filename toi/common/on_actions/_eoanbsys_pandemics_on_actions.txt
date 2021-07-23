@@ -1,0 +1,1270 @@
+on_actions = {
+	on_startup = {
+		effect = {
+			EOANBSYS_pandemics_constants_setup = yes
+		}
+	}
+}
+
+
+
+# Disabled for VT Update.
+# on_actions = {
+
+# 	on_startup = {
+# 		effect = {
+# 			set_variable = { country_influenza_spread_factor = 0 }
+# 			every_owned_state = {
+# 				set_variable = { state_influenza_spread_factor = 0 }
+# 			}
+# 		}
+# 	}
+
+# 	### CALCULATE NEW STATE IMPACT (% of pop infected) AND REMOVE % OF POP INFECTED BASED ON MORTALITY RATE ###
+# 	on_weekly = {
+# 		effect = {
+# 			if = {
+# 				limit = {
+# 					has_global_flag = influenza
+# 				}
+
+# 				### INIT ALL VARS NECESSARY FOR PLAGUE ###
+# 				### ALL VARS ARE SUBJECT TO CHANGE ###
+# 				### TODO: ALL EVENTS FOR PLAGUE ARE YET TO BE MADE ###
+
+# 				### R FACTOR ###
+# 				set_temp_variable = { R_rate = 1.8 }
+
+# 				### BASE SPREAD IS A MULTIPLIER OF THE R RATE OF THE DISEASE ### 
+# 				### BASE SPREAD IS CALCULATED AS: BASE_SPREAD = 1 + COUNTRY_SPREAD_FACTOR + STATE_SPREAD_FACTOR ###
+# 				### COUNTRY SPREAD FACTOR AND STATE SPREAD FACTOR CAN BE [0,+Inf] ###
+# 				### IF BASE SPREAD IS NEGATIVE, THEN IT COUNTS AS 0 AND THE SPREAD STOPS ###
+# 				set_temp_variable = { base_spread = 1 }
+
+# 				### MORTALITY RATE ### DOUBLES DURING WINTER MONTHS ###
+# 				set_temp_variable = { base_mortality_rate =  0.03 }
+# 				set_temp_variable = { winter_mortality_rate =  0.06 }
+
+# 				### PERCENTAGE OF POPULATION REQUIRED TO ACHIEVE IMMUNITY ###
+# 				set_temp_variable = { immunity_percentage = 0.97 }
+
+# 				### SET TIME PERIOD (IN WEEKS) REQUIRED TO SPREAD TO A NEIGHBOURING STATE ###
+# 				### IF VALUE IS > 1 THEN ALL BELOW EFFECTS SHOULD HAPPEN ONCE IN 2 WEEKS AND NOT ON_WEEKLY
+# 				set_temp_variable = { base_spread_time = 1 }
+
+				
+# 				### CALCULATE DEATHS-IMMUNITY-INFECTED WITHIN STATE ###
+# 				if = {
+# 					limit = {
+# 						AND = {
+# 							has_country_flag = country_influenza
+# 							NOT = {
+# 								has_country_flag = country_influenza_immunity
+# 							}
+# 						}
+# 					}
+
+# 					add_to_temp_variable = { base_spread = country_influenza_spread_factor }
+
+# 					every_owned_state = {
+
+# 						if = {
+# 							limit = {
+# 								has_state_flag = state_influenza
+# 								NOT = {
+# 									has_state_flag = state_influenza_immunity
+# 								}
+# 							}
+
+# 							###  CALCULATE STATE'S SPREAD FACTOR ###
+# 							set_temp_variable = { base_state_spread = base_spread }
+# 							add_to_temp_variable = { base_state_spread = state_influenza_spread_factor }
+							
+# 							if = {
+# 								limit = {
+# 									check_variable = { base_state_spread < 0 }
+# 								}
+# 								set_temp_variable = { base_state_spread = 0 }
+# 							}
+							
+							
+# 							### MORTALITY RATE OF THE DISEASE ###
+# 							if = {
+# 								limit = {
+# 									AND = {
+# 										date > [?global.year].3.1
+# 										date < [?global.year].11.1 
+# 									}
+# 								}
+# 								set_temp_variable = { mortality_rate = base_mortality_rate }
+# 							}
+# 							else = {
+# 								set_temp_variable = { mortality_rate = winter_mortality_rate }
+# 							}
+							
+# 							### TOCHECK: AS A BONUS, IF PLAYER GETS MEASURES TO COUNTER THE PLAGUE, REWARD HIM WITH LOWER MORTALITY RATE ###
+# 							if = {
+# 								limit = {
+# 									check_variable = { country_influenza_spread_factor < 0 }
+# 								}
+# 								subtract_from_temp_variable = { mortality_rate = 0.01 }
+# 							}
+# 							### DELETE IF UNWANTED ###
+
+
+# 							### CALCULATE STATE POPULATION LOSSES ### 
+# 							set_temp_variable = { infected_population = state_population }
+# 							multiply_temp_variable = { infected_population = infected_population_percentage }
+# 							set_temp_variable = { pop_to_remove = infected_population }
+# 							multiply_temp_variable = { pop_to_remove = mortality_rate }
+
+# 							### GET THE NEGATIVE VALUE OF THE POP_TO_REMOVE NUMBER ###
+# 							set_temp_variable = { temp_pop_to_remove = pop_to_remove }
+# 							subtract_from_temp_variable = { pop_to_remove = temp_pop_to_remove }				
+# 							subtract_from_temp_variable = { pop_to_remove = temp_pop_to_remove }
+
+# 							add_manpower = var:pop_to_remove
+
+# 							add_to_variable = { immune_population_percentage = infected_population_percentage }
+
+# 							### DISEASE DURATION IN STATE +1 WEEK
+# 							add_to_variable = { influenza_duration = 1 }
+
+# 							### CHECK IF STATE ACHIEVED IMMUNITY ###
+# 							if = {
+# 								limit = {
+# 									check_variable = { immune_population_percentage > immunity_percentage }
+# 								}
+# 								set_state_flag = state_influenza_immunity
+
+# 								if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.03 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_01 }
+# 									add_dynamic_modifier = { modifier = influenza_aftermath }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.11 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_02 }
+# 									add_dynamic_modifier = { modifier = influenza_aftermath }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.26 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_03 }
+# 									add_dynamic_modifier = { modifier = influenza_aftermath }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.51 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_04 }
+# 									add_dynamic_modifier = { modifier = influenza_aftermath }
+# 								}
+# 								else = {
+# 									remove_dynamic_modifier = { modifier = influenza_impact_05 }
+# 									add_dynamic_modifier = { modifier = influenza_aftermath }
+# 								}
+								
+# 							}
+							
+# 							### DISEASE SPREAD WITHIN STATE ###
+# 							### 5 STATE MODIFIERS FOR DIFFERENT % (3%, 11%, 26%, 51%, else)  OF INFECTED POPULATION ###
+# 							else = {
+# 								set_temp_variable = { state_R_rate = R_rate }
+# 								multiply_temp_variable = { state_R_rate = base_state_spread }
+
+# 								if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.03 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_01 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.11 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_02 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.26 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_03 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.51 }
+# 									}
+# 									remove_dynamic_modifier = { modifier = influenza_impact_04 }
+# 								}
+# 								else = {
+# 									remove_dynamic_modifier = { modifier = influenza_impact_05 }
+# 								}
+
+# 								set_temp_variable = { remaining_percentage = 1 }
+# 								subtract_from_temp_variable = { remaining_percentage = immune_population_percentage }
+# 								multiply_variable = { infected_population_percentage = state_R_rate }
+# 								if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage > remaining_percentage }
+# 									}
+# 									set_variable = { infected_population_percentage = remaining_percentage }	
+# 								}
+								
+								
+
+# 								if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.03 }
+# 									}
+# 									add_dynamic_modifier = { modifier = influenza_impact_01 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.11 }
+# 									}
+# 									add_dynamic_modifier = { modifier = influenza_impact_02 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.26 }
+# 									}
+# 									add_dynamic_modifier = { modifier = influenza_impact_03 }
+# 								}
+# 								else_if = {
+# 									limit = {
+# 										check_variable = { infected_population_percentage < 0.51 }
+# 									}
+# 									add_dynamic_modifier = { modifier = influenza_impact_04 }
+# 								}
+# 								else = {
+# 									add_dynamic_modifier = { modifier = influenza_impact_05 }
+# 								}
+# 							}
+# 						}
+# 					}
+
+# 					### BEFORE ENDING CHECK IF THE CONTROLLER HAS NO MORE INFECTED STATES ###
+# 					if = {
+# 						limit = {
+# 							all_owned_state = {
+# 								has_state_flag = state_influenza_immunity
+# 							}
+# 						}
+# 						set_country_flag = country_influenza_immunity
+# 						### TODO: AND TRIGGER COUNTRY EVENT THAT PLAGUE HAS PASSED ###
+# 					}
+
+# 				}
+
+# 				### SPREAD SYSTEM ###
+# 				### INFECTED POPULATION CANT TRAVEL ###
+# 				### USE IMMUNE POPULATION TO CALCULATE SPREAD IN ADJACENT STATES ###
+# 				if = {
+# 					limit = {
+# 						NOT = {
+# 							has_country_flag = country_influenza_immunity
+# 						}
+# 					}
+
+					
+# 					add_to_temp_variable = { base_spread = country_influenza_spread_factor }
+# 					set_temp_variable = { border_policy_spread = 0 }
+					
+# 					if = {
+# 						limit = {
+# 							has_idea = closed_borders
+# 						}
+# 						add_to_temp_variable = { border_policy_spread = -12 }
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_idea = border_control
+# 						}
+# 						add_to_temp_variable = { border_policy_spread = -5 }
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_idea = open_borders
+# 						}
+# 						add_to_temp_variable = { border_policy_spread = 5 }
+# 					}
+# 					else = {
+# 						add_to_temp_variable = { border_policy_spread = 15 }
+# 					}
+
+# 					every_owned_state = {
+						
+# 						if = {
+# 							limit = {
+# 								AND = {
+# 									NOT = {
+# 										has_state_flag = state_influenza
+# 									}
+# 									any_neighbor_state = {
+# 										has_state_flag = state_influenza
+# 									}
+# 								}
+# 							}
+# 							set_temp_variable = { base_spread_chance = 25 }
+
+# 							every_neighbor_state = {
+# 								if = {
+# 									limit = {
+# 										has_state_flag = state_influenza
+# 										check_variable = { influenza_duration > base_spread_time }
+# 									}
+
+# 									### FOR EVERY INFECTED NEIGHBOUR STATE, CHANCE TO SPREAD DISEASE IN CURRENT STATE IS +25%/immune_pop_percentage (ALSO AFFECTED BY OTHER FACTORS ###
+									
+# 									set_temp_variable = { temp_state_immunity = 0 }
+# 									if = {
+# 										limit = {
+# 											check_variable = { immune_population_percentage > 0.97 }
+# 										}
+# 										add_to_temp_variable = { temp_state_immunity = 1 }
+# 									}
+# 									else = {
+# 										add_to_temp_variable = { temp_state_immunity = immune_population_percentage }
+# 									}
+
+# 									if = {
+# 										limit = {
+# 											controller = {
+# 												tag = PREV.controller
+# 											}
+# 										} 
+# 										set_temp_variable = { neighbor_state_spread = 33 }
+										
+# 										### TODO: STATE_QUARANTINE FLAG NOT YET CREATED ###
+# 										### IMPLEMENT SYSTEM TO QUARANTINE STATE ###
+# 										if = {
+# 											limit = {
+# 												has_state_flag = state_quarantine 
+# 											}
+# 											if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_mercenary_groups
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -5 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_police_force
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -11 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_paramilitary_police_force
+# 													}		
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -18 }								
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_military_police_force
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -26 }
+# 											}
+# 										}
+	
+# 										divide_temp_variable = { neighbor_state_spread = temp_state_immunity }
+# 										add_to_temp_variable = { base_spread_chance = neighbor_state_spread }
+# 									}
+# 									else = {
+# 										### CONTROLLER IS ANOTHER COUNTRY ###
+# 										### ADD BORDER POLICY OF BOTH NATIONS AS FACTORS ###
+# 										set_temp_variable = { neighbor_state_spread = 25 }
+# 										add_to_temp_variable = { neighbor_state_spread = border_policy_spread }
+# 										set_temp_variable = { foreign_border_policy_spread = 0 }
+# 										controller = {
+# 											if = {
+# 												limit = {
+# 													has_idea = closed_borders
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -16 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													has_idea = border_control
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -7 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													has_idea = no_borders
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = 8 }
+# 											}
+# 										}
+										
+# 										if = {
+# 											limit = {
+# 												has_state_flag = state_quarantine
+# 											}
+# 											if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_mercenary_groups
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -4 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_police_force
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -9 }
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_paramilitary_police_force
+# 													}		
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -15 }								
+# 											}
+# 											else_if = {
+# 												limit = {
+# 													controller = {
+# 														has_idea = law_military_police_force
+# 													}
+# 												}
+# 												add_to_temp_variable = { neighbor_state_spread = -21 }
+# 											}
+# 										}
+
+# 										divide_temp_variable = { neighbor_state_spread = temp_state_immunity }
+# 										add_to_temp_variable = { base_spread_chance = neighbor_state_spread }
+# 									}
+# 									add_to_temp_variable = { base_spread_chance = neighbor_state_spread }
+# 								}
+# 							}
+
+# 							clamp_temp_variable = { 
+# 								var = base_spread_chance
+# 								min = 0
+# 								max = 100
+# 							}
+								
+# 							randomize_temp_variable = {
+# 								var = influenza_expands
+# 								distribution = uniform
+# 								min = 1
+# 								max = 99
+# 							}
+							
+# 							### CHECK IF IT SPREAD TO NEIGHBOUR STATE ###
+# 							if = {
+# 								limit = {
+# 									check_variable = { influenza_expands < base_spread_chance }
+# 								}
+# 								set_variable = { influenza_duration = 0 }
+# 								set_variable = { immune_population_percentage = 0 }
+# 								set_variable = { infected_population_percentage = 0.01 }
+# 								set_state_flag = state_influenza
+# 								add_dynamic_modifier = { modifier = influenza_impact_01 }
+# 								if = {
+# 									limit ={
+# 										controller = {
+# 											NOT = {
+# 												has_country_flag = country_influenza
+# 											}
+# 										}
+# 									}
+# 									controller = {
+# 										set_country_flag = country_influenza
+# 									}
+									
+# 								}
+# 							}
+# 						}
+						
+						
+# 						### TRANSPORT DISEASE THROUGH SEA ###
+# 						### BASE IDEA IS TO TRANSPORT DISEASE THROUGH DOCKS. WE ASSUME THAT EVERY WEEK, THREE (3) CLOSE DISTANCE AND ONE (1) LONG DISTANCE JOURNEYS WITH INFECTED POP HAPPEN ###
+# 						### THIS SYSTEM DOESN'T TAKE INTO EFFECT THE COUNTRY'S POLICIES ETC AND SHOULD BE REWORKED IN ORDER TO NOT PUNISH THE COUNTRIES WITH ACTUAL MEASURES TO FIGHT THE PLAGUE ###
+# 						### TODO: THIS SYSTEM NEEDS REWORK ###
+# 						if = {
+# 							limit = {
+# 								AND = {
+# 									has_state_flag = state_influenza
+# 									OR = {
+# 										is_coastal = yes
+# 										is_island_state = yes
+# 									}
+# 									naval_base > 1
+# 									check_variable = { influenza_duration > 1 }
+# 								}
+# 							}
+# 							set_temp_variable = { i = 0 }
+# 							### 3 TRIPS TO CLOSE DISTANCE ###
+# 							while_loop_effect = {
+# 								limit = {
+# 									always = yes
+# 								}
+
+# 								add_to_temp_variable = { i = 1 }
+# 								if = {
+# 									limit = {
+# 										check_variable = { i = 3 }
+# 									}
+# 									set_temp_variable = { break = 1 }
+# 								}
+
+# 								random_state = { 
+# 									limit = { 
+# 										distance_to = {
+# 											value > 30
+# 											target = PREV
+# 										}
+# 										distance_to = {
+# 											value < 300
+# 											target = PREV
+# 										}
+# 										NOT = {
+# 											has_state_flag = state_influenza
+# 										}
+# 										OR = {
+# 											is_island_state = yes
+# 											is_coastal = yes
+# 										}
+# 										naval_base > 0		
+# 									} 
+# 									set_variable = { influenza_duration = 0 }
+# 									set_variable = { immune_population_percentage = 0 }
+# 									set_variable = { infected_population_percentage = 0.01 }
+# 									set_state_flag = state_influenza
+# 									add_dynamic_modifier = { modifier = influenza_impact_01 }
+
+# 									if = {
+# 										limit ={
+# 											controller = {
+# 												NOT = {
+# 													has_country_flag = country_influenza
+# 												}
+# 											}
+# 										}
+# 										controller = {
+# 											set_country_flag = country_influenza
+# 										}
+										
+# 									}
+# 								}
+
+# 							}
+# 							### 1 TRIP TO LONGER DISTANCE ###
+# 							if = {
+# 								limit = {
+# 									naval_base > 4
+# 								}
+# 								random_state = { 
+# 									limit = { 
+# 										distance_to = {
+# 											value > 1000
+# 											target = PREV
+# 										}
+# 										NOT = {
+# 											has_state_flag = state_influenza
+# 										}
+# 										OR = {
+# 											is_island_state = yes
+# 											is_coastal = yes
+# 										}
+# 										naval_base > 0	
+# 									} 
+# 									set_variable = { influenza_duration = 0 }
+# 									set_variable = { immune_population_percentage = 0 }
+# 									set_variable = { infected_population_percentage = 0.01 }
+# 									set_state_flag = state_influenza
+# 									add_dynamic_modifier = { modifier = influenza_impact_01 }
+# 									GRE = {
+# 										add_to_array = { far_coastal_states_inf = PREV.id }
+# 									}
+# 									if = {
+# 										limit ={
+# 											controller = {
+# 												NOT = {
+# 													has_country_flag = country_influenza
+# 												}
+# 											}
+# 										}
+# 										controller = {
+# 											set_country_flag = country_influenza
+# 										}
+# 									}
+# 								}
+# 							}
+
+# 						}
+# 					}
+# 				}
+
+# 			}
+# 		}
+# 	}
+
+# 	### CALCULATE SPREAD FACTORS FOR EVERY COUNTRY AND STATE ON MONTHLY BASIS ###
+# 	### REMEMBER TO DE-ACTIVATE GLOBAL FLAG INFLUENZA IF THERE'S NO PLAGUE IN ORDER TO BYPASS ALL THE BELOW CODE ###
+# 	on_monthly = {
+# 		effect = {
+# 			if = {
+# 				limit = {
+# 					has_global_flag = influenza
+# 				}
+
+# 				### HEALTHCARE FACTOR ###
+# 				set_variable = { country_influenza_spread_factor = 0 }
+# 				if = {
+# 					limit = {
+# 						has_idea = hc_no_healthcare
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = 0.3 }
+# 				}
+# 				else_if = {
+# 					limit = {
+# 						has_idea = hc_low_healthcare
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = 0.15 }
+# 				}
+# 				else_if = {
+# 					limit = {
+# 						has_idea = hc_decent_healthcare
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = 0 }
+# 				}
+# 				else_if = {
+# 					limit = {
+# 						has_idea = hc_good_healthcare
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = -0.1 }
+# 				}
+# 				else = {
+# 					add_to_variable = { country_influenza_spread_factor = -0.2 }
+# 				}
+
+# 				### TRADE POLICY FACTOR ###
+# 				if = {
+# 					limit = {
+# 						has_idea = closed_economy
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = -0.1 }
+# 				}
+# 				else_if = {
+# 					limit = {
+# 						has_idea = limited_exports
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = 0.05 }
+# 				}
+# 				else_if = {
+# 					limit = {
+# 						has_idea = export_focus
+# 					}
+# 					add_to_variable = { country_influenza_spread_factor = 0.15 }
+# 				}
+# 				else = {
+# 					add_to_variable = { country_influenza_spread_factor = 0.25 }
+# 				}
+
+# 				every_owned_state = {
+# 					set_variable = { state_influenza_spread_factor = 0 }
+					
+# 					### STATE CATEGORY COMBINED WITH STATE POPULATION FACTOR ###
+# 					if = {
+# 						limit = {
+# 							has_state_category = rural
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = -0.25 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = town
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = city
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = large_town
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = large_city
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = metropolis
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							has_state_category = megalopolis
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+# 					else = {
+# 						add_to_variable = { state_influenza_spread_factor = 0 }
+# 						if = {
+# 							limit = {
+# 								state_population < 100000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 200000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 300000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 400000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.2 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 500000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 600000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.3 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 700000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.35 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 800000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.40 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								state_population < 900000
+# 							}
+# 							add_to_variable = { state_influenza_spread_factor = 0.45 }
+# 						}
+# 						else = {
+# 							add_to_variable = { state_influenza_spread_factor = 0.5 }
+# 						}
+# 					}
+
+					
+# 					### STATE INFRASTRUCTURE FACTOR ###
+# 					if = {
+# 						limit = {
+# 							infrastructure < 5
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = -0.1 }
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							infrastructure < 10
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.05 }
+# 					}
+# 					else_if = {
+# 						limit = {
+# 							infrastructure < 15
+# 						}
+# 						add_to_variable = { state_influenza_spread_factor = 0.1 }
+# 					}
+# 					else = {
+# 						add_to_variable = { state_influenza_spread_factor = 0.25 }
+# 					}
+
+# 					### POLICE FORCE IMPACT ASSUMING THERE IS A STATE QUARANTINE ###
+# 					if = {
+# 						limit = {
+# 							has_state_flag = state_quarantine
+# 						}
+# 						if = {
+# 							limit = {
+# 								PREV = {
+# 									OR = {
+# 										has_idea = law_no_organized_force
+# 										has_idea = law_communal_policing
+# 									}
+									
+# 								}
+# 							}
+# 							add_to_variable = { country_influenza_spread_factor = 0 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								PREV = {
+# 									has_idea = law_mercenary_groups
+# 								}
+# 							}
+# 							add_to_variable = { country_influenza_spread_factor = -0.05 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								PREV = {
+# 									has_idea = law_police_force
+# 								}
+# 							}
+# 							add_to_variable = { country_influenza_spread_factor = -0.15 }
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								PREV = {
+# 									has_idea = law_paramilitary_police_force
+# 								}		
+# 							}
+# 							add_to_variable = { country_influenza_spread_factor = -0.35 }								
+# 						}
+# 						else_if = {
+# 							limit = {
+# 								PREV = {
+# 									has_idea = law_military_police_force
+# 								}
+# 							}
+# 							add_to_variable = { country_influenza_spread_factor = -0.5 }
+# 						}
+# 					}
+# 				}
+# 			}
+			
+# 		}
+# 	}
+
+# }
