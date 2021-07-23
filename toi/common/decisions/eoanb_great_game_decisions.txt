@@ -119,6 +119,7 @@ great_game_category={
 			KOK = {
 				exists = yes
 			}
+			NOT = {controls_state = 1363}
 			check_variable = { global.great_game_stage > 2}
 		}
 		highlight_states = {
@@ -126,7 +127,7 @@ great_game_category={
 		}
 		war_with_on_remove = KOK
 		allowed = { tag = RUS }
-		fire_only_once = no
+		fire_only_once = yes
 		custom_cost_trigger = {
 			check_variable = {great_game_points > 4}
 		}
@@ -147,12 +148,82 @@ great_game_category={
 			}
 		}
 	}
+	great_game_seige_tashkent_ongoing = {
+		icon = generic_prepare_civil_war
+		available = {
+			controls_state = 1363
+		}
+		visible = {
+			KOK = {
+				exists = yes
+			}
+			check_variable = { global.great_game_stage > 2}
+		}
+		activation = {always = no}
+		highlight_states = {
+			state = 1363
+		}
+		allowed = { tag = RUS }
+		fire_only_once = no
+		days_mission_timeout = 15
+		ai_will_do = {
+			base = 1
+		}
+		fixed_random_seed = no
+		timeout_effect = {
+			random_list = {
+				7 = {
+					modifier = {
+						add = great_game_tashkent_seige_tick
+						check_variable = {great_game_tashkent_seige_tick > 0}
+					}
+					country_event = { id = tashkentwar.8 days = 1 }
+				}
+				3 = {
+					activate_mission  = great_game_seige_tashkent_ongoing
+					modifier = {
+						add = 3
+						BUK={has_country_flag = BUK_supports_KOK}
+					}
+				}
+			}
+		}
+	}
+	great_game_seige_tashkent_fails = {
+		icon = generic_prepare_civil_war
+		available = {
+			controls_state = 1363
+		}
+		visible = {
+			KOK = {
+				exists = yes
+			}
+			check_variable = { global.great_game_stage > 2}
+		}
+		activation = {always = no}
+		allowed = { tag = RUS }
+		fire_only_once = yes
+		days_mission_timeout = 150
+		ai_will_do = {
+			base = 1
+		}
+		is_good = no
+		timeout_effect = {
+			remove_mission = great_game_seige_tashkent_ongoing
+		}
+	}
 	great_game_invasion_kokand = {
 		icon = generic_prepare_civil_war
 		available = {
 			date > 1866.1.1
 			has_war = no
-			controls_state = 1363
+			OR={
+				controls_state = 1363
+				AND={
+					date > 1870.1.1
+					check_variable = {great_game_points > 9}
+				}
+			}
 			#x great game points
 		}
 		visible = {
@@ -178,6 +249,13 @@ great_game_category={
 			set_variable = { global.great_game_kokand = 1}
 			country_event = {id=russiacentralasia.1}
 			subtract_from_variable = {great_game_points = 5}
+			if={
+				limit ={
+					NOT={controls_state = 1363}
+				}
+				subtract_from_variable = {great_game_points = 5}
+				custom_effect_tooltip = RUS_failed_tashkent
+			}
 		}
 	}
 	great_game_invasion_bukara = {
@@ -473,6 +551,8 @@ great_game_category={
 			state = 267
 		}
 		complete_effect = {
+			add_to_variable = {great_game_points = 5}
+			custom_effect_tooltip = GetGreatGamePoints
 			AFG={country_event={id=anglo_afghan_war.1}}
 		}
 	}
