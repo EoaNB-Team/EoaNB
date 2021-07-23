@@ -375,11 +375,14 @@ country_event = {
 	immediate = {
 		hidden_effect = {
 			if = {
-				limit = { any_country = { is_subject_of = TSH } }
+				limit = { 
+					any_country = { 
+						is_subject_of = TSH 
+						#is_ai = no
+					}						
+				}
 
 				clear_array = TSH_boshin_war_han_ranks_tag
-				clear_array = TSH_boshin_war_han_ranks_score_temp
-				clear_array = TSH_boshin_war_han_ranks_tag_temp
 				for_each_loop = {
 					array =  global.score_array
 					value = v
@@ -387,43 +390,12 @@ country_event = {
 
 					if = {
 						limit = { var:global.score_tag_array^i = { is_subject_of = TSH } }
-						add_to_array = { TSH_boshin_war_han_ranks_score_temp = global.score_array^i }
-						add_to_array = { TSH_boshin_war_han_ranks_tag_temp = global.score_tag_array^i }
+						add_to_array = { TSH_boshin_war_han_ranks_tag = global.score_tag_array^i }
 						log = "Adding Tag: [?global.score_tag_array^i.GetName]"
 					}
 				}
-				set_temp_variable = { temp_high = TSH_boshin_war_han_ranks_score_temp^num }
-				for_loop_effect = {
-					start = 0
-					end = temp_high
-					add = 1
-					value = v
-					find_highest_in_array = {
-						array = TSH_boshin_war_han_ranks_score_temp
-						value = TSH_boshin_war_highest_value_temp
-						index = TSH_boshin_war_highest_index_temp
-					}
-					log = "Highest Score: [?TSH_boshin_war_highest_value_temp]"
-					# add_to_array = {
-					# 	array = TSH_boshin_war_han_ranks_score
-					# 	value = TSH_boshin_war_highest_value_temp
-					# }
-					add_to_array = {
-						array = TSH_boshin_war_han_ranks_tag
-						value = TSH_boshin_war_han_ranks_tag_temp^TSH_boshin_war_highest_index_temp
-					}
-					remove_from_array = {
-						array = TSH_boshin_war_han_ranks_score_temp
-						index = TSH_boshin_war_highest_index_temp
-					}
-					remove_from_array = {
-						array = TSH_boshin_war_han_ranks_tag_temp
-						index = TSH_boshin_war_highest_index_temp
-					}
-				}
-
-				set_variable = { global.boshin_war_han_switch_tag = 0 }
-				var:TSH_boshin_war_han_ranks_tag^global.boshin_war_han_switch_tag = { country_event = feudal_tokugawa_shogunate.201 }
+				set_variable = { TSH.boshin_war_han_switch_tag = 0 }
+				var:TSH_boshin_war_han_ranks_tag^boshin_war_han_switch_tag = { country_event = feudal_tokugawa_shogunate.201 }
 			}
 			JAP = {
 				inherit_technology = TSH
@@ -503,35 +475,6 @@ country_event = {
 	is_triggered_only = yes
 
 	immediate = {
-		add_to_variable = { global.boshin_war_han_switch_tag = 1 }
-		log = "[GetDateText]: [Root.GetName]: event feudal_tokugawa_shogunate.201"
-	}
-
-	option = {
-		name = feudal_tokugawa_shogunate.201.a
-		trigger = { is_ai = no }
-		JAP = { change_tag_from = ROOT }
-	}
-	option = {
-		name = feudal_tokugawa_shogunate.201.b
-		if = {
-			limit = { check_variable = { TSH.TSH_boshin_war_han_ranks_tag^num > TSH.boshin_war_han_switch_tag } }
-			set_politics = {
-				ruling_party = anarchism
-			}
-			var:TSH.TSH_boshin_war_han_ranks_tag^boshin_war_han_switch_tag = { country_event = feudal_tokugawa_shogunate.201 }
-		}
-	}
-}
-
-country_event = {
-	id = feudal_tokugawa_shogunate.201
-	title = feudal_tokugawa_shogunate.201.t
-	desc = feudal_tokugawa_shogunate.201.d
-
-	is_triggered_only = yes
-
-	immediate = {
 		add_to_variable = { TSH.boshin_war_han_switch_tag = 1 }
 		log = "[GetDateText]: [Root.GetName]: event feudal_tokugawa_shogunate.201"
 	}
@@ -543,13 +486,18 @@ country_event = {
 	}
 	option = {
 		name = feudal_tokugawa_shogunate.201.b
-		if = {
-			limit = { check_variable = { TSH.TSH_boshin_war_han_ranks_tag^num > TSH.boshin_war_han_switch_tag } }
-			set_politics = {
-				ruling_party = anarchism
-			}
-			var:TSH.TSH_boshin_war_han_ranks_tag^boshin_war_han_switch_tag = { country_event = feudal_tokugawa_shogunate.201 }
+		trigger={
+			check_variable = { TSH.TSH_boshin_war_han_ranks_tag^num > TSH.boshin_war_han_switch_tag }
 		}
+		
+		TSH={var:TSH_boshin_war_han_ranks_tag^boshin_war_han_switch_tag = { country_event = feudal_tokugawa_shogunate.201 }}
+	}
+	option = {
+		name = feudal_tokugawa_shogunate.201.c#ends
+		trigger={
+			check_variable = { TSH.TSH_boshin_war_han_ranks_tag^num = TSH.boshin_war_han_switch_tag }
+		}
+		
 	}
 }
 #Amity Treaty Negotiations
