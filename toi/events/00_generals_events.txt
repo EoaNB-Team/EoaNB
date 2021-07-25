@@ -1,50 +1,26 @@
 ﻿add_namespace = generals_aging_generic
 
-### EVENTS DISABLED AS UNIT LEADER EVENTS MUST BE TRIGGERED ONLY ###
-#leader ages
-#unit_leader_event = {
-#	id = generals_aging_generic.1
-#	title = generals_aging_generic.1.t
-#	desc = generals_aging_generic.1.d
-#	
-#	immediate ={
-#		FROM={
-#			if={
-#				limit={has_unit_leader_trait = age_experienced}
-#				remove_unit_leader_trait = age_experienced
-#				add_unit_leader_trait = age_aged
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_established}
-#				remove_unit_leader_trait = age_established
-#				add_unit_leader_trait = age_experienced
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_young}
-#				remove_unit_leader_trait = age_young
-#				add_unit_leader_trait = age_established
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_baby_faced}
-#				remove_unit_leader_trait = age_baby_faced
-#				add_unit_leader_trait = age_young
-#			}
-#			else={
-#				add_unit_leader_trait = age_baby_faced
-#			}
-#		}
-#	}
-#	
-#	trigger={
-#		FROM={
-#			#NOT={has_unit_leader_flag = historical_figure}
-#		}
-#	}
-#	
-#	mean_time_to_happen = { days = 7300 }
-#	
-#}
-#leader dies or retires
+#leader tries to retire
+unit_leader_event = {
+	id = generals_aging_generic.1
+	title = generals_aging_generic.1.t
+	desc = generals_aging_generic.1.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = generals_aging_generic.1.a
+		ai_chance = { factor = 50 }
+		retire = yes
+	}
+	option = {
+		name = generals_aging_generic.1.b
+		trigger={has_political_power = 49}
+		ai_chance = { factor = 50 }
+		add_political_power = -50
+	}
+}
+#leader retires without 
 unit_leader_event = {
 	id = generals_aging_generic.2
 	title = generals_aging_generic.2.t
@@ -95,39 +71,98 @@ unit_leader_event = {
 			limit={
 				NOT={has_unit_leader_flag = historical_figure}
 			}
-			if={
-				limit={has_trait = age_aged}
+			if={#
+				limit={has_trait = age_old}
 				random_list = {
-					85={
-						unit_leader_event = { id = generals_aging_generic.2 random_days = 50}
+					75={#leader dies
+						unit_leader_event = { id = generals_aging_generic.2 days = 5 random_days = 50}
 					}
 					15={
 						
+					}
+					10={#leader 
+						unit_leader_event = { id = generals_aging_generic.1 days = 5 random_days = 50}
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_aged}
+				remove_unit_leader_trait = age_aged
+				add_unit_leader_trait = age_old
+				random_list = {
+					55={
+						
+					}
+					25={#leader dies
+						unit_leader_event = { id = generals_aging_generic.2 days = 5 random_days = 50}
+					}
+					20={#leader 
+						unit_leader_event = { id = generals_aging_generic.1 days = 5 random_days = 50}
 					}
 				}
 			}
 			else_if={
 				limit={has_trait = age_experienced}
-				remove_unit_leader_trait = age_experienced
-				add_unit_leader_trait = age_aged
+				random_list = {
+					60={
+						remove_unit_leader_trait = age_experienced
+						add_unit_leader_trait = age_aged
+					}
+					40={
+					}
+				}
 			}
 			else_if={
 				limit={has_trait = age_established}
-				remove_unit_leader_trait = age_established
-				add_unit_leader_trait = age_experienced
+				random_list = {
+					60={
+						remove_unit_leader_trait = age_established
+						add_unit_leader_trait = age_experienced
+					}
+					40={
+					}
+				}
 			}
 			else_if={
 				limit={has_trait = age_young}
-				remove_unit_leader_trait = age_young
-				add_unit_leader_trait = age_established
+				random_list = {
+					60={
+						remove_unit_leader_trait = age_young
+						add_unit_leader_trait = age_established
+					}
+					40={
+					}
+				}
 			}
 			else_if={
 				limit={has_trait = age_baby_faced}
-				remove_unit_leader_trait = age_baby_faced
-				add_unit_leader_trait = age_young
+				random_list = {
+					55={
+						remove_unit_leader_trait = age_baby_faced
+						add_unit_leader_trait = age_young
+					}
+					45={
+					}
+				}
 			}
-			else={
-				add_unit_leader_trait = age_baby_faced
+			else={#leader does not have trait
+				random_list = {
+					55={
+						add_unit_leader_trait = age_baby_faced
+					}
+					25={
+						add_unit_leader_trait = age_young
+					}
+					10={
+						add_unit_leader_trait = age_established
+					}
+					7={
+						add_unit_leader_trait = age_experienced
+					}
+					3={
+						add_unit_leader_trait = age_aged
+					}
+				}
 			}
 		}
 	}
@@ -139,6 +174,6 @@ unit_leader_event = {
 		}
 	}
 	
-	mean_time_to_happen = { days = 7300 }
+	mean_time_to_happen = { days = 3650 }
 	
 }
