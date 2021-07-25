@@ -1,4 +1,4 @@
-﻿#add_namespace = generals_aging_generic
+﻿add_namespace = generals_aging_generic
 
 ### EVENTS DISABLED AS UNIT LEADER EVENTS MUST BE TRIGGERED ONLY ###
 #leader ages
@@ -43,34 +43,21 @@
 #	
 #	mean_time_to_happen = { days = 7300 }
 #	
-#	option = {
-#		name = generals_aging_generic.1.a
-#		ai_chance = { factor = 100 }
-#	}
 #}
 #leader dies or retires
-#unit_leader_event = {
-#	id = generals_aging_generic.2
-#	title = generals_aging_generic.2.t
-#	desc = generals_aging_generic.2.d
-#	
-#	trigger={
-#		FROM={
-#			#NOT={has_unit_leader_flag = historical_figure} # error log says this is in wrong scope, no clue why
-#			has_unit_leader_trait = age_aged
-#		}
-#	}
-#	
-#	mean_time_to_happen = { days = 7300 }
-#	
-#	option = {
-#		name = generals_aging_generic.2.a
-#		ai_chance = { factor = 100 }
-#		FROM={
-#			retire = yes
-#		}
-#	}
-#}
+unit_leader_event = {
+	id = generals_aging_generic.2
+	title = generals_aging_generic.2.t
+	desc = generals_aging_generic.2.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = generals_aging_generic.2.a
+		ai_chance = { factor = 100 }
+		retire = yes
+	}
+}
 
 #experienced leader demands field martial
 # unit_leader_event = {
@@ -95,3 +82,63 @@
 		# ai_chance = { factor = 100 }
 	# }
 # }
+
+##ping event to age a leader
+unit_leader_event = {
+	id = generals_aging_generic.4
+	title = generals_aging_generic.4.t
+	desc = generals_aging_generic.4.d
+	picture = GFX_report_event_royal_visit
+	
+	immediate ={
+		every_unit_leader={
+			limit={
+				NOT={has_unit_leader_flag = historical_figure}
+			}
+			if={
+				limit={has_trait = age_aged}
+				random_list = {
+					85={
+						unit_leader_event = { id = generals_aging_generic.2 random_days = 50}
+					}
+					15={
+						
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_experienced}
+				remove_unit_leader_trait = age_experienced
+				add_unit_leader_trait = age_aged
+			}
+			else_if={
+				limit={has_trait = age_established}
+				remove_unit_leader_trait = age_established
+				add_unit_leader_trait = age_experienced
+			}
+			else_if={
+				limit={has_trait = age_young}
+				remove_unit_leader_trait = age_young
+				add_unit_leader_trait = age_established
+			}
+			else_if={
+				limit={has_trait = age_baby_faced}
+				remove_unit_leader_trait = age_baby_faced
+				add_unit_leader_trait = age_young
+			}
+			else={
+				add_unit_leader_trait = age_baby_faced
+			}
+		}
+	}
+	hidden = yes
+	
+	trigger={
+		any_unit_leader={
+			NOT={has_unit_leader_flag = historical_figure}
+		}
+	}
+	
+	mean_time_to_happen = { days = 7300 }
+	
+}
