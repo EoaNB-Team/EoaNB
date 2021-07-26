@@ -400,7 +400,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 						if = {
 							limit = { var:global.score_tag_array^i = { is_subject_of = TSH } }
 							add_to_array = { TSH_boshin_war_han_ranks_tag = global.score_tag_array^i }
-							log = "Adding Tag: [?global.score_tag_array^i.GetName]"
+							# log = "Adding Tag: [?global.score_tag_array^i.GetName]"
 						}
 					}
 
@@ -515,7 +515,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 							array = TSH.boshin_war_meiji_states
 							value = v
 							index = i
-							log = "[GetDateText]: [?v.GetName]"
+							# log = "[GetDateText]: [?v.GetName]"
 							var:v = {
 								set_demilitarized_zone = yes
 								state_event = { id = feudal_tokugawa_shogunate.202 days = 2 random_days = 19 trigger_for = controller }
@@ -553,7 +553,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			is_triggered_only = yes
 
 			immediate = {
-				log = "[GetDateText]: [?THIS.id]: event feudal_tokugawa_shogunate.202"
+				# log = "[GetDateText]: [?THIS.id]: event feudal_tokugawa_shogunate.202"
 				randomize_temp_variable = {
 					var = delayy
 					distribution = uniform
@@ -574,7 +574,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			}
 
 			immediate = {
-				log = "[GetDateText]: [?THIS.id]: event feudal_tokugawa_shogunate.203"
+				# log = "[GetDateText]: [?THIS.id]: event feudal_tokugawa_shogunate.203"
 				set_demilitarized_zone = no
 				remove_core_of = TSH
 				add_core_of = JAP
@@ -648,6 +648,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				hidden_effect = {
 					if = {
 						limit = { tag = TSH }
+						UCT = { activate_mission = JAP_decision_boshin_war_tokugawan_navy_defect }
 						every_other_country = {
 							country_event = feudal_tokugawa_shogunate.205
 						}
@@ -726,7 +727,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			trigger = { is_japanese_country = yes is_subject_of = TSH }
 
 			immediate = {
-				log = "[GetDateText]: [Root.GetName]: event feudal_tokugawa_shogunate.209 #[?TSH.boshin_war_han_switch_tag]"
+				# log = "[GetDateText]: [Root.GetName]: event feudal_tokugawa_shogunate.209 #[?TSH.boshin_war_han_switch_tag]"
 			}
 
 			# Player Joins Meiji Rebellion
@@ -762,9 +763,15 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				trigger = { autocracy > 0.4 }
 				ai_chance = { base = 0 modifier = { add = 1 autocracy > 0.5 } }
 				JAP = {
-					set_autonomy = {
-						target = PREV
-						autonomy_state = autonomy_daimyo
+					if = {
+						limit = { eoanb_enable_autonomy = yes }
+						set_autonomy = {
+							target = PREV
+							autonomy_state = autonomy_daimyo
+						}
+					}
+					else = {
+						puppet = PREV
 					}
 				}
 				hidden_effect = {
@@ -794,6 +801,126 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			}
 		}
 
+	# Tokugawan Navy Defects
+		country_event = {
+			id = feudal_tokugawa_shogunate.240
+			title = feudal_tokugawa_shogunate.240.t
+			desc = feudal_tokugawa_shogunate.240.d
+
+			is_triggered_only = yes
+
+			immediate = {
+				if = {
+					limit = { tag = TSH }
+					hidden_effect = {
+						EZO = {
+							if = {
+								limit = { TSH = { OR = { owns_state = 536 owns_state = 750 } } }
+								if = {
+									limit = { TSH = { owns_state = 536 } }
+									transfer_state = 536
+									536 = {
+										add_core_of = EZO
+										add_core_of = JAP
+									}
+								}
+								if = {
+									limit = { TSH = { owns_state = 750 } }
+									transfer_state = 750
+									750 = {
+										add_core_of = EZO
+										add_core_of = JAP
+									}
+								}
+
+								inherit_technology = TSH
+								set_cosmetic_tag = EZO_provisional_cosmetic
+							}
+						}
+					}
+					transfer_units_fraction = {
+						target = EZO
+						size = 0.1
+						army_ratio = 0.1
+						navy_ratio = 0.9
+						air_ratio = 0.0
+						keep_unit_leaders_trigger = { always = yes }
+					}
+				}
+			}
+
+			option = {
+				name = feudal_tokugawa_shogunate.240.a
+				trigger = { has_war_with = JAP }
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.240.b
+				trigger = { has_war_with = TSH }
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.240.c
+				trigger = { tag = TSH is_ai = no }
+				change_tag_from = TSH
+			}
+		}
+		# Should we declare war on Ezo?
+		country_event = {
+			id = feudal_tokugawa_shogunate.247
+			title = feudal_tokugawa_shogunate.247.t
+			desc = feudal_tokugawa_shogunate.247.d
+
+			is_triggered_only = yes
+
+			trigger = { EZO = { exists = yes NOT = { is_subject_of = ROOT } } }
+
+			immediate = {
+				hidden_effect = {
+					if = {
+						limit = { tag = TSH }
+						EZO = {
+							every_owned_state = {
+								remove_core_of = JAP
+							}
+						}
+					}
+					else_if = {
+						limit = { tag = JAP }
+						EZO = {
+							every_owned_state = {
+								remove_core_of = TSH
+							}
+						}
+					}
+				}
+			}
+
+			option = {
+				name = feudal_tokugawa_shogunate.247.a
+				declare_war_on = {
+					target = EZO
+					type = annex_everything
+				}
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.247.b
+				EZO = {
+					store_current_ideologies = yes
+					JAP = {
+						if = {
+							limit = { eoanb_enable_autonomy = yes }
+							set_autonomy = {
+								target = PREV
+								autonomy_state = autonomy_puppet
+							}
+						}
+						else = {
+							puppet = PREV
+						}
+					}
+					load_prevous_ideologies = yes
+				}
+			}
+		}
 	# Imperial Loss
 		news_event = {
 			id = feudal_tokugawa_shogunate.248
@@ -821,9 +948,15 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				every_other_country = {
 					limit = { is_subject_of = JAP }
 					TSH = {
-						set_autonomy = {
-							target = PREV
-							autonomy_state = autonomy_daimyo
+						if = {
+							limit = { eoanb_enable_autonomy = yes }
+							set_autonomy = {
+								target = PREV
+								autonomy_state = autonomy_daimyo
+							}
+						}
+						else = {
+							puppet = PREV
 						}
 					}
 					hidden_effect = {
@@ -845,6 +978,9 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				if = {
 					limit = { is_ai = no }
 					set_variable = { super_event_displayed = 13 }
+				}
+				hidden_effect = {
+					country_event = { id = feudal_tokugawa_shogunate.247 days = 7 }
 				}
 			}
 			option = {
@@ -892,9 +1028,59 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				every_other_country = {
 					limit = { is_subject_of = TSH }
 					JAP = {
-						set_autonomy = {
-							target = PREV
-							autonomy_state = autonomy_daimyo
+						if = {
+							limit = { eoanb_enable_autonomy = yes }
+							set_autonomy = {
+								target = PREV
+								autonomy_state = autonomy_daimyo
+							}
+						}
+						else = {
+							puppet = PREV
+						}
+					}
+					hidden_effect = {
+						set_popularities = {
+							autocracy = 85
+							radical_democracy = 4
+							traditional_conservatism = 10
+							fundamentalism = 1
+						}
+					}
+				}
+				TSH = {
+					every_owned_state = {
+						remove_core_of = TSH
+						add_core_of = JAP
+						JAP = { transfer_state = PREV }
+					}
+				}
+				if = {
+					limit = { is_ai = no }
+					set_variable = { super_event_displayed = 12 }
+				}
+				hidden_effect = {
+					country_event = { id = feudal_tokugawa_shogunate.247 days = 7 }
+				}
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.249.a
+				trigger = { tag = JAP }
+				drop_cosmetic_tag = yes
+				set_temp_variable = { eoanb_prestige_change = 10 }
+				eoanb_change_prestige_score = yes
+				every_other_country = {
+					limit = { is_subject_of = TSH }
+					JAP = {
+						if = {
+							limit = { eoanb_enable_autonomy = yes }
+							set_autonomy = {
+								target = PREV
+								autonomy_state = autonomy_daimyo
+							}
+						}
+						else = {
+							puppet = PREV
 						}
 					}
 					hidden_effect = {
