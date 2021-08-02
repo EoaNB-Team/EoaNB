@@ -1,6 +1,6 @@
 #Everything that has to do with advancing scientific research and the infrastructure required for it
 
-scientific_advancement_decisions = {
+eoanb_category_institutions = {
 	eoanb_decision_westernisation = {
 
 		icon = generic_decision
@@ -456,7 +456,7 @@ scientific_advancement_decisions = {
 
 #War Measures (these by default only show when at war, so adding an extra line in "visible = {}" is not necessary)
 
-war_measures = {
+eoanb_category_war_measures = {
 
 	#Promote Austerity
 	eoanb_decision_war_austerity = {
@@ -568,7 +568,7 @@ war_measures = {
 
 #Economic Development of the Country
 
-economic_decisions = {
+eoanb_category_economic = {
 
 	#Expand Building Area (Victorian to Oil Era)
 	eoanb_decision_building_slot_victorian = {
@@ -748,6 +748,8 @@ economic_decisions = {
 
 		fire_only_once = yes
 
+		days_remove = 700
+
 		custom_cost_trigger = {
 
 			if = {
@@ -760,14 +762,24 @@ economic_decisions = {
 		custom_cost_text = eoanb_decision_generic_start_industrializing_cost
 
 		complete_effect = {
-			if = {
-				limit = { has_idea = egy_vic_debt }
-				debt_level_increase_by_10 = yes
-			}
-			custom_effect_tooltip = eoanb_tt_decision_industrializing
 			hidden_effect = {
-				swap_ideas = { remove_idea = agrarian add_idea = industrializing }
+				if = {
+					limit = { has_idea = egy_vic_debt }
+					debt_level_increase_by_10 = yes
+				}
+				else = {
+					add_political_power = -250
+				}
 			}
+		}
+
+		remove_effect = {
+			custom_effect_tooltip = eoanb_tt_decision_industrializing
+			swap_ideas = { remove_idea = agrarian add_idea = industrializing }
+		}
+
+		modifier = {
+			consumer_goods_factor = 0.05
 		}
 
 		ai_will_do = {
@@ -895,7 +907,7 @@ economic_decisions = {
 }
 
 #Internal Politics
-internal_politics_eoanb = {
+eoanb_category_politics_internal = {
 
 	#Encourage Centrism
 	eoanb_decision_drift_centrism = {
@@ -951,6 +963,7 @@ internal_politics_eoanb = {
 				OR = {
 					TAG = SPR
 					TAG = BAD
+					tag = TSH
 				}
 			}
 		}
@@ -1432,6 +1445,10 @@ internal_politics_eoanb = {
 			if = {
 				limit = { has_war_support < 0.8 }
 				add_war_support = 0.015
+			}
+			hidden_effect = {
+				add_command_power = -50
+				army_experience = -75
 			}
 			set_temp_variable = { political_legitimacy_change = 0.1 }
 			eoanb_political_legitimacy_change = yes
@@ -2131,42 +2148,42 @@ eoanb_category_diplomatic_actions = {
 		}
 	}
 
-	#Attack the Tribals on North Sentinel Island
-	eoanb_decision_generic_attack_NSI_tribals = {
+	# #Attack the Tribals on North Sentinel Island
+	# eoanb_decision_generic_attack_NSI_tribals = {
 
-		icon = generic_prepare_civil_war
+		# icon = generic_prepare_civil_war
 
-		available = {
-			has_full_control_of_state = 1308
-		}
+		# available = {
+			# has_full_control_of_state = 1308
+		# }
 
-		visible = {
-			has_full_control_of_state = 1308
-		}
+		# visible = {
+			# has_full_control_of_state = 1308
+		# }
 
-		fire_only_once = yes
+		# fire_only_once = yes
 
-		cost = 0
+		# cost = 0
 
-		complete_effect = {
-			NSI = {
-				transfer_state = 1308
-				add_state_core = 1308
-			}
-			declare_war_on = {
-				target = NSI
-				type = annex_everything
-			}
-			hidden_effect = {
-				1308 = { add_manpower = -60 }
-				NSI = { load_oob = "NSI_attack" }
-			}
-		}
+		# complete_effect = {
+			# NSI = {
+				# transfer_state = 1308
+				# add_state_core = 1308
+			# }
+			# declare_war_on = {
+				# target = NSI
+				# type = annex_everything
+			# }
+			# hidden_effect = {
+				# 1308 = { add_manpower = -60 }
+				# NSI = { load_oob = "NSI_attack" }
+			# }
+		# }
 
-		ai_will_do = {
-			base = 0
-		}
-	}
+		# ai_will_do = {
+			# base = 0
+		# }
+	# }
 }
 
 tribal_decisions_eoanb = {
@@ -2656,7 +2673,40 @@ eoanb_category_military = {
 			base = 0
 		}
 	}
+}
 
+eoanb_category_navy = {
+	eoanb_found_naval_command = {
+
+		available = {
+			has_navy_size = {
+				size > 1
+			}
+		}
+
+		visible = {
+			any_owned_state = {
+				is_coastal = yes
+			}
+			NOT = { has_country_flag = naval_command_founded }
+		}
+
+		fire_only_once = yes
+
+		cost = 0
+
+		ai_will_do = {
+			base = 1000
+		}
+
+		complete_effect = {
+			set_country_flag = naval_command_founded
+			mhc_fill_generic_navy_advisor = yes
+		}
+	}
+}
+
+eoanb_category_air = {
 	eoanb_found_nuclear_missile_command={
 
 		available = {
@@ -2702,35 +2752,6 @@ eoanb_category_military = {
 		complete_effect = {
 			set_country_flag = air_command_founded
 			mhc_fill_generic_airforce_advisor = yes
-		}
-	}
-
-	eoanb_found_naval_command = {
-
-		available = {
-			has_navy_size = {
-				size > 1
-			}
-		}
-
-		visible = {
-			any_owned_state = {
-				is_coastal = yes
-			}
-			NOT = { has_country_flag = naval_command_founded }
-		}
-
-		fire_only_once = yes
-
-		cost = 0
-
-		ai_will_do = {
-			base = 1000
-		}
-
-		complete_effect = {
-			set_country_flag = naval_command_founded
-			mhc_fill_generic_navy_advisor = yes
 		}
 	}
 }

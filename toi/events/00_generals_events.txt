@@ -1,76 +1,39 @@
-﻿#add_namespace = generals_aging_generic
+﻿add_namespace = generals_aging_generic
 
-### EVENTS DISABLED AS UNIT LEADER EVENTS MUST BE TRIGGERED ONLY ###
-#leader ages
-#unit_leader_event = {
-#	id = generals_aging_generic.1
-#	title = generals_aging_generic.1.t
-#	desc = generals_aging_generic.1.d
-#	
-#	immediate ={
-#		FROM={
-#			if={
-#				limit={has_unit_leader_trait = age_experienced}
-#				remove_unit_leader_trait = age_experienced
-#				add_unit_leader_trait = age_aged
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_established}
-#				remove_unit_leader_trait = age_established
-#				add_unit_leader_trait = age_experienced
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_young}
-#				remove_unit_leader_trait = age_young
-#				add_unit_leader_trait = age_established
-#			}
-#			else_if={
-#				limit={has_unit_leader_trait = age_baby_faced}
-#				remove_unit_leader_trait = age_baby_faced
-#				add_unit_leader_trait = age_young
-#			}
-#			else={
-#				add_unit_leader_trait = age_baby_faced
-#			}
-#		}
-#	}
-#	
-#	trigger={
-#		FROM={
-#			#NOT={has_unit_leader_flag = historical_figure}
-#		}
-#	}
-#	
-#	mean_time_to_happen = { days = 7300 }
-#	
-#	option = {
-#		name = generals_aging_generic.1.a
-#		ai_chance = { factor = 100 }
-#	}
-#}
-#leader dies or retires
-#unit_leader_event = {
-#	id = generals_aging_generic.2
-#	title = generals_aging_generic.2.t
-#	desc = generals_aging_generic.2.d
-#	
-#	trigger={
-#		FROM={
-#			#NOT={has_unit_leader_flag = historical_figure} # error log says this is in wrong scope, no clue why
-#			has_unit_leader_trait = age_aged
-#		}
-#	}
-#	
-#	mean_time_to_happen = { days = 7300 }
-#	
-#	option = {
-#		name = generals_aging_generic.2.a
-#		ai_chance = { factor = 100 }
-#		FROM={
-#			retire = yes
-#		}
-#	}
-#}
+#leader tries to retire
+unit_leader_event = {
+	id = generals_aging_generic.1
+	title = generals_aging_generic.1.t
+	desc = generals_aging_generic.1.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = generals_aging_generic.1.a
+		ai_chance = { factor = 50 }
+		retire = yes
+	}
+	option = {
+		name = generals_aging_generic.1.b
+		trigger={has_political_power > 49}
+		ai_chance = { factor = 50 }
+		add_political_power = -50
+	}
+}
+#leader retires without 
+unit_leader_event = {
+	id = generals_aging_generic.2
+	title = generals_aging_generic.2.t
+	desc = generals_aging_generic.2.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = generals_aging_generic.2.a
+		ai_chance = { factor = 100 }
+		retire = yes
+	}
+}
 
 #experienced leader demands field martial
 # unit_leader_event = {
@@ -95,3 +58,122 @@
 		# ai_chance = { factor = 100 }
 	# }
 # }
+
+##ping event to age a leader
+unit_leader_event = {
+	id = generals_aging_generic.4
+	title = generals_aging_generic.4.t
+	desc = generals_aging_generic.4.d
+	picture = GFX_report_event_royal_visit
+	
+	immediate ={
+		every_unit_leader={
+			limit={
+				NOT={has_unit_leader_flag = historical_figure}
+			}
+			if={#
+				limit={has_trait = age_old}
+				random_list = {
+					75={#leader dies
+						unit_leader_event = { id = generals_aging_generic.2 days = 5 random_days = 50}
+					}
+					15={
+						
+					}
+					10={#leader 
+						unit_leader_event = { id = generals_aging_generic.1 days = 5 random_days = 50}
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_aged}
+				remove_unit_leader_trait = age_aged
+				add_unit_leader_trait = age_old
+				random_list = {
+					45={
+						
+					}
+					30={#leader dies
+						unit_leader_event = { id = generals_aging_generic.2 days = 5 random_days = 50}
+					}
+					25={#leader 
+						unit_leader_event = { id = generals_aging_generic.1 days = 5 random_days = 50}
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_experienced}
+				random_list = {
+					70={
+						remove_unit_leader_trait = age_experienced
+						add_unit_leader_trait = age_aged
+					}
+					30={
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_established}
+				random_list = {
+					70={
+						remove_unit_leader_trait = age_established
+						add_unit_leader_trait = age_experienced
+					}
+					30={
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_young}
+				random_list = {
+					70={
+						remove_unit_leader_trait = age_young
+						add_unit_leader_trait = age_established
+					}
+					30={
+					}
+				}
+			}
+			else_if={
+				limit={has_trait = age_baby_faced}
+				random_list = {
+					65={
+						remove_unit_leader_trait = age_baby_faced
+						add_unit_leader_trait = age_young
+					}
+					35={
+					}
+				}
+			}
+			else={#leader does not have trait
+				random_list = {
+					55={
+						add_unit_leader_trait = age_baby_faced
+					}
+					25={
+						add_unit_leader_trait = age_young
+					}
+					10={
+						add_unit_leader_trait = age_established
+					}
+					7={
+						add_unit_leader_trait = age_experienced
+					}
+					3={
+						add_unit_leader_trait = age_aged
+					}
+				}
+			}
+		}
+	}
+	hidden = yes
+	
+	trigger={
+		any_unit_leader={
+			NOT={has_unit_leader_flag = historical_figure}
+		}
+	}
+	
+	mean_time_to_happen = { days = 3650 }
+	
+}
