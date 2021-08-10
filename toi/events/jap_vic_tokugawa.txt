@@ -50,7 +50,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			eoanb_change_prestige_score = yes
 			hidden_effect = {
 				news_event = { id = feudal_tokugawa_shogunate.2 days = 10 } # Cholera Outbreak Introduction
-				news_event = { id = feudal_tokugawa_shogunate.20 days = 3 } # Bakumatsu Introduction
+				news_event = { id = feudal_tokugawa_shogunate.30 days = 3 } # Bakumatsu Introduction
 				# news_event = { id = feudal_tokugawa_shogunate.4 days = 17 } # Han System Introduction
 			}
 		}
@@ -213,6 +213,8 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			is_triggered_only = yes
 
+			trigger = { has_pandemic = yes }
+
 			option = {
 				name = feudal_tokugawa_shogunate.6.a
 				trigger = { tag = TSH }
@@ -250,6 +252,8 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			picture = GFX_report_event_japanese_report
 
 			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
 
 			# Warn the Rest of Japan
 			option = {
@@ -327,6 +331,8 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			is_triggered_only = yes
 
+			trigger = { has_pandemic = yes }
+
 			option = {
 				name = feudal_tokugawa_shogunate.8.a
 				EOANBSYS_pandemics_progress_add_one = yes
@@ -339,6 +345,8 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			desc = feudal_tokugawa_shogunate.9.d
 
 			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
 
 			option = {
 				name = feudal_tokugawa_shogunate.9.a
@@ -362,6 +370,8 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			desc = feudal_tokugawa_shogunate.10.d
 
 			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
 
 			option = {
 				name = feudal_tokugawa_shogunate.10.a
@@ -392,6 +402,12 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 						limit = { state_population_k > 700 }
 						state_event = feudal_tokugawa_shogunate.12
 					}
+					random_other_country = {
+						limit = { is_subject_of = ROOT }
+						capital_scope = {
+							state_event = feudal_tokugawa_shogunate.12
+						}
+					}
 					country_event = { id = feudal_tokugawa_shogunate.11 days = 20 random_days = 45 }
 				}
 			}
@@ -415,6 +431,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			option = {
 				name = feudal_tokugawa_shogunate.13.a
+				trigger = { tag = TSH }
 				FROM = {
 					randomize_temp_variable = {
 						var = earthquake_deaths
@@ -434,6 +451,19 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 					add_manpower = earthquake_deaths
 				}
 			}
+			option = {
+				name = feudal_tokugawa_shogunate.13.a
+				trigger = { NOT = { tag = TSH } }
+				capital_scope = {
+					randomize_temp_variable = {
+						var = earthquake_deaths
+						distribution = uniform
+						min = -222
+						max = -41
+					}
+					add_manpower = earthquake_deaths
+				}
+			}
 		}
 	# Edo Festival
 		country_event = {
@@ -443,22 +473,26 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			is_triggered_only = yes
 
+			trigger = { has_pandemic = yes }
+
 			option = {
 				name = feudal_tokugawa_shogunate.14.a
 				set_temp_variable = { eoanb_prestige_change = 3 }
 				eoanb_change_prestige_score = yes
-				random_list = {
-					3 = {
-						increase_ps_by_one = yes
-						EOANBSYS_pandemics_progress_add_two = yes
+				hidden_effect = {
+					random_list = {
+						1 = {
+							country_event = { id = feudal_tokugawa_shogunate.15 days = 20 }
+						}
+						1 = {
+							country_event = { id = feudal_tokugawa_shogunate.16 days = 20 }
+						}
 					}
-					1 = {
-						EOANBSYS_pandemics_progress_minus_five = yes
-					}
+					country_event = { id = feudal_tokugawa_shogunate.17 days = 120 }
 				}
 			}
 		}
-	# Great Progress in Nagasaki Hospital
+	# Things get Better
 		country_event = {
 			id = feudal_tokugawa_shogunate.15
 			title = feudal_tokugawa_shogunate.15.t
@@ -466,17 +500,22 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			is_triggered_only = yes
 
+			trigger = { has_pandemic = yes }
+
 			option = {
 				name = feudal_tokugawa_shogunate.15.a
-				EOANBSYS_pandemics_progress_add_ten = yes
-				EOANBSYS_institutions_humantive_add_two = yes
-				add_popularity = {
-					ideology = traditional_conservatism
-					popularity = 0.04
+				if = {
+					limit = { tag = TSH }
+					increase_ps_by_one = yes
+					every_country = {
+						limit = { is_subject_of = ROOT }
+						country_event = feudal_tokugawa_shogunate.15
+					}
 				}
+				EOANBSYS_pandemics_progress_add_two = yes
 			}
 		}
-	# Pompe Suggests to Open
+	# Things get Worse
 		country_event = {
 			id = feudal_tokugawa_shogunate.16
 			title = feudal_tokugawa_shogunate.16.t
@@ -484,9 +523,131 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 
 			is_triggered_only = yes
 
+			trigger = { has_pandemic = yes }
+
+			option = {
+				name = feudal_tokugawa_shogunate.15.a
+				if = {
+					limit = { tag = TSH }
+					decrease_ps_by_one = yes
+					every_country = {
+						limit = { is_subject_of = ROOT }
+						country_event = feudal_tokugawa_shogunate.16
+					}
+				}
+				EOANBSYS_pandemics_progress_minus_five = yes
+			}
+		}
+	# Distrust with Bakufu Authority
+		country_event = {
+			id = feudal_tokugawa_shogunate.17
+			title = feudal_tokugawa_shogunate.17.t
+			desc = feudal_tokugawa_shogunate.17.d
+
+			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
+
+			immediate = {
+				if = {
+					limit = { tag = TSH }
+					every_country = {
+						limit = { OR = { is_tozama_daimyo = yes is_fudai_daimyo = yes } }
+						country_event = feudal_tokugawa_shogunate.17
+					}
+				}
+			}
+
+			option = {
+				name = feudal_tokugawa_shogunate.17.a
+				trigger = { tag = TSH }
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.17.b
+				trigger = { is_tozama_daimyo = yes }
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.17.c
+				trigger = { is_fudai_daimyo = yes }
+			}
+		}
+	# Byogaku Tsuron
+		country_event = {
+			id = feudal_tokugawa_shogunate.18
+			title = feudal_tokugawa_shogunate.18.t
+			desc = feudal_tokugawa_shogunate.18.d
+
+			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
+
+			option = {
+				name = feudal_tokugawa_shogunate.18.a
+
+			}
+		}
+	# Shows of Kokera Decline
+		country_event = {
+			id = feudal_tokugawa_shogunate.19
+			title = feudal_tokugawa_shogunate.19.t
+			desc = feudal_tokugawa_shogunate.19.d
+
+			is_triggered_only = yes
+
+			trigger = { has_pandemic = yes }
+
+			immediate = {
+				if = {
+					limit = { tag = TSH }
+					every_other_country = {
+						limit = { is_subject_of = TSH }
+						country_event = feudal_tokugawa_shogunate.19
+					}
+				}
+			}
+
+			option = {
+				name = feudal_tokugawa_shogunate.19.a
+				EOANBSYS_pandemics_progress_add_ten = yes
+			}
+		}
+	# Arrival of the Kanrin Mahru
+		country_event = {
+			id = feudal_tokugawa_shogunate.20
+			title = feudal_tokugawa_shogunate.20.t
+			desc = feudal_tokugawa_shogunate.20.d
+			picture = GFX_report_event_generic_sailship
+
+			is_triggered_only = yes
+
+			option = {
+				name = feudal_tokugawa_shogunate.20.a
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					load_oob = JAP_NAVAL_1858
+				}
+				else = {
+					load_oob = JAP_NAVAL_1858_legacy
+				}
+				custom_effect_tooltip = feudal_tokugawa_shogunate.20.a_tt
+				set_country_flag = TSH_van_meerdervoort_arrive_flag
+				EOANBSYS_institutions_humanitive_add_five = yes
+				hidden_effect = {
+					country_event = { id = feudal_tokugawa_shogunate.21 days = 700 random_days = 100 }
+				}
+			}
+		}
+		# Pompe Suggests to Open
+		country_event = {
+			id = feudal_tokugawa_shogunate.21
+			title = feudal_tokugawa_shogunate.21.t
+			desc = feudal_tokugawa_shogunate.21.d
+
+			is_triggered_only = yes
+
 			# Let him do it
 			option = {
-				name = feudal_tokugawa_shogunate.16.a
+				name = feudal_tokugawa_shogunate.21.a
 				ai_chance = { base = 1 }
 				trigger = { NOT = { has_completed_focus = JAP_vic_beyond_byogaku_tsuron } }
 				add_political_power = -20
@@ -500,12 +661,12 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 					add_opinion_modifier = { target = TSH modifier = small_decrease }
 				}
 				hidden_effect = {
-					country_event = { id = feudal_tokugawa_shogunate.15 days = 35 }
+					country_event = { id = feudal_tokugawa_shogunate.22 days = 35 }
 				}
 			}
 			# No
 			option = {
-				name = feudal_tokugawa_shogunate.16.b
+				name = feudal_tokugawa_shogunate.21.b
 				ai_chance = { base = 0 }
 				every_country = {
 					limit = { is_tozama_daimyo = yes }
@@ -518,120 +679,113 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 				EOANBSYS_national_crisis_progress_minus_three = yes
 			}
 		}
-	# Arrival of the Kanrin Mahru
+	# Great Progress in Nagasaki Hospital
 		country_event = {
-			id = feudal_tokugawa_shogunate.17
-			title = feudal_tokugawa_shogunate.17.t
-			desc = feudal_tokugawa_shogunate.17.d
-			picture = GFX_report_event_generic_sailship
+			id = feudal_tokugawa_shogunate.22
+			title = feudal_tokugawa_shogunate.22.t
+			desc = feudal_tokugawa_shogunate.22.d
 
 			is_triggered_only = yes
 
 			option = {
-				name = feudal_tokugawa_shogunate.17.a
-				if = {
-					limit = { has_dlc = "Man the Guns" }
-					load_oob = JAP_NAVAL_1858
-				}
-				else = {
-					load_oob = JAP_NAVAL_1858_legacy
-				}
-				custom_effect_tooltip = feudal_tokugawa_shogunate.17.a_tt
-				set_country_flag = TSH_van_meerdervoort_arrive_flag
-				EOANBSYS_institutions_humanitive_add_five = yes
-				hidden_effect = {
-					country_event = { id = feudal_tokugawa_shogunate.16 days = 700 random_days = 100 }
+				name = feudal_tokugawa_shogunate.22.a
+				EOANBSYS_pandemics_progress_add_ten = yes
+				EOANBSYS_institutions_humantive_add_two = yes
+				add_popularity = {
+					ideology = traditional_conservatism
+					popularity = 0.04
 				}
 			}
 		}
+	#
 # Hietsu Quake 1858
-	# Event Distributor
-		country_event = {
-			id = feudal_tokugawa_shogunate.18
-			hidden = yes
+	# # Event Distributor
+	# 	country_event = {
+	# 		id = feudal_tokugawa_shogunate.18
+	# 		hidden = yes
 
-			is_triggered_only = yes
+	# 		is_triggered_only = yes
 
-			immediate = {
-				every_country = {
-					limit = { any_owned_state = { is_in_japan = yes } }
-					news_event = feudal_tokugawa_shogunate.19
-				}
-			}
-		}
-	# Hietsu Earthquake of 1858
-		country_event = {
-			id = feudal_tokugawa_shogunate.19
-			title = feudal_tokugawa_shogunate.19.t
-			desc = feudal_tokugawa_shogunate.19.d
+	# 		immediate = {
+	# 			every_country = {
+	# 				limit = { any_owned_state = { is_in_japan = yes } }
+	# 				news_event = feudal_tokugawa_shogunate.19
+	# 			}
+	# 		}
+	# 	}
+	# # Hietsu Earthquake of 1858
+		# country_event = {
+		# 	id = feudal_tokugawa_shogunate.19
+		# 	title = feudal_tokugawa_shogunate.19.t
+		# 	desc = feudal_tokugawa_shogunate.19.d
 
-			is_triggered_only = yes
+		# 	is_triggered_only = yes
 
-			immediate = {
-				every_owned_state = {
-					limit = { is_in_japan = yes }
-					random_list = {
-						1 = {
-							damage_building = {
-								type = infrastructure
-								damage = 1
-							}
-						}
-						1 = {
-						}
-					}
-				}
-			}
+		# 	immediate = {
+		# 		every_owned_state = {
+		# 			limit = { is_in_japan = yes }
+		# 			random_list = {
+		# 				1 = {
+		# 					damage_building = {
+		# 						type = infrastructure
+		# 						damage = 1
+		# 					}
+		# 				}
+		# 				1 = {
+		# 				}
+		# 			}
+		# 		}
+		# 	}
 
-			option = {
-				name = feudal_tokugawa_shogunate.19.a
-				ai_chance = { base = 1 }
-				if = {
-					limit = { owns_state = 535 }
-					add_timed_idea = {
-						idea = Generic_Idea_Earthquake_Damage_3
-						days = 100
-					}
-					535 = {
-						randomize_temp_variable = {
-							var = earthquake_deaths
-							distribution = uniform
-							min = -95
-							max = -35
-						}
-						add_manpower = earthquake_deaths
-					}
-				}
-				if = {
-					limit = { owns_state = 531 }
-					add_timed_idea = {
-						idea = Generic_Idea_Earthquake_Damage_3
-						days = 100
-					}
-					531 = {
-						randomize_temp_variable = {
-							var = earthquake_deaths
-							distribution = uniform
-							min = -95
-							max = -35
-						}
-						add_manpower = earthquake_deaths
-					}
-				}
-			}
-		}
+		# 	option = {
+		# 		name = feudal_tokugawa_shogunate.19.a
+		# 		ai_chance = { base = 1 }
+		# 		if = {
+		# 			limit = { owns_state = 535 }
+		# 			add_timed_idea = {
+		# 				idea = Generic_Idea_Earthquake_Damage_3
+		# 				days = 100
+		# 			}
+		# 			535 = {
+		# 				randomize_temp_variable = {
+		# 					var = earthquake_deaths
+		# 					distribution = uniform
+		# 					min = -95
+		# 					max = -35
+		# 				}
+		# 				add_manpower = earthquake_deaths
+		# 			}
+		# 		}
+		# 		if = {
+		# 			limit = { owns_state = 531 }
+		# 			add_timed_idea = {
+		# 				idea = Generic_Idea_Earthquake_Damage_3
+		# 				days = 100
+		# 			}
+		# 			531 = {
+		# 				randomize_temp_variable = {
+		# 					var = earthquake_deaths
+		# 					distribution = uniform
+		# 					min = -95
+		# 					max = -35
+		# 				}
+		# 				add_manpower = earthquake_deaths
+		# 			}
+		# 		}
+		# 	}
+		# }
 # Western Treaties
 	# Introduction to Amity Treaties and Bakumatsu Crisis
 		news_event = {
-			id = feudal_tokugawa_shogunate.20
-			title = feudal_tokugawa_shogunate.20.t
+			id = feudal_tokugawa_shogunate.30
+			title = feudal_tokugawa_shogunate.30.t
 			desc = {
 				trigger = { tag = TSH }
-				text = feudal_tokugawa_shogunate.20.d_shogunate
+				text = feudal_tokugawa_shogunate.30.d_shogunate
 			}
 			desc = {
 				trigger = { NOT = { tag = TSH } }
-				text = feudal_tokugawa_shogunate.20.d_han
+				text = feudal_tokugawa_shogunate.30.d_han
 			}
 
 			picture = GFX_news_event_shogunate_1
@@ -641,7 +795,7 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			option = {
 				trigger = { tag = TSH }
 				ai_chance = { base = 1 }
-				name = feudal_tokugawa_shogunate.20.a
+				name = feudal_tokugawa_shogunate.30.a
 				set_country_flag = EOANBSYS_national_crisis_bakumatsu_crisis_flag
 				EOANBSYS_national_crisis_setup = yes
 				1260 = { set_demilitarized_zone = yes }
@@ -653,43 +807,14 @@ add_namespace = feudal_tokugawa_daimyos_rebel
 			option = {
 				trigger = { NOT = { tag = TSH } }
 				ai_chance = { base = 1 }
-				name = feudal_tokugawa_shogunate.20.b
+				name = feudal_tokugawa_shogunate.30.b
 				add_popularity = {
 					ideology = autocracy
 					popularity = 0.02
 				}
 			}
 		}
-		country_event = {
-			id = feudal_tokugawa_shogunate.21
-			title = feudal_tokugawa_shogunate.21.t
-			desc = feudal_tokugawa_shogunate.21.d
 
-			is_triggered_only = yes
-
-			option = {
-				name = feudal_tokugawa_shogunate.21.a
-				ai_chance = { base = 1 }
-			}
-			option = {
-				name = feudal_tokugawa_shogunate.21.b
-			}
-		}
-		country_event = {
-			id = feudal_tokugawa_shogunate.22
-			title = feudal_tokugawa_shogunate.22.t
-			desc = feudal_tokugawa_shogunate.22.d
-
-			is_triggered_only = yes
-
-			option = {
-				name = feudal_tokugawa_shogunate.22.a
-				ai_chance = { base = 1 }
-			}
-			option = {
-				name = feudal_tokugawa_shogunate.22.b
-			}
-		}
 		country_event = {
 			id = feudal_tokugawa_shogunate.23
 			title = feudal_tokugawa_shogunate.23.t
