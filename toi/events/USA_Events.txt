@@ -24,6 +24,124 @@ add_namespace = usa_guano_islands
 add_namespace = usa_worldmapperus
 
 add_namespace = usa_western_expansion
+add_namespace = usa_worker_events
+
+####################### Worker Events ##########################
+
+#####################################
+# 1860 New England Shoemaker Strike #
+#####################################
+country_event = { #New England Shoemakers Cut Wages
+	id = usa_worker_events.1
+	title = usa_worker_events.1.t
+	desc = usa_worker_events.1.d
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = usa_worker_events.1.a
+	}
+}
+state_event = { #1860
+	id = usa_worker_events.2
+	hidden = yes
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		OWNER = { country_event = { id = usa_worker_events.3 } }
+	}
+}
+country_event = { #Mechanics Association Formed
+	id = usa_worker_events.3
+	title = usa_worker_events.3.t
+	desc = usa_worker_events.3.d
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = { 
+		hidden_effect = { 
+			news_event = { id = usa_worker_events.4 days = 7 } 
+			news_event = { id = usa_worker_events.5 days = 170 }
+		} 
+	}
+
+	option = {
+		name = usa_western_expansion.3.a
+		add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
+		#worker organization increase
+	}
+	option = {
+		name = usa_western_expansion.3.b
+		trigger = { has_political_power > 0 }
+		add_political_power = -50
+		add_popularity = { ideology = social_egalitarianism popularity = 0.03 }
+		#worker organization increase
+	}
+}
+news_event = { #Shoemaker Strike Begins
+	id = usa_worker_events.4
+	title = usa_worker_events.4.t
+	desc = usa_worker_events.4.d
+	show_major = {
+		if = {
+			limit = { USA = { exists = yes } }
+			TAG = USA
+			is_subject_of = USA
+		}
+		else = {
+			NA_B_is_american_allowed = yes
+		}
+	}
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = usa_worker_events.4.a
+		trigger = { 
+			OR = { 
+				owns_state = 357
+				owns_state = 960
+			}
+		}
+		add_stability = -0.01
+	}
+	
+	option = {
+		name = usa_worker_events.4.b
+		trigger = { 
+			NOT = {
+				owns_state = 357
+				owns_state = 960
+			}
+		}
+	}
+}
+news_event = { #Shoemaker Strike Ends
+	id = usa_worker_events.5
+	title = usa_worker_events.5.t
+	desc = usa_worker_events.5.d
+	show_major = {
+		if = {
+			limit = { USA = { exists = yes } }
+			TAG = USA
+			is_subject_of = USA
+		}
+		else = {
+			NA_B_is_american_allowed = yes
+		}
+	}
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = usa_worker_events.5.a
+	}
+}
+
 
 ####################### Western Expansion Events ##########################
 
@@ -393,6 +511,15 @@ news_event = {
 
 	immediate = {
 		hidden_effect = {
+			every_country = {
+				limit = { 
+					OR = {
+						owns_state = 357
+						owns_state = 960
+					}
+				}
+				country_event = { id = usa_worker_events.1 days = 12 }
+			}
 			if = {
 				limit = { is_ai = no }
 				set_variable = { super_event_displayed = 3 }
