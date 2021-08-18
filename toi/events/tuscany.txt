@@ -1,581 +1,590 @@
 add_namespace = tuscany
 add_namespace = tuscany_news
-#1860 Elections
-country_event = {
-	id = tuscany.1
-	title = tuscany.1.t
-	desc = tuscany.1.d
-	picture = GFX_report_event_election_vote
-	
-	fire_only_once = yes
-    is_triggered_only = yes
-
-    trigger = {
-        tag = TUS
-        has_completed_focus = TUS_vic_The_Second_Constitution
-        #date > 1860.01.05
-        #date < 1860.12.06
-        TUS = {
-            NOT = { has_country_flag = TUS_vic_No_Monarchy }
-        }
-    }
-	
-	option = {
-		name = tuscany.1.a  #Conservatives win
-		ai_chance = { factor = 60 }
-
-        hidden_effect = {
-            complete_national_focus = TUS_vic_Elections_Of_1860
-            TUS = { set_country_flag = TUS_vic_conservative_win_1860 }
-        }
-	}
-	
-	option = {
-		name = tuscany.1.b  #socialists win
-		ai_chance = { factor = 40 }
-        
-        hidden_effect = {
-            complete_national_focus = TUS_vic_Elections_Of_1860
-            TUS = { set_country_flag = TUS_vic_socialist_win_1860 }
-        } 	
-	}
-}
-
-#Farmers Rebellion
-country_event = {
-    id = tuscany.2
-    title = tuscany.2.t
-    desc = tuscany.2.d
-    picture = GFX_event_ITA_Influence_Central_States
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-    trigger = {
-        tag = TUS
-        has_idea = absolute_monarchy
-        NOT = {
-            OR = {
-                has_government = centrism
-                has_government = social_egalitarianism
-            }
- 
-        }
-        #date > 1860.03.05
-        #date < 1860.04.06
-    }
-    
-    option = {
-        name = tuscany.2.a  #OK
-        ai_chance = { factor = 100 }
-        hidden_effect = {
-            complete_national_focus = TUS_vic_Farmers_Rebellion
-        }
-        country_event = {
-            id = tuscany.3
-        }
-        add_ideas = {
-            TUS_farmer_strikes
-        }
-    }
-}
-
-#King is deposed
-country_event = {
-    id = tuscany.3
-    title = tuscany.3.t
-    desc = tuscany.3.d
-    picture = GFX_event_ITA_Creation_Army
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-
-    
-    option = {
-        name = tuscany.3.a  #republic
-        ai_chance = { factor = 90 }
-        trigger = {
-            NOT = {
-                has_government = autocracy
-            }
-           
-        }
-        TUS = {
-            set_politics = {
-                ruling_party = centrism
-            }
-            add_popularity = {
-                ideology = centrism
-                popularity = 0.56
-            }
-            add_popularity = {
-                ideology = autocracy
-                popularity = -0.40
-            }
-            create_country_leader = {
-                name = "Eugene Emmanuel de Savoie-Carignan"
-                expire = "1900.1.1"
-                picture = "Portrait_TUS_Eugen_di_Savoy.dds"
-                ideology = conserv_liberal
-                traits = {
-            
-                }
-              }
-            swap_ideas = { 
-                remove_idea = absolute_monarchy
-                add_idea = parliamentary_republic
-            }
-        }
-        TUS = {
-            create_country_leader = {
-                name = "Ferdinand IV"
-                picture = "Portrait_TUS_Ferdinand_IV.dds"
-                expire = "1965.1.1"
-                ideology = despotism
-                traits = {}
-            }
-        }
-        hidden_effect = {
-            complete_national_focus = TUS_vic_The_King_Is_Dead_Long_Live_The_King
-            news_event = {
-                id = tuscany_news.1
-            }
-        }
-        TUS = {
-            set_country_flag = TUS_vic_No_Monarchy
-            mark_focus_tree_layout_dirty = yes
-        }
-    }
-
-    option = {
-        name = tuscany.3.b  #keep the king
-        ai_chance = { factor = 10 }
-        trigger = {
-            has_government = autocracy
-        }
-        TUS = {
-            set_country_flag = TUS_vic_Keep_Monarchy
-        }
-        TUS = {
-            create_country_leader = {
-                name = "Ferdinand IV"
-                picture = "Portrait_TUS_Ferdinand_IV.dds"
-                expire = "1965.1.1"
-                ideology = despotism
-                traits = {}
-            }
-            add_popularity = {
-                ideology = centrism
-                popularity = 0.21
-            }
-        }
-        hidden_effect = {
-            complete_national_focus = TUS_vic_The_King_Is_Dead_Long_Live_The_King
-            mark_focus_tree_layout_dirty = yes
-        }
-    }
-}
-
-### PIE Unification
-
-country_event = {
-    id = tuscany.4
-    title = tuscany.4.t
-    desc = tuscany.4.d
-    picture = GFX_event_ITA_Generic_General_Meeting
-    
-    is_triggered_only = yes
-	fire_only_once = yes
-	
-	immediate = { 
-		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
-	}
-    
-    option = {
-        name = tuscany.4.a  #Yes
-        ai_chance = { factor = 35 }
-        TUS = {
-            set_country_flag = TUS_vic_unification_PIE_agrees
-            annex_country = {
-               target = PIE
-               transfer_troops = yes
-            }
-        }
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				TUS = { country_event = { id = tuscany.7 days = 5 } }
-			}
-		}	
-    }
-    
-    option = {
-        name = tuscany.4.b  #No
-        ai_chance = { factor = 65 }  
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				if = {
-					limit = {
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
-					}
-					TUS = { country_event = { id = tuscany.8 days = 5 } }
-				}
-				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
-			}
-		}	
-    }
-}
-
-### MOD Unification
-
-country_event = {
-    id = tuscany.5
-    title = tuscany.5.t
-    desc = tuscany.5.d
-    picture = GFX_event_ITA_Generic_General_Meeting
-    
-    is_triggered_only = yes
-	fire_only_once = yes
-	
-	immediate = { 
-		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
-	}
-    
-    option = {
-        name = tuscany.5.a  #Yes
-        ai_chance = { factor = 80 }
-        TUS = {
-            set_country_flag = TUS_vic_unification_MOD_agrees
-            annex_country = {
-               target = MOD
-               transfer_troops = yes
-            }
-        }
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				TUS = { country_event = { id = tuscany.7 days = 5 } }
-			}
-		}	
-    }
-    
-    option = {
-        name = tuscany.5.b  #No
-        ai_chance = { factor = 20 }  
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				if = {
-					limit = {
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
-					}
-					TUS = { country_event = { id = tuscany.8 days = 5 } }
-				}
-				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
-			}
-		}	
-    }
-}
-
-### PRM Unification
-
-country_event = {
-    id = tuscany.6
-    title = tuscany.6.t
-    desc = tuscany.6.d
-    picture = GFX_event_ITA_Generic_General_Meeting
-    
-    is_triggered_only = yes
-	fire_only_once = yes
-	
-	immediate = { 
-		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
-	}
-    
-    option = {
-        name = tuscany.6.a  #Yes
-        ai_chance = { factor = 80 }
-        TUS = {
-            set_country_flag = TUS_vic_unification_PRM_agrees
-            annex_country = {
-               target = PRM
-               transfer_troops = yes
-            }
-        }
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				TUS = { country_event = { id = tuscany.7 days = 5 } }
-			}
-		}
-    }
-    
-    option = {
-        name = tuscany.6.b  #No
-        ai_chance = { factor = 20 } 
-		hidden_effect = {
-			if = {
-				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
-				if = {
-					limit = {
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
-						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
-					}
-					TUS = { country_event = { id = tuscany.8 days = 5 } }
-				}
-				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
-			}
-		}		
-    }
-}
-
-### Unification Success
-
-country_event = {
-    id = tuscany.7
-    title = tuscany.7.t
-    desc = tuscany.7.d
-    picture = GFX_ITA_Proclamation_of_the_Kingdom_of_Italy
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-    trigger = {
-        tag = TUS
-		check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals }
-        TUS = {
-            OR = {
-                has_country_flag = TUS_vic_unification_PIE_agrees
-                has_country_flag = TUS_vic_unification_MOD_agrees
-                has_country_flag = TUS_vic_unification_PRM_agrees
-            }
-        }
-    }
-    
-    option = {
-        name = tuscany.7.a  #Yes
-        ai_chance = { factor = 100 }
-        TUS = {
-            add_political_power = 60
-            #load_focus_tree = central_italian_states_focus
-            #set_cosmetic_tag = TUS_ITA_central
-            ### Clearing flags
-            clr_country_flag = TUS_vic_unification_PRM_agrees
-            clr_country_flag = TUS_vic_unification_MOD_agrees
-            clr_country_flag = TUS_vic_unification_PIE_agrees
-            clr_country_flag = TUS_vic_unification
-            clr_country_flag = TUS_vic_No_Monarchy
-            clr_country_flag = TUS_vic_Keep_Monarchy
-            clr_country_flag = TUS_vic_conservative_win_1860
-            clr_country_flag = TUS_vic_socialist_win_1860
-        }
-    }
-}
-
-### Unification Failure
-
-country_event = {
-    id = tuscany.8
-    title = tuscany.8.t
-    desc = tuscany.8.d
-    picture = GFX_ITA_Negociate
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-    trigger = {
-        tag = TUS
-		check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals }
-        TUS = {
-            has_country_flag = TUS_vic_unification
-            NOT = {
-                has_country_flag = TUS_vic_unification_PIE_agrees
-                has_country_flag = TUS_vic_unification_MOD_agrees
-                has_country_flag = TUS_vic_unification_PRM_agrees
-            }
-        }
-    }
-    
-    option = {
-        name = tuscany.8.a  #Yes
-        ai_chance = { factor = 100 }
-        TUS = { complete_national_focus = TUS_vic_Diplomatic_Failure }
-    }
-}
-####Elections or Democratic Revolution
-country_event = {
-    id = tuscany.9
-    title = tuscany.9.t
-    desc = tuscany.9.d
-    picture = GFX_ITA_Negociate
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-  
-    option = {
-        name = tuscany.9.a  #Yes
-        ai_chance = { factor = 60 }
-        country_event = {
-            id = tuscany.3
-        }
-    }
-    option = {
-        name = tuscany.9.b  #Yes
-        ai_chance = { factor = 30 }
-        custom_effect_tooltip = TUS_vic_Elections_Ocurring
-        mark_focus_tree_layout_dirty = yes
-    }
-}
-
-##Papal Territory
-country_event = {
-    id = tuscany.10
-    title = tuscany.10.t
-    desc = tuscany.10.d
-    picture = GFX_event_ITA_Creation_Army
-    
-    fire_only_once = yes
-    is_triggered_only = yes
-
-  
-    option = {
-        name = tuscany.10.a  #Yes
-        ai_chance = { factor = 90 }
-        remove_state_core = 157
-        remove_state_core = 161
-        TUS = {
-            transfer_state = 157
-            transfer_state = 161
-        }
-        
-    }
-    option = {
-        name = tuscany.10.a  #no
-        ai_chance = { factor = 10 }
-        declare_war_on = {
-            target = TUS
-            type = annex_everything
-        }
-        add_state_core = 162
-    }
-}
-country_event = {
-    id = tuscany.12
-    title = tuscany.12.t
-    desc = tuscany.12.d
-    picture = GFX_ITA_Negociate
-
-    
-    fire_only_once = yes
-    
-    is_triggered_only = yes
-    
-    option = {
-        name = tuscany.12.a
-        ai_chance = {
-            base = 1
-            modifier = {
-                add = 1
-				is_historical_focus_on = yes
-            }
-        }
-        PIE = {
-            complete_national_focus = PIE_United_Provinces_of_Central_Italy
-        }
-        load_focus_tree = generic
-        
-
-            
-    }
-    option = {
-        name = tuscany.12.b
-        ai_chance = {
-            base = 1
-            modifier = {
-                add = 1
-                NOT = {
-					is_historical_focus_on = yes
-				}
-            }
-        }
-        hidden_effect = {
-            PIE = {
-                set_country_flag = PIE_at_war_with_tuscany
-            }
-        }
-        declare_war_on = {
-			target = PIE
-			type = annex_everything
-		}
-    }
-}
-country_event = {
-    id = tuscany.13
-    title = tuscany.13.t
-    desc = tuscany.13.d
-    picture = GFX_ITA_Negociate
-
-    
-    fire_only_once = yes
-    
-    is_triggered_only = yes
-    
-    option = {
-        name = tuscany.13.a
-        
-        country_event = {
-            id = sardinia.58
-        } 
-    }
-}
-###start event
-country_event = {
-    id = tuscany.11
-    title = tuscany.11.t
-    desc = tuscany.11.d
-    picture = GFX_ITA_Negociate
-
-    
-    fire_only_once = yes
-    
-    is_triggered_only = yes
-    
-    option = {
-            name = tuscany.11.a
-            hidden_effect = {
-                add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 6000 producer = TUS }
-                add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 3000 producer = TUS }
-            }
-            
-    }
-}
-
-####News Events
-
-
-##king Deposed
-
-news_event = {
-    id = tuscany_news.1
-    title = tuscany_news.1.t
-    desc = tuscany_news.1.d
-    picture = GFX_new_event_ITA_Tuscan_King_Deposed
-
-    major = yes
-    fire_only_once = yes
-
-    is_triggered_only = yes
-
-    option = {
-        name = tuscany_news.1.a
-        
-    }
-}
+##1860 Elections
+#country_event = {
+#	id = tuscany.1
+#	title = tuscany.1.t
+#	desc = tuscany.1.d
+#	picture = GFX_report_event_election_vote
+#	
+#	fire_only_once = yes
+#    is_triggered_only = yes
+#
+#    trigger = {
+#        tag = TUS
+#        has_completed_focus = TUS_vic_The_Second_Constitution
+#        #date > 1860.01.05
+#        #date < 1860.12.06
+#        TUS = {
+#            NOT = { has_country_flag = TUS_vic_No_Monarchy }
+#        }
+#    }
+#	
+#	option = {
+#		name = tuscany.1.a  #Conservatives win
+#		ai_chance = { factor = 60 }
+#
+#        hidden_effect = {
+#            complete_national_focus = TUS_vic_Elections_Of_1860
+#            TUS = { set_country_flag = TUS_vic_conservative_win_1860 }
+#        }
+#	}
+#	
+#	option = {
+#		name = tuscany.1.b  #socialists win
+#		ai_chance = { factor = 40 }
+#        
+#        hidden_effect = {
+#            complete_national_focus = TUS_vic_Elections_Of_1860
+#            TUS = { set_country_flag = TUS_vic_socialist_win_1860 }
+#        } 	
+#	}
+#}
+#
+##Farmers Rebellion
+#country_event = {
+#    id = tuscany.2
+#    title = tuscany.2.t
+#    desc = tuscany.2.d
+#    picture = GFX_event_ITA_Influence_Central_States
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#    trigger = {
+#        tag = TUS
+#        has_idea = absolute_monarchy
+#        NOT = {
+#            OR = {
+#                has_government = centrism
+#                has_government = social_egalitarianism
+#            }
+# 
+#        }
+#        #date > 1860.03.05
+#        #date < 1860.04.06
+#    }
+#    
+#    option = {
+#        name = tuscany.2.a  #OK
+#        ai_chance = { factor = 100 }
+#        hidden_effect = {
+#            complete_national_focus = TUS_vic_Farmers_Rebellion
+#        }
+#        country_event = {
+#            id = tuscany.3
+#        }
+#        add_ideas = {
+#            TUS_farmer_strikes
+#        }
+#    }
+#}
+#
+##King is deposed
+#country_event = {
+#    id = tuscany.3
+#    title = tuscany.3.t
+#    desc = tuscany.3.d
+#    picture = GFX_event_ITA_Creation_Army
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#
+#    
+#    option = {
+#        name = tuscany.3.a  #republic
+#        ai_chance = { factor = 90 }
+#        trigger = {
+#            NOT = {
+#                has_government = autocracy
+#            }
+#           
+#        }
+#        TUS = {
+#            set_politics = {
+#                ruling_party = centrism
+#            }
+#            add_popularity = {
+#                ideology = centrism
+#                popularity = 0.56
+#            }
+#            add_popularity = {
+#                ideology = autocracy
+#                popularity = -0.40
+#            }
+#            create_country_leader = {
+#                name = "Eugene Emmanuel de Savoie-Carignan"
+#                expire = "1900.1.1"
+#                picture = "Portrait_TUS_Eugen_di_Savoy.dds"
+#                ideology = conserv_liberal
+#                traits = {
+#            
+#                }
+#              }
+#            swap_ideas = { 
+#                remove_idea = absolute_monarchy
+#                add_idea = parliamentary_republic
+#            }
+#        }
+#        TUS = {
+#            create_country_leader = {
+#                name = "Ferdinand IV"
+#                picture = "Portrait_TUS_Ferdinand_IV.dds"
+#                expire = "1965.1.1"
+#                ideology = despotism
+#                traits = {}
+#            }
+#        }
+#        hidden_effect = {
+#            complete_national_focus = TUS_vic_The_King_Is_Dead_Long_Live_The_King
+#            news_event = {
+#                id = tuscany_news.1
+#            }
+#        }
+#        TUS = {
+#            set_country_flag = TUS_vic_No_Monarchy
+#            mark_focus_tree_layout_dirty = yes
+#        }
+#    }
+#
+#    option = {
+#        name = tuscany.3.b  #keep the king
+#        ai_chance = { factor = 10 }
+#        trigger = {
+#            has_government = autocracy
+#        }
+#        TUS = {
+#            set_country_flag = TUS_vic_Keep_Monarchy
+#        }
+#        TUS = {
+#            create_country_leader = {
+#                name = "Ferdinand IV"
+#                picture = "Portrait_TUS_Ferdinand_IV.dds"
+#                expire = "1965.1.1"
+#                ideology = despotism
+#                traits = {}
+#            }
+#            add_popularity = {
+#                ideology = centrism
+#                popularity = 0.21
+#            }
+#        }
+#        hidden_effect = {
+#            complete_national_focus = TUS_vic_The_King_Is_Dead_Long_Live_The_King
+#            mark_focus_tree_layout_dirty = yes
+#            if = {
+#                limit = {
+#                    has_global_flag = PIE_2IW_Victory
+#                }
+#                country_event = {
+#                    id = tuscany.2
+#                    days = 50
+#                }
+#            }
+#        }
+#    }
+#}
+#
+#### PIE Unification
+#
+#country_event = {
+#    id = tuscany.4
+#    title = tuscany.4.t
+#    desc = tuscany.4.d
+#    picture = GFX_event_ITA_Generic_General_Meeting
+#    
+#    is_triggered_only = yes
+#	fire_only_once = yes
+#	
+#	immediate = { 
+#		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
+#	}
+#    
+#    option = {
+#        name = tuscany.4.a  #Yes
+#        ai_chance = { factor = 35 }
+#        TUS = {
+#            set_country_flag = TUS_vic_unification_PIE_agrees
+#            annex_country = {
+#               target = PIE
+#               transfer_troops = yes
+#            }
+#        }
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				TUS = { country_event = { id = tuscany.7 days = 5 } }
+#			}
+#		}	
+#    }
+#    
+#    option = {
+#        name = tuscany.4.b  #No
+#        ai_chance = { factor = 65 }  
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				if = {
+#					limit = {
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
+#					}
+#					TUS = { country_event = { id = tuscany.8 days = 5 } }
+#				}
+#				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
+#			}
+#		}	
+#    }
+#}
+#
+#### MOD Unification
+#
+#country_event = {
+#    id = tuscany.5
+#    title = tuscany.5.t
+#    desc = tuscany.5.d
+#    picture = GFX_event_ITA_Generic_General_Meeting
+#    
+#    is_triggered_only = yes
+#	fire_only_once = yes
+#	
+#	immediate = { 
+#		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
+#	}
+#    
+#    option = {
+#        name = tuscany.5.a  #Yes
+#        ai_chance = { factor = 80 }
+#        TUS = {
+#            set_country_flag = TUS_vic_unification_MOD_agrees
+#            annex_country = {
+#               target = MOD
+#               transfer_troops = yes
+#            }
+#        }
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				TUS = { country_event = { id = tuscany.7 days = 5 } }
+#			}
+#		}	
+#    }
+#    
+#    option = {
+#        name = tuscany.5.b  #No
+#        ai_chance = { factor = 20 }  
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				if = {
+#					limit = {
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
+#					}
+#					TUS = { country_event = { id = tuscany.8 days = 5 } }
+#				}
+#				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
+#			}
+#		}	
+#    }
+#}
+#
+#### PRM Unification
+#
+#country_event = {
+#    id = tuscany.6
+#    title = tuscany.6.t
+#    desc = tuscany.6.d
+#    picture = GFX_event_ITA_Generic_General_Meeting
+#    
+#    is_triggered_only = yes
+#	fire_only_once = yes
+#	
+#	immediate = { 
+#		hidden_effect = { TUS = { add_to_variable = { var = TUS.ask_vic_unification value = 1 } } }
+#	}
+#    
+#    option = {
+#        name = tuscany.6.a  #Yes
+#        ai_chance = { factor = 80 }
+#        TUS = {
+#            set_country_flag = TUS_vic_unification_PRM_agrees
+#            annex_country = {
+#               target = PRM
+#               transfer_troops = yes
+#            }
+#        }
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				TUS = { country_event = { id = tuscany.7 days = 5 } }
+#			}
+#		}
+#    }
+#    
+#    option = {
+#        name = tuscany.6.b  #No
+#        ai_chance = { factor = 20 } 
+#		hidden_effect = {
+#			if = {
+#				limit = { TUS = { check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals } } }
+#				if = {
+#					limit = {
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PIE_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_MOD_agrees } }
+#						TUS = { NOT = { has_country_flag = TUS_vic_unification_PRM_agrees } }
+#					}
+#					TUS = { country_event = { id = tuscany.8 days = 5 } }
+#				}
+#				else = { TUS = { country_event = { id = tuscany.7 days = 5 } } }
+#			}
+#		}		
+#    }
+#}
+#
+#### Unification Success
+#
+#country_event = {
+#    id = tuscany.7
+#    title = tuscany.7.t
+#    desc = tuscany.7.d
+#    picture = GFX_ITA_Proclamation_of_the_Kingdom_of_Italy
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#    trigger = {
+#        tag = TUS
+#		check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals }
+#        TUS = {
+#            OR = {
+#                has_country_flag = TUS_vic_unification_PIE_agrees
+#                has_country_flag = TUS_vic_unification_MOD_agrees
+#                has_country_flag = TUS_vic_unification_PRM_agrees
+#            }
+#        }
+#    }
+#    
+#    option = {
+#        name = tuscany.7.a  #Yes
+#        ai_chance = { factor = 100 }
+#        TUS = {
+#            add_political_power = 60
+#            #load_focus_tree = central_italian_states_focus
+#            #set_cosmetic_tag = TUS_ITA_central
+#            ### Clearing flags
+#            clr_country_flag = TUS_vic_unification_PRM_agrees
+#            clr_country_flag = TUS_vic_unification_MOD_agrees
+#            clr_country_flag = TUS_vic_unification_PIE_agrees
+#            clr_country_flag = TUS_vic_unification
+#            clr_country_flag = TUS_vic_No_Monarchy
+#            clr_country_flag = TUS_vic_Keep_Monarchy
+#            clr_country_flag = TUS_vic_conservative_win_1860
+#            clr_country_flag = TUS_vic_socialist_win_1860
+#        }
+#    }
+#}
+#
+#### Unification Failure
+#
+#country_event = {
+#    id = tuscany.8
+#    title = tuscany.8.t
+#    desc = tuscany.8.d
+#    picture = GFX_ITA_Negociate
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#    trigger = {
+#        tag = TUS
+#		check_variable = { var = TUS.ask_vic_unification value = 3 compare = greater_than_or_equals }
+#        TUS = {
+#            has_country_flag = TUS_vic_unification
+#            NOT = {
+#                has_country_flag = TUS_vic_unification_PIE_agrees
+#                has_country_flag = TUS_vic_unification_MOD_agrees
+#                has_country_flag = TUS_vic_unification_PRM_agrees
+#            }
+#        }
+#    }
+#    
+#    option = {
+#        name = tuscany.8.a  #Yes
+#        ai_chance = { factor = 100 }
+#        TUS = { complete_national_focus = TUS_vic_Diplomatic_Failure }
+#    }
+#}
+#####Elections or Democratic Revolution
+#country_event = {
+#    id = tuscany.9
+#    title = tuscany.9.t
+#    desc = tuscany.9.d
+#    picture = GFX_ITA_Negociate
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#  
+#    option = {
+#        name = tuscany.9.a  #Yes
+#        ai_chance = { factor = 60 }
+#        country_event = {
+#            id = tuscany.3
+#        }
+#    }
+#    option = {
+#        name = tuscany.9.b  #Yes
+#        ai_chance = { factor = 30 }
+#        custom_effect_tooltip = TUS_vic_Elections_Ocurring
+#        mark_focus_tree_layout_dirty = yes
+#    }
+#}
+#
+###Papal Territory
+#country_event = {
+#    id = tuscany.10
+#    title = tuscany.10.t
+#    desc = tuscany.10.d
+#    picture = GFX_event_ITA_Creation_Army
+#    
+#    fire_only_once = yes
+#    is_triggered_only = yes
+#
+#  
+#    option = {
+#        name = tuscany.10.a  #Yes
+#        ai_chance = { factor = 90 }
+#        remove_state_core = 157
+#        remove_state_core = 161
+#        TUS = {
+#            transfer_state = 157
+#            transfer_state = 161
+#        }
+#        
+#    }
+#    option = {
+#        name = tuscany.10.a  #no
+#        ai_chance = { factor = 10 }
+#        declare_war_on = {
+#            target = TUS
+#            type = annex_everything
+#        }
+#        add_state_core = 162
+#    }
+#}
+#country_event = {
+#    id = tuscany.12
+#    title = tuscany.12.t
+#    desc = tuscany.12.d
+#    picture = GFX_ITA_Negociate
+#
+#    
+#    fire_only_once = yes
+#    
+#    is_triggered_only = yes
+#    
+#    option = {
+#        name = tuscany.12.a
+#        ai_chance = {
+#            base = 1
+#            modifier = {
+#                add = 1
+#				is_historical_focus_on = yes
+#            }
+#        }
+#        PIE = {
+#            complete_national_focus = PIE_United_Provinces_of_Central_Italy
+#        }
+#        load_focus_tree = generic
+#        
+#
+#            
+#    }
+#    option = {
+#        name = tuscany.12.b
+#        ai_chance = {
+#            base = 1
+#            modifier = {
+#                add = 1
+#                NOT = {
+#					is_historical_focus_on = yes
+#				}
+#            }
+#        }
+#        hidden_effect = {
+#            PIE = {
+#                set_country_flag = PIE_at_war_with_tuscany
+#            }
+#        }
+#        declare_war_on = {
+#			target = PIE
+#			type = annex_everything
+#		}
+#    }
+#}
+#country_event = {
+#    id = tuscany.13
+#    title = tuscany.13.t
+#    desc = tuscany.13.d
+#    picture = GFX_ITA_Negociate
+#
+#    
+#    fire_only_once = yes
+#    
+#    is_triggered_only = yes
+#    
+#    option = {
+#        name = tuscany.13.a
+#        
+#        country_event = {
+#            id = sardinia.58
+#        } 
+#    }
+#}
+####start event
+#country_event = {
+#    id = tuscany.11
+#    title = tuscany.11.t
+#    desc = tuscany.11.d
+#    picture = GFX_ITA_Negociate
+#
+#    
+#    fire_only_once = yes
+#    
+#    is_triggered_only = yes
+#    
+#    option = {
+#            name = tuscany.11.a
+#            hidden_effect = {
+#                add_equipment_to_stockpile = { type = infantry_equipment_rifle_0 amount = 6000 producer = TUS }
+#                add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 3000 producer = TUS }
+#            }
+#            
+#    }
+#}
+#
+#####News Events
+#
+#
+###king Deposed
+#
+#news_event = {
+#    id = tuscany_news.1
+#    title = tuscany_news.1.t
+#    desc = tuscany_news.1.d
+#    picture = GFX_new_event_ITA_Tuscan_King_Deposed
+#
+#    major = yes
+#    fire_only_once = yes
+#
+#    is_triggered_only = yes
+#
+#    option = {
+#        name = tuscany_news.1.a
+#        
+#    }
+#}
