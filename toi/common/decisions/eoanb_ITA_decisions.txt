@@ -156,7 +156,7 @@ ITA_decisions_category_wars_and_conflicts = {
 		# MEANS NO ONE SEES IT AT GAMESTART
 		icon = generic_political_actions
 		is_good = no		# AI is smarter with conditions/achieving them if it is no, trust me.
-		days_mission_timeout = 200		# Arbitrary number, but I recommend a time of 1.5x expected time to finish war, max 1000
+		days_mission_timeout = 250		# Arbitrary number, but I recommend a time of 1.5x expected time to finish war, max 1000
 		activation = {
 			always = no
 		}
@@ -164,42 +164,62 @@ ITA_decisions_category_wars_and_conflicts = {
 		available = {
 			# Conditions to trigger peace treaty
 			OR = {
-				custom_trigger_tooltip = {
-					tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_ITA_VICTORY_tt
+			  # SardiniaPiedmont's Victory Conditions w/ Carbonari
+				if = {
+				  limit = { 
+					PIE = { has_completed_focus = PIE_Path_of_the_Carbonari }
+				  }
+				  custom_trigger_tooltip = {
+					tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_ITA_VICTORY_France_Carbonari_tt
 					tag = PIE
-					PIE = {
-						if = {
-							limit = {
-								has_completed_focus = PIE_Path_of_the_Carbonari
-							}
-							LVN = {
-								has_capitulated = yes
-							}
-						}
-						if = {
-							limit = {
-								NOT = {
-									has_completed_focus = PIE_Path_of_the_Carbonari
-								}
-							}
-							divisions_in_state = {
-								type = infantry
-								size > 10
-								state = 159
-							}
-						}
-					}
-					# SardiniaPiedmont's Victory Conditions
+					LVN = { has_capitulated = yes }
+				  }
 				}
-				custom_trigger_tooltip = {
-					tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_AUS_VICTORY_tt
-					tag = AUS
-					PIE = {
-						surrender_progress > 0.3						# Austria's Victory Conditions
+			  # SardiniaPiedmont's Victory Conditions Normal
+				else_if = {
+				  limit = { 
+					NOT = { has_country_flag = PIE_RUS_Alliance_2IP }
+				  }
+				  custom_trigger_tooltip = {
+					tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_ITA_VICTORY_NORMAL_tt
+					controls_state = 159
+				  }
+				}
+			  ####Russia and Piedmont Vicotry Conditions
+				else = {
+				  custom_trigger_tooltip = {
+					tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_ITA_VICTORY_Russia_tt
+					OR = {
+					  tag = PIE
+					  tag = RUS
 					}
+					OR = {
+					  AND = {
+						PIE = {
+						  controls_state = 159
+						  controls_state = 160
+						}
+						RUS = {
+						  controls_state = 88
+						  controls_state = 91
+						}
+					  }
+					  AUS = {
+						surrender_progress > 0.55
+					  }
+					}
+				  }
+				}
+			  # Austria's Victory Conditions
+				custom_trigger_tooltip = {
+				  tooltip = ITA_Mission_AUS_PIE_Peace_Treaty_1860_AUS_VICTORY_tt
+				  tag = AUS
+				  PIE = {
+					surrender_progress > 0.5  
+				  }
 				}
 			}
-		}
+		  }
 		complete_effect = {
 			# Peace Treaty (Simple form, you can customize it later for various outcomes)
 			if = {
@@ -275,6 +295,7 @@ ITA_decisions_category_wars_and_conflicts = {
 							tag = PIE
 							NOT = {
 								has_completed_focus = PIE_Path_of_the_Carbonari
+								has_country_flag = PIE_RUS_Alliance_2IP
 							}
 						}
 						TUS = {
@@ -381,14 +402,14 @@ ITA_decisions_category_wars_and_conflicts = {
 				}
 				# Insert Austria's Victory Here (Recommended you also check for tag so it only fires for Austria)
 				AUS = {
-					country_event = {
-						id = ita_confederation.6
-					}
+					#country_event = {
+					#	id = ita_confederation.6
+					#}
 					annex_country = {
 						target = PIE
 					}
-					set_country_flag = ITA_AUS_Divide_Italy_Yes
-					set_country_flag = ITA_AUS_won_2I_Divide_Italy
+					#set_country_flag = ITA_AUS_Divide_Italy_Yes
+					#set_country_flag = ITA_AUS_won_2I_Divide_Italy
 				}
 				TUS = {
 					white_peace = PIE
@@ -468,6 +489,7 @@ ITA_decisions_category_wars_and_conflicts = {
 				}
 				# Peace Treaty Event for X_country victory
 				white_peace = TUS
+				### Farmer's Rebellion
 			}
 			if = {
 				limit = {
@@ -637,11 +659,27 @@ ITA_decisions_category_wars_and_conflicts = {
 		days_mission_timeout = 200
 		timeout_effect = {
 			remove_mission = ITA_2IP_Mobilization_War_Imiment
+			PRM = {
+				country_event = {
+					id = sardinia.57
+				}
+			}
+			TUS = {
+				country_event = {
+					id = sardinia.57
+				}
+			}
+			MOD = {
+				country_event = {
+					id = sardinia.57
+				}
+			}
 			AUS = {
 				declare_war_on = {
 					target = PIE
 					type = annex_everything
 				}
+				activate_mission = ITA_Mission_AUS_PIE_Peace_Treaty_1860
 			}
 			LVN = {
 				declare_war_on = {
@@ -665,11 +703,13 @@ ITA_decisions_category_wars_and_conflicts = {
 					limit = {
 						has_country_flag = PIE_RUS_Alliance_2IP
 					}
+
 					country_event = {
 						id = sardinia.85
 					}
 				}
 				complete_national_focus = PIE_The_War_Starts
+				activate_mission = ITA_Mission_AUS_PIE_Peace_Treaty_1860
 			}
 		}
 	}
