@@ -816,34 +816,162 @@ add_namespace = feudal_tokugawa_daimyos
 
 			is_triggered_only = yes
 
+			immediate = {
+				set_variable = { hitosubashi_faction = 0.462 }
+				set_variable = { kii_faction = 0.538 }
+			}
+
+			# The Council will advise
 			option = {
 				name = feudal_tokugawa_shogunate.26.a
+				ai_chance = { base = 0 }
 				activate_mission = TSH_mission_pick_heir
 				complete_national_focus = JAP_vic_illness_of_shogun_iesada
+				hidden_effect = {
+					set_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE
+					country_event = { id = feudal_tokugawa_shogunate.27 days = 30 random_days = 15 }
+					country_event = { id = feudal_tokugawa_shogunate.28 days = 300 random_days = 50 }
+				}
+			}
+			# Tokugawa Iesada will choose
+			option = {
+				name = feudal_tokugawa_shogunate.26.b
+				ai_chance = { base = 1 }
+				activate_mission = TSH_mission_pick_heir
+				complete_national_focus = JAP_vic_illness_of_shogun_iesada
+				hidden_effect = {
+					country_event = { id = feudal_tokugawa_shogunate.27 days = 30 random_days = 15 }
+					country_event = { id = feudal_tokugawa_shogunate.28 days = 300 random_days = 50 }
+				}
 			}
 		}
-	# Practical Observations
+	# Shinpan Feud
 		country_event = {
 			id = feudal_tokugawa_shogunate.27
 			title = feudal_tokugawa_shogunate.27.t
-			desc = feudal_tokugawa_shogunate.27.d
-
+			desc = {
+				text = feudal_tokugawa_shogunate.27.d_player
+				trigger = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
+			}
+			desc = {
+				text = feudal_tokugawa_shogunate.27.d_historical
+			}
 			is_triggered_only = yes
 
+			immediate = {
+				randomize_variable = {
+					var = faction_change_percentage
+					distribution = uniform
+					min = 0.036
+					max = 0.100
+				}
+			}
+			# Hitosubashi
 			option = {
 				name = feudal_tokugawa_shogunate.27.a
+				trigger = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
+				ai_chance = { base = 1 modifier = { factor = 0 is_historical_focus_on = yes } }
+				complete_national_focus = JAP_vic_feud_of_the_shinpan
+				add_to_variable = { hitosubashi_faction = faction_change_percentage }
+				subtract_from_variable = { kii_faction = faction_change_percentage }
+				custom_effect_tooltip = feudal_tokugawa_shogunate.27.a_tt
+				set_country_flag = TSH_IESADA_SUCESSION_HITO
+				clear_variable = faction_change_percentage
+			}
+			# Kii
+			option = {
+				name = feudal_tokugawa_shogunate.27.b
+				trigger = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
+				ai_chance = { base = 1 }
+				complete_national_focus = JAP_vic_feud_of_the_shinpan
+				subtract_from_variable = { hitosubashi_faction = faction_change_percentage }
+				add_to_variable = { kii_faction = faction_change_percentage }
+				custom_effect_tooltip = feudal_tokugawa_shogunate.27.b_tt
+				set_country_flag = TSH_IESADA_SUCESSION_KII
+				clear_variable = faction_change_percentage
+			}
+			# Stay Neutral
+			option = {
+				name = feudal_tokugawa_shogunate.27.c
+				trigger = { NOT = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE } }
+				ai_chance = { base = 1 }
+				add_stability = 0.15
+				complete_national_focus = JAP_vic_feud_of_the_shinpan
 			}
 		}
-	# Mechanical Theory
+	# Iesada chooses Heir
 		country_event = {
 			id = feudal_tokugawa_shogunate.28
 			title = feudal_tokugawa_shogunate.28.t
-			desc = feudal_tokugawa_shogunate.28.d
-
+			desc = {
+				text = feudal_tokugawa_shogunate.28.d_kii
+				trigger = { TSH = { has_country_flag = TSH_IESADA_SUCESSION_KII } }
+			}
+			desc = {
+				text = feudal_tokugawa_shogunate.28.d_hitosubashi
+				trigger = { TSH = { has_country_flag = TSH_IESADA_SUCESSION_HITO } }
+			}
+			desc = {
+				text = feudal_tokugawa_shogunate.28.d_kii
+				trigger = { check_variable = { TSH.kii_faction > TSH.hitosubashi_faction } }
+			}
+			desc = {
+				text = feudal_tokugawa_shogunate.28.d_hitosubashi
+			}
 			is_triggered_only = yes
 
 			option = {
 				name = feudal_tokugawa_shogunate.28.a
+				trigger = { tag = TSH }
+				swap_ideas = {
+					remove_idea = no_heir
+					add_idea = weak_heir
+				}
+				if = {
+					limit = {
+						has_country_flag = TSH_IESADA_SUCESSION_KII
+					}
+					custom_effect_tooltip = TSH_IESADA_SUCESSION_KII
+					complete_national_focus = JAP_vic_kii_shogun
+				}
+				else_if = {
+					limit = {
+						has_country_flag = TSH_IESADA_SUCESSION_HITO
+					}
+					custom_effect_tooltip = TSH_IESADA_SUCESSION_HITO
+					complete_national_focus = JAP_vic_hitosubashi_shogun
+				}
+				else_if = {
+					limit = {
+						check_variable = { TSH.kii_faction > TSH.hitosubashi_faction }
+					}
+					set_country_flag = TSH_IESADA_SUCESSION_KII
+					custom_effect_tooltip = TSH_IESADA_SUCESSION_KII
+					complete_national_focus = JAP_vic_kii_shogun
+				}
+				else = {
+					set_country_flag = TSH_IESADA_SUCESSION_HITO
+					custom_effect_tooltip = TSH_IESADA_SUCESSION_HITO
+					complete_national_focus = JAP_vic_hitosubashi_shogun
+				}
+				every_other_country = {
+					limit = {
+						OR = {
+							is_fudai_daimyo = yes
+							is_tozama_daimyo = yes
+						}
+					}
+					country_event = feudal_tokugawa_shogunate.28
+				}
+				clr_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.28.b
+				trigger = { is_fudai_daimyo = yes }
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.28.c
+				trigger = { is_tozama_daimyo = yes }
 			}
 		}
 	# Ensei Kiki Jutsu
