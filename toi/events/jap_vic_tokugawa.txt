@@ -47,6 +47,7 @@ add_namespace = feudal_tokugawa_daimyos
 			hidden_effect = {
 				news_event = { id = feudal_tokugawa_shogunate.2 days = 10 } # Cholera Outbreak Introduction
 				news_event = { id = feudal_tokugawa_shogunate.50 days = 3 } # Bakumatsu Introduction
+				country_event = { id = feudal_tokugawa_shogunate.26 days = 14 } # Sickness of Iesada
 				# news_event = { id = feudal_tokugawa_shogunate.4 days = 17 } # Han System Introduction
 			}
 		}
@@ -812,38 +813,59 @@ add_namespace = feudal_tokugawa_daimyos
 		country_event = {
 			id = feudal_tokugawa_shogunate.26
 			title = feudal_tokugawa_shogunate.26.t
-			desc = feudal_tokugawa_shogunate.26.d
+			desc = {
+				text = feudal_tokugawa_shogunate.26.d
+				trigger = { tag = TSH }
+			}
+			desc = {
+				text = feudal_tokugawa_shogunate.26.d_han
+			}
 			picture = GFX_report_event_shogun
 
 			is_triggered_only = yes
 
 			immediate = {
-				set_variable = { hitosubashi_faction = 0.462 }
-				set_variable = { kii_faction = 0.538 }
+				if = {
+					limit = { tag = TSH }
+					hidden_effect = {
+						set_variable = { hitosubashi_faction = 0.538 }
+						set_variable = { kii_faction = 0.462 }
+						every_other_country = {
+							limit = { OR = { is_tozama_daimyo = yes is_fudai_daimyo = yes }
+							country_event = feudal_tokugawa_shogunate.26
+						}
+					}
+				}
 			}
 
 			# The Council will advise
 			option = {
 				name = feudal_tokugawa_shogunate.26.a
+				trigger = { tag = TSH }
 				ai_chance = { base = 0 }
 				activate_mission = TSH_mission_pick_heir
 				complete_national_focus = JAP_vic_illness_of_shogun_iesada
 				hidden_effect = {
 					set_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE
 					country_event = { id = feudal_tokugawa_shogunate.27 days = 30 random_days = 15 }
-					country_event = { id = feudal_tokugawa_shogunate.28 days = 300 random_days = 50 }
+					country_event = { id = feudal_tokugawa_shogunate.28 days = 270 random_days = 50 }
 				}
 			}
 			# Tokugawa Iesada will choose
 			option = {
 				name = feudal_tokugawa_shogunate.26.b
+				trigger = { tag = TSH }
 				ai_chance = { base = 1 }
 				activate_mission = TSH_mission_pick_heir
 				complete_national_focus = JAP_vic_illness_of_shogun_iesada
 				hidden_effect = {
 					country_event = { id = feudal_tokugawa_shogunate.27 days = 30 random_days = 15 }
-					country_event = { id = feudal_tokugawa_shogunate.28 days = 300 random_days = 50 }
+					country_event = { id = feudal_tokugawa_shogunate.28 days = 270 random_days = 50 }
 				}
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.26.c
+				trigger = { NOT = { tag = TSH } }
 			}
 		}
 	# Shinpan Feud
@@ -872,7 +894,7 @@ add_namespace = feudal_tokugawa_daimyos
 			# Hitosubashi
 			option = {
 				name = feudal_tokugawa_shogunate.27.a
-				trigger = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
+				trigger = { tag = TSH has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
 				ai_chance = { base = 1 modifier = { factor = 0 is_historical_focus_on = yes } }
 				complete_national_focus = JAP_vic_feud_of_the_shinpan
 				add_to_variable = { hitosubashi_faction = faction_change_percentage }
@@ -884,7 +906,7 @@ add_namespace = feudal_tokugawa_daimyos
 			# Kii
 			option = {
 				name = feudal_tokugawa_shogunate.27.b
-				trigger = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
+				trigger = { tag = TSH has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE }
 				ai_chance = { base = 1 }
 				complete_national_focus = JAP_vic_feud_of_the_shinpan
 				subtract_from_variable = { hitosubashi_faction = faction_change_percentage }
@@ -896,10 +918,29 @@ add_namespace = feudal_tokugawa_daimyos
 			# Stay Neutral
 			option = {
 				name = feudal_tokugawa_shogunate.27.c
-				trigger = { NOT = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE } }
+				trigger = { tag = TSH NOT = { has_country_flag = TSH_IESADA_SUCESSION_PLAYER_CHOICE } }
 				ai_chance = { base = 1 }
 				add_stability = 0.15
 				complete_national_focus = JAP_vic_feud_of_the_shinpan
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.27.e
+				trigger = { is_fudai_daimyo = yes }
+				add_war_support = -0.05
+				add_popularity = {
+					ideology = autocracy
+					popularity = 0.01
+				}
+			}
+			option = {
+				name = feudal_tokugawa_shogunate.27.f
+				trigger = { is_tozama_daimyo = yes }
+				add_war_support = 0.05
+				add_political_power = 15
+				add_popularity = {
+					ideology = autocracy
+					popularity = 0.03
+				}
 			}
 		}
 	# Iesada chooses Heir
@@ -1413,7 +1454,7 @@ add_namespace = feudal_tokugawa_daimyos
 				}
 			}
 		}
-	#
+	# Hotta Masayoshi in Kyoto
 		country_event = {
 			id = feudal_tokugawa_shogunate.52
 			title = feudal_tokugawa_shogunate.52.t
