@@ -213,6 +213,113 @@ EOANBSYS_detrimental_colonial_impact_decision_category = {
 		  base = 10
 		}
 	}
+	
+	DCI_philippines_incident = {
+		icon = generic_civil_support
+		allowed = {
+			always = yes
+		}
+        activation = {
+           hidden_trigger = {
+				NOT = { has_country_flag = DCI_philippines_incident_mission_stop }
+				custom_trigger_tooltip = {
+					tooltip = any_philippines_states_have_over_10_DCI_tooltip
+					any_owned_state = {
+						if = {
+							limit = {
+								is_philippines_land = yes
+								check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals }
+							}
+							always = yes
+						}
+						else = {
+							always = no
+						}
+					}
+				}
+			}
+        }
+		available = {
+			hidden_trigger = { always = no }
+		}
+        cancel_trigger = {
+            custom_trigger_tooltip = {
+				tooltip = all_philippines_states_have_under_10_DCI_tooltip
+				all_owned_state = {
+					if = {
+						limit = { is_philippines_land = yes }
+						check_variable = { var = detrimental_colonial_impact_value value = 10 compare = less_than }
+					}
+				}
+			}
+        }
+        days_mission_timeout = 90
+		is_good = no
+		selectable_mission = no
+		fire_only_once = no
+        timeout_effect = {
+			custom_effect_tooltip = DCI_philippines_incident_tooltip
+            hidden_effect = {
+				random_owned_state = {
+					limit = {
+						is_philippines_land = yes
+						check_variable = { var = detrimental_colonial_impact_value value = 10 compare = greater_than_or_equals }
+					}
+					state_event = { id = DCI_philippines_incident_event.1 random_days = 90 }
+					OWNER = { set_variable = { THIS.DCI_philippines_state_id = PREV.id } }
+				}
+				set_country_flag = DCI_philippines_incident_mission_stop
+				country_event = { id = DCI_philippines_incident_mission_event.1 days = 90 }
+			}
+        }
+    }
+
+	DCI_philippines_resistance_in_state = {
+		icon = GFX_decision_generic_political_discourse
+		allowed = { always = yes }
+		#highlight_color_while_active = 0
+		highlight_states = {
+			STATE = var:ROOT.DCI_philippines_state_id
+		}
+		available = { DCI_resistance_in_state_mission_scripted_trigger = yes }
+		activation = { any_owned_state = { has_state_flag = DCI_philippines_resistance_in_state_flag } }
+		fire_only_once = no
+		selectable_mission = yes
+		custom_cost_trigger = {
+			command_power > 99.9
+		}
+		custom_cost_text = DCI_philippines_resistance_in_state_custom_cost
+		is_good = no
+		days_mission_timeout = 45
+		complete_effect = {
+			var:DCI_philippines_state_id = {
+				hidden_effect = {
+					set_state_flag = DCI_resistance_mission_outcome_comeplete_flag
+					clr_state_flag = DCI_philippines_resistance_in_state_flag
+					state_event = { id = DCI_resistance_mission_outcome.1 }
+				}
+			}
+			hidden_effect = {
+				add_command_power = -100
+			}
+			clear_variable = ROOT.DCI_philippines_state_id
+
+		}
+		timeout_effect = {
+			var:DCI_philippines_state_id = {
+				custom_effect_tooltip = DCI_resistance_mission_outcome_timeout_tooltip
+				hidden_effect = {
+					set_state_flag = DCI_resistance_mission_outcome_timeout_flag
+					clr_state_flag = DCI_philippines_resistance_in_state_flag
+					state_event = { id = DCI_resistance_mission_outcome.1 }
+				}
+			}
+			clear_variable = ROOT.DCI_philippines_state_id
+		}
+		ai_will_do = {
+		  base = 10
+		}
+	}
 
 	DCI_oceania_incident = {
 		icon = generic_civil_support

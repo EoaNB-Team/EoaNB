@@ -101,6 +101,169 @@ mhc_junta_enable_parliament_decisions = {
 	}
 }
 
+mhc_alerts_collector = {
+	hidden_effect = {
+		mhc_check_alerts_powerful = yes
+		mhc_check_alerts_unfit = yes
+		mhc_check_alerts_activated = yes
+	}
+}
+
+mhc_check_alerts_powerful = {
+	hidden_effect = {
+		# advisors
+		if = {
+			limit = {
+				OR = {
+					check_variable = { mhc_powerful_army_officials^num > 0 }
+					check_variable = { mhc_powerful_airforce_officials^num > 0 }
+					check_variable = { mhc_powerful_navy_officials^num > 0 }
+				}
+			}
+			set_temp_variable = { custom_alerts_add_target = 1 }
+			custom_alerts_add_alert = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					is_in_array = {
+						array = local_alerts_array
+						value = 1
+					}
+					is_in_array = {
+						array = local_alerts_disabled_array
+						value = 1
+					}
+				}
+			}
+			set_temp_variable = { custom_alerts_remove_target = 1 }
+			custom_alerts_remove_alert = yes
+		}
+		
+		# orgs
+		if = {
+			limit = {
+				OR = {
+					check_variable = { mhc_army_power > 79 }
+					check_variable = { mhc_airforce_power > 79 }
+					check_variable = { mhc_navy_power > 79 }
+				}
+			}
+			set_temp_variable = { custom_alerts_add_target = 2 }
+			custom_alerts_add_alert = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					is_in_array = {
+						array = local_alerts_array
+						value = 2
+					}
+					is_in_array = {
+						array = local_alerts_disabled_array
+						value = 2
+					}
+				}
+			}
+			set_temp_variable = { custom_alerts_remove_target = 2 }
+			custom_alerts_remove_alert = yes
+		}
+	}
+}
+
+mhc_check_alerts_unfit = {
+	hidden_effect = {
+		if = {
+			limit = {
+				OR = {
+					# army
+					has_country_flag = mhc_sec_unfit
+					has_country_flag = mhc_chief_unfit
+					# airforce
+					has_country_flag = mhc_afc_unfit
+					# navy
+					has_country_flag = mhc_nas_unfit
+					has_country_flag = mhc_ncs_unfit
+				}
+			}
+			set_temp_variable = { custom_alerts_add_target = 3 }
+			custom_alerts_add_alert = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					is_in_array = {
+						array = local_alerts_array
+						value = 3
+					}
+					is_in_array = {
+						array = local_alerts_disabled_array
+						value = 3
+					}
+				}
+			}
+			set_temp_variable = { custom_alerts_remove_target = 3 }
+			custom_alerts_remove_alert = yes
+		}
+	}
+}
+
+mhc_check_alerts_activated = {
+	hidden_effect = {
+		# activated, peace
+		if = {
+			limit = {
+				has_war = no
+				check_variable = { local_mhc_active^num > 0 }
+			}
+			set_temp_variable = { custom_alerts_add_target = 4 }
+			custom_alerts_add_alert = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					is_in_array = {
+						array = local_alerts_array
+						value = 4
+					}
+					is_in_array = {
+						array = local_alerts_disabled_array
+						value = 4
+					}
+				}
+			}
+			set_temp_variable = { custom_alerts_remove_target = 4 }
+			custom_alerts_remove_alert = yes
+		}
+		
+		# inactive, war
+		if = {
+			limit = {
+				has_war = yes
+				check_variable = { local_mhc_active^num = 0 }
+			}
+			set_temp_variable = { custom_alerts_add_target = 5 }
+			custom_alerts_add_alert = yes
+		}
+		else_if = {
+			limit = {
+				OR = {
+					is_in_array = {
+						array = local_alerts_array
+						value = 5
+					}
+					is_in_array = {
+						array = local_alerts_disabled_array
+						value = 5
+					}
+				}
+			}
+			set_temp_variable = { custom_alerts_remove_target = 5 }
+			custom_alerts_remove_alert = yes
+		}
+	}
+}
+
 mhc_reset_all_selectors = {
 	hidden_effect = {
 		ROOT = {
@@ -4604,6 +4767,34 @@ mhc_add_airforce_advisor = {
 		###TRAIT SETUP###
 		#Index is reference to minister
 		#Value is reference to trait
+		#add_to_array = {
+		#	array = local_mhc_airforce_available_traits_array
+		#	index = temp_advisor_frame
+		#	value = temp_advisor_trait
+		#}
+		
+		while_loop_effect = {
+			limit = {
+				OR = {
+					check_variable = { local_mhc_airforce_available_traits_array^num < temp_advisor_frame }
+					check_variable = { local_mhc_airforce_available_traits_array^num = temp_advisor_frame }
+				}
+			}
+			add_to_array = {
+				array = local_mhc_airforce_available_traits_array
+				value = 0
+			}
+		}
+		if = {
+			limit = {
+				has_variable = local_mhc_airforce_available_traits_array^temp_advisor_frame
+				check_variable = { local_mhc_airforce_available_traits_array^temp_advisor_frame = 0 }
+			}
+			remove_from_array = {
+				array = local_mhc_airforce_available_traits_array
+				index = temp_advisor_frame
+			}
+		}
 		add_to_array = {
 			array = local_mhc_airforce_available_traits_array
 			index = temp_advisor_frame
@@ -4624,6 +4815,34 @@ mhc_add_navy_advisor = {
 		###TRAIT SETUP###
 		#Index is reference to minister
 		#Value is reference to trait
+		#add_to_array = {
+		#	array = local_mhc_navy_available_traits_array
+		#	index = temp_advisor_frame
+		#	value = temp_advisor_trait
+		#}
+		
+		while_loop_effect = {
+			limit = {
+				OR = {
+					check_variable = { local_mhc_navy_available_traits_array^num < temp_advisor_frame }
+					check_variable = { local_mhc_navy_available_traits_array^num = temp_advisor_frame }
+				}
+			}
+			add_to_array = {
+				array = local_mhc_navy_available_traits_array
+				value = 0
+			}
+		}
+		if = {
+			limit = {
+				has_variable = local_mhc_navy_available_traits_array^temp_advisor_frame
+				check_variable = { local_mhc_navy_available_traits_array^temp_advisor_frame = 0 }
+			}
+			remove_from_array = {
+				array = local_mhc_navy_available_traits_array
+				index = temp_advisor_frame
+			}
+		}
 		add_to_array = {
 			array = local_mhc_navy_available_traits_array
 			index = temp_advisor_frame
@@ -4644,7 +4863,7 @@ mhc_add_army_advisor = {
 		###TRAIT SETUP###
 		#Index is reference to minister
 		#Value is reference to trait
-		while_loop_effect = { #cant remember why this is here but not for navy and airf above, maybe because advisor ids are in order in startup effects?
+		while_loop_effect = { # added above as well, let's see how this goes #cant remember why this is here but not for navy and airf above, maybe because advisor ids are in order in startup effects?
 			limit = {
 				OR = {
 					check_variable = { local_mhc_army_available_traits_array^num < temp_advisor_frame }
