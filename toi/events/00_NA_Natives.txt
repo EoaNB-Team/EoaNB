@@ -78,6 +78,7 @@ country_event = { #Walla Walla Treaty of 1863 - Nez Perce
 			}
 		}
 		hidden_effect = { 
+			USA = { set_country_flag = walla_walla_treaty_1863 }
 			remove_opinion_modifier = {
 				target = USA
 				modifier = NA_N_cooperative_tribe_opinion_modifier
@@ -103,6 +104,197 @@ country_event = { #Walla Walla Treaty of 1863 - US
 	}
 }
 
+state_event = { #Settlers Demand Removal of Non-Treaty Native Americans
+	id = NA_N_nez_perce_war.4
+	hidden = yes
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	trigger = { 
+		NEZ = { exists = yes } 
+		USA = { has_country_flag = walla_walla_treaty_1863 }
+	}
+
+	immediate = {
+		USA = { clr_country_flag = walla_walla_treaty_1863 }
+		OWNER = {
+			if = {
+				limit = { USA = { exists = yes } }
+				USA = { country_event = { id = NA_N_nez_perce_war.5 } }
+			}
+			#else_if = { 
+			#	limit = { ORE = { exists = yes } }
+			#	ORE = { country_event = { id = NA_N_nez_perce_war.5 } }
+			#}
+		}
+	}
+}
+
+country_event = { #Settlers Demand Removal of Non-Treaty Native Americans
+	id = NA_N_nez_perce_war.5
+	title = NA_N_nez_perce_war.5.t
+	desc = NA_N_nez_perce_war.5.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.5.a
+		NEZ = { country_event = { id = NA_N_nez_perce_war.6 days = 3 } }
+		hidden_effect = {
+			ROOT = { country_event = { id = NA_N_nez_perce_war.6 days = 3 } }
+			NEZ = { country_event = { id = NA_N_nez_perce_war.7 days = 30 } }
+		}
+	}
+	#option = {
+	#    name = NA_N_nez_perce_war.5.b
+	#	trigger = { has_completed_focus = USA_buchanan_reservations }
+	#	
+	#}
+}
+
+country_event = { #The Settler Ultimatum to Nez Perce
+	id = NA_N_nez_perce_war.6
+	title = NA_N_nez_perce_war.6.t
+	desc = NA_N_nez_perce_war.6.desc_1
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.6.a
+	}
+}
+
+country_event = { #Nez Perce War Begins - NEZ
+	id = NA_N_nez_perce_war.7
+	title = NA_N_nez_perce_war.7.t
+	desc = NA_N_nez_perce_war.7.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.7.a
+		FROM = { 
+			declare_war_on = {
+				target = ROOT
+				type = annex_everything
+			}
+		}
+		hidden_effect = { FROM = { country_event = { id = NA_N_nez_perce_war.8 } } }
+		CRW = { country_event = { id = NA_N_nez_perce_war.9 days = 20 } }
+	}
+}
+
+country_event = { #Nez Perce War Begins
+	id = NA_N_nez_perce_war.8
+	title = NA_N_nez_perce_war.8.t
+	desc = NA_N_nez_perce_war.8.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.8.a
+	}
+}
+
+country_event = { #Nez Perce Seeks Refuge in Crow
+	id = NA_N_nez_perce_war.9
+	title = NA_N_nez_perce_war.9.t
+	desc = NA_N_nez_perce_war.9.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.9.a
+		ai_chance = {
+			base = 95
+			modifier = {
+				factor = 0
+				is_historical_focus_on = no
+				NEZ = { is_ai = no }
+			}
+		}
+	}
+	
+	option = {
+	    name = NA_N_nez_perce_war.9.b
+		trigger = {
+			if = {
+				limit = { CRW = { is_ai = yes } }
+				always = yes
+			}
+			else_if = {
+				limit = { CRW = { is_ai = no } }
+				NEZ = { is_ai = yes }
+			}
+		}
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+country_event = { #Crow Declines Refuge
+	id = NA_N_nez_perce_war.10
+	title = NA_N_nez_perce_war.10.t
+	desc = NA_N_nez_perce_war.10.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.10.a
+	}
+}
+
+country_event = { #Crow Accepts Refuge
+	id = NA_N_nez_perce_war.11
+	title = NA_N_nez_perce_war.11.t
+	desc = NA_N_nez_perce_war.11.d
+
+	is_triggered_only = yes
+	
+	option = {
+	    name = NA_N_nez_perce_war.11.a
+		if = {
+			limit = { NEZ = { is_ai = yes } }
+			CRW = { inherit_technology = NEZ }
+			USA = { 
+				annex_country = {
+					target = NEZ
+					transfer_troops = no
+				}
+			}
+			if = {
+				limit = { has_dlc = "Man the Guns" }
+				become_exiled_in = { target = CRW legitimacy = 1 }
+			}
+		}
+		else = {
+			CRW = { 
+				change_tag_from = ROOT 
+				inherit_technology = NEZ
+			}
+			USA = { 
+				annex_country = {
+					target = NEZ
+					transfer_troops = no
+				}
+			}
+			if = {
+				limit = { has_dlc = "Man the Guns" }
+				become_exiled_in = { target = CRW legitimacy = 1 }
+			}
+		}
+	}
+	
+	option = {
+	    name = NA_N_nez_perce_war.11.b
+		trigger = { NEZ = { is_ai = no } }
+	}
+}
 
 ####################
 ### Colorado War ###
