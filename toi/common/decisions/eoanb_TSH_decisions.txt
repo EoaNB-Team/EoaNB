@@ -16,6 +16,41 @@ EOANBSYS_pandemics_decision_category = {
 		}
 	}
 }
+EOANBSYS_national_crisis_decision_category = {
+	TSH_decision_sonno_joi = {
+
+		icon = generic_construction
+
+		allowed = { TAG = TSH }
+
+		visible = {
+			has_completed_focus = JAP_vic_conciliate_the_courts
+			has_country_flag = EOANBSYS_national_crisis_bakumatsu_crisis_flag
+		}
+
+		fire_only_once = yes
+		is_good = yes
+
+		cost = 100
+		days_remove = 1
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+
+		remove_effect = {
+			custom_effect_tooltip = TSH_sonno_joi_tt
+			add_stability = 0.15
+			hidden_effect = {
+				country_event = { id = shogunate_japan.20 hours = 1 }
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+}
 
 eoanb_category_politics_foreign = {
 	TSH_decision_european_amity_treaty = {
@@ -74,7 +109,7 @@ eoanb_category_politics_foreign = {
 		custom_cost_text = TSH_decision_european_amity_treaty_cost_tt
 
 		complete_effect = {
-			country_event = feudal_tokugawa_shogunate.60
+			country_event = feudal_tokugawa_shogunate.58
 			add_opinion_modifier = { target = TSH modifier = small_increase }
 			reverse_add_opinion_modifier = { target = TSH modifier = small_decrease }
 			hidden_effect = {
@@ -83,10 +118,6 @@ eoanb_category_politics_foreign = {
 			}
 		}
 	}
-}
-
-eoanb_category_politics_internal = {
-
 }
 
 eoanb_category_war_measures = {
@@ -128,7 +159,10 @@ eoanb_category_war_measures = {
 		allowed = { always = no }
 		activation = { always = no }
 		available = {
-			JAP = { surrender_progress > 0.70 }
+			OR = {
+				JAP = { surrender_progress > 0.70 }
+				JAP = { NOT = { has_war_with = TSH } }
+			}
 		}
 
 		is_good = no
@@ -148,7 +182,7 @@ eoanb_category_war_measures = {
 			# complete_national_focus = USA_Focus_ACW_Soaring_Eagle
 			hidden_effect = {
 				if = {
-					limit = { tag = TSH }
+					limit = { tag = TSH has_war_with = JAP }
 					country_event = feudal_tokugawa_shogunate.248
 				}
 			}
@@ -160,7 +194,10 @@ eoanb_category_war_measures = {
 		allowed = { always = no }
 		activation = { always = no }
 		available = {
-			TSH = { surrender_progress > 0.70 }
+			OR = {
+				TSH = { surrender_progress > 0.70 }
+				TSH = { NOT = { has_war_with = JAP } }
+			}
 		}
 
 		is_good = no
@@ -179,7 +216,7 @@ eoanb_category_war_measures = {
 			custom_effect_tooltip = feudal_tokugawa_shogunate.249.t
 			hidden_effect = {
 				if = {
-					limit = { tag = JAP }
+					limit = { tag = JAP has_war_with = TSH }
 					country_event = feudal_tokugawa_shogunate.249
 				}
 			}
@@ -208,9 +245,7 @@ eoanb_category_institutions = {
 
 		complete_effect = {
 			set_country_flag = tsh_purchase_rangaku_flag
-			EOANBSYS_institutions_innovative_add_five = yes
-			EOANBSYS_institutions_humanitive_add_ten = yes
-			# COUNTRY EVENT
+			country_event = feudal_tokugawa_shogunate.25
 		}
 	}
 	TSH_decision_foreign_engineering_manuals = {
@@ -385,7 +420,7 @@ eoanb_category_industry = {
 		}
 
 		complete_effect = {
-			# COUNTRY EVENT
+			country_event = feudal_tokugawa_shogunate.32
 			EOANBSYS_institutions_innovative_add_one = yes
 			if = {
 				limit = { owns_state = 1260 }
@@ -449,7 +484,7 @@ eoanb_category_industry = {
 		}
 
 		complete_effect = {
-			# COUNTRY EVENT
+			country_event = feudal_tokugawa_shogunate.33
 			EOANBSYS_institutions_innovative_add_one = yes
 			if = {
 				limit = { owns_state = 534 }
@@ -1280,11 +1315,8 @@ eoanb_category_development = {
 
 		days_mission_timeout = 730
 
-		modifier = {
-			political_power_gain = -0.15
-		}
-
 		timeout_effect = {
+			add_political_power = -100
 			if = {
 				limit = { has_idea = TSH_spirit_vic_sakoku_kemi }
 				swap_ideas = {
@@ -2170,12 +2202,16 @@ TSH_category_shogun_succession_crisis = {
 		icon = eng_ally_imperialist_coup
 
 		available = {
-			has_political_power < -100
-			has_stability < -0.40
+			OR = {
+				NOT = { has_country_leader = { name = "Tokugawa Iesada" ruling_only = yes } }
+				has_idea = has_heir
+				has_idea = weak_heir
+				has_idea = nonfamily_heir
+			}
 		}
 
 		activation = {
-			has_country_flag = succession_crisis_starts
+			always = no
 		}
 
 		allowed = {
@@ -2184,15 +2220,11 @@ TSH_category_shogun_succession_crisis = {
 
 		fire_only_once = yes
 
-		days_mission_timeout = 50
+		days_mission_timeout = 500
 
 		timeout_effect = {
 		custom_effect_tooltip = TSH_succession_struggle_1
 		  hidden_effect = {
-				if = {
-					limit = { has_idea = TSH_succession_struggle }
-					remove_ideas = TSH_succession_struggle
-				}
 				if = {
 					limit = { check_variable = { TSH.hitotsubashi_faction@TSH > TSH.kishu_faction@TSH }  }
 					country_event = shogunate_japan_l.7
@@ -2212,11 +2244,6 @@ TSH_category_shogun_succession_crisis = {
 			decrease_ps_by_two = yes
 			add_political_power = -100
 			add_stability = -0.15
-
-			if = {
-				limit = { has_idea = TSH_succession_struggle }
-				remove_ideas = TSH_succession_struggle
-			}
 
 			if = {
 			    limit = { check_variable = { TSH.hitotsubashi_faction@TSH > TSH.kishu_faction@TSH }  }
@@ -2551,7 +2578,7 @@ eoanb_category_navy = {
 		}
 
 		remove_effect = {
-			PRS = { country_event = {id = shogunate_japan.21 } }
+			PRS = { country_event = { id = shogunate_japan.21 } }
 		}
 
 		ai_will_do = {
@@ -2631,7 +2658,7 @@ TSH_category_ansei_purge = {
 		}
 
 		visible = {
-				has_completed_focus = TSH_vic_ansei_purge
+			has_completed_focus = JAP_vic_ansei_purge
 		}
 
 		allowed = {
@@ -2696,7 +2723,7 @@ TSH_category_ansei_purge = {
 		}
 
 		visible = {
-				has_completed_focus = TSH_vic_ansei_purge
+				has_completed_focus = JAP_vic_ansei_purge
 		}
 
 		allowed = {
@@ -2754,11 +2781,11 @@ TSH_category_ansei_purge = {
 		}
 
 		activation = {
-			has_completed_focus = TSH_vic_ansei_purge
+			has_completed_focus = JAP_vic_ansei_purge
 		}
 
 		visible = {
-			has_completed_focus = TSH_vic_ansei_purge
+			has_completed_focus = JAP_vic_ansei_purge
 		}
 
 		allowed = {

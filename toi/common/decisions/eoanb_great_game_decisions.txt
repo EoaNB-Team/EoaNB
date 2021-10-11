@@ -640,10 +640,10 @@ great_game_category={
 		visible = {
 			AFG = {
 				exists = yes
+				owns_state = 1360
 			}
 			check_variable = { global.great_game_stage > 4}
 		}
-		war_with_on_remove = AFG
 		highlight_states = {
 			state = 1360
 		}
@@ -659,6 +659,25 @@ great_game_category={
 		}
 		remove_effect = {
 			subtract_from_variable = {great_game_points = 5}
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 1361
+					num_provinces = 3
+					on_win = GreatGame.12
+					on_lose = GreatGame.11
+					on_cancel = japan_border_conflict.4
+				}
+							
+				defender = {
+					state = 1360
+					num_provinces = 3
+					on_win = GreatGame.11
+					on_lose = GreatGame.12
+					on_cancel = japan_border_conflict.4
+				}
+			}
+			ENG={country_event = {id = GreatGame.7}}
 		}
 	}
 	great_game_persian_rebellion_mission = {
@@ -1378,7 +1397,7 @@ great_game_category={
 				exists = yes
 			}
 			AFG={owns_state = 1362}
-			check_variable = { global.great_game_stage > 2}
+			check_variable = { global.great_game_stage > 4}
 		}
 		allowed = { tag = RUS }
 		fire_only_once = yes
@@ -1394,6 +1413,224 @@ great_game_category={
 			subtract_from_variable = {great_game_points = 5}
 		}
 	}
+
+##Amur decisions moved here so russia can now always pressure for that land (as long as china is in crisis)
+	#RUS: Draft the Treaty of Aigun
+	eoanb_decision_sow_RUS_draft_aigun_treaty = {
+
+		icon = generic_decision
+
+		available = {
+			NOT = { has_war_with = QNG }
+			date > 1858.1.1
+			QNG={##Qing is weak
+				OR={
+					AND={
+						has_global_flag = eoanb_flag_sow_ongoing
+						has_country_flag = eoanb_flag_sow_QNG_refused_tianjin_treaty
+					}
+					surrender_progress > 0.15
+					has_stability > 0.49
+					AND={
+						NOT={
+							controls_state = 613
+						}
+						NOT={
+							controls_state = 593
+						}
+						NOT={
+							controls_state = 1056
+						}
+						NOT={
+							controls_state = 597
+						}
+					}
+				}
+			}
+		}
+
+		visible = {
+			TAG = RUS
+			NOT={controls_state = 560}
+			QNG={
+				OR={
+					has_war = yes
+					has_global_flag = eoanb_flag_sow_ongoing
+				}
+			}
+			date < 1900.1.1
+		}
+		allowed = { TAG = RUS }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			QNG = { country_event = { id = secondopiumwar.32 days = 1 } }
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	#RUS: Declare war on QNG after they reject Aigun
+	eoanb_decision_sow_RUS_war_QNG_aigun = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			NOT = { has_war_with = QNG }
+		}
+
+		visible = {
+			TAG = RUS
+			QNG = { has_country_flag = eoanb_flag_sow_QNG_refused_aigun_treaty }
+		}
+		allowed = { TAG = RUS }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			declare_war_on = {
+				target = QNG
+				type = take_state
+			}
+			hidden_effect = {
+				set_global_flag = eoanb_flag_sow_RUS_QNG_aigun_war
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	#RUS: Propose Peking Treaty Supplement
+	eoanb_decision_sow_RUS_peking_treaty_supplement = {
+
+		icon = generic_decision
+
+		available = {
+			NOT = { has_war_with = QNG }
+		}
+
+		visible = {
+			has_global_flag = eoanb_flag_sow_peking_treaty
+			TAG = RUS
+		}
+		allowed = { TAG = RUS }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			QNG = { country_event = { id = secondopiumwar.61 days = 1 } }
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	#RUS: Declare war on QNG after they reject Peking amendments
+	eoanb_decision_sow_RUS_war_QNG_peking = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			NOT = { has_war_with = QNG }
+		}
+
+		visible = {
+			has_global_flag = eoanb_flag_sow_peking_treaty
+			TAG = RUS
+			has_country_flag = eoanb_flag_sow_RUS_QNG_peking_amendment_war_possible
+		}
+		allowed = { TAG = RUS }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			declare_war_on = {
+				target = QNG
+				type = take_state
+			}
+			hidden_effect = {
+				set_global_flag = eoanb_flag_sow_RUS_QNG_peking_war
+				clr_country_flag = eoanb_flag_sow_RUS_QNG_peking_amendment_war_possible
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	#RUS: can occupy primorskatya if qing collapses
+	eoanb_decision_RUS_take_primorskatya = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			NOT = { has_war_with = QNG }
+		}
+
+		visible = {
+			QNG={
+				OR={
+					exists = no
+					NOT={tag = CHI}
+				}
+			}
+			TAG = RUS
+			PPG = {exists = yes}
+		}
+		allowed = { TAG = RUS }
+
+		fire_only_once = yes
+
+		cost = 0
+
+		complete_effect = {
+			if = {
+				limit = {
+					NOT = { RUS = { owns_state = 408 } }
+				}
+				transfer_state = 408
+			}
+			if = {
+				limit = {
+					NOT = { RUS = { owns_state = 409 } }
+				}
+				transfer_state = 409
+			}
+			hidden_effect = {
+				408 = { 
+					remove_core_of = QNG 
+					remove_core_of = PPG 
+				}
+				409 = { 
+					remove_core_of = QNG 
+					remove_core_of = PPG 
+				}
+				PPG={
+					drop_cosmetic_tag = yes
+				}
+				RUS = { 
+					add_state_core = 408 
+					add_state_core = 409 
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
 }
 eoanb_category_diplomatic_actions={
 	great_game_invasion_afghanistan_mission = {
@@ -1426,11 +1663,41 @@ eoanb_category_diplomatic_actions={
 			white_peace = AFG
 			set_variable = { global.great_game_peshawar = 5}
 			set_variable = { global.great_game_afghanistan = 5}
+			if={
+				limit={AFG={controls_state = 1362}}
+				set_variable = { global.great_game_wukhan = 5}
+			}
 			transfer_state = 445
 			transfer_state = 442
 			AFG={
 				ROOT={puppet = PREV}
 			}
+		}
+	}
+	eoanb_decision_AFG_take_badakhshan = {
+
+		icon = generic_prepare_civil_war
+
+		available = {
+			UCT={controls_state = 1362}
+		}
+
+		visible = {
+			tag = AFG
+			date > 1869.1.1
+		}
+		allowed = { TAG = AFG }
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			country_event = {id = anglo_afghan_war.4}
+		}
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
 }
