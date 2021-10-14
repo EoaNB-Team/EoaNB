@@ -1,60 +1,3 @@
-political_actions = {
-	
-	#Treaty with China after SOW
-	eoanb_decision_DEN_CHI_treaty = {
-
-		icon = generic_decision
-
-		available = {
-			custom_trigger_tooltip = {
-				tooltip = eoanb_tt_no_war_with_china
-			}
-			hidden_trigger = {
-				NOT = { has_war_with = QNG }
-				NOT = { has_war_with = CHI }
-			}
-		}
-		
-		allowed = { TAG = DEN }
-
-		visible = {
-			TAG = DEN
-			OR = {
-				country_exists = QNG
-				country_exists = CHI
-			}
-			has_global_flag = eoanb_flag_sow_peking_treaty
-		}
-
-		fire_only_once = yes
-
-		cost = 0
-		
-		complete_effect = {
-			if = {
-				limit = {
-					country_exists = QNG
-				}
-				QNG = { country_event = { id = asiageneraldiplomatic.4 days = 1 } }
-			}
-			else_if = {
-				limit = {
-					country_exists = CHI
-				}
-				CHI = { country_event = { id = asiageneraldiplomatic.4 days = 1 } }
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-			modifier = {
-				factor = 0
-				date < 1863.4.1
-			}
-		}
-	}
-}
-
 DEN_decision_category_economy = {
 	
 	DEN_decision_railway_upgrade = {
@@ -1437,7 +1380,11 @@ DEN_decision_category_army  = {
 			has_tech = sixfour_army_cloth
 			has_tech = improved_cavalry
 			has_tech = improved_handguns
-			has_idea = three_percent
+			has_idea = extensive_conscription
+			OR = {
+				has_idea = three_percent
+				has_idea = five_percent
+			}
 		}
 		
 		activation = { always = no }
@@ -1700,102 +1647,144 @@ DEN_decision_category_army  = {
 		}
 	}
 	
-	DEN_new_law_conscription = {
+	DEN_decision_new_conscription_law = {
 
-		icon = generic_construction
+		icon = generic_military
 
-		allowed = {
-			tag = DEN
-		}
+		allowed = { tag = DEN }
 
 		available = {
-			date > 1861.3.1
-			date < 1864.8.1
-			NOT = { 
-				OR = { 
-					has_country_flag = DEN_army_reform_ongoing_flag
-				}
-			}
+			NOT = { has_country_flag = DEN_army_reform_ongoing_flag }
 		}
 
 		visible = {
-			has_completed_focus = DEN_focus_thestrup_army_reforms
+			has_completed_focus = DEN_focus_new_conscription_law
+			OR = {
+				has_idea = volunteer_only
+				has_idea = early_conscription
+				has_idea = limited_conscription
+			}
 		}
 
 		fire_only_once = yes
-
-		days_remove = 160
-
+		
 		cost = 100
+
+		days_remove = 180
+		
+		modifier = {
+			consumer_goods_factor = 0.05
+			political_power_gain = -0.1
+			war_support_weekly = -0.001
+			stability_weekly_factor = -0.001
+		}
+		
+		cancel_trigger = {
+			NOT = { has_active_mission = DEN_mission_thestrups_army_reforms }
+		}
+		
+		complete_effect = {
+			add_stability = -0.05
+			add_war_support = -0.05
+			hidden_effect = {
+				set_country_flag = DEN_army_reform_ongoing_flag
+			}
+		}
 		
 		remove_effect = {  
-			hidden_effect = {
-				set_country_flag = { flag = DEN_army_reform_ongoing_flag value = 1 days = 60 }
+			if = {
+				limit = {
+					has_idea = limited_conscription
 				}
 				swap_ideas = { remove_idea = limited_conscription add_idea = extensive_conscription }
+			}
+			else_if = {
+				limit = {
+					has_idea = early_conscription
+				}
+				swap_ideas = { remove_idea = early_conscription add_idea = limited_conscription }
+			}
+			else_if = {
+				limit = {
+					has_idea = volunteer_only
+				}
+				swap_ideas = { remove_idea = volunteer_only add_idea = early_conscription }
+			}
+			hidden_effect = {
+				clr_country_flag = DEN_army_reform_ongoing_flag
+			}
 		}
-
-		modifier = {
-			political_power_gain = -0.4
-			war_support_weekly = -0.001
-		}
-
-		cancel_trigger = {
-			 OR = {
-			 has_global_flag = eoanb_flag_second_schleswig_war 
-		}
-	}
 
 		ai_will_do = {
 			base = 1000
 		}
 	}
 	
-	DEN_increase_army_spending = {
+	DEN_decision_increase_army_spending = {
 
-		icon = generic_construction
+		icon = money
 
-		allowed = {
-			tag = DEN
-		}
+		allowed = { tag = DEN }
 
 		available = {
-			date > 1861.3.1
-			date < 1864.8.1
-			NOT = { 
-				OR = { 
-					has_country_flag = DEN_army_reform_ongoing_flag
-				}
-			}
+			NOT = { has_country_flag = DEN_army_reform_ongoing_flag }
 		}
 
 		visible = {
-			has_completed_focus = DEN_focus_thestrup_army_reforms
+			has_completed_focus = DEN_focus_increase_army_budget
+			OR = {
+				has_idea = one_percent
+				has_idea = two_percent
+				has_idea = three_percent
+			}
 		}
 
 		fire_only_once = yes
-
-		days_remove = 160
-
-		cost = 100
 		
-		remove_effect = {  
-			hidden_effect = {
-				set_country_flag = { flag = DEN_army_reform_ongoing_flag value = 1 days = 60 }
-				}
-				swap_ideas = { remove_idea = two_percent add_idea = three_percent }
-		}
+		cost = 100
 
+		days_remove = 180
+		
 		modifier = {
-			political_power_gain = -0.4
+			political_power_gain = -0.1
 			war_support_weekly = -0.001
 		}
-
+		
 		cancel_trigger = {
-			 OR = {
-			 has_global_flag = eoanb_flag_second_schleswig_war 
+			NOT = { has_active_mission = DEN_mission_thestrups_army_reforms }
 		}
-	}
+		
+		complete_effect = {
+			add_stability = -0.03
+			add_war_support = -0.03
+			hidden_effect = {
+				set_country_flag = DEN_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {  
+			if = {
+				limit = {
+					has_idea = three_percent
+				}
+				swap_ideas = { remove_idea = three_percent add_idea = five_percent }
+			}
+			else_if = {
+				limit = {
+					has_idea = two_percent
+				}
+				swap_ideas = { remove_idea = two_percent add_idea = three_percent }
+			}
+			else_if = {
+				limit = {
+					has_idea = one_percent
+				}
+				swap_ideas = { remove_idea = one_percent add_idea = two_percent }
+			}
+			hidden_effect = {
+				clr_country_flag = DEN_army_reform_ongoing_flag
+			}
+		}
 
 		ai_will_do = {
 			base = 1000
@@ -1867,6 +1856,60 @@ DEN_decision_category_foreign_relations = {
 		ai_will_do = {
 			base = 800
 		} 		
+	}
+	
+	#Treaty with China after SOW
+	eoanb_decision_DEN_CHI_treaty = {
+
+		icon = generic_decision
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = eoanb_tt_no_war_with_china
+			}
+			hidden_trigger = {
+				NOT = { has_war_with = QNG }
+				NOT = { has_war_with = CHI }
+			}
+		}
+		
+		allowed = { TAG = DEN }
+
+		visible = {
+			TAG = DEN
+			OR = {
+				country_exists = QNG
+				country_exists = CHI
+			}
+			has_global_flag = eoanb_flag_sow_peking_treaty
+		}
+
+		fire_only_once = yes
+
+		cost = 0
+		
+		complete_effect = {
+			if = {
+				limit = {
+					country_exists = QNG
+				}
+				QNG = { country_event = { id = asiageneraldiplomatic.4 days = 1 } }
+			}
+			else_if = {
+				limit = {
+					country_exists = CHI
+				}
+				CHI = { country_event = { id = asiageneraldiplomatic.4 days = 1 } }
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				date < 1863.4.1
+			}
+		}
 	}
 }
 
