@@ -1569,7 +1569,6 @@ focus_tree = {
 					limit = { has_government = traditional_conservatism }	
 					PRS = { country_event = { days = 30 id = prussia.48 } }
 				}
-				set_variable = { var = PRS_NGC_constitution value = 0 }
 				clr_country_flag = PRS_constitutive_parliament_elected_flag
 				activate_mission = PRS_mission_draft_constitution
 			}
@@ -1662,7 +1661,7 @@ focus_tree = {
 		available_if_capitulated = no
 		available = {
 			custom_trigger_tooltip = {
-				tooltip = GENERIC_Triggered_By_Event_tt
+				tooltip = GENERIC_Triggered_By_Decision_tt
 				always = no
 			}
 		}
@@ -1673,6 +1672,7 @@ focus_tree = {
 
 		completion_reward = {
 			remove_ideas = PRS_idea_anti_ngc_sentiment_1
+			add_dynamic_modifier = { modifier = PRS_NGC_Constitution_Modifier }
 			PRS = { 
 				if = {
 					limit = {
@@ -1707,30 +1707,77 @@ focus_tree = {
 					swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
 				}
 			}
-			PRS = { country_event = { days = 60 id = prussiaelection.10 } }
-			hidden_effect = { 
-				clear_variable = PRS_NGC_constitution
-				PRS = {
-					if = {
-						limit = { 
-							has_idea = PRS_idea_ngc_constitution_other
-						}
-						PRS = { set_variable = { political_legitimacy_equilibrium_custom = 0.05 }}
+			PRS = {
+				if = {
+					limit = {
+						has_country_flag = PRS_ngc_constitution_new_voting_franchise_flag
 					}
-					else_if = {
-						limit = { 
-							has_idea = PRS_idea_ngc_constitution_bismarck
+					remove_ideas = PRS_idea_three_class_franchise
+					PRS = {
+						if = {
+							limit = {
+								has_idea = absolutism
+							}
+							swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
 						}
-						PRS = { set_variable = { political_legitimacy_equilibrium_custom = 0.1 }}
-					}
-					else_if = {
-						limit = { 
-							has_idea = PRS_idea_ngc_constitution_liberal
+						else_if = {
+							limit = {
+								has_idea = property_owners_suffrage
+							}
+							swap_ideas = { remove_idea = property_owners_suffrage add_idea = universal_male_suffrage }
 						}
-						PRS = { set_variable = { political_legitimacy_equilibrium_custom = 0.15 }}
+						else_if = {
+							limit = {
+								has_idea = parliamentary_suffrage
+							}
+							swap_ideas = { remove_idea = parliamentary_suffrage add_idea = universal_male_suffrage }
+						}
 					}
-					else = { add_ideas = PRS_idea_ngc_constitution_stopgap }
+					PRS = {
+						if = {
+							limit = {
+								has_idea = no_elections
+							}
+							swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
+						}
+						else_if = {
+							limit = {
+								has_idea = one_party_elections
+							}
+							swap_ideas = { remove_idea = one_party_elections add_idea = limited_elections }
+						}
+					}
 				}
+			}
+			PRS = {
+				if = {
+					limit = {
+						has_country_flag = PRS_ngc_constitution_more_taxes_flag
+					}
+					if = {
+						limit = {
+							has_idea = normal_taxes
+						}
+						swap_ideas = { remove_idea = normal_taxes add_idea = high_taxes }
+					}
+					else_if = {
+						limit = {
+							has_idea = low_taxes
+						}
+						swap_ideas = { remove_idea = low_taxes add_idea = normal_taxes }
+					}
+					else_if = {
+						limit = {
+							has_idea = very_low_taxes
+						}
+						swap_ideas = { remove_idea = very_low_taxes add_idea = normal_taxes }
+					}
+				}
+			}
+			PRS = { country_event = { days = 60 id = prussiaelection.10 } }
+			hidden_effect = {
+				clr_country_flag = PRS_ngc_constitution_new_voting_franchise_flag
+				clr_country_flag = PRS_ngc_constitution_more_taxes_flag
 			}
 		}
 	}
