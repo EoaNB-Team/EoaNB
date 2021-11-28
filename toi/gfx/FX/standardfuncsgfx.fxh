@@ -238,8 +238,8 @@ PixelShader =
 		float vMudCurrent = lerp( vMudSnowColor.r, vMudSnowColor.a, vFoWOpacity_FoWTime_SnowMudFade_MaxGameSpeed.z );
 		vMudCurrent *= 1.0 - saturate( saturate( vNormal.y - MUD_NORMAL_CUTOFF ) * ( ( 1.0 - MUD_NORMAL_CUTOFF ) * 1000.0 ) );
 		vMudCurrent = saturate( vMudCurrent * MUD_STRENGHTEN );
-		float4 vMudDiffuseGloss = tex2D( MudDiffuseGloss, vPos.xz * MUD_TILING );
-		float4 vMudNormalSpec = tex2D( MudNormalSpec, vPos.xz * MUD_TILING );
+		float4 vMudDiffuseGloss = tex2D( MudDiffuseGlossSampler, vPos.xz * MUD_TILING );
+		float4 vMudNormalSpec = tex2D( MudNormalSpecSampler, vPos.xz * MUD_TILING );
 		
 		float3 vMudNormal = normalize( vMudNormalSpec.rbg - 0.5 );
 		vMudNormal = normalize( RotateVectorByVector( vMudNormal, vNormal ) );
@@ -259,7 +259,7 @@ PixelShader =
 	{
 		float vSnowFade = saturate( vPos.y - SNOW_START_HEIGHT );
 		float vNormalFade = saturate( saturate( vNormal.y - SNOW_NORMAL_START ) * SNOW_CLIFFS );
-		float4 vSnowTexture = tex2D( SnowTexture, vPos.xz * SNOW_TILING );
+		float4 vSnowTexture = tex2D( SnowTextureSampler, vPos.xz * SNOW_TILING );
 		float vNoise = tex2D( SnowNoise, vPos.xz * SNOW_NOISE_TILING ).a;
 		
 		float vIsSnow = GetSnow( vMudSnowColor );
@@ -498,14 +498,14 @@ PixelShader =
 		return SpecularColor + (max(vec3(Smoothness), SpecularColor) - SpecularColor) * pow(1.0 - saturate(dot(E, N)), 5.0);
 	}
 
-	float3 MetalnessToDiffuse(float Metalness, float3 Diffuse)
+	float3 MetalnessToDiffuse(float Metalness, float3 DiffuseValue)
 	{
-		return lerp(Diffuse, vec3(0.0), Metalness);
+		return lerp(DiffuseValue, vec3(0.0), Metalness);
 	}
 
-	float3 MetalnessToSpec(float Metalness, float3 Diffuse, float Spec)
+	float3 MetalnessToSpec(float Metalness, float3 DiffuseValue, float Spec)
 	{
-		return lerp(vec3(Spec), Diffuse, Metalness);
+		return lerp(vec3(Spec), DiffuseValue, Metalness);
 	}
 
 	//------------------------------
@@ -906,10 +906,10 @@ PixelShader =
 				
 		// Now mix, the resultat with background
 		float TranspA = 1.0f - tex2D( TexCh2, vUV ).g;
+		vColor = lerp( vColor, vGradMix, ( GB_OPACITY_NEAR + ( 1.0f - vGBCamDist ) * ( GB_OPACITY_FAR - GB_OPACITY_NEAR ) ) * TranspA );
 		float TranspB = 1.0f - tex2D( TexCh2, vUV2 ).g;
-		float GlobalTransp = min( TranspA, TranspB );
-		vColor = lerp( vColor, vGradMix, ( GB_OPACITY_NEAR + ( 1.0f - vGBCamDist ) * ( GB_OPACITY_FAR - GB_OPACITY_NEAR ) ) * GlobalTransp );
-	//vColor = GetOverlay( vColor, ToLinear(vGradMix), 0.80);
+		vColor = lerp( vColor, vGradMix, ( GB_OPACITY_NEAR + ( 1.0f - vGBCamDist ) * ( GB_OPACITY_FAR - GB_OPACITY_NEAR ) ) * TranspB );
+			//vColor = GetOverlay( vColor, ToLinear(vGradMix), 0.80);
 
 		// Return some alpha, so the postprocess will ignore gradient borders
 		// when applying season coloring overlay 
@@ -967,9 +967,9 @@ PixelShader =
 		return stripeVal;
 	}	
 	
-	void secondary_color_mask( inout float3 vColor, float3 vNormal, float2 vUV, in sampler2D TexMask, inout float vBloomAlpha )
+	void secondary_color_mask( inout float3 vColor, float3 vNormal, float2 vUV, in sampler2D TexMaskSampler, inout float vBloomAlpha )
 	{
-		float4 vColorMask = tex2D( TexMask, vUV ).rgba;
+		float4 vColorMask = tex2D( TexMaskSampler, vUV ).rgba;
 
 		float vOccupationMask = CalculateOccupationMask( vUV );
 		vOccupationMask *= vColorMask.a;
@@ -1094,12 +1094,12 @@ PixelShader =
 
 	void SampleLEAN( float2 uv, out float2 Bout, out float3 Mout, in sampler2D LeanTexture1, in sampler2D LeanTexture2 )
 	{
-		float4 lean1 = tex2D( LeanTexture1, uv );
-		float4 lean2 = tex2D( LeanTexture2, uv );
+		float4 lean1 = tex2D( LeanTexture1Sampler, uv );
+		float4 lean2 = tex2D( LeanTexture2Sampler, uv );
 
 		float vScale = 1.7f;
 		Bout = ( 2*lean2.xy - 1 ) * vScale;
-		Mout = float3( lean2.zw, 2*lean1.w - 1 ) * vScale * vScale;
+		Mout = float3( lean2.zw, (2*lean1.w - 1 ) * 0.5) *vScale * vScale;
 	}
 
 	void SampleBlendLEAN( float t, float2 uv1, float2 uv2, out float2 Bout, out float3 Mout, in sampler2D Lean1, in sampler2D Lean2 )
