@@ -9,10 +9,10 @@ PixelShader =
 		{
 			Index = 0
 			MagFilter = "Point"
-			MinFilter = "Linear"
-			MipFilter = "Linear"
-			AddressU = "Clamp"
-			AddressV = "Clamp"
+			MinFilter = "Point"
+			MipFilter = "None"
+			AddressU = "Wrap"
+			AddressV = "Wrap"
 		}
 		MaskTexture =
 		{
@@ -20,8 +20,8 @@ PixelShader =
 			MagFilter = "Point"
 			MinFilter = "Point"
 			MipFilter = "None"
-			AddressU = "Clamp"
-			AddressV = "Clamp"
+			AddressU = "Wrap"
+			AddressV = "Wrap"
 		}
 	}
 }
@@ -29,14 +29,16 @@ PixelShader =
 
 VertexStruct VS_INPUT
 {
-    float3 vPosition  : POSITION;
+    float4 vPosition  : POSITION;
     float2 vTexCoord  : TEXCOORD0;
+    float2 vMaskCoord  : TEXCOORD1;
 };
 
 VertexStruct VS_OUTPUT
 {
     float4  vPosition : PDX_POSITION;
-    float4  vTexCoord : TEXCOORD0;
+    float2  vTexCoord0 : TEXCOORD0;
+    float2  vTexCoord1 : TEXCOORD1;
 };
 
 
@@ -54,10 +56,16 @@ VertexShader =
 		VS_OUTPUT main(const VS_INPUT v )
 		{
 			VS_OUTPUT Out;
-			Out.vPosition  = mul( WorldViewProjectionMatrix, float4( v.vPosition.xyz, 1 ) );
-			Out.vTexCoord.zw = v.vTexCoord.xy;
-			Out.vTexCoord.xy = FlagCoords.xy;
-			Out.vTexCoord.xy += v.vTexCoord.xy * FlagCoords.zw;
+		
+			Out.vPosition  = mul( WorldViewProjectionMatrix, v.vPosition );
+		
+			Out.vTexCoord1 = v.vMaskCoord;
+		
+			Out.vTexCoord0.x = v.vTexCoord.x/FlagCoords.x;
+			Out.vTexCoord0.x = Out.vTexCoord0.x + FlagCoords.z;
+			Out.vTexCoord0.y = v.vTexCoord.y/FlagCoords.y;
+			Out.vTexCoord0.y = Out.vTexCoord0.y + FlagCoords.w;
+		
 			return Out;
 		}
 		
@@ -70,8 +78,8 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT v ) : PDX_COLOR
 		{
-			float4 OutColor = tex2D( BaseTexture, v.vTexCoord.xy );
-			float4 MaskColor = tex2D( MaskTexture, v.vTexCoord.zw );
+			float4 OutColor = tex2D( BaseTexture, v.vTexCoord0.xy );
+			float4 MaskColor = tex2D( MaskTexture, v.vTexCoord1.xy );
 			OutColor.a = MaskColor.a;
 			
 			return OutColor;
@@ -83,8 +91,8 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT v ) : PDX_COLOR
 		{
-		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord.xy );
-		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord.zw );
+		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord0.xy );
+		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord1.xy );
 		    float4 MixColor = float4( 0.1, 0.1, 0.1, 0 );
 		    OutColor.a = MaskColor.a;
 		    OutColor += MixColor;
@@ -98,8 +106,8 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT v ) : PDX_COLOR
 		{
-		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord.xy );
-		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord.zw );
+		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord0.xy );
+		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord1.xy );
 		    float Grey = dot( OutColor.rgb, float3( 0.212671f, 0.715160f, 0.072169f ) ); 
 		    
 		    OutColor.rgb = float3(Grey,Grey,Grey);
@@ -114,8 +122,8 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT v ) : PDX_COLOR
 		{
-		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord.xy );
-		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord.zw );
+		    float4 OutColor = tex2D( BaseTexture, v.vTexCoord0.xy );
+		    float4 MaskColor = tex2D( MaskTexture, v.vTexCoord1.xy );
 		    float Grey = dot( OutColor.rgb, float3( 0.212671f, 0.715160f, 0.072169f ) ); 
 		    
 		    OutColor.rgb = float3(Grey,Grey,Grey);
