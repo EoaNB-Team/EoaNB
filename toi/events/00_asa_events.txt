@@ -1803,26 +1803,9 @@ country_event = {
 	fire_only_once = yes
 
 	is_triggered_only = yes
-
 	option = {
 		name = asa_new_country.1.a
-		set_cosmetic_tag = ASA_autocracy_napoleonic
-		country_event = {
-			id = asa_mcclellan_declares_himself_emperor.1
-			days = 1
-		}
-	}
-	option = {
-		name = asa_new_country.1.b
 		set_cosmetic_tag = ASA_autocracy_eol
-		country_event = {
-			id = asa_mcclellan_declares_himself_emperor.1
-			days = 1
-		}
-	}
-	option = {
-		name = asa_new_country.1.c
-		set_cosmetic_tag = ASA_autocracy_uda
 		country_event = {
 			id = asa_mcclellan_declares_himself_emperor.1
 			days = 1
@@ -2215,7 +2198,7 @@ country_event = {
 	}
 }
 
-country_event = {
+country_event = { # SocEgal Countercoup
 	id = asa_counter_coup.1
 	title = asa_counter_coup.1.t
 	desc = asa_counter_coup.1.desc
@@ -2807,7 +2790,7 @@ country_event = {
 	option = {
 		name = asa_alliance_with_new_england.2.a
 		set_rule = {
-			can_create_factions = yes
+    		can_create_factions = yes
 		}
 		create_faction = FACTION_ABOLITIONIST_FRONT
 		ASA = {
@@ -7188,6 +7171,9 @@ country_event = { # Stevens Roasts The Government
 			set_country_flag = asa_stevens_gone_flag
 		}
 	}
+	option = { # Nothing we can do about it
+		name = asa_flavor.1.b
+	}
 }
 
 country_event = { # Thaddeus Stevens Dies
@@ -8056,20 +8042,77 @@ country_event = {
 	is_triggered_only = yes
 	immediate = {
 		hidden_effect = {
+			set_country_flag = asa_officer_revolt_flag
+			country_event = {
+				id = asa_flavor.52
+				days = 14
+			}
 			start_civil_war = {
-				ruling_party = radical_democracy
-				ideology = ROOT
-				size = 0.5
+				ruling_party = ROOT
+				ideology = radical_democracy
+				size = 0.4
 				capital = 358
 				states = { 358 }
 				keep_unit_leaders = { 5003 }
 			}
+			358 = {
+				owner = {
+					save_global_event_target_as = na_b_asa_provisional_government
+					set_cosmetic_tag = ASA_provisional
+				}
+			}
 		}
 	}
-	option = {
+	option = { # Uh oh
 		name = asa_flavor.51.a
 	}
 }
+
+### End of the Officer Revolt Check
+country_event = {
+	id = asa_flavor.52
+	title = asa_flavor.52.t
+	desc = asa_flavor.52.desc
+	picture = placeholder
+	is_triggered_only = yes
+	hidden = yes
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					AND = {
+						has_country_flag = asa_officer_revolt_flag
+						has_civil_war = no
+					}
+				}
+				country_event = asa_flavor.53
+			}
+			else = {
+				country_event = {
+					id = asa_flavor.52
+					days = 14
+				}
+			}
+		}
+	}
+}
+###
+country_event = {
+	id = asa_flavor.53
+	title = asa_flavor.53.t
+	desc = asa_flavor.53.desc
+	picture = placeholder
+	is_triggered_only = yes
+	option = { # Maintain our course
+		name = asa_flavor.53.a
+	}
+	option = { # I need to secure my legacy
+		name = asa_flavor.53.a
+		complete_national_focus = ASA_The_American_Napoleon
+	}
+}
+
+### asa_flavor.54 is under asa_ga_extracontinental_affairs_committee.10
 
 ### GILDED AGE EVENTS ###
 
@@ -8152,17 +8195,17 @@ country_event = { # Question of big businesses
 	}
 }
 
-country_event = {
+country_event = { # State Reintegration
 	id = asa_ga_domestic_affairs_committee.2
 	title = asa_ga_domestic_affairs_committee.2.t
 	desc = asa_ga_domestic_affairs_committee.2.desc
 	picture = placeholder
 	is_triggered_only = yes
-	option = {
+	option = { # 50 Percent Plan
 		name = asa_ga_domestic_affairs_committee.2.a
 		complete_national_focus = ASA_GA_DAC_50_Percent_Plan
 	}
-	option = {
+	option = { # 10 Percent Plan
 		name = asa_ga_domestic_affairs_committee.2.b
 		complete_national_focus = ASA_GA_DAC_10_Percent_Plan
 	}
@@ -8176,10 +8219,8 @@ country_event = { # Keep Europe out of America
 	is_triggered_only = yes
 	option = { # Agree
 		name = asa_ga_extracontinental_affairs_committee.1.a
+		set_country_flag = asa_ga_eac_agreed_to_neutrality_flag
 		every_other_country = {
-			limit = {
-				has_opinion_modifier = ASA_ga_eac_relations_department
-			}
 			add_opinion_modifier = {
 				target = ASA
 				modifier = ASA_ga_eac_agreed_to_stay_out_of_america
@@ -8320,6 +8361,21 @@ country_event = { # Neutrality Agreement
 		ASA = {
 			country_event = asa_ga_extracontinental_affairs_committee.6
 		}
+		if = {
+			limit = {
+				has_opinion_modifier = ASA_ga_eac_disagreed_to_stay_out_of_america
+			}
+			remove_opinion_modifier = {
+				target = FROM
+				modifier = ASA_ga_eac_disagreed_to_stay_out_of_america
+			}
+			FROM = {
+				remove_opinion_modifier = {
+					target = ROOT
+					modifier = ASA_ga_eac_disagreed_to_stay_out_of_america
+				}
+			}
+		}
 	}
 }
 
@@ -8345,7 +8401,7 @@ country_event = { # (European Country) refuses to neutrality agreement
 	}
 }
 
-country_event = { # Free trade agreement proposal
+country_event = { # Free trade agreement proposal (European perspective)
 	id = asa_ga_extracontinental_affairs_committee.7
 	title = asa_ga_extracontinental_affairs_committee.7.t
 	desc = asa_ga_extracontinental_affairs_committee.7.desc
@@ -8397,6 +8453,11 @@ country_event = { # The Diplomatic Tour of Europe
 	is_triggered_only = yes
 	option = {
 		name = asa_ga_extracontinental_affairs_committee.10.a
+		add_country_leader_trait = eoanb_diplomatic_voyage
+		country_event = {
+			id = asa_flavor.54
+			days = 180
+		}
 		every_other_country = {
             limit = {
                 any_owned_state = {
@@ -8425,7 +8486,19 @@ country_event = { # The Diplomatic Tour of Europe
 	}
 }
 
-country_event = { # ASA requests free trade
+country_event = { # President returns from Europe
+	id = asa_flavor.54
+	title = asa_flavor.54.t
+	desc = asa_flavor.54.desc
+	picture = placeholder
+	is_triggered_only = yes
+	option = { # It seems to have gone well
+		name = asa_flavor.54.a
+		remove_country_leader_trait = eoanb_diplomatic_voyage
+	}
+}
+
+country_event = { # ASA requests free trade (Asia)
 	id = asa_ga_extracontinental_affairs_committee.11
 	title = asa_ga_extracontinental_affairs_committee.11.t
 	desc = asa_ga_extracontinental_affairs_committee.11.desc
@@ -8529,7 +8602,7 @@ country_event = { # No free trade with Japan :(
 	}
 }
 
-country_event = { # ASA requests free trade
+country_event = { # ASA requests free trade with Liberia
 	id = asa_ga_extracontinental_affairs_committee.17
 	title = asa_ga_extracontinental_affairs_committee.17.t
 	desc = asa_ga_extracontinental_affairs_committee.17.desc
@@ -8558,6 +8631,7 @@ country_event = { # Free trade with Liberia!
 	is_triggered_only = yes
 	option = {
 		name = asa_ga_extracontinental_affairs_committee.18.a
+		add_ideas = ASA_ga_free_trade_with_liberia
 	}
 }
 
