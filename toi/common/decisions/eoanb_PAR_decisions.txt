@@ -1,0 +1,927 @@
+Paraguayan_War_Decision_Category = {
+	Paraguayan_War_Peace_Treaty_Mission = {
+		#ai_will_do = { factor = 1 }
+		allowed = {
+			always = no
+		}
+		icon = generic_political_actions
+		is_good = no
+		days_mission_timeout = 1000
+		activation = {
+			always = no
+		}
+		available = {
+			#Condition to trigger peace treaty
+			OR = {
+				if = {
+					limit = {
+						BRA = { has_completed_focus = BRA_direct_intervention }
+						CSA = { exists = no }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_BRA_VICTORY_NORMAL_tt
+						tag = BRA
+						PAR = { surrender_progress > 0.9 }
+					}
+				}
+				else_if = {
+					limit = {
+						BRA = { has_completed_focus = BRA_direct_intervention }
+						CSA = { exists = yes } 
+					}
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_BRA_VICTORY_NORMAL_ACW_tt
+						tag = BRA
+						PAR = { surrender_progress > 0.9 }
+					}
+				}
+				else_if = {
+					limit = {
+						BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+						CSA = { exists = no }
+					}
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_BRA_VICTORY_ALTERNATE_tt
+						tag = BRA
+						PAR = { surrender_progress > 0.9 }
+					}
+				}
+				else_if = {
+					limit = {
+						BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+						CSA = { exists = yes } 
+					}
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_BRA_VICTORY_ALTERNATE_ACW_tt
+						tag = BRA
+						PAR = { surrender_progress > 0.9 }
+					}
+				}
+				if = {
+					limit = { CSA = { exists = no } }
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_PAR_VICTORY_tt
+						tag = PAR
+						BRA = { 
+							OR={
+								NOT={controls_state = 1037}
+								surrender_progress > 0.35 
+							}
+						}
+					}
+				}
+				else_if = { 
+					limit = { CSA = { exists = yes } }
+					custom_trigger_tooltip = {
+						tooltip = Paraguayan_War_Mission_PAR_VICTORY_ACW_tt
+						tag = PAR
+						BRA = { 
+							OR={
+								NOT={controls_state = 1037}
+								surrender_progress > 0.35 
+							}
+						}
+					}
+				}
+				# other victory....
+
+				#custom_trigger_tooltip = {
+				#	tooltip = Paraguayan_War_Mission_ARG_VICTORY_tt
+				#	# Victory Condition for Argentina
+				#	tag = ARG
+				#	ARG = {
+				#		if = {
+				#			limit = {
+				#				has_war_with = BRA
+				#				has_war_with = PAR
+				#			}
+				#			PAR = {
+				#				has_capitulated = yes
+				#			}
+				#			BRA = {
+				#				has_capitulated = yes
+				#			}
+				#		}
+				#	}
+				#}
+			}
+		}
+		
+		complete_effect = {
+			if = {#historical brazil victory
+				limit = {
+					tag = BRA
+					has_completed_focus = BRA_direct_intervention
+					PAR = { surrender_progress > 0.9 }
+				}
+				dismantle_faction = yes
+				if = {
+					limit = { has_global_flag = Triple_Alliance_Faction }
+					clr_global_flag = Triple_Alliance_Faction
+				}
+				else_if = {
+					limit = { has_global_flag = Imperial_Alliance_Faction }
+					clr_global_flag = Imperial_Alliance_Faction
+				}
+				PAR = {
+					clr_country_flag = Paraguayan_War
+					dismantle_faction = yes
+					clr_global_flag = Paraguayan_Legion_Faction
+					remove_ideas = PAR_not_one_step_back
+					add_ideas = PAR_brazil_occupation
+					add_timed_idea = {
+						idea = PAR_land_of_women
+						days = 22500
+					}
+					kill_country_leader = yes
+					every_owned_state = {
+						add_manpower = -20000
+					}
+					1068 = {
+						add_manpower = -20000
+					}
+					1069 = {
+						add_manpower = -20000
+					}
+					1138 = {
+						add_manpower = -20000
+					}
+					1139 = {
+						add_manpower = -20000
+					}
+					hidden_effect = {
+						country_event = { id = par.15 }
+						remove_ideas = PAR_disorganized_attack
+					}
+				}
+				BRA = {
+					clr_country_flag = Paraguayan_War
+					set_global_flag = Paraguay_Loses_War
+					remove_ideas = BRA_not_prepared_paraguay
+					transfer_state = 1065
+					1064 = {
+						remove_core_of = PAR
+					}
+					1065 = {
+						remove_core_of = PAR
+						add_claim_by = PAR
+					}
+					puppet = PAR
+					white_peace = PAR
+					if={
+						limit={
+							CSA = {exists = yes}
+						}
+						add_state_claim = 1068
+						add_state_claim = 1069
+						add_state_claim = 1139
+					}
+					if = {
+						limit = { 
+							has_war_with = ARG 
+						}
+						transfer_state = 1062
+						1062 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						if={
+							limit={CSA = {exists = yes}}
+							ETR = {
+								transfer_state = 1058
+								1058 = {
+									remove_core_of = ARG
+									add_claim_by = ARG
+								}
+							}
+						}
+						white_peace = ARG
+						ARG = {
+							add_ideas = ARG_devastating_defeat
+							white_peace = URC
+						}
+					}
+					if = {
+						limit = {
+							has_war_with = BOL
+						}
+						transfer_state = 753
+						transfer_state = 1418
+						753 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1418 = {
+							remove_core_of = BOL
+							add_claim_by =BOL
+						}
+						white_peace = BOL
+						BOL = {
+							white_peace = URC
+						}
+					}
+				}
+				URC = {
+					clr_country_flag = Paraguayan_War
+					annex_country = {
+						target = URG
+						transfer_troops = no 
+					}
+					white_peace = PAR
+				}
+				ARG = {
+					clr_country_flag = Paraguayan_War
+					if = { 
+						limit = {
+							has_war_with = PAR
+							NOT = { has_war_with = BRA }
+						}
+						transfer_state = 1066
+						1062 = {
+							remove_core_of = PAR
+							add_claim_by = PAR
+						}
+						1066 = {
+							remove_core_of = PAR
+						}
+						1099 = {
+							remove_claim_by = PAR
+						}
+						white_peace = PAR
+					}
+					if = {
+						limit = {
+							has_war_with = BOL
+							NOT = { has_war_with = BRA }
+						}
+						transfer_state = 1095
+						transfer_state = 1100
+						1095 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1100 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						white_peace = BOL
+					}
+				}
+				BOL = {
+					clr_country_flag = Paraguayan_War
+					transfer_state = 1138
+					transfer_state = 1063
+					if = {
+						limit = {
+							has_war_with = PAR
+							NOT = { has_war_with = BRA }
+						}
+						1138 = {
+							remove_core_of = PAR
+							add_claim_by = PAR
+						}
+						688 = {
+							remove_claim_by = PAR
+						}
+						white_peace = PAR
+					}
+					if = {
+						limit = {
+							has_war_with = ARG
+							NOT = { has_war_with = BRA }
+						}
+						688 = {
+							remove_claim_by = ARG
+						}
+						1095 = {
+							remove_claim_by = ARG
+						}
+
+						1100 = {
+							remove_claim_by = ARG
+						}
+						transfer_state = 1099
+						transfer_state = 1102
+						1099 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						1102 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						white_peace = ARG
+					}
+				}
+			}
+			else_if = {#alt-history brazil wins
+				limit = {
+					tag = BRA
+					has_completed_focus = BRA_the_second_cisplatine_war
+					PAR = { surrender_progress > 0.9 }
+					CSA = { exists = no }
+				}
+				dismantle_faction = yes
+				if = {
+					limit = { has_global_flag = Triple_Alliance_Faction }
+					clr_global_flag = Triple_Alliance_Faction
+				}
+				else_if = {
+					limit = { has_global_flag = Imperial_Alliance_Faction }
+					clr_global_flag = Imperial_Alliance_Faction
+				}
+				PAR = {
+					clr_country_flag = Paraguayan_War
+					dismantle_faction = yes
+					clr_global_flag = Paraguayan_Legion_Faction
+					remove_ideas = PAR_not_one_step_back
+					add_ideas = PAR_brazil_occupation
+					add_timed_idea = {
+						idea = PAR_land_of_women
+						days = 22500
+					}
+					kill_country_leader = yes
+					every_owned_state = {
+						add_manpower = -20000
+					}
+					1068 = {
+						add_manpower = -20000
+					}
+					1069 = {
+						add_manpower = -20000
+					}
+					1138 = {
+						add_manpower = -20000
+					}
+					1139 = {
+						add_manpower = -20000
+					}
+					hidden_effect = {
+						country_event = { id = par.15 }
+						remove_ideas = PAR_disorganized_attack
+					}
+				}
+				NOM = {
+					clr_country_flag = Paraguayan_War
+					annex_country = {
+						target = URG
+					}
+					annex_country = {
+						target = URC
+					}
+					every_owned_state={
+						limit = {
+							OR = {
+								is_claimed_by = NOM
+								is_core_of = NOM
+							}
+						}
+						remove_core_of = URG
+						remove_core_of = URC
+						remove_claim_by = URC
+						remove_claim_by = URG
+						add_core_of = NOM
+						remove_claim_by = NOM
+						add_claim_by = BRA
+					}
+					every_unit_leader = {
+						set_nationality = BRA
+					}
+				}
+				BRA = {
+					remove_ideas = BRA_not_prepared_paraguay
+					clr_country_flag = Paraguayan_War
+					set_global_flag = Paraguay_Loses_War
+					transfer_navy = {
+						target = NOM
+					}
+					annex_country = {
+						target = NOM
+						transfer_troops = yes
+					}
+					transfer_state = 1065
+					1064 = {
+						remove_core_of = PAR
+					}
+					1065 = {
+						remove_core_of = PAR
+						add_claim_by = PAR
+					}
+					if={
+						limit={
+							CSA={exists = yes}
+						}
+						add_state_claim = 1068
+						add_state_claim = 1069
+						add_state_claim = 1139
+						transfer_navy = {
+							target = NOM
+						}
+						annex_country = {
+							target = NOM
+							transfer_troops = yes
+						}
+					}
+					puppet = PAR
+					white_peace = PAR
+					if = {
+						limit = {
+							has_war_with = ARG 
+						}
+						transfer_state = 1062
+						1062 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						ETR = {
+							transfer_state = 1058
+							1058 = {
+								remove_core_of = ARG
+								add_claim_by = ARG
+							}
+						}
+						BRA = { puppet = ETR} 
+						#every_state = {
+						#	limit = { is_owned_by = ARG is_claimed_by = BRA}
+						#	transfer_state = PREV
+						#	ARG = { 
+						#		remove_state_core = PREV
+						#		add_state_claim = PREV
+						#	}
+						#}
+						white_peace = ARG
+						ARG = { add_ideas = ARG_devastating_defeat }
+					}
+					if = {
+						limit = {
+							has_war_with = BOL
+						}
+						transfer_state = 753
+						transfer_state = 1418
+						753 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1418 = {
+							remove_core_of = BOL
+							add_claim_by =BOL
+						}
+						white_peace = BOL
+						BOL = {
+							white_peace = URC
+						}
+					}
+				}
+				ARG = {
+					if = { 
+						limit = {
+							has_war_with = PAR
+							NOT = { has_war_with = BRA }
+						}
+						transfer_state = 1066
+						if={
+							limit={
+								owns_state = 1063
+							}
+						}
+						1062 = {
+							remove_core_of = PAR
+							add_claim_by = PAR
+						}
+						1066 = {
+							remove_core_of = PAR
+						}
+						1099 = {
+							remove_claim_by = PAR
+						}
+						white_peace = PAR
+					}
+					if = {
+						limit = {
+							has_war_with = BOL
+							NOT = { has_war_with = BRA }
+						}
+						transfer_state = 1095
+						transfer_state = 1100
+						if={
+							limit={
+								CSA={exists = yes}
+							}
+							1063 = {
+								remove_claim_by = BOL
+							}
+						}
+						1095 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1100 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						white_peace = BOL
+					}
+				}
+				BOL = {
+					transfer_state = 1138
+					transfer_state = 1063
+					if = {
+						limit = {
+							has_war_with = PAR
+							NOT = { has_war_with = BRA }
+						}
+						transfer_state = 1138
+						1138 = {
+							remove_core_of = PAR
+							add_claim_by = PAR
+						}
+						688 = {
+							remove_claim_by = PAR
+						}
+						white_peace = PAR
+					}
+					if = {
+						limit = {
+							has_war_with = ARG
+							NOT = { has_war_with = BRA }
+						}
+						688 = {
+							remove_claim_by = ARG
+						}
+						1095 = {
+							remove_claim_by = ARG
+						}
+
+						1100 = {
+							remove_claim_by = ARG
+						}
+						transfer_state = 1099
+						transfer_state = 1102
+						1099 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						1102 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						white_peace = ARG
+					}
+				}
+			}
+			else_if = {#paraguay wins
+				limit = {
+					tag = PAR
+					BRA = { 
+						OR={
+							NOT={controls_state = 1037}
+							surrender_progress > 0.35 
+						}
+					}
+				}
+				BRA={
+					dismantle_faction = yes
+					if = {
+						limit = { has_global_flag = Triple_Alliance_Faction }
+						clr_global_flag = Triple_Alliance_Faction
+					}
+					else_if = {
+						limit = { has_global_flag = Imperial_Alliance_Faction }
+						clr_global_flag = Imperial_Alliance_Faction
+					}
+				}
+				PAR = {
+					set_global_flag = Paraguay_Wins_War
+					clr_country_flag = Paraguayan_War
+					dismantle_faction = yes
+					clr_global_flag = Paraguayan_Legion_Faction
+					transfer_state = 301
+					transfer_state = 1072
+					301 = {
+						remove_core_of = BRA
+						add_claim_by = BRA
+					}
+					1072 = {
+						remove_core_of = BRA
+						add_claim_by = BRA
+					}
+					1065 = {
+						remove_core_of = BRA
+						add_claim_by = BRA
+					}
+					if={
+						limit={
+							CSA = { exists = yes }
+						}
+						RGS = {
+							502 = {
+								add_core_of = RGS
+								remove_core_of = BRA
+								add_claim_by = BRA
+							}
+							503 = {
+								add_core_of = RGS
+								remove_core_of = BRA
+								add_claim_by = BRA
+							}
+							transfer_state = 502
+							transfer_state = 503
+							1036 = {
+								add_claim_by = RGS
+							}
+						}
+						puppet = RGS
+					}
+					white_peace = BRA
+					if = {#argentinia joined aganist
+						limit = {
+							tag = PAR
+							has_war_with = ARG
+						}
+						add_state_claim = 1058
+						transfer_state = 1062
+						transfer_state = 1064
+						transfer_state = 1099
+						ETR={
+							transfer_state = 1058
+						}
+						puppet = ETR
+						1062 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						1064 = {
+							remove_core_of = ARG
+							remove_core_of = BRA
+							add_claim_by = ARG
+							add_claim_by = BRA
+						}
+						1099 = {
+							remove_core_of = ARG
+							remove_claim_by = PAR
+							add_claim_by = ARG
+						}
+						1058 = {
+							remove_core_of = ARG
+							add_claim_by = ARG
+						}
+						white_peace = ARG
+						ARG = { add_ideas = ARG_devastating_defeat }
+						URG = {
+							white_peace = ARG
+						}
+					}
+					if = { #bolivia joined aganist paraguay
+						limit = {
+							tag = PAR
+							has_war_with = BOL
+						}
+						add_state_claim = 1095
+						transfer_state = 688
+						transfer_state = 1071
+						688 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1071 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						1095 = {
+							remove_core_of = BOL
+							add_claim_by = BOL
+						}
+						white_peace = BOL
+						URG = {
+							white_peace = BOL
+						}
+					}
+					URG = {#clean up uruguay
+						clr_country_flag = Paraguayan_War
+						annex_country = {
+							target = URC
+						}
+						every_state={
+							limit = {
+								is_core_of = URC
+							}
+							remove_core_of = URC
+						}
+						if = {
+							limit = {
+								tag = URG
+								CIS = {
+									exists = yes
+								}
+							}
+							annex_country = {
+								target = CIS
+							}
+							every_state={
+								limit = {
+									is_core_of = CIS
+								}
+								remove_core_of = CIS
+							}
+						}
+						white_peace = BRA
+					}
+					ARG = {#clean up argentina
+						clr_country_flag = Paraguayan_War
+						if = {
+							limit = {
+								NOT = {
+									has_war_with = PAR
+								}
+								OR={
+									has_war_with = BRA
+									is_in_faction_with = PAR
+								}
+							}
+							transfer_state = 1064
+							1064 = {
+								remove_core_of = BRA
+								add_claim_by = BRA
+							}
+							white_peace = BRA
+						}
+						if = {
+							limit = {
+								NOT = {
+									has_war_with = PAR
+								}
+								has_war_with = BOL
+							}
+							transfer_state = 1095
+							1100 = {
+								remove_core_of = BOL
+								add_claim_by = BOL
+							}
+							white_peace = BOL
+						}
+					}
+					BOL = {#clean up boliva
+						clr_country_flag = Paraguayan_War
+						if = {
+							limit = {
+								NOT = {
+									has_war_with = PAR
+								}
+								has_war_with = BRA
+							}
+							753 = {
+								remove_claim_by = BRA
+							}
+							1418 = {
+								remove_claim_by = BRA
+							}
+							white_peace = BRA
+						}
+						if = {
+							limit = {
+								NOT = {
+									has_war_with = PAR
+								}
+								has_war_with = ARG
+							}
+							transfer_state = 1100
+							1100 = {
+								remove_core_of = ARG
+								add_claim_by = ARG
+							}
+							white_peace = ARG
+						}
+					}
+					hidden_effect = {
+						country_event = { id = par.16 }
+					}
+				}
+			}
+			
+			#else = {
+			#	custom_trigger_tooltip = {
+			#		tooltip = Paraguayan_War_Peace_Treaty_Mission_tt
+			#	}
+			#}
+		}
+		timeout_effect = {
+			if = {
+				limit={
+					OR = {
+						AND = {
+							tag = BRA
+							has_war_with = PAR
+						}
+						AND = {
+							tag = PAR
+							has_war_with = BRA
+						}
+					}
+					date < 1875.1.1
+				}
+				activate_mission = Paraguayan_War_Peace_Treaty_Mission
+			}
+			else_if = {
+				limit = { date > 1875.1.1 }
+				white_peace = BRA
+				white_peace = PAR
+			}
+		}
+	}
+}
+
+eoanb_category_industry={
+	PAR_arsenal_construction = {
+          allowed = { tag = PAR }
+          available = {
+               NOT={controls_state = 1068}
+          }
+          activation = {
+              always = no
+          }
+          is_good = yes
+          selectable_mission = no 
+          days_mission_timeout = 220
+          timeout_effect = {
+           1068={
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+          }
+          # complete_effect = {
+               # add_political_power = 50
+          # }
+     }
+	PAR_villarrica_construction = {
+		allowed = { tag = PAR }
+		available = {
+			always = no
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		selectable_mission = no 
+		days_mission_timeout = 150
+		timeout_effect = {
+			1139={
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+          # complete_effect = {
+               # add_political_power = 50
+          # }
+     }
+	PAR_import_ENG_rifles = {
+		allowed = { tag = PAR }
+		available = {
+			has_war = yes
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		selectable_mission = no 
+		days_mission_timeout = 450
+		timeout_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 200
+				producer = ENG
+			}
+		}
+        complete_effect = {
+			add_political_power = 50
+		}
+     }
+	PAR_import_FRA_rifles = {
+		allowed = { tag = PAR }
+		available = {
+			has_war = yes
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		selectable_mission = no 
+		days_mission_timeout = 450
+		timeout_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 200
+				producer = FRA
+			}
+		}
+        complete_effect = {
+			add_political_power = 50
+		}
+     }
+}
