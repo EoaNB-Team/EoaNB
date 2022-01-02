@@ -110,6 +110,22 @@ country_event = {
 	}
 }
 
+#Startup Event: Starting Situation
+country_event = {
+	id = austria.2
+	title = austria.2.t
+	desc = austria.2.d
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = austria.2.a
+		ai_chance = { base = 100 }
+		complete_national_focus = AUS_focus_an_empire_in_demise
+		activate_decision = AUS_decision_uproar_in_italy_countdown
+	}
+}
+
 #Fall of Freiherr von Bach 
 country_event = {
 	id = AUSpolitics.1 
@@ -3732,23 +3748,44 @@ country_event = {
 	}
 }
 
-#The Italian Conundrum
+#HIDDEN EVENT: Trouble in Lombardy-Venetia?
 country_event = {
 	id = austriaexternal.11
 	title = austriaexternal.11.t
 	desc = austriaexternal.11.d
 	#picture = GFX_report_event_AUS_wien_1
 	
-    fire_only_once = yes
 	is_triggered_only = yes
+	hidden = yes
 	
-	option = {
-		name = austriaexternal.11.a
-		ai_chance = { base = 100 }
+	trigger = {
+		has_variable = ITA_UPROAR_RISK
+	}
+	
+	immediate = {
+		set_temp_variable = {
+			var = temp1
+			value = 100
+		}
+		set_temp_variable = {
+			var = temp2
+			value = var:ITA_UPROAR_RISK
+		}
+		multiply_temp_variable = { temp2 = 100 }
+		subtract_from_temp_variable = { temp1 = temp2 }
+		
+		random_list = {
+			temp_var:temp1 = {
+				activate_decision = AUS_decision_uproar_in_italy_countdown
+			}
+			temp_var:temp2 = {
+				country_event = { id = austriaexternal.12 }
+			}
+		}
 	}
 }
 
-#Our Subjects in Italy Demand Liberalization Promises Kept
+#Uproar in Italy
 country_event = {
 	id = austriaexternal.12
 	title = austriaexternal.12.t
@@ -3759,11 +3796,195 @@ country_event = {
 	
 	option = {
 		name = austriaexternal.12.a
+		ai_chance = { base = 100 }
+		random_list = {
+			50 = {
+				LVN = {
+					random_owned_controlled_state = {
+						limit = { 
+							infrastructure > 0 
+						}
+						custom_effect_tooltip = AUS_uproar_in_italy_infrastructure_effect_tt
+						hidden_effect = {
+							damage_building = {
+								type = infrastructure
+								damage = 0.75
+							}
+						}
+					}
+				}
+			}
+			25 = {
+				LVN = {
+					if = { 
+						limit = {
+							controls_state = 160
+							160 = {
+								any_province_building_level = {
+									province = {
+										id = 11584
+									}
+									building = naval_base
+									level > 1
+								}
+							}
+						}
+						custom_effect_tooltip = AUS_uproar_in_italy_naval_base_effect_tt
+						hidden_effect = {
+							160 = {
+								damage_building = {
+									type = naval_base
+									damage = 1
+									province = 11584
+								}
+							}
+						}
+					}
+					else = {
+						random_owned_controlled_state = {
+							limit = { 
+								industrial_complex > 0 
+							}
+							custom_effect_tooltip = AUS_uproar_in_italy_civilian_industry_effect_tt
+							hidden_effect = {
+								damage_building = {
+									type = industrial_complex
+									damage = 0.5
+								}
+							}
+						}
+					}
+				}
+			}
+			15 = {
+				custom_effect_tooltip = AUS_uproar_in_italy_equipment_effect_tt
+				add_manpower = -10
+				add_equipment_to_stockpile = {
+					type = infantry_equipment
+					amount = -500
+					producer = AUS
+				}
+				add_equipment_to_stockpile = {
+					type = uniform_equipment
+					amount = -500
+					producer = AUS
+				}
+				add_stability = -0.02
+				LVN = {
+					add_stability = -0.02
+				}
+			}
+			10 = {
+				LVN = {
+					if = {
+						limit = {
+							controls_state = 159
+						}
+						159 = {
+							if = {
+								limit = { 
+									arms_factory > 0 
+								}
+								custom_effect_tooltip = AUS_uproar_in_italy_military_industry_effect_tt
+								hidden_effect = {
+									damage_building = {
+										type = arms_factory
+										damage = 0.5
+									}
+								}
+							}
+							else_if = {
+								limit = { 
+									steel_mill > 0 
+								}
+								custom_effect_tooltip = AUS_uproar_in_italy_military_industry_effect_tt
+								hidden_effect = {
+									damage_building = {
+										type = steel_mill
+										damage = 0.75
+									}
+								}
+							}
+							else_if = {
+								limit = { 
+									machine_parts_factory > 0 
+								}
+								custom_effect_tooltip = AUS_uproar_in_italy_military_industry_effect_tt
+								hidden_effect = {
+									damage_building = {
+										type = machine_parts_factory
+										damage = 0.75
+									}
+								}
+							}
+						}
+					}
+					else = {
+						160 = {
+							if = {
+								limit = { 
+									dockyard > 0 
+								}
+								custom_effect_tooltip = AUS_uproar_in_italy_military_industry_effect_tt
+								hidden_effect = {
+									damage_building = {
+										type = dockyard
+										damage = 0.75
+									}
+								}
+							}
+							else_if = {
+								limit = { 
+									fabric_weavery > 0 
+								}
+								custom_effect_tooltip = AUS_uproar_in_italy_military_industry_effect_tt
+								hidden_effect = {
+									damage_building = {
+										type = fabric_weavery
+										damage = 1
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+#The Italian Conundrum
+country_event = {
+	id = austriaexternal.13
+	title = austriaexternal.13.t
+	desc = austriaexternal.13.d
+	#picture = GFX_report_event_AUS_wien_1
+	
+    fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = austriaexternal.13.a
+		ai_chance = { base = 100 }
+	}
+}
+
+#Our Subjects in Italy Demand Liberalization Promises Kept
+country_event = {
+	id = austriaexternal.14
+	title = austriaexternal.14.t
+	desc = austriaexternal.14.d
+	#picture = GFX_report_event_AUS_wien_1
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = austriaexternal.14.a
 		ai_chance = { base = 50 }
 	}
 	
 	option = {
-		name = austriaexternal.12.b
+		name = austriaexternal.14.b
 		ai_chance = { base = 50 }
 	}
 }
