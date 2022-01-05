@@ -56,7 +56,7 @@ AUS_decision_category_italian_unrest = {
 						}
 					}
 					add_to_variable = {
-						AUS_ITA_Unrest_risk_change = -0.01
+						ITA_UPROAR_RISK = -0.01
 					}
 				}
 				if = {
@@ -64,7 +64,7 @@ AUS_decision_category_italian_unrest = {
 						is_ai = yes
 					}
 					add_to_variable = {
-						AUS_ITA_Unrest_risk_change = -0.01
+						ITA_UPROAR_RISK = -0.01
 					}
 				}
 				add_to_variable = {
@@ -689,7 +689,9 @@ AUS_decision_category_external_threats = {
 				tooltip = AUS_mission_calm_the_unrest_in_italy_trigger_tt
 				hidden_trigger = {
 					NOT = {
-						#
+						has_dynamic_modifier = {
+							modifier = AUS_Italian_Unrest_Modifier
+						}
 					}
 				}
 			}
@@ -733,6 +735,10 @@ AUS_decision_category_external_threats = {
 					add_war_support = -0.15
 				}
 			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_fail_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
         }
 
         complete_effect = {
@@ -742,13 +748,17 @@ AUS_decision_category_external_threats = {
 				add_political_power = 50
 				add_stability = 0.05
 			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_success_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
 			#LVN_archduke_maximilian = {
 			#	add_country_leader_trait = XYZ
 			#}
         }
 
         ai_will_do = {
-			base = 1000
+			base = 100
 		}
     }
 	
@@ -769,8 +779,12 @@ AUS_decision_category_external_threats = {
 		visible = {
 			LVN = {
 				is_puppet_of = AUS
+				OR = {
+					NOT = { has_idea = human_rights }
+					NOT = {	has_idea = free_press }
+				}
 			}
-			NOT = { has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_flag }
+			NOT = { has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag }
 			has_active_mission = AUS_mission_calm_the_unrest_in_italy
 		}
 
@@ -779,7 +793,7 @@ AUS_decision_category_external_threats = {
 		days_remove = 90
 		
 		modifier = {
-            political_power_gain = -0.03
+            political_power_gain = -0.05
         }
 		
 		cancel_trigger = {
@@ -789,22 +803,142 @@ AUS_decision_category_external_threats = {
 		}
 		
 		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_two_effect_tt
+			if = {
+				limit = {
+				}
+			}
 			add_stability = 0.01
 			LVN = {
 				add_stability = 0.02
 				add_political_power = 10
 			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.02
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			}
 		}
 		
 		remove_effect = {
-			country_event = { days = 60 id = austriaexternal.14 }
+			custom_effect_tooltip = AUS_decision_make_promises_of_liberalization_in_italy_effect_tt
 			hidden_effect = {
-				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_flag
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+				country_event = { days = 60 id = austriaexternal.14 }
 			}
 		}
 
 		ai_will_do = {
 			base = 100
+		}
+	}
+	
+	#Grant Human Rights to the Citizens of Lombardy-Venetia
+	AUS_decision_grant_human_rights_in_lvn = {
+
+		icon = generic_independence
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = human_rights }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 50
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_ten_effect_tt
+			LVN = {
+				add_ideas = human_rights
+				add_stability = 0.03
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.1
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+	
+	#Grant Freedom of the Press in Lombardy-Venetia
+	AUS_decision_grant_free_press_in_lvn = {
+
+		icon = ger_mefo_bills
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = free_press }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 25
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_five_effect_tt
+			LVN = {
+				add_ideas = free_press
+				add_stability = 0.01
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.05
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
 	}
 }
