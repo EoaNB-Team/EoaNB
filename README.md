@@ -127,9 +127,5 @@ If you wish to contribute to the development of the mod, supprt us on Patreon or
   <a href = "https://github.com/TPS-Geronam"><strong>TPS-Geronam</strong></a>
   <img src="https://cdn.discordapp.com/avatars/212693204519223296/12c04fd0ebb1cde05159ae6c5c25e41c.png?size=256" width="120px;" alt="TPS-Geronam"/>
 </td>
-<td align="center">
-  <a href = "https://github.com/Vanadium-GITHUB"><strong>Vanadium</strong></a>
-  <img src="https://media.discordapp.net/attachments/520351376963010560/816811068693282856/kaede_pfp-removebg.png?width=499&height=553" width="120px;" alt="Vanadium"/>
-</td>
 </tr>
 </table>
