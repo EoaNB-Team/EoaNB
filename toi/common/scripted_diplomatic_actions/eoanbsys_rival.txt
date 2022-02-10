@@ -1,0 +1,114 @@
+scripted_diplomatic_actions = {
+	eoanbdiplo_designate_rival_action = {
+		allowed = {}
+		selectable = {
+			NOT = {
+				ROOT={has_country_flag = eoanb_diplo_designate_rival_recent}
+				is_ally_with = ROOT
+			}
+			OR = {
+				ROOT = {
+					has_opinion = {
+						target = PREV
+						value < 50
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = eoanbdiplo_has_rivaled_us_tt
+					check_variable = {
+						var = rival_country
+						value = ROOT.id
+					}
+				}
+			}
+		}
+		visible = {
+			NOT={
+				check_variable = {
+					ROOT.rival_country = THIS.id
+				}
+			}
+		}
+
+		cost = 50
+		command_power = 0
+
+		icon = 3
+
+		requires_acceptance = no
+		show_acceptance_on_action_button = no
+
+		complete_effect = {
+			ROOT = {
+				set_variable = {
+					var = rival_country
+					value = PREV.id
+				}
+				set_country_flag = {
+					flag = eoanb_diplo_designate_rival_recent
+					days = 730
+				}
+				hidden_effect = {
+					if = {
+						limit = { NOT = { has_idea = generic_rival_modifier } }
+						add_ideas = generic_rival_modifier
+					}
+				}
+			}
+		}
+
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = eoanbdiplo_rival_action_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = eoanbdiplo_rival_action_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+	eoanbdiplo_remove_rival_action = {
+		allowed = {}
+		visible = {
+			check_variable = {
+				ROOT.rival_country = THIS.id
+			}
+		}
+
+		cost = 5
+		command_power = 0
+
+		icon = 3
+
+		requires_acceptance = no
+		show_acceptance_on_action_button = no
+
+		complete_effect = {
+			ROOT = {
+				hidden_effect = {
+					if = {
+						limit = { has_idea = generic_rival_modifier }
+						remove_ideas = generic_rival_modifier
+					}
+					if = {
+						limit = { has_idea = eoanbdiplomacy_rival_war }
+						remove_ideas = eoanbdiplomacy_rival_war
+					}
+				}
+				clear_variable = ROOT.rival_country
+			}
+		}
+
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = eoanbdiplo_clear_rival_action_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = eoanbdiplo_clear_rival_action_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
+		}
+	}
+}

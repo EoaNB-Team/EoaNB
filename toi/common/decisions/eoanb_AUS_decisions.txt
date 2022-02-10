@@ -1,3 +1,1110 @@
+AUS_decision_category_italian_unrest = {
+	
+	#Uproar in Italy
+	AUS_decision_uproar_in_italy_countdown = {
+
+		icon = generic_ignite_civil_war
+
+		allowed = { tag = AUS }
+
+		available = {
+			hidden_trigger = { always = no }
+		}
+		
+		visible = {
+			has_variable = ITA_UPROAR_RISK
+			LVN = { is_puppet_of = AUS }
+		}
+		
+		priority = 10
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_decision_uproar_in_italy_countdown_trigger_tt
+				OR = {
+					NOT = { has_variable = ITA_UPROAR_RISK }
+					NOT = { LVN = { is_puppet_of = AUS } }
+				}
+			}
+		}
+
+		remove_effect = {
+            custom_effect_tooltip = AUS_decision_uproar_in_italy_countdown_effect_tt
+			hidden_effect = {
+				if = {
+					limit = {
+						if = {
+							limit = {
+								LVN = {
+									controls_state = 159
+								}
+							}
+							army_manpower_in_state = {
+								amount > 20000
+								state = 159
+							}
+						}
+						if = {
+							limit = {
+								LVN = {
+									controls_state = 160
+								}
+							}
+							army_manpower_in_state = {
+								amount > 20000
+								state = 160
+							}
+						}
+					}
+					add_to_variable = {
+						ITA_UPROAR_RISK = -0.01
+					}
+				}
+				if = {
+					limit = {
+						is_ai = yes
+					}
+					add_to_variable = {
+						ITA_UPROAR_RISK = -0.01
+					}
+				}
+				add_to_variable = {
+					ITA_UPROAR_RISK = modifier@AUS_Italian_Uproar_Risk_Modifier
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+				country_event = { id = austriaexternal.11 }
+			}
+        }
+
+		ai_will_do = {
+			base = 100
+		}
+    }
+}
+
+AUS_decision_category_external_threats = {
+	
+	#Cooperate with France and Britain to Stabilize the Mediterranean
+	AUS_decision_stabilize_the_mediterranean = {
+
+		icon = eng_trade_unions_support
+		
+		allowed = { tag = AUS }
+
+		available = {
+			has_completed_focus = AUS_focus_aftermath_of_the_crimean_war
+			has_war = no
+			ENG = { has_war = no }
+			FRA = { has_war = no }
+			OTO = { has_war = no }
+		}
+
+		visible = {
+			AUS = {
+				is_puppet = no 
+			}
+			ENG = {
+				is_puppet = no 
+			}
+			FRA = {
+				is_puppet = no 
+			}
+			OTO = {
+				is_puppet = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 10
+		
+        days_remove = 60
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			ENG = { country_event = { days = 7 id = austriaexternal.3 } }
+			FRA = { country_event = { days = 7 id = austriaexternal.3 } }
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = AUS_decision_stabilize_the_mediterranean_effect_tt
+			if = {
+				limit = {
+					has_country_flag = AUS_decision_stabilize_the_mediterranean_ENG_flag
+					has_country_flag = AUS_decision_stabilize_the_mediterranean_FRA_flag
+				}
+				country_event = { id = austriaexternal.6 }
+			}
+			else = {
+				country_event = { id = austriaexternal.7 }
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Austro-Russian Rapprochement
+	AUS_decision_austro_russian_rapprochement = {
+
+		icon = hol_exchange_intelligence_data
+		
+		allowed = { tag = AUS }
+
+		available = {
+			has_completed_focus = AUS_focus_reapproach_russia
+		}
+
+		visible = {
+			NOT = { has_completed_focus = AUS_focus_loosen_russian_ties_further }
+			AUS = {
+				is_puppet = no 
+			}
+			RUS = {
+				is_puppet = no 
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 10
+		
+        days_remove = 120
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			add_stability = -0.03
+		}
+       
+        remove_effect = {
+			remove_opinion_modifier = {
+				target = RUS
+				modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD
+			}
+			RUS = {
+				remove_opinion_modifier = {
+					target = AUS
+					modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD
+				}
+			}
+			add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+			reverse_add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Try to Mend the Divide
+	AUS_decision_try_to_mend_the_divide = {
+
+		icon = eng_ally_imperialist_coup
+		
+		allowed = { tag = AUS }
+
+		available = {
+			has_completed_focus = AUS_focus_mending_the_divide
+		}
+
+		visible = {
+			AUS = {
+				is_puppet = no
+			}
+			RUS = { 
+				is_puppet = no
+				has_opinion_modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD
+			}
+		}
+		
+		cost = 10
+		
+        days_remove = 120
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			add_stability = -0.01
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = AUS_decision_try_to_mend_the_divide_effect_tt
+			remove_opinion_modifier = {
+				target = RUS
+				modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD
+			}
+			RUS = {
+				remove_opinion_modifier = {
+					target = AUS
+					modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD
+				}
+			}
+			hidden_effect = {
+				RUS = { country_event = { days = 60 id = austriaexternal.8 } }
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Tighten Cooperation with Britain
+	AUS_decision_tighten_cooperation_with_britain = {
+
+		icon = eng_ally_imperialist_coup
+		
+		allowed = { tag = AUS }
+
+		available = {
+			has_completed_focus = AUS_focus_tighten_cooperation_with_britain
+		}
+
+		visible = {
+			NOT = { has_completed_focus = AUS_focus_reapproach_russia }
+			AUS = {
+				is_puppet = no
+			}
+			ENG = {
+				is_puppet = no
+				has_opinion_modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD
+			}
+		}
+		
+		cost = 10
+		
+        days_remove = 120
+         
+        modifier = {
+            political_power_gain = -0.05
+        }
+		
+		complete_effect = {
+			add_stability = 0.02
+		}
+       
+        remove_effect = {
+			custom_effect_tooltip = AUS_decision_tighten_cooperation_with_britain_effect_tt
+			remove_opinion_modifier = {
+				target = ENG
+				modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD
+			}
+			ENG = {
+				remove_opinion_modifier = {
+					target = AUS
+					modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD
+				}
+			}
+			add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+			reverse_add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+			hidden_effect = {
+				ENG = { country_event = { days = 60 id = austriaexternal.9 } }
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Bolster Our Defenses
+	AUS_mission_bolster_our_defenses = {
+
+		icon = fort
+
+		allowed = { 
+			always = no
+		}
+
+		available = {
+			OR = {
+				LVN = { 
+					is_puppet_of = AUS 
+					owns_state = 160
+				}
+				AUS = {
+					owns_state = 160
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = AUS_mission_bolster_our_defenses_trigger_tt
+				hidden_trigger = {
+					160 = {
+						any_province_building_level = {
+							province = {
+								id = 603 #Peschiera
+							}
+							building = bunker
+							level > 2
+						}
+						any_province_building_level = {
+							province = {
+								id = 3604 #Legnago
+							}
+							building = bunker
+							level > 2
+						}
+						any_province_building_level = {
+							province = {
+								id = 3657 #Verona
+							}
+							building = bunker
+							level > 2
+						}
+						any_province_building_level = {
+							province = {
+								id = 6656 #Mantova
+							}
+							building = bunker
+							level > 2
+						}
+					}
+				}
+			}
+		}
+		
+		activation = {
+			always = no
+		}
+		
+		highlight_states = {
+			state = 160
+		}
+
+		fire_only_once = yes
+		
+		is_good = no
+		
+		days_mission_timeout = 365
+
+        timeout_effect = {
+            if = {
+				limit = {
+					is_ai = no
+				}
+				decrease_ps_by_one = yes
+				add_stability = -0.05
+				add_war_support = -0.1
+			}
+        }
+
+        complete_effect = {
+            add_political_power = 50
+			add_war_support = 0.01
+			add_stability = 0.05
+        }
+
+        ai_will_do = {
+			base = 100
+		}
+    }
+	
+	#Refit the Fortifications at Peschiera
+	AUS_decision_refit_fort_peschiera = {
+
+		icon = fort_flag
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_completed_focus = AUS_focus_refit_the_forts
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_bolster_our_defenses
+		}
+		
+		highlight_states = {
+			state = 160
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 20 }
+				check_variable = { debt_level < 50 }
+			}
+			else = { has_political_power > 24.9 }
+		}
+		custom_cost_text = eoanb_decision_building_slot_victorian_cost
+		
+		days_remove = 120
+		
+		cancel_trigger = {
+			NOT = { owns_state = 160 }
+			NOT = { has_active_mission = AUS_mission_bolster_our_defenses }
+		}
+		
+		complete_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = { add_political_power = -25 }
+		}
+		
+		remove_effect = {
+			army_experience = 5
+			add_war_support = 0.01
+			160 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 603
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Refit the Fortifications at Legnago
+	AUS_decision_refit_fort_legnago = {
+
+		icon = fort_flag
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_completed_focus = AUS_focus_refit_the_forts
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_bolster_our_defenses
+		}
+		
+		highlight_states = {
+			state = 160
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 20 }
+				check_variable = { debt_level < 50 }
+			}
+			else = { has_political_power > 24.9 }
+		}
+		custom_cost_text = eoanb_decision_building_slot_victorian_cost
+		
+		days_remove = 120
+		
+		cancel_trigger = {
+			NOT = { owns_state = 160 }
+			NOT = { has_active_mission = AUS_mission_bolster_our_defenses }
+		}
+		
+		complete_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = { add_political_power = -25 }
+		}
+		
+		remove_effect = {
+			army_experience = 5
+			add_war_support = 0.01
+			160 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3604
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Refit the Fortifications at Verona
+	AUS_decision_refit_fort_verona = {
+
+		icon = fort_flag
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_completed_focus = AUS_focus_refit_the_forts
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_bolster_our_defenses
+		}
+		
+		highlight_states = {
+			state = 160
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 20 }
+				check_variable = { debt_level < 50 }
+			}
+			else = { has_political_power > 24.9 }
+		}
+		custom_cost_text = eoanb_decision_building_slot_victorian_cost
+		
+		days_remove = 120
+		
+		cancel_trigger = {
+			NOT = { owns_state = 160 }
+			NOT = { has_active_mission = AUS_mission_bolster_our_defenses }
+		}
+		
+		complete_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = { add_political_power = -25 }
+		}
+		
+		remove_effect = {
+			army_experience = 5
+			add_war_support = 0.01
+			160 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 3657
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Refit the Fortifications at Mantua
+	AUS_decision_refit_fort_mantua = {
+
+		icon = fort_flag
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_completed_focus = AUS_focus_refit_the_forts
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_bolster_our_defenses
+		}
+		
+		highlight_states = {
+			state = 160
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 20 }
+				check_variable = { debt_level < 50 }
+			}
+			else = { has_political_power > 24.9 }
+		}
+		custom_cost_text = eoanb_decision_building_slot_victorian_cost
+		
+		days_remove = 120
+		
+		cancel_trigger = {
+			NOT = { owns_state = 160 }
+			NOT = { has_active_mission = AUS_mission_bolster_our_defenses }
+		}
+		
+		complete_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = { add_political_power = -25 }
+		}
+		
+		remove_effect = {
+			army_experience = 5
+			add_war_support = 0.01
+			160 = {
+				add_building_construction = {
+					type = bunker
+					level = 2
+					instant_build = yes
+					province = 6656
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Calm the Unrest in Italy
+	AUS_mission_calm_the_unrest_in_italy = {
+
+		icon = generic_nationalism
+
+		allowed = {
+			always = no
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_mission_calm_the_unrest_in_italy_trigger_tt
+				hidden_trigger = {
+					NOT = {
+						has_dynamic_modifier = {
+							modifier = AUS_Italian_Unrest_Modifier
+						}
+					}
+				}
+			}
+		}
+		
+		activation = {
+			always = no
+		}
+		
+		highlight_states = {
+			state = 159
+			state = 160
+		}
+
+		fire_only_once = yes
+		
+		is_good = no
+		
+		days_mission_timeout = 365
+		
+		cancel_trigger = {
+			NOT = {
+				LVN = { 
+					is_puppet_of = AUS 
+					owns_state = 159
+				}
+			}
+		}
+
+        timeout_effect = {
+            if = {
+				limit = {
+					is_ai = no
+				}
+				decrease_ps_by_one = yes
+				add_stability = -0.05
+				add_war_support = -0.1
+				LVN = {
+					decrease_ps_by_one = yes
+					add_stability = -0.1
+					add_war_support = -0.15
+				}
+			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_fail_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
+        }
+
+        complete_effect = {
+            add_political_power = 50
+			add_stability = 0.05
+			LVN = {
+				add_political_power = 50
+				add_stability = 0.05
+			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_success_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
+        }
+
+        ai_will_do = {
+			base = 100
+		}
+    }
+	
+	#Make Promises of Liberalization in Italy
+	AUS_decision_make_promises_of_liberalization_in_italy = {
+
+		icon = eng_puppet_usa
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_completed_focus = AUS_focus_token_liberalization
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				OR = {
+					NOT = { has_idea = human_rights }
+					NOT = {	has_idea = free_press }
+				}
+			}
+			NOT = { has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag }
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 10
+		
+		days_remove = 90
+		
+		modifier = {
+            political_power_gain = -0.05
+        }
+		
+		cancel_trigger = {
+			LVN = {
+				NOT = { is_puppet_of = AUS }
+			}
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_two_effect_tt
+			if = {
+				limit = {
+					LVN = {
+						NOT = { has_idea = human_rights }
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_grant_human_rights_in_lvn
+			}
+			if = {
+				limit = {
+					LVN = {
+						NOT = { has_idea = free_press }
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_grant_free_press_in_lvn
+			}
+			add_stability = 0.01
+			LVN = {
+				add_stability = 0.02
+				add_political_power = 10
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.02
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			}
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = AUS_decision_make_promises_of_liberalization_in_italy_effect_tt
+			hidden_effect = {
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+				country_event = { days = 60 id = austriaexternal.14 }
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Grant Human Rights to the Citizens of Lombardy-Venetia
+	AUS_decision_grant_human_rights_in_lvn = {
+
+		icon = generic_independence
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = human_rights }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 50
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_ten_effect_tt
+			LVN = {
+				add_ideas = human_rights
+				add_stability = 0.03
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.1
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+	
+	#Grant Freedom of the Press in Lombardy-Venetia
+	AUS_decision_grant_free_press_in_lvn = {
+
+		icon = ger_mefo_bills
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = free_press }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 25
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_five_effect_tt
+			LVN = {
+				add_ideas = free_press
+				add_stability = 0.01
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.05
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+	AUS_decision_russian_troops_galicia = {
+		###Russian Troops on the Border
+		allowed = {
+			always = no
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 50
+		available = {
+			OR = {
+				AND = {
+					divisions_in_state = {
+						type = infantry
+						size > 9
+						state = 91
+					}
+					divisions_in_state = {
+						type = infantry
+						size > 9
+						state = 88
+					}
+					NOT = {
+						has_war_with = PIE
+					}
+				}
+				NOT = {
+					has_war_with = PIE
+				}
+				NOT = {
+					controls_state = 88
+					controls_state = 91
+				}
+			}
+				
+		}
+		complete_effect = {
+			## event about Russians leaving 
+		}
+		timeout_effect = {
+			activate_mission = AUS_decision_russian_troops_galicia
+			#custom_effect_tooltip = AUS_decision_russian_troops_TT
+			if = {
+				limit = {
+					NOT = {
+						divisions_in_state = {
+							type = infantry
+							size > 9
+							state = 91
+						}
+						divisions_in_state = {
+							type = infantry
+							size > 9
+							state = 88
+						}
+					}
+				}
+				random_list = {
+					40 = {
+						add_manpower = -250
+						add_equipment_to_stockpile = {
+							type = infantry_equipment
+							amount = -500
+						}
+						add_equipment_to_stockpile = {
+							type = uniform_equipment
+							amount = -500
+						}
+					}
+					5 = {
+						RUS = {
+							transfer_state = 88
+							country_event = {
+								id = sardinia.220
+							}
+							hidden_effect = {
+								add_state_core = 88
+							}
+						}
+						modifier = {
+							factor = 0
+							RUS = {
+								controls_state = 88
+							}
+						}
+					}
+					5 = {
+						RUS = {
+							transfer_state = 91
+							country_event = {
+								id = sardinia.220
+							}
+							hidden_effect = {
+								add_state_core = 91
+							}
+						}
+						modifier = {
+							factor = 0
+							RUS = {
+								controls_state = 91
+							}
+						}
+					}
+					25 = {
+						start_border_war = {
+							change_state_after_war = no
+							attacker = {
+								state = 93
+								num_provinces = 4
+							}			
+							defender = {
+								state = 91
+								num_provinces = 3
+							}
+						}
+						modifier = {
+							factor = 0
+							RUS = {
+								controls_state = 91
+							}
+						}
+					}
+					25 = {
+						start_border_war = {
+							change_state_after_war = no
+							attacker = {
+								state = 92
+								num_provinces = 2
+							}			
+							defender = {
+								state = 88
+								num_provinces = 2
+							}
+						}
+						modifier = {
+							factor = 0
+							RUS = {
+								controls_state = 88
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+AUS_decision_category_internal_threats = {
+
+}
+
 AUS_decision_category_habsburg_industry = {
 
 	#Es ist mein Wille - Decree
@@ -138,7 +1245,7 @@ AUS_decision_category_habsburg_industry = {
 			base = 1000
 		}
 	}
-
+	
 	eoanb_decision_AUS_vic_transylvania_iron = {
 
         allowed = {
@@ -2293,4 +3400,149 @@ AUS_decision_category_habsburg_navy = {
 			base = 100
 		}
     }
+}
+
+AUS_decision_category_habsburg_army = {
+
+	AUS_decision_edelsheim_gyulais_proposal = {
+
+		#icon = generic_cavalry
+
+		allowed = { tag = AUS }
+
+		available = {
+			NOT = { has_country_flag = AUS_army_reform_ongoing_flag }
+			has_completed_focus = AUS_focus_edelsheim_gyulais_proposal
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			has_political_power > 9.9
+			command_power > 74.99
+		}
+		custom_cost_text = DEN_pp_more_than_10_cp_more_than_75
+
+		days_remove = 180
+		
+		modifier = {
+			consumer_goods_factor = 0.05
+			political_power_gain = -0.05
+		}
+		
+		cancel_trigger = {
+			NOT = { debt_not_bankrupt_trigger = yes }
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = RUS_military_reform_ongoing_effect_tt
+			hidden_effect = {
+				add_political_power = -10
+				add_command_power = -75
+				set_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			add_tech_bonus = { bonus = 0.5 uses = 2 category = tech_category_cavalry }
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = land_doctrine }
+			army_experience = 20
+			add_war_support = 0.03
+			hidden_effect = {
+				clr_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	AUS_decision_muzzle_loading_cannons = {
+
+		icon = artillery
+
+		allowed = { tag = AUS }
+		
+		available = {
+			NOT = { has_country_flag = AUS_army_reform_ongoing_flag }
+			has_completed_focus = AUS_focus_muzzle_loading_cannons
+		}
+
+		visible = {
+		}
+
+		fire_only_once = yes
+
+		cost = 0
+		custom_cost_trigger = { has_army_experience > 49.99 }
+		custom_cost_text = RUS_army_experience_more_than_49
+		
+		days_remove = 180
+		
+		modifier = {
+			political_power_gain = -0.05
+			experience_gain_army -0.10
+			research_speed_factor = -0.01
+		}
+		
+		cancel_trigger = {
+			NOT = { debt_not_bankrupt_trigger = yes }
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = RUS_military_reform_ongoing_effect_tt
+			hidden_effect = { 
+				set_country_flag = AUS_army_reform_ongoing_flag 
+			}
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = "RUS_vic_army_new_artillery"
+			if = {
+		        limit = {
+		            NOT = { has_tech = rml_field_gun }
+		        }
+		        add_tech_bonus = {
+					bonus = 0.2
+					uses = 1
+					technology = rml_field_gun
+				}
+		    }
+		    else_if = {
+		        limit = {
+		            has_tech = rml_field_gun
+		            NOT = { has_tech = rbl_field_gun }
+		        }
+		        add_tech_bonus = {
+					bonus = 0.2
+					uses = 1
+					technology = rbl_field_gun
+				}
+		    }
+		    else_if = {
+		        limit = {
+		            has_tech = rml_field_gun
+		            has_tech = rbl_field_gun
+		            NOT = { has_tech = improved_artillery }
+		        }
+		         add_tech_bonus = {
+					bonus = 0.2
+					uses = 1
+					technology = improved_artillery
+				}
+		    }
+			hidden_effect = {
+				clr_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
 }
