@@ -45,7 +45,7 @@ def date_calc(event_year, event_month, event_day, start_year = 1858, s_m = 1, s_
 	if start_year == 1857:
 		KDE_scripted_effect = "on_startup"
 	else:
- 		KDE_scripted_effect = "KDE_bi_yearly_event_fire_" + str(start_year)
+		KDE_scripted_effect = "KDE_bi_yearly_event_fire_" + str(start_year)
 
 	return int(days), KDE_scripted_effect
 
