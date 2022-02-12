@@ -746,7 +746,7 @@ NMilitary = {
 	AIR_SUPPORT_BASE = 0.3,                        -- base ground bonus to troops when active planes helping them
 	LOW_SUPPLY = 0.99,							   -- When the supply status of an unit becomes low.
 	BORDER_WAR_ATTRITION_FACTOR = 0.01,			   -- How much of borderwar balance of power makes it into attrition
-	BORDER_WAR_VICTORY = 1.0,					   -- At wich border war balance of power is victory declared
+	BORDER_WAR_VICTORY = 0.8,					   -- At wich border war balance of power is victory declared
 	REINFORCE_CHANCE = 0.03,                 	   -- base chance to join combat from back line when empty
 	SPEED_REINFORCEMENT_BONUS = 0.01,              -- chance to join combat bonus by each 100% larger than infantry base (up to 200%)
 	OVERSEAS_LOSE_EQUIPMENT_FACTOR = 0.75,		   -- percentage of equipment lost disbanded overseas
@@ -872,11 +872,11 @@ NMilitary = {
 	ACCLIMATIZATION_LOSS_SPEED_FACTOR = 2.0,		-- Loosing one acclimatization while being under affect of the opposite climate should cause it to drop down much faster than gaining.
 
 
-	PROMOTE_LEADER_CP_COST = 30.0,					-- cost of promoting a leader
+	PROMOTE_LEADER_CP_COST = 40.0,					-- cost of promoting a leader
 	
 	FIELD_MARSHAL_ARMY_BONUS_RATIO = 0.5,           -- ratio to apply regular bonuses FM bonuses to armies
 	
-	FIELD_MARSHAL_XP_RATIO = 0.25,					-- xp gain ratio for army group leaders
+	FIELD_MARSHAL_XP_RATIO = 0.3,					-- xp gain ratio for army group leaders
 	
 	GARRISON_ORDER_ARMY_CAP_FACTOR = 3.0,			-- armies gets increased cap when they are garrisoned
 	
@@ -901,7 +901,7 @@ NMilitary = {
 
 	UNIT_LEADER_USE_NONLINEAR_XP_GAIN = true,       -- Whether unit leader XP gain is scaled by 1/<nr_of_traits>
 	
-	HOURS_REQ_REJOIN_BORDER_WAR_FOR_INJURED_UNITS = 36, -- minimum hours required for units to rejoin border wars
+	HOURS_REQ_REJOIN_BORDER_WAR_FOR_INJURED_UNITS = 336, -- minimum hours required for units to rejoin border wars
 	
 	NEW_COMMANDER_RANDOM_PERSONALITY_TRAIT_CHANCES = {  -- chances to gain a personality trait for new generals
 		0.5, -- 50% for first trait
@@ -1247,7 +1247,7 @@ NNavy = {
 	REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.8,						-- % of total damaged ships, that will be sent for repair-and-return in one call.
 	REPAIR_AND_RETURN_UNIT_DYING_STR = 0.2,							-- Str below this point is considering a single ship "dying", and a high priority to send to repair.
 	EXPERIENCE_LOSS_FACTOR = 1.00,                 					-- percentage of experienced solders who die when manpower is removed
-	NAVY_EXPENSIVE_IC = 5000,										-- How much IC is considering the fleet to be expensive. Those expensive will triger the alert, when are on low STR.
+	NAVY_EXPENSIVE_IC = 5500,										-- How much IC is considering the fleet to be expensive. Those expensive will triger the alert, when are on low STR.
 	MISSION_MAX_REGIONS = 0,										-- Limit of the regions that can be assigned to naval mission. Set to 0 for unlimited.
 	CONVOY_EFFICIENCY_LOSS_MODIFIER = 1.25,							-- How much efficiency drops when losing convoys. If modifier is 0.5, then losing 100% of convoys in short period, the efficiency will drop by 50%.
 	CONVOY_EFFICIENCY_REGAIN_AFTER_DAYS = 7,						-- Convoy starts regaining it's efficiency after X days without any convoys being sink.
@@ -1770,7 +1770,7 @@ NAI = {
 	DIPLOMATIC_ACTION_GOOD_BAD_RATIO_THRESHOLD = 1,
 	BASE_RELUCTANCE = 20, 						-- Base reluctance applied to all diplomatic offers
 	DIPLOMATIC_ACTION_RANDOM_FACTOR = 0.5, 		-- How much of the AI diplomatic action scoring is randomly determined (1.0 = half random, 2.0 = 2/3rd random, etc)
-	DIPLOMATIC_ACTION_PROPOSE_SCORE = 35, 		-- AI must score a diplomatic action at least this highly to propose it themselves
+	DIPLOMATIC_ACTION_PROPOSE_SCORE = 50, 		-- AI must score a diplomatic action at least this highly to propose it themselves
 	DILPOMATIC_ACTION_DECLARE_WAR_WARGOAL_BASE = -50, -- Base diplomatic action score bonus to go to war per wargoal
 	DIPLOMATIC_ACTION_BREAK_SCORE = -10, 		-- AI must score a diplomatic action less than this to break it off	
 	DIPLOMACY_CREATE_FACTION_FACTOR = 0.75,		-- Factor for AI desire to create a new faction. Val < 1.0 makes it less likely to create than to join.
@@ -2199,7 +2199,7 @@ FOCUS_TREE_CONTINUE_FACTOR = 1.5,			-- Factor for score of how likely the AI is 
 	
 	
 	NAVY_PREFERED_MAX_SIZE = 20,						-- AI will generally attempt to merge fleets into this size, but as a soft limit.
-	INVASION_COASTAL_PROVS_PER_ORDER = 12,				-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
+	INVASION_COASTAL_PROVS_PER_ORDER = 24,				-- AI will consider one extra invasion per number of provinces stated here (num orders = total coast / this)
 	MIN_INVASION_AREA_SIZE_FOR_FLOATING_HARBORS = 15,   -- AI will consider using floating harbors for naval invasion if invasion area is larger than this many provinces
 
 	CONVOY_NEED_SAFETY_BUFFER = 1.30,					-- AI will try and keep 15% more convoys than what it needs.
@@ -2248,12 +2248,12 @@ FOCUS_TREE_CONTINUE_FACTOR = 1.5,			-- Factor for score of how likely the AI is 
 	HOUR_BAD_COMBAT_REEVALUATE = 100,                   -- if we are in combat for this amount and it goes shitty then try skipping it 
 	MIN_PLAN_VALUE_TO_MICRO_INACTIVE = 0.2,				-- The AI will not consider members of groups which plan is not activated AND evaluates lower than this.
 	
-	MAX_UNITS_FACTOR_AREA_ORDER = 1.0,					-- Factor for max number of units to assign to area defense orders
-	DESIRED_UNITS_FACTOR_AREA_ORDER = 1.0,				-- Factor for desired number of units to assign to area defense orders
+	MAX_UNITS_FACTOR_AREA_ORDER = 0.85,					-- Factor for max number of units to assign to area defense orders
+	DESIRED_UNITS_FACTOR_AREA_ORDER = 0.8,				-- Factor for desired number of units to assign to area defense orders
 	MIN_UNITS_FACTOR_AREA_ORDER = 1.0,					-- Factor for min number of units to assign to area defense orders
 
-	MAX_UNITS_FACTOR_FRONT_ORDER = 1.5,					-- Factor for max number of units to assign to area front orders
-	DESIRED_UNITS_FACTOR_FRONT_ORDER = 1.5,				-- Factor for desired number of units to assign to area front orders
+	MAX_UNITS_FACTOR_FRONT_ORDER = 1.0,					-- Factor for max number of units to assign to area front orders
+	DESIRED_UNITS_FACTOR_FRONT_ORDER = 1.1,				-- Factor for desired number of units to assign to area front orders
 	MIN_UNITS_FACTOR_FRONT_ORDER = 1.0,					-- Factor for min number of units to assign to area front orders
 
 	MAX_UNITS_FACTOR_INVASION_ORDER = 1.0,				-- Factor for max number of units to assign to naval invasion orders
@@ -2608,7 +2608,7 @@ FOCUS_TREE_CONTINUE_FACTOR = 1.5,			-- Factor for score of how likely the AI is 
 	AGGRESSIVENESS_CHECK_FULLY_FORTIFIED = 10,					-- if front strength balance is at or above this value versus a fully fortified enemy with no weak points, we do a balanced attack instead being careful
 	AGGRESSIVENESS_CHECK_FULLY_FORTIFIED_POCKET = 6,			-- if front strength balance is at or above this value versus a fully fortified enemy in a pocket, we do a balanced attack instead being careful
 	FRONT_EVAL_UNIT_ACCURACY = 0.7,								-- scale how stupid ai will act on fronts. 0 is potato
-	FRONT_EVAL_UNIT_SUPPLY_AND_ORG_LACK_IMPACT = 0.0,			-- scale how painful the AI thinks a combined lack of supply and organization is for units
+	FRONT_EVAL_UNIT_SUPPLY_AND_ORG_LACK_IMPACT = 1.0,			-- scale how painful the AI thinks a combined lack of supply and organization is for units
 	FRONT_EVAL_UNIT_AIR_SUP_IMPACT = 0.5,						-- scale how good the AI thinks air superiority is for units
 	FRONT_EVAL_PERCENT_TO_ASSIST_ALLY_FRONT = 0.5, 				-- percentage of how many units the AI thinks it should have compared to an ally before considering sending units
 
@@ -3553,7 +3553,7 @@ NSupply = {
 
 	MIN_DIFF_FOR_AUTO_UPDATING_EXISTING_RAILWAYS = 5, -- while building railways, the system will prefer updating existing railway if new railway is close enough to existing one
 
-	LOCAL_SUPPLY_PER_AIR_MISSION = 1.2, -- each assigned plane gives this much supply at full efficiency
+	LOCAL_SUPPLY_PER_AIR_MISSION = 0.2, -- each assigned plane gives this much supply at full efficiency
 
 	-- reinforcements depends on distance to capital and following defines are used for calculating reinforcement time
 	SUPPLY_PATH_MAX_DISTANCE = 15,	-- max time it can take
@@ -3561,8 +3561,8 @@ NSupply = {
 	TRUCK_DISTANCE_FACTOR_FOR_REINFORCEMENT_SPEED = 0.01, -- time factor for total truck distance
 	NAVAL_DISTANCE_FACTOR_FOR_REINFORCEMENT_SPEED = 0.08, -- time factor for total naval distance
 
-	ALERT_VERY_LOW_SUPPLY_LEVEL = 0.3,			   -- At which point we show up the low and very low supply level alert. Value is in % of supplies supported vs required.
-	ALERT_LOW_SUPPLY_LEVEL = 0.75,
+	ALERT_VERY_LOW_SUPPLY_LEVEL = 0.2,			   -- At which point we show up the low and very low supply level alert. Value is in % of supplies supported vs required.
+	ALERT_LOW_SUPPLY_LEVEL = 0.5,
 
 	AI_FRONT_MINIMUM_UNITS_PER_PROVINCE_FOR_SUPPLY_CALCULATIONS = 1,    -- AI will try to keep this amount of divisions per province as a minimum when evaluating supply limitations for war fronts
 	AI_FRONT_DIVISIONS_PER_SUPPLY_POINT = 1.0, -- How many divisions should the AI consider it can supply per available supply point
