@@ -290,14 +290,22 @@ debt_related_country_content_effects = {
 				limit = { has_country_flag = SPR_paying_debt_interest_flag }
 				hidden_effect = { 
 					clr_country_flag = SPR_paying_debt_interest_flag
-					if = { 
-						limit = { NOT = { OR = { TAG = MEX TAG = MEC TAG = MXE } } }
-						SPR = { add_to_variable = { var = SPR_debt_repayment_profits value = -0.1 } }
-					} 
+					SPR = { add_to_variable = { var = SPR_debt_repayment_profits value = -0.1 } } 
 				}
 				if = {
 					limit = { SPR = { exists = yes } }
 					SPR = { country_event = { id = egy_debt_system.14 days = 2 } }
+				}
+			}
+			if = {
+				limit = { has_country_flag = USA_paying_debt_interest_flag }
+				hidden_effect = { 
+					clr_country_flag = USA_paying_debt_interest_flag
+					USA = { add_to_variable = { var = USA_debt_repayment_profits value = -0.1 } }
+				}
+				if = {
+					limit = { USA = { exists = yes } }
+					USA = { country_event = { id = egy_debt_system.14 days = 2 } }
 				}
 			}
 			country_event = { id = egy_debt_system.7 days = 1}
@@ -608,7 +616,6 @@ SPR_debt_repayments_related_country_content_effects = {
 	}
 }
 
-
 SPR_foreign_debt_repayments_decrease_by_1 = {
 	custom_effect_tooltip = SPR_repayments_decrease_1
 	hidden_effect = { add_to_variable = {var = SPR_debt_repayments_level value = -1} }
@@ -618,4 +625,48 @@ SPR_foreign_debt_repayments_increase_by_1 = {
 	custom_effect_tooltip = SPR_repayments_increase_1
 	hidden_effect = { add_to_variable = {var = SPR_debt_repayments_level value = 1} }
 	SPR_debt_repayments_related_country_content_effects = yes
+}
+
+#USA Loan Payments
+
+USA_debt_repayments_related_country_content_effects = {
+	if = {
+		limit = { check_variable = { var = debt_level value = 0 compare = greater_than } }
+		if = {
+			limit = { NOT = { has_country_flag = USA_paying_debt_interest_flag } }
+			hidden_effect = { 
+				set_country_flag = USA_paying_debt_interest_flag
+				USA = { add_to_variable = { var = USA_debt_repayment_profits value = 0.1 } } 
+			}
+			if = {
+				limit = { USA = { exists = yes } }
+				USA = { country_event = { id = egy_debt_system.12 days = 2 } }
+			}
+		}
+	}
+	else_if = {
+		limit = { check_variable = { var = debt_level value = 0 compare = less_than_or_equals } }
+		if = {
+			limit = { has_country_flag = USA_paying_debt_interest_flag }
+			hidden_effect = { 
+				clr_country_flag = USA_paying_debt_interest_flag
+				USA = { add_to_variable = { var = USA_debt_repayment_profits value = -0.1 } } 
+			}
+			if = {
+				limit = { USA = { exists = yes } }
+				USA = { country_event = { id = egy_debt_system.13 } }
+			}
+		}
+	}
+}
+
+USA_foreign_debt_repayments_decrease_by_1 = {
+	custom_effect_tooltip = USA_repayments_decrease_1
+	hidden_effect = { add_to_variable = {var = USA_debt_repayments_level value = -1} }
+	USA_debt_repayments_related_country_content_effects = yes
+}
+USA_foreign_debt_repayments_increase_by_1 = {
+	custom_effect_tooltip = USA_repayments_increase_1
+	hidden_effect = { add_to_variable = {var = USA_debt_repayments_level value = 1} }
+	USA_debt_repayments_related_country_content_effects = yes
 }
