@@ -324,6 +324,7 @@ country_event = { #Debt system initial announcement
 				1114 = { add_core_of = MEC }
 				MEC = { transfer_state = 1113 }
 				1113 = { add_core_of = MEC }
+				MEC = { inherit_technology = MEX }
 				set_variable = { var = MEC.SPR_debt_repayments_level value = MEX.SPR_debt_repayments_level }
 				if = { 
 					limit = { check_variable = { var = MEC.SPR_debt_repayments_level value = 0 compare = greater_than } }
@@ -862,6 +863,7 @@ country_event = { #Debt system initial announcement
 					modifier = large_decrease
 				}
 			}
+			MEX = { country_event = { id = mexico_civil_war.31 days = 3 } }
 			hidden_effect = { SPR = { country_event = { id = mexico_civil_war.18 days = 3 } } }
 		}
 	}
@@ -883,6 +885,7 @@ country_event = { #Debt system initial announcement
 					modifier = small_decrease
 				}
 			}
+			MEC = { country_event = { id = mexico_civil_war.31 } }
 		}
 	}
 	#USA Confronts Spain
@@ -949,6 +952,7 @@ country_event = { #Debt system initial announcement
 			OR = {
 				TAG = USA
 				TAG = SPR
+				is_subject_of = USA
 				is_subject_of = SPR
 				TAG = MEX
 				TAG = MEC
@@ -1264,9 +1268,28 @@ country_event = { #Debt system initial announcement
 			}
 		}
 	}
+	#Mexico is notified that USA Discovered Spanish Troops
+	country_event = {
+		id = mexico_civil_war.31
+		title = mexico_civil_war.31.t
+		desc= mexico_civil_war.31.d
+		
+		is_triggered_only = yes
+		
+		option = { #Viva La America!
+			name = mexico_civil_war.31.a
+			trigger = { TAG = MEX }
+			add_war_support = 0.05
+		}
+		option = { #Damn!
+			name = mexico_civil_war.31.b
+			trigger = { TAG = MEC }
+			add_war_support = -0.05
+		}
+	}
 	
 #----------------------------------------------------
-#Reform War Consv ask for French or Spanish Monarchy
+#Reform War Consv ask for French Monarchy
 #----------------------------------------------------
 	country_event = { #Meet with France
 		id = mexico_civil_war.25
@@ -1368,6 +1391,11 @@ country_event = { #Debt system initial announcement
 		}
 	}
 	
+	
+#----------------------------------------------------
+#Reform War Consv ask for Spanish Monarchy
+#----------------------------------------------------	
+	
 	country_event = { #Meet with Spain
 		id = mexico_civil_war.30
 		title = mexico_civil_war.30.t
@@ -1379,21 +1407,266 @@ country_event = { #Debt system initial announcement
 		option = { #No
 			name = mexico_civil_war.30.a
 			ai_chance = { 
-				base = 90
-			}
-			hidden_effect = { MEC = { country_event = { id = mexico_civil_war.26 days = 7 } } }
-		}
-		option = { #Yes
-			name = mexico_civil_war.25.b
-			ai_chance = { 
-				base = 10 
+				base = 0
 				modifier = {
 					factor = 0
 					is_historical_focus_on = yes
 				}
 			}
-			hidden_effect = { MEC = { set_country_flag = MEC_france_accepts_monarch_choice_flag } }
-			hidden_effect = { MEC = { country_event = { id = mexico_civil_war.27 days = 7 } } }
+			hidden_effect = { MEC = { country_event = { id = mexico_civil_war.32 days = 7 } } }
+		}
+		option = { #Yes
+			name = mexico_civil_war.25.b
+			ai_chance = { 
+				base = 100 
+			}
+			hidden_effect = {
+				USA = { 
+					diplomatic_relation = {
+						country = MEX
+						relation = guarantee
+						active = no
+					}
+				}
+			}
+			hidden_effect = { MEC = { set_country_flag = autonomy_hispanic_crown_union_flag } }
+			if = {
+				limit = { OR = {
+					has_dlc = "Together for Victory"
+					has_dlc = "Waking the Tiger"
+					has_dlc = "Death or Dishonor"
+				} }
+				SPR = {
+					hidden_effect = { MEC = { store_current_ideologies = yes } }
+					set_autonomy = {
+						target = MEC
+						autonomy_state = autonomy_hispanic_crown_union
+						freedom_level = 0.80
+						end_wars = no
+						end_civil_wars = no
+					}
+					hidden_effect = { MEC = { load_prevous_ideologies = yes } }
+				}
+			}
+			else = { 
+				hidden_effect = { MEC = { store_current_ideologies = yes } }
+				SPR = { puppet = MEC }
+				hidden_effect = { MEC = { load_prevous_ideologies = yes } }
+			}
+			news_event = { id = mexico_civil_war.34 days = 3 }
+			hidden_effect = { 
+				USA = { country_event = { id = mexico_civil_war.35 days = 5 } } 
+				MEC = { country_event = { id = mexico_civil_war.33 days = 7 } } 
+				MEX = { country_event = { id = mexico_civil_war.33 days = 7 } }
+				SPR = { country_event = { id = mexico_civil_war.33 days = 7 } }
+			}
+		}
+	}
+	country_event = { #No 
+		id = mexico_civil_war.32
+		title = mexico_civil_war.32.t
+		desc= mexico_civil_war.32.d
+	
+		fire_only_once = yes
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico_civil_war.32.a
+		}
+	}
+	country_event = { #Yes 
+		id = mexico_civil_war.33
+		title = mexico_civil_war.33.t
+		desc= mexico_civil_war.33.d
+	
+		fire_only_once = yes
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico_civil_war.33.a
+			trigger = { TAG = SPR }
+			add_stability = 0.10
+			add_war_support = 0.15
+			MEC = { 
+				add_to_war = { 
+					targeted_alliance = SPR 
+					enemy = MEX 
+					hostility_reason = asked_to_join
+				}
+			}
+			USA = { custom_effect_tooltip = mexico_civil_war_usa_stops_guarantee_tooltip }
+		}
+		
+		option = {
+			name = mexico_civil_war.33.c
+			trigger = { TAG = MEX }
+			add_stability = -0.05
+			USA = { custom_effect_tooltip = mexico_civil_war_usa_stops_guarantee_tooltip }
+		}
+		
+		option = {
+			name = mexico_civil_war.33.d
+			trigger = { TAG = MEC }
+			add_stability = 0.15
+			add_war_support = 0.1
+			USA = { custom_effect_tooltip = mexico_civil_war_usa_stops_guarantee_tooltip }
+		}
+	}
+	
+	country_event = { #Yes 
+		id = mexico_civil_war.35
+		title = mexico_civil_war.35.t
+		desc= mexico_civil_war.35.d
+	
+		fire_only_once = yes
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico_civil_war.35.a
+			trigger = { TAG = USA }
+			USA = { custom_effect_tooltip = mexico_civil_war_usa_stops_guarantee_tooltip }
+		}
+	}
+	
+	#Spain Announces Intervention in Mexican Civil War
+	news_event = {
+		id = mexico_civil_war.34
+		title = mexico_civil_war.34.t
+		desc= mexico_civil_war.34.d
+		
+		show_major = {
+			OR = {
+				TAG = PAP
+				TAG = USA
+				TAG = FRA
+				TAG = ENG
+				TAG = SPR
+				is_subject_of = USA
+				is_subject_of = SPR
+				TAG = MEX
+				TAG = MEC
+				TAG = FRA
+				TAG = ENG
+				TAG = HOL
+				TAG = YAQ
+				TAG = MAY
+				TAG = DOM
+				TAG = HAI
+				TAG = GUA
+				TAG = ELS
+				TAG = HON
+				TAG = NIC
+				TAG = COS
+				TAG = COL
+				TAG = VEN
+				TAG = ECU
+				TAG = PRU
+				TAG = PRR
+				TAG = BOL
+				TAG = CHL
+				TAG = BUE
+				TAG = URG
+				TAG = ARG
+				TAG = PAR
+				TAG = BRA
+			}
+		}
+		fire_only_once = yes
+		is_triggered_only = yes
+		
+		option = {
+			name = mexico_civil_war.34.a
+			trigger = { TAG = USA }
+		}
+		option = {
+			name = mexico_civil_war.34.b
+			trigger = { TAG = SPR }
+		}
+		option = {
+			name = mexico_civil_war.34.c
+			trigger = { is_subject_of = SPR }
+		}
+		option = {
+			name = mexico_civil_war.34.e
+			trigger = { TAG = MEX }
+		}
+		option = {
+			name = mexico_civil_war.34.f
+			trigger = { TAG = MEC }
+		}
+		option = {
+			name = mexico_civil_war.34.g
+			trigger = { 
+				OR = {
+					TAG = FRA
+					TAG = ENG
+					TAG = HOL
+				}
+			}
+		}
+		option = {
+			name = mexico_civil_war.34.h
+			trigger = { 
+				NOT = { 
+					TAG = PAP
+					TAG = USA
+					TAG = SPR
+					TAG = MEX
+					TAG = MEC
+					TAG = FRA
+					TAG = ENG
+					TAG = HOL
+					is_subject_of = SPR
+				}
+			}
+		}
+		option = {
+			name = mexico_civil_war.34.i
+			trigger = { 
+				NOT = { 
+					TAG = PAP
+					TAG = YAQ
+					TAG = MAY
+					TAG = BRA
+					TAG = USA
+					TAG = SPR
+					TAG = MEX
+					TAG = MEC
+					TAG = FRA
+					TAG = ENG
+					TAG = HOL
+					is_subject_of = SPR
+					is_subject_of = USA
+				}
+				has_government = centrism
+			}
+		}
+		option = {
+			name = mexico_civil_war.34.j
+			trigger = { 
+				NOT = { 
+					TAG = PAP
+					TAG = YAQ
+					TAG = MAY
+					TAG = BRA
+					TAG = USA
+					TAG = SPR
+					TAG = MEX
+					TAG = MEC
+					TAG = FRA
+					TAG = ENG
+					TAG = HOL
+					is_subject_of = SPR
+					is_subject_of = USA
+				}
+				has_government = traditional_conservatism
+			}
+		}
+		option = {
+			name = mexico_civil_war.34.k
+			trigger = { 
+				TAG = PAP
+			}
 		}
 	}
 
