@@ -877,6 +877,7 @@ GRE_decision_category_industry = {
 		}
 
 		visible = {
+			has_completed_focus = GRE_industrialization
 			hidden_trigger = {
 				has_idea = egy_vic_debt
 			}
@@ -938,6 +939,7 @@ GRE_decision_category_industry = {
 		}
 
 		visible = {
+			has_completed_focus = GRE_industrialization
 			hidden_trigger = {
 				has_idea = egy_vic_debt
 			}
@@ -996,6 +998,7 @@ GRE_decision_category_industry = {
 		}
 
 		visible = {
+			has_completed_focus = GRE_industrialization
 			hidden_trigger = {
 				has_idea = egy_vic_debt
 			}
@@ -1122,6 +1125,7 @@ GRE_decision_category_industry = {
 		}
 
 		visible = {
+			has_completed_focus = GRE_land_reform
 			has_full_control_of_state = 186
 		}
 
@@ -1180,6 +1184,9 @@ GRE_decision_category_industry = {
 		}
 
 		visible = {
+			GRE_karl_johann_fix = {
+				is_character_slot = political_advisor
+			}
 			has_full_control_of_state = 186
 		}
 
@@ -1213,17 +1220,87 @@ GRE_decision_category_industry = {
 		}
 	}
 	
+	#Enact Free Enterprise
+	GRE_decision_enact_free_enterprise = {
+
+		icon = eng_trade_unions_support
+
+		allowed = { tag = GRE }
+		
+		available = {
+			has_completed_focus = GRE_balance_import_and_export
+			custom_trigger_tooltip = {
+				tooltip = GRE_debt_less_than_40
+				check_variable = {
+					debt_level < 40
+				}
+			}
+		}
+
+		visible = {
+			has_completed_focus = GRE_industrialization
+			has_full_control_of_state = 1251
+			NOT = {
+				OR = {
+					has_government = social_egalitarianism
+					has_government = collectivist_socialism
+					has_government = vanguard_communism
+					has_government = anarchism
+					has_government = chauvinist_populism
+				}
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+		
+		days_remove = 60
+		
+		remove_effect = {
+			debt_level_decrease_by_5 = yes
+			if = {
+				limit = {
+					NOT = {
+						has_idea = SAX_idea_free_enterprise_1
+					}
+				}
+				add_ideas = SAX_idea_free_enterprise_1
+			}
+			else_if = {
+				limit = {
+					has_idea = SAX_idea_free_enterprise_1
+				}
+				swap_ideas = { remove_idea = SAX_idea_free_enterprise_1 add_idea = SAX_idea_free_enterprise_2 }
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
 	GRE_decision_land_reform = { 
 
         icon = generic_construction
 
 		available = {
 			has_completed_focus = GRE_land_reform
+			custom_trigger_tooltip = {
+				tooltip = GRE_debt_less_than_40
+				check_variable = {
+					debt_level < 40
+				}
+			}
 			NOT = { has_country_flag = SAX_industry_development_ongoing_flag }
 		}
 
 		allowed = {
 		    tag = GRE
+		}
+		
+		visible = {
+			has_completed_focus = GRE_land_reform
 		}
 
 		fire_only_once = yes
@@ -1273,12 +1350,17 @@ GRE_decision_category_industry = {
 		
 		available = {
 			has_completed_focus = GRE_attract_foreign_investors
-			has_stability > 0.3
-			centrism > 0.3
-			traditional_conservatism < 0.6
+			custom_trigger_tooltip = {
+				tooltip = GRE_debt_less_than_40
+				check_variable = {
+					debt_level < 40
+				}
+			}
+			NOT = { has_country_flag = SAX_financial_investment_ongoing_flag }
 		}
 
 		visible = {
+			has_completed_focus = GRE_industrialization
 			has_full_control_of_state = 1251
 			NOT = {
 				OR = {
@@ -1297,21 +1379,31 @@ GRE_decision_category_industry = {
 		
 		days_remove = 60
 		
+		complete_effect = {
+			custom_effect_tooltip = SAX_financial_investment_ongoing_effect_tt
+			hidden_effect = { 
+				set_country_flag = SAX_financial_investment_ongoing_flag 
+			}
+		}
+		
 		remove_effect = {
 			debt_level_decrease_by_5 = yes
-			add_ideas = SAX_idea_free_enterprise_1
 			if = {
 				limit = {
 					NOT = {
-						OR = {
-							has_government = social_egalitarianism
-							has_government = collectivist_socialism
-							has_government = vanguard_communism
-							has_government = anarchism
-							has_government = chauvinist_populism
-						}
+						has_idea = SAX_idea_free_enterprise_1
 					}
 				}
+				add_ideas = SAX_idea_free_enterprise_1
+			}
+			else_if = {
+				limit = {
+					has_idea = SAX_idea_free_enterprise_1
+				}
+				swap_ideas = { remove_idea = SAX_idea_free_enterprise_1 add_idea = SAX_idea_free_enterprise_2 }
+			}
+			hidden_effect = {
+				clr_country_flag = SAX_financial_investment_ongoing_flag
 			}
 		}
 
@@ -1329,7 +1421,30 @@ GRE_decision_category_industry = {
 		
 		available = {
 			has_completed_focus = GRE_establish_the_greek_stock_market
+			custom_trigger_tooltip = {
+				tooltip = GRE_debt_less_than_40
+				check_variable = {
+					debt_level < 40
+				}
+			}
 			NOT = { has_country_flag = SAX_financial_investment_ongoing_flag }
+		}
+		
+		visible = {
+			OR = {
+				has_completed_focus = GRE_industrialization
+				has_completed_focus = GRE_land_reform
+			}
+			has_full_control_of_state = 1251
+			NOT = {
+				OR = {
+					has_government = social_egalitarianism
+					has_government = collectivist_socialism
+					has_government = vanguard_communism
+					has_government = anarchism
+					has_government = chauvinist_populism
+				}
+			}
 		}
 
 		fire_only_once = yes
