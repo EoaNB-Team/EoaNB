@@ -31,7 +31,9 @@ GEC_decision_category_domestic_policy = {
 			NOT = { has_idea = GEC_idea_scientific_research }
 		}
 		
-		cost = 100
+		fire_only_once = no
+		
+		cost = 150
 		
         days_remove = 365
          
@@ -62,9 +64,9 @@ GEC_decision_category_domestic_policy = {
 
 GEC_decision_category_our_armed_forces = {
 	
-	GEC_decision_sign_military_convention_with_prussia = {
+	GEC_decision_military_convention_with_prussia = {
 
-		icon = generic_research
+		icon = generic_military
 
 		#allowed = {
 		#	OR = {
@@ -82,37 +84,423 @@ GEC_decision_category_our_armed_forces = {
 		#}
 		
 		available = {
-			has_completed_focus = GEC_focus_technological_advancements
-			has_tech = tech_humanities_capitalism
-			has_tech = tech_humanities_social_stratification
-			has_tech = tech_humanities_public_works
-			NOT = { has_country_flag = GEC_domestic_policy_flag }
+			has_completed_focus = GEC_focus_prussian_style_reform
 		}
 
 		visible = {
-			NOT = { has_idea = GEC_idea_scientific_research }
+			country_exists = PRS
+			NOT = { has_war_with = PRS }
+			NOT = { has_completed_focus = GEC_focus_austrian_style_reform }
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
 		}
+		
+		fire_only_once = yes
 		
 		cost = 100
 		
-        days_remove = 365
+		complete_effect = {
+			PRS = { country_event = { days = 7 id = gerconfed.32 } }
+		}
+       
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	GEC_decision_military_convention_with_austria = {
+
+		icon = generic_military
+
+		#allowed = {
+		#	OR = {
+        #       tag = BRE
+		#		tag = FRK
+		#		tag = HAN
+		#		tag = HES
+		#		tag = HSD
+		#		tag = LCK
+		#		tag = MCK
+		#		tag = NAS
+		#		tag = OLD
+		#		tag = THU
+		#	}
+		#}
+		
+		available = {
+			has_completed_focus = GEC_focus_austrian_style_reform
+		}
+
+		visible = {
+			country_exists = AUS
+			NOT = { has_war_with = AUS }
+			NOT = { has_completed_focus = GEC_focus_prussian_style_reform }
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+		
+		fire_only_once = yes
+		
+		cost = 100
+		
+		complete_effect = {
+			AUS = { country_event = { days = 7 id = gerconfed.32 } }
+		}
+       
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	GEC_decision_intensify_convention = {
+
+		icon = generic_military
+		
+		#allowed = {
+		#	OR = {
+        #       tag = BRE
+		#		tag = FRK
+		#		tag = HAN
+		#		tag = HES
+		#		tag = HSD
+		#		tag = LCK
+		#		tag = MCK
+		#		tag = NAS
+		#		tag = OLD
+		#		tag = THU
+		#	}
+		#}
+
+		available = {
+			if = {
+				limit = {
+					has_idea = GEC_idea_PRS_military_convention_1
+				}
+				PRS = { has_war = no }
+			}
+			if = {
+				limit = {
+					has_idea = GEC_idea_AUS_military_convention_1
+				}
+				AUS = { has_war = no }
+			}
+			has_stability > 0.5
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				centrism > 0.35
+			}
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
+				}
+				traditional_conservatism > 0.35
+			}
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				autocracy > 0.2
+			}
+		}
+
+		visible = {
+			OR = {
+				has_idea = GEC_idea_PRS_military_convention_1
+				has_idea = GEC_idea_AUS_military_convention_1
+			}
+			NOT = {
+				OR = {
+					has_country_flag = MHC_military_junta_army
+					has_country_flag = MHC_military_junta_airforce
+					has_country_flag = MHC_military_junta_navy
+				}
+				is_in_array = {
+					array = mhc_powerful_army_officials
+					value = mhc_sec_value
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 180
+		
+		remove_effect = {
+			if = {
+				limit = {
+					has_idea = GEC_idea_PRS_military_convention_1
+				}
+				swap_ideas = { remove_idea = GEC_idea_PRS_military_convention_1 add_idea = GEC_idea_PRS_military_convention_2 }
+				PRS = {
+					remove_opinion_modifier = {
+						target = ROOT
+						modifier = GEC_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				ROOT = {
+					remove_opinion_modifier = {
+						target = PRS
+						modifier = GEC_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				add_opinion_modifier = { target = PRS modifier = GEC_MILITARY_CONVENTION_MEDIUM_REL }
+				reverse_add_opinion_modifier = { target = PRS modifier = GEC_MILITARY_CONVENTION_MEDIUM_REL }
+			}
+			else_if = {
+				limit = {
+					has_idea = GEC_idea_AUS_military_convention_1
+				}
+				swap_ideas = { remove_idea = GEC_idea_AUS_military_convention_1 add_idea = GEC_idea_AUS_military_convention_2 }
+				AUS = {
+					remove_opinion_modifier = {
+						target = ROOT
+						modifier = GEC_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				ROOT = {
+					remove_opinion_modifier = {
+						target = AUS
+						modifier = GEC_MILITARY_CONVENTION_EARLY_REL
+					}
+				}
+				add_opinion_modifier = { target = AUS modifier = GEC_MILITARY_CONVENTION_MEDIUM_REL }
+				reverse_add_opinion_modifier = { target = AUS modifier = GEC_MILITARY_CONVENTION_MEDIUM_REL }
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	GEC_decision_landwehr_adaptation_strenghtening = {
+
+		icon = landwehr
+
+		#allowed = {
+		#	OR = {
+        #       tag = BRE
+		#		tag = FRK
+		#		tag = HAN
+		#		tag = HES
+		#		tag = HSD
+		#		tag = LCK
+		#		tag = MCK
+		#		tag = NAS
+		#		tag = OLD
+		#		tag = THU
+		#	}
+		#}
+		
+		available = {
+			has_completed_focus = GEC_focus_landwehr_adaptation
+			NOT = { has_country_flag = GEC_army_reform_flag }
+		}
+
+		visible = {
+			has_government = centrism
+		}
+		
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 365
          
         modifier = {
             political_power_gain = -0.1
-			consumer_goods_factor = 0.1
+			stability_weekly = 0.001
         }
 		
 		complete_effect = {
+			if = {
+				limit = {
+					has_idea = non_monarchical_system
+					NOT = { tag = LCK }
+				}
+				add_popularity = {
+					ideology = traditional_conservatism
+					popularity = 0.05
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = non_monarchical_system
+					tag = LCK
+				}
+				add_popularity = {
+					ideology = traditional_conservatism
+					popularity = 0.03
+				}
+				add_popularity = {
+					ideology = radical_democracy
+					popularity = 0.02
+				}
+			}
+			else_if = {
+				add_popularity = {
+					ideology = traditional_conservatism
+					popularity = 0.03
+				}
+				add_popularity = {
+					ideology = autocracy
+					popularity = 0.03
+				}
+			}
 			hidden_effect = {
-				set_country_flag = GEC_domestic_policy_flag
+				set_country_flag = GEC_army_reform_flag
 			}
 		}
        
         remove_effect = {
-			add_timed_idea = { idea = GEC_idea_scientific_research days = 1095 }
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = biochemistry_tech }
+			add_ideas = GEC_idea_landwehr_strengthened
 			hidden_effect = {
-				clr_country_flag = GEC_domestic_policy_flag
+				clr_country_flag = GEC_army_reform_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	GEC_decision_landwehr_adaptation_weakening = {
+
+		icon = landwehr
+
+		#allowed = {
+		#	OR = {
+        #       tag = BRE
+		#		tag = FRK
+		#		tag = HAN
+		#		tag = HES
+		#		tag = HSD
+		#		tag = LCK
+		#		tag = MCK
+		#		tag = NAS
+		#		tag = OLD
+		#		tag = THU
+		#	}
+		#}
+		
+		available = {
+			has_completed_focus = GEC_focus_landwehr_adaptation
+			NOT = { has_country_flag = GEC_army_reform_flag }
+		}
+
+		visible = {
+			OR = {
+				has_government = traditional_conservatism
+				has_government = autocracy
+			}
+		}
+		
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 365
+         
+        modifier = {
+            political_power_gain = -0.05
+			stability_weekly = -0.001
+        }
+		
+		complete_effect = {
+			add_popularity = {
+				ideology = centrism
+				popularity = 0.05
+			}
+			hidden_effect = {
+				set_country_flag = GEC_army_reform_flag
+			}
+		}
+       
+        remove_effect = {
+			add_ideas = GEC_idea_landwehr_weakened
+			hidden_effect = {
+				clr_country_flag = GEC_army_reform_flag
+			}
+	    }
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	GEC_decision_incorporate_jager_tactics = {
+
+		icon = landwehr
+
+		#allowed = {
+		#	OR = {
+        #       tag = BRE
+		#		tag = FRK
+		#		tag = HAN
+		#		tag = HES
+		#		tag = HSD
+		#		tag = LCK
+		#		tag = MCK
+		#		tag = NAS
+		#		tag = OLD
+		#		tag = THU
+		#	}
+		#}
+		
+		available = {
+			has_completed_focus = GEC_focus_jager_tactics
+			NOT = { has_country_flag = GEC_army_reform_flag }
+		}
+
+		visible = {
+			#
+		}
+		
+		fire_only_once = yes
+		
+		cost = 50
+		
+		days_remove = 180
+         
+        modifier = {
+            political_power_gain = -0.05
+			experience_gain_army_factor = -0.25
+        }
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = GEC_army_reform_flag
+			}
+		}
+       
+        remove_effect = {
+			army_experience = 25
+			add_doctrine_cost_reduction = { cost_reduction = 0.5 uses = 1 category = land_doctrine }
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = infantry_weapons }
+			hidden_effect = {
+				clr_country_flag = GEC_army_reform_flag
 			}
 	    }
        
@@ -1319,7 +1707,7 @@ GEC_decision_category_industrialization = {
          
         modifier = {
 			political_power_gain = -0.1
-			stability_weekly_factor = -0.003
+			stability_weekly = -0.003
         }
 		
 		complete_effect = {
@@ -1374,7 +1762,7 @@ GEC_decision_category_industrialization = {
          
         modifier = {
 			political_power_gain = -0.1
-			stability_weekly_factor = -0.001
+			stability_weekly = -0.001
         }
 		
 		complete_effect = {
@@ -1540,7 +1928,7 @@ GEC_decision_category_industrialization = {
 }
 
 GEC_decision_category_trade = {
-	GEC_trade_consulate_bremen = {
+	GEC_decision_trade_consulate_bremen = {
 
 		icon = gre_investment_decisions
 		
@@ -1568,6 +1956,8 @@ GEC_decision_category_trade = {
 		}
 
 		visible = {
+			NOT = { has_country_flag = GEC_trade_from_hamburg_flag }
+			NOT = { has_decision = GEC_decision_trade_consulate_hamburg }
 			NOT = { 
 				any_owned_state = {
 					is_coastal = yes
@@ -1602,7 +1992,7 @@ GEC_decision_category_trade = {
 		}
 	}
 	
-	GEC_trade_consulate_hamburg = {
+	GEC_decision_trade_consulate_hamburg = {
 
 		icon = gre_investment_decisions
 		
@@ -1626,10 +2016,12 @@ GEC_decision_category_trade = {
 		}
 
 		available = {
-			NOT = { has_country_flag = GEC_trade_from_bremen_flag } 
+			NOT = { has_country_flag = GEC_trade_from_bremen_flag }
 		}
 
 		visible = {
+			NOT = { has_country_flag = GEC_trade_from_bremen_flag }
+			NOT = { has_decision = GEC_decision_trade_consulate_bremen }
 			NOT = { 
 				any_owned_state = {
 					is_coastal = yes
@@ -1645,7 +2037,7 @@ GEC_decision_category_trade = {
          
         modifier = {
             political_power_gain = -0.15
-        }        
+        }
        
         remove_effect = {
 		    add_opinion_modifier = {
@@ -1656,7 +2048,7 @@ GEC_decision_category_trade = {
 				target = HAM
 				modifier = medium_increase 
 			}
-            set_country_flag = GEC_trade_from_hamburg_flag	
+            set_country_flag = GEC_trade_from_hamburg_flag
 	    }
        
 		ai_will_do = {
@@ -1664,7 +2056,7 @@ GEC_decision_category_trade = {
 		}
 	}
 	
-	GEC_purchasing_trade_convoys_non_trade_countries = {
+	GEC_decision_purchasing_trade_convoys_non_coastal = {
 
 		icon = generic_naval
 		
@@ -1734,7 +2126,7 @@ GEC_decision_category_trade = {
 		}
 	}
 	
-	GEC_establish_trade_UK = {
+	GEC_decision_establish_trade_UK = {
 
 		icon = money
 		
@@ -1785,11 +2177,11 @@ GEC_decision_category_trade = {
 			add_ideas = GEC_idea_trade_with_england
 			add_opinion_modifier = {
 				target = ENG
-				modifier = GEC_TRADE_WITH_ENG
+				modifier = GEC_TRADE_WITH_ENG_REL
 			}
 			reverse_add_opinion_modifier = {
 				target = ENG
-				modifier = GEC_TRADE_WITH_ENG 
+				modifier = GEC_TRADE_WITH_ENG_REL 
 			}
 		}
        
@@ -1800,7 +2192,7 @@ GEC_decision_category_trade = {
 }
 
 GEC_decision_category_hansa_cities = {
-    GEC_purchasing_trade_convoys = {
+    GEC_decision_purchasing_trade_convoys = {
 
 		icon = generic_naval
 		
@@ -1849,7 +2241,7 @@ GEC_decision_category_hansa_cities = {
 		}
 	}
 	
-	HAM_zoologischer_garten = {
+	HAM_decision_zoologischer_garten = {
 
 		icon = generic_decision
 		
@@ -1885,7 +2277,7 @@ GEC_decision_category_hansa_cities = {
 		}
 	}
 	
-	HAM_rescue_shipwrecked_people = {
+	HAM_decision_rescue_shipwrecked_people = {
 
 		icon = generic_operation
 		
@@ -1948,7 +2340,7 @@ GEC_decision_category_polizeiverein = {
          
         modifier = {
             political_power_gain = 0.25
-			stability_weekly_factor = 0.005
+			stability_weekly = 0.005
         }
 
 		complete_effect = {
@@ -2001,7 +2393,7 @@ GEC_decision_category_polizeiverein = {
         modifier = {
             political_power_gain = 0.2
 			drift_defence_factor = 0.25
-			stability_weekly_factor = 0.005
+			stability_weekly = 0.005
         }
 
 		complete_effect = {
@@ -2207,7 +2599,7 @@ GEC_decision_category_polizeiverein = {
         modifier = {
             political_power_gain = 0.2
 			drift_defence_factor = 0.25
-			stability_weekly_factor = 0.005
+			stability_weekly = 0.005
         }
 
 		complete_effect = {
@@ -2263,7 +2655,7 @@ GEC_decision_category_polizeiverein = {
         modifier = {
             political_power_gain = 0.2
 			drift_defence_factor = 0.25
-			stability_weekly_factor = 0.005
+			stability_weekly = 0.005
         }
 
 		complete_effect = {
