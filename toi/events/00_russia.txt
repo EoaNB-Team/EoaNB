@@ -777,6 +777,94 @@ add_namespace = russiaarmyreform
   				191 = { set_compliance = 90 }
   				1134 = { set_compliance = 90 }
 			}
+			add_ai_strategy = {
+				type = front_control
+
+				tag = CIR
+				state = 233
+				strategic_region = 134
+				country_trigger = { RUS = { has_war_with = CIR } }
+
+				ratio = 0.0
+
+				priority = 20000
+				ordertype = invasion
+				execution_type = careful
+				execute_order = yes
+				manual_attack = yes
+			}
+			add_ai_strategy = {
+				type = invasion_unit_request
+
+				tag = CIR
+				state = 233
+				strategic_region = 134
+				country_trigger = { RUS = { has_war_with = CIR } }
+
+				value = 40000
+			}
+			add_ai_strategy = {
+				type = front_control
+
+				tag = CAU
+				state = 232
+				strategic_region = 135
+				country_trigger = { RUS = { has_war_with = CAU } }
+
+				ratio = 0.0
+
+				priority = 30000
+				ordertype = invasion
+				execution_type = careful
+				execute_order = yes
+				manual_attack = yes
+			}
+			add_ai_strategy = {
+				type = invasion_unit_request
+
+				tag = CAU
+				state = 232
+				strategic_region = 135
+				country_trigger = { RUS = { has_war_with = CAU } }
+
+				value = 60000
+			}
+			CIR = {
+				add_ai_strategy = {
+					type = front_control
+
+					tag = RUS
+					state = 233
+					strategic_region = 134
+					country_trigger = { CIR = { has_war_with = RUS } }
+
+					ratio = 0.0
+
+					priority = 20000
+					ordertype = front
+					execution_type = careful
+					execute_order = no
+					manual_attack = yes
+				}
+			}
+			CAU = {
+				add_ai_strategy = {
+					type = front_control
+
+					tag = RUS
+					state = 232
+					strategic_region = 135
+					country_trigger = { CAU = { has_war_with = RUS } }
+
+					ratio = 0.0
+
+					priority = 20000
+					ordertype = front
+					execution_type = careful
+					execute_order = no
+					manual_attack = yes
+				}
+			}
 		}
 		
 		option = {
@@ -2723,6 +2811,7 @@ country_event = {	# The sale of alaska, USA responds
 		option = {
 			name = russiacaucasus.2.a
 			add_political_power = 100
+			hidden_effect = { country_event = { id = imamate.3 days = 400 } }
 	    }
     }
 	
@@ -2749,16 +2838,6 @@ country_event = {	# The sale of alaska, USA responds
 		}
 
 		immediate = {
-			hidden_effect = {
-				CIR = { 
-					remove_ideas = { 
-						CAU_fighters
-						CAU_fierce_resistance
-						CAU_fierce_resistance_weak
-					}
-				}
-				clr_country_flag = RUS_flag_war_with_caucasus
-			}
 			increase_ps_by_one = yes
 			if = {
 			    limit = { 
@@ -2772,11 +2851,60 @@ country_event = {	# The sale of alaska, USA responds
 			if = {
 			    limit = { 
 	    			country_exists = CIR
+	    			CIR = {	### This is a check to see if CIR decided to become a puppet of RUS
+	    				has_idea = CAU_fighters
+	    				has_idea = CAU_fierce_resistance
+	    				has_idea = CAU_fierce_resistance_weak
+	    			}
 	    		}
 	    		annex_country = {
     				target = CIR
     				transfer_troops = no
 				}
+			}
+			hidden_effect = {
+				CIR = { 
+					remove_ideas = { 
+						CAU_fighters
+						CAU_fierce_resistance
+						CAU_fierce_resistance_weak
+					}
+				}
+				clr_country_flag = RUS_flag_war_with_caucasus
+			}
+			RUS = {
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = GEO
+						autonomous_state = autonomy_dominion
+						freedom_level = 0.2
+					}
+				}
+				else = { puppet = GEO }
+			}
+			RUS = {
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = ABK
+						autonomous_state = autonomy_dominion
+						freedom_level = 0.2
+					}
+				}
+				else = { puppet = ABK }
 			}
 		}
 		
