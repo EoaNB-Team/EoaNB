@@ -234,7 +234,7 @@ country_event = {
 						name = DOM_Buenaventura_Baez_temp
 						portraits={
 							civilian={
-								large="gfx/leaders/DOM/Portrait_DOM_Buenaventura_Baez.png"
+								large="GFX_Portrait_DOM_Buenaventura_Baez"
 							}
 						}
 					}
@@ -250,6 +250,9 @@ country_event = {
 					promote_character = {
 						character = DOM_Buenaventura_Baez_temp
 						Ideology = conserv
+					}
+					set_country_leader_portrait = {
+						portrait = GFX_Portrait_DOM_Buenaventura_Baez
 					}
 					add_ideas = presidential_republic
 					division_template = {
@@ -554,7 +557,7 @@ country_event = {
 						name = DOM_Pedro_Santana_temp
 						portraits={
 							civilian={
-								large="gfx/leaders/DOM/Portrait_DOM_Pedro_Santana.png"
+								large="GFX_Portrait_DOM_Pedro_Santana"
 							}
 						}
 					}
@@ -578,6 +581,9 @@ country_event = {
 					promote_character = {
 						character = DOM_Pedro_Santana_temp
 						Ideology = military_junta
+					}
+					set_country_leader_portrait = {
+						portrait = GFX_Portrait_DOM_Pedro_Santana
 					}
 					add_ideas = military_junta
 					division_template = {
@@ -1558,6 +1564,7 @@ country_event = {
 						freedom_level = 0.5
 					}
 					hidden_effect = { FROM = { load_prevous_ideologies = yes } }
+					hidden_effect = { DOM = { set_cosmetic_tag = DOM_SPC_cosmetic } }
 				}
 			}
 			else = { 
@@ -2091,58 +2098,59 @@ country_event = {
 	
 	fire_only_once = yes 
 	is_triggered_only = yes
-	
-	trigger = {
-		OR = {
-			1318 = {
-				check_variable = { var = detrimental_colonial_impact_value value = 20 compare = greater_than_or_equals }
-				#check_variable = { var = DCI_anti_colonial_organization_var value = 100 compare = greater_than_or_equals }
-				#OR = {
-					#OWNER = { is_subject_of = SPR }
-					is_owned_by = SPR
-				#}
-			}
-			319 = {
-				check_variable = { var = detrimental_colonial_impact_value value = 20 compare = greater_than_or_equals }
-				#check_variable = { var = DCI_anti_colonial_organization_var value = 100 compare = greater_than_or_equals }
-				#OR = {
-					#OWNER = { is_subject_of = SPR }
-					is_owned_by = SPR
-				#}
-			}
-		}
-	}
     
     option = {
 		name = hispaniola.7.a
-		DOM = {
-			transfer_state = 319
-			hidden_effect = { load_oob = "DOM_1863_REVOLT" }	
-			declare_war_on = {
-				target = SPR
-				type = annex_everything
+		if = { 
+			limit = { DOM = { exists = no } }
+			DOM = {
+				transfer_state = 319
+				hidden_effect = { load_oob = "DOM_1863_REVOLT" }	
+				declare_war_on = {
+					target = ROOT
+					type = annex_everything
+				}
+				hidden_effect = {
+					set_politics = {
+						ruling_party = radical_democracy
+					}
+					add_popularity = {
+						ideology = radical_democracy
+						popularity = 0.5
+					}
+					swap_ideas = {
+						add_idea = presidential_republic
+						remove_idea = absolute_monarchy
+					}
+					swap_ideas = {
+						add_idea = universal_male_suffrage
+						remove_idea = absolutism
+					}
+					add_ideas = {
+						DOM_restoration_war
+					}				
+				}
 			}
-			set_politics = {
-				ruling_party = centrism
-            }
-			add_popularity = {
-				ideology = centrism
-				popularity = 0.5
-			}
-			swap_ideas = {
-				add_idea = presidential_republic
-				remove_idea = absolute_monarchy
-			}
-			swap_ideas = {
-				add_idea = universal_male_suffrage
-				remove_idea = absolutism
-			}
-            add_ideas = {
-				DOM_restoration_war
-			}				
 			add_political_power = -10
 			add_war_support = 0.015
-		}    
+		}
+		else_if = {
+			limit = { DOM = { is_subject_of = SPR } }
+			start_civil_war = {
+				ruling_party = radical_democracy
+				ideology = ROOT
+				size = 0
+				capital = 319
+				states = { 
+					319
+				}
+				#keep_unit_leaders = {
+				#	
+				#}
+				keep_political_leader = yes
+				keep_political_party_members = yes
+			}
+		}
 	}
 }
 
@@ -2434,3 +2442,31 @@ country_event = {
 	}
 }
 	
+
+country_event = { 
+	id = SPR_hispaniola.12
+	title = SPR_hispaniola.12.t
+	desc = SPR_hispaniola.12.d
+
+	is_triggered_only = yes
+	
+	option = { #Dont Promote French
+		name = SPR_hispaniola.12.a
+		ai_chance = { base = 80 }
+		if = { 
+			limit = { ROOT = { owns_state = 790 } }
+			790 = { DCI_increase_by_1 = yes }
+		}
+		if = { 
+			limit = { ROOT = { owns_state = 319 } }
+			319 = { DCI_increase_by_1 = yes }
+		}
+	}
+	
+	option = { #Accommodate Both
+		name = SPR_hispaniola.12.b
+		trigger = { has_political_power > 0 }
+		ai_chance = { base = 20 }
+		add_political_power = -75
+	}
+}
