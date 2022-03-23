@@ -86,7 +86,10 @@ focus_tree = {
 			base = 100
 			modifier = {
 				factor = 0
-				has_government = traditional_conservatism
+				OR = {
+					has_government = traditional_conservatism
+					has_government = autocracy
+				}
 			}
 		}
 		
@@ -116,7 +119,13 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_liberal_reforms }
 
 		completion_reward = {
-			#unlock_decision_tooltip = 
+			unlock_decision_tooltip = GEC_decision_constitutional_amendments
+			add_popularity = {
+	    	  	ideology = centrism
+	    	  	popularity = 0.03
+	    	}
+        	add_political_power = 25
+			add_stability = 0.02
 		}
 	}
 	
@@ -162,9 +171,18 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_conservative_stance }
 
 		completion_reward = {
-			#unlock_decision_tooltip = 
-			add_political_power = 50
-			add_stability = 0.02
+			if = {
+				limit = {
+					has_idea = free_city
+				}
+				add_political_power = 150
+				add_stability = 0.1
+			}
+			else = {
+				unlock_decision_tooltip = GEC_decision_contain_revolutionary_ideas
+				add_political_power = 50
+				add_stability = 0.03
+			}
 		}
 	}
 	
@@ -199,44 +217,71 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_external_policy }
 
 		completion_reward = {
-			add_political_power = 50
-			#unlock_decision_tooltip = 
+			if = {
+				limit = {
+					NOT = { has_idea = free_trade }
+				}
+				unlock_decision_tooltip = GEC_decision_open_our_trade_policy
+				add_political_power = 50
+			}
+			else = {
+				add_political_power = 120
+			}
 		}
 	}
 	
 	focus = {
 		id = GEC_focus_profits_from_our_harbours
-		icon = GFX_
+		icon = GFX_Focus_Naval_Industry_Profits
 		relative_position_id = GEC_focus_trade_policy
 		x = -1
 		y = 1
 		cost = 75
 		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GEC_focus_profits_from_our_harbours_trigger_tt
+				hidden_trigger = {
+					any_owned_state = {
+						is_coastal = yes
+					}
+					nation_is_in_zollverein = no
+				}
+			}
+		}
 		ai_will_do = { base = 100 }
 		
 		prerequisite = { focus = GEC_focus_trade_policy }
 		mutually_exclusive = { focus = GEC_focus_profits_from_the_zollverein }
 
 		completion_reward = {
-			#unlock_decision_tooltip = 
+			add_ideas = GEC_idea_harbour_trade_profits
 		}
 	}
 	
 	focus = {
 		id = GEC_focus_profits_from_the_zollverein
-		icon = GFX_
+		icon = GFX_focus_zollverein_profits
 		relative_position_id = GEC_focus_trade_policy
 		x = 1
 		y = 1
 		cost = 75
 		available_if_capitulated = no
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = GEC_focus_profits_from_the_zollverein_trigger_tt
+				hidden_trigger = {
+					nation_is_in_zollverein = yes
+				}
+			}
+		}
 		ai_will_do = { base = 100 }
 		
 		prerequisite = { focus = GEC_focus_trade_policy }
 		mutually_exclusive = { focus = GEC_focus_profits_from_our_harbours }
 
 		completion_reward = {
-			#unlock_decision_tooltip = 
+			add_ideas = GEC_idea_zollverein_trade_profits
 		}
 	}
 	
@@ -358,9 +403,9 @@ focus_tree = {
 	
 	focus = {
 		id = GEC_focus_bring_our_weight_to_bear
-		icon = GFX_
+		icon = GFX_Focus_Electorate_rally_people
 		relative_position_id = GEC_focus_constitutional_amendments
-		x = 4
+		x = 5
 		y = 1
 		cost = 75
 		available_if_capitulated = no
@@ -799,10 +844,6 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_member_of_the_german_confederation }
 
 		completion_reward = {
-			add_timed_idea = { idea = GEC_idea_industrialization_efforts days = 1825 }
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = mechanical_engineering_tech }
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = process_engineering_tech }
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = electronics_devices_tech }
 			if = {
 				limit = {
 					NOT = { has_idea = industrializing }
@@ -812,6 +853,10 @@ focus_tree = {
 					activate_mission = GEC_mission_industrializing
 				}
 			}
+			add_timed_idea = { idea = GEC_idea_industrialization_efforts days = 1825 }
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = mechanical_engineering_tech }
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = process_engineering_tech }
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = electronics_devices_tech }
 		}
 	}
 	
@@ -828,9 +873,9 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_industrialization }
 
 		completion_reward = {
+			unlock_decision_tooltip = GEC_decision_establish_scientific_research
 			add_tech_bonus = { bonus = 0.75 uses = 1 category = infantry_weapons }
 			add_tech_bonus = { bonus = 0.75 uses = 2 category = mechanical_engineering_tech }
-			unlock_decision_tooltip = GEC_decision_establish_scientific_research
 		}
 	}
 	
@@ -940,14 +985,14 @@ focus_tree = {
 						is_coastal = yes
 					}
 				}
+				unlock_decision_tooltip = GEC_decision_invest_in_our_naval_infrastructure
 				navy_experience = 25
 				add_doctrine_cost_reduction = { cost_reduction = 0.75 uses = 1 category = naval_doctrine }
-				unlock_decision_tooltip = GEC_decision_invest_in_our_naval_infrastructure
 			}
 			else = {
+				unlock_decision_tooltip = GEC_decision_invest_in_our_naval_infrastructure_inland
 				add_political_power = 50
 				navy_experience = 10
-				unlock_decision_tooltip = GEC_decision_invest_in_our_naval_infrastructure_inland
 			}
 		}
 	}
@@ -971,15 +1016,15 @@ focus_tree = {
 						is_coastal = yes
 					}
 				}
-				navy_experience = 25
-				add_doctrine_cost_reduction = { cost_reduction = 0.75 uses = 1 category = naval_doctrine }
 				unlock_decision_tooltip = GEC_decision_invest_in_our_naval_ports
 				unlock_decision_tooltip = GEC_decision_invest_in_our_dockyards
+				navy_experience = 25
+				add_doctrine_cost_reduction = { cost_reduction = 0.75 uses = 1 category = naval_doctrine }
 			}
 			else = {
+				unlock_decision_tooltip = GEC_decision_invest_in_our_river_ports
 				add_political_power = 50
 				navy_experience = 10
-				unlock_decision_tooltip = GEC_decision_invest_in_our_river_ports
 			}
 		}
 	}
@@ -997,10 +1042,10 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_infrastructure_investments }
 		
 		completion_reward = {
+			unlock_decision_tooltip = GEC_decision_invest_in_our_terrestrial_infrastructure
 			army_experience = 25
 			add_doctrine_cost_reduction = { cost_reduction = 0.75 uses = 1 category = land_doctrine }
 			add_tech_bonus = { bonus = 0.75 uses = 1 category = mechanical_engineering_tech }
-			unlock_decision_tooltip = GEC_decision_invest_in_our_terrestrial_infrastructure
 		}
 	}
 	
@@ -1018,9 +1063,9 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_terrestrial_infrastructure }
 
 		completion_reward = {
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = transport_tech }
 			unlock_decision_tooltip = GEC_decision_invest_in_our_road_network
 			unlock_decision_tooltip = GEC_decision_invest_in_our_canals
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = transport_tech }
 		}
 	}
 	
@@ -1037,9 +1082,9 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_terrestrial_infrastructure }
 
 		completion_reward = {
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = trains_tech }
 			unlock_decision_tooltip = GEC_decision_railway_upgrade
 			unlock_decision_tooltip = GEC_decision_acquire_trains
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = trains_tech }
 		}
 	}
 	
@@ -1075,7 +1120,6 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_industrial_developments }
 
 		completion_reward = {
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = resource_extraction_tech }
 			if = {
 				limit = {
 					any_owned_state = {
@@ -1099,6 +1143,7 @@ focus_tree = {
 				unlock_decision_tooltip = GEC_decision_resource_prospecting_coal
 			}
 			#alternative for city states?
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = resource_extraction_tech }
 		}
 	}
 	
@@ -1115,9 +1160,9 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_resource_prospecting }
 
 		completion_reward = {
-			add_tech_bonus = { bonus = 0.75 uses = 2 category = resource_extraction_tech }
 			unlock_decision_tooltip = GEC_decision_subsidize_new_extraction_methods_1
 			#alternative for city states?
+			add_tech_bonus = { bonus = 0.75 uses = 2 category = resource_extraction_tech }
 		}
 	}
 	
@@ -1134,7 +1179,6 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_industrial_developments }
 
 		completion_reward = {
-			add_tech_bonus = { bonus = 0.75 uses = 1 category = humanities_tech }
 			if = {
 				limit = {
 					has_idea = GEC_idea_zunftwesen
@@ -1144,6 +1188,7 @@ focus_tree = {
 			else = {
 				unlock_decision_tooltip = GEC_decision_establish_gewerbeordnung
 			}
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = humanities_tech }
 		}
 	}
 	
@@ -1160,9 +1205,9 @@ focus_tree = {
 		prerequisite = { focus = GEC_focus_encouraging_trades_and_industry }
 
 		completion_reward = {
+			unlock_decision_tooltip = GEC_decision_subsidize_and_support_major_industries
 			add_tech_bonus = { bonus = 0.75 uses = 1 category = humanities_tech }
 			add_tech_bonus = { bonus = 0.75 uses = 1 category = economics_tech }
-			unlock_decision_tooltip = GEC_decision_subsidize_and_support_major_industries
 		}
 	}
 	
@@ -1192,5 +1237,4 @@ focus_tree = {
 			add_timed_idea = { idea = GEC_idea_steady_industrialization days = 1825 }
 		}
 	}
-	
 }
