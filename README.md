@@ -112,10 +112,6 @@ If you wish to contribute to the development of the mod, supprt us on Patreon or
   <img src="https://cdn.discordapp.com/avatars/118877444542300164/ee0bac252d2038b1cf77d1b382618918.png?size=256" width="120px;" alt="Garion132"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Imperialism1"><strong>Imperialism</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/254066709252669440/dbe57d4081757cc0aa36ae256e106284.png?size=256" width="120px;" alt="Imperialism"/>
-</td>
-<td align="center">
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
   <img src="https://media.discordapp.net/attachments/733406104243011687/816435452373893140/clown_generation.jpg" width="120px;" alt="Kuba"/>
 </td>
