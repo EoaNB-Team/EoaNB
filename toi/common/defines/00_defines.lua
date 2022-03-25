@@ -1301,7 +1301,7 @@ NDefines = {
 		DAILY_MANPOWER_GAIN_RATIO = 0.05,								-- the ships not in combat will be able to gain this ratio of their max manpower
 		PRIDE_OF_THE_FLEET_UNASSIGN_COST = 100,							-- cost to unassign/replace pride of the fleet
 		PRIDE_OF_THE_FLEET_LOST_TEMP_MODIFIER_DURATION = 30,			-- duration for temp modifiers that you get when you lose your pride of the fleet
-		XP_GAIN_FACTOR = 1.0,	   			   							-- xp gain factor for navy
+		XP_GAIN_FACTOR = 0.25,	   			   							-- xp gain factor for navy
 
 		NAVAL_TRANSFER_DAMAGE_REDUCTION = 0.25,							-- its hard to specifically balance 1-tick naval strikes vs unit transports so here is a factor for it
 		CARRIER_ONLY_COMBAT_ACTIVATE_TIME = 0,							-- hours from start of combat when carriers get to fight
@@ -1480,12 +1480,12 @@ NDefines = {
 
 																		-- The Formula: Min( TRAINING_MAX_DAILY_COUNTRY_EXP * Ratio, TRAINING_DAILY_COUNTRY_EXP_FACTOR * ( TRAINING_DAILY_COUNTRY_EXP_SHIP_RATIO_FACTOR * TrainingShipCount / CountryShipCount 
 																		--              + TRAINING_DAILY_COUNTRY_EXP_MANPOWER_FACTOR * Manpower + TRAINING_DAILY_COUNTRY_EXP_MANPOWER_RATIO_FACTOR * Manpower / CountryShipCount ) ) 
-		TRAINING_EXPERIENCE_FACTOR = 0.03,								-- Amount of exp each ship gain every 24h while training (before modifiers)
+		TRAINING_EXPERIENCE_FACTOR = 0.01,								-- Amount of exp each ship gain every 24h while training (before modifiers)
 		TRAINING_DAILY_COUNTRY_EXP_FACTOR = 0.001,						-- Factor used to scale the Daily Country Navy XP gain
 		TRAINING_DAILY_COUNTRY_EXP_MANPOWER_FACTOR = 0.01,					-- Factor used to scale the sum of the training manpower for the Daily Country Navy XP gain
 		TRAINING_DAILY_COUNTRY_EXP_MANPOWER_RATIO_FACTOR = 0.01,				-- Factor used to scale the sum of the manpower divided by the country's number of ship for the Daily Country Navy XP gain
-		TRAINING_DAILY_COUNTRY_EXP_SHIP_RATIO_FACTOR = 890.0,					-- Factor used to scale the ratio of training ships for the Daily Country Navy XP gain
-		TRAINING_MAX_DAILY_COUNTRY_EXP = 3.0,							-- Maximum navy XP daily gain
+		TRAINING_DAILY_COUNTRY_EXP_SHIP_RATIO_FACTOR = 100.0,					-- Factor used to scale the ratio of training ships for the Daily Country Navy XP gain
+		TRAINING_MAX_DAILY_COUNTRY_EXP = 1.0,							-- Maximum navy XP daily gain
 		TRAINING_MIN_STRENGTH = 0.1,									-- if strength is less than this, the unit will not contribute to training and cant be damaged by training
 		
 		TRAINING_ORG = 0.2,												-- max organization on traiaing mission

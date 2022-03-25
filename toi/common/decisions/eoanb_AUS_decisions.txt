@@ -1221,35 +1221,97 @@ AUS_decision_category_external_threats = {
 }
 
 AUS_decision_category_internal_threats = {
+
+}
+
+AUS_decision_category_multinational_empire = {
 	
-	AUS_mission_the_multinational_empire = {
+	AUS_decision_nationalist_agitation_countdown = {
 
         icon = generic_nationalism
 
-        allowed = { always = no }
+        allowed = {
+			tag = AUS
+		}
 
         available = {
-			
+			hidden_trigger = { always = no }
         }
 		
-        activation = { always = no }
+        visible = {
+			check_variable = {
+				var = HUN_REVOLT_RISK
+				value = 0
+				compare = greater_than
+			}
+		}
 
-        fire_only_once = no
-
-        is_good = no
+        days_remove = 90
 		
-        days_mission_timeout = 1500
+        cancel_trigger = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_decision_uproar_in_italy_countdown_trigger_tt
+				OR = {
+					NOT = { has_variable = ITA_UPROAR_RISK }
+					NOT = { LVN = { is_puppet_of = AUS } }
+				}
+			}
+		}
 		
-        timeout_effect = {
-            
-        }
-		
-        complete_effect = {
-            
+        remove_effect = {
+            custom_effect_tooltip = AUS_decision_uproar_in_italy_countdown_effect_tt
+			hidden_effect = {
+				if = {
+					limit = {
+						if = {
+							limit = {
+								LVN = {
+									controls_state = 159
+								}
+							}
+							army_manpower_in_state = {
+								amount > 20000
+								state = 159
+							}
+						}
+						if = {
+							limit = {
+								LVN = {
+									controls_state = 160
+								}
+							}
+							army_manpower_in_state = {
+								amount > 20000
+								state = 160
+							}
+						}
+					}
+					add_to_variable = {
+						ITA_UPROAR_RISK = -0.01
+					}
+				}
+				if = {
+					limit = {
+						is_ai = yes
+					}
+					add_to_variable = {
+						ITA_UPROAR_RISK = -0.01
+					}
+				}
+				add_to_variable = {
+					ITA_UPROAR_RISK = modifier@AUS_Italian_Uproar_Risk_Modifier
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+				country_event = { id = austriaexternal.11 }
+			}
         }
 
         ai_will_do = {
-			base = 500
+			base = 100
 		}
 	}
 	
@@ -1403,7 +1465,7 @@ AUS_decision_category_internal_threats = {
 		}
 	}
 	
-	AUS_decision_suppress_czechoslovakian_nationalism = {
+	AUS_decision_suppress_west_slavic_nationalism = {
 
 		icon = oppression
 		
@@ -1445,7 +1507,7 @@ AUS_decision_category_internal_threats = {
 						}
 					}
 				}
-				custom_effect_tooltip = AUS_increase_czech_nationalism_by_two_tt
+				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_two_tt
 				add_to_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.02
@@ -1464,7 +1526,7 @@ AUS_decision_category_internal_threats = {
 						PS_pol_stab_minus_five = yes
 					}
 				}
-				custom_effect_tooltip = AUS_increase_czech_nationalism_by_three_tt
+				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_three_tt
 				add_to_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.03
@@ -1476,7 +1538,7 @@ AUS_decision_category_internal_threats = {
 				}
 			}
 			else = {
-				custom_effect_tooltip = AUS_increase_czech_nationalism_by_one_tt
+				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_one_tt
 				add_to_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.01
@@ -1502,7 +1564,7 @@ AUS_decision_category_internal_threats = {
 					}
 				}
 				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_czech_nationalism_by_three_tt
+				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_three_tt
 				subtract_from_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.03
@@ -1522,7 +1584,7 @@ AUS_decision_category_internal_threats = {
 					}
 				}
 				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_czech_nationalism_by_four_tt
+				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_four_tt
 				subtract_from_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.04
@@ -1535,13 +1597,163 @@ AUS_decision_category_internal_threats = {
 			}
 			else = {
 				add_stability = 0.03
-				custom_effect_tooltip = AUS_decrease_czech_nationalism_by_two_tt
+				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_two_tt
 				subtract_from_variable = {
 					var = CZE_REVOLT_RISK
 					value = 0.02
 				}
 				clamp_variable = {
 					var = CZE_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+       
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	AUS_decision_suppress_south_slavic_nationalism = {
+
+		icon = oppression
+		
+		allowed = {
+			tag = AUS
+		}
+
+		available = {
+			has_stability > 0.3
+		}
+
+		visible = {
+			check_variable = {
+				var = CRO_REVOLT_RISK
+				value = 0
+				compare = greater_than
+			}
+		}
+		
+		cost = 25
+		
+        days_remove = 180
+         
+        modifier = {
+            political_power_gain = -0.05
+			drift_defence_factor = 0.25
+			stability_weekly = -0.001
+        }
+
+		complete_effect = {
+			if = {
+				limit = {
+					PS_pol_negative_null = yes
+					NOT = {
+						OR = {
+							PS_pol_stab_minus_three = yes
+							PS_pol_stab_minus_four = yes
+							PS_pol_stab_minus_five = yes
+						}
+					}
+				}
+				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_two_tt
+				add_to_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.02
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						PS_pol_stab_minus_three = yes
+						PS_pol_stab_minus_four = yes
+						PS_pol_stab_minus_five = yes
+					}
+				}
+				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_three_tt
+				add_to_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.03
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+			else = {
+				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_one_tt
+				add_to_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.01
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+       
+        remove_effect = {
+		   if = {
+				limit = {
+					PS_pol_negative_null = yes
+					NOT = {
+						OR = {
+							PS_pol_stab_minus_three = yes
+							PS_pol_stab_minus_four = yes
+							PS_pol_stab_minus_five = yes
+						}
+					}
+				}
+				add_stability = 0.02
+				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_three_tt
+				subtract_from_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.03
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+			else_if = {
+				limit = {
+					OR = {
+						PS_pol_stab_minus_three = yes
+						PS_pol_stab_minus_four = yes
+						PS_pol_stab_minus_five = yes
+					}
+				}
+				add_stability = 0.01
+				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_four_tt
+				subtract_from_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.04
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
+					min = 0
+					max = 1
+				}
+			}
+			else = {
+				add_stability = 0.03
+				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_two_tt
+				subtract_from_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.02
+				}
+				clamp_variable = {
+					var = CRO_REVOLT_RISK
 					min = 0
 					max = 1
 				}
@@ -4326,7 +4538,7 @@ AUS_decision_category_habsburg_army = {
 	
 	AUS_decision_new_uhlan_regiments = {
 
-		icon = generic_army_support
+		icon = generic_cavalry
 
 		allowed = { tag = AUS }
 		
