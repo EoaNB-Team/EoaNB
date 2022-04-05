@@ -88,7 +88,7 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
 
 ### Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `experimental` branch.
+- Current General Development for EoaNB shall be pushed onto the `Ver-Tersus-(Optimization-and-Finishing-Pax)` branch.
 - All code should be error-checked before pushed onto the Github
 - Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
 - If procedural pushing (including incomplete content) is crucial to development, request a new branch.
