@@ -438,7 +438,7 @@ AUS_decision_category_external_threats = {
 		custom_cost_trigger = {
 			if = {
 				limit = { has_idea = egy_vic_debt }
-				check_variable = { debt_level > 20 }
+				check_variable = { debt_level > 0 }
 				check_variable = { debt_level < 50 }
 			}
 			else = { has_political_power > 24.9 }
@@ -500,7 +500,7 @@ AUS_decision_category_external_threats = {
 		custom_cost_trigger = {
 			if = {
 				limit = { has_idea = egy_vic_debt }
-				check_variable = { debt_level > 20 }
+				check_variable = { debt_level > 0 }
 				check_variable = { debt_level < 50 }
 			}
 			else = { has_political_power > 24.9 }
@@ -562,7 +562,7 @@ AUS_decision_category_external_threats = {
 		custom_cost_trigger = {
 			if = {
 				limit = { has_idea = egy_vic_debt }
-				check_variable = { debt_level > 20 }
+				check_variable = { debt_level > 0 }
 				check_variable = { debt_level < 50 }
 			}
 			else = { has_political_power > 24.9 }
@@ -624,7 +624,7 @@ AUS_decision_category_external_threats = {
 		custom_cost_trigger = {
 			if = {
 				limit = { has_idea = egy_vic_debt }
-				check_variable = { debt_level > 20 }
+				check_variable = { debt_level > 0 }
 				check_variable = { debt_level < 50 }
 			}
 			else = { has_political_power > 24.9 }
@@ -2691,12 +2691,8 @@ AUS_decision_category_financial_affairs = {
 		is_good = yes
 		
 		timeout_effect = {
-			custom_effect_tooltip = AUS_decrease_debt_by_1
+			debt_level_decrease_by_1 = yes
 			hidden_effect = {
-				subtract_from_variable = { 
-					var = debt_level
-					value = 1
-				}
 				activate_decision = AUS_decision_debt_repayments_done
 			}
 		}
@@ -2805,6 +2801,126 @@ AUS_decision_category_financial_affairs = {
 		
 		ai_will_do = {
 			base = 100
+		}
+	}
+	
+	AUS_decision_reduce_army_budget = {
+
+		icon = money
+
+		available = {
+			NOT = { has_country_flag = AUS_fiscal_measure_in_progress_flag }
+		}
+
+		visible = {
+			has_completed_focus = AUS_focus_cut_army_budget
+			OR = {
+				has_idea = ten_percent
+				has_idea = five_percent
+				has_idea = three_percent
+			}
+		}
+		
+		fire_only_once = no
+		
+		cost = 50
+		
+		days_remove = 400
+		
+		modifier = {
+			political_power_gain = -0.05
+			war_support_weekly = -0.003
+			stability_weekly = -0.001
+		}
+
+		complete_effect = {
+			add_stability = -0.02
+			if = {
+				limit = {
+					has_idea = three_percent
+				}
+				swap_ideas = { remove_idea = three_percent add_idea = two_percent }
+				hidden_effect = {
+					set_country_flag = AUS_army_budget_was_three_percent
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = five_percent
+				}
+				swap_ideas = { remove_idea = five_percent add_idea = three_percent }
+				hidden_effect = {
+					set_country_flag = AUS_army_budget_was_five_percent
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = ten_percent
+				}
+				swap_ideas = { remove_idea = ten_percent add_idea = five_percent }
+				hidden_effect = {
+					set_country_flag = AUS_army_budget_was_ten_percent
+				}
+			}
+			hidden_effect = {
+				set_country_flag = AUS_fiscal_measure_in_progress_flag
+			}
+		}
+		
+        remove_effect = {
+			custom_effect_tooltip = AUS_decision_reduce_army_budget_effect_tt
+			debt_level_decrease_by_1 = yes
+			hidden_effect = {
+				clr_country_flag = AUS_fiscal_measure_in_progress_flag
+				country_event = { id = austriainternal.102 days = 365 }
+			}
+		}
+		
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	AUS_decision_levy_newspaper_tax = {
+
+		icon = newspaper
+
+		available = {
+			has_stability > 0.3
+			NOT = { has_country_flag = AUS_fiscal_measure_in_progress_flag }
+		}
+
+		visible = {
+			has_completed_focus = AUS_focus_newspaper_tax
+		}
+		
+		fire_only_once = yes
+		
+		cost = 50
+		
+		days_remove = 90
+		
+		modifier = {
+			political_power_gain = -0.05
+		}
+
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = AUS_fiscal_measure_in_progress_flag
+			}
+		}
+		
+        remove_effect = {
+			custom_effect_tooltip = AUS_decision_levy_newspaper_tax_effect_tt
+			add_ideas = AUS_idea_newspaper_tax
+			hidden_effect = {
+				clr_country_flag = AUS_fiscal_measure_in_progress_flag
+				country_event = { id = austriainternal.104 days = 500 }
+			}
+		}
+		
+		ai_will_do = {
+			base = 300
 		}
 	}
 }
