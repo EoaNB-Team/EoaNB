@@ -175,7 +175,7 @@ add_namespace = russiaarmyreform
             RUS = {
                 effect_tooltip = {
                     navy_experience = 10
-			        add_tech_bonus = { bonus = 2 uses = 2 category = naval_doctrine }
+			        add_doctrine_cost_reduction = { cost_reduction = 2 uses = 2 category = naval_doctrine }
                 }
                 country_event = {
                     id = russiavicfocus.11
@@ -214,7 +214,7 @@ add_namespace = russiaarmyreform
 			    reverse_add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_increase_small }
 			}
             navy_experience = 10
-			add_tech_bonus = { bonus = 2 uses = 2 category = naval_doctrine }
+			add_doctrine_cost_reduction = { cost_reduction = 2 uses = 2 category = naval_doctrine }
 		}
 	}
 
@@ -364,6 +364,7 @@ add_namespace = russiaarmyreform
 
 		option = {
 			name = russiavicfocus.20.a # Replace
+			ai_chance = { base = 90 }
 			FIN = {
 			    retire_country_leader = yes
 			    create_country_leader = {
@@ -389,6 +390,13 @@ add_namespace = russiaarmyreform
 
 		option = {
 			name = russiavicfocus.20.b # Keep the old one
+			ai_chance = { 
+				base = 10 
+				modifier = {
+					factor = 0
+					is_historical_focus_on = yes
+				}
+			}
 			FIN = { set_country_flag = FIN_vic_Berg_Governor }
 		}
 	}
@@ -485,6 +493,37 @@ add_namespace = russiaarmyreform
 			name = russiavicfocus.23.b # Leave Lithuanians 
 			ai_chance = { base = 30 }
 			
+		}
+	}
+
+	country_event = {  # Finland - Russian Integration
+		id = russiavicfocus.24
+		title = russiavicfocus.24.t
+		desc = russiavicfocus.24.d
+		picture = GFX_GEO_report_event_Dadiani_Palace
+		
+		fire_only_once = yes
+	    is_triggered_only = yes
+
+		option = {
+			name = russiavicfocus.24.a # Accept
+			RUS = {
+				add_stability = -0.07
+				add_political_power = -20
+				activate_decision = RUS_mission_vic_Annex_FIN
+			}
+		}
+
+		option = {
+			name = russiavicfocus.24.b # Reject (War is declared)
+			RUS = { 
+				add_stability = -0.03 
+				end_puppet = FIN
+			}
+			declare_war_on = {
+    			target = RUS
+    			type = independence_wargoal
+			}
 		}
 	}
 
@@ -731,13 +770,100 @@ add_namespace = russiaarmyreform
   				1127 = { set_compliance = 85 }
   				791 = { set_compliance = 85 }
   				78 = { set_compliance = 85 }
-
   				12 = { set_compliance = 90 }
   				13 = { set_compliance = 90 }
   				190 = { set_compliance = 90 }
   				191 = { set_compliance = 90 }
   				191 = { set_compliance = 90 }
   				1134 = { set_compliance = 90 }
+			}
+			add_ai_strategy = {
+				type = front_control
+
+				tag = CIR
+				state = 233
+				strategic_region = 134
+				country_trigger = { RUS = { has_war_with = CIR } }
+
+				ratio = 0.0
+
+				priority = 20000
+				ordertype = invasion
+				execution_type = careful
+				execute_order = yes
+				manual_attack = yes
+			}
+			add_ai_strategy = {
+				type = invasion_unit_request
+
+				tag = CIR
+				state = 233
+				strategic_region = 134
+				country_trigger = { RUS = { has_war_with = CIR } }
+
+				value = 40000
+			}
+			add_ai_strategy = {
+				type = front_control
+
+				tag = CAU
+				state = 232
+				strategic_region = 135
+				country_trigger = { RUS = { has_war_with = CAU } }
+
+				ratio = 0.0
+
+				priority = 30000
+				ordertype = invasion
+				execution_type = careful
+				execute_order = yes
+				manual_attack = yes
+			}
+			add_ai_strategy = {
+				type = invasion_unit_request
+
+				tag = CAU
+				state = 232
+				strategic_region = 135
+				country_trigger = { RUS = { has_war_with = CAU } }
+
+				value = 60000
+			}
+			CIR = {
+				add_ai_strategy = {
+					type = front_control
+
+					tag = RUS
+					state = 233
+					strategic_region = 134
+					country_trigger = { CIR = { has_war_with = RUS } }
+
+					ratio = 0.0
+
+					priority = 20000
+					ordertype = front
+					execution_type = careful
+					execute_order = no
+					manual_attack = yes
+				}
+			}
+			CAU = {
+				add_ai_strategy = {
+					type = front_control
+
+					tag = RUS
+					state = 232
+					strategic_region = 135
+					country_trigger = { CAU = { has_war_with = RUS } }
+
+					ratio = 0.0
+
+					priority = 20000
+					ordertype = front
+					execution_type = careful
+					execute_order = no
+					manual_attack = yes
+				}
 			}
 		}
 		
@@ -781,7 +907,7 @@ add_namespace = russiaarmyreform
 		}		
 		option = {
 			name = russia.12.a
-            add_tech_bonus = { bonus = 0.5 uses = 1 category = land_doctrine }
+            add_doctrine_cost_reduction = { cost_reduction = 0.5 uses = 1 category = land_doctrine }
             army_experience = 7
 		}
 	}
@@ -2635,40 +2761,22 @@ country_event = {	# The sale of alaska, USA responds
 	} 
 	
 	
-	###Resume Caucasus War
+	### Caucasus War Starting Event
 	country_event = {
 		id = russiacaucasus.1
 		title = russiacaucasus.1.t
 		desc = russiacaucasus.1.d
 		
-		fire_only_once = yes
-		
-		trigger = {
-			tag = RUS
-			date > 1857.07.15
-			CAU = { exists = yes }
-		}
+		is_triggered_only = yes
 		
 		picture = GFX_report_event_second_opium_war_tianjin_treaty
 		
 		option = {
 			name = russiacaucasus.1.a
-			activate_mission = RUS_mission_vic_cau_war
-			hidden_effect = {
-                if = { 
-	    			limit = { CAU = { is_ai = yes } }
-    				CAU = { add_ideas = CAU_fighters }
-    			}
-                else = { 
-    				CAU = { add_ideas = CAU_fighters_a }
-     			}
-     			CAU = { add_ideas = CAU_fierce_resistance }
-				set_country_flag = RUS_flag_war_with_caucasus
-            }			
-		} 				
+		}
     }
 	
-	country_event = { #Attack Circassia after Caucasus Surrenders  
+	country_event = { # The Imamate Defeated
 		id = russiacaucasus.2
 		title = russiacaucasus.2.t
 		desc = russiacaucasus.2.d
@@ -2683,49 +2791,27 @@ country_event = {	# The sale of alaska, USA responds
             OR = {
             	NOT = { country_exists = CAU }
             	CAU = { is_subject_of = RUS }
+            }			
+		}
+
+		immediate = {
+			add_stability = 0.05
+			hidden_effect = {
+				CAU = { 
+					remove_ideas = { 
+						CAU_fighters
+						CAU_fierce_resistance
+						CAU_fierce_resistance_weak
+					}
+				}
+				retire_character = CAU_teofil_lapinski
             }
-            country_exists = CIR 				
 		}
 		
 		option = {
 			name = russiacaucasus.2.a
 			add_political_power = 100
-			create_wargoal = {
- 			   	type = annex_everything
-    			target = CIR
-			}
-			activate_mission = RUS_mission_vic_cir_war
-			hidden_effect = {
-				CAU = {
-					remove_ideas = {
-						CAU_fighters
-						CAU_fighters_a
-					}
-				}
-                if = { 
-	    			limit = { 
-	    				CIR = { is_ai = yes } 
-	    		    }
-    				CIR = { add_ideas = CAU_fighters }
-                    else = { 
-    					CIR = { add_ideas = CAU_fighters_a }
-     				}
-	    		}
-				increase_ps_by_one = yes 
-				CIR = {
-					create_corps_commander = {
-  						name = "Magomet-Amin"
-  						picture = "Portrait_Magomet_Amin.dds"
- 						traits = { ambusher hill_fighter trait_mountaineer }
-  						skill = 2
-  						attack_skill = 2
-  						defense_skill = 3
-  						planning_skill = 2
-  						logistics_skill = 3
-					}
-					add_ideas = CAU_fierce_resistance
-				}
-            }
+			hidden_effect = { country_event = { id = imamate.3 days = 400 } }
 	    }
     }
 	
@@ -2742,25 +2828,17 @@ country_event = {	# The sale of alaska, USA responds
 		    tag = RUS 
             has_country_flag = RUS_flag_war_with_caucasus
             OR = {
-            	NOT = { 
+            	NOT = {
 			    	country_exists = CAU
-                	country_exists = CIR 				
+                	country_exists = CIR
 				}
 				CAU = { is_subject_of = RUS }
 				CIR = { is_subject_of = RUS }
 			}
 		}
-		
-		option = {
-			name = russiacaucasus.3.a
-			hidden_effect = {
-				CIR = {
-					remove_ideas = {
-						CAU_fighters
-						CAU_fighters_a
-					}
-				}
-			}
+
+		immediate = {
+			increase_ps_by_one = yes
 			if = {
 			    limit = { 
 	    			country_exists = CAU
@@ -2773,323 +2851,81 @@ country_event = {	# The sale of alaska, USA responds
 			if = {
 			    limit = { 
 	    			country_exists = CIR
+	    			CIR = {	### This is a check to see if CIR decided to become a puppet of RUS
+	    				has_idea = CAU_fighters
+	    				has_idea = CAU_fierce_resistance
+	    				has_idea = CAU_fierce_resistance_weak
+	    			}
 	    		}
 	    		annex_country = {
     				target = CIR
     				transfer_troops = no
 				}
 			}
-			add_stability = 0.05 
+			hidden_effect = {
+				CIR = { 
+					remove_ideas = { 
+						CAU_fighters
+						CAU_fierce_resistance
+						CAU_fierce_resistance_weak
+					}
+				}
+				clr_country_flag = RUS_flag_war_with_caucasus
+			}
+			RUS = {
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = GEO
+						autonomous_state = autonomy_dominion
+						freedom_level = 0.2
+					}
+				}
+				else = { puppet = GEO }
+			}
+			RUS = {
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = ABK
+						autonomous_state = autonomy_dominion
+						freedom_level = 0.2
+					}
+				}
+				else = { puppet = ABK }
+			}
+		}
+		
+		option = {
+			name = russiacaucasus.3.a
 			add_political_power = 200
 			custom_effect_tooltip = eoanb_tt_RUS_Caucasian_War_Ends
 	    }
     }
 	
-	country_event = { #Circassia victorious 
+	country_event = {
 		id = russiacaucasus.4
 		title = russiacaucasus.4.t
 		desc = russiacaucasus.4.d
-        picture = GFX_report_event_second_opium_war_tianjin_treaty
-		fire_only_once = yes
 		
-		trigger = {
-			tag = CIR 
-			RUS = { has_country_flag = RUS_flag_war_with_caucasus }
-			CIR = { 
-			    has_full_control_of_state = 233
-                has_full_control_of_state = 1115	
-			}	
-		} 	
+        is_triggered_only = yes 
 		
-		option = {
+		picture = GFX_report_event_second_opium_war_tianjin_treaty	
+		
+		option = {  
 			name = russiacaucasus.4.a
-            hidden_effect = { RUS = { country_event = russiacaucasus.6 } }
- 			custom_effect_tooltip = caucasus_war_3
- 			CIR = {
-				remove_ideas = {
-					CAU_fighters
-					CAU_fighters_a
-				}
-			}
-		}
-	}
-		
-	country_event = { #Caucasus victorious 
-		id = russiacaucasus.5
-		title = russiacaucasus.5.t
-		desc = russiacaucasus.5.d
-		
-		fire_only_once = yes
-		
-		trigger = {
-			tag = CAU  
-			RUS = { has_country_flag = RUS_flag_war_with_caucasus }
-			CAU = { 
-			    has_full_control_of_state = 1216  
-                has_full_control_of_state = 229   				
-			}			
-		} 	
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {
-			name = russiacaucasus.5.a
-            hidden_effect = {
-			    RUS = { country_event = russiacaucasus.7 }	
-				set_country_flag = caucasus_win
-			}
- 			custom_effect_tooltip = caucasus_war_4
- 			CAU = {
-				remove_ideas = {
-					CAU_fighters
-					CAU_fighters_a
-				}
-			}
-		}
-	}
-		
-	country_event = { #Circassia victorious - Russian event
-		id = russiacaucasus.6
-		title = russiacaucasus.6.t
-		desc = russiacaucasus.6.d
-		
-        is_triggered_only = yes  
-		
-		immediate = {
-            hidden_effect = { 		
-			    every_other_country = { 
-				    limit = {
-					    NOT = { has_idea = pre_industrial_era }
-					}
-				    news_event = { id = russiacaucasus.8 } 
-				} 
-			}
-		}
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {
-			name = russiacaucasus.6.a
-            white_peace = CIR
-			decrease_ps_by_one = yes 
-			add_stability = -0.05 
-			CIR = {
-                transfer_state = 1123			
-			    annex_country = { target = ABK }
-            }					
-	    }
-	}
-	
-	country_event = { #Caucasus victorious - Russian event
-		id = russiacaucasus.7
-		title = russiacaucasus.7.t
-		desc = russiacaucasus.7.d
-		
-        is_triggered_only = yes  
-		
-		immediate = {
-            hidden_effect = { 		
-			    every_other_country = { 
-				    limit = {
-					    NOT = { has_idea = pre_industrial_era }
-					}
-				    news_event = { id = russiacaucasus.9 } 
-				} 
-			}
-		}
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty
-		
-		option = {
-			name = russiacaucasus.7.a
-	        white_peace = CAU
-			decrease_ps_by_one = yes 
-			add_stability = -0.05 
-			CAU = {
-                transfer_state = 1216	
-                transfer_state = 229	
-                transfer_state = 1121 
-                transfer_state = 1008  				
-			}
-	    }
-	}
-		
-	news_event = { #Circassia victorious - News
-	    id = russiacaucasus.8
-		title = russiacaucasus.8.t
-		desc = russiacaucasus.8.d
-		
-		is_triggered_only = yes
-		
-	    option = {
-	        name = russiacaucasus.8.a
-        }	
-	}
-	
-	news_event = { #Caucasus victorious - News
-	    id = russiacaucasus.9
-		title = russiacaucasus.9.t
-		desc = russiacaucasus.9.d
-		
-		is_triggered_only = yes
-		
-	    option = {
-	        name = russiacaucasus.9.a
-        }	
-	}
-	
-	country_event = { #Persia demands Lankaran 
-		id = russiacaucasus.10
-		title = russiacaucasus.10.t
-		desc = russiacaucasus.10.d
-		
-		fire_only_once = yes
-		
-		trigger = {
-			tag = PER  
-		    CAU = { 
-			    has_country_flag = caucasus_win 
-				owns_state = 1008 
-			}
-		} 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {
-			name = russiacaucasus.10.a
-			
-			ai_chance = { factor = 60 }
-            hidden_effect = {
-			    CAU = { 
-				    country_event = { id = russiacaucasus.11 days = 25 }	
-				}
-			}
- 			custom_effect_tooltip = caucasus_war_5	
-		}
-		
-		option = {
-			name = russiacaucasus.10.b
-			ai_chance = { factor = 40 }
-			
-			add_stability = -0.05 
-			add_political_power = -50 
-		}
-	}
-		
-	country_event = { #Persia demands Lankaran - 2
-		id = russiacaucasus.11
-		title = russiacaucasus.11.t
-		desc = russiacaucasus.11.d
-		
-        is_triggered_only = yes 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {  #Accept
-			name = russiacaucasus.11.a 
-			ai_chance = { factor = 70 }
-			
-			decrease_ps_by_one = yes 
-			add_stability = -0.05 
-            hidden_effect = {
-			    PER = { 
-				    country_event = { id = russiacaucasus.12 days = 25 } 
-				} 	
-			}	
-		}
-		
-		option = { #Refuse
-			name = russiacaucasus.11.b
-			ai_chance = { factor = 30 }
-			
-	    	hidden_effect = {
-	  	        PER = { 
-				    country_event = { id = russiacaucasus.13 days = 25 } 
-				} 
-		    } 
-		}
-	}
-	
-	country_event = { #Persia demands Lankaran - 3 - Caucasus Accepts 
-		id = russiacaucasus.12
-		title = russiacaucasus.12.t
-		desc = russiacaucasus.12.d
-		
-        is_triggered_only = yes 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {  
-			name = russiacaucasus.12.a
-			PER = { transfer_state = 1008 }	
-		}
-	}
-	
-	country_event = { #Persia demands Lankaran - 3 - Caucasus Denies 
-		id = russiacaucasus.13
-		title = russiacaucasus.13.t
-		desc = russiacaucasus.13.d
-		
-        is_triggered_only = yes 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {  
-			name = russiacaucasus.13.a 
-			PER = {
-				declare_war_on = {
-    				target = CAU
-    				type = take_claimed_state
-				}
-			}
-		}
-	}
-
-	country_event = {
-		id = russiacaucasus.14
-		title = russiacaucasus.14.t
-		desc = russiacaucasus.14.d
-		
-		fire_only_once = yes 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		trigger = {
-            OR = {
-            	tag = CIR
-            	tag = CAU
-            }
-            NOT = { has_idea = CAU_fighters }
-            NOT = { has_idea = CAU_fighters_a }
-            RUS = { has_war_with = ROOT }
-            date < 1880.01.01
-		}
-		
-		mean_time_to_happen = { days = 2 }
-		
-		option = {
-			name = russiacaucasus.14.a
-            if = { 
-	    		limit = { ROOT = { is_ai = yes } }
-    			ROOT = { add_ideas = CAU_fighters }
-                else = { 
-    				ROOT = { add_ideas = CAU_fighters_a }
-     			}
-	    	}
-	    }
-    }
-	
-	country_event = {
-		id = russiacaucasus.15
-		title = russiacaucasus.15.t
-		desc = russiacaucasus.15.d
-		
-        is_triggered_only = yes 
-		
-		picture = GFX_report_event_second_opium_war_tianjin_treaty	
-		
-		option = {  
-			name = russiacaucasus.15.a 
 			swap_ideas = {
     			remove_idea = CAU_fierce_resistance
     			add_idea = CAU_fierce_resistance_weak
@@ -3099,9 +2935,58 @@ country_event = {	# The sale of alaska, USA responds
 			}
 		}
 	}
+
+	country_event = {
+		id = russiacaucasus.5
+		title = russiacaucasus.5.t
+		desc = russiacaucasus.5.d
+		
+        is_triggered_only = yes
+		
+		picture = GFX_report_event_second_opium_war_tianjin_treaty
+
+		immediate = {
+			add_manpower = -9748
+			CIR = { add_manpower = 3228 }
+			CAU = { add_manpower = 3753 }
+		}
+		
+		option = {
+			name = russiacaucasus.5.a
+		}
+	}
+
+	country_event = {
+		id = russiacaucasus.6
+		title = russiacaucasus.6.t
+		desc = russiacaucasus.6.d
+		
+        is_triggered_only = yes
+		
+		picture = GFX_report_event_second_opium_war_tianjin_treaty
+
+		option = {
+			name = russiacaucasus.6.a
+			effect_tooltip = {
+				CIR = {
+					add_manpower = 87
+					add_equipment_to_stockpile = {
+						type = infantry_equipment_rifle_1
+						amount = 200
+						producer = ENG
+					}
+					add_equipment_to_stockpile = {
+						type = uniform_equipment_1
+						amount = 200
+						producer = ENG
+					}
+				}
+			}
+		}
+	}
+
+
 	
-
-
 
 	country_event = { #Commanders' deaths events
 		id = russiacommander.1

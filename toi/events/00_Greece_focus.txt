@@ -1,40 +1,212 @@
-﻿add_namespace = Greecemisc
+﻿add_namespace = Greeceelections
 
+ #1859 elections start 
+country_event = {       
+	id = Greeceelections.1
+	title = Greeceelections.1.t
+	desc = Greeceelections.1.d
+	picture = GFX_report_event_election_vote
+	
+	trigger = {
+		tag = GRE
+	}
+	
+	fire_only_once = yes 
+	is_triggered_only = yes
+	
+	option = {
+		name = Greeceelections.1.a
+		ai_chance = { factor = 100 }
+		
+		hidden_effect = {
+			GRE = {
+				set_country_flag = gre_election_1859	
+				country_event = { id = Greeceelections.2 days = 25 }
+			}
+		}
+	}
+}
+
+#Election fraud 
+country_event = {
+    id = Greeceelections.2 
+	title = Greeceelections.2.t 
+	desc = Greeceelections.2.d 
+	picture = GFX_report_event_election_vote 
+	
+	is_triggered_only = yes
+		
+	fire_only_once = yes
+	
+	#Do Fraud
+	option = {
+	     name = Greeceelections.2.a
+		 
+		 
+		 hidden_effect = {
+		    GRE = {
+		        add_to_variable = {
+                    var = gre_electiona
+                    value = 2
+                }
+	           country_event = { id = Greecemisc.2 days = 25 }
+            }
+	
+        }
+    }
+
+	#no fraud 
+	option = {
+	     name = Greeceelections.2.b 
+		 ai_chance = {factor = 50}
+		 
+		 hidden_effect = {
+		    GRE = {
+		        subtract_from_variable = {
+                    var = gre_electiona
+                    value = 2
+                }
+	            country_event = { id = Greecemisc.2 days = 25 }
+            }
+	
+        }
+    }
+}
+
+country_event = { #1859 elections results
+	id = Greeceelections.3
+	title = Greeceelections.3.t
+	desc = Greeceelections.3.d
+	picture = GFX_report_event_election_vote
+	
+	fire_only_once = yes
+	
+	trigger = {
+		tag = GRE
+		GRE = {
+			has_country_flag = gre_election_1859
+		}
+	}
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+	        GRE = {
+		        complete_national_focus = GRE_elections_1859
+		    }
+	    }
+	}
+
+	#Otto win
+	option = {
+		name = Greeceelections.3.a
+
+		trigger = {
+		        GRE = {
+		            check_variable = {
+                        var = gre_electiona
+                        value = 0
+                        compare = greater_than
+                    }
+	            }
+        }
+		
+		hidden_effect = {
+		    GRE = {
+    			clr_country_flag = gre_election_1859
+    			set_country_flag = otto_win  
+    	            set_politics = {	
+	                        ruling_party = autocracy
+                }
+
+                    set_popularities = {
+                        autocracy = 60
+                        centrism = 10
+                        traditional_conservatism = 10
+                        radical_democracy = 20
+                    }
+            }
+			
+		}
+	}
+
+	#Otto lose 
+	option = {
+        name = Greeceelections.3.b 
+		
+		trigger = {
+		    GRE = {
+		        check_variable = {
+                    var = gre_electiona
+                    value = 0
+                    compare = less_than
+                }     
+	        }
+        }  
+		hidden_effect = {
+		    GRE = {
+		    	clr_country_flag = gre_election_1859
+		    	set_country_flag = otto_lose 
+	                set_politics = {	
+	                    ruling_party = radical_democracy 
+                }
+
+                    set_popularities = {
+                        autocracy = 30
+                        centrism = 20
+                        traditional_conservatism = 20
+                        radical_democracy = 30
+                    }
+		    }
+	    }
+    }
+}
+
+add_namespace = Greecemisc
+
+#Voulgaris resigns 
 country_event = {
     id = Greecemisc.1 
-	title = Greecemisc.1.t #Voulgaris resigns 
+	title = Greecemisc.1.t 
 	desc = Greecemisc.1.d 
 	picture = GFX_report_event_gre_athens_1 
 	
 	trigger = {
 	    TAG = GRE
-        #date > 1857.11.25
 	}
 
 	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Replace with Athanasios miaoulis
 	option = {
-	name = Greecemisc.1.a #replace with miaoulis
-		 
-    hidden_effect = { 
-		        GRE = {
-		            retire_country_leader = yes
-		            create_country_leader = {
-                        name = "Athanasios Miaoulis"
-                        desc = "POLITICS_TEMP_DESC"
-                        picture = "Portrait_GRE_Athanasios_miaoulis.dds"
-                        expire = 1867.7.6
-                        ideology = despotism
-	                }
-                }
-            }
-        }
-    }
+		name = Greecemisc.1.a 
+		GRE = {
+			retire_country_leader = yes
+			GRE_athanasios_miaoulis = {
+				add_country_leader_role = {
+					country_leader = {
+						expire="1877.6.7.1"
+						desc = "POLITICS_GENERIC_EOANB_DESC"
+						ideology = despotism
+						traits = {
+							eoanb_trait_military_leader
+						}
+					}
+				}
+				promote_character = yes
+			}
+		}
+		
+	}
+}
 
+#Newspaper slams monarchy 
 country_event = {
-    id = Greecemisc.2 
-	title = Greecemisc.2.t #election fraud 
+    id = Greecemisc.2
+	title = Greecemisc.2.t 
 	desc = Greecemisc.2.d 
 	picture = GFX_report_event_election_vote 
 	
@@ -42,51 +214,9 @@ country_event = {
 		
 	fire_only_once = yes
 	
+	#Arrest journalist 
 	option = {
-	     name = Greecemisc.2.a #do fraud 
-		 
-		 
-		 hidden_effect = {
-		    GRE = {
-		        add_to_variable = {
-                    var = gre_electiona
-                    value = 2
-                }
-	           country_event = { id = Greecemisc.3 days = 25 }
-            }
-	
-        }
-    }
-
-	option = {
-	     name = Greecemisc.2.b #no fraud 
-		 ai_chance = {factor = 50}
-		 
-		 hidden_effect = {
-		    GRE = {
-		        subtract_from_variable = {
-                    var = gre_electiona
-                    value = 2
-                }
-	            country_event = { id = Greecemisc.3 days = 25 }
-            }
-	
-        }
-    }
-}
-
-country_event = {
-    id = Greecemisc.3
-	title = Greecemisc.3.t #newspaper slams monarchy 
-	desc = Greecemisc.3.d 
-	picture = GFX_report_event_election_vote 
-	
-	is_triggered_only = yes
-		
-	fire_only_once = yes
-	
-	option = {
-	     name = Greecemisc.3.a #arrest journalist 
+	     name = Greecemisc.2.a 
 		 ai_chance = {factor = 50}
 		 
 		hidden_effect = {
@@ -101,8 +231,9 @@ country_event = {
         }
     }
 
+	#Do not arrest  
 	option = {
-	     name = Greecemisc.3.b #do not arrest  
+	     name = Greecemisc.2.b
 		 ai_chance = {factor = 50}
 		 
 		 hidden_effect = {
@@ -117,9 +248,10 @@ country_event = {
     }
 }
 
+#Public protests 
 country_event = {
     id = Greecemisc.4
-	title = Greecemisc.4.t #public protests 
+	title = Greecemisc.4.t 
 	desc = Greecemisc.4.d 
 	picture = GFX_report_event_election_vote 
 	
@@ -127,8 +259,9 @@ country_event = {
 
 	fire_only_once = yes
 	
+	#ban protests 
 	option = {
-	     name = Greecemisc.4.a #ban protests 
+	     name = Greecemisc.4.a 
 		 ai_chance = {factor = 50}
 		 
 		hidden_effect = {
@@ -141,8 +274,9 @@ country_event = {
         }
     }
 
+	#do not ban protests
 	option = {
-	     name = Greecemisc.4.b #do not ban  
+	     name = Greecemisc.4.b 
 		 ai_chance = {factor = 50}
 		 
 		hidden_effect = {
@@ -156,36 +290,41 @@ country_event = {
     }
 }
 
+#Miaoulis Resigns 
 country_event = {
     id = Greecemisc.5
-	title = Greecemisc.5.t #Miaoulis Resigns 
+	title = Greecemisc.5.t 
 	desc = Greecemisc.5.d 
 	picture = GFX_report_event_gre_athens_2 
 	
 	trigger = {
-	    TAG = GRE
-        #date > 1862.05.16 
-		}
+	    tag = GRE
+	}
 
 	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Remove Miaoulis  
 	option = {
-	     name = Greecemisc.5.a #Remove Miaoulis  
+	     name = Greecemisc.5.a 
 		 ai_chance = {factor = 95}
 		 
 		GRE = { 
 		    retire_country_leader = yes
-            create_country_leader = {
-                name = "Gennaios Kolokotronis"
-                desc = "POLITICS_TEMP_DESC"
-                picture = "Portrait_GRE_Gennaios_Kolokotronis.dds"
-                expire = 1868.05.23 
-                ideology = despotism
-                traits = {
-                    war_veteran
-                }
-            }			
+			GRE_gennaios_kolokotronis = {
+				add_country_leader_role = {
+					country_leader = {
+						expire="1868.5.23.1"
+						desc = "POLITICS_GENERIC_EOANB_DESC"
+						ideology = despotism
+						traits = {
+							war_veteran
+						}
+					}
+				}
+				promote_character = yes
+				promote_character = despotism
+			}	
 		}
 		 
 		hidden_effect = {
@@ -199,9 +338,11 @@ country_event = {
 		custom_effect_tooltip = miaoulis_remove 	
     } 
 
+	#Do not remove   
 	option = {
-			name = Greecemisc.5.b #Do not remove   
+			name = Greecemisc.5.b 
 			ai_chance = {factor = 5}
+			add_political_power = -100
 			
 		}	
 }
@@ -239,9 +380,10 @@ country_event = {
     } 
 }
 
+#Skiadika 
 country_event = {
     id = Greecemisc.7
-	title = Greecemisc.7.t #Skiadika  
+	title = Greecemisc.7.t  
 	desc = Greecemisc.7.d 
 	picture = GFX_report_event_gre_athens_2 
 
@@ -249,12 +391,11 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-	    TAG = GRE
-        #date > 1859.04.20 
+	    tag = GRE
 	}	
 	
 	option = {
-	     name = Greecemisc.7.a #  
+	     name = Greecemisc.7.a 
 		 
 		 hidden_effect = {
 		    GRE = {
@@ -302,9 +443,10 @@ country_event = {
     } 
 }
 
+ #The famous tobacco Company George karelias and sons is founded
 country_event = {
     id = Greecemisc.9
-	title = Greecemisc.9.t #The famous tobacco Company George karelias and sons is found
+	title = Greecemisc.9.t
 	desc = Greecemisc.9.d 
 	picture = GFX_report_event_gre_athens_2 
 
@@ -320,134 +462,10 @@ country_event = {
 	}	
 } 
 
-
-	
-
-add_namespace = Greeceelections
-
-country_event = {        #1859 elections start 
-	id = Greeceelections.1
-	title = Greeceelections.1.t
-	desc = Greeceelections.1.d
-	picture = GFX_report_event_election_vote
-	
-	trigger = {
-		TAG = GRE
-		#date > 1859.07.1
-	}
-	
-	fire_only_once = yes 
-	is_triggered_only = yes
-	
-	option = {
-		name = Greeceelections.1.a
-		ai_chance = { factor = 100 }
-		
-	hidden_effect = {
-	    GRE = {
-		set_country_flag = gre_election_1859	
-        set_variable = {
-            var = gre_electiona
-            value = 1
-        }
-	    country_event = { id = Greecemisc.2 days = 25 }
-	    }
-	
-    }
-}
-}
-
-country_event = { #1859 elections results
-	id = Greeceelections.2
-	title = Greeceelections.2.t
-	desc = Greeceelections.2.d
-	picture = GFX_report_event_election_vote
-	
-	fire_only_once = yes
-	
-	trigger = {
-		TAG = GRE
-		GRE = {has_country_flag = gre_election_1859}
-		#date > 1859.10.1
-	}
-	
-	fire_only_once = yes
-	is_triggered_only = yes
-	
-	immediate = {
-		hidden_effect = {
-	        GRE = {
-		        complete_national_focus = GRE_elections_1859
-		    }
-	    }
-	}
-	
-	option = {
-		name = Greeceelections.2.a #Otto win
-
-		trigger = {
-		        GRE = {
-		            check_variable = {
-                        var = gre_electiona
-                        value = 0
-                        compare = greater_than
-                    }
-	            }
-        }
-		
-		hidden_effect = {
-		    GRE = {
-    			clr_country_flag = gre_election_1859
-    			set_country_flag = otto_win  
-    	            set_politics = {	
-	                        ruling_party = autocracy
-                }
-
-                    set_popularities = {
-                        autocracy = 60
-                        centrism = 10
-                        traditional_conservatism = 10
-                        radical_democracy = 20
-                    }
-            }
-			
-		}
-	}
-		
-	option = {
-        name = Greeceelections.2.b #Otto lose 
-		
-		trigger = {
-		    GRE = {
-		        check_variable = {
-                    var = gre_electiona
-                    value = 0
-                    compare = less_than
-                }     
-	        }
-        }  
-		hidden_effect = {
-		    GRE = {
-		    	clr_country_flag = gre_election_1859
-		    	set_country_flag = otto_lose 
-	                set_politics = {	
-	                    ruling_party = radical_democracy 
-                }
-
-                    set_popularities = {
-                        autocracy = 30
-                        centrism = 20
-                        traditional_conservatism = 20
-                        radical_democracy = 30
-                    }
-		    }
-	    }
-    }
-}
-
 add_namespace = GREpolitics
 
-country_event = { #Otto abdicates 
+#Otto abdicates
+country_event = {  
 	id = GREpolitics.1
 	title = GREpolitics.1.t
 	desc = GREpolitics.1.d
@@ -1111,7 +1129,8 @@ country_event = {
 
 add_namespace = GRE_succession
 
-country_event = { #The succession issue
+#The succession issue
+country_event = { 
 	id = GRE_succession.1
 	title = GRE_succession.1.t			
 	desc = GRE_succession.1.d
@@ -1127,9 +1146,10 @@ country_event = { #The succession issue
 	
 }
 
-country_event = { #
+#A Visit to Munchen
+country_event = { 
 	id = GRE_succession.2
-	title = GRE_succession.2.t			#A Visit to Munchen
+	title = GRE_succession.2.t			
 	desc = GRE_succession.2.d
 	picture = GFX_report_wittelsbachs
 	
@@ -1237,16 +1257,18 @@ country_event = {
 	}
 }
 
+#No heir was found
+#Queen Amalia shall succeed the King
 country_event = {
 	id = GRE_succession.33 
-	title = GRE_succession.33.t			#No heir was found
+	title = GRE_succession.33.t			
 	desc = GRE_succession.33.d
 	picture = GFX_report_event_gre_athens_1
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 
-	option = { #Queen Amalia shall succeed the King
+	option = { 
 		name = GRE_succession.33.a
 		
 		GRE = {
@@ -1443,7 +1465,7 @@ country_event = { #Question of Phalanx
 
 add_namespace = GRE_Navy
 
-country_event = { #Question of Navy
+country_event = { #History of Navy
 	id = GRE_Navy.1
 	title = GRE_Navy.1.t
 	desc = GRE_Navy.1.d
@@ -1451,24 +1473,8 @@ country_event = { #Question of Navy
 
 	is_triggered_only = yes 	
 
-	option = { #Focus on large ships #Towards a large navy
+	option = { 
 		name = GRE_Navy.1.a  
-
-		GRE = {
-			add_ideas = {
-				idea = GRE_idea_Navy_focus_large
-			}
-		}
-	}
-
-	option = { #Focus on small ships #Towards a small but efficient navy
-		name = GRE_Navy.1.b 
-
-		GRE = {
-			add_ideas = {
-				idea = GRE_idea_Navy_focus_small
-			}
-		}
 	}
 }
 
@@ -1509,6 +1515,73 @@ country_event = { #Cadets Return
 		GRE = {
 			navy_experience = 15
 			set_country_flag = GRE_cadets_returned
+		}
+	}
+}
+
+country_event = { #School Ship Athens
+	id = GRE_Navy.4
+	title = GRE_Navy.4.t
+	desc = GRE_Navy.4.d
+	picture = placeholder
+
+	is_triggered_only = yes 	
+
+	option = { 
+		name = GRE_Navy.4.a  
+		add_political_power = 5
+	}
+}
+
+country_event = { #School Ship Loudovikos
+	id = GRE_Navy.5
+	title = GRE_Navy.5.t
+	desc = GRE_Navy.5.d
+	picture = placeholder
+
+	is_triggered_only = yes 	
+
+	option = { 
+		name = GRE_Navy.5.a  
+		add_political_power = 5
+	}
+}
+
+#Foreign Ships
+country_event = {
+	id = GRE_Navy.6
+	title = GRE_Navy.6.t
+	desc = GRE_Navy.6.d
+		
+	fire_only_once = yes
+	is_triggered_only = yes
+		
+	option = {
+		name = GRE_Navy.6.a
+		custom_effect_tooltip = GRE_event_order_armored_schooners_abroad_tt
+		navy_experience = 5
+		hidden_effect = {
+			if = {
+				limit = { has_dlc = "Man the Guns" }
+				create_equipment_variant = {
+					name = "Armored Schooner"
+					type = ship_hull_gunboat_2
+					name_group = GER_CA_HISTORICAL
+					parent_version = 0
+					modules = {
+						fixed_ship_battery_slot = ship_cannon_battery_1
+						fixed_ship_fire_control_system_slot = fire_control_system_0
+						fixed_ship_engine_slot = ship_engine_steam_screw_gunboat
+						fixed_ship_secondaries_slot = empty
+						fixed_ship_armor_slot = ship_armor_capital_hardwood_0
+						mid_1_custom_slot = empty
+						mid_2_custom_slot = empty
+						rear_1_custom_slot = empty
+					}
+					#obsolete = no
+				}
+				load_oob = GRE_armored_schooners_foreign
+			}
 		}
 	}
 }
@@ -1582,8 +1655,8 @@ country_event = { #Turkey threatens war to Greece
         }		
 		
 		hidden_effect = {
-        OTO = { country_event = { id = GREdiplo.4 days = 100 } } 	
-		GRE = { set_country_flag = GRE_Crete_Support_Yes }
+        	OTO = { country_event = { id = GREdiplo.4 days = 100 } } 	
+			GRE = { set_country_flag = GRE_Crete_Support_Yes }
 		}
 	}
 	option = { #Back down        
@@ -1913,7 +1986,8 @@ country_event = {
 		
 	}
 }
-#Greece loss
+
+#Greece helped Crete
 country_event = { 
 	id = GREdiplo.17
 	title = GREdiplo.17.t
@@ -1925,6 +1999,61 @@ country_event = {
 	#Informative option
 	option = {      
 		name = GREdiplo.17.a  
+		GRE = {
+			increase_ps_by_one = yes
+			add_ideas = {
+				idea = GRE_idea_promise_fullfilled
+			}
+		}
+	}
+}
+
+#Greece didn't help Crete
+country_event = { 
+	id = GREdiplo.18
+	title = GREdiplo.18.t
+	desc = GREdiplo.18.d
+	picture = GFX_report_event_gre_athens_1
+	
+	is_triggered_only = yes 	
+
+	#Informative option
+	option = {      
+		name = GREdiplo.18.a  
+		
+		GRE = {
+			decrease_ps_by_one = yes
+			add_ideas = {
+				idea = GRE_idea_failed_promise
+			}
+		}
+	}
+}
+
+#Greece remained neutral
+country_event = { 
+	id = GREdiplo.19
+	title = GREdiplo.19.t
+	desc = GREdiplo.19.d
+	picture = GFX_report_event_gre_athens_1
+	
+	is_triggered_only = yes 	
+
+	#Informative option
+	option = {      
+		name = GREdiplo.19.a  
+		
+		OTO = {
+			add_opinion_modifier = {
+				target = GRE
+				modifier = small_increase
+			}
+		}
+
+		add_opinion_modifier = {
+				target = OTO
+				modifier = small_increase
+		}
 		
 	}
 }
@@ -1941,13 +2070,14 @@ country_event = {
 	
 	is_triggered_only = yes 	
 
-	option = { #Construction begins     
-		name = GREeconomy.1.a  
+	#Construction begins    
+	option = {  
+		name = GREeconomy.1.a
 		GRE = {
 			country_event = { 
 				id = GREeconomy.2 
-				days = 365 
-			} 
+				days = 365
+			}
 			add_ideas = GRE_idea_Athens_Piraeus_rail
 		}
 		add_political_power = 5 
@@ -1964,14 +2094,15 @@ country_event = {
 	
 	is_triggered_only = yes 	
 
-	option = { #Construction Completed      
+	#Construction Completed
+	option = {       
 		name = GREeconomy.2.a 
-		1251 = { 
-			add_building_construction = { 
-				type = infrastructure 
-				level = 1 
-				instant_build = yes 
-			} 
+		1251 = {
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
+			}
 		}
 		GRE = {
 			remove_ideas = GRE_idea_Athens_Piraeus_rail
@@ -2027,7 +2158,67 @@ country_event = {
 	}
 }
 
+country_event = {      
+	id = GREeconomy.5
+	title = GREeconomy.5.t
+	desc = GREeconomy.5.d
+	picture = GFX_report_event_gre_lake_kopais
+	
+	is_triggered_only = yes 	
 
+	option = {      
+		name = GREeconomy.5.a  
+		GRE_karl_johann_fix = {
+				add_advisor_role = {
+					advisor = {
+						slot = political_advisor
+						idea_token = GRE_karl_johann_fix
+						allowed = {
+							original_tag = GRE
+						}
+						available = {
+						}
+						research_bonus = {
+							farming_tech = 0.10
+						}
+						traits = {
+							GRE_trait_karl_johann_fix
+						}
+						ai_will_do = {
+							factor = 0
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {      
+	id = GREeconomy.6
+	title = GREeconomy.6.t
+	desc = GREeconomy.6.d
+	picture = GFX_report_event_gre_lake_kopais
+	
+	is_triggered_only = yes 	
+
+	option = { #Maximum Effort    
+		name = GREeconomy.6.a  
+		ai_chance = { factor = 50 }
+		add_timed_idea = { idea = GRE_idea_increase_industrial_capacity1  days = 360 }
+	}
+	
+	option = { #Medium Effort      
+		name = GREeconomy.6.b  
+		ai_chance = { factor = 25 }
+		add_timed_idea = { idea = GRE_idea_increase_industrial_capacity2  days = 360 }
+	}
+	
+	option = { #Minimal Effort      
+		name = GREeconomy.6.c  
+		ai_chance = { factor = 25 }
+		add_timed_idea = { idea = GRE_idea_increase_industrial_capacity3  days = 360 }
+	}
+}
 
 add_namespace = GRENavy
 country_event = {      #Ask Britain for ship models
