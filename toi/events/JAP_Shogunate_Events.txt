@@ -2404,7 +2404,7 @@ add_namespace = feudal_tokugawa_daimyos
 				add_political_power = 25
 				random_state = {
 					limit = { is_owned_by = TSH }
-					state_event = { id = afr_rrp_racial_tension_increase.2 }
+					state_event = { id = afr_rrp_racial_tension_increase.1 }
 				}
 			}
 			option = {
@@ -2638,6 +2638,24 @@ add_namespace = feudal_tokugawa_daimyos
 				trigger = { tag = TSH }
 				EOANBSYS_national_crisis_progress_add_five = yes
 				hidden_effect = {
+					if = {
+						limit = {
+							check_variable = {
+								var = EOANBSYS_national_crisis_progress_var
+								value > 35
+							}
+						}
+						EOANBSYS_national_crisis_progress_add_five = yes
+					}
+					if = {
+						limit = {
+							check_variable = {
+								var = EOANBSYS_national_crisis_progress_var
+								value > 50
+							}
+						}
+						EOANBSYS_national_crisis_progress_add_two = yes
+					}
 					for_each_scope_loop = {
 						array = subjects
 						country_event = feudal_tokugawa_shogunate.79
@@ -2697,13 +2715,20 @@ add_namespace = feudal_tokugawa_daimyos
 			}
 
 			immediate = {
-				random_owned_state = {
-					limit = { is_demilitarized_zone = yes }
-					state_event = feudal_tokugawa_shogunate.82
+				random_other_country = {
+					limit = { has_idea = TSH_spirit_vic_external_amity_treaty_west }
+					random_state = {
+						limit = {
+							is_owned_by = TSH
+							is_demilitarized_zone = yes
+						}
+						state_event = feudal_tokugawa_shogunate.82
+						set_variable = { var = bullying_country value = PREV.id }
+					}
 				}
 				if = {
-					limit = { complete_national_focus = JAP_vic_bare_westerner_abuse }
-					country_event = { id = feudal_tokugawa_shogunate.81 days = 65 random_days = 35 }
+					limit = { has_completed_focus = JAP_vic_bare_westerner_abuse }
+					country_event = { id = feudal_tokugawa_shogunate.81 days = 55 random_days = 35 }
 				}
 				else = {
 					country_event = { id = feudal_tokugawa_shogunate.81 days = 45 random_days = 30 }
@@ -2791,10 +2816,17 @@ add_namespace = feudal_tokugawa_daimyos
 				name = feudal_tokugawa_shogunate.83.a
 				trigger = { tag = TSH }
 				EOANBSYS_national_crisis_progress_add_three = yes
+				var:FROM.bullying_country = {
+					FROM = { state_event = { id = afr_rrp_racial_tension_increase.1 }
+				}
 				add_political_power = -5
 				add_popularity = {
 					ideology = autocracy
 					popularity = 0.03
+				}
+				random_owned_state = {
+					limit = { is_demilitarized_zone = yes }
+					282 = { state_event = { id = afr_rrp_racial_tension_increase.1 } }
 				}
 			}
 			option = {
@@ -2824,7 +2856,7 @@ add_namespace = feudal_tokugawa_daimyos
 				}
 				add_stability = -0.01
 				add_political_power = -5
-				EOANBSYS_national_crisis_progress_add_two = yes
+				EOANBSYS_national_crisis_progress_add_three = yes
 			}
 			option = {
 				name = feudal_tokugawa_shogunate.84.b
@@ -2834,7 +2866,7 @@ add_namespace = feudal_tokugawa_daimyos
 					popularity = 0.02
 				}
 				add_political_power = -7
-				EOANBSYS_national_crisis_progress_add_one = yes
+				EOANBSYS_national_crisis_progress_add_two = yes
 			}
 			option = {
 				name = feudal_tokugawa_shogunate.84.c
@@ -2866,7 +2898,7 @@ add_namespace = feudal_tokugawa_daimyos
 				}
 				add_stability = -0.02
 				add_political_power = -5
-				EOANBSYS_national_crisis_progress_add_three = yes
+				EOANBSYS_national_crisis_progress_add_five = yes
 			}
 			option = {
 				name = feudal_tokugawa_shogunate.84.b
@@ -2914,7 +2946,7 @@ add_namespace = feudal_tokugawa_daimyos
 				name = feudal_tokugawa_shogunate.84.b
 				trigger = { tag = TSH has_completed_focus = JAP_vic_security_against_harassment }
 				add_command_power = -2
-				EOANBSYS_national_crisis_progress_minus_two = yes
+				EOANBSYS_national_crisis_progress_add_two = yes
 				add_popularity = {
 					ideology = radical_democracy
 					popularity = 0.05
@@ -2941,19 +2973,21 @@ add_namespace = feudal_tokugawa_daimyos
 			option = {
 				name = feudal_tokugawa_shogunate.84.a
 				trigger = { tag = TSH }
-					destroy_resource = {
-						type = fabric
-						amount = 1
-						state = FROM.id
-					}
+				add_resource = {
+					type = fabric
+					amount = -1
+					state = FROM.id
+				}
 				add_popularity = {
 					ideology = autocracy
 					popularity = 0.02
 				}
+				EOANBSYS_national_crisis_progress_add_five = yes
 			}
 			option = {
 				name = feudal_tokugawa_shogunate.84.b
 				trigger = { tag = TSH has_completed_focus = JAP_vic_security_against_harassment }
+				EOANBSYS_national_crisis_progress_add_three = yes
 				add_political_power = -10
 			}
 			option = {
@@ -4104,7 +4138,7 @@ add_namespace = feudal_tokugawa_daimyos
 					store_current_ideologies = yes
 					declare_war_on = {
 						target = TSH
-						wargoal = civil_war
+						type = civil_war
 					}
 					hidden_effect = {
 						country_event = { id = feudal_tokugawa_shogunate.108 days = 3 }
@@ -4699,7 +4733,7 @@ add_namespace = feudal_tokugawa_daimyos
 				name = feudal_tokugawa_shogunate.153.b
 				trigger = { tag = ENG }
 				add_war_support = 0.05
-				TSH = { country_event = feudal_tokugawa_shogunate.155 days = 200 }
+				TSH = { country_event = { id = feudal_tokugawa_shogunate.155 days = 200 } }
 			}
 		}
 	# Satsuma Pays
@@ -4908,7 +4942,7 @@ add_namespace = feudal_tokugawa_daimyos
 				name = feudal_tokugawa_shogunate.156.a
 				declare_war_on = {
 					target = SAT
-					wargoal = wargoal_diplomatic_humiliation
+					type = wargoal_diplomatic_humiliation
 				}
 				news_event = feudal_tokugawa_shogunate.157
 			}
@@ -4926,7 +4960,7 @@ add_namespace = feudal_tokugawa_daimyos
 				hidden_effect = {
 					if = {
 						limit = { tag = ENG }
-						country_event = { id = feudal_tokugawa_shogunate.158 = 10 }
+						country_event = { id = feudal_tokugawa_shogunate.158 days = 10 }
 					}
 					if = {
 						limit = { tag = SAT }
@@ -4946,7 +4980,7 @@ add_namespace = feudal_tokugawa_daimyos
 					add_war_support = 0.10
 				}
 				if = {
-					limt = { tag = SAT }
+					limit = { tag = SAT }
 					add_stability = 0.10
 				}
 				if = {
