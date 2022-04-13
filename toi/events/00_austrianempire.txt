@@ -3768,7 +3768,7 @@ country_event = {
 			add_country_leader_role = {
 				promote_leader = yes
 				country_leader = {
-					desc = "POLITICS_GENERIC_EOANB_DESC"
+					desc = "POLITICS_BERNHARD_VON_RECHBERG_DESC"
 					ideology = absolutism
 					expire = "1899.2.26"
 					#id = -1
@@ -4783,16 +4783,16 @@ country_event = {
 
 #Laws to Protect Personal Liberty and Property Passed
 country_event = {
-	id = austria.429
-	title = austria.429.t
-	desc = austria.429.d
+	id = austria.427
+	title = austria.427.t
+	desc = austria.427.d
 	picture = GFX_report_event_vienna_1
 	
 	fire_only_once = yes
     is_triggered_only = yes
 	
 	option = {
-		name = austria.429.a
+		name = austria.427.a
 		ai_chance = { base = 100 }
 		add_political_power = 25
 		add_stability = 0.02
@@ -4856,12 +4856,71 @@ country_event = {
 	}
 }
 
-#Schmerling's Resignation
+#Resignation of Anton von Schmerling
+country_event = {
+	id = austria.428
+	title = austria.428.t
+	desc = austria.428.d
+	picture = GFX_report_event_abgeordnetenhaus_schmerlingtheater
+	
+	fire_only_once = yes
+    is_triggered_only = yes
+	
+	option = {
+		name = austria.428.a
+		ai_chance = { base = 100 }
+		set_politics = { ruling_party = autocracy }
+		add_popularity = { ideology = autocracy popularity = 0.05 }
+		AUS_richard_belcredi = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_RICHARD_VON_BELCREDI_DESC"
+					ideology = absolutism
+					expire = "1902.12.2"
+					#id = -1
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_character = AUS_anton_von_schmerling
+			}
+			retire_character = AUS_anton_von_schmerling
+		}
+		hidden_effect = {
+			compute_national_vote = yes
+			country_event = { id = austria.429 days = 1 } #30
+		}
+	}
+}
+
+#The Hungarian Question
+country_event = {
+	id = austria.429
+	title = austria.429.t
+	desc = austria.429.d
+	picture = GFX_report_event_budapest_1
+	
+	fire_only_once = yes
+    is_triggered_only = yes
+	
+	option = {
+		name = austria.429.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = AUS_failure_to_bring_hungarians_to_reason_effect_tt
+		hidden_effect = {
+			country_event = { id = austria.430 days = 1 } #30
+		}
+	}
+}
+
+#Constitution Suspended
 country_event = {
 	id = austria.430
 	title = austria.430.t
 	desc = austria.430.d
-	picture = GFX_report_event_abgeordnetenhaus_schmerlingtheater
+	picture = GFX_report_event_franz_joseph_coronation
 	
 	fire_only_once = yes
     is_triggered_only = yes
@@ -4869,15 +4928,145 @@ country_event = {
 	option = {
 		name = austria.430.a
 		ai_chance = { base = 100 }
-		
-		AUS = {
-			retire_country_leader = yes
-			create_country_leader = {
-				name = "Richard von Belcredi"
-				desc = "POLITICS_RICHARD_VON_BELCREDI_DESC"
-				picture = "GFX_Portrait_AUS_Richard_Belcredi"
-				expire = 2000.09.10
-				ideology = despotism
+		complete_national_focus = AUS_focus_sistierungspatent
+		custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_three_tt
+		if = {
+			limit = {
+				has_idea = AUS_idea_constitutional_diploma_1
+			}
+			remove_ideas = AUS_idea_constitutional_diploma_1
+		}
+		else_if = {
+			limit = {
+				has_idea = AUS_idea_constitutional_diploma_2
+			}
+			remove_ideas = AUS_idea_constitutional_diploma_2
+		}
+		else_if = {
+			limit = {
+				has_idea = AUS_idea_imperial_constitution_of_1861
+			}
+			remove_ideas = AUS_idea_imperial_constitution_of_1861
+		}
+		if = {
+			limit = {
+				has_idea = constitutional_monarchy
+			}
+			swap_ideas = {
+				remove_idea = constitutional_monarchy
+				add_idea = absolute_monarchy
+			}
+		}
+		if = {
+			limit = {
+				has_idea = human_rights
+			}
+			swap_ideas = {
+				remove_idea = human_rights
+				add_idea = no_constitution
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = constitution_adopted
+			}
+			swap_ideas = {
+				remove_idea = constitution_adopted
+				add_idea = no_constitution
+			}
+		}
+		if = {
+			limit = {
+				has_idea = limited_elections
+			}
+			swap_ideas = {
+				remove_idea = limited_elections
+				add_idea = no_elections
+			}
+		}
+		if = {
+			limit = {
+				has_idea = federalist
+			}
+			swap_ideas = {
+				remove_idea = federalist
+				add_idea = federal_control
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = states_restricted
+			}
+			swap_ideas = {
+				remove_idea = states_restricted
+				add_idea = federal_control
+			}
+		}
+		hidden_effect = {
+			subtract_from_variable = {
+				var = HUN_REVOLT_RISK
+				value = 0.03
+			}
+			clamp_variable = {
+				var = HUN_REVOLT_RISK
+				min = 0
+				max = 1
+			}
+		}
+	}
+}
+
+#Constitutionality Established
+country_event = {
+	id = austria.431
+	title = austria.431.t
+	desc = austria.431.d
+	picture = GFX_report_event_franz_joseph_coronation
+	
+	fire_only_once = yes
+    is_triggered_only = yes
+	
+	option = {
+		name = austria.431.a
+		ai_chance = { base = 100 }
+		complete_national_focus = AUS_focus_a_constitutional_monarchy
+		custom_effect_tooltip = AUS_decrease_all_nationalisms_by_three_tt
+		hidden_effect = {
+			subtract_from_variable = {
+				var = HUN_REVOLT_RISK
+				value = 0.03
+			}
+			clamp_variable = {
+				var = HUN_REVOLT_RISK
+				min = 0
+				max = 1
+			}
+			subtract_from_variable = {
+				var = CZE_REVOLT_RISK
+				value = 0.03
+			}
+			clamp_variable = {
+				var = CZE_REVOLT_RISK
+				min = 0
+				max = 1
+			}
+			subtract_from_variable = {
+				var = CRO_REVOLT_RISK
+				value = 0.03
+			}
+			clamp_variable = {
+				var = CRO_REVOLT_RISK
+				min = 0
+				max = 1
+			}
+			subtract_from_variable = {
+				var = POL_REVOLT_RISK
+				value = 0.03
+			}
+			clamp_variable = {
+				var = POL_REVOLT_RISK
+				min = 0
+				max = 1
 			}
 		}
 	}
@@ -4885,9 +5074,9 @@ country_event = {
 
 #Choose Beust or Keep Belcredi
 country_event = {
-	id = austria.431
-	title = austria.431.t
-	desc = austria.431.d
+	id = austria.451
+	title = austria.451.t
+	desc = austria.451.d
 	picture = GFX_report_event_vienna_1
 	
 	fire_only_once = yes
@@ -4901,7 +5090,7 @@ country_event = {
 	}
 	
 	option = {
-		name = austria.431.a #Replace with Beust - Dual Monarchy
+		name = austria.451.a #Replace with Beust - Dual Monarchy
 		ai_chance = { base = 75 }
 		AUS = {
 			retire_country_leader = yes
@@ -4917,7 +5106,7 @@ country_event = {
 	}
 	
 	option = {
-		name = austria.431.b #Keep Belcredi - Federalization
+		name = austria.451.b #Keep Belcredi - Federalization
 		ai_chance = { base = 25 }
 		custom_effect_tooltip = AUS_tt_keep_richard_belcredi
 	}
