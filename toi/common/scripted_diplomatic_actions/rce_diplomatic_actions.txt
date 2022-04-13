@@ -1,30 +1,112 @@
 scripted_diplomatic_actions = {
 	eoanbdiplo_tribal_border_raid_action = {
-		allowed = {}
+		allowed = {
+			ROOT = {
+				OR = {
+					afr_is_tribal_allowed = yes
+					is_first_nations_tribe_allowed = yes
+				}
+			}
+		}
 
 		# What makes button selectable (this button's version of available)
 		# ROOT is country YOU
 		# THIS is country being raided
 		selectable = {
+			ROOT = { has_tech = tribal_tatics }
 			ROOT = {
-				NOT = {
-					OR = {
-						is_ally_with = PREV
-						has_non_aggression_pact_with = PREV
-						has_guaranteed = PREV
+				custom_trigger_tooltip = {
+					tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+					NOT = { has_non_aggression_pact_with = PREV }
+					check_variable = { var = ROOT.afr_has_special_diplomacy@PREV value = 0 compare = equals }
+					NOT = {
+						check_variable = { var = PREV.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+						check_variable = { var = ROOT.afr_regional_power_peace_treaty@PREV value = 1 compare = greater_than_or_equals }
+					}
+					if = {
+						limit = { has_idea = WDD_KBO_TRUCE }
+						PREV = { NOT = { has_idea = WDD_KBO_TRUCE } }
 					}
 				}
 			}
+			ROOT = {
+				custom_trigger_tooltip = {
+					tooltip = afr_raid_neighbor_at_peace_trigger
+					has_war = no
+					has_border_war = no
+					NOT = { has_country_flag = set_border_war_data_first_nations_tribal_raid_neighbor_flag }
+					NOT = { has_country_flag = set_border_war_data_first_nations_tribal_raid_colonial_neighbor_flag }
+					NOT = { has_country_flag = raiding_neighbour }
+				}
+			}
+			ROOT = {
+				custom_trigger_tooltip={
+					tooltip = EDC_Any_Tribal_Army_over_1000
+					OR = {
+						check_variable = { Tribal_army_num > 999 }
+						check_variable = { Tribal_horse_army_num > 999 }
+						check_variable = { Tribal_horse_pistoleer_army_num > 999 }
+						check_variable = { Tribal_camel_army_num > 999 }
+					}
+				}
+			}
+			ROOT = {
+				custom_trigger_tooltip = {
+					tooltip = afr_war_exhaustion_value_less_than_5
+					check_variable = {
+						afr_war_exhaustion_value < 5
+					}
+				}
+			}
+			any_state = {
+				is_owned_and_controlled_by = THIS
+				any_neighbor_state = {
+					is_fully_controlled_by = ROOT
+				}
+			}
+			hidden_trigger = { ROOT = { afr_is_tribal = yes } }
 		}
 		# same as selectable
 		visible = {
-			has_variable = has_afr_empire_mechanic_system
 			ROOT = {
+				NOT = { has_country_flag = first_nations_tribe_recently_raided_flag }
+				OR = {
+					afr_is_tribal = yes
+					is_first_nations_tribe = yes
+				}
+				NOT = { has_war_with = PREV }
+				NOT = { is_in_faction_with = PREV }
+			}
+			any_state = {
+				is_owned_and_controlled_by = THIS
+				any_neighbor_state = {
+					is_fully_controlled_by = ROOT
+				}
+			}
+			ROOT = {
+				NOT = { has_idea = FN_T_settled_regional_power }
+				NOT = { has_idea = FN_T_nomadic_regional_power }
+				NOT = { has_idea = afr_large_kingdom }
+				NOT = { has_idea = afr_reforming_kingdom }
+			}
+			ROOT = {
+				NOT = { is_subject_of = PREV }
+				NOT = { is_in_faction_with = PREV }
+				NOT = { is_subject_of = PREV.OVERLORD }
+			}
+			THIS = {
+				NOT = { is_subject_of = ROOT }
+			}
+			THIS = {
+				NOT = { is_subject_of = OVERLORD }
+			}
+			THIS = {
+				is_neighbor_of = ROOT
 				has_variable = has_afr_empire_mechanic_system
 			}
 		}
 
-		command_power = 50
+		command_power = 100
 
 		icon = 3
 
@@ -32,7 +114,9 @@ scripted_diplomatic_actions = {
 		show_acceptance_on_action_button = no
 
 		complete_effect = {
-			# effects when you click button
+			hidden_effect = { ROOT = { set_country_flag = raiding_neighbour } }
+			ROOT={country_event = { id = EDC_afr.43 }}
+			hidden_effect = { THIS = { country_event = { id = afr_empire_scripted_diplomatic_events.3 } } }
 		}
 
 		reject_effect = {} # runs when the action is properly sent and rejected
@@ -43,7 +127,369 @@ scripted_diplomatic_actions = {
 		receive_description = eoanbdiplo_tribal_border_raid_action_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
 		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
-			base = 0
+			base = 1
+			modifier = {
+				factor = 0
+				ROOT = { has_active_mission = afr_decision_internal_tribal_coup }
+			}
+			modifier = {
+				factor = 0
+				ROOT = {
+					has_opinion = {
+						target = PREV
+						value > 45
+					}
+				}
+			}
+			modifier = {
+				factor = 10
+				ROOT = {
+					has_opinion = {
+						target = PREV
+						value < -40
+					}
+				}
+			}
+			modifier = {
+				factor = 0
+				ROOT = { 
+					AND = {
+						TAG = FTT
+						date < 1861.01.01
+					}
+				}
+			}
+		}
+	}
+	
+	eoanbdiplo_raid_colonial_neighbor_action = {
+		allowed = {
+			ROOT = {
+				 OR = {
+					afr_is_tribal_allowed = yes
+					is_south_american_tribe_allowed = yes
+					TAG = MAY
+					TAG = YAQ
+				}
+			}
+		}
+
+		# What makes button selectable (this button's version of available)
+		# ROOT is country YOU
+		# THIS is country being raided
+		selectable = {
+			 if = {
+				limit = {
+					check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@PREV value = 1 compare = greater_than_or_equals }
+				}
+				hidden_trigger = {
+					NOT = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@PREV value = 1 compare = greater_than_or_equals } }
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_tribal_raid_colonial_neighbor_desc_unsanctioned
+					always = no
+				}
+			}
+			else = {
+				ROOT = { has_tech = tribal_tatics }
+				if = {
+					limit = {
+						ROOT = {
+							OR = {
+								has_idea = AFR_history_of_colonial_resistance
+								has_idea = AFR_history_of_colonial_resistance_1
+							}
+						}
+					}
+					ROOT = { 
+						custom_trigger_tooltip = {
+							 tooltip = afr_is_colonial_resistor_tooltip
+							 OR = {
+								 has_idea = AFR_history_of_colonial_resistance
+								 has_idea = AFR_history_of_colonial_resistance_1
+							 }
+						 }
+					 }
+				}
+				else = {
+					custom_trigger_tooltip = {
+						tooltip = afr_colonial_neighbor_has_our_land_tooltip
+						any_state = {
+							is_owned_and_controlled_by = THIS
+							OR = {
+								NOT = { is_core_of = THIS }
+								is_claimed_by = ROOT
+								is_core_of = ROOT
+							}
+							any_neighbor_state = {
+								is_fully_controlled_by = THIS
+							}
+						}
+					}
+				}
+				ROOT = {
+					 custom_trigger_tooltip = {
+						tooltip = first_nations_tribal_raid_neighbor_diplomacy_trigger
+						NOT = { has_non_aggression_pact_with = PREV }
+						check_variable = { var = ROOT.afr_has_special_diplomacy@PREV value = 0 compare = equals }
+						NOT = {
+							check_variable = { var = PREV.afr_regional_power_peace_treaty@ROOT value = 1 compare = greater_than_or_equals }
+							check_variable = { var = ROOT.afr_regional_power_peace_treaty@PREV value = 1 compare = greater_than_or_equals }
+						}
+					 }
+				}
+				ROOT = {
+					 custom_trigger_tooltip = {
+						tooltip = first_nations_tribal_raid_neighbor_at_peace_trigger
+						has_border_war = no
+						has_war = no
+						NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_neighbor_flag }
+						NOT = { has_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }
+					 }
+				}
+				ROOT = {
+					 custom_trigger_tooltip = {
+						tooltip = FNT_has_not_recently_raided_colonial_encroacher_tooltip
+						NOT = { has_variable = FNT_recently_raided@PREV }
+					 }
+				}
+				ROOT = {
+					 custom_trigger_tooltip = {
+						tooltip = afr_war_exhaustion_value_less_than_5
+						check_variable = {
+							 afr_war_exhaustion_value < 5
+						}
+					 }
+				}
+				ROOT = {
+					 custom_trigger_tooltip={
+						 tooltip = EDC_Has_Division_Or_Any_Tribal_Army_over_1000
+						 OR = {
+							 check_variable = { Tribal_army_num > 999 }
+							 check_variable = { Tribal_horse_army_num > 999 }
+							 check_variable = { Tribal_horse_pistoleer_army_num > 999 }
+							 check_variable = { Tribal_camel_army_num > 999 }
+							 num_divisions > 0
+						 }
+					 }
+				}
+				any_state = {
+					is_owned_and_controlled_by = PREV
+					any_neighbor_state = {
+						is_fully_controlled_by = ROOT
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = afr_tribal_raid_colonial_neighbor_desc_unsanctioned
+					always = yes
+				}
+			}
+		}
+		# same as selectable
+		visible = {
+			ROOT = {
+				NOT = { has_country_flag = first_nations_tribe_recently_raided_flag }
+				NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
+				NOT = { has_autonomy_state = autonomy_first_nations_reservation }
+				NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
+				NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
+				NOT = { has_autonomy_state = autonomy_freely_associated_state }
+				NOT = { has_war_with = PREV }
+				NOT = { is_in_faction_with = PREV }
+				any_state = {
+					is_owned_and_controlled_by = PREV
+					any_neighbor_state = {
+						is_fully_controlled_by = THIS
+					}
+				}
+				OR = {
+					is_south_american_tribe = yes
+					is_first_nations_tribe = yes
+					has_idea = AF_T_unorganized_tribal_nation
+					has_idea = AF_T_unorganized_tribal_nation_2
+					has_idea = AF_T_unorganized_tribal_nation_3
+					has_idea = AF_T_unorganized_tribal_nation_4
+					has_idea = AF_T_unorganized_tribal_nation_5
+					has_idea = AF_T_organized_tribal_nation
+					has_idea = AF_T_organized_tribal_nation_2
+					has_idea = AF_T_organized_tribal_nation_3
+					has_idea = AF_T_small_kingdom
+					has_idea = afr_large_kingdom
+					AND = {
+						has_idea = afr_reforming_kingdom
+						OR = {
+							has_idea = AFR_history_of_colonial_resistance
+							has_idea = AFR_history_of_colonial_resistance_1
+						}
+					}
+				}
+				if = {
+					limit = { ROOT = { afr_has_company_port_trigger = yes } }
+					if = {
+						limit = { has_country_flag = afr_rrp_orange_company_port }
+						FROM = {
+							NOT = { is_subject_of = OFS }
+							NOT = { TAG = OFS }
+							NOT = { is_in_faction_with = OFS }
+						}
+					}
+				}
+			}
+			THIS = {
+				is_neighbor_of = ROOT
+				OR = {
+					AND = {
+						NOT = { afr_is_tribal = yes }
+						NOT = { is_south_american_tribe = yes }
+					}
+					AND = {
+						OR = {
+							afr_is_tribal = yes
+							is_south_american_tribe = yes
+						}
+						is_subject = yes
+						OR = {
+							has_autonomy_state = autonomy_afr_colony
+							has_autonomy_state = autonomy_afr_dominion
+							has_autonomy_state = autonomy_afr_colonial_company
+							has_autonomy_state = autonomy_afr_protectorate
+						}
+					}
+					afr_has_company_port_trigger = yes
+					any_state = {
+						is_owned_and_controlled_by = THIS
+						OWNER = {
+							OR = {
+								AND = {
+									has_idea = afr_reforming_kingdom
+									is_subject = no
+								}
+								is_subject_of = OTO
+								TAG = OTO
+								is_subject_of = EGY
+								TAG = EGY
+							}
+						}
+						OR = {
+							NOT = { is_core_of = THIS }
+							is_claimed_by = ROOT
+							is_core_of = ROOT
+						}
+						any_neighbor_state = {
+							is_fully_controlled_by = ROOT
+						}
+					}
+				 }
+			 }
+			 ROOT = {
+				 NOT = { is_subject_of = PREV }
+			 }
+			 THIS = {
+				 NOT = { is_subject_of = ROOT }
+			 }
+			 if = {
+				 limit = { ROOT = { is_subject = yes } }
+				 THIS = {
+					 NOT = { is_subject_of = OVERLORD }
+				 }
+			 }
+			 if = {
+				 limit = { THIS = { num_divisions < 24 } }
+				 THIS = { has_war = no }
+			 }
+		}
+
+		command_power = 100
+
+		icon = 3
+
+		requires_acceptance = no
+		show_acceptance_on_action_button = no
+
+		complete_effect = {
+			if = {
+				limit = { check_variable = { var = ROOT.afr_has_unsanctioned_raid_against_colonial_neighbor@PREV value = 1 compare = greater_than_or_equals } }
+				custom_effect_tooltip = afr_has_unsanctioned_raid_against_colonial_neighbor_effect_tooltip
+			}
+			hidden_effect = {
+				ROOT = { set_country_flag = set_border_war_data_afr_tribal_raid_colonial_neighbor_flag }
+				ROOT = { country_event = { id = set_border_war_data_first_nations_tribal_raid.1 days = 31 } }
+				random_list = {
+					50 = {
+						THIS = {
+							country_event = { id = afr_tribal_raid_colonial_neighbor_detect_raid.1 }
+							set_country_flag = afr_tribal_raid_spotted_flag
+							add_ai_strategy = {
+								type = prepare_for_war
+								id = ROOT
+								value = 5
+							}
+						}
+						#modifier = {
+						#	factor = 2
+						#	ROOT = { afr_is_tribal = yes }
+						#}
+					}
+					50 = {
+						#modifier = {
+						#	factor = 0
+						#	ROOT = { afr_is_tribal = yes }
+						#}
+					}
+				}
+			}
+			ROOT = { 
+				if = {
+					limit = {
+						NOT = { has_country_flag = Tribal_Army_Raised }
+						OR = {
+							check_variable = { Tribal_army_num > 999 }
+							check_variable = { Tribal_horse_army_num > 999 }
+							check_variable = { Tribal_horse_pistoleer_army_num > 999 }
+							check_variable = { Tribal_camel_army_num > 999 }
+						}
+					}
+					hidden_effect = {
+						set_country_flag = Tribal_Army_Raised_Due_To_Border_War
+						country_event = { id = first_nations_tribal_army_flag_change.1 days = 35 }
+						set_country_flag = Tribal_Army_Raised
+						afr_call_all_warrior_types = yes
+					}
+				}
+			}
+			ROOT = {
+				add_ai_strategy = {
+					type = prepare_for_war
+					id = PREV
+					value = 5
+				}
+			}
+			set_dynamic_american_state_border_war_variables = yes
+			hidden_effect = { THIS = { country_event = { id = afr_empire_scripted_diplomatic_events.1 } } }
+		}
+
+		reject_effect = {} # runs when the action is properly sent and rejected
+		can_be_sent = {} # send button will be disabled if no
+		send_description = eoanbdiplo_tribal_border_raid_action_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
+		reset_receive_effect = {}
+		can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = eoanbdiplo_tribal_border_raid_action_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 1
+			modifier = {
+				factor = 0
+				ROOT = { has_active_mission = afr_decision_internal_tribal_coup }
+			}
+			modifier = {
+				factor = 0
+				ROOT = {
+					has_opinion = {
+						target = FROM
+						value > 60
+					}
+				}
+			}
 		}
 	}
 }
