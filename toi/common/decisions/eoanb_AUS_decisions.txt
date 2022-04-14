@@ -108,6 +108,270 @@ AUS_decision_category_italian_unrest = {
 			base = 100
 		}
     }
+	
+	#Calm the Unrest in Italy
+	AUS_mission_calm_the_unrest_in_italy = {
+
+		icon = generic_nationalism
+
+		allowed = {
+			always = no
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_mission_calm_the_unrest_in_italy_trigger_tt
+				hidden_trigger = {
+					NOT = {
+						has_dynamic_modifier = {
+							modifier = AUS_Italian_Unrest_Modifier
+						}
+					}
+				}
+			}
+		}
+		
+		activation = {
+			always = no
+		}
+		
+		highlight_states = {
+			state = 159
+			state = 160
+		}
+
+		fire_only_once = yes
+		
+		is_good = no
+		
+		days_mission_timeout = 365
+		
+		cancel_trigger = {
+			NOT = {
+				LVN = { 
+					is_puppet_of = AUS 
+					owns_state = 159
+				}
+			}
+		}
+
+        timeout_effect = {
+            if = {
+				limit = {
+					is_ai = no
+				}
+				decrease_ps_by_one = yes
+				add_stability = -0.05
+				add_war_support = -0.1
+				LVN = {
+					decrease_ps_by_one = yes
+					add_stability = -0.1
+					add_war_support = -0.15
+				}
+			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_fail_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
+        }
+
+        complete_effect = {
+            add_political_power = 50
+			add_stability = 0.05
+			LVN = {
+				add_political_power = 50
+				add_stability = 0.05
+			}
+			hidden_effect = {
+				set_country_flag = AUS_mission_calm_the_unrest_in_italy_success_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+			}
+        }
+
+        ai_will_do = {
+			base = 100
+		}
+    }
+	
+	#Make Promises of Liberalization in Italy
+	AUS_decision_make_promises_of_liberalization_in_italy = {
+
+		icon = eng_puppet_usa
+
+		available = {
+			has_completed_focus = AUS_focus_token_liberalization
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				OR = {
+					NOT = { has_idea = human_rights }
+					NOT = {	has_idea = free_press }
+				}
+			}
+			NOT = { has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag }
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 10
+		
+		days_remove = 90
+		
+		modifier = {
+            political_power_gain = -0.05
+        }
+		
+		cancel_trigger = {
+			LVN = {
+				NOT = { is_puppet_of = AUS }
+			}
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_two_effect_tt
+			if = {
+				limit = {
+					LVN = {
+						NOT = { has_idea = human_rights }
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_grant_human_rights_in_lvn
+			}
+			if = {
+				limit = {
+					LVN = {
+						NOT = { has_idea = free_press }
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_grant_free_press_in_lvn
+			}
+			add_stability = 0.01
+			LVN = {
+				add_stability = 0.02
+				add_political_power = 10
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.02
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			}
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = AUS_decision_make_promises_of_liberalization_in_italy_effect_tt
+			hidden_effect = {
+				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
+				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+				country_event = { days = 60 id = austria.204 }
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Grant Human Rights to the Citizens of Lombardy-Venetia
+	AUS_decision_grant_human_rights_in_lvn = {
+
+		icon = generic_independence
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = human_rights }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 50
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_ten_effect_tt
+			LVN = {
+				add_ideas = human_rights
+				add_stability = 0.03
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.1
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+	
+	#Grant Freedom of the Press in Lombardy-Venetia
+	AUS_decision_grant_free_press_in_lvn = {
+
+		icon = ger_mefo_bills
+
+		available = {
+			has_war = no
+		}
+
+		visible = {
+			LVN = {
+				is_puppet_of = AUS
+				NOT = { has_idea = free_press }
+			}
+			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
+			has_active_mission = AUS_mission_calm_the_unrest_in_italy
+		}
+
+		cost = 25
+		
+		complete_effect = {
+			custom_effect_tooltip = AUS_unrest_in_italy_minus_five_effect_tt
+			LVN = {
+				add_ideas = free_press
+				add_stability = 0.01
+			}
+			hidden_effect = {
+				add_to_variable = {
+					ITA_UPROAR_RISK = -0.05
+				}
+				clamp_variable = {
+					var = ITA_UPROAR_RISK
+					min = 0
+					max = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 250
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
 }
 
 AUS_decision_category_external_threats = {
@@ -681,270 +945,6 @@ AUS_decision_category_external_threats = {
 
 		ai_will_do = {
 			base = 1000
-		}
-	}
-	
-	#Calm the Unrest in Italy
-	AUS_mission_calm_the_unrest_in_italy = {
-
-		icon = generic_nationalism
-
-		allowed = {
-			always = no
-		}
-
-		available = {
-			custom_trigger_tooltip = {
-				tooltip = AUS_mission_calm_the_unrest_in_italy_trigger_tt
-				hidden_trigger = {
-					NOT = {
-						has_dynamic_modifier = {
-							modifier = AUS_Italian_Unrest_Modifier
-						}
-					}
-				}
-			}
-		}
-		
-		activation = {
-			always = no
-		}
-		
-		highlight_states = {
-			state = 159
-			state = 160
-		}
-
-		fire_only_once = yes
-		
-		is_good = no
-		
-		days_mission_timeout = 365
-		
-		cancel_trigger = {
-			NOT = {
-				LVN = { 
-					is_puppet_of = AUS 
-					owns_state = 159
-				}
-			}
-		}
-
-        timeout_effect = {
-            if = {
-				limit = {
-					is_ai = no
-				}
-				decrease_ps_by_one = yes
-				add_stability = -0.05
-				add_war_support = -0.1
-				LVN = {
-					decrease_ps_by_one = yes
-					add_stability = -0.1
-					add_war_support = -0.15
-				}
-			}
-			hidden_effect = {
-				set_country_flag = AUS_mission_calm_the_unrest_in_italy_fail_flag
-				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
-			}
-        }
-
-        complete_effect = {
-            add_political_power = 50
-			add_stability = 0.05
-			LVN = {
-				add_political_power = 50
-				add_stability = 0.05
-			}
-			hidden_effect = {
-				set_country_flag = AUS_mission_calm_the_unrest_in_italy_success_flag
-				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
-			}
-        }
-
-        ai_will_do = {
-			base = 100
-		}
-    }
-	
-	#Make Promises of Liberalization in Italy
-	AUS_decision_make_promises_of_liberalization_in_italy = {
-
-		icon = eng_puppet_usa
-
-		available = {
-			has_completed_focus = AUS_focus_token_liberalization
-			has_war = no
-		}
-
-		visible = {
-			LVN = {
-				is_puppet_of = AUS
-				OR = {
-					NOT = { has_idea = human_rights }
-					NOT = {	has_idea = free_press }
-				}
-			}
-			NOT = { has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag }
-			has_active_mission = AUS_mission_calm_the_unrest_in_italy
-		}
-
-		cost = 10
-		
-		days_remove = 90
-		
-		modifier = {
-            political_power_gain = -0.05
-        }
-		
-		cancel_trigger = {
-			LVN = {
-				NOT = { is_puppet_of = AUS }
-			}
-		}
-		
-		complete_effect = {
-			custom_effect_tooltip = AUS_unrest_in_italy_minus_two_effect_tt
-			if = {
-				limit = {
-					LVN = {
-						NOT = { has_idea = human_rights }
-					}
-				}
-				unlock_decision_tooltip = AUS_decision_grant_human_rights_in_lvn
-			}
-			if = {
-				limit = {
-					LVN = {
-						NOT = { has_idea = free_press }
-					}
-				}
-				unlock_decision_tooltip = AUS_decision_grant_free_press_in_lvn
-			}
-			add_stability = 0.01
-			LVN = {
-				add_stability = 0.02
-				add_political_power = 10
-			}
-			hidden_effect = {
-				add_to_variable = {
-					ITA_UPROAR_RISK = -0.02
-				}
-				clamp_variable = {
-					var = ITA_UPROAR_RISK
-					min = 0
-					max = 1
-				}
-				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
-			}
-		}
-		
-		remove_effect = {
-			custom_effect_tooltip = AUS_decision_make_promises_of_liberalization_in_italy_effect_tt
-			hidden_effect = {
-				set_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_remove_effect_flag
-				clr_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
-				country_event = { days = 60 id = austria.204 }
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#Grant Human Rights to the Citizens of Lombardy-Venetia
-	AUS_decision_grant_human_rights_in_lvn = {
-
-		icon = generic_independence
-
-		available = {
-			has_war = no
-		}
-
-		visible = {
-			LVN = {
-				is_puppet_of = AUS
-				NOT = { has_idea = human_rights }
-			}
-			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
-			has_active_mission = AUS_mission_calm_the_unrest_in_italy
-		}
-
-		cost = 50
-		
-		complete_effect = {
-			custom_effect_tooltip = AUS_unrest_in_italy_minus_ten_effect_tt
-			LVN = {
-				add_ideas = human_rights
-				add_stability = 0.03
-			}
-			hidden_effect = {
-				add_to_variable = {
-					ITA_UPROAR_RISK = -0.1
-				}
-				clamp_variable = {
-					var = ITA_UPROAR_RISK
-					min = 0
-					max = 1
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 250
-			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
-			}
-		}
-	}
-	
-	#Grant Freedom of the Press in Lombardy-Venetia
-	AUS_decision_grant_free_press_in_lvn = {
-
-		icon = ger_mefo_bills
-
-		available = {
-			has_war = no
-		}
-
-		visible = {
-			LVN = {
-				is_puppet_of = AUS
-				NOT = { has_idea = free_press }
-			}
-			has_country_flag = AUS_decision_make_promises_of_liberalization_in_italy_complete_effect_flag
-			has_active_mission = AUS_mission_calm_the_unrest_in_italy
-		}
-
-		cost = 25
-		
-		complete_effect = {
-			custom_effect_tooltip = AUS_unrest_in_italy_minus_five_effect_tt
-			LVN = {
-				add_ideas = free_press
-				add_stability = 0.01
-			}
-			hidden_effect = {
-				add_to_variable = {
-					ITA_UPROAR_RISK = -0.05
-				}
-				clamp_variable = {
-					var = ITA_UPROAR_RISK
-					min = 0
-					max = 1
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 250
-			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
-			}
 		}
 	}
 	
@@ -1624,7 +1624,7 @@ AUS_decision_category_multinational_empire = {
 		}
        
 		ai_will_do = {
-			base = 100
+			base = 200
 		}
 	}
 	
@@ -1743,14 +1743,16 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_hungarian_nationalism_by_two_tt
-				add_to_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = HUN_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = HUN_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else_if = {
@@ -1762,26 +1764,30 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_hungarian_nationalism_by_three_tt
-				add_to_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = HUN_REVOLT_RISK
+						value = 0.03
+					}
+					clamp_variable = {
+						var = HUN_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else = {
 				custom_effect_tooltip = AUS_increase_hungarian_nationalism_by_one_tt
-				add_to_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.01
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = HUN_REVOLT_RISK
+						value = 0.01
+					}
+					clamp_variable = {
+						var = HUN_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
@@ -1797,42 +1803,38 @@ AUS_decision_category_multinational_empire = {
 							PS_pol_stab_minus_five = yes
 						}
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.05
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					PS_pol_negative_null = yes
-					NOT = {
-						OR = {
-							PS_pol_stab_minus_three = yes
-							PS_pol_stab_minus_four = yes
-							PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
+					}
+					custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = HUN_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = HUN_REVOLT_RISK
+							min = 0
+							max = 1
 						}
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
 				}
-				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_three_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = HUN_REVOLT_RISK
+							value = 0.03
+						}
+						clamp_variable = {
+							var = HUN_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else_if = {
@@ -1842,58 +1844,95 @@ AUS_decision_category_multinational_empire = {
 						PS_pol_stab_minus_four = yes
 						PS_pol_stab_minus_five = yes
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.06
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					OR = {
-						PS_pol_stab_minus_three = yes
-						PS_pol_stab_minus_four = yes
-						PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
+					custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_five_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = HUN_REVOLT_RISK
+							value = 0.05
+						}
+						clamp_variable = {
+							var = HUN_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
-				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.04
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = HUN_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = HUN_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else = {
 				add_stability = 0.03
 				custom_effect_tooltip = AUS_decrease_hungarian_nationalism_by_two_tt
-				subtract_from_variable = {
-					var = HUN_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = HUN_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					subtract_from_variable = {
+						var = HUN_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = HUN_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
        
 		ai_will_do = {
 			base = 100
+			modifier = {
+				factor = 2
+				check_variable = {
+					var = HUN_REVOLT_RISK
+					value = 0.3
+					compare = greater_than_or_equals
+				}
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = {
+					var = HUN_REVOLT_RISK
+					value = 0.2
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.2
+				check_variable = {
+					var = HUN_REVOLT_RISK
+					value = 0.1
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = {
+					var = HUN_REVOLT_RISK
+					value = 0.05
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 3
+				has_country_flag = AUS_restore_order_flag
+			}
 		}
 	}
 	
@@ -1939,14 +1978,16 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_two_tt
-				add_to_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CZE_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = CZE_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else_if = {
@@ -1958,26 +1999,30 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_three_tt
-				add_to_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CZE_REVOLT_RISK
+						value = 0.03
+					}
+					clamp_variable = {
+						var = CZE_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else = {
 				custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_one_tt
-				add_to_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.01
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CZE_REVOLT_RISK
+						value = 0.01
+					}
+					clamp_variable = {
+						var = CZE_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
@@ -1993,42 +2038,38 @@ AUS_decision_category_multinational_empire = {
 							PS_pol_stab_minus_five = yes
 						}
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.05
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					PS_pol_negative_null = yes
-					NOT = {
-						OR = {
-							PS_pol_stab_minus_three = yes
-							PS_pol_stab_minus_four = yes
-							PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
+					}
+					custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CZE_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = CZE_REVOLT_RISK
+							min = 0
+							max = 1
 						}
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
 				}
-				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_three_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CZE_REVOLT_RISK
+							value = 0.03
+						}
+						clamp_variable = {
+							var = CZE_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else_if = {
@@ -2038,58 +2079,95 @@ AUS_decision_category_multinational_empire = {
 						PS_pol_stab_minus_four = yes
 						PS_pol_stab_minus_five = yes
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.06
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					OR = {
-						PS_pol_stab_minus_three = yes
-						PS_pol_stab_minus_four = yes
-						PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
+					custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_five_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CZE_REVOLT_RISK
+							value = 0.05
+						}
+						clamp_variable = {
+							var = CZE_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
-				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.04
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CZE_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = CZE_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else = {
 				add_stability = 0.03
 				custom_effect_tooltip = AUS_decrease_west_slavic_nationalism_by_two_tt
-				subtract_from_variable = {
-					var = CZE_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = CZE_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					subtract_from_variable = {
+						var = CZE_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = CZE_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
        
 		ai_will_do = {
 			base = 100
+			modifier = {
+				factor = 2
+				check_variable = {
+					var = CZE_REVOLT_RISK
+					value = 0.3
+					compare = greater_than_or_equals
+				}
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = {
+					var = CZE_REVOLT_RISK
+					value = 0.2
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.2
+				check_variable = {
+					var = CZE_REVOLT_RISK
+					value = 0.1
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = {
+					var = CZE_REVOLT_RISK
+					value = 0.05
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 3
+				has_country_flag = AUS_restore_order_flag
+			}
 		}
 	}
 	
@@ -2136,14 +2214,16 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_two_tt
-				add_to_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CRO_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = CRO_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else_if = {
@@ -2155,26 +2235,30 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_three_tt
-				add_to_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CRO_REVOLT_RISK
+						value = 0.03
+					}
+					clamp_variable = {
+						var = CRO_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else = {
 				custom_effect_tooltip = AUS_increase_south_slavic_nationalism_by_one_tt
-				add_to_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.01
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = CRO_REVOLT_RISK
+						value = 0.01
+					}
+					clamp_variable = {
+						var = CRO_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
@@ -2190,42 +2274,38 @@ AUS_decision_category_multinational_empire = {
 							PS_pol_stab_minus_five = yes
 						}
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.05
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					PS_pol_negative_null = yes
-					NOT = {
-						OR = {
-							PS_pol_stab_minus_three = yes
-							PS_pol_stab_minus_four = yes
-							PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
+					}
+					custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CRO_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = CRO_REVOLT_RISK
+							min = 0
+							max = 1
 						}
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
 				}
-				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_three_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CRO_REVOLT_RISK
+							value = 0.03
+						}
+						clamp_variable = {
+							var = CRO_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else_if = {
@@ -2235,58 +2315,95 @@ AUS_decision_category_multinational_empire = {
 						PS_pol_stab_minus_four = yes
 						PS_pol_stab_minus_five = yes
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.06
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					OR = {
-						PS_pol_stab_minus_three = yes
-						PS_pol_stab_minus_four = yes
-						PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
+					custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_five_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CRO_REVOLT_RISK
+							value = 0.05
+						}
+						clamp_variable = {
+							var = CRO_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
-				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.04
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = CRO_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = CRO_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else = {
 				add_stability = 0.03
 				custom_effect_tooltip = AUS_decrease_south_slavic_nationalism_by_two_tt
-				subtract_from_variable = {
-					var = CRO_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = CRO_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					subtract_from_variable = {
+						var = CRO_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = CRO_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
        
 		ai_will_do = {
 			base = 100
+			modifier = {
+				factor = 2
+				check_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.3
+					compare = greater_than_or_equals
+				}
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.2
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.2
+				check_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.1
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = {
+					var = CRO_REVOLT_RISK
+					value = 0.05
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 3
+				has_country_flag = AUS_restore_order_flag
+			}
 		}
 	}
 	
@@ -2332,14 +2449,16 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_polish_nationalism_by_two_tt
-				add_to_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = POL_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = POL_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else_if = {
@@ -2351,26 +2470,30 @@ AUS_decision_category_multinational_empire = {
 					}
 				}
 				custom_effect_tooltip = AUS_increase_polish_nationalism_by_three_tt
-				add_to_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = POL_REVOLT_RISK
+						value = 0.03
+					}
+					clamp_variable = {
+						var = POL_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 			else = {
 				custom_effect_tooltip = AUS_increase_polish_nationalism_by_one_tt
-				add_to_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.01
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					add_to_variable = {
+						var = POL_REVOLT_RISK
+						value = 0.01
+					}
+					clamp_variable = {
+						var = POL_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
@@ -2386,42 +2509,38 @@ AUS_decision_category_multinational_empire = {
 							PS_pol_stab_minus_five = yes
 						}
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_polish_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.05
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					PS_pol_negative_null = yes
-					NOT = {
-						OR = {
-							PS_pol_stab_minus_three = yes
-							PS_pol_stab_minus_four = yes
-							PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
+					}
+					custom_effect_tooltip = AUS_decrease_polish_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = POL_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = POL_REVOLT_RISK
+							min = 0
+							max = 1
 						}
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
 				}
-				add_stability = 0.02
-				custom_effect_tooltip = AUS_decrease_polish_nationalism_by_three_tt
-				subtract_from_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.03
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_polish_nationalism_by_three_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = POL_REVOLT_RISK
+							value = 0.03
+						}
+						clamp_variable = {
+							var = POL_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else_if = {
@@ -2431,58 +2550,95 @@ AUS_decision_category_multinational_empire = {
 						PS_pol_stab_minus_four = yes
 						PS_pol_stab_minus_five = yes
 					}
-					has_country_flag = AUS_restore_order_flag
 				}
 				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_polish_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.06
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
-				}
-			}
-			else_if = {
-				limit = {
-					OR = {
-						PS_pol_stab_minus_three = yes
-						PS_pol_stab_minus_four = yes
-						PS_pol_stab_minus_five = yes
+				if = {
+					limit = {
+						has_country_flag = AUS_restore_order_flag
 					}
-					NOT = { has_country_flag = AUS_restore_order_flag }
+					custom_effect_tooltip = AUS_decrease_polish_nationalism_by_five_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = POL_REVOLT_RISK
+							value = 0.05
+						}
+						clamp_variable = {
+							var = POL_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
-				add_stability = 0.01
-				custom_effect_tooltip = AUS_decrease_polish_nationalism_by_four_tt
-				subtract_from_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.04
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				else = {
+					custom_effect_tooltip = AUS_decrease_polish_nationalism_by_four_tt
+					hidden_effect = {
+						subtract_from_variable = {
+							var = POL_REVOLT_RISK
+							value = 0.04
+						}
+						clamp_variable = {
+							var = POL_REVOLT_RISK
+							min = 0
+							max = 1
+						}
+					}
 				}
 			}
 			else = {
 				add_stability = 0.03
 				custom_effect_tooltip = AUS_decrease_polish_nationalism_by_two_tt
-				subtract_from_variable = {
-					var = POL_REVOLT_RISK
-					value = 0.02
-				}
-				clamp_variable = {
-					var = POL_REVOLT_RISK
-					min = 0
-					max = 1
+				hidden_effect = {
+					subtract_from_variable = {
+						var = POL_REVOLT_RISK
+						value = 0.02
+					}
+					clamp_variable = {
+						var = POL_REVOLT_RISK
+						min = 0
+						max = 1
+					}
 				}
 			}
 		}
        
 		ai_will_do = {
 			base = 100
+			modifier = {
+				factor = 2
+				check_variable = {
+					var = POL_REVOLT_RISK
+					value = 0.3
+					compare = greater_than_or_equals
+				}
+			}
+			modifier = {
+				factor = 0.5
+				check_variable = {
+					var = POL_REVOLT_RISK
+					value = 0.2
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.2
+				check_variable = {
+					var = POL_REVOLT_RISK
+					value = 0.1
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 0.1
+				check_variable = {
+					var = POL_REVOLT_RISK
+					value = 0.05
+					compare = less_than
+				}
+			}
+			modifier = {
+				factor = 3
+				has_country_flag = AUS_restore_order_flag
+			}
 		}
 	}
 }
