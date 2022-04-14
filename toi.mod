@@ -13,6 +13,7 @@ tags={
 name="End of a New Beginning - GitHub Edition"
 picture="thumbnail.png"
 replace_path="common/ai_equipment"
+replace_path="common/ai_focuses"
 replace_path="common/ai_templates"
 replace_path="common/bookmarks"
 replace_path="common/characters"
