@@ -5852,6 +5852,7 @@ AUS_decision_category_austrian_army = {
 					has_country_flag = AUS_breechloader_prototype_developed_flag
 					has_country_flag = AUS_breechloader_prototype_mass_production_ready_flag
 					has_country_flag = AUS_breechloader_waenzel_flag
+					has_idea = AUS_oewg_waenzel
 				}
 			}
 		}
@@ -5899,10 +5900,10 @@ AUS_decision_category_austrian_army = {
 			hidden_effect = {
 				clr_country_flag = AUS_army_reform_ongoing_flag
 				random_list = {
-					75 = {
+					60 = {
 						country_event = { id = austria.651 }
 					}
-					25 = {
+					40 = {
 						country_event = { id = austria.652 }
 					}
 				}
@@ -6054,6 +6055,226 @@ AUS_decision_category_austrian_army = {
 		}
 	}
 	
+	#Begin Mass Production of Improved Lorenz Rifle
+	AUS_decision_begin_improved_lorenz_rifle_mass_production = {
+
+		icon = generic_industry
+
+		#allowed = { tag = AUS }
+		
+		available = {
+			has_completed_focus = AUS_focus_cooperate_with_the_vienna_arsenal
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 0 }
+				check_variable = { debt_level < 50 }
+			}
+			else = {
+				has_political_power > 24.9
+				has_army_experience > 24.99
+				command_power > 49.99
+			}
+		}
+		custom_cost_text = eoanb_decision_army_investment_debt_cost
+		
+		days_remove = 730
+		
+		modifier = {
+			industrial_capacity_factory = 0.1
+			production_factory_max_efficiency_factor = 0.1
+			equipment_conversion_speed = 0.75
+		}
+		
+		cancel_trigger = {
+			NOT = { debt_not_bankrupt_trigger = yes }
+		}
+		
+		complete_effect = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = {
+				add_political_power = -25
+				army_experience = -25
+				add_command_power = -50
+			}
+			if = {
+				limit = {
+					has_country_flag = AUS_has_lorenz_m1862_flag
+				}
+				create_equipment_variant = { 
+					type = infantry_equipment_rifle_2
+					parent = infantry_equipment_rifle_2
+					name = "Lorenz M1862 (Improved)"
+				}
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = AUS_breechloader_prototype_mass_production_ready_flag
+				clr_country_flag = AUS_has_lorenz_m1862_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#Conduct Artillery Experiments
+	AUS_decision_conduct_cannon_experiment = {
+
+		icon = artillery
+
+		#allowed = { tag = AUS }
+		
+		available = {
+			NOT = { has_country_flag = AUS_army_reform_ongoing_flag }
+			has_completed_focus = AUS_focus_conduct_cannon_experiments
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 99.99
+		}
+		custom_cost_text = PRS_command_power_more_than_99
+		
+		days_remove = 90
+		
+		complete_effect = {
+			custom_effect_tooltip = RUS_military_reform_ongoing_effect_tt
+			add_command_power = -100
+			hidden_effect = {
+				set_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			army_experience = 25
+			add_tech_bonus = { ahead_reduction = 0.5 uses = 1 category = artillery }
+			hidden_effect = {
+				clr_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	AUS_decision_acquire_cannons = {
+
+		icon = artillery
+
+		allowed = { tag = AUS }
+		
+		available = {
+			NOT = { has_country_flag = AUS_army_reform_ongoing_flag }
+			has_completed_focus = AUS_focus_muzzle_loading_cannons
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				check_variable = { debt_level > 0 }
+				check_variable = { debt_level < 50 }
+			}
+			else = {
+				has_political_power > 24.9
+				has_army_experience > 24.99
+				command_power > 49.99
+			}
+		}
+		custom_cost_text = eoanb_decision_army_investment_debt_cost
+		
+		days_remove = 180
+		
+		cancel_trigger = {
+			NOT = { debt_not_bankrupt_trigger = yes }
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = RUS_military_reform_ongoing_effect_tt
+			if = {
+				limit = { has_idea = egy_vic_debt }
+				debt_level_increase_by_1 = yes
+			}
+			else = {
+				add_political_power = -25
+				army_experience = -25
+				add_command_power = -50
+			}
+			hidden_effect = {
+				set_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					has_tech = gw_artillery
+					NOT = { has_tech = rml_field_gun }
+				}
+				add_equipment_to_stockpile = {
+					type = cannon_equipment_0
+					amount = 50
+					producer = AUS
+					variant_name = "Panzer III"
+				}
+			}
+			else_if = {
+				limit = {
+					has_tech = rml_field_gun
+					NOT = { has_tech = rbl_field_gun }
+				}
+				add_equipment_to_stockpile = {
+					type = rifled_cannon_equipment_0
+					amount = 50
+					producer = AUS
+				}
+			}
+			else_if = {
+				limit = {
+					has_tech = rbl_field_gun
+				}
+				add_equipment_to_stockpile = {
+					type = rifled_cannon_equipment_1
+					amount = 50
+					producer = AUS
+				}
+			}
+			hidden_effect = {
+				clr_country_flag = AUS_army_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
 	#Degenfeld's Army Reform Plans
 	AUS_mission_degenfelds_army_reform_plans = {
 		
@@ -6166,7 +6387,7 @@ AUS_decision_category_austrian_army = {
 				}
 				add_equipment_to_stockpile = {
 					type = train_equipment_1
-					amount = 50
+					amount = 100
 					producer = AUS
 				}
 			}
@@ -6410,91 +6631,6 @@ AUS_decision_category_austrian_army = {
 			add_doctrine_cost_reduction = { cost_reduction = 0.5 uses = 2 category = doctrine_victorian_innovative_tech }
 		}
 	}
-	
-	AUS_decision_muzzle_loading_cannons = {
-
-		icon = artillery
-
-		allowed = { tag = AUS }
-		
-		available = {
-			NOT = { has_country_flag = AUS_army_reform_ongoing_flag }
-			has_completed_focus = AUS_focus_muzzle_loading_cannons
-		}
-
-		visible = {
-		}
-
-		fire_only_once = yes
-
-		cost = 0
-		custom_cost_trigger = { has_army_experience > 49.99 }
-		custom_cost_text = RUS_army_experience_more_than_49
-		
-		days_remove = 180
-		
-		modifier = {
-			political_power_gain = -0.05
-			experience_gain_army -0.10
-			research_speed_factor = -0.01
-		}
-		
-		cancel_trigger = {
-			NOT = { debt_not_bankrupt_trigger = yes }
-		}
-		
-		complete_effect = {
-			army_experience = -50
-			custom_effect_tooltip = RUS_military_reform_ongoing_effect_tt
-			hidden_effect = { 
-				set_country_flag = AUS_army_reform_ongoing_flag 
-			}
-		}
-		
-		remove_effect = {
-			custom_effect_tooltip = "RUS_vic_army_new_artillery"
-			if = {
-		        limit = {
-		            NOT = { has_tech = rml_field_gun }
-		        }
-		        add_tech_bonus = {
-					bonus = 0.2
-					uses = 1
-					technology = rml_field_gun
-				}
-		    }
-		    else_if = {
-		        limit = {
-		            has_tech = rml_field_gun
-		            NOT = { has_tech = rbl_field_gun }
-		        }
-		        add_tech_bonus = {
-					bonus = 0.2
-					uses = 1
-					technology = rbl_field_gun
-				}
-		    }
-		    else_if = {
-		        limit = {
-		            has_tech = rml_field_gun
-		            has_tech = rbl_field_gun
-		            NOT = { has_tech = improved_artillery }
-		        }
-		         add_tech_bonus = {
-					bonus = 0.2
-					uses = 1
-					technology = improved_artillery
-				}
-		    }
-			hidden_effect = {
-				clr_country_flag = AUS_army_reform_ongoing_flag
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}	
 	
 	AUS_decision_new_uhlan_regiments = {
 
