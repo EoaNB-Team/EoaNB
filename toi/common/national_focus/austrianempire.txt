@@ -3135,11 +3135,14 @@ focus_tree = {
 		available = {
 			debt_not_bankrupt_trigger = yes
 		}
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
 		allow_branch = {
-			#OR = {
-			#	has_country_flag = AUS_triumph_in_italy_flag
-			#	has_country_flag = AUS_disaster_in_italy_flag
-			#}
+			OR = {
+				has_country_flag = AUS_triumph_in_italy_flag
+				has_country_flag = AUS_disaster_in_italy_flag
+			}
 		}
 		ai_will_do = { base = 50 }
 		
@@ -3149,22 +3152,22 @@ focus_tree = {
 		
 		completion_reward = {
 			custom_effect_tooltip = AUS_naval_reform_effect_tt
-			#if = {
-			#	limit = {
-			#		has_country_flag = AUS_triumph_in_italy_flag
-			#	}
+			if = {
+				limit = {
+					has_country_flag = AUS_triumph_in_italy_flag
+				}
 				set_variable = { AUS_naval_reform_wsf = 0.03 tooltip = war_support_factor_tooltip }
 				set_variable = { AUS_naval_reform_ndcf = -0.05 tooltip = naval_doctrine_cost_factor_tooltip }
 				add_to_variable = { AUS_naval_reform_egn = 0.01 tooltip = experience_gain_navy_tooltip }
-			#}
-			#else_if = {
-			#	limit = {
-			#		has_country_flag = AUS_disaster_in_italy_flag
-			#	}
-			#	set_variable = { AUS_naval_reform_wsf = 0.03 tooltip = war_support_factor_tooltip }
-			#	set_variable = { AUS_naval_reform_ndcf = -0.1 tooltip = naval_doctrine_cost_factor_tooltip }
-			#	add_to_variable = { AUS_naval_reform_egn = 0.02 tooltip = experience_gain_navy_tooltip }
-			#}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = AUS_disaster_in_italy_flag
+				}
+				set_variable = { AUS_naval_reform_wsf = 0.03 tooltip = war_support_factor_tooltip }
+				set_variable = { AUS_naval_reform_ndcf = -0.1 tooltip = naval_doctrine_cost_factor_tooltip }
+				add_to_variable = { AUS_naval_reform_egn = 0.02 tooltip = experience_gain_navy_tooltip }
+			}
 		}
 	}
 	
@@ -3180,6 +3183,12 @@ focus_tree = {
 		}
 		cost = 30
 		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		allow_branch = {
+			has_country_flag = AUS_triumph_in_italy_flag
+		}
 		ai_will_do = { base = 50 }
 		
 		prerequisite = {
@@ -3187,12 +3196,41 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_idea_adriatic_navy days = 720 }
+			if = {
+				limit = {
+					160 = {
+						OR = {
+							owner = {
+								tag = AUS
+							}
+							owner = {
+								is_puppet_of = AUS
+							}
+						}
+					}
+					162 = {
+						OR = {
+							owner = {
+								tag = AUS
+							}
+							owner = {
+								is_puppet_of = AUS
+							}
+						}
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_strengthen_our_stronghold_in_italy
+			}
+			else = {
+				add_timed_idea = { idea = AUS_idea_emperor_of_the_adriatic days = 1095 }
+				set_temp_variable = { eoanb_prestige_change = 1 }
+				eoanb_change_prestige_score = yes
+			}
 		}
 	}
 	
 	focus = {
-		id = AUS_focus_the_race_for_supremacy
+		id = AUS_focus_race_for_supremacy_in_the_eastern_mediterranean
 		icon = GFX_goal_generic_navy_battleship
 		relative_position_id = AUS_focus_imperial_royal_navy
 		x = -8
@@ -3203,6 +3241,12 @@ focus_tree = {
 		}
 		cost = 30
 		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		allow_branch = {
+			has_country_flag = AUS_triumph_in_italy_flag
+		}
 		ai_will_do = { base = 50 }
 		
 		prerequisite = {
@@ -3210,14 +3254,167 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_tech_bonus = {
-				bonus = 0.5
-				uses = 3
-				category = naval_equipment
+			custom_effect_tooltip = AUS_focus_race_for_supremacy_effect_tt
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = naval_equipment }
+			add_timed_idea = { idea = AUS_idea_race_for_supremacy days = 1500 }
+			if = {
+				limit = {
+					has_idea = navinfra_good_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_good_naval_infrastructure
+					add_idea = navinfra_excellent_naval_infrastructure
+				}
 			}
-			swap_ideas = {
-				add_idea = navinfra_good_naval_infrastructure
-				remove_idea = navinfra_decent_naval_infrastructure
+			else_if = {
+				limit = {
+					has_idea = navinfra_decent_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_decent_naval_infrastructure
+					add_idea = navinfra_good_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = navinfra_low_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_low_naval_infrastructure
+					add_idea = navinfra_decent_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = navinfra_no_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_no_naval_infrastructure
+					add_idea = navinfra_low_naval_infrastructure
+				}
+			}
+		}
+	}
+	
+	focus = {
+		id = AUS_focus_strenghten_non_italian_naval_bases
+		icon = GFX_goal_generic_navy_cruiser
+		relative_position_id = AUS_focus_imperial_royal_navy
+		x = -10
+		y = 6
+		search_filters = {
+			FOCUS_FILTER_NAVY
+			FOCUS_FILTER_HISTORICAL
+		}
+		cost = 30
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		allow_branch = {
+			has_country_flag = AUS_disaster_in_italy_flag
+		}
+		ai_will_do = { base = 50 }
+		
+		prerequisite = {
+			focus = AUS_focus_lessons_from_the_italian_war
+		}
+		
+		completion_reward = {
+			if = {
+				limit = {
+					1235 = {
+						OR = {
+							owner = {
+								tag = AUS
+							}
+							owner = {
+								is_puppet_of = AUS
+							}
+						}
+					}
+					1236 = {
+						OR = {
+							owner = {
+								tag = AUS
+							}
+							owner = {
+								is_puppet_of = AUS
+							}
+						}
+					}
+				}
+				unlock_decision_tooltip = AUS_decision_strengthen_our_non_italian_naval_bases
+			}
+			else = {
+				add_timed_idea = { idea = AUS_idea_reinforcing_naval_bases days = 1095 }
+			}
+		}
+	}
+	
+	focus = {
+		id = AUS_focus_race_for_supremacy_in_the_adriatic_sea
+		icon = GFX_goal_generic_navy_battleship
+		relative_position_id = AUS_focus_imperial_royal_navy
+		x = -8
+		y = 6
+		search_filters = {
+			FOCUS_FILTER_NAVY
+			FOCUS_FILTER_HISTORICAL
+		}
+		cost = 30
+		available_if_capitulated = no
+		available = {
+			debt_not_bankrupt_trigger = yes
+		}
+		allow_branch = {
+			has_country_flag = AUS_disaster_in_italy_flag
+		}
+		ai_will_do = { base = 50 }
+		
+		prerequisite = {
+			focus = AUS_focus_lessons_from_the_italian_war
+		}
+		
+		completion_reward = {
+			custom_effect_tooltip = AUS_focus_race_for_supremacy_effect_tt
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = naval_equipment }
+			add_timed_idea = { idea = AUS_idea_race_for_supremacy days = 1500 }
+			if = {
+				limit = {
+					has_idea = navinfra_good_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_good_naval_infrastructure
+					add_idea = navinfra_excellent_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = navinfra_decent_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_decent_naval_infrastructure
+					add_idea = navinfra_good_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = navinfra_low_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_low_naval_infrastructure
+					add_idea = navinfra_decent_naval_infrastructure
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = navinfra_no_naval_infrastructure
+				}
+				swap_ideas = {
+					remove_idea = navinfra_no_naval_infrastructure
+					add_idea = navinfra_low_naval_infrastructure
+				}
 			}
 		}
 	}
@@ -3249,7 +3446,7 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_New_Navy_1 days = 365 }
+			
 		}
 	}
 	
@@ -3280,7 +3477,7 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_New_Navy_1 days = 365 }
+			
 		}
 	}
 	
@@ -3528,7 +3725,7 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_New_Navy_1 days = 365 }
+			
 		}
 	}
 	
@@ -3559,7 +3756,7 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_New_Navy_1 days = 365 }
+			
 		}
 	}
 	
@@ -3718,7 +3915,7 @@ focus_tree = {
 		}
 		
 		completion_reward = {
-			add_timed_idea = { idea = AUS_New_Navy_1 days = 365 }
+			
 		}
 	}
 	
@@ -3822,6 +4019,26 @@ focus_tree = {
 		}
 		cost = 30
 		available_if_capitulated = no
+		available = {
+			if = {
+				limit = {
+					has_country_flag = AUS_triumph_in_italy_flag
+				}
+				has_completed_focus = AUS_focus_race_for_supremacy_in_the_eastern_mediterranean
+			}
+			if = {
+				limit = {
+					has_country_flag = AUS_disaster_in_italy_flag
+				}
+				has_completed_focus = AUS_focus_race_for_supremacy_in_the_adriatic_sea
+			}
+		}
+		allow_branch = {
+			#OR = {
+			#	has_country_flag = AUS_triumph_in_italy_flag
+			#	has_country_flag = AUS_disaster_in_italy_flag
+			#}
+		}
 		ai_will_do = { base = 50 }
 		
 		prerequisite = {
