@@ -146,6 +146,10 @@ country_event = {
 		activate_mission_tooltip = AUS_mission_avoid_bankruptcy
 		hidden_effect = {
 			activate_mission = AUS_mission_avoid_bankruptcy
+			set_temp_variable = {
+				mhc_add_ncs_target = 1
+			}
+			mhc_add_ncs = yes
 		}
 	}
 }
@@ -8017,18 +8021,331 @@ country_event = {
 
 ### Italian Organization after victory in 2IW
 
-#Future of Lombardy-Venetia
+#Victory in Italy!
 country_event = {
 	id = austria.1601
 	title = austria.1601.t
 	desc = austria.1601.d
-	picture = GFX_report_event_vienna_1
+	picture = GFX_report_event_franz_joseph_coronation
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = austria.1601.a
+		ai_chance = { base = 100 }
+		complete_national_focus = AUS_focus_triumph_in_italy
+		set_temp_variable = { eoanb_prestige_change = 25 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			country_event = { id = austria.1602 days = 7 }
+		}
+	}
+}
+
+#Future of the Central Italian States
+country_event = {
+	id = austria.1602
+	title = austria.1602.t
+	desc = austria.1602.d
+	picture = GFX_report_event_austrian_north_italy
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			country_event = { id = austria.1603 days = 14 }
+		}
+	}
+	
+	timeout_days = 10
+	
+	option = { #Make them Puppets
+		name = austria.1602.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = AUS_future_of_the_central_italian_states_effect_tt
+		custom_effect_tooltip = AUS_unrest_in_italy_plus_two_effect_tt
+		hidden_effect = {
+			if = {
+				limit = {
+					OR = {
+						has_dlc = "Together for Victory"
+						has_dlc = "Waking the Tiger"
+						has_dlc = "Death or Dishonor"
+					}
+				}
+				if = {
+					limit = {
+						country_exists = MOD
+					}
+					set_autonomy = {
+						target = MOD
+						autonomy_state = autonomy_puppet
+					}
+				}
+				if = {
+					limit = {
+						country_exists = PRM
+					}
+					set_autonomy = {
+						target = PRM
+						autonomy_state = autonomy_puppet
+					}
+				}
+				if = {
+					limit = {
+						country_exists = TUS
+					}
+					set_autonomy = {
+						target = TUS
+						autonomy_state = autonomy_puppet
+					}
+				}
+			}
+			else = {
+				if = {
+					limit = {
+						country_exists = MOD
+					}
+					puppet = MOD
+				}
+				if = {
+					limit = {
+						country_exists = PRM
+					}
+					puppet = PRM
+				}
+				if = {
+					limit = {
+						country_exists = TUS
+					}
+					puppet = TUS
+				}
+			}
+			add_to_variable = {
+				ITA_UPROAR_RISK = 0.02
+			}
+			clamp_variable = {
+				var = ITA_UPROAR_RISK
+				min = 0
+				max = 1
+			}
+		}
+	}
+	
+	option = { #Status Quo
+		name = austria.1602.b
+		ai_chance = { base = 0 }
+	}
+}
+
+#Future of the Former Piedmontese Lands
+country_event = {
+	id = austria.1603
+	title = austria.1603.t
+	desc = austria.1603.d
+	picture = GFX_report_event_turin_city
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			country_event = { id = austria.1604 days = 14 }
+		}
+	}
+	
+	timeout_days = 10
+	
+	option = { #Integrate them into LVN
+		name = austria.1603.a
+		ai_chance = { base = 100 }
+		add_political_power = 25
+		LVN = {
+			add_political_power = 25
+			158 = { add_core_of = LVN }
+			735 = { add_core_of = LVN }
+			822 = { add_core_of = LVN }
+			981 = { add_core_of = LVN }
+			1153 = { add_core_of = LVN }
+		}
+	}
+	
+	option = { #Separate Kingdom
+		name = austria.1603.b
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = AUS_create_piedmontese_kingdom_effect_tt
+		custom_effect_tooltip = unfinished_content_tt
+		hidden_effect = {
+			TIC = {
+				set_cosmetic_tag = TIC_habsburg_kingdom_of_piedmont
+				transfer_state = 158
+				transfer_state = 735
+				transfer_state = 822
+				transfer_state = 981
+				transfer_state = 1153
+			}
+			AUS = {
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = TIC
+						autonomy_state = autonomy_puppet
+					}
+				}
+				else = {
+					puppet = TIC
+				}
+			}
+		}
+	}
+	
+	option = { #Hand them back to PIE
+		name = austria.1603.c
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = unfinished_content_tt
+		PIE = {
+			transfer_state = 158
+			transfer_state = 735
+			transfer_state = 822
+			transfer_state = 981
+			transfer_state = 1153
+		}
+	}
+}
+
+#Creation of the Italian League
+country_event = {
+	id = austria.1604
+	title = austria.1604.t
+	desc = austria.1604.d
+	picture = GFX_report_event_austrian_north_italy
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			country_event = { id = austria.1608 days = 14 }
+		}
+	}
+	
+	timeout_days = 10
+	
+	option = { #Yes
+		name = austria.1604.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = AUS_italian_league_effect_tt
+		hidden_effect = {
+			if = {
+				limit = {
+					country_exists = LVN
+				}
+				LVN = {
+					add_ideas = AUS_idea_italian_league
+					add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+					reverse_add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = MOD
+				}
+				MOD = {
+					add_ideas = AUS_idea_italian_league
+					add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+					reverse_add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = PRM
+				}
+				PRM = {
+					add_ideas = AUS_idea_italian_league
+					add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+					reverse_add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = TIC
+					TIC = { has_cosmetic_tag = TIC_habsburg_kingdom_of_piedmont }
+				}
+				TIC = {
+					add_ideas = AUS_idea_italian_league
+					add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+					reverse_add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+				}
+			}
+			if = {
+				limit = {
+					country_exists = TUS
+				}
+				TUS = {
+					add_ideas = AUS_idea_italian_league
+					add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+					reverse_add_opinion_modifier = {
+						target = AUS
+						modifier = AUS_ITALIAN_LEAGUE_REL
+					}
+				}
+			}
+		}
+	}
+	
+	option = { #No
+		name = austria.1604.b
+		ai_chance = { base = 0 }
+	}
+}
+
+#Future of the Kingdom of Lombardy-Venetia
+country_event = {
+	id = austria.1607
+	title = austria.1607.t
+	desc = austria.1607.d
+	picture = GFX_report_event_turin_city
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = { #Keep the Puppet
-		name = austria.1601.a
+		name = austria.1607.a
 		ai_chance = {
 			base = 100
 			modifier = {
@@ -8040,7 +8357,7 @@ country_event = {
 	}
 	
 	option = { #Annex only Venetia
-		name = austria.1601.b
+		name = austria.1607.b
 		ai_chance = {
 			base = 0
 			modifier = {
@@ -8059,7 +8376,7 @@ country_event = {
 	}
 	
 	option = { #TfV - Give more freedom
-		name = austria.1601.c
+		name = austria.1607.c
 		trigger = {
 			OR = {
 				has_dlc = "Together for Victory"
@@ -8098,139 +8415,22 @@ country_event = {
 	}
 }
 
-#Future of the Central Italian States
-country_event = {
-	id = austria.1602
-	title = austria.1602.t
-	desc = austria.1602.d
-	picture = GFX_report_event_vienna_1
-	
-	fire_only_once = yes
-	is_triggered_only = yes
-	
-	option = { #Make them Puppets
-		name = austria.1602.a
-		ai_chance = {
-			base = 100
-			modifier = {
-				add = -5
-				is_historical_focus_on = no
-			}
-		}
-		custom_effect_tooltip = AUS_italian_league_effect_tt
-		if = {
-			limit = {
-				OR = {
-					has_dlc = "Together for Victory"
-					has_dlc = "Waking the Tiger"
-					has_dlc = "Death or Dishonor"
-				}
-			}
-			set_autonomy = {
-				target = MOD
-				autonomy_state = autonomy_puppet
-			}
-			set_autonomy = {
-				target = PRM
-				autonomy_state = autonomy_puppet
-			}
-			set_autonomy = {
-				target = TUS
-				autonomy_state = autonomy_puppet
-			}
-		}
-		else = {
-			AUS = {
-				puppet = MOD
-				puppet = PRM
-				puppet = TUS
-			}
-		}
-		custom_effect_tooltip = AUS_unrest_in_italy_plus_two_effect_tt
-		hidden_effect = {
-			LVN = {
-				add_ideas = AUS_idea_italian_league
-				add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-				reverse_add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-			}
-			MOD = {
-				add_ideas = AUS_idea_italian_league
-				add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-				reverse_add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-			}
-			PRM = {
-				add_ideas = AUS_idea_italian_league
-				add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-				reverse_add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-			}
-			TUS = {
-				add_ideas = AUS_idea_italian_league
-				add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-				reverse_add_opinion_modifier = {
-					target = AUS
-					modifier = AUS_ITALIAN_LEAGUE_REL
-				}
-			}
-			add_to_variable = {
-				ITA_UPROAR_RISK = 0.02
-			}
-			clamp_variable = {
-				var = ITA_UPROAR_RISK
-				min = 0
-				max = 1
-			}
-		}
-	}
-	
-	option = { #Status Quo
-		name = austria.1602.b
-		ai_chance = {
-			base = 0
-			modifier = {
-				add = -5
-				is_historical_focus_on = no
-			}
-		}
-	}
-}
-
 #Cede Savoy and Nice to France
 country_event = {
-	id = austria.1603
-	title = austria.1603.t
-	desc = austria.1603.d
+	id = austria.1608
+	title = austria.1608.t
+	desc = austria.1608.d
 	picture = GFX_report_event_vienna_1
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = { #Give Savoy and Nice to France
-		name = austria.1603.a
+		name = austria.1608.a
 		ai_chance = {
-			base = 60
+			base = 90
 			modifier = {
-				add = 40
+				add = 10
 				FRA = {
 					has_completed_focus = FRA_close_relations_austria
 				}
@@ -8250,7 +8450,7 @@ country_event = {
 		}
 		custom_effect_tooltip = AUS_unrest_in_italy_plus_two_effect_tt
 		hidden_effect = {
-			FRA = { country_event = austria.1604 }
+			FRA = { country_event = austria.1609 }
 			add_to_variable = {
 				ITA_UPROAR_RISK = 0.02
 			}
@@ -8262,12 +8462,39 @@ country_event = {
 		}
 	}
 	
-	option = { #Let Piedmont keep them
-		name = austria.1603.b
+	option = { #Keep them
+		name = austria.1608.b
+		trigger = {
+			NOT = {
+				PIE = {
+					owns_state = 735
+					owns_state = 822
+				}
+			}
+		}
 		ai_chance = {
-			base = 40
+			base = 10
 			modifier = {
-				add = 40
+				add = -10
+				FRA = {
+					has_completed_focus = FRA_close_relations_austria
+				}
+			}
+		}
+	}
+	
+	option = { #Let the Sardinians keep them
+		name = austria.1608.c
+		trigger = {
+			PIE = {
+				owns_state = 735
+				owns_state = 822
+			}
+		}
+		ai_chance = {
+			base = 0
+			modifier = {
+				add = 10
 				NOT = {
 					FRA = {
 						has_completed_focus = FRA_close_relations_austria
@@ -8291,9 +8518,9 @@ country_event = {
 
 #FRA - Savoy and Nice ceded
 country_event = {
-	id = austria.1604
-	title = austria.1604.t
-	desc = austria.1604.d
+	id = austria.1609
+	title = austria.1609.t
+	desc = austria.1609.d
 	picture = GFX_report_event_vienna_1
 	
 	fire_only_once = yes
@@ -8326,7 +8553,7 @@ country_event = {
 	}
 	
 	option = {
-		name = austria.1604.a
+		name = austria.1609.a
 		ai_chance = { base = 100 }
 		FRA = {
 			transfer_state = 735
@@ -8334,10 +8561,12 @@ country_event = {
 		}
 		735 = {
 			add_core_of = FRA
+			remove_core_of = LVN
 			remove_core_of = PIE
 		}
 		822 = {
 			add_core_of = FRA
+			remove_core_of = LVN
 			remove_core_of = PIE
 		}
 		add_opinion_modifier = {
