@@ -1049,7 +1049,7 @@ country_event = {#sets AI behavior
 	option = {
 		name = USA_utah_war_start.1.a
 		hidden_effect = {
-			set_country_flag = USA_mormon_mME
+			set_country_flag = USA_mormon_NME
 			if = {
 				limit = {
 					is_historical_focus_on = yes
@@ -1119,6 +1119,9 @@ country_event = {#Send small military escort
 		add_to_variable = {
 			var = USA_mormon_unrest
     		value = 2
+		}
+		USA = {
+			set_country_flag = USA_mormon_SME
 		}
 	}
 }
@@ -1547,6 +1550,179 @@ country_event = {#Promise to expedite statehood
 		add_to_variable = {
 			var = USA_mormon_unrest
     		value = -4
+		}
+	}
+}
+
+country_event = {#parent event for "Send military Escort?"
+	id = USA_utah_war.25
+	title = USA_utah_war.25.t
+	desc = USA_utah_war.25.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {#small
+		name = USA_utah_war.25.a
+		country_event = {
+			id = USA_utah_war.3
+		}
+		add_political_power = 5
+		set_country_flag = USA_mormon_SME
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_peaceful
+				factor = 1.5
+			}
+		}
+	}
+
+	option = {#medium
+		name = USA_utah_war.25.b
+		country_event = {
+			id = USA_utah_war.4
+		}
+		set_country_flag = USA_mormon_MME
+		ai_chance = {
+			base = 10
+		}
+	}
+
+	option = {#large
+		name = USA_utah_war.25.c
+		country_event = {
+			id = USA_utah_war.5
+		}
+		
+		add_political_power = -5
+		set_country_flag = USA_mormon_LME
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_aggressive
+				factor = 1.5
+			}
+		}
+	}
+}
+
+country_event = {#parent event for "adjust military Escort?"
+	id = USA_utah_war.26
+	title = USA_utah_war.26.t
+	desc = USA_utah_war.26.d
+
+	is_triggered_only = yes
+
+	option = {#reduce by 1
+		name = USA_utah_war.26.a
+		trigger = {
+			NOT = {
+				has_country_flag = USA_mormon_NME
+				has_country_flag = USA_mormon_SME
+			}
+		}
+		country_event = {
+			id = USA_utah_war.22
+		}
+		if = {
+			limit = {
+				has_country_flag = USA_mormon_MME
+			}
+			clr_country_flag = USA_mormon_MME
+			set_country_flag = USA_mormon_SME
+		}
+		else = {
+			clr_country_flag = USA_mormon_LME
+			set_country_flag = USA_mormon_MME
+		}
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_peaceful
+				factor = 2
+			}
+		}
+	}
+
+	option = {#reduce by 2
+		name = USA_utah_war.26.b
+		trigger = {
+			NOT = {
+				has_country_flag = USA_mormon_MME
+				has_country_flag = USA_mormon_SME
+				has_country_flag = USA_mormon_NME
+			}
+		}
+		country_event = {
+			id = USA_utah_war.23
+		}
+		clr_country_flag = USA_mormon_LME
+		set_country_flag = USA_mormon_SME
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_peaceful
+				factor = 2
+			}
+			modifier = {
+				check_variable = {
+					USA_mormon_unrest > 10
+				}
+				factor = 2
+			}
+		}
+	}
+
+	option = {#increase by 1
+		name = USA_utah_war.26.c
+		trigger = {
+			NOT = {
+				has_country_flag = USA_mormon_LME
+			}
+		}
+		country_event = {
+			id = USA_utah_war.20
+		}
+		if = {
+			limit = {
+				has_country_flag = USA_mormon_SME
+			}
+			clr_country_flag = USA_mormon_SME
+			set_country_flag = USA_mormon_MME
+		}
+		else = {
+			clr_country_flag = USA_mormon_MME
+			set_country_flag = USA_mormon_LME
+		}
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_aggressive
+				factor = 2
+			}
+		}
+	}
+
+	option = {#increase by 2
+		name = USA_utah_war.26.e
+		trigger = {
+			NOT = {
+				has_country_flag = USA_mormon_LME
+				has_country_flag = USA_mormon_MME
+			}
+		}
+		country_event = {
+			id = USA_utah_war.21
+		}
+		clr_country_flag = USA_mormon_SME
+		set_country_flag = USA_mormon_LME
+		ai_chance = {
+			base = 10
+			modifier = {
+				has_country_flag = AI_USA_mormonWar_aggressive
+				factor = 2
+			}
 		}
 	}
 }
@@ -12819,16 +12995,16 @@ country_event = { #USA sends support to Mexican Liberals Mid-Civil-War
 				value = 0.4
 			}
 		}
-		#send_equipment_fraction = {
-		#	type = infantry_equipment
-		#	value = 0.4
-		#	target = MEX
-		#}
-		#send_equipment_fraction = {
-		#	type = uniform_equipment
-		#	value = 0.4
-		#	target = MEX
-		#}
+		send_equipment = {
+			type = infantry_equipment
+			amount = inf_equip_total
+			target = MEX
+		}
+		send_equipment = {
+			type = uniform_equipment
+			amount = uni_equip_total
+			target = MEX
+		}
 		MEX = {
 			add_opinion_modifier = {
 				target = USA
@@ -12939,6 +13115,13 @@ country_event = {#midway atoll #631
 		USA = {
 			transfer_state = 631
 		}
+		631 = {
+			add_state_modifier = {
+				modifier = {
+					required_garrison_factor = 0.1
+				}
+			}
+		}
 	}
 }
 
@@ -13007,6 +13190,13 @@ country_event = {
 		name = usa_guano_islands.1.a
 		USA = {
 			transfer_state = 630
+		}
+		630 = {
+			add_state_modifier = {
+				modifier = {
+					required_garrison_factor = 0.1
+				}
+			}
 		}
 	}
 }
