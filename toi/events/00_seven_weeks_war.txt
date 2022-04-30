@@ -155,13 +155,18 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
+
+	trigger = {
+		has_idea = egy_vic_debt
+		check_variable = { debt_level > 15 }
+	}
 	
 	timeout_days = 2
 	
 	option = {
 		name = sevenweekswar.6.a
 		ai_chance = { base = 100 }
-		add_timed_idea = { idea = AUS_idea_financial_crisis  days = 365 }
+		add_political_power = -75
 		hidden_effect = {
 			AUS = { country_event = { days = 21 id = sevenweekswar.8 } }
 		}
@@ -1104,8 +1109,8 @@ country_event = {
 		ai_chance = { base = 90 }
 		custom_effect_tooltip = AUS_FRA_convention_1866_2
 		add_political_power = 25
-		add_opinion_modifier = { target = FRA modifier = AUS_FRA_ARRANGEMENTS_REL }
-		reverse_add_opinion_modifier = { target = FRA modifier = AUS_FRA_ARRANGEMENTS_REL }
+		add_opinion_modifier = { target = FRA modifier = AUS_POL_ARRANGEMENTS_REL }
+		reverse_add_opinion_modifier = { target = FRA modifier = AUS_POL_ARRANGEMENTS_REL }
 		FRA = { country_event = { days = 1 id = sevenweekswar.42 } }
 		hidden_effect = {
 			AUS = { set_country_flag = AUS_FRA_convention_1866_signed }
@@ -1311,8 +1316,21 @@ country_event = {
 	
 	immediate = {
 		hidden_effect = {
-			AUS = { remove_ideas = GEC_idea_polizeiverein_leader }
-			PRS = { remove_ideas = GEC_idea_polizeiverein_leader }
+			AUS = {
+				if = {
+					limit = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+					}
+					remove_ideas = GEC_idea_polizeiverein_leader_1
+				}
+				else_if = {
+					limit = {
+						has_idea = GEC_idea_polizeiverein_leader_2
+					}
+					remove_ideas = GEC_idea_polizeiverein_leader_2
+				}
+			}
+			PRS = { remove_ideas = GEC_idea_polizeiverein_leader_1 }
 			BAD = { remove_ideas = GEC_idea_polizeiverein_member }
 			BAV = { remove_ideas = GEC_idea_polizeiverein_member }
 			HAN = { remove_ideas = GEC_idea_polizeiverein_member }
@@ -1761,6 +1779,8 @@ country_event = {
 		add_stability = -0.15
 		add_war_support = -0.5
 		custom_effect_tooltip = AUS_german_war_sue_for_peace
+		custom_effect_tooltip = AUS_increase_hungarian_nationalism_by_two_tt
+		custom_effect_tooltip = AUS_increase_west_slavic_nationalism_by_one_tt
 		hidden_effect = {
 			white_peace = PRS
 			white_peace = ITA
@@ -1772,7 +1792,7 @@ country_event = {
 				remove_ideas = PRS_idea_weakened_sww
                 add_to_variable = {
                     var = HUN_REVOLT_RISK
-                    value = 0.02  
+                    value = 0.02
                 }
 				clamp_variable = {
 					var = HUN_REVOLT_RISK
@@ -1781,15 +1801,13 @@ country_event = {
 				}
                 add_to_variable = {
                     var = CZE_REVOLT_RISK
-                    value = 0.01 
+                    value = 0.01
                 }
 				clamp_variable = {
 					var = CZE_REVOLT_RISK
 					min = 0
 					max = 1
 				}
-				custom_effect_tooltip = AUS_increase_hungarian_nationalism_by_two_tt
-				custom_effect_tooltip = AUS_increase_czech_nationalism_by_one_tt
 			}
 			PRS = { country_event = { id = sevenweekswar.60 } }
 			every_other_country = {
@@ -2309,12 +2327,47 @@ country_event = {
 			}
 			if = {
 				limit = {
-					950 = { is_claimed_by = SAX }
-					SAX = { has_country_flag = eoanb_flag_AUS_ally_sww }
+					OR = {
+						950 = { is_claimed_by = SAX }
+						SAX = { has_country_flag = eoanb_flag_AUS_ally_sww }
+					}
 				}
 				SAX = { 
 					transfer_state = 950
 					add_state_core = 950
+				}
+			}
+			if = {
+				limit = {
+					SCH = { exists = no }
+					PRS = {
+						owns_state = 58
+						owns_state = 949
+						owns_state = 1032
+					}
+				}
+				SCH = {
+					transfer_state = 58
+					transfer_state = 949
+					transfer_state = 1032
+					give_military_access = AUS
+					load_oob = "SCH_free_GC_member"
+					set_politics = { ruling_party = autocracy }
+					set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg }
+					SCH_friedrich_von_augustenburg = {
+						add_country_leader_role = {
+							promote_leader = yes
+							country_leader = {
+								expire = "1950.1.1"
+								desc = "POLITICS_GENERIC_EOANB_DESC"
+								ideology = constit_monarch
+								traits = {
+									#
+								}
+							}
+						}
+					}
+					country_event = { days = 14 id = secschwar.54 }
 				}
 			}
 			AUS = { set_country_flag = AUS_flag_won_sww }

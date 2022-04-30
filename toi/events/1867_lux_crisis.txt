@@ -1,0 +1,480 @@
+add_namespace = lux_crisis
+
+#Event France gets to buy luxembourg
+country_event = {
+	id = lux_crisis.1
+	title = lux_crisis.1.t
+	desc = lux_crisis.1.d
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { #Send Offer
+		name = lux_crisis.1.a
+        HOL = { country_event = { days = 2 id = lux_crisis.2 } }
+	}
+	
+	option = { #Nevermind
+		name = lux_crisis.1.b
+	}
+}
+
+#Event Netherlands gets to buy Luxembourg, given to them by France
+country_event = {
+	id = lux_crisis.2
+	title = lux_crisis.2.t
+	desc = lux_crisis.2.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Accept, ask Prussia for approval
+		name = lux_crisis.2.a
+        PRS = { country_event = { days = 2 id = lux_crisis.4 } }
+	}
+	
+	option = { #Reject France
+		name = lux_crisis.2.b
+		FRA = { country_event = { days = 2 id = lux_crisis.3 } }
+	}
+}
+
+## Netherlands rejects
+country_event = {
+	id = lux_crisis.3
+	title = lux_crisis.3.t
+	desc = lux_crisis.3.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.3.a
+        FRA = {
+			add_opinion_modifier = { 
+				target = HOL
+				modifier = medium_decrease
+			}
+		}
+	}
+}
+
+## Netherlans accepts, but asks Prussia if they approve
+country_event = {
+	id = lux_crisis.4
+	title = lux_crisis.4.t
+	desc = lux_crisis.4.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = { #Prussia Approves
+		name = lux_crisis.4.a
+        FRA = { country_event = { days = 2 id = lux_crisis.5 } }
+        add_stability = -0.10
+	}
+	
+	option = { #Prussia Doesn't Agree
+		name = lux_crisis.4.b
+		FRA = { country_event = { days = 2 id = lux_crisis.6 } }
+		add_political_power = 10
+	}
+}
+
+## Prussia approves, France annexes Luxembourg
+country_event = {
+	id = lux_crisis.5
+	title = lux_crisis.5.t
+	desc = lux_crisis.5.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.5.a
+		
+        ## Add the economy stuff later
+        annex_country = {
+            target = LUX
+            transfer_troops = yes
+        }
+	}
+}
+
+# Event France gets if Prussia doesn't agree
+country_event = {
+	id = lux_crisis.6
+	title = lux_crisis.6.t
+	desc = lux_crisis.6.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+    ## Back down
+	option = {
+		name = lux_crisis.6.a
+        add_stability = -0.05
+        FRA = {
+			add_opinion_modifier = { 
+				target = PRS
+				modifier = large_decrease
+			}
+		}
+	}
+	
+    ## Ask Daddy UK to mediate, London Conference
+	option = {
+		name = lux_crisis.6.b
+		ENG = { country_event = { days = 2 id = lux_crisis.7 } }
+	}
+
+    ## Viva la France, complete the deal anyway
+    option = {
+		name = lux_crisis.6.c
+        annex_country = {
+            target = LUX
+            transfer_troops = yes
+        }
+		PRS = { country_event = { days = 2 id = lux_crisis.11 } }
+	}
+}
+
+## Event UK gets if France seeks mediation
+country_event = {
+	id = lux_crisis.7
+	title = lux_crisis.7.t
+	desc = lux_crisis.7.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.7.a
+        FRA = { country_event = { days = 2 id = lux_crisis.8 } }
+	}
+}
+
+# Event France gets from UK
+country_event = {
+	id = lux_crisis.8
+	title = lux_crisis.8.t
+	desc = lux_crisis.8.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.8.a
+		FRA = {
+			remove_state_claim = 8
+        	give_guarantee = LUX
+		}
+        PRS = { country_event = { days = 2 id = lux_crisis.9 } }
+	}
+}
+
+# Event Prussia gets from UK - after France
+country_event = {
+	id = lux_crisis.9
+	title = lux_crisis.9.t
+	desc = lux_crisis.9.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.9.a
+		
+        ## Prussia can't have military access to luxembourg, PRS guarantees luxembourg
+        if = {
+            limit = {
+                PRS = {
+                    has_military_access_to = LUX
+                }
+            }
+			#LUX = {
+            #	remove_military_access = PRS
+			#}
+        }
+        give_guarantee = LUX
+        HOL = { country_event = { days = 2 id = lux_crisis.10 } }
+	}
+}
+
+# Event Dutch get from UK - After Prussia
+country_event = {
+	id = lux_crisis.10
+	title = lux_crisis.10.t
+	desc = lux_crisis.10.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.10.a
+        8 = {
+			add_building_construction = {
+				type = bunker
+				province = 6583
+				level = -10
+				instant_build = yes
+			}
+		}
+	}
+}
+
+# Event Prussia gets if France completes the deal anyway
+country_event = {
+	id = lux_crisis.11
+	title = lux_crisis.11.t
+	desc = lux_crisis.11.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+    ## PRS stands down
+	option = {
+		name = lux_crisis.11.a
+        add_war_support = -0.15
+        add_stability = -0.15
+	}
+	
+    ## PRS attacks France
+	option = {
+		name = lux_crisis.11.b
+        declare_war_on = {
+            target = FRA
+            type = take_claimed_state
+        }
+		FRA = { country_event = { days = 2 id = lux_crisis.12 } }
+	}
+}
+
+# Event France gets if Germany attacks them
+country_event = {
+	id = lux_crisis.12
+	title = lux_crisis.12.t
+	desc = lux_crisis.12.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = lux_crisis.12.a
+		FRA = {
+        	add_war_support = 0.05
+		}
+	}
+	
+}
+
+## PEACE STUFF - Prussia wins
+country_event = {
+	id = lux_crisis.13
+	title = lux_crisis.13.t
+	desc = lux_crisis.13.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = PRU
+		PRS = { 
+			controls_state = 814
+			controls_state = 28
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 1
+	}
+	
+	#Offer Peace to France
+	option = {
+		name = lux_crisis.13.a
+		ai_chance = { factor = 100 }
+		FRA = { country_event = { days = 1 id = lux_crisis.14 } }
+	}
+	
+    ## Doesn't offer surrender to France
+	option = {
+		name = lux_crisis.13.b
+		ai_chance = { factor = 0 }
+        add_war_support = -0.15
+	}
+}
+
+#France recieves Peace terms
+country_event = {
+	id = lux_crisis.14
+	title = lux_crisis.14.t
+	desc = lux_crisis.14.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.14.a
+		ai_chance = { factor = 100 }
+        white_peace = PRS
+		LUX = {
+			set_state_owner = 8
+		}
+        PRS = {
+            set_state_owner = 28
+            give_guarantee = LUX
+        }
+		FRA = {
+			give_guarantee = LUX
+		}
+		PRS = { country_event = { days = 1 id = lux_crisis.16 } }
+	}
+	
+    ## Doesn't accept 
+	option = {
+		name = lux_crisis.14.b
+		ai_chance = { factor = 0 }
+        add_war_support = -0.20
+        PRS = { country_event = { days = 1 id = lux_crisis.15 } }
+	}
+}
+
+country_event = { #France Refuse Peace
+	id = lux_crisis.15
+	title = lux_crisis.15.t
+	desc = lux_crisis.15.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.15.a
+		ai_chance = { factor = 100 }
+		PRS = {
+        	add_war_support = 0.1
+		}
+	}
+}
+
+country_event = { #Prussia Won the War
+	id = lux_crisis.16
+	title = lux_crisis.16.t
+	desc = lux_crisis.16.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.16.a
+		ai_chance = { factor = 100 }
+		PRS = {
+        	add_war_support = 0.1
+		}	
+	}
+}
+
+## PEACE STUFF - France wins
+country_event = {
+	id = lux_crisis.17
+	title = lux_crisis.17.t
+	desc = lux_crisis.17.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	
+	trigger = {
+		TAG = FRA
+		FRA = { 
+			controls_state = 984
+			controls_state = 51
+		}
+	}
+
+	mean_time_to_happen = {
+		days = 1
+	}
+	
+	# Offer Peace to Prussia
+	option = {
+		name = lux_crisis.17.a
+		ai_chance = { factor = 100 }
+		PRS = { country_event = { days = 1 id = lux_crisis.18 } }
+	}
+	
+    ## Doesn't offer surrender to Prussia
+	option = {
+		name = lux_crisis.17.b
+		ai_chance = { factor = 0 }
+        add_war_support = -0.1
+	}
+}
+
+country_event = { #Prussia recieves Peace terms
+	id = lux_crisis.18
+	title = lux_crisis.18.t
+	desc = lux_crisis.18.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.18.a
+		ai_chance = { factor = 100 }
+        white_peace = FRA
+        FRA = {
+            set_state_owner = 984
+			set_state_owner = 8
+        }
+		FRA = { country_event = { days = 1 id = lux_crisis.20 } }
+	}
+	
+    ## Doesn't accept 
+	option = {
+		name = lux_crisis.18.b
+		ai_chance = { factor = 0 }
+        add_war_support = -0.20
+        FRA = { country_event = { days = 1 id = lux_crisis.19 } }
+	}
+}
+
+# Prussia Refuse Peace
+country_event = {
+	id = lux_crisis.19
+	title = lux_crisis.19.t
+	desc = lux_crisis.19.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.19.a
+		ai_chance = { factor = 100 }
+		FRA = {
+        	add_war_support = 0.1
+		}
+	}
+}
+
+#France Win the War
+country_event = {
+	id = lux_crisis.20
+	title = lux_crisis.20.t
+	desc = lux_crisis.20.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.20.a
+		ai_chance = { factor = 100 }
+		FRA = {
+        	add_war_support = 0.15
+		}
+	}
+}

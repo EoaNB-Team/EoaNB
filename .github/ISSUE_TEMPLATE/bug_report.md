@@ -7,29 +7,30 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+**Description**
 A clear and concise description of what the bug is.
 
-**Which branch are you on**
-Eg. Experimental. Use "Steam" if you're on steam
+**Branch**
+Eg. Experimental. Use "Steam" if you're on steam.
 
-**To Reproduce**
-Steps to reproduce the behavior:
+**Reproduction**
+If applicable, steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
-**Expected behavior (if you know)**
-A clear and concise description of what you expected to happen.
+**Expected behavior**
+If applicable, a clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (only enter if applicable):**
+**Desktop**
+If applicable:
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
 
-**Additional context**
-Add any other context about the problem here.
+**Notes**
+Add any other context or information about the problem here.
