@@ -34,7 +34,7 @@
 
 This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, **End of a New Beginning**. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
-<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
+<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_vertersus.png?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
 <hr>
 
