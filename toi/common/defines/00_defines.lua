@@ -588,7 +588,7 @@ NDefines = {
 		HOURLY_ORG_MOVEMENT_IMPACT = -0.1,		-- how much org is lost every hour while moving an army.
 		ZERO_ORG_MOVEMENT_MODIFIER = -0.8,		-- speed impact at 0 org.
 		INFRA_ORG_IMPACT = 0.5,				-- scale factor of infra on org regain.
-		ENGAGEMENT_WIDTH_PER_WIDTH = 5.0,	-- how much enemy combat width we are allowed to engage per width of our own
+		ENGAGEMENT_WIDTH_PER_WIDTH = 2.0,	-- how much enemy combat width we are allowed to engage per width of our own
 
 
 		
