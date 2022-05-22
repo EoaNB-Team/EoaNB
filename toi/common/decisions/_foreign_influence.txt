@@ -38,6 +38,7 @@ eoanb_category_foreign_influence_actions = {
 						tag = GRE
 						tag = BEL
 						tag = SWI
+						tag = POR
 					}
 				}
 			}
@@ -70,12 +71,12 @@ eoanb_category_foreign_influence_actions = {
 			custom_trigger_tooltip = {
 				tooltip = target_is_not_influenced_by_this
 				FROM = {
-					NOT = {
-						check_variable = { influenced_by = PREV.id }
-					}
+					check_variable = { influenced_by = PREV.id }
 				}				
 			}
 		}
+
+
 
 		complete_effect = {	
 			hidden_effect = {
@@ -166,14 +167,22 @@ eoanb_category_foreign_influence_actions = {
 				}
 			}
 
-			### CASE: COUNTRY IS MINOR INFLUENCED BY ANOTHER GREAT POWER
+			### CASE: COUNTRY IS MINOR INFLUENCED BY ANOTHER GREAT POWER ###
 			else_if = {
 				limit = {
-					FROM = {
-						has_country_flag = {
-							flag = minor_foreign_influence
+					AND = {
+						FROM = {
+							has_country_flag = {
+								flag = minor_foreign_influence
+							}
 						}
-					} 
+						FROM = {
+							NOT = {
+								check_variable = { influenced_by = PREV.id }
+							}
+						}
+					}
+					
 				}
 
 				FROM = {
@@ -210,6 +219,49 @@ eoanb_category_foreign_influence_actions = {
 					}		
 				}
 				add_political_power = -25	
+			}
+
+			### CASE: COUNTRY IS MINOR INFLUENCED BY THIS GREAT POWER ###
+			else_if = {
+				limit = {
+					AND = {
+						FROM = {
+							has_country_flag = {
+								flag = minor_foreign_influence
+							}
+						}
+						FROM = {
+							check_variable = { influenced_by = PREV.id }
+						}
+					}
+					
+				}
+
+				FROM = {
+					country_event = {
+						id = foreign_influence.1
+						days = 3
+					}
+				
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_minor_external_influence
+							}
+							remove_ideas = idea_minor_external_influence
+						}
+					}
+
+					### SET INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+					
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_minor_external_influence
+							days = 365
+						}
+					}		
+				}
 			}
 
 			### CASE: COUNTRY IS MAJORLY INFLUENCED BY ANOTHER GREAT POWER ###
@@ -298,61 +350,61 @@ eoanb_category_foreign_influence_actions = {
 						remove_ideas = idea_autocracy_drift
 					}
 				}
+			}
 
-				### ADD NEW POLITICAL INFLUENCE ###
-				if = {
-					limit = {
-						has_government = centrism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_centrism_drift
-							days = 365
-						}
+			### ADD POLITICAL INFLUENCE ###
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_centrism_drift
+						days = 365
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = traditional_conservatism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_traditional_conservatism_drift
-							days = 365
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_traditional_conservatism_drift
+						days = 365
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = autocracy
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_autocracy_drift
-							days = 365
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_autocracy_drift
+						days = 365
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = social_egalitarianism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_social_egalitarianism_drift
-							days = 365
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = social_egalitarianism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_social_egalitarianism_drift
+						days = 365
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = collectivist_socialism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_collectivist_socialism_drift
-							days = 365
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = collectivist_socialism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_collectivist_socialism_drift
+						days = 365
 					}
 				}
 			}
@@ -361,8 +413,10 @@ eoanb_category_foreign_influence_actions = {
 		ai_will_do = {
 			base = 100
 			modifier = {
-				NOT = {
-					is_ai = yes
+				FROM = {
+					NOT = {
+						is_ai = yes
+					}
 				}
 				factor = 2
 			}
@@ -443,6 +497,7 @@ eoanb_category_foreign_influence_actions = {
 						tag = GRE
 						tag = BEL
 						tag = SWI
+						tag = POR
 					}
 				}
 			}
@@ -470,6 +525,10 @@ eoanb_category_foreign_influence_actions = {
 							has_country_flag = {
 								flag = shared_foreign_influence
 								days > 180
+							}
+							has_country_flag = {
+								flag = major_foreign_influence
+								days > 365
 							}
 						}
 					}
@@ -638,6 +697,43 @@ eoanb_category_foreign_influence_actions = {
 				add_political_power = -25
 			}
 
+			### CASE: IS ALREADY MAJORLY INFLUENCED BY THIS GREAT POWER ###
+			else_if = {
+				limit = {
+					FROM = {
+						has_country_flag = major_foreign_influence
+					}
+				}
+
+				### FOR NATION TO BE INFLUENCED ###
+				FROM = {
+					### NOTIFICATION EVENT ###
+					country_event = {
+						id = foreign_influence.4
+						days = 3
+					}
+
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_major_external_influence
+							}
+							remove_ideas = idea_major_external_influence
+						}
+					}
+
+					### SET 1ST INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_major_external_influence
+							days = 730
+						}
+					}
+				}
+			}
+
 			### ADD POLITICAL INFLUENCE ###
 			FROM = {
 				### REMOVE PREVIOUS POLITICAL INFLUENCE ###
@@ -673,61 +769,61 @@ eoanb_category_foreign_influence_actions = {
 						remove_ideas = idea_autocracy_drift
 					}
 				}
+			}
 
-				### ADD NEW POLITICAL INFLUENCE ###
-				if = {
-					limit = {
-						has_government = centrism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_centrism_drift
-							days = 730
-						}
+			### ADD NEW POLITICAL INFLUENCE ###
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_centrism_drift
+						days = 730
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = traditional_conservatism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_traditional_conservatism_drift
-							days = 730
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_traditional_conservatism_drift
+						days = 730
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = autocracy
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_autocracy_drift
-							days = 730
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_autocracy_drift
+						days = 730
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = social_egalitarianism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_social_egalitarianism_drift
-							days = 730
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = social_egalitarianism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_social_egalitarianism_drift
+						days = 730
 					}
 				}
-				else_if = {
-					limit = {
-						has_government = collectivist_socialism
-					}
-					FROM = {
-						add_timed_idea = {
-							idea = idea_collectivist_socialism_drift
-							days = 730
-						}
+			}
+			else_if = {
+				limit = {
+					has_government = collectivist_socialism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_collectivist_socialism_drift
+						days = 730
 					}
 				}
 			}
@@ -736,8 +832,10 @@ eoanb_category_foreign_influence_actions = {
 		ai_will_do = {
 			base = 200
 			modifier = {
-				NOT = {
-					is_ai = yes
+				FROM = {
+					NOT = {
+						is_ai = yes
+					}
 				}
 				factor = 2
 			}
