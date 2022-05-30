@@ -1,574 +1,865 @@
-eoanb_category_diplomatic_actions = {
-	Minor_Greek_Influence = {
-	
+eoanb_category_foreign_influence_actions = {
+	### TO MAKE YOUR COUNTRY AVAILABLE IN THE INFLUENCE SYSTEM ###
+	### 1st STEP: ADD YOUR TAG INSIDE THE TARGET TRIGGER BELOW IN BOTH DECISIONS ###
+	### 2nd STEP: ADD THE FOLLOWING VARIABLES IN YOUR COUNTRY'S FILE ###
+	### set_variable = { influenced_by = YOUR_TAG.id } ### 
+	### set_variable = { influenced_by2 = YOUR_TAG.id } ###
+	### YOU'RE ALL SET ###
+	Minor_Influence = {
+
 		visible = {
 			is_great_power = yes
 		}
-		
+
+		allowed = {
+			OR = {
+				tag = FRA
+				tag = RUS
+				tag = ENG
+				tag = PRS
+				tag = AUS
+				tag = OTO
+				tag = PIE
+				tag = NSC
+				tag = TUS
+				tag = PAP
+			}
+		}
+
+		cost = 75
+
+		days_remove = 180
+
+		target_trigger = {
+			FROM = {
+				AND = {
+					is_great_power = no
+					OR = {
+						tag = GRE
+						tag = BEL
+						tag = SWI
+						tag = POR
+					}
+				}
+			}
+		}
+
 		available = {
-			 custom_trigger_tooltip = {
-				tooltip = Greece_great_power
-				GRE = { is_great_power = no }
+			custom_trigger_tooltip = {
+				tooltip = target_is_not_great_power
+				FROM = { is_great_power = no }
 			}
 			custom_trigger_tooltip = {
-				tooltip = Great_Power_influence_over_Greece
-				any_country = {
+				tooltip = Great_Power_influence_over_country
+				FROM = {
 					OR = {
-						GRE = {
-							AND = {
-								check_variable = { influenced_by = GRE.id }
-								check_variable = { influenced_by2 = GRE.id }
-							}
+						AND = {
+							check_variable = { influenced_by = FROM.id }
+							check_variable = { influenced_by2 = FROM.id }
 						}
 						has_country_flag = {
-							flag = minor_greek_influence_flag
+							flag = minor_foreign_influence
 							days > 180
 						}
 						has_country_flag = {
-							flag = major_greek_influence_flag
+							flag = major_foreign_influence
 							days > 365
 						}
 					}
 				}
 			}
-			NOT = {
-				has_country_flag = major_greek_influence_flag
-			}
 		}
-		
-		days_remove = 181
-		
-		cost = 100
-		
-		complete_effect = {
-			custom_effect_tooltip = custom_tt_influence
-			set_temp_variable = { temp1 = 0 }
 
-			custom_effect_tooltip = custom_tt_influence_country
+
+
+		complete_effect = {	
 			hidden_effect = {
-				every_country = {
-					if = { 
-						limit = {
-							AND = {
-								is_great_power = yes
-								has_country_flag = minor_greek_influence_flag
+				if = {
+					limit = {
+						NOT = {
+							has_dynamic_modifier = {
+								modifier = dynmod_foreign_influence
+								scope = THIS
 							}
 						}
+					}
+					add_dynamic_modifier = {
+						modifier = dynmod_foreign_influence
+						scope = THIS
+					}
+				}
+			}
+			set_temp_variable = { target_capital = FROM.capital }
+			set_temp_variable = { distance_between_capitals = THIS.capital:distance_to@var:target_capital }
+			set_temp_variable = { cost = 0 }
 
-						clr_country_flag = minor_greek_influence_flag
-						remove_ideas = GRE_idea_minor_greek_influence
-						set_temp_variable = { temp1 = 1 }
-						
-						add_opinion_modifier = { 
-							target = GRE
-							modifier = small_decrease
-						}
-						
-						add_opinion_modifier = { 
-							target = ROOT
-							modifier = small_decrease
-						}
-						
-						GRE = {
-							set_variable = { influenced_by = ROOT.id }
-							set_variable = { influenced_by2 = GRE.id }
-							add_opinion_modifier = { 
-								target = PREV
-								modifier = small_decrease
+			hidden_effect = {
+				if = {
+					limit = {
+						check_variable = { distance_between_capitals < 250 }
+					}
+					add_to_temp_variable = { cost = 0 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 500 }
+					}
+					add_to_temp_variable = { cost = -10 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 750 }
+					}
+					add_to_temp_variable = { cost = -25 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 1000 }
+					}
+					add_to_temp_variable = { cost = -50 }
+				}
+				else = {
+					add_to_temp_variable = { cost = -75 }
+				}
+			}
+			custom_effect_tooltip = foreign_influence_cost_based_on_distance
+			add_political_power = cost
+
+			### CASE: COUNTRY IS NOT INFLUENCED BY OTHER GREAT POWERS
+			if = {
+				limit = {
+					FROM = {
+						AND = {
+							NOT = {
+								has_country_flag = minor_foreign_influence
+							}
+							NOT = {
+								has_country_flag = major_foreign_influence
 							}
 						}
-						
+					} 
+				}
+
+				### FOR NATION TO BE INFLUENCED ###
+				FROM = {
+					
+					### SET 1ST INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = PREV.id }
+
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_minor_external_influence
+							days = 365
+						}
+					}
+
+					### NOTIFICATION EVENT ### 
+					country_event = {
+						id = foreign_influence.1
+						days = 3
+					}
+				}
+			}
+
+			### CASE: COUNTRY IS MINOR INFLUENCED BY ANOTHER GREAT POWER ###
+			else_if = {
+				limit = {
+					AND = {
+						FROM = {
+							has_country_flag = {
+								flag = minor_foreign_influence
+							}
+						}
+						FROM = {
+							NOT = {
+								check_variable = { influenced_by = PREV.id }
+							}
+						}
+					}
+					
+				}
+
+				FROM = {
+					country_event = {
+						id = foreign_influence.1
+						days = 3
+					}
+
+					### NOTIFY THE OTHER GREAT POWER WITH EVENT ###
+					var:influenced_by = {
+						country_event = {
+							id = foreign_influence.2
+							days = 3
+						}
+					}
+					
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_minor_external_influence
+							}
+							remove_ideas = idea_minor_external_influence
+						}
+					}
+
+					### SET INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+					
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_minor_external_influence
+							days = 365
+						}
+					}		
+				}
+				add_political_power = -25	
+			}
+
+			### CASE: COUNTRY IS MINOR INFLUENCED BY THIS GREAT POWER ###
+			else_if = {
+				limit = {
+					AND = {
+						FROM = {
+							has_country_flag = {
+								flag = minor_foreign_influence
+							}
+						}
+						FROM = {
+							check_variable = { influenced_by = PREV.id }
+						}
+					}
+					
+				}
+
+				FROM = {
+					country_event = {
+						id = foreign_influence.1
+						days = 3
+					}
+				
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_minor_external_influence
+							}
+							remove_ideas = idea_minor_external_influence
+						}
+					}
+
+					### SET INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+					
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_minor_external_influence
+							days = 365
+						}
+					}		
+				}
+			}
+
+			### CASE: COUNTRY IS MAJORLY INFLUENCED BY ANOTHER GREAT POWER ###
+			else_if = {
+				limit = {
+					FROM = {
+						has_country_flag = {
+							flag = major_foreign_influence
+						}
+					}
+				}
+
+				FROM = {
+					country_event = {
+						id = foreign_influence.5
+						days = 3
+					}
+
+					### NOTIFY GREAT POWER THAT ANOTHER GP IS COMPETING FOR THEIR INFLUENCE ###
+					var:influenced_by = {
 						country_event = {
 							id = foreign_influence.3
-							days = 1
+							days = 3
 						}
+					}
+
+					set_temp_variable = { tempid = influenced_by }
+
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_major_external_influence
+							}
+							remove_ideas = idea_major_external_influence
+						}
+					}
+
+					### SET 1ST INFLUENCE VARIABLE AS TEMP COUNTRY ###
+					### BECAUSE ON IDEAS REMOVE, THE ID IS SET BACK TO TARGET COUNTRY ###
+					### SET 2ND INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = tempid }
+					set_variable = { influenced_by2 = ROOT.id }
+					
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_shared_external_influence
+							days = 365
+						}	
+					}
+				}
+				add_political_power = -50
+			}
+		
+			## ADD POLITICAL INFLUENCE TO MINOR NATION AND REMOVE PREVIOUS POLITICAL INFLUENCE ##
+			FROM = {
+				### REMOVE PREVIOUS POLITICAL INFLUENCE ###
+				hidden_effect = {
+					if = {
+						limit = {
+							has_idea = idea_centrism_drift
+						}
+						remove_ideas = idea_centrism_drift
 					}
 					else_if = {
 						limit = {
-							AND = {
-								is_great_power = yes
-								has_country_flag = major_greek_influence_flag
-							}
+							has_idea = idea_traditional_conservatism_drift
 						}
-						clr_country_flag = major_greek_influence_flag
-						set_country_flag = minor_greek_influence_flag
-						set_global_flag = battle_over_greek_influence
-						remove_ideas = GRE_idea_major_greek_influence
-						add_timed_idea = { idea = GRE_idea_minor_greek_influence  days = 365 }
-						set_temp_variable = { temp1 = 2 }
-						
-						add_opinion_modifier = { 
-							target = GRE
-							modifier = medium_decrease
+						remove_ideas = idea_traditional_conservatism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_social_egalitarianism_drift
 						}
-						
-						add_opinion_modifier = { 
-							target = ROOT
-							modifier = small_decrease
+						remove_ideas = idea_social_egalitarianism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_collectivist_socialism_drift
 						}
-						
-						GRE = {
-							set_variable = { influenced_by2 = ROOT.id }
-							add_opinion_modifier = { 
-								target = PREV
-								modifier = medium_decrease
-							}
-							
-							hidden_effect = {
-								country_event = {
-									id = foreign_influence.5
-									days = 1
-								}
-							}
+						remove_ideas = idea_collectivist_socialism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_autocracy_drift
 						}
-						
-						country_event = {
-							id = foreign_influence.4
-							days = 1
-						}
+						remove_ideas = idea_autocracy_drift
 					}
 				}
 			}
-				
 
-			
-			## NOTIFICATION EVENT FOR COUNTRY TO BE INFLUENCED AND REMOVE OTHER POLITICS DRIFT ##
-			GRE = {
-				hidden_effect = {
-					
-					country_event = {
-						id = foreign_influence.1
-						days = 1
-					}
-					if = {
-						limit = {
-							AND = {
-								has_idea = GRE_idea_centrism_drift
-								NOT = {
-									check_variable = { temp1 = 2 }
-								}
-							}
-						}
-						remove_ideas = GRE_idea_centrism_drift
-					}
-					if = {
-						limit = {
-							AND = {
-								has_idea = GRE_idea_centrism_drift
-								NOT = {
-									check_variable = { temp1 = 2 }
-								}
-							}
-						}
-						remove_ideas = GRE_idea_traditional_conservatism_drift
-					}
-					if = {
-						limit = {
-							AND = {
-								has_idea = GRE_idea_centrism_drift
-								NOT = {
-									check_variable = { temp1 = 2 }
-								}
-							}
-						}
-						remove_ideas = GRE_idea_social_egalitarianism_drift
-					}
-					if = {
-						limit = {
-							AND = {
-								has_idea = GRE_idea_centrism_drift
-								NOT = {
-									check_variable = { temp1 = 2 }
-								}
-							}
-						}
-						remove_ideas = GRE_idea_collectivist_socialism_drift
-					}
-					if = {
-						limit = {
-							AND = {
-								has_idea = GRE_idea_centrism_drift
-								NOT = {
-									check_variable = { temp1 = 2 }
-								}
-							}
-						}
-						remove_ideas = GRE_idea_autocracy_drift
+			### ADD POLITICAL INFLUENCE ###
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_centrism_drift
+						days = 365
 					}
 				}
 			}
-			
-			##MODIFIERS FOR COUNTRY THAT WILL INFLUENCE GREECE
-			
-			ROOT = {
-				set_country_flag = minor_greek_influence_flag
-				add_timed_idea = { 
-					idea = GRE_idea_minor_greek_influence  
-					days = 365 
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
 				}
-
-				add_opinion_modifier = { 
-					target = GRE
-					modifier = small_increase 
-				}
-				
-				if = {
-					limit = {
-						check_variable = { temp1 = 0 }
-					}
-					GRE = {
-						set_variable = { influenced_by = ROOT.id }
-						add_timed_idea = { 
-							idea = GRE_idea_minor_foreign_influence  
-							days = 365
-						}
-						add_opinion_modifier = { 
-							target = ROOT
-							modifier = small_increase 
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						check_variable = { temp1 = 1 }
-					}
-					add_political_power = -25
-					GRE = {
-						remove_ideas = GRE_idea_minor_foreign_influence
-						add_timed_idea = { 
-							idea = GRE_idea_minor_foreign_influence  
-							days = 365
-						}
-						add_opinion_modifier = { 
-							target = ROOT
-							modifier = small_increase 
-						}
-					}
-					
-				}
-				else_if = {
-					limit = {
-						check_variable = { temp1 = 2 }
-					}
-					add_political_power = -50
-					GRE = {
-						remove_ideas = GRE_idea_major_foreign_influence
-						add_timed_idea = { 
-							idea = GRE_idea_shared_foreign_influence  
-							days = 365
-						}
-						add_opinion_modifier = { 
-							target = ROOT
-							modifier = small_increase 
-						}
-					}
-				}
-				
-				## ADD POLITICAL INFLUENCE TO MINOR NATION ##
-				
-				if = {
-					limit = {
-						has_government = centrism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_centrism_drift
-							days = 365
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = traditional_conservatism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_traditional_conservatism_drift
-							days = 365
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = autocracy
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_autocracy_drift
-							days = 365
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = social_egalitarianism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_social_egalitarianism_drift
-							days = 365
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = collectivist_socialism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_collectivist_socialism_drift
-							days = 365
-						}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_traditional_conservatism_drift
+						days = 365
 					}
 				}
 			}
-				
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_autocracy_drift
+						days = 365
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = social_egalitarianism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_social_egalitarianism_drift
+						days = 365
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = collectivist_socialism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_collectivist_socialism_drift
+						days = 365
+					}
+				}
+			}
 		}
-		
+
 		ai_will_do = {
-			base = 10  
-			
-			modifier = { 
-				OR = {
-					tag = RUS 
-					tag = AUS
-					tag = ENG
-				}
-				factor = 3
-			}
-			
+			base = 100
 			modifier = {
-				factor = 0 
-				OR = {
-					AND = {
-						tag = PRS
-						NOT = { PRS_trigger_formed_germany = yes }
+				FROM = {
+					NOT = {
+						is_ai = yes
 					}
-					tag = AUS
 				}
+				factor = 2
+			}
+			modifier = {
+				has_political_power < 150 
+				factor = 0.25
+			}
+			modifier = {
+				has_political_power < 200
+				factor = 0.5
+			}
+			modifier = {
+				has_political_power < 250
+				factor = 0.75
+			}
+			modifier = {
+				has_political_power > 249
+				factor = 1.25
+			}
+			modifier = {
+				has_political_power > 300
+				factor = 1.5
+			}
+			modifier = {
+				has_political_power > 350
+				factor = 1.75
+			}
+			modifier = {
+				has_political_power > 400
+				factor = 2
 			}
 		}
-		
 	}
-	Major_Greek_Influence = {
-	
+
+	Major_Influence = {
+
+		allowed = {
+			OR = {
+				tag = FRA
+				tag = RUS
+				tag = ENG
+				tag = PRS
+				tag = AUS
+				tag = OTO
+				tag = PIE
+				tag = NSC
+				tag = TUS
+				tag = PAP
+			}
+		}
+
 		visible = {
 			AND = {
 				is_great_power = yes
-				has_country_flag = minor_greek_influence_flag
-			}
-		}
-		
-		available = {
-			has_country_flag = minor_greek_influence_flag
-		}
-			
-		cost = 150
-		
-		days_remove = 366
-		
-		complete_effect = {
-			set_temp_variable = { temp1 = 0 }
-			GRE = {
-				if = { 
-					limit = {
-						has_idea = GRE_idea_shared_foreign_influence
-					}
-					remove_ideas = GRE_idea_shared_foreign_influence
-				}
-				else_if = {
-					limit = {
-						has_idea = GRE_idea_minor_foreign_influence
-					}
-					remove_ideas = GRE_idea_minor_foreign_influence
-				}
-				
-				add_timed_idea = {
-					idea = GRE_idea_major_foreign_influence
-					days = 1095
-				}
-				
-				add_opinion_modifier = { 
-					target = ROOT
-					modifier = medium_increase
-				}	
-			}	
-			
-			hidden_effect = {
-				every_country = {
-					if = {
-						limit = {
-							AND = {
-								has_country_flag = minor_greek_influence_flag
-								NOT = {
-									tag = ROOT
-								}
-							}
-						}
-						clr_country_flag = minor_greek_influence_flag
-						set_temp_variable = { temp1 = 1 }
-						remove_ideas = GRE_idea_minor_greek_influence
-						add_opinion_modifier = { 
-							target = GRE
-							modifier = small_decrease
+				custom_trigger_tooltip = {
+					tooltip = has_minor_influence_over_target
+					FROM = {
+						OR = {
+							check_variable = { influenced_by = PREV.id}
+							check_variable = { influenced_by2 = PREV.id}
 						}
 						
-						GRE = {
-							add_opinion_modifier = { 
-								target = PREV
-								modifier = small_decrease
-							}
-						}
 					}
 				}
 			}
 			
-			
-			## NOTIFICATION EVENT FOR COUNTRY TO BE INFLUENCED ##
-			GRE = {
-				hidden_effect = {
-					country_event = {
-						id = foreign_influence.2
-						days = 1
-					}
-					
-					if = {
-						limit = {
-							has_idea = GRE_idea_centrism_drift
-						}
-						remove_ideas = GRE_idea_centrism_drift
-					}
-					else_if = {
-						limit = {
-							has_idea = GRE_idea_traditional_conservatism_drift
-						}
-						remove_ideas = GRE_idea_traditional_conservatism_drift
-					}
-					else_if = {
-						limit = {
-							has_idea = GRE_idea_social_egalitarianism_drift
-						}
-						remove_ideas = GRE_idea_social_egalitarianism_drift
-					}
-					else_if = {
-						limit = {
-							has_idea = GRE_idea_collectivist_socialism_drift
-						}
-						remove_ideas = GRE_idea_collectivist_socialism_drift
-					}
-					else_if = {
-						limit = {
-							has_idea = GRE_idea_autocracy_drift
-						}
-						remove_ideas = GRE_idea_autocracy_drift
-					}
-				}
-			}
-		
-			ROOT = {
-			
-				clr_country_flag = minor_greek_influence_flag
-				set_country_flag = major_greek_influence_flag
+		}
 
-				remove_ideas = GRE_idea_minor_greek_influence
-				add_timed_idea = {
-					idea = GRE_idea_major_greek_influence
-					days = 1095
-				}
-				
-				add_opinion_modifier = { 
-					target = GRE
-					modifier = medium_increase 
-				}
-				
-				if = {
-					limit = {
-						check_variable = { temp1 = 1 }
-					}
-					add_political_power = -25
-					set_variable = { GRE.influenced_by2 = GRE.id }
-					set_variable = { GRE.influenced_by = THIS.id }
-				}
-				
-				if = {
-					limit = {
-						has_government = centrism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_centrism_drift
-							days = 1095
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = traditional_conservatism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_traditional_conservatism_drift
-							days = 1095
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = autocracy
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_autocracy_drift
-							days = 1095
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = social_egalitarianism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_social_egalitarianism_drift
-							days = 1095
-						}
-					}
-				}
-				else_if = {
-					limit = {
-						has_government = collectivist_socialism
-					}
-					GRE = {
-						add_timed_idea = {
-							idea = GRE_idea_collectivist_socialism_drift
-							days = 1095
-						}
+		cost = 150
+
+		days_remove = 365
+
+		target_trigger = {
+			FROM = {
+				AND = {
+					is_great_power = no
+					OR = {
+						tag = GRE
+						tag = BEL
+						tag = SWI
+						tag = POR
 					}
 				}
 			}
 		}
-		
-		ai_will_do = {
-			base = 20  
-			
-			modifier = {
-				factor = 2
-				OR = {
-					tag = ENG
-					tag = RUS
-					tag = AUS
+
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = target_is_not_great_power
+				FROM = { is_great_power = no }
+			}
+			custom_trigger_tooltip = {
+				tooltip = root_has_minor_influence_over_target
+				FROM = {
+					AND = {
+						OR = {
+							check_variable = { influenced_by = PREV.id}
+							check_variable = { influenced_by2 = PREV.id}
+						}
+						OR = {
+							has_country_flag = {
+								flag = minor_foreign_influence
+								days > 180
+							}
+							has_country_flag = {
+								flag = shared_foreign_influence
+								days > 180
+							}
+							has_country_flag = {
+								flag = major_foreign_influence
+								days > 365
+							}
+						}
+					}
+					
 				}
 			}
-			
-			modifier = {
-				factor = 0 
-				OR = {
-					AND = {
-						tag = PRS
-						NOT = { PRS_trigger_formed_germany = yes }
+		}
+
+		complete_effect = {	
+
+			hidden_effect = {
+				if = {
+					limit = {
+						NOT = {
+							has_dynamic_modifier = {
+								modifier = dynmod_foreign_influence
+								scope = THIS
+							}
+						}
 					}
-					tag = AUS
+					add_dynamic_modifier = {
+						modifier = dynmod_foreign_influence
+						scope = THIS
+					}
 				}
+			}
+
+			set_temp_variable = { target_capital = FROM.capital }
+			set_temp_variable = { distance_between_capitals = THIS.capital:distance_to@var:target_capital }
+			set_temp_variable = { cost = 0 }
+
+			hidden_effect = {
+				if = {
+					limit = {
+						check_variable = { distance_between_capitals < 250 }
+					}
+					add_to_temp_variable = { cost = 0 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 500 }
+					}
+					add_to_temp_variable = { cost = -10 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 750 }
+					}
+					add_to_temp_variable = { cost = -25 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { distance_between_capitals < 1000 }
+					}
+					add_to_temp_variable = { cost = -50 }
+				}
+				else = {
+					add_to_temp_variable = { cost = -75 }
+				}
+			}
+			custom_effect_tooltip = foreign_influence_cost_based_on_distance
+			add_political_power = cost
+
+			### CASE: IS ALREADY MINOR INFLUENCED BY ONE GREAT POWER
+			if = {
+				limit = {
+					FROM = {
+						has_country_flag = minor_foreign_influence
+					}
+				}
+
+				### FOR NATION TO BE INFLUENCED ###
+				FROM = {
+					### NOTIFICATION EVENT ###
+					country_event = {
+						id = foreign_influence.4
+						days = 3
+					}
+
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_minor_external_influence
+							}
+							remove_ideas = idea_minor_external_influence
+						}
+					}
+
+					### SET 1ST INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_major_external_influence
+							days = 730
+						}
+					}
+				}
+			}
+
+			### CASE: MINOR IS INFLUENCED BY TWO GREAT POWERS
+			else_if = {
+				limit = {
+					FROM = {
+						has_country_flag = shared_foreign_influence
+					}
+				}
+
+				if = {
+					limit = {
+						check_variable = { influenced_by = ROOT.id }
+					}
+					
+					var:influenced_by2 = {
+						country_event = {
+							id = foreign_influence.2
+							days = 3
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						check_variable = { influenced_by2 = ROOT.id }
+					}
+
+					
+					var:influenced_by = {
+						country_event = {
+							id = foreign_influence.2
+							days = 3
+						}
+					}
+				}
+
+				### FOR NATION TO BE INFLUENCED ###
+				FROM = {
+					### NOTIFICATION EVENT ###
+					country_event = {
+						id = foreign_influence.4
+						days = 3
+					}
+
+
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_shared_external_influence
+							}
+							remove_ideas = idea_shared_external_influence
+						}
+					}
+
+					### SET 1ST INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					### RE-SET 2ND INFLUENCE VARIABLE ###
+					set_variable = { influenced_by = ROOT.id }
+					set_variable = { influenced_by = THIS.id }
+
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_major_external_influence
+							days = 730
+						}
+					}
+				}
+
+				add_political_power = -25
+			}
+
+			### CASE: IS ALREADY MAJORLY INFLUENCED BY THIS GREAT POWER ###
+			else_if = {
+				limit = {
+					FROM = {
+						has_country_flag = major_foreign_influence
+					}
+				}
+
+				### FOR NATION TO BE INFLUENCED ###
+				FROM = {
+					### NOTIFICATION EVENT ###
+					country_event = {
+						id = foreign_influence.4
+						days = 3
+					}
+
+					hidden_effect = {
+						if = {
+							limit = {
+								has_idea = idea_major_external_influence
+							}
+							remove_ideas = idea_major_external_influence
+						}
+					}
+
+					### SET 1ST INFLUENCE VARIABLE AS ROOT COUNTRY ###
+					set_variable = { influenced_by = ROOT.id }
+
+					hidden_effect = {
+						add_timed_idea = {
+							idea = idea_major_external_influence
+							days = 730
+						}
+					}
+				}
+			}
+
+			### ADD POLITICAL INFLUENCE ###
+			FROM = {
+				### REMOVE PREVIOUS POLITICAL INFLUENCE ###
+				hidden_effect = {
+					if = {
+						limit = {
+							has_idea = idea_centrism_drift
+						}
+						remove_ideas = idea_centrism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_traditional_conservatism_drift
+						}
+						remove_ideas = idea_traditional_conservatism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_social_egalitarianism_drift
+						}
+						remove_ideas = idea_social_egalitarianism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_collectivist_socialism_drift
+						}
+						remove_ideas = idea_collectivist_socialism_drift
+					}
+					else_if = {
+						limit = {
+							has_idea = idea_autocracy_drift
+						}
+						remove_ideas = idea_autocracy_drift
+					}
+				}
+			}
+
+			### ADD NEW POLITICAL INFLUENCE ###
+			if = {
+				limit = {
+					has_government = centrism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_centrism_drift
+						days = 730
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = traditional_conservatism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_traditional_conservatism_drift
+						days = 730
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = autocracy
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_autocracy_drift
+						days = 730
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = social_egalitarianism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_social_egalitarianism_drift
+						days = 730
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					has_government = collectivist_socialism
+				}
+				FROM = {
+					add_timed_idea = {
+						idea = idea_collectivist_socialism_drift
+						days = 730
+					}
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+			modifier = {
+				FROM = {
+					NOT = {
+						is_ai = yes
+					}
+				}
+				factor = 2
+			}
+			modifier = {
+				has_political_power < 200 
+				factor = 0.25
+			}
+			modifier = {
+				has_political_power < 250
+				factor = 0.5
+			}
+			modifier = {
+				has_political_power < 300
+				factor = 0.75
+			}
+			modifier = {
+				has_political_power > 299
+				factor = 1.25
+			}
+			modifier = {
+				has_political_power > 350
+				factor = 1.5
+			}
+			modifier = {
+				has_political_power > 400
+				factor = 1.75
+			}
+			modifier = {
+				has_political_power > 450
+				factor = 2
 			}
 		}
 	}
