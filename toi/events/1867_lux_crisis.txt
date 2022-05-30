@@ -14,7 +14,8 @@ country_event = {
 	option = {
 		name = lux_crisis.1.a
 		ai_chance = { base = 100 }
-        HOL = { country_event = { days = 3 id = lux_crisis.2 } }
+		HOL = { country_event = { days = 5 id = lux_crisis.2 } }
+		custom_effect_tooltip = historical_option
 	}
 	
 	#Nevermind
@@ -34,18 +35,29 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	option = { #Accept, ask Prussia for approval
+	#Accept, ask Prussia for approval
+	option = {
 		name = lux_crisis.2.a
-        PRS = { country_event = { days = 2 id = lux_crisis.4 } }
+		ai_chance = { base = 75 }
+		PRS = { country_event = { days = 5 id = lux_crisis.4 } }
+		custom_effect_tooltip = historical_option
 	}
 	
-	option = { #Reject France
+	#Reject
+	option = {
 		name = lux_crisis.2.b
-		FRA = { country_event = { days = 2 id = lux_crisis.3 } }
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		FRA = { country_event = { days = 5 id = lux_crisis.3 } }
 	}
 }
 
-## Netherlands rejects
+#FRA - The Netherlands Have Rejected the Offer
 country_event = {
 	id = lux_crisis.3
 	title = lux_crisis.3.t
@@ -56,16 +68,15 @@ country_event = {
 	
 	option = {
 		name = lux_crisis.3.a
-        FRA = {
-			add_opinion_modifier = { 
-				target = HOL
-				modifier = medium_decrease
-			}
-		}
+		ai_chance = { base = 100 }
+		add_opinion_modifier = { target = HOL modifier = fra_lux_crisis_refused_selling }
+		reverse_add_opinion_modifier = { target = HOL modifier = fra_lux_crisis_refused_selling }
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
-## Netherlans accepts, but asks Prussia if they approve
+#PRS - The Netherlands Asks for Permission to Sell Luxembourg to France
 country_event = {
 	id = lux_crisis.4
 	title = lux_crisis.4.t
@@ -74,20 +85,38 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	option = { #Prussia Approves
+	#Object against the selling
+	option = {
 		name = lux_crisis.4.a
-        FRA = { country_event = { days = 2 id = lux_crisis.5 } }
-        add_stability = -0.10
+		ai_chance = { base = 75 }
+		FRA = { country_event = { days = 5 id = lux_crisis.5 } }
+		HOL = { country_event = { days = 5 id = lux_crisis.6 } }
+		add_stability = -0.05
+		add_war_support = 0.05
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			FRA = { country_event = { days = 10 id = lux_crisis.9 } }
+		}
 	}
 	
-	option = { #Prussia Doesn't Agree
+	#Agree to the selling
+	option = {
 		name = lux_crisis.4.b
-		FRA = { country_event = { days = 2 id = lux_crisis.6 } }
-		add_political_power = 10
+		ai_chance = {
+			base = 25
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		FRA = { country_event = { days = 5 id = lux_crisis.7 } }
+		HOL = { country_event = { days = 5 id = lux_crisis.8 } }
+		add_political_power = 25
+		add_war_support = -0.05
 	}
 }
 
-## Prussia approves, France annexes Luxembourg
+#FRA - Prussia Objects Against the Selling
 country_event = {
 	id = lux_crisis.5
 	title = lux_crisis.5.t
@@ -96,18 +125,55 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	option = {
+	timeout_days = 5
+	
+	#Protest the decision
+    option = {
 		name = lux_crisis.5.a
-		
-        ## Add the economy stuff later
-        annex_country = {
-            target = LUX
-            transfer_troops = yes
-        }
+		ai_chance = { base = 75 }
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = 0.1
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			RUS = { country_event = { days = 14 id = lux_crisis.10 } }
+		}
+	}
+	
+	#Back down
+	option = {
+		name = lux_crisis.5.b
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -25
+		add_stability = -0.02
+		add_war_support = 0.05
+		add_opinion_modifier = { target = PRS modifier = fra_lux_crisis_refused_selling_prs }
+		reverse_add_opinion_modifier = { target = PRS modifier = fra_lux_crisis_refused_selling_prs }
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+	}
+
+    #Ask the Dutch to confirm the deal anyway
+    option = {
+		name = lux_crisis.5.c
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		#HOL = { country_event = { days = 3 id = lux_crisis.10 } }
 	}
 }
 
-# Event France gets if Prussia doesn't agree
+#HOL - Prussia Objects Against the Selling
 country_event = {
 	id = lux_crisis.6
 	title = lux_crisis.6.t
@@ -115,37 +181,18 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
-	
-    ## Back down
-	option = {
-		name = lux_crisis.6.a
-        add_stability = -0.05
-        FRA = {
-			add_opinion_modifier = { 
-				target = PRS
-				modifier = large_decrease
-			}
-		}
-	}
-	
-    ## Ask Daddy UK to mediate, London Conference
-	option = {
-		name = lux_crisis.6.b
-		ENG = { country_event = { days = 2 id = lux_crisis.7 } }
-	}
 
-    ## Viva la France, complete the deal anyway
     option = {
-		name = lux_crisis.6.c
-        annex_country = {
-            target = LUX
-            transfer_troops = yes
-        }
-		PRS = { country_event = { days = 2 id = lux_crisis.11 } }
+		name = lux_crisis.6.a
+		ai_chance = { base = 100 }
+        add_political_power = -10
+		add_stability = -0.01
+		add_opinion_modifier = { target = PRS modifier = hol_lux_crisis_refused_selling }
+		reverse_add_opinion_modifier = { target = PRS modifier = hol_lux_crisis_refused_selling }
 	}
 }
 
-## Event UK gets if France seeks mediation
+#FRA - Prussia Agrees to the Selling
 country_event = {
 	id = lux_crisis.7
 	title = lux_crisis.7.t
@@ -156,11 +203,27 @@ country_event = {
 	
 	option = {
 		name = lux_crisis.7.a
-        FRA = { country_event = { days = 2 id = lux_crisis.8 } }
+		#Add economy stuff later
+		add_opinion_modifier = { target = PRS modifier = fra_lux_crisis_accepted_selling_prs }
+		reverse_add_opinion_modifier = { target = PRS modifier = fra_lux_crisis_accepted_selling_prs }
+		add_timed_idea = {
+			idea = FRA_idea_luxembourg_compensation
+			days = 730
+		}
+		annex_country = {
+			target = LUX
+			transfer_troops = no
+		}
+		8 = {
+			add_core_of = FRA
+			remove_core_of = LUX
+		}
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
-# Event France gets from UK
+#HOL - Prussia Agrees to the Selling
 country_event = {
 	id = lux_crisis.8
 	title = lux_crisis.8.t
@@ -171,15 +234,19 @@ country_event = {
 	
 	option = {
 		name = lux_crisis.8.a
-		FRA = {
-			remove_state_claim = 8
-        	give_guarantee = LUX
+		#Add economy stuff later
+		add_opinion_modifier = { target = FRA modifier = fra_lux_crisis_accepted_selling }
+		reverse_add_opinion_modifier = { target = FRA modifier = fra_lux_crisis_accepted_selling }
+		add_timed_idea = {
+			idea = HOL_idea_luxembourg_compensation
+			days = 730
 		}
-        PRS = { country_event = { days = 2 id = lux_crisis.9 } }
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
-# Event Prussia gets from UK - after France
+#FRA - Public Outcry Against Prussian Deception
 country_event = {
 	id = lux_crisis.9
 	title = lux_crisis.9.t
@@ -188,26 +255,21 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
+	immediate = {
+		hidden_effect = {
+			news_event = { id = news.38 days = 3 }
+		}
+	}
+	
 	option = {
 		name = lux_crisis.9.a
-		
-        ## Prussia can't have military access to luxembourg, PRS guarantees luxembourg
-        if = {
-            limit = {
-                PRS = {
-                    has_military_access_to = LUX
-                }
-            }
-			#LUX = {
-            #	remove_military_access = PRS
-			#}
-        }
-        give_guarantee = LUX
-        HOL = { country_event = { days = 2 id = lux_crisis.10 } }
+		ai_chance = { base = 100 }
+		add_stability = -0.03
+		add_war_support = 0.15
 	}
 }
 
-# Event Dutch get from UK - After Prussia
+#RUS - Call for an International Conference to Settle the Luxembourg Crisis
 country_event = {
 	id = lux_crisis.10
 	title = lux_crisis.10.t
@@ -218,18 +280,15 @@ country_event = {
 	
 	option = {
 		name = lux_crisis.10.a
-        8 = {
-			add_building_construction = {
-				type = bunker
-				province = 6583
-				level = -10
-				instant_build = yes
-			}
-		}
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		ENG = { country_event = { days = 7 id = lux_crisis.11 } }
 	}
 }
 
-# Event Prussia gets if France completes the deal anyway
+#ENG - Invite the Great Powers to an International Conference to Settle the Luxembourg Crisis
 country_event = {
 	id = lux_crisis.11
 	title = lux_crisis.11.t
@@ -238,53 +297,390 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-    ## PRS stands down
 	option = {
 		name = lux_crisis.11.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		custom_effect_tooltip = lux_crisis_london_conference_invite_effect_tt
+		hidden_effect = {
+			AUS = { country_event = { days = 2 id = lux_crisis.12 } }
+			BEL = { country_event = { days = 2 id = lux_crisis.12 } }
+			FRA = { country_event = { days = 2 id = lux_crisis.12 } }
+			HOL = { country_event = { days = 2 id = lux_crisis.12 } }
+			PRS = { country_event = { days = 2 id = lux_crisis.12 } }
+			RUS = { country_event = { days = 2 id = lux_crisis.12 } }
+			if = {
+				limit = {
+					NSC = {
+						has_country_flag = is_literally_italy
+					}
+				}
+				NSC = { country_event = { days = 2 id = lux_crisis.12 } }
+			}
+			if = {
+				limit = {
+					PAP = {
+						has_country_flag = is_literally_italy
+					}
+				}
+				PAP = { country_event = { days = 2 id = lux_crisis.12 } }
+			}
+			if = {
+				limit = {
+					PIE = {
+						has_country_flag = is_literally_italy
+					}
+				}
+				PIE = { country_event = { days = 2 id = lux_crisis.12 } }
+			}
+			if = {
+				limit = {
+					TUS = {
+						has_country_flag = is_literally_italy
+					}
+				}
+				TUS = { country_event = { days = 2 id = lux_crisis.12 } }
+			}
+			ENG = { country_event = { days = 9 id = lux_crisis.13 } }
+			ENG = { country_event = { days = 9 id = lux_crisis.14 } }
+			ENG = { country_event = { days = 9 id = lux_crisis.15 } }
+		}
+	}
+}
+
+#AUS/BEL/FRA/HOL/PRS/RUS/ITA - England Invites the Great Powers to an International Conference in London
+country_event = {
+	id = lux_crisis.12
+	title = lux_crisis.12.t
+	desc = lux_crisis.12.d
+	
+	is_triggered_only = yes
+	
+	timeout_days = 5
+	
+	#Accept the invitation
+	option = {
+		name = lux_crisis.12.a
+		ai_chance = { base = 100 }
+		hidden_effect = {
+			set_country_flag = lux_crisis_london_conference_attend_flag
+		}
+	}
+	
+	#Decline the invitation
+	option = {
+		name = lux_crisis.12.b
+		trigger = {
+			NOT = {
+				OR = {
+					tag = BEL
+					tag = HOL
+					tag = RUS
+				}
+			}
+		}
+		ai_chance = { base = 0 }
+		add_political_power = -20
+	}
+}
+
+#ENG - The London Conference Starts - France and Prussia present
+country_event = {
+	id = lux_crisis.13
+	title = lux_crisis.13.t
+	desc = {
+		trigger = {
+			FRA = { has_country_flag = lux_crisis_london_conference_attend_flag }
+			PRS = { has_country_flag = lux_crisis_london_conference_attend_flag }
+		}
+		text = lux_crisis.13.d_france_and_prussia_present
+	}
+	desc = {
+		trigger = {
+			FRA = { has_country_flag = lux_crisis_london_conference_attend_flag }
+			PRS = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+		}
+		text = lux_crisis.13.d_france_present_prussia_not
+	}
+	desc = {
+		trigger = {
+			FRA = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+			PRS = { has_country_flag = lux_crisis_london_conference_attend_flag }
+		}
+		text = lux_crisis.13.d_prussia_present_france_not
+	}
+	desc = {
+		trigger = {
+			FRA = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+			PRS = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+		}
+		text = lux_crisis.13.d_france_and_prussia_not_present
+	}
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	option = {
+		name = lux_crisis.13.a
+		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				FRA = { has_country_flag = lux_crisis_london_conference_attend_flag }
+				PRS = { has_country_flag = lux_crisis_london_conference_attend_flag }
+			}
+			add_political_power = 10
+			set_temp_variable = { eoanb_prestige_change = 3 }
+			eoanb_change_prestige_score = yes
+		}
+		else_if = {
+			limit = {
+				FRA = { has_country_flag = lux_crisis_london_conference_attend_flag }
+				PRS = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+			}
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+		}
+		else_if = {
+			limit = {
+				FRA = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+				PRS = { has_country_flag = lux_crisis_london_conference_attend_flag }
+			}
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+		}
+		else_if = {
+			limit = {
+				FRA = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+				PRS = { NOT = { has_country_flag = lux_crisis_london_conference_attend_flag } }
+			}
+			set_temp_variable = { eoanb_prestige_change = -2 }
+			eoanb_change_prestige_score = yes
+		}
+		custom_effect_tooltip = lux_crisis_london_conference_start_effect_tt
+		hidden_effect = {
+			BEL = { country_event = { id = lux_crisis.14 } }
+			HOL = { country_event = { id = lux_crisis.14 } }
+			RUS = { country_event = { id = lux_crisis.14 } }
+			if = {
+				limit = {
+					AUS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				AUS = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					FRA = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				FRA = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PRS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PRS = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					NSC = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				NSC = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PAP = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PAP = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PIE = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PIE = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					TUS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				TUS = { country_event = { id = lux_crisis.14 } }
+			}
+			country_event = { days = 4 id = lux_crisis.15 }
+		}
+	}
+}
+
+#AUS/BEL/FRA/HOL/PRS/RUS/ITA - The London Conference Starts
+country_event = {
+	id = lux_crisis.14
+	title = lux_crisis.14.t
+	desc = lux_crisis.14.d
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	option = {
+		name = lux_crisis.14.a
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = FRA }
+		}
+		if = {
+			limit = {
+				NOT = { tag = PRS }
+			}
+			add_stability = 0.01
+		}
+	}
+	
+	option = {
+		name = lux_crisis.14.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		
+	}
+}
+
+#ENG - 
+country_event = {
+	id = lux_crisis.15
+	title = lux_crisis.15.t
+	desc = lux_crisis.15.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = lux_crisis.15.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		set_temp_variable = { eoanb_prestige_change = 2 }
+		eoanb_change_prestige_score = yes
+		custom_effect_tooltip = lux_crisis_london_conference_start_effect_tt
+		hidden_effect = {
+			BEL = { country_event = { id = lux_crisis.14 } }
+			HOL = { country_event = { id = lux_crisis.14 } }
+			RUS = { country_event = { id = lux_crisis.14 } }
+			if = {
+				limit = {
+					AUS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				AUS = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					FRA = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				FRA = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PRS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PRS = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					NSC = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				NSC = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PAP = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PAP = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					PIE = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				PIE = { country_event = { id = lux_crisis.14 } }
+			}
+			if = {
+				limit = {
+					TUS = {
+						has_country_flag = lux_crisis_london_conference_attend_flag
+					}
+				}
+				TUS = { country_event = { id = lux_crisis.14 } }
+			}
+			country_event = { days = 4 id = lux_crisis.15 }
+		}
+	}
+}
+
+# Event Prussia gets if France completes the deal anyway
+country_event = {
+	id = lux_crisis.66
+	title = lux_crisis.66.t
+	desc = lux_crisis.66.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+    ## PRS stands down
+	option = {
+		name = lux_crisis.66.a
         add_war_support = -0.15
         add_stability = -0.15
 	}
 	
     ## PRS attacks France
 	option = {
-		name = lux_crisis.11.b
+		name = lux_crisis.66.b
         declare_war_on = {
             target = FRA
             type = take_claimed_state
         }
-		FRA = { country_event = { days = 2 id = lux_crisis.12 } }
+		FRA = { country_event = { days = 2 id = lux_crisis.67 } }
 	}
-}
-
-# Event France gets if Germany attacks them
-country_event = {
-	id = lux_crisis.12
-	title = lux_crisis.12.t
-	desc = lux_crisis.12.d
-	
-	fire_only_once = yes
-	is_triggered_only = yes
-
-	option = {
-		name = lux_crisis.12.a
-		FRA = {
-        	add_war_support = 0.05
-		}
-	}
-	
 }
 
 ## PEACE STUFF - Prussia wins
 country_event = {
-	id = lux_crisis.13
-	title = lux_crisis.13.t
-	desc = lux_crisis.13.d
+	id = lux_crisis.15
+	title = lux_crisis.15.t
+	desc = lux_crisis.15.d
 	picture = GFX_report_event_generic_train
 	
 	fire_only_once = yes
 	
 	trigger = {
-		TAG = PRU
+		TAG = PRS
 		PRS = { 
 			controls_state = 814
 			controls_state = 28
@@ -297,32 +693,32 @@ country_event = {
 	
 	#Offer Peace to France
 	option = {
-		name = lux_crisis.13.a
-		ai_chance = { factor = 100 }
-		FRA = { country_event = { days = 1 id = lux_crisis.14 } }
+		name = lux_crisis.15.a
+		ai_chance = { base = 100 }
+		FRA = { country_event = { days = 1 id = lux_crisis.16 } }
 	}
 	
     ## Doesn't offer surrender to France
 	option = {
-		name = lux_crisis.13.b
-		ai_chance = { factor = 0 }
+		name = lux_crisis.15.b
+		ai_chance = { base = 0 }
         add_war_support = -0.15
 	}
 }
 
 #France recieves Peace terms
 country_event = {
-	id = lux_crisis.14
-	title = lux_crisis.14.t
-	desc = lux_crisis.14.d
+	id = lux_crisis.16
+	title = lux_crisis.16.t
+	desc = lux_crisis.16.d
 	picture = GFX_report_event_generic_train
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
-		name = lux_crisis.14.a
-		ai_chance = { factor = 100 }
+		name = lux_crisis.16.a
+		ai_chance = { base = 100 }
         white_peace = PRS
 		LUX = {
 			set_state_owner = 8
@@ -334,30 +730,30 @@ country_event = {
 		FRA = {
 			give_guarantee = LUX
 		}
-		PRS = { country_event = { days = 1 id = lux_crisis.16 } }
+		PRS = { country_event = { days = 1 id = lux_crisis.18 } }
 	}
 	
     ## Doesn't accept 
 	option = {
-		name = lux_crisis.14.b
-		ai_chance = { factor = 0 }
+		name = lux_crisis.16.b
+		ai_chance = { base = 0 }
         add_war_support = -0.20
-        PRS = { country_event = { days = 1 id = lux_crisis.15 } }
+        PRS = { country_event = { days = 1 id = lux_crisis.17 } }
 	}
 }
 
 country_event = { #France Refuse Peace
-	id = lux_crisis.15
-	title = lux_crisis.15.t
-	desc = lux_crisis.15.d
+	id = lux_crisis.17
+	title = lux_crisis.17.t
+	desc = lux_crisis.17.d
 	picture = GFX_report_event_generic_train
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
-		name = lux_crisis.15.a
-		ai_chance = { factor = 100 }
+		name = lux_crisis.17.a
+		ai_chance = { base = 100 }
 		PRS = {
         	add_war_support = 0.1
 		}
@@ -365,17 +761,17 @@ country_event = { #France Refuse Peace
 }
 
 country_event = { #Prussia Won the War
-	id = lux_crisis.16
-	title = lux_crisis.16.t
-	desc = lux_crisis.16.d
+	id = lux_crisis.18
+	title = lux_crisis.18.t
+	desc = lux_crisis.18.d
 	picture = GFX_report_event_generic_train
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
-		name = lux_crisis.16.a
-		ai_chance = { factor = 100 }
+		name = lux_crisis.18.a
+		ai_chance = { base = 100 }
 		PRS = {
         	add_war_support = 0.1
 		}	
@@ -384,9 +780,9 @@ country_event = { #Prussia Won the War
 
 ## PEACE STUFF - France wins
 country_event = {
-	id = lux_crisis.17
-	title = lux_crisis.17.t
-	desc = lux_crisis.17.d
+	id = lux_crisis.19
+	title = lux_crisis.19.t
+	desc = lux_crisis.19.d
 	picture = GFX_report_event_generic_train
 	
 	fire_only_once = yes
@@ -405,15 +801,15 @@ country_event = {
 	
 	# Offer Peace to Prussia
 	option = {
-		name = lux_crisis.17.a
-		ai_chance = { factor = 100 }
-		PRS = { country_event = { days = 1 id = lux_crisis.18 } }
+		name = lux_crisis.19.a
+		ai_chance = { base = 100 }
+		PRS = { country_event = { days = 1 id = lux_crisis.20 } }
 	}
 	
     ## Doesn't offer surrender to Prussia
 	option = {
-		name = lux_crisis.17.b
-		ai_chance = { factor = 0 }
+		name = lux_crisis.19.b
+		ai_chance = { base = 0 }
         add_war_support = -0.1
 	}
 }
@@ -479,7 +875,56 @@ country_event = {
 	
 	option = {
 		name = lux_crisis.20.a
-		ai_chance = { factor = 100 }
+		ai_chance = { base = 100 }
+        white_peace = FRA
+        FRA = {
+            set_state_owner = 984
+			set_state_owner = 8
+        }
+		FRA = { country_event = { days = 1 id = lux_crisis.22 } }
+	}
+	
+    ## Doesn't accept 
+	option = {
+		name = lux_crisis.20.b
+		ai_chance = { base = 0 }
+        add_war_support = -0.20
+        FRA = { country_event = { days = 1 id = lux_crisis.21 } }
+	}
+}
+
+#Prussia Refuse Peace
+country_event = {
+	id = lux_crisis.21
+	title = lux_crisis.21.t
+	desc = lux_crisis.21.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.21.a
+		ai_chance = { base = 100 }
+		FRA = {
+        	add_war_support = 0.1
+		}
+	}
+}
+
+#France Win the War
+country_event = {
+	id = lux_crisis.22
+	title = lux_crisis.22.t
+	desc = lux_crisis.22.d
+	picture = GFX_report_event_generic_train
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = lux_crisis.22.a
+		ai_chance = { base = 100 }
 		FRA = {
         	add_war_support = 0.15
 		}
