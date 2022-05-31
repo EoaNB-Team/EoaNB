@@ -1,111 +1,111 @@
-on_actions = {
+# on_actions = {
 	
-	on_weekly = {
-		effect = {
-			if = {
-				limit = {
-					has_country_flag = eoanb_ai_want_peace
-					OR = {
-						var:eoanb_ai_want_peace_with = {
-							NOT = { eoanb_ai_will_offer_peace = yes }
-						}
-						NOT = { has_war_with = var:eoanb_ai_want_peace_with }
-					}
-				}
-				clr_country_flag = eoanb_ai_want_peace
-				clear_variable = eoanb_ai_want_peace_with 
-				reset_peace_deal_proposal = yes
-			}
-			if = {
-				limit = {
-					is_ai = yes
-					has_war = yes
-					NOT = { has_country_flag = eoanb_ai_want_peace }
-				}
-				random_enemy_country = {
-					limit = {
-						eoanb_ai_will_offer_peace = yes
-					}
-					reset_peace_deal_proposal = yes
-					eoanb_ai_prepare_peace_deal = yes
-					ROOT = {
-						set_country_flag = eoanb_ai_want_peace
-						set_variable = { eoanb_ai_want_peace_with = PREV }
-					}
-				}
-			}
-		}
-	}
+# 	on_weekly = {
+# 		effect = {
+# 			if = {
+# 				limit = {
+# 					has_country_flag = eoanb_ai_want_peace
+# 					OR = {
+# 						var:eoanb_ai_want_peace_with = {
+# 							NOT = { eoanb_ai_will_offer_peace = yes }
+# 						}
+# 						NOT = { has_war_with = var:eoanb_ai_want_peace_with }
+# 					}
+# 				}
+# 				clr_country_flag = eoanb_ai_want_peace
+# 				clear_variable = eoanb_ai_want_peace_with
+# 				reset_peace_deal_proposal = yes
+# 			}
+# 			if = {
+# 				limit = {
+# 					is_ai = yes
+# 					has_war = yes
+# 					NOT = { has_country_flag = eoanb_ai_want_peace }
+# 				}
+# 				random_enemy_country = {
+# 					limit = {
+# 						eoanb_ai_will_offer_peace = yes
+# 					}
+# 					reset_peace_deal_proposal = yes
+# 					eoanb_ai_prepare_peace_deal = yes
+# 					ROOT = {
+# 						set_country_flag = eoanb_ai_want_peace
+# 						set_variable = { eoanb_ai_want_peace_with = PREV }
+# 					}
+# 				}
+# 			}
+# 		}
+# 	}
 	
-	# ROOT is capitulated country, FROM is winner
-	on_capitulation = {
-		effect = {
-			if = {
-				limit = {
-					is_in_faction = yes
-				}
-				random_country = {
-					limit = {
-						is_in_faction_with = ROOT
-						is_faction_leader = yes
-						has_war_with = FROM
-					}
-					set_temp_variable = { pts = FROM.vp@ROOT }
-					divide_temp_variable = { pts = 2 }
-					round_temp_variable = pts
-					add_to_variable = { FROM.vp@THIS = pts }
-				}
-			}
-			set_temp_variable = { tot_pts = 0 }
-			every_owned_state = {
-				limit = {
-					is_controlled_by = FROM
-				}
-				add_to_temp_variable = { tot_pts = THIS.state_strategic_value }
-			}
-			divide_temp_variable = { tot_pts = 2 }
-			round_temp_variable = tot_pts
-			add_to_variable = { FROM.vp@ROOT = tot_pts }
-		}
-	}
+# 	# ROOT is capitulated country, FROM is winner
+# 	on_capitulation = {
+# 		effect = {
+# 			if = {
+# 				limit = {
+# 					is_in_faction = yes
+# 				}
+# 				random_country = {
+# 					limit = {
+# 						is_in_faction_with = ROOT
+# 						is_faction_leader = yes
+# 						has_war_with = FROM
+# 					}
+# 					set_temp_variable = { pts = FROM.vp@ROOT }
+# 					divide_temp_variable = { pts = 2 }
+# 					round_temp_variable = pts
+# 					add_to_variable = { FROM.vp@THIS = pts }
+# 				}
+# 			}
+# 			set_temp_variable = { tot_pts = 0 }
+# 			every_owned_state = {
+# 				limit = {
+# 					is_controlled_by = FROM
+# 				}
+# 				add_to_temp_variable = { tot_pts = THIS.state_strategic_value }
+# 			}
+# 			divide_temp_variable = { tot_pts = 2 }
+# 			round_temp_variable = tot_pts
+# 			add_to_variable = { FROM.vp@ROOT = tot_pts }
+# 		}
+# 	}
 
-	on_war_relation_added = {
-		effect = {
-			set_variable = { vp@FROM = 0 }
-			set_variable = { FROM.vp@ROOT = 0 }
-		}
-	}
+# 	on_war_relation_added = {
+# 		effect = {
+# 			set_variable = { vp@FROM = 0 }
+# 			set_variable = { FROM.vp@ROOT = 0 }
+# 		}
+# 	}
 	
-	on_nuke_drop = {
-		effect = {
-			add_to_variable = { vp@FROM.owner = 500 }
-		}
-	}
+# 	on_nuke_drop = {
+# 		effect = {
+# 			add_to_variable = { vp@FROM.owner = 500 }
+# 		}
+# 	}
 
-	on_state_control_changed = {
-		effect = {
-			set_temp_variable = { state_vp = FROM.FROM.state_strategic_value }
-			set_temp_variable = { tot_pts = 0 }
-			every_country = {
-				limit = {
-					has_war_with = FROM
-				}
-				add_to_temp_variable = { tot_pts = num_armies_in_state@FROM.FROM }
-			}
-			every_country = {
-				limit = {
-					has_war_with = FROM
-				}
-				set_temp_variable = { pts = num_armies_in_state@FROM.FROM }
-				divide_temp_variable = { pts = tot_pts }
-				multiply_temp_variable = { pts = state_vp }
-				add_to_variable = { vp@FROM = pts }
-				subtract_from_variable = { FROM.vp@THIS = pts }
-				clamp_variable = {
-					var = FROM.vp@THIS
-					min = 0
-				}
-			}
-		}
-	}
-}
+# 	on_state_control_changed = {
+# 		effect = {
+# 			set_temp_variable = { state_vp = FROM.FROM.state_strategic_value }
+# 			set_temp_variable = { tot_pts = 0 }
+# 			every_country = {
+# 				limit = {
+# 					has_war_with = FROM
+# 				}
+# 				add_to_temp_variable = { tot_pts = num_armies_in_state@FROM.FROM }
+# 			}
+# 			every_country = {
+# 				limit = {
+# 					has_war_with = FROM
+# 				}
+# 				set_temp_variable = { pts = num_armies_in_state@FROM.FROM }
+# 				divide_temp_variable = { pts = tot_pts }
+# 				multiply_temp_variable = { pts = state_vp }
+# 				add_to_variable = { vp@FROM = pts }
+# 				subtract_from_variable = { FROM.vp@THIS = pts }
+# 				clamp_variable = {
+# 					var = FROM.vp@THIS
+# 					min = 0
+# 				}
+# 			}
+# 		}
+# 	}
+# }
