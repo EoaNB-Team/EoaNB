@@ -2046,7 +2046,7 @@ country_event = {
 		title = brazil.62.t
 		desc = brazil.62.d
 
-		#picture = GFX_report_event_guarani
+		picture = GFX_report_event_o_guarany
 
 		fire_only_once = yes
 		is_triggered_only = yes
@@ -11344,12 +11344,13 @@ country_event = {
 	title = brazil.minister.actions.0.t
 	desc = brazil.minister.actions.0.d
 	is_triggered_only = yes
-	picture = GFX_idea_olinda
+	picture = GFX_report_event_marques_de_olinda
 	option = {
 		name = brazil.minister.actions.0.a
 		BRA = { 
 			complete_national_focus = BRA_olinda_1857
 		}
+		activate_advisor = BRA_Pedro_de_Araujo_Lima_adm
 	}
 }
 
@@ -11374,7 +11375,6 @@ country_event = {
 		#	}
 		#	activate = yes
 		#}
-		activate_advisor = BRA_Pedro_de_Araujo_Lima_adm
 		#add_advisor_role = {
 		#	character = BRA_francisco_pereira
 		#	advisor = {
@@ -11453,7 +11453,6 @@ country_event = {
 		#	}
 		#	activate = yes
 		#}
-		activate_advisor = BRA_Pedro_de_Araujo_Lima_adm
 		#add_advisor_role = {
 		#	character = BRA_eusebio_de_queiros
 		#	advisor = {
@@ -13636,6 +13635,265 @@ country_event = { # Brazil Votes results 14_1857
 
 	option = { # It's a tie.
 		name = brazil_votes_results.14.c
+		trigger = {
+			has_country_flag = eoanb_reform_vote_tie
+		}
+		clr_country_flag = eoanb_reform_vote_tie
+
+			# Put here if the result is a tie
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+}
+
+country_event = { # Brazil Votes 1857_15
+	id = brazil_votes.15
+	title = brazil_votes.15.t
+	desc = brazil_votes.15.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = { # Don't change
+			var = current_reform_id
+			value = -1									# This allows the system to detect a custom vote in progress
+		}
+
+		reset_approval_arrays = yes						# Resets all of the approvals
+		#set_1_approval_highly_disagree = yes			# For those ideologies who have a 1 for this type of legislation will highly disagree with this bill
+		#set_2_approval_disagree = yes					# For those ideologies who have a 2 for this type of legislation will disagree with this bill
+		#set_3_approval_neutral = yes					# For those ideolgoies who have a 3 for this type of legislation will be neutral about this bill
+		#set_4_approval_highly_agree = yes				# For those ideologies who have a 4 for this type of legislation will highly agree with this bill
+		set_4_approval_highly_agree = yes				# Change for planned economy
+		set_3_approval_highly_agree = yes				# Change for autocracy approvals
+		set_2_approval_highly_agree = yes				# Change for conservative approvals
+		set_1_approval_highly_disagree = yes					# Change for centrists approvalsroval
+		set_vote_eco = yes								# Determines what type of legislation this is, and what values of the ideologies' wishlist will be considered (cul, eco, dem, war, bud)
+		compute_voting_approval = yes					# Calculates the approvals
+
+		compute_number_seats_tot = yes					# Calculates the total number of seats in the current Parliament
+		compute_number_seats_approve_est = yes			# Estimates the number of seats that will vote yes for the vote
+	}
+
+	option = { # Let's vote in a month
+		name = brazil_votes.15.a
+
+		country_event = {
+			id = brazil_votes_results.15				# Sets the custom result event for your custom law
+			days = 30									# Usually, a vote takes 30 days. You can go lower, but the timed mission won't be able to show the right amount of time. It's not a big deal because this fires the event by itself, and because the decision does nothing in the case of a custom vote.
+		}
+	}
+
+	option = { # Abandon the idea
+		name = brazil_votes.15.b
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+	
+	option = { # Let's vote in a month
+		name = brazil_votes.15.c
+		country_event = {
+			id = brazil_votes_results.15				# Sets the custom result event for your custom law
+			days = 1									# Usually, a vote takes 30 days. You can go lower, but the timed mission won't be able to show the right amount of time. It's not a big deal because this fires the event by itself, and because the decision does nothing in the case of a custom vote.
+		}
+	}
+}
+
+country_event = { # Brazil Votes results 15_1857
+	id = brazil_votes_results.15
+	title = brazil_votes_results.15.t
+	desc = brazil_votes_results.15.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			calculate_vote_result = yes								# Do all the calculations for the vote, and outputs a country flag (eoanb_reform_vote_success, eoanb_reform_vote_failure, eoanb_reform_vote_tie)
+		}
+	}
+
+	option = { # It's a success!
+		name = brazil_votes_results.15.a
+		trigger = {
+			has_country_flag = eoanb_reform_vote_success
+		}
+		clr_country_flag = eoanb_reform_vote_success
+
+			# Put here if the result is a victory
+		enact_voted_reform = yes
+		unlock_decision_tooltip = BRA_decision_acquire_gold_from_mines
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+		if = {
+			limit = { has_government = traditional_conservatism }
+			add_political_power = 50
+			add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
+			add_popularity = { ideology = centrism popularity = 0.01 }
+		}
+		if = {
+			limit = { has_government = centrism }
+			add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
+			add_popularity = { ideology = centrism popularity = -0.01 }
+		}
+	}
+
+	option = { # It's a failure...
+		name = brazil_votes_results.15.b
+		trigger = {
+			has_country_flag = eoanb_reform_vote_failure
+		}
+		clr_country_flag = eoanb_reform_vote_failure
+
+			# Put here if the result is a failure
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+
+	option = { # It's a tie.
+		name = brazil_votes_results.15.c
+		trigger = {
+			has_country_flag = eoanb_reform_vote_tie
+		}
+		clr_country_flag = eoanb_reform_vote_tie
+
+			# Put here if the result is a tie
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+}
+
+country_event = { # Brazil Votes 1857_16
+	id = brazil_votes.16
+	title = brazil_votes.16.t
+	desc = brazil_votes.16.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = { # Don't change
+			var = current_reform_id
+			value = -1									# This allows the system to detect a custom vote in progress
+		}
+
+		reset_approval_arrays = yes						# Resets all of the approvals
+		#set_1_approval_highly_disagree = yes			# For those ideologies who have a 1 for this type of legislation will highly disagree with this bill
+		#set_2_approval_disagree = yes					# For those ideologies who have a 2 for this type of legislation will disagree with this bill
+		#set_3_approval_neutral = yes					# For those ideolgoies who have a 3 for this type of legislation will be neutral about this bill
+		#set_4_approval_highly_agree = yes				# For those ideologies who have a 4 for this type of legislation will highly agree with this bill
+		set_4_approval_highly_agree = yes				# Change for planned economy
+		set_3_approval_highly_agree = yes				# Change for autocracy approvals
+		set_2_approval_highly_agree = yes				# Change for conservative approvals
+		set_1_approval_highly_disagree = yes					# Change for centrists approvalsroval
+		set_vote_eco = yes								# Determines what type of legislation this is, and what values of the ideologies' wishlist will be considered (cul, eco, dem, war, bud)
+		compute_voting_approval = yes					# Calculates the approvals
+
+		compute_number_seats_tot = yes					# Calculates the total number of seats in the current Parliament
+		compute_number_seats_approve_est = yes			# Estimates the number of seats that will vote yes for the vote
+	}
+
+	option = { # Let's vote in a month
+		name = brazil_votes.16.a
+
+		country_event = {
+			id = brazil_votes_results.16				# Sets the custom result event for your custom law
+			days = 30									# Usually, a vote takes 30 days. You can go lower, but the timed mission won't be able to show the right amount of time. It's not a big deal because this fires the event by itself, and because the decision does nothing in the case of a custom vote.
+		}
+	}
+
+	option = { # Abandon the idea
+		name = brazil_votes.16.b
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+	
+	option = { # Let's vote in a month
+		name = brazil_votes.16.c
+		country_event = {
+			id = brazil_votes_results.16				# Sets the custom result event for your custom law
+			days = 1									# Usually, a vote takes 30 days. You can go lower, but the timed mission won't be able to show the right amount of time. It's not a big deal because this fires the event by itself, and because the decision does nothing in the case of a custom vote.
+		}
+	}
+}
+
+country_event = { # Brazil Votes results 16_1857
+	id = brazil_votes_results.16
+	title = brazil_votes_results.16.t
+	desc = brazil_votes_results.16.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			calculate_vote_result = yes								# Do all the calculations for the vote, and outputs a country flag (eoanb_reform_vote_success, eoanb_reform_vote_failure, eoanb_reform_vote_tie)
+		}
+	}
+
+	option = { # It's a success!
+		name = brazil_votes_results.16.a
+		trigger = {
+			has_country_flag = eoanb_reform_vote_success
+		}
+		clr_country_flag = eoanb_reform_vote_success
+
+			# Put here if the result is a victory
+		enact_voted_reform = yes
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+		add_ideas = BRA_1857_monopoly_on_issuing_money
+		if = {
+			limit = { has_government = traditional_conservatism }
+			add_political_power = 50
+			add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
+			add_popularity = { ideology = centrism popularity = 0.01 }
+		}
+		if = {
+			limit = { has_government = centrism }
+			add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
+			add_popularity = { ideology = centrism popularity = -0.01 }
+		}
+	}
+
+	option = { # It's a failure...
+		name = brazil_votes_results.16.b
+		trigger = {
+			has_country_flag = eoanb_reform_vote_failure
+		}
+		clr_country_flag = eoanb_reform_vote_failure
+
+			# Put here if the result is a failure
+
+		set_variable = { 
+			var = current_reform_id
+			value = 0
+		}
+	}
+
+	option = { # It's a tie.
+		name = brazil_votes_results.16.c
 		trigger = {
 			has_country_flag = eoanb_reform_vote_tie
 		}
