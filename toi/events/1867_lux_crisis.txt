@@ -665,6 +665,7 @@ country_event = {
 			}
 			country_event = { days = 7 id = lux_crisis.17 }
 			country_event = { days = 7 id = lux_crisis.60 }
+			set_country_flag = lux_crisis_london_conference_ratified_flag
 		}
 	}
 }
@@ -757,6 +758,7 @@ country_event = {
 	option = {
 		name = lux_crisis.17.a
 		ai_chance = { base = 100 }
+		give_guarantee = LUX
 		add_political_power = 25
 		set_temp_variable = { eoanb_prestige_change = 3 }
 		eoanb_change_prestige_score = yes
@@ -808,6 +810,7 @@ country_event = {
 				}
 				TUS = { country_event = { id = lux_crisis.22 } }
 			}
+			clr_country_flag = lux_crisis_london_conference_ratified_flag
 		}
 	}
 }
@@ -1007,7 +1010,7 @@ country_event = {
 	#Reject the ultimatum
 	option = {
 		name = lux_crisis.24.a
-		ai_chance = { base = 100 }
+		ai_chance = { base = 95 }
 		custom_effect_tooltip = FRA_lux_crisis_refuse_ultimatum_effect_tt
 		add_political_power = 25
 		add_war_support = 0.05
@@ -1022,7 +1025,13 @@ country_event = {
 	#Accept the ultimatum
 	option = {
 		name = lux_crisis.24.b
-		ai_chance = { base = 0 }
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
 		add_political_power = -50
 		add_stability = -0.05
 		add_war_support = -0.02
@@ -1084,6 +1093,9 @@ country_event = {
 		}
 		set_temp_variable = { eoanb_prestige_change = 10 }
 		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			news_event = { days = 3 id = news.40 }
+		}
 	}
 }
 
@@ -1113,11 +1125,194 @@ country_event = {
 				name = eoanb_threat_lux_crisis_war
 			}
 			set_global_flag = eoanb_flag_luxembourg_crisis_escalated
-			PRS = { country_event = { days = 1 id = lux_crisis.28 } }
+			PRS = { country_event = { id = lux_crisis.28 } }
 			activate_mission = FRA_mission_luxembourg_crisis
 			PRS = { activate_mission = FRA_mission_luxembourg_crisis }
-			#news_event = { id = news.41 }
+			news_event = { days = 1 id = news.41 }
 		}
+	}
+}
+
+#PRS - Declaration of War from France
+country_event = {
+	id = lux_crisis.28
+	title = lux_crisis.28.t
+	desc = lux_crisis.28.d
+	picture = GFX_report_event_luxembourg_painting
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Ask the signatories of the London Treaty and the other German states for help
+	option = {
+		name = lux_crisis.28.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.05
+		every_other_country = {
+			limit = {
+				has_country_flag = lux_crisis_london_conference_ratified_flag
+			}
+			country_event = { days = 1 id = lux_crisis.29 }
+		}
+		BAD = { country_event = { days = 1 id = lux_crisis.30 } }
+		BAV = { country_event = { days = 1 id = lux_crisis.30 } }
+		HSD = { country_event = { days = 1 id = lux_crisis.30 } }
+		WUR = { country_event = { days = 1 id = lux_crisis.30 } }
+	}
+	
+	#Ask only the signatories of the London Treaty for help
+	option = {
+		name = lux_crisis.28.b
+		ai_chance = { base = 0 }
+		add_war_support = 0.05
+		every_other_country = {
+			limit = {
+				has_country_flag = lux_crisis_london_conference_ratified_flag
+			}
+			country_event = { days = 1 id = lux_crisis.29 }
+		}
+	}
+	
+	#Ask only the other German states for help
+	option = {
+		name = lux_crisis.28.c
+		ai_chance = { base = 0 }
+		add_war_support = 0.05
+		BAD = { country_event = { days = 1 id = lux_crisis.30 } }
+		BAV = { country_event = { days = 1 id = lux_crisis.30 } }
+		HSD = { country_event = { days = 1 id = lux_crisis.30 } }
+		WUR = { country_event = { days = 1 id = lux_crisis.30 } }
+	}
+	
+	#We can handle the situation on our own
+	option = {
+		name = lux_crisis.28.e
+		ai_chance = { base = 0 }
+		add_stability = -0.05
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#AUS/BEL/ENG/HOL/LUX/RUS/ITA - Join Prussia Against France?
+country_event = {
+	id = lux_crisis.29
+	title = lux_crisis.29.t
+	desc = lux_crisis.29.d
+	picture = GFX_france_kepi_general
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Join the Prussians
+	option = {
+		name = lux_crisis.29.a
+		ai_chance = {
+			base = 60
+			modifier = {
+				factor = 0
+				OR = {
+					tag = BEL
+					tag = HOL
+					tag = LUX
+				}
+			}
+			modifier = {
+				add = -40
+				OR = {
+					tag = AUS
+					has_country_flag = is_literally_italy
+				}
+			}
+			modifier = {
+				add = -10
+				tag = RUS
+			}
+			modifier = {
+				add = 20
+				tag = ENG
+			}
+		}
+		add_to_war = { targeted_alliance = PRS enemy = FRA }
+		PRS = {
+			add_to_faction = ROOT
+		}
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+	}
+	
+	#Stay out of this
+	option = {
+		name = lux_crisis.29.b
+		ai_chance = {
+			base = 40
+			modifier = {
+				add = 40
+				OR = {
+					tag = AUS
+					has_country_flag = is_literally_italy
+				}
+			}
+			modifier = {
+				add = 10
+				tag = RUS
+			}
+			modifier = {
+				add = -20
+				tag = ENG
+			}
+		}
+		add_stability = -0.02
+		add_war_support = -0.05
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#BAD/BAV/HSD/WUR - Join Prussia Against France?
+country_event = {
+	id = lux_crisis.30
+	title = lux_crisis.30.t
+	desc = lux_crisis.30.d
+	picture = GFX_france_kepi_general
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Join the Prussians
+	option = {
+		name = lux_crisis.30.a
+		ai_chance = {
+			base = 95
+			modifier = {
+				factor = 0
+				has_idea = GC_idea_schutz_und_trutz
+			}
+		}
+		add_to_war = { targeted_alliance = PRS enemy = FRA }
+		PRS = {
+			add_to_faction = ROOT
+		}
+		add_war_support = 0.15
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+	}
+	
+	#Stay out of this
+	option = {
+		name = lux_crisis.30.b
+		ai_chance = { base = 5 }
+		decrease_ps_by_one = yes
+		add_stability = -0.05
+		add_war_support = -0.05
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
