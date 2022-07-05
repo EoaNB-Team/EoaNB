@@ -1318,6 +1318,8 @@ country_event = {
 	}
 }
 
+### INITIAL PEACE EVENTS - FRENCH VICTORY ###
+
 #PRS - Offer Peace to France
 country_event = {
 	id = lux_crisis.31
@@ -1448,6 +1450,7 @@ country_event = {
 		FRA = { country_event = { days = 2 id = lux_crisis.7 } }
 		HOL = { country_event = { days = 2 id = lux_crisis.8 } }
 		hidden_effect = {
+			PRS = { country_event = { id = lux_crisis.35 } }
 			PRS = { dismantle_faction = yes }
 		}
 	}
@@ -1568,8 +1571,484 @@ country_event = {
 		add_war_support = 0.2
 		add_ideas = PRS_idea_collective_struggle_against_france
 		hidden_effect = {
-			#events to invite signatories
+			every_other_country = {
+				limit = {
+					NOT = { has_war_with = FRA }
+					OR = {
+						has_country_flag = lux_crisis_london_conference_ratified_flag
+						tag = BAD
+						tag = BAV
+						tag = HSD
+						tag = WUR
+					}
+				}
+				country_event = { days = 1 id = lux_crisis.34 }
+			}
 		}
+	}
+}
+
+#AUS/BEL/ENG/HOL/LUX/RUS/ITA + BAD/BAV/HSD/WUR - Join Prussia Against France?
+country_event = {
+	id = lux_crisis.34
+	title = lux_crisis.34.t
+	desc = lux_crisis.34.d
+	picture = GFX_france_kepi_general
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Join the Prussians
+	option = {
+		name = lux_crisis.34.a
+		ai_chance = {
+			base = 95
+			modifier = {
+				add = -45
+				OR = {
+					tag = BEL
+					tag = HOL
+					tag = LUX
+				}
+			}
+			modifier = {
+				add = -20
+				OR = {
+					tag = AUS
+					has_country_flag = is_literally_italy
+				}
+			}
+		}
+		add_to_war = { targeted_alliance = PRS enemy = FRA }
+		PRS = {
+			add_to_faction = ROOT
+		}
+		add_war_support = 0.1
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+	}
+	
+	#Stay out of this
+	option = {
+		name = lux_crisis.34.b
+		ai_chance = {
+			base = 5
+			modifier = {
+				add = 45
+				OR = {
+					tag = BEL
+					tag = HOL
+					tag = LUX
+				}
+			}
+			modifier = {
+				add = 20
+				OR = {
+					tag = AUS
+					has_country_flag = is_literally_italy
+				}
+			}
+			modifier = {
+				factor = 0
+				tag = ENG
+			}
+		}
+		add_stability = -0.05
+		add_war_support = -0.1
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#PRS - France Accepts Our Peace Offer
+country_event = {
+	id = lux_crisis.35
+	title = lux_crisis.35.t
+	desc = lux_crisis.35.d
+	picture = GFX_report_event_luxembourg_painting
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = {
+		name = lux_crisis.35.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_disband_mobilized_divisions_effect_tt
+		hidden_effect = {
+			if = {
+				limit = {
+					has_template = "Infanterie-Division (mob.)"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Infanterie-Division (mob.)"
+				}
+			}
+			if = {
+				limit = {
+					has_template = "Landwehr-Regiment (mob.)"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Landwehr-Regiment (mob.)"
+				}
+			}
+			if = {
+				limit = {
+					has_template = "Füsilier-Regiment (mob.)"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Füsilier-Regiment (mob.)"
+				}
+			}
+			if = {
+				limit = {
+					has_template = "Husaren-Regiment (mob.)"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Husaren-Regiment (mob.)"
+				}
+			}
+		}
+	}
+}
+
+### INITIAL PEACE EVENTS - PRUSSIAN VICTORY ###
+
+#FRA - Offer Peace to Prussia
+country_event = {
+	id = lux_crisis.36
+	title = lux_crisis.36.t
+	desc = lux_crisis.36.d
+	picture = GFX_report_event_austrian_army_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			remove_mission = FRA_mission_luxembourg_crisis
+			PRS = { remove_mission = FRA_mission_luxembourg_crisis }
+		}
+	}
+	
+	timeout_days = 3
+	
+	option = {
+		name = lux_crisis.36.a
+		ai_chance = { base = 100 }
+		add_political_power = -50
+		add_stability = -0.1
+		add_war_support = -0.15
+		set_temp_variable = { eoanb_prestige_change = -10 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			PRS = { country_event = { id = lux_crisis.37 } }
+		}
+	}
+}
+
+#PRS - France Offers Peace
+country_event = {
+	id = lux_crisis.37
+	title = lux_crisis.37.t
+	desc = lux_crisis.37.d
+	picture = GFX_report_event_austrian_army_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Accept these terms
+	option = {
+		name = lux_crisis.37.a
+		ai_chance = {
+			base = 75
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 10
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 15
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 20
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 25
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 30
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 30
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 35
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 40
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 45
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 50
+				}
+			}
+		}
+		white_peace = FRA
+		add_political_power = 50
+		add_stability = 0.05
+		add_war_support = -0.25
+		set_temp_variable = { eoanb_prestige_change = 10 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			FRA = { country_event = { id = lux_crisis.40 } }
+			HOL = { country_event = { id = lux_crisis.41 } }
+			PRS = { dismantle_faction = yes }
+		}
+	}
+	
+	#Reject these terms and continue the war
+	option = {
+		name = lux_crisis.37.b
+		ai_chance = {
+			base = 25
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 10
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 15
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 20
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 25
+				}
+			}
+			modifier = {
+				add = 5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands < 30
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 30
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 35
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 40
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 45
+				}
+			}
+			modifier = {
+				add = -5
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 50
+				}
+			}
+			modifier = {
+				factor = 0
+				casualties_inflicted_by = {
+					opponent = FRA
+					thousands > 55
+				}
+			}
+		}
+		custom_effect_tooltip = PRS_lux_crisis_continue_the_war_effect_tt
+		add_political_power = -10
+		add_stability = -0.02
+		activate_mission = FRA_mission_luxembourg_crisis_continued
+		hidden_effect = {
+			add_named_threat = {
+				threat = 3
+				name = eoanb_threat_lux_crisis_war_continued
+			}
+			FRA = { activate_mission = FRA_mission_luxembourg_crisis_continued }
+			FRA = { country_event = { days = 1 id = lux_crisis.38 } }
+		}
+	}
+}
+
+#FRA - Prussia Rejects Our Peace Offer
+country_event = {
+	id = lux_crisis.38
+	title = lux_crisis.38.t
+	desc = lux_crisis.38.d
+	picture = GFX_report_event_generic_riot_uproar_unrest
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	option = {
+		name = lux_crisis.38.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.2
+		add_ideas = FRA_idea_collective_struggle_against_prussia
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_country_flag = lux_crisis_london_conference_ratified_flag
+					has_war_with = FRA
+				}
+				country_event = { days = 1 id = lux_crisis.39 }
+			}
+		}
+	}
+}
+
+#AUS/BEL/ENG/HOL/LUX/RUS/ITA - Leave Prussia's Side?
+country_event = {
+	id = lux_crisis.39
+	title = lux_crisis.39.t
+	desc = lux_crisis.39.d
+	picture = GFX_france_kepi_general
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Leave them on their own
+	option = {
+		name = lux_crisis.39.a
+		ai_chance = {
+			base = 90
+			modifier = {
+				add = -15
+				tag = ENG
+			}
+		}
+		white_peace = FRA
+		leave_faction = yes
+		add_stability = 0.05
+		add_war_support = -0.1
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			#set_country_flag = lux_crisis_support_france_flag
+		}
+	}
+	
+	#Stay with them
+	option = {
+		name = lux_crisis.39.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 15
+				tag = ENG
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					tag = BEL
+					tag = HOL
+					tag = LUX
+				}
+			}
+		}
+		add_stability = -0.05
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#FRA - Prussia Accepts Our Peace Offer
+country_event = {
+	id = lux_crisis.40
+	title = lux_crisis.40.t
+	desc = lux_crisis.40.d
+	picture = GFX_report_event_luxembourg_painting
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	option = {
+		name = lux_crisis.40.a
+		ai_chance = { base = 100 }
 	}
 }
 
