@@ -1,4 +1,4 @@
-version="0.2.7 Ver Tersus"
+version="0.3.1 Ars Bellica"
 tags={
 	"Alternative History"
 	"Events"
