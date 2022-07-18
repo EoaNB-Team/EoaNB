@@ -567,8 +567,8 @@ add_namespace = feudal_tokugawa_daimyos
 			immediate = {
 				if = {
 					limit = { tag = TSH }
-					every_country = {
-						limit = { OR = { is_tozama_daimyo = yes is_fudai_daimyo = yes } }
+					for_each_scope_loop = {
+						array = subjects
 						country_event = feudal_tokugawa_shogunate.17
 					}
 				}
@@ -678,9 +678,12 @@ add_namespace = feudal_tokugawa_daimyos
 					ideology = autocracy
 					popularity = 0.06
 				}
-				every_country = {
-					limit = { is_tozama_daimyo = yes }
-					add_opinion_modifier = { target = TSH modifier = small_decrease }
+				for_each_scope_loop = {
+					array = subjects
+					if = {
+						limit = { is_tozama_daimyo = yes }
+						add_opinion_modifier = { target = TSH modifier = small_decrease }
+					}
 				}
 				hidden_effect = {
 					country_event = { id = feudal_tokugawa_shogunate.22 days = 35 }
@@ -690,13 +693,9 @@ add_namespace = feudal_tokugawa_daimyos
 			option = {
 				name = feudal_tokugawa_shogunate.21.b
 				ai_chance = { base = 0 }
-				every_country = {
-					limit = { is_tozama_daimyo = yes }
-					add_opinion_modifier = { target = TSH modifier = small_increase }
-				}
-				every_country = {
-					limit = { is_fudai_daimyo = yes }
-					add_opinion_modifier = { target = TSH modifier = small_increase }
+				for_each_scope_loop = {
+					array = subjects
+					add_opinion_modifier = { target = TSH modifier = small_decrease }
 				}
 				EOANBSYS_national_crisis_progress_minus_three = yes
 			}
@@ -6995,6 +6994,9 @@ add_namespace = feudal_tokugawa_daimyos
 
 			is_triggered_only = yes
 			immediate = {
+				every_owned_state = {
+					add_core_of = JAP
+				}
 				JAP = {
 					annex_country = {
 						target = PREV
@@ -7396,6 +7398,11 @@ add_namespace = feudal_tokugawa_daimyos
 			trigger = { EZO = { is_ai = yes } }
 
 			immediate = {
+				EZO = {
+					every_owned_state = {
+						add_core_of = ROOT
+					}
+				}
 				annex_country = {
 					target = EZO
 					transfer_troops = no
@@ -7691,16 +7698,19 @@ add_namespace = feudal_tokugawa_daimyos
 			option = {
 				name = feudal_tokugawa_shogunate.300.a
 				set_cosmetic_tag = TSH_Daimyo_Republic_Cosmetic
-				every_country = {
-					limit = { is_subject_of = ROOT }
-					if = {
-						limit = { is_ai = yes }
-						OVERLORD = {
-							annex_country = {
-								target = PREV
-								transfer_troops = yes
-							}
+				for_each_scope_loop = {
+					array = subjects
+					OVERLORD = {
+						annex_country = {
+							target = PREV
+							transfer_troops = yes
 						}
+					}
+				}
+				hidden_effect = {
+					every_owned_state = {
+						limit = { is_in_japan = yes NOT = { has_core_of = PREV } }
+						add_core_of = PREV
 					}
 				}
 				complete_national_focus = JAP_vic_resurgance_of_the_han
