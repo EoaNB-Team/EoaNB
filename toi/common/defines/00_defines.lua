@@ -1287,7 +1287,7 @@ NDefines = {
 		NAVAL_TRANSFER_BASE_SPEED = 6,                                  -- base speed of units on water being transported
 		NAVAL_TRANSFER_BASE_NAVAL_DIST_ADD = 100,						-- Extra cost for naval movement ( compared to land movement ) when deciding what ports to use for a naval transfer
 		NAVAL_TRANSFER_BASE_NAVAL_DIST_MULT = 20,						-- Multiplier for the cost of naval movement ( compared to land movement ) when deciding what ports to use for naval transfer
-		NAVAL_SUPREMACY_CAN_INVADE = 0.5,								-- required naval supremacy to perform invasions on an area
+		NAVAL_SUPREMACY_CAN_INVADE = 0.25,								-- required naval supremacy to perform invasions on an area
 		CARRIER_STACK_PENALTY = 4,										-- The most efficient is 4 carriers in combat. 5+ brings the penalty to the amount of wings in battle.
 		CARRIER_STACK_PENALTY_EFFECT = 0.2,								-- Each carrier above the optimal amount decreases the amount of airplanes being able to takeoff by such %.
 		SHORE_BOMBARDMENT_CAP = 0.5,
@@ -1443,12 +1443,12 @@ NDefines = {
 			0.3, -- MINES SWEEPING	
 			0.0, -- TRAIN
 			0.0, -- RESERVE_FLEET
-			1.0, -- NAVAL_INVASION_SUPPORT
+			2.5, -- NAVAL_INVASION_SUPPORT
 		},
 		
-		SUPREMACY_PER_SHIP_PER_MANPOWER = 0.05,							-- supremacy of a ship is calculated using its IC, manpower and a base define
-		SUPREMACY_PER_SHIP_PER_IC = 0.005,
-		SUPREMACY_PER_SHIP_BASE = 100.0,
+		SUPREMACY_PER_SHIP_PER_MANPOWER = 0.5,							-- supremacy of a ship is calculated using its IC, manpower and a base define
+		SUPREMACY_PER_SHIP_PER_IC = 0.1,
+		SUPREMACY_PER_SHIP_BASE = 500.0,
 
 		NAVAL_MINES_IN_REGION_MAX = 1000.0,								-- Max number of mines that can be layed by the ships. The value should be hidden from the user, as we present % so it's an abstract value that should be used for balancing.
 		NAVAL_MINES_PLANTING_SPEED_MULT = 0.01,						-- Value used to overall balance of the speed of planting naval mines
