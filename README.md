@@ -38,7 +38,7 @@ This site is the official respository (cloud) for sharing and cooperating in the
 
 <hr>
 
-## Installing the Mod
+## Installing the Mod (currently being reworked)
 
 Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our lead developers: 
