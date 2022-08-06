@@ -102,10 +102,6 @@ If you wish to contribute to the development of the mod, supprt us on Patreon or
   <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075039432724/chris.png" width="80px;" alt="ChrisSGD"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Energywelder"><strong>Energywelder</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730076553576498/energy.png" width="80px;" alt="Energywelder"/>
-</td>
-<td align="center">
   <a href = "https://github.com/Sir-DEM0"><strong>Dem0</strong></a>
   <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="Dem0"/>
 </td>
