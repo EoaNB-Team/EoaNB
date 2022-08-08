@@ -2050,3 +2050,121 @@ eoanb_political_legitimacy_change = {
 	multiply_temp_variable = { full_legitimacy_temp_value = -1 }
 	set_variable = { legitimacy_pacf = full_legitimacy_temp_value }
 }
+
+eoanb_parliament_setup_pie_seats = {
+	if = {
+		limit = {
+			check_variable = { force_total_seats_no_recount = 0 }
+		}
+		set_variable = { parl_seats_total = 0 }
+		add_to_variable = { parl_seats_total = centr_seats }
+		add_to_variable = { parl_seats_total = vangc_seats }
+		add_to_variable = { parl_seats_total = colsoc_seats }
+		add_to_variable = { parl_seats_total = socegal_seats }
+		add_to_variable = { parl_seats_total = trad_seats }
+		add_to_variable = { parl_seats_total = raddem_seats }
+		add_to_variable = { parl_seats_total = auto_seats }
+		add_to_variable = { parl_seats_total = fund_seats }
+		add_to_variable = { parl_seats_total = chauv_seats }
+		add_to_variable = { parl_seats_total = anar_seats }
+	}
+	
+	resize_array = {
+		array = parliament_pie
+		value = 1 # default value is 1, in our case centrism
+		size = 100 # 100 pieces, each percent is one piece
+	}
+	
+	### CENTRISM
+	### can be skipped due to 1 being default value
+	set_temp_variable = { cur_percentage = centr_seats }
+	divide_temp_variable = { cur_percentage = parl_seats_total }
+	multiply_temp_variable = { cur_percentage = 100 }
+	round_temp_variable = cur_percentage
+	# counter
+	set_temp_variable = { parl_i = cur_percentage }
+	
+	### VANGCOM
+	set_temp_variable = { cur_seats = vangc_seats }
+	set_temp_variable = { cur_ideology = 2 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### COLSOC
+	set_temp_variable = { cur_seats = colsoc_seats }
+	set_temp_variable = { cur_ideology = 3 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### SOCEGAL
+	set_temp_variable = { cur_seats = socegal_seats }
+	set_temp_variable = { cur_ideology = 4 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### TRADCON
+	set_temp_variable = { cur_seats = trad_seats }
+	set_temp_variable = { cur_ideology = 5 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### RADDEM / PERIPHERAL
+	set_temp_variable = { cur_seats = socegal_seats }
+	set_temp_variable = { cur_ideology = 6 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### AUTOCRACY
+	set_temp_variable = { cur_seats = auto_seats }
+	set_temp_variable = { cur_ideology = 7 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### FUNDAMENTALISM
+	set_temp_variable = { cur_seats = fund_seats }
+	set_temp_variable = { cur_ideology = 8 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### CHAUVENISM
+	set_temp_variable = { cur_seats = chauv_seats }
+	set_temp_variable = { cur_ideology = 9 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	### ANARCHISM
+	set_temp_variable = { cur_seats = anar_seats }
+	set_temp_variable = { cur_ideology = 10 }
+	eoanb_parliament_setup_pie_seats_percentage = yes
+	
+	if = {
+		limit = {
+			check_variable = { parl_i = 99 }
+		}
+		set_variable = { parliament_pie^99 = parliament_pie^98 }
+	}
+}
+
+eoanb_parliament_setup_pie_seats_percentage = {
+	set_temp_variable = { cur_percentage = cur_seats }
+	divide_temp_variable = { cur_percentage = parl_seats_total }
+	multiply_temp_variable = { cur_percentage = 100 }
+	round_temp_variable = cur_percentage
+	
+	while_loop_effect = {
+		limit = {
+			check_variable = { cur_percentage > 0 }
+		}
+		
+		set_variable = { parliament_pie^parl_i = cur_ideology }
+		
+		subtract_from_temp_variable = { cur_percentage = 1 }
+		add_to_temp_variable = { parl_i = 1 }
+	}
+}
+
+eoanb_debug_clear_all_seats = {
+	clear_array = parliament_pie
+	clear_variable = centr_seats
+	clear_variable = vangc_seats
+	clear_variable = colsoc_seats
+	clear_variable = socegal_seats
+	clear_variable = trad_seats
+	clear_variable = raddem_seats
+	clear_variable = auto_seats
+	clear_variable = fund_seats
+	clear_variable = chauv_seats
+	clear_variable = anar_seats
+}
