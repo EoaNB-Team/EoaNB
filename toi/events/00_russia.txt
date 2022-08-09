@@ -1,6 +1,5 @@
 ﻿add_namespace = rossiya
 add_namespace = russia
-add_namespace = russiaforeign
 add_namespace = russiaalas
 add_namespace = russiageorgia
 add_namespace = russiacaucasus
@@ -11,6 +10,452 @@ add_namespace = russiasiberiancolonization
 #rossiya.201-500	Political and War Events
 #rossiya.501-700	Economy and Trade Events
 #rossiya.701-999	Military Events
+
+##### POLITICAL AND WAR EVENTS (rossiya.201-500) #####
+
+### DOMESTIC POLITICS EVENTS (rossiya.201-300) ###
+
+### FOREIGN POLITICS, COLONIAL, AND WAR EVENTS (rossiya.301-500) ###
+
+#Russian involvement in ACW
+country_event = {
+	id = rossiya.301
+	title = rossiya.301.t
+	desc = rossiya.301.d
+	picture = GFX_report_event_russian_sailors_1860
+
+	fire_only_once = yes
+
+	trigger = {
+		tag = RUS
+		CSA = { exists = yes }
+		USA = { has_war_with = CSA }
+	}
+	
+	mean_time_to_happen = {
+		days = 30
+	}
+
+	#Support the Union
+	option = {
+		name = rossiya.301.a
+		ai_chance = { factor = 70 }
+		reverse_add_opinion_modifier = { target = USA modifier = large_increase }
+		reverse_add_opinion_modifier = { target = CSA modifier = medium_decrease }
+		USA = { country_event = { id = rossiya.302 days = 4 } }
+		activate_mission = RUS_mission_vic_Support_USA
+		navy_experience = 5
+		set_country_flag = RUS_vic_ACW_Supported_USA
+		diplomatic_relation = {
+			country = USA
+			relation = docking_rights
+			active = yes
+		}
+	}
+	
+	#Support the Confederates
+	option = {
+		name = rossiya.301.b
+		trigger = {
+			OR = {
+				RUS = { has_completed_focus = RUS_vic_Anglo_Russian_Alliance }
+				AND = {
+					ENG = {
+						has_opinion = {
+							target = RUS
+							value > 50
+						}
+					}
+					RUS = {
+						has_opinion = {
+							target = ENG
+							value > 25
+						}
+					}
+				}
+			}
+		}
+		ai_chance = {
+			factor = 70
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		reverse_add_opinion_modifier = { target = CSA modifier = large_increase }
+		reverse_add_opinion_modifier = { target = USA modifier = medium_decrease }
+		RUS = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -500
+			}
+			add_equipment_to_stockpile = {
+				type = uniform_equipment
+				amount = -500
+			}
+		}
+		CSA = { country_event = { id = rossiya.303 days = 15 } }
+	}
+
+	#Stay neutral
+	option = {
+		name = rossiya.301.c
+		ai_chance = {
+			factor = 30
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+#USA - Russian Support
+country_event = {
+	id = rossiya.302
+	title = rossiya.302.t
+	desc = rossiya.302.d
+	picture = GFX_report_event_russian_sailors_1860
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.302.a
+		reverse_add_opinion_modifier = { target = RUS modifier = medium_increase }
+		RUS = {
+			diplomatic_relation = {
+				country = USA
+				relation = docking_rights
+				active = yes
+			}
+		}
+	}
+}
+
+#CSA - Russian Support
+country_event = {
+	id = rossiya.303
+	title = rossiya.303.t
+	desc = rossiya.303.d
+	picture = GFX_GEO_report_event_Dadiani_Palace
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.303.a
+		reverse_add_opinion_modifier = { target = RUS modifier = medium_increase }
+		CSA = {
+			division_template = {
+				name = "Russian-Equipped Infantry"
+				is_locked = yes
+				regiments = {
+					line_infantry = { x = 0 y = 0 }
+					line_infantry = { x = 0 y = 1 }
+					line_infantry = { x = 1 y = 0 }
+					line_infantry = { x = 1 y = 1 }
+					line_infantry = { x = 2 y = 0 }
+				}
+				support = {
+					#
+				}
+			}
+			367 = {
+				create_unit = {
+					division = "name = \"Russian-Equipped Infantry\" division_template = \"Russian-Equipped Infantry\" start_experience_factor = 0.4"
+					owner = CSA
+				}
+			}
+		}
+	}
+}
+
+#US-Russia Telegraph Line
+country_event = {
+	id = rossiya.304
+	title = rossiya.304.t
+	desc = rossiya.304.d
+	picture = GFX_GEO_report_event_Dadiani_Palace
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Reject the offer
+	option = {
+		name = rossiya.304.a
+		ai_chance = {
+			factor = 50
+		}
+		RUS = { country_event = { id = rossiya.305 days = 5 } }
+	}
+	
+	#Accept the offer
+	option = {
+		name = rossiya.304.b
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		RUS = { add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech } }
+		add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech }
+		reverse_add_opinion_modifier = { target = RUS modifier = eoanb_om_ENG_sea_cable }
+		RUS = { country_event = { id = rossiya.306 days = 5 } }
+	}
+}
+
+#The US Rejects
+country_event = {
+	id = rossiya.305
+	title = rossiya.305.t
+	desc = rossiya.305.d
+	picture = GFX_GEO_report_event_Dadiani_Palace
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.305.a
+	}
+}
+
+#The US Agrees
+country_event = {
+	id = rossiya.306
+	title = rossiya.306.t
+	desc = rossiya.306.d
+	picture = GFX_GEO_report_event_Dadiani_Palace
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.306.a
+		reverse_add_opinion_modifier = { target = USA modifier = eoanb_om_ENG_sea_cable }
+		add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech }
+	}
+}
+	
+#The Sale of Alaska
+country_event = {
+	id = rossiya.307
+	title = rossiya.307.t
+	desc = rossiya.307.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Approach the Americans
+	option = {
+		name = rossiya.307.a
+		ai_chance = { factor = 90 }
+		USA = { country_event = { id = rossiya.310 days = 7 } }
+	}
+	
+	#Approach our friends in Liechtenstein first
+	option = {
+		name = rossiya.307.b
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		LIE = { country_event = { id = rossiya.308 days = 7 } }
+	}
+}
+
+LIE - The Sale of Alaska
+country_event = {
+	id = rossiya.308
+	title = rossiya.308.t
+	desc = rossiya.308.d
+	picture = GFX_report_event_german_reichstag_gathering
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Alaska, really?
+	option = {
+		name = rossiya.308.a
+		ai_chance = { factor = 90 }
+		RUS = { country_event = { id = rossiya.309 days = 7 } }
+	}
+	
+	#We can afford it
+	option = {
+		name = rossiya.308.b
+		ai_chance = {
+			factor = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		RUS = { country_event = { id = rossiya.309 days = 7 } }
+		set_global_flag = LIE_Alaska_Purchased_flag
+		add_timed_idea = { idea = USA_idea_alaska_purchase days = 365 }
+		custom_effect_tooltip = RUS_vic_Russian_Alaska_tooltip
+		hidden_effect = {
+			463 = { add_core_of = ALK }
+			transfer_state = 463
+			release_puppet = ALK
+			ALK = {
+				set_cosmetic_tag = ALK_LIE_company
+				swap_ideas = {
+					remove_idea = RUS_Alexander_II
+					add_idea = hos_is_leader
+				}
+				swap_ideas = {
+					remove_idea = religion_orthodox
+					add_idea = religion_catholic
+				}
+				if = {
+					limit = {
+						PREV = { has_country_leader = { name = "Aloys II" ruling_only = yes } }
+					}
+					ALK_aloys_ii = {
+						add_country_leader_role = {
+							promote_leader = yes
+							country_leader = {
+								desc = "POLITICS_TEMP_DESC"
+								ideology = despotism
+								expire = "1900.1.1.1"
+								#id = -1
+							}
+						}
+					}
+					retire_character = ALK_grand_duke_konstantin
+				}
+				else = {
+					ALK_johann_ii = {
+						add_country_leader_role = {
+							promote_leader = yes
+							country_leader = {
+								desc = "POLITICS_TEMP_DESC"
+								ideology = despotism
+								expire = "1929.2.11"
+								#id = -1
+							}
+						}
+					}
+					retire_character = ALK_grand_duke_konstantin
+				}
+				#load_oob = "ALK_Licthenstien_Troops" ##LIE has 80 troops historically, where would it get a army?
+			}
+		}
+	}
+}
+
+#The Sale of Alaska - Liechtenstein's Response
+country_event = {
+	id = rossiya.309
+	title = rossiya.309.t
+	desc = {
+		text = rossiya.309.d
+		trigger = { has_global_flag = LIE_Alaska_Purchased_flag }
+	}
+	desc = {
+		text = rossiya.309.d_a
+		trigger = { NOT = { has_global_flag = LIE_Alaska_Purchased_flag } }
+	}
+	picture = GFX_report_event_german_reichstag_gathering
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Approach the Americans then
+	option = {
+		name = rossiya.309.a
+		trigger = {
+			NOT = { has_global_flag = LIE_Alaska_Purchased_flag }
+		}
+		USA = { country_event = { id = rossiya.310 days = 7 } }
+	}
+	
+	#We will keep Alaska then
+	option = {
+		trigger = {
+			NOT = { has_global_flag = LIE_Alaska_Purchased_flag }
+		}
+		name = rossiya.309.b
+	}
+	
+	#Great news from our friends
+	option = {
+		trigger = {
+			has_global_flag = LIE_Alaska_Purchased_flag
+		}
+		name = rossiya.309.c
+		add_timed_idea = { idea = USA_idea_alaska_sale days = 365 }
+	}
+}
+	
+#USA - The Sale of Alaska
+country_event = {
+	id = rossiya.310
+	title = rossiya.310.t
+	desc = rossiya.310.d
+	picture = GFX_report_event_german_reichstag_gathering
+		
+	is_triggered_only = yes
+	
+	#Accept their offer
+	option = {
+		name = rossiya.310.a
+		USA = { add_timed_idea = { idea = USA_idea_alaska_purchase days = 365 } }
+		USA = { transfer_state = 463 }
+		set_global_flag = USA_Alaska_Purchased_flag
+		news_event = { id = usa_news.17 }
+		RUS = { country_event = { id = rossiya.311 } }
+	}
+	
+	#Decline their offer
+	option = {
+		name = rossiya.310.b
+		RUS = { country_event = { id = rossiya.311 } }
+	}
+}
+
+#The Sale of Alaska - The Americans' Response
+country_event = {
+	id = rossiya.311
+	title = rossiya.311.t
+	desc = {
+		text = rossiya.311.d
+		trigger = { has_global_flag = USA_Alaska_Purchased_flag }
+	}
+	desc = {
+		text = rossiya.311.d_a
+		trigger = { NOT ={ has_global_flag = USA_Alaska_Purchased_flag } }
+	}
+	picture = GFX_report_event_german_reichstag_gathering
+
+	is_triggered_only = yes
+
+	#The Americans decline (this will NOT disable the USA focus)
+	option = {
+		name = rossiya.311.a
+		trigger = {
+			NOT = { has_global_flag = USA_Alaska_Purchased_flag }
+		}
+	}
+	
+	#The Americans accept
+	option = {
+		trigger = {
+			has_global_flag = USA_Alaska_Purchased_flag
+		}
+		name = rossiya.311.b
+		news_event = { id = usa_news.17 }
+		add_timed_idea = { idea = USA_idea_alaska_sale days = 365 }
+	}
+}
 
 ##### MILITARY EVENTS (rossiya.701-999) #####
 
@@ -3325,471 +3770,6 @@ country_event = {
 			}
 		}
 	}
-
-	### russiaforeign
-	
-	#1-9 Purged due to being obsolete with SOW content
-
-	country_event = {	# Russian involvement in ACW
-		id = russiaforeign.10
-		title = russiaforeign.10.t
-		desc = russiaforeign.10.d
-
-		fire_only_once = yes 
-
-		trigger = {
-			CSA = { exists = yes }
-			USA = { has_war_with = CSA }
-			date < 1867.01.01
-			tag = RUS
-		}
-
-		picture = GFX_report_event_russian_sailors_1860
-
-		option = {	# Help USA
-			name = russiaforeign.10.a
-			reverse_add_opinion_modifier = { target = USA modifier = large_increase }
-			reverse_add_opinion_modifier = { target = CSA modifier = medium_decrease }
-            USA = {
-			    country_event = { 
-			        id = russiaforeign.12
-			        days = 4
-			    } 
-			}
-			activate_mission = RUS_mission_vic_Support_USA
-			navy_experience = 5
-			set_country_flag = RUS_vic_ACW_Supported_USA
-			ai_chance = {
-				factor = 70
-				modifier = {
-                    factor = 1000000
-                    is_historical_focus_on = yes
-                }
-			}
-			effect_tooltip = {
-					diplomatic_relation = {
-						country = USA
-						relation = docking_rights
-						active = yes
-					}
-			}
-		}
-		
-		option = {	# Help CSA
-			name = russiaforeign.10.b
-			trigger = {
-			    OR = {
-                    RUS = { has_completed_focus = RUS_vic_Anglo_Russian_Alliance }
-                    AND = {
-                        ENG = {
-                            has_opinion = {
-                                target = RUS
-                                value > 50
-                            }
-                        }
-                        RUS = {
-                            has_opinion = {
-                                target = ENG
-                                value > 25
-                            }
-                        }
-                    }
-			    }
-			}
-			reverse_add_opinion_modifier = { target = CSA modifier = large_increase }
-			reverse_add_opinion_modifier = { target = USA modifier = medium_decrease }
-			RUS = {
-			    add_equipment_to_stockpile = {
-				    type = infantry_equipment
-				    amount = -500
-			    }
-			    add_equipment_to_stockpile = {
-				    type = uniform_equipment
-				    amount = -500
-			    }
-			}
-			CSA = { 
-			    country_event = { 
-			        id = russiaforeign.11 
-			        days = 15 
-			    } 
-			}
-			ai_chance = {
-				factor = 70
-				modifier = {
-                    factor = 0
-                    is_historical_focus_on = yes
-                }
-			}
-		}
-
-		option = {	# Stay neutral
-			name = russiaforeign.10.c
-			ai_chance = {
-				factor = 30
-				modifier = {
-                    factor = 0
-                    is_historical_focus_on = yes
-                }
-			}
-		}
-	}
-
-	country_event = {	# Russian involvement in ACW (Helped CSA)
-		id = russiaforeign.11
-		title = russiaforeign.11.t
-		desc = russiaforeign.11.d
-
-		is_triggered_only = yes 
-		fire_only_once = yes
-
-		picture = GFX_GEO_report_event_Dadiani_Palace
-
-		option = {	# Ok
-			name = russiaforeign.11.a
-			reverse_add_opinion_modifier = { target = RUS modifier = medium_increase }
-			CSA = {
-			    division_template = {
-                    name = "Russian-Equipped Infantry"
-                    regiments = {
-                        line_infantry = { x = 0 y = 0 }
-                        line_infantry = { x = 0 y = 1 }
-                        line_infantry = { x = 0 y = 2 }
-                        line_infantry = { x = 0 y = 3 }
-                        line_infantry = { x = 0 y = 4 }
-                    }
-                    support = {} 
-                }
-                367 = {
-                    create_unit = {
-                        division = "name = \"Russian-Equipped Infantry\" division_template = \"Russian-Equipped Infantry\" start_experience_factor = 0.4"
-                        owner = CSA
-                    }
-                }
-			}
-		}
-    }
-
-    country_event = {	# Russian involvement in ACW (Helped USA)
-		id = russiaforeign.12
-		title = russiaforeign.12.t
-		desc = russiaforeign.12.d
-
-		fire_only_once = yes
-		is_triggered_only = yes	
-
-		picture = GFX_report_event_russian_sailors_1860
-
-		option = {	# Ok
-			name = russiaforeign.12.a
-			reverse_add_opinion_modifier = { target = RUS modifier = medium_increase }
-			RUS = {
-				diplomatic_relation = {
-    				country = USA
-    				relation = docking_rights
-    				active = yes
-				}
-			}
-		}
-    }
-
-    country_event = {	# US-Russia Telegraph Line
-		id = russiaforeign.13
-		title = russiaforeign.13.t
-		desc = russiaforeign.13.d
-
-		is_triggered_only = yes
-
-		fire_only_once = yes
-		is_triggered_only = yes	
-
-		picture = GFX_GEO_report_event_Dadiani_Palace
-
-		option = {	# Agree
-			name = russiaforeign.13.a
-			RUS = { add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech } }
-			add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech }
-			reverse_add_opinion_modifier = { target = RUS modifier = eoanb_om_ENG_sea_cable }
-			RUS = {
-			    country_event = { 
-			        id = russiaforeign.14
-			        days = 5
-			        random = 1
-			    } 
-			}
-			ai_chance = {
-				factor = 50
-				modifier = {
-                    factor = 0
-                    is_historical_focus_on = yes
-                }
-			}
-		}
-
-		option = {	# No
-			name = russiaforeign.13.b
-			RUS = { 
-			    country_event = { 
-			        id = russiaforeign.15
-			        days = 5
-			        random = 1
-			    }
-			}
-			ai_chance = {
-				factor = 50
-			}
-		}
-    }
-
-    country_event = {	# USA Agrees
-		id = russiaforeign.14
-		title = russiaforeign.14.t
-		desc = russiaforeign.14.d
-
-		fire_only_once = yes
-		is_triggered_only = yes	
-
-		picture = GFX_GEO_report_event_Dadiani_Palace
-
-		option = {	# Ok
-			name = russiaforeign.14.a
-			reverse_add_opinion_modifier = { target = USA modifier = eoanb_om_ENG_sea_cable }
-			effect_tooltip = {
-			    add_tech_bonus = { bonus = 1 uses = 1 category = electronics_devices_tech }
-			}
-		}
-    }
-
-    country_event = {	# USA Rejects
-		id = russiaforeign.15
-		title = russiaforeign.15.t
-		desc = russiaforeign.15.d
-
-		fire_only_once = yes
-		is_triggered_only = yes
-
-		picture = GFX_GEO_report_event_Dadiani_Palace
-
-		option = {	# Ok
-			name = russiaforeign.15.a
-		}
-    }
-	
-	
-	country_event = {	# The sale of alaska, russian side
-		id = russiaforeign.16
-		title = russiaforeign.16.t
-		desc = russiaforeign.16.d
-
-		fire_only_once = yes
-		is_triggered_only = yes
-
-		picture = GFX_report_event_german_reichstag_gathering
-
-		option = {	# go to the americans
-			name = russiaforeign.16.a
-			USA={country_event = { id = russiaforeign.19 hours = 1}}
-			ai_chance = {
-				factor = 90
-				modifier = {
-                    factor = 100
-                	is_historical_focus_on = yes
-                }
-            }
-		}
-		option = {	# go to our friend in Liechtenstein first
-			name = russiaforeign.16.b
-			LIE={country_event = { id = russiaforeign.17 hours = 1}}
-			ai_chance = {
-				factor = 10
-				modifier = {
-                    factor = 0
-                	is_historical_focus_on = yes
-                }
-            }
-		}
-    }
-	country_event = {	# The sale of alaska, Liechtenstein first
-		id = russiaforeign.17
-		title = russiaforeign.17.t
-		desc = russiaforeign.17.d
-
-		fire_only_once = yes
-		is_triggered_only = yes
-
-		picture = GFX_report_event_german_reichstag_gathering
-
-		option = {	# Alaska, Really?
-			name = russiaforeign.17.a
-			RUS={country_event = { id = russiaforeign.18 hours = 1}}
-			ai_chance = {
-				factor = 90
-				modifier = {
-                    factor = 100
-                	is_historical_focus_on = yes
-                }
-            }
-		}
-		option = {	# We can afford it(just)
-			name = russiaforeign.17.b
-			RUS={country_event = { id = russiaforeign.18 hours = 1}}
-			set_global_flag = LIEAlaska_Purchased
-			add_timed_idea = { idea = USA_alaska_purchase_usa days = 365 }
-			hidden_effect = {
-                463 = {
-			        add_core_of = ALK
-			    }
-				transfer_state = 463
-		        LIE = { release_puppet = ALK }
-		        ALK = { #set up for ALK_LIE
-					set_cosmetic_tag = ALK_LIE_company
-					swap_ideas = {
-						remove_idea = RUS_Alexander_II
-						add_idea=hos_is_leader
-					}
-					swap_ideas = {
-						remove_idea = religion_orthodox
-						add_idea=religion_catholic
-					}
-					if={
-						limit={
-							PREV = {has_country_leader = {name = "Aloys II" ruling_only = yes}}
-						}
-						ALK_aloys_ii = {
-							add_country_leader_role = {
-								promote_leader = yes
-								country_leader={
-									desc="POLITICS_TEMP_DESC"
-									ideology=despotism
-									expire="1900.1.1.1"
-									#id=-1
-								}
-							}
-						}
-						retire_character = ALK_grand_duke_konstantin
-					}
-					else={
-						ALK_johann_ii = {
-							add_country_leader_role = {
-								promote_leader = yes
-								country_leader={
-									desc="POLITICS_TEMP_DESC"
-									ideology=despotism
-									expire="1929.2.11"
-									#id=-1
-								}
-							}
-						}
-						retire_character = ALK_grand_duke_konstantin
-					}
-		            # load_oob = "ALK_Licthenstien_Troops" ##LIE has 80 troops historically, where would it get a army?
-		        }
-		    }
-		    effect_tooltip = {
-                463 = {
-			        add_core_of = ALK
-			    }
-            }
-		    custom_effect_tooltip = "RUS_vic_Russian_Alaska_tooltip"
-			ai_chance = {
-					factor = 10
-					modifier = {
-                    	factor = 0
-                	is_historical_focus_on = yes
-                }
-            }
-		}
-    }
-	country_event = {	# The sale of Alaska, LIE responds
-		id = russiaforeign.18
-		title = russiaforeign.18.t
-		desc = {
-			text = russiaforeign.18.d
-			trigger = { has_global_flag = LIEAlaska_Purchased }
-		}
-		desc = {
-			text = russiaforeign.18.d_a
-			trigger = { NOT ={ has_global_flag = LIEAlaska_Purchased } }
-		}
-
-		fire_only_once = yes
-		is_triggered_only = yes
-
-		picture = GFX_report_event_german_reichstag_gathering
-
-		option = {	# the americans then
-			name = russiaforeign.18.a
-			trigger = {
-				NOT={has_global_flag = LIEAlaska_Purchased}
-			}
-			USA={country_event = { id = russiaforeign.19 hours = 1}}
-		}
-		option = {	# obviously this is our burden (no reason for this one, but player choice)
-			trigger = {
-				NOT={has_global_flag = LIEAlaska_Purchased}
-			}
-			name = russiaforeign.18.b
-		}
-		option = {	# Litchenstein agrees
-			trigger = {
-				has_global_flag = LIEAlaska_Purchased
-			}
-			name = russiaforeign.18.c
-			add_timed_idea = { idea = USA_alaska_purchase_rus days = 365 }
-		}
-    }
-	#Alaska Result
-country_event = {
-		id = russiaforeign.19
-		title = russiaforeign.19.t
-		desc = russiaforeign.19.d
-		picture = GFX_report_event_german_reichstag_gathering
-		
-		is_triggered_only = yes
-		
-		option = {#agree
-			name = russiaforeign.19.a
-			USA = { add_timed_idea = { idea = USA_alaska_purchase_usa days = 365 } }
-			USA = { transfer_state = 463 }
-			set_global_flag = USAAlaska_Purchased
-			news_event = { id = usa_news.17 }
-		}
-		option = {#decline
-			name = russiaforeign.19.b
-		}
-}
-country_event = {	# The sale of alaska, USA responds
-		id = russiaforeign.20
-		title = russiaforeign.20.t
-		desc = {
-			text = russiaforeign.20.d
-			trigger = { has_global_flag = USAAlaska_Purchased }
-		}
-		desc = {
-			text = russiaforeign.20.d_a
-			trigger = { NOT ={ has_global_flag = USAAlaska_Purchased } }
-		}
-
-		fire_only_once = yes
-		is_triggered_only = yes
-
-		picture = GFX_report_event_german_reichstag_gathering
-
-		option = {	# USA declined (this will NOT disable the USA focus)
-			name = russiaforeign.20.a
-			trigger = {
-				NOT={has_global_flag = USAAlaska_Purchased}
-			}
-		}
-		option = {	# USA agreed
-			trigger = {
-				has_global_flag = USAAlaska_Purchased
-			}
-			name = russiaforeign.20.b
-			news_event = { id = usa_news.17 }
-			add_timed_idea = { idea = USA_alaska_purchase_rus days = 365 }
-		}
-    }
 
 	###ALEXANDER II ASSASSINATION ATTEMPS
 
