@@ -83,7 +83,7 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 
 ## Join the Team
 
-If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
+If you wish to contribute to the development of the mod, support us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
 
 ### Rules for Developers
 - Current General Development for EoaNB shall be pushed onto the `(0.3)-Ars-Bellica` branch.
