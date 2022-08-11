@@ -47,7 +47,7 @@ Here's a useful installation video by one of our lead developers:
 
 ### Links from the Video 
 * <a href="https://desktop.github.com/">Github Desktop App: https://desktop.github.com/</a>
-* <a href="https://github.com/team-eoanb/EoaNB">Github Repo URL: https://github.com/team-eoanb/EoaNB</a>
+* <a href="https://github.com/EoaNB-Team/EoaNB">Github Repo URL: https://github.com/EoaNB-Team/EoaNB</a>
 
 <hr>
 
