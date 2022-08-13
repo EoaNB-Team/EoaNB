@@ -559,15 +559,19 @@ ROM_military_decision_wallachia = {
 
 ROM_navy_decision_wallachia = {
 
-	
+	ROM_decision_romanian_merchant_navy = {
 
-	ROM_decision_expand_the_danube_flotilla = {
-
-		icon = placeholder
+		icon = money
 
 		available = {
+			has_completed_focus = ROM_united_flotillas_decree
 			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
-			has_completed_focus = ROM_danube_flotilla
+			1126 = {
+				naval_base > 0
+			}
+			has_equipment = {
+				convoy > 4
+            }
 		}
 
 		allowed = { TAG = ROM }
@@ -585,17 +589,187 @@ ROM_navy_decision_wallachia = {
 		}
 		
 		remove_effect = {
+			add_ideas = ROM_romanian_merchant_navy
+			swap_ideas = { remove_idea = navinfra_no_naval_infrastructure add_idea = navinfra_low_naval_infrastructure }
+			if = {
+	            limit = { has_dlc = "Man the Guns" }
+		        add_tech_bonus = {
+                    bonus = 0.25
+                    uses = 2
+                    category = naval_mtg_module_transport_tech
+                }
+		    }
+	        else = {
+		        add_tech_bonus = {
+                    bonus = 0.25
+                    uses = 2
+                    category = naval_equipment
+                }
+	        }
+			hidden_effect = {
+				clr_country_flag = ROM_navy_reform_ongoing_flag
+			}
+		}
+	}
+	
+	ROM_decision_purchasing_trade_convoys = {
+
+		icon = generic_naval
 		
+		allowed = {
+		   tag = ROM
+		}
+
+		available = {
+		   has_completed_focus = ROM_united_flotillas_decree
+		   1126 = {
+				naval_base > 0
+			}
+		}
+
+		visible = {
+			NOT = { 
+				any_owned_state = {
+					is_coastal = yes
+				}
+			}
+		}
+
+		fire_only_once = no
+		
+		cost = 100
+		
+        days_remove = 180
+		
+		days_re_enable = 180
+         
+        modifier = {
+            political_power_gain = -0.1
+			consumer_goods_factor = 0.05
+			industrial_capacity_dockyard = -0.1
+        }
+
+		complete_effect = {
+		    hidden_effect = {
+				set_country_flag = GEC_trade_purchasing_convoys_flag
+			}
+		}
+       
+        remove_effect = {
+		    add_equipment_to_stockpile = {
+                type = convoy
+                amount = 5
+			}
+			hidden_effect = {
+				clr_country_flag = GEC_trade_purchasing_convoys_flag
+			}
+		}
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	ROM_decision_expansion_black_sea_ports = {
+
+		icon = naval_base
+
+		available = {
+			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
+			has_completed_focus = ROM_united_flotillas_decree
+		}
+
+		allowed = { TAG = ROM }
+		
+		custom_cost_trigger = {
+			has_political_power > 24.9
+			has_navy_experience > 24.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_25_navy_experience_25_command_power_50
+		
+		fire_only_once = yes
+		ai_will_do = {
+			factor = 100
+		}
+		modifier = {
+			consumer_goods_factor = 0.05
+			political_power_factor = -0.02
+		}
+
+		complete_effect = {
+			add_political_power = -25
+			navy_experience = -25
+			add_command_power = -50
+			hidden_effect = {
+				set_country_flag = ROM_navy_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			1126 = {
+				add_building_construction = {
+					type = naval_base
+					province = 13682
+					level = 1
+					instant_build = yes
+				}
+			}
+			hidden_effect = {
+				clr_country_flag = ROM_navy_reform_ongoing_flag
+			}
+		}
+	}
+
+	ROM_decision_expand_the_danube_flotilla = {
+
+		icon = generic_naval
+
+		available = {
+			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
+			has_completed_focus = ROM_danube_flotilla
+			1126 = {
+				naval_base > 0
+			}
+		}
+
+		allowed = { TAG = ROM }
+		
+		cost = 100
+		fire_only_once = yes
+		ai_will_do = {
+			factor = 100
+		}
+
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = ROM_navy_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			add_doctrine_cost_reduction = {
+				cost_reduction = 0.10
+				uses = 3
+				category = naval_doctrine
+				category = naval_equipment
+			}
+			hidden_effect = {
+				clr_country_flag = ROM_navy_reform_ongoing_flag
+			}
 		}
 	}
 	
 	ROM_decision_romania_ship = {
 
-		icon = placeholder
+		icon = GFX_decision_blueprint
 
 		available = {
 			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
 			has_completed_focus = ROM_foreign_ships
+			1126 = {
+				naval_base > 0
+			}
 		}
 
 		allowed = { TAG = ROM }
@@ -623,9 +797,35 @@ ROM_navy_decision_wallachia = {
 		
 		remove_effect = {
 			hidden_effect = {
-				country_event = {
-					id = rom_military.6
-					days = 10
+			clr_country_flag = ROM_navy_reform_ongoing_flag
+			country_event = {
+				id = rom_military.6
+				days = 10
+			}
+			if = {
+				limit = { has_dlc = "Man the Guns" }
+				create_equipment_variant = {
+					name = "Romania"
+					type = ship_hull_gunboat_2
+					name_group = DEN_GB_HISTORICAL
+					parent_version = 0
+					modules = {
+						fixed_ship_battery_slot = ship_cannon_battery_1
+						fixed_ship_fire_control_system_slot = fire_control_system_0
+						fixed_ship_engine_slot = ship_engine_steam_screw_gunboat
+						fixed_ship_secondaries_slot = empty
+						fixed_ship_armor_slot = ship_armor_capital_hardwood_0
+						mid_1_custom_slot = empty
+						mid_2_custom_slot = empty
+						rear_1_custom_slot = empty
+					}
+					#obsolete = no
+					}
+					create_ship = {
+						type = ship_hull_gunboat_2
+						equipment_variant = "Romania"
+						name = "Romania"
+					}
 				}
 			}
 		}
@@ -633,11 +833,17 @@ ROM_navy_decision_wallachia = {
 	
 	ROM_decision_stefan_cel_mare = {
 
-		icon = placeholder
+		icon = GFX_decision_blueprint
 
 		available = {
 			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
 			has_completed_focus = ROM_foreign_ships
+			has_navy_size = {
+				size > 0
+			}
+			1126 = {
+				naval_base > 0
+			}
 		}
 
 		allowed = { TAG = ROM }
@@ -664,7 +870,14 @@ ROM_navy_decision_wallachia = {
 		}
 		
 		remove_effect = {
-		
+			hidden_effect = {
+				create_ship = {
+					type = ship_hull_gunboat_2
+					equipment_variant = "Romania"
+					name = "Stefan Cel Mare"
+				}
+				clr_country_flag = ROM_navy_reform_ongoing_flag
+			}
 		}
 	}
 }	
