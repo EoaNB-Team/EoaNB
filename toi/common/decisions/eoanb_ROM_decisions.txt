@@ -150,7 +150,7 @@ eoanb_category_formables = {
 ### Decisions from Focus Tree ###
 ROM_military_decision_wallachia = {
 
-	#Major Hercht in Belgium - 1 
+	#Major Hercht in Belgium 
 	ROM_send_major_heinrich_hercht_to_belgium = {
 
 		icon = placeholder
@@ -161,24 +161,35 @@ ROM_military_decision_wallachia = {
 
 		allowed = { TAG = ROM }
 		
-		cost = 100
+		cost = 25
 		fire_only_once = yes
 		ai_will_do = {
 			factor = 100
 		}
-
+		days_remove = 210
+		
 		complete_effect = {
-
+			hidden_effect = {
+				set_country_flag = ROM_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			country_event = rom_military.4
+			hidden_effect = {
+				clr_country_flag = ROM_army_reform_ongoing_flag
+			}
 		}
 	}
 
-	#Major Hercht in Belgium - 2
+	#Major Hercht in Belgium - MHC
 	ROM_major_heinrich_hercht_return_from_belgium = {
 
 		icon = placeholder
 
 		available = {
-			
+			NOT = { has_country_flag = ROM_army_reform_ongoing_flag }
+			has_country_flag = major_heinrich_returns
 		}
 
 		allowed = { TAG = ROM }
@@ -190,7 +201,15 @@ ROM_military_decision_wallachia = {
 		}
 
 		complete_effect = {
-			set_country_flag = major_heinrich_returns
+			hidden_effect = {
+				set_country_flag = ROM_army_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = ROM_army_reform_ongoing_flag
+			}
 		}
 	}
 	
@@ -473,7 +492,7 @@ ROM_military_decision_wallachia = {
 	#Romania and American Civil War
 	ROM_decision_emanoil_boteanu_mission = {
 
-		icon = generic_industry
+		icon = generic_army_support
 		
 		#allowed = { tag = ROM }
 
@@ -488,7 +507,7 @@ ROM_military_decision_wallachia = {
 
 		fire_only_once = yes
 		
-		cost = 75
+		cost = 25
 		
         days_remove = 10
          
@@ -531,21 +550,45 @@ ROM_military_decision_wallachia = {
 
 		fire_only_once = yes
 		
-		cost = 75
+		custom_cost_trigger = {
+			has_political_power > 24.9
+			has_army_experience > 24.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_25_army_experience_25_command_power_50
 		
         days_remove = 180
          
         modifier = {
-            
+            consumer_goods_factor = 0.15
+			political_power_gain = -0.05
         }
 		
 		complete_effect = {
+			add_political_power = -25
+			army_experience = -25
+			add_command_power = -50
 			hidden_effect = {
 				set_country_flag = ROM_army_reform_ongoing_flag
 			}
 		}
        
         remove_effect = {
+			division_template = {
+                name = "Vânătorii"
+                is_locked = yes
+                    regiments = {
+                        light_infantry = { x = 0 y = 0 }
+                        light_infantry = { x = 0 y = 1 }
+                        light_infantry = { x = 0 y = 2 }
+                } 
+            }
+			81 = {
+				create_unit = {
+					division = "name = \"Batalionul 1 Vânători\" division_template = \"Vânătorii\"  start_experience_factor = 1"
+					owner = ROM
+				}
+			}
 			hidden_effect = {
 				clr_country_flag = ROM_army_reform_ongoing_flag
 			}
@@ -583,12 +626,14 @@ ROM_navy_decision_wallachia = {
 		}
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 			hidden_effect = {
 				set_country_flag = ROM_navy_reform_ongoing_flag
 			}
 		}
 		
 		remove_effect = {
+			custom_effect_tooltip = ROM_naval_reform_effect_tt
 			add_ideas = ROM_romanian_merchant_navy
 			swap_ideas = { remove_idea = navinfra_no_naval_infrastructure add_idea = navinfra_low_naval_infrastructure }
 			if = {
@@ -650,12 +695,14 @@ ROM_navy_decision_wallachia = {
         }
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 		    hidden_effect = {
 				set_country_flag = GEC_trade_purchasing_convoys_flag
 			}
 		}
        
         remove_effect = {
+			custom_effect_tooltip = ROM_naval_reform_effect_tt
 		    add_equipment_to_stockpile = {
                 type = convoy
                 amount = 5
@@ -698,6 +745,7 @@ ROM_navy_decision_wallachia = {
 		}
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 			add_political_power = -25
 			navy_experience = -25
 			add_command_power = -50
@@ -707,6 +755,8 @@ ROM_navy_decision_wallachia = {
 		}
 		
 		remove_effect = {
+			custom_effect_tooltip = ROM_naval_reform_effect_tt
+			EOANBSYS_institutions_innovative_add_two = yes
 			1126 = {
 				add_building_construction = {
 					type = naval_base
@@ -742,12 +792,14 @@ ROM_navy_decision_wallachia = {
 		}
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 			hidden_effect = {
 				set_country_flag = ROM_navy_reform_ongoing_flag
 			}
 		}
 		
 		remove_effect = {
+			custom_effect_tooltip = ROM_naval_reform_effect_tt
 			add_doctrine_cost_reduction = {
 				cost_reduction = 0.10
 				uses = 3
@@ -765,7 +817,7 @@ ROM_navy_decision_wallachia = {
 		icon = GFX_decision_blueprint
 
 		available = {
-			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
+			NOT = { has_country_flag = ROM_ship_order_in_progress_flag }
 			has_completed_focus = ROM_foreign_ships
 			1126 = {
 				naval_base > 0
@@ -787,17 +839,19 @@ ROM_navy_decision_wallachia = {
 		}
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 			add_political_power = -25
 			navy_experience = -25
 			add_command_power = -50
 			hidden_effect = {
-				set_country_flag = ROM_navy_reform_ongoing_flag
+				set_country_flag = ROM_ship_order_in_progress_flag
 			}
 		}
 		
 		remove_effect = {
+			custom_effect_tooltip = AUS_ship_order_in_progress_effect_tt
 			hidden_effect = {
-			clr_country_flag = ROM_navy_reform_ongoing_flag
+			clr_country_flag = ROM_ship_order_in_progress_flag
 			country_event = {
 				id = rom_military.6
 				days = 10
@@ -836,7 +890,7 @@ ROM_navy_decision_wallachia = {
 		icon = GFX_decision_blueprint
 
 		available = {
-			NOT = { has_country_flag = ROM_navy_reform_ongoing_flag }
+			NOT = { has_country_flag = ROM_ship_order_in_progress_flag }
 			has_completed_focus = ROM_foreign_ships
 			has_navy_size = {
 				size > 0
@@ -861,22 +915,24 @@ ROM_navy_decision_wallachia = {
 		}
 
 		complete_effect = {
+			custom_effect_tooltip = AUS_navy_reform_ongoing_effect_tt
 			add_political_power = -25
 			navy_experience = -25
 			add_command_power = -50
 			hidden_effect = {
-				set_country_flag = ROM_navy_reform_ongoing_flag
+				set_country_flag = ROM_ship_order_in_progress_flag
 			}
 		}
 		
 		remove_effect = {
+			custom_effect_tooltip = AUS_ship_order_in_progress_effect_tt
 			hidden_effect = {
 				create_ship = {
 					type = ship_hull_gunboat_2
 					equipment_variant = "Romania"
 					name = "Stefan Cel Mare"
 				}
-				clr_country_flag = ROM_navy_reform_ongoing_flag
+				clr_country_flag = ROM_ship_order_in_progress_flag
 			}
 		}
 	}
