@@ -1,5 +1,3 @@
-<hr>
-
 # Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
 
 ### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
@@ -12,9 +10,6 @@
 
 [steam-badge]: https://img.shields.io/static/v1?label=Steam&message=Download&color=lightgrey&logo=steam	
 [steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2114093692
-
-[youtube-badge]: https://img.shields.io/static/v1?label=Youtube&message=Videos&color=red&logo=youtube
-[youtube-link]: https://www.youtube.com/channel/UCR6n-pjZ4ain9hhUESuhZNw
 
 [discord-badge]: https://img.shields.io/static/v1?label=Discord&message=Chat&color=blue&logo=discord
 [discord-link]: https://discord.gg/VgufEME
@@ -41,7 +36,7 @@ This site is the official respository (cloud) for sharing and cooperating in the
 ## Installing the Mod (currently being reworked)
 
 Get easy access to our open-source development, with just a few quick steps!
-Here's a useful installation video by one of our lead developers: 
+Here's a useful installation video by one of our former lead developers: 
 
 <a href="https://youtu.be/Qr6l2DEneNY">Video Link: https://youtu.be/Qr6l2DEneNY</a>
 
