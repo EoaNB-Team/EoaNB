@@ -1,6 +1,6 @@
 # Official Repository of the End of a New Beginning Mod ![github-size]  ![github-stars]
 
-### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
+### Media      [![Patreon][patreon-badge]][patreon-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
 
 [github-size]: https://img.shields.io/github/languages/code-size/EoaNB-Team/EoaNB
 [github-stars]: https://img.shields.io/github/stars/EoaNB-Team/EoaNB?style=social
