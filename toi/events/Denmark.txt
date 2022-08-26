@@ -508,6 +508,7 @@ country_event = {
 			clr_country_flag = DEN_1858_elections_liberals_victorious_flag
 			clr_country_flag = DEN_1858_elections_conservatives_victorious_flag
 			clr_country_flag = DEN_1858_elections_historical_flag
+			compute_national_vote = yes
 		}
 	}
 }
@@ -4066,6 +4067,131 @@ country_event = {
 	#This is somehow worse than a failure...
 	option = {
 		name = denmark.914.c
+		trigger = {
+			has_country_flag = eoanb_reform_vote_tie
+		}
+		clr_country_flag = eoanb_reform_vote_tie
+
+		set_variable = {
+			var = current_reform_id
+			value = 0
+		}
+	}
+}
+
+#Vote on the Peasants Emancipation Act
+country_event = {
+	id = denmark.915
+	title = denmark.915.t
+	desc = denmark.915.d
+	picture = GFX_event_danish_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_variable = {
+			var = current_reform_id
+			value = 26.8
+		}
+
+		reset_approval_arrays = yes
+		set_1_approval_highly_disagree = yes
+		set_2_approval_highly_disagree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_agree = yes
+
+		set_vote_dem = yes
+		compute_voting_approval = yes
+
+		compute_number_seats_tot = yes
+		compute_number_seats_approve_est = yes
+	}
+
+	#Let's vote in a month
+	option = {
+		name = denmark.915.a
+		ai_chance = { base = 100 }
+		
+		country_event = {
+			id = denmark.916
+			days = 31
+		}
+	}
+
+	#Abandon the idea
+	option = {
+		name = denmark.915.b
+		ai_chance = { base = 0 }
+
+		set_variable = {
+			var = current_reform_id
+			value = 0
+		}
+	}
+}
+
+#Results of the Vote on the Peasants Emancipation Act
+country_event = {
+	id = denmark.916
+	title = denmark.916.t
+	desc = denmark.916.d
+	picture = GFX_event_danish_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			calculate_vote_result = yes
+		}
+	}
+
+	#It's a success!
+	option = {
+		name = denmark.916.a
+		trigger = {
+			has_country_flag = eoanb_reform_vote_success
+		}
+		clr_country_flag = eoanb_reform_vote_success
+		enact_voted_reform = yes
+	
+		set_variable = {
+			var = current_reform_id
+			value = 0
+		}
+	}
+
+	#It's a failure...
+	option = {
+		name = denmark.916.b
+		trigger = {
+			has_country_flag = eoanb_reform_vote_failure
+		}
+		clr_country_flag = eoanb_reform_vote_failure
+
+		decrease_legitimacy_by_two = yes
+		if = {
+			limit = {
+				NOT = { has_variable = political_legitimacy_equilibrium_custom }
+			}
+			set_variable = { political_legitimacy_equilibrium_custom = -0.02 }
+		}
+		else = {
+			add_to_variable = {
+				political_legitimacy_equilibrium_custom = -0.02
+			}
+		}
+		add_popularity = { ideology = social_egalitarianism popularity = -0.02 }
+		add_political_power = -25
+		
+		set_variable = {
+			var = current_reform_id
+			value = 0
+		}
+    }
+
+	#This is somehow worse than a failure...
+	option = {
+		name = denmark.916.c
 		trigger = {
 			has_country_flag = eoanb_reform_vote_tie
 		}
