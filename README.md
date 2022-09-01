@@ -9,7 +9,7 @@
 [patreon-link]: https://www.patreon.com/mod_eoanb
 
 [steam-badge]: https://img.shields.io/static/v1?label=Steam&message=Download&color=lightgrey&logo=steam	
-[steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2114093692
+[steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2856963714
 
 [discord-badge]: https://img.shields.io/static/v1?label=Discord&message=Chat&color=blue&logo=discord
 [discord-link]: https://discord.gg/VgufEME
