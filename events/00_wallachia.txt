@@ -208,11 +208,6 @@ add_namespace = rom_wallachia
 		}
 	}
 
-	###############################################
-	### END OF WALLACHIAN EVENTS FOR FOCUS TREE ###
-	###############################################
-
-
 	#Burning Fields Event
 	country_event = {
 		id = rom_wallachia.11
@@ -231,6 +226,194 @@ add_namespace = rom_wallachia
 			ai_chance = { factor = 1}
 		}
 	}
+
+	
+	###############################################
+	### END OF WALLACHIAN EVENTS FOR FOCUS TREE ###
+	###############################################
+
+	#######################################################################################
+	### Grigore Ghica's request to Napoleon III, his suicide or his road to unification ###
+	#######################################################################################
+
+	country_event = { # Grigore asks napoleon for audience
+		id = rom_wallachia.12
+		title = rom_wallachia.12.t
+		desc = rom_wallachia.12.d
+		picture = GFX_grigore_ghica2
+
+		fire_only_once = yes
+		is_triggered_only = yes
+
+		trigger = {
+			AND = {
+				#date > 1857.7.15
+				original_tag = FRA
+				exists = yes
+			}
+		}
+
+		option = { # Napoleon accepts Ghika's offer, no Paris convention will happen and England will get angry
+			name = rom_wallachia.12.a
+			ai_chance = { 
+				factor = 25
+				modifier = { 
+					factor = 0
+					is_historical_focus_on = yes
+				}
+			}
+			ENG = {
+				country_event = {
+					id = rom_wallachia.13
+					days = 5
+				}
+			}
+			RUS = {
+				country_event = {
+					id = rom_wallachia.13
+					days = 5
+				}
+			}
+			AUS = {
+				add_opinion_modifier = {
+					target = FRA
+					modifier = fra_accept_romanian_unification
+				}
+				country_event = {
+					id = rom_wallachia.13
+					days = 5
+				}
+			}
+			OTO = {
+				add_opinion_modifier = {
+					target = FRA
+					modifier = fra_accept_romanian_unification
+				}
+				country_event = {
+					id = rom_wallachia.13
+					days = 5
+				}
+			}
+			hidden_effect = {
+				set_global_flag = ghicas_road_to_union
+			}
+		}
+
+		option = { # Napoleon rejects Ghika's offer, if Vogoride will execute the electoral fraud the Paris convention will happen, England is happy with this but Ghika will suffer and commit suicide
+			name = rom_wallachia.12.b
+			ai_chance = { factor = 75 }
+			custom_effect_tooltip = reject_ghika_tt
+			hidden_effect = {
+				news_event = {
+					id = rom_wallachia.17
+					days = 10
+				}
+				set_global_flag = ghika_bad_health
+			}
+		}
+	}
+
+	country_event = { # anti-unionist powers of Austria, Russia, Ottoman Empire and Britain act to this
+		id = rom_wallachia.13
+		title = rom_wallachia.13.t
+		desc = rom_wallachia.13.d
+		picture = GFX_grigore_ghica2
+
+		is_triggered_only = yes
+
+		trigger = {
+			NOT = { has_country_flag = great_powers_revoke_guarantee }
+			has_global_flag = ghicas_road_to_union
+		}
+
+		option = { # revoke_guarantee
+			name = rom_wallachia.13.a
+			ai_chance = { factor = 25 }
+			diplomatic_relation = {
+				country = ROM
+				relation = guarantee
+				active = no
+			}
+			diplomatic_relation = {
+				country = MOL
+				relation = guarantee
+				active = no
+			}
+		}
+
+		option = { # stand_with_ghica
+			name = rom_wallachia.13.b
+			ai_chance = {
+				factor = 75
+				modifier = {
+					factor = 0
+						OR = {
+							tag = OTO
+							tag = AUS
+						}
+					}
+			}
+			remove_opinion_modifier = {
+				target = FRA
+				modifier = fra_accept_romanian_unification
+			}
+		}
+	}
+
+	# gap of 4 events, several reasons
+	news_event = {
+		id = rom_wallachia.17 # ghika commits suicide
+		title = rom_wallachia.17.t
+		desc = rom_wallachia.17.d
+		picture = GFX_grigore_ghica1
+
+		major = yes
+
+		is_triggered_only = yes
+
+		trigger = {
+			OR = {
+				TAG = FRA
+				TAG = ROM
+				TAG = MOL
+			}
+		}
+
+		immediate = { # Optional : all the following will occur once the event occurs
+			set_global_flag = ghika_dead
+		}
+
+		option = {
+			name = rom_wallachia.17.a
+			trigger = {
+				OR = {
+					TAG = ROM
+					TAG = MOL
+					TAG = FRA
+					TAG = RUS
+					TAG = AUS
+					TAG = OTO
+				}
+			}
+		}
+		option = {
+			name = rom_wallachia.17.b
+			trigger = {
+				NOT = {
+					TAG = ROM
+					TAG = MOL
+					TAG = FRA
+					TAG = RUS
+					TAG = AUS
+					TAG = OTO
+				}
+			}
+		}
+	}
+
+	##########################################################
+	### THIS IS THE CHAIN OF EVENTS RELATING GHIKA FOR NOW ###
+	##########################################################
 
 	########################
 	### WALLACHIAN UNION ###
