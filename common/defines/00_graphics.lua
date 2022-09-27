@@ -26,6 +26,9 @@ NMapMode = {
 	CONSTRUCTION_MAP_MODE_TRANSPARENCY_OVERRIDE = 241, 								-- When you use gradient borders to defeat the purpose of gradient borders. Larger than 248 seems to make the transparency stronger?
 	PEACE_CONFERENCE_CURRENT_SELECTED_SECONDARY_COLOR = { 0, 0, 1, 0.25 },
 	PEACE_CONFERENCE_SELECTABLE_SECONDARY_COLOR = { 0, 1, 0, 0.25 },
+	PEACE_CONFERENCE_CONTESTED_SECONDARY_COLOR = { 1, 0, 0, 0.25 },
+	PEACE_CONFERENCE_CHANGE_TARGET_TAG_SECONDARY_COLOR =  { 0, 0.8, 0.5, 0.25 },
+	PEACE_CONFERENCE_DIFFERENT_STACKABLE_SECONDARY_COLOR =  { 1, 1, 0, 0.25 },
 	FACTIONS_COLOR_NOT_MEMBER = { 0.6, 0.6, 0.6, 0.25 },
 	FACTIONS_MEMBER_TRANSPARENCY = 1.0,
 	PLAYER_MAPMODE_NOT_SELECTED_COUNTRY_TRANSPARENCY = 0.15,						-- How much is the country colors faded out, for countries that are not occupied by the any player.
@@ -43,17 +46,17 @@ NMapMode = {
 	AIR_RANGE_CANNOT_ASSIGN_MISSION_STRIPES_COLOR = { 0.8, 0, 0, 0.5 },
 	AIR_RANGE_INDICATOR_DEFAULT_COLOR = { 1.0, 1.0, 0, 1 },							-- On map circle indicating the air wings range.
 	AIR_RANGE_INDICATOR_NO_WINGS_COLOR = { 1.0, 0, 0, 1 },							-- Same as above, but for air wings with no airplanes.
-	AIR_RANGE_INDICATOR_ROTATION_SPEED = 0.0005,									-- How quickly is that indicator rotating
+	AIR_RANGE_INDICATOR_ROTATION_SPEED = 0.001,										-- How quickly is that indicator rotating
 	AIR_MISSION_ARROW_ACTIVE_COLOR = { 0, 1.0, 0, 0.5 },							-- Color of the arrow drawn in the strategic air map mode, between the air base and the region for the active missions
 	AIR_MISSION_ARROW_NONACTIVE_COLOR = { 1.0, 1.0, 1.0, 0.2 },						-- Same as above, but for non active missions (when no air wing has any mission active)
 	AIR_MISSION_ARROW_SELECTED_COLOR = { 1.0, 1.0, 0, 0.8 },						-- Same as above, but for currently selected air wings/air bases.
 	AIR_TRANSFER_ARROW_COLOR = { 1, 1, 0, 0.75 },									-- Same as above, but for the arrows drawn between airbases for current transfers
 	NAVAL_REGION_ACCESS_AVOID_COLOR = { 1, 1, 0, 0.35 },							-- Color for the map stripes on naval regions that has set an access level = AVOID
 	NAVAL_REGION_ACCESS_BLOCK_COLOR = { 1, 0, 0, 0.45 },							-- Color for the map stripes on naval regions that has set an access level = BLOCK
-	NAVAL_REGION_FADE_WHEN_FLEET_SELECTED = 0.15,									-- How much all region borders (except those with mission assigned to it) are faded out, when a fleet is selected.
+	NAVAL_REGION_FADE_WHEN_FLEET_SELECTED = 0.25,									-- How much all region borders (except those with mission assigned to it) are faded out, when a fleet is selected.
 	AIR_REGION_FADE_WHEN_WING_SELECTED = 0.15,
-	UI_CONFIGURABLE_SLOT_FROM = 3,													-- Mapmode slots range that may be configurable. Indices are 0-based (first slot is 0)
-	UI_CONFIGURABLE_SLOT_TO = 8,
+	UI_CONFIGURABLE_SLOT_FROM = 4,													-- Mapmode slots range that may be configurable. Indices are 0-based (first slot is 0)
+	UI_CONFIGURABLE_SLOT_TO = 10,
 	MAP_MODE_TERRAIN_TRANSPARENCY = 0.5,											-- How much transparent are the province colors in the simplified terrain map mode
 	MAP_MODE_NAVAL_TERRAIN_TRANSPARENCY = 0.8,										-- How much transparent are the SEA province colors in the simplified terrain map mode
 	MAP_MODE_INTEL_NETWORK_STRENGTH_COLOR_LOW = { 0.1, 0.1, 0.5, 0.2 },					-- Color of a state with the lowest intel network strength
@@ -68,6 +71,7 @@ NMapMode = {
 	OCCUPATION_MAP_MODE_COUNTRY_STRIPE_ALPHA = 0.3,									-- alpha of occupied country stripes in occupation map mode
 	OPERATIVE_MAP_MODE_INVALID_COUNTRY_TARGET_TRANSPARENCY = 0.15,							-- alpha of country which cannot be targeted by the selected operative mission
 	
+
 	SUPPLY_MAP_MODE_COUNTRY_BORDER_CAMERA_DISTANCE = 1.0,
 	SUPPLY_MAP_MODE_COUNTRY_BORDER_OUTLINE_CUTOFF = 0.973,
 	GRADIENT_BORDERS_THICKNESS_SUPPLY_COUNTRY_BORDER = 10.0,
@@ -94,6 +98,8 @@ NMapMode = {
 	SUPPLY_STATUS_DISPLAY_THRESHOLD = 0.90, -- at what average supply status we move to show status colors instead of flow
 	SUPPLY_HOVERED_STATE_COLOR_INDEX = 0, -- Border color of hovered state. Refers to the colors in BORDER_COLOR_CUSTOM_HIGHLIGHTS.
 	SUPPLY_HOVERED_PROVINCE_COLOR_INDEX = 4, -- Border color of hovered province. Refers to the colors in BORDER_COLOR_CUSTOM_HIGHLIGHTS.
+	PEACE_HOVERED_STATE_COLOR_INDEX = 3 , -- Border color of hovered state in Peace conference. Refers to the colors in BORDER_COLOR_CUSTOM_HIGHLIGHTS.
+	PEACE_CLAIMED_STATE_COLOR_INDEX = 2 , -- Border color of claimed states in Peace conference. Refers to the colors in BORDER_COLOR_CUSTOM_HIGHLIGHTS.
 },
 
 NMapIcons = {
@@ -102,6 +108,7 @@ NMapIcons = {
 	INTERPOLATION_SNAP_DISTANCE = 0.3,
 	INTEL_MAP_MODE_MAP_ICON_OFFSET = { 12, 40 },				-- Control the offset of the intel map mode map icon (counterintelligence, operatives and operations)
 	COARSE_RAILWAY_GUN_POSITION_OFFSET = { -30, 0 },			-- Coarse railway gun icons will have their world centers offset by this offset
+
 	DEFAULT_PRIORITY_UNITS_STACK = 10,
     DEFAULT_PRIORITY_UNITS_STACK_GROUP = 11,
     DEFAULT_PRIORITY_VICTORY_POINTS = 5,
@@ -121,6 +128,7 @@ NMapIcons = {
     DEFAULT_PRIORITY_ADJACENCY_RULE = 3,
     DEFAULT_PRIORITY_NAVAL_MINES = 13,
     DEFAULT_PRIORITY_NAVAL_ACCIDENTS = 13,
+	DEFAULT_PRIORITY_NAVAL_ACCIDENTS = 13,
         
         STATES_PRIORITY_UNITS_STACK = 10,
         STATES_PRIORITY_UNITS_STACK_GROUP = 11,
@@ -377,7 +385,7 @@ NMapIcons = {
         PEACE_CONFERENCE_PRIORITY_AIR_MISSION = 13,
         PEACE_CONFERENCE_PRIORITY_SUPPLY = 14,
         PEACE_CONFERENCE_PRIORITY_CAPITAL = 5,
-        PEACE_CONFERENCE_PRIORITY_PEACE_COST = 3,
+		PEACE_CONFERENCE_PRIORITY_PEACE_COST = 20,
         PEACE_CONFERENCE_PRIORITY_ADJACENCY_RULE = 3,
         PEACE_CONFERENCE_PRIORITY_NAVAL_MINES = 13,
         PEACE_CONFERENCE_PRIORITY_NAVAL_ACCIDENTS = 13,
@@ -531,16 +539,16 @@ NMapIcons = {
 },
 
 NAirGfx = {
-	AIRPLANES_ANIMATION_GLOBAL_SPEED_PER_GAMESPEED = { 0.3, 0.35, 0.40, 0.45, 0.50, 0.55 }, -- Speed factor for each game speed (begin with paused). Larger value = faster animation.
+	AIRPLANES_ANIMATION_GLOBAL_SPEED_PER_GAMESPEED = { 0.22, 0.28, 0.32, 0.38, 0.44, 0.50 }, -- Speed factor for each game speed (begin with paused). Larger value = faster animation.
 	ROCKET_SPEED = 15.0,							-- Speed of rockets launched from rocket sites	
-	AIRPLANES_CURVE_POINT_DENSITY = 5.0, 			-- Higher value = more midpoints in the flight path.
-	AIRPLANES_CURVE_MAX_EXTRAPOLATION = 30.0, 		-- It's the limit value that avoid making gigantic curves that may happen when flight path is very long.
+	AIRPLANES_CURVE_POINT_DENSITY = 2.0, 			-- LOWER value = more midpoints in the flight path.
+	AIRPLANES_CURVE_MAX_EXTRAPOLATION = 20.0, 		-- It's the limit value that avoid making gigantic curves that may happen when flight path is very long.
 	AIRPLANES_CURVE_MIN_ELEVATION = 4.0, 			-- Minimum height above the ground that the curve will generate it's points. Excludes first and last point (takeoff/landing).
 	AIRPLANES_SCALE_TAKEOFF_DIST = 0.1, 				-- Until first x% of the flight path, the airplane will scale up.
 	AIRPLANES_SCALE_MIN = 0.1, 						-- Minimum airplane scale down when takeoff/landing.
 	AIRPLANES_SCALE_LANDING_DIST = 0.9, 				-- After last x% of the flight path, the airplane will scale down.
 	AIRPLANES_SMOOTH_INTERPOLATION_MOVE = 0.13, 	-- How smooth is the movement interpolation.
-	AIRPLANES_SMOOTH_INTERPOLATION_TURN = 0.095, 	-- How smooth is the turning interpolation.
+	AIRPLANES_SMOOTH_INTERPOLATION_TURN = 0.12, 	-- How smooth is the turning interpolation.
 	AIRPLANES_BANK_STRENGTH = 210.0, 				-- Multiplier of how much the curve affects the wings banking. (angle limited by the following value)
 	AIRPLANES_BANK_ANGLE_LIMIT = 55.0, 				-- Bank angle limit.
 	AIRPLANES_GROUND_COLLISION_OFFSET_Y = -5.0, 		-- Lets the 3d airplanes disappear after going a bit under the ground.
@@ -557,13 +565,13 @@ NAirGfx = {
 	
 	BOMBERS_DIVISION_FACTOR = 60,					-- Number of effective bombers in a strategic region will be divided by this factor.
 	MISSILES_DIVISION_FACTOR = 60,					-- Number of missiles shown in a strategic region will be divided by this factor.
-	FIGHTERS_DIVISION_FACTOR = 60,					-- Number of missiles shown in a strategic region will be divided by this factor.
-	SCOUT_PLANE_DIVISION_FACTOR = 60,				-- Number of missiles shown in a strategic region will be divided by this factor.
+	FIGHTERS_DIVISION_FACTOR = 40,					-- Number of missiles shown in a strategic region will be divided by this factor.
+	SCOUT_PLANE_DIVISION_FACTOR = 30,				-- Number of missiles shown in a strategic region will be divided by this factor.
 	TRANSPORT_DIVISION_FACTOR = 60,
 	MAX_MISSILE_BOMBING_SCENARIOS = 2,				-- Max number of missile bombing scenarios in a strategic region.
 	MAX_PATROL_SCENARIOS = 2,						-- Max number of patrol scenarios in a strategic region.
 	MAX_BOMBING_SCENARIOS = 2,						-- Max number of bombings scenarios in a strategic region.
-	MAX_DOGFIGHTS_SCENARIOS = 2,					-- Max number of dogfight scenarios in a strategic region.
+	MAX_DOGFIGHTS_SCENARIOS = 3,					-- Max number of dogfight scenarios in a strategic region.
 	MAX_TRANSPORT_SCENARIOS = 2,					-- Max number of transport scenarios in a strategic region
 	MAX_TRAINING_SCENARIOS = 2,						-- Max number of training scenarios in a strategic region
 	MAX_SCOUT_SCENARIOS = 2,
@@ -590,7 +598,6 @@ NGraphics = {
 	TRAIN_MAP_SPEED = 3.0,							-- Trains will move at this relative speed. This has no gameplay implications. Changing this value (originally 4.0) may cause audio effects to lose sync with animation.
 	TUNNELBANA_TIMETABLE = { 9200, 12000 },			-- Frequency range in milliseconds for regular train service. Adjust this if changing speed to avoid LONGTRAIN
 
-	
 	MAX_MESHES_LOADED_PER_FRAME = 10,
 	MESH_POPUP_SCALE_UP_SPEED = 5.0,
 	MESH_POPUP_SCALE_DOWN_SPEED = 2.1,
@@ -623,7 +630,7 @@ NGraphics = {
 	LAND_UNIT_MOVEMENT_SPEED = 12  ,
 	NAVAL_UNIT_MOVEMENT_SPEED = 12,
 	ARROW_MOVEMENT_SPEED = 2,
-	DRAW_DETAILED_CUTOFF = 400,
+	DRAW_COUNTRY_NAMES_CUTOFF = 400,                    -- Cutoff for drawing country names on the map
 	TRADEROUTE_SMOOTHNESS = 0.65,
 	TRADEROUTE_SMOOTHEN_PASSES = 2,
 	SUPPLYFLOW_SMOOTHNESS = 0.25,
@@ -708,6 +715,8 @@ NGraphics = {
 	GRADIENT_BORDERS_THICKNESS_STRATEGIC_REGIONS = 150.0,
 	GRADIENT_BORDERS_THICKNESS_DIPLOMACY = 12.0,
 	GRADIENT_BORDERS_THICKNESS_DIPLOMACY_ON_INTEL_LEDGER = 3.0,
+	GRADIENT_BORDERS_THICKNESS_PEACE_CONFERENCE_A = 3.0, -- transparency at 0 up until A
+	GRADIENT_BORDERS_THICKNESS_PEACE_CONFERENCE_B = 6.0, -- increasing transparency up to 100% when at B
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_COUNTRY = 0.973, -- Magic number to balance cutoff on edges without neighbor
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_DIPLOMACY = 0.973,
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_DIPLOMACY_ON_INTEL_LEDGER = 0.973,
@@ -717,6 +726,7 @@ NGraphics = {
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_RESISTANCE = 0.973,
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_FACTIONS = 0.973,
 	GRADIENT_BORDERS_OUTLINE_CUTOFF_INTEL_LEDGER = 0.973,
+	GRADIENT_BORDERS_OUTLINE_CUTOFF_PEACE_CONFERENCE = 0.973,
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_COUNTRY = 0.0, -- 0 to 1 value for override filling when camera zooms in/out. 0 = override disabled
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_STATE = 0.4, 
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_SUPPLY_AREA = 1.0, 
@@ -727,6 +737,9 @@ NGraphics = {
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_INTEL_LEDGER = 0.2,
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_DIPLOMACY = 0.0,
 	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_DIPLOMACY_ON_INTEL_LEDGER = 1.0,
+	GRADIENT_BORDERS_CAMERA_DISTANCE_OVERRIDE_PEACE_CONFERENCE = 1.0,
+	GRADIENT_BORDERS_ACTIVATE_FOR_PEACE_CONFERENCE = false,
+	GRADIENT_BORDERS_ONE_COLOR_FOR_PEACE_CONFERENCE = { -1.0, -1.0, -1.0, -1.0 }, -- all gradient will have this color. if { -1.0, -1.0, -1.0, -1.0 } then use Negotiator MapColor
 	
 	GRADIENT_BORDERS_OPTIMIZATION_RANGE = 30.0, -- smaller value = faster gradient borders but may have artifacts on large provinces (value to balance)
 	GRADIENT_BORDERS_REFRESH_FREQ = 0.12, -- how frequent is gradient borders repainting (optimization for high-speed gameplay)
@@ -781,16 +794,16 @@ NGraphics = {
 	COUNTRY_FLAG_LARGE_STRIPE_MAX_HEIGHT = 4000,
 	VICTORY_POINT_LEVELS = 2,
 	VICTORY_POINT_MAP_ICON_AFTER = {0, 20}, -- After this amount of VP the map icon becomes bigger dot.
-	VICTORY_POINT_MAP_ICON_TEXT_CUTOFF = {100, 250, 500},  -- At what camera distance the VP name text disappears.
-	VICTORY_POINTS_DISTANCE_CUTOFF = {300, 500, 1500}, -- At what distance VPs are hidden
+	VICTORY_POINT_MAP_ICON_TEXT_CUTOFF = {150, 250, 500},  -- At what camera distance the VP name text disappears.
+	VICTORY_POINTS_DISTANCE_CUTOFF = {250, 500, 1000}, -- At what distance VPs are hidden
 	AIRBASE_ICON_DISTANCE_CUTOFF = 900, -- At what distance air bases are hidden
-	NAVALBASE_ICON_DISTANCE_CUTOFF = 1300, -- At what distance naval bases are hidden
+	NAVALBASE_ICON_DISTANCE_CUTOFF = 900, -- 1300, -- At what distance naval bases are hidden
 	RADAR_ICON_DISTANCE_CUTOFF = 1100, -- At what distance the radars are hidden
 	RESOURCE_MAP_ICON_TEXT_CUTOFF = 800,  -- At what camera distance the resource name/amount text disappears.
 	RESISTANCE_MAP_ICON_MODIFIERS_DISTANCE_CUTOFF = 500,  -- At what camera distance the resistance/compliance map icon modifiers are hidden
 	RESISTANCE_MAP_ICON_DISTANCE_CUTOFF = 1200,  -- At what camera distance the resistance/compliance map icons are hidden
 	PROVINCE_ANIM_TEXT_DISTANCE_CUTOFF = 500,
-	CAPITAL_ICON_CUTOFF = 1500,	-- At what camera distance capital icons disappears
+	CAPITAL_ICON_CUTOFF = 1100,	-- At what camera distance capital icons disappears
 	UNITS_DISTANCE_CUTOFF = 120,
 	SHIPS_DISTANCE_CUTOFF = 240,
 	UNIT_ARROW_DISTANCE_CUTOFF = 875,
@@ -803,9 +816,10 @@ NGraphics = {
 	DECISION_MAP_ICON_DISTANCE_CUTOFF = 1000,
 	DECISION_MAP_ICON_DEPTH_PRIORITY = 50,
 	NAVAL_MISSION_TASK_FORCES_GROUP_BY_ALLEGIANCE_CUTOFF = 500,
-	NAVAL_MISSION_ICONS_DISTANCE_CUTOFF = 1300,
+	NAVAL_MISSION_ICONS_DISTANCE_CUTOFF = 900, --1300,
 	NAVAL_MINES_DISTANCE_CUTOFF = 800,
 	CRYPTOLOGY_MAP_ICON_DISTANCE_CUTOFF = 1000,
+	PEACE_CONFERENCE_MAP_ICON_DISTANCE_CUTOFF = 500,
 	NAVAL_MINES_CLUMPING = 58, -- The higher value, the more likely the 3d naval mines will clamp together
 	NAVAL_MINES_CLUMP_NEAR_TERRITORY = 25, -- Higher chance to spawn 3d naval mine near our territory
 	NAVAL_MINES_COUNT_TO_VISUAL_ASPECT = 0.1, -- How many in-game-naval-mines is one visual 3d naval mine?
@@ -885,10 +899,11 @@ NGraphics = {
 	AMBIENT_LIGHT_POS_Z = { 0.6,  0.2, 0.924 }, -- top
 	AMBIENT_LIGHT_NEG_Z = { 0.55, 0.1, 0.9 }, -- bottom
 
-	SUN_DIFFUSE_COLOR   = {0.14, 0.0, 1.0},
-	SUN_INTENSITY 		= 1.0; -- 0.4
-	MOON_DIFFUSE_COLOR  = {0.58, 0.5, 1.0},
-	MOON_INTENSITY 		= 2.5;
+	SUN_DIFFUSE_COLOR   	= {0.14, 0.0, 1.0},
+	SUN_INTENSITY 			= 1.0; -- 0.4
+	SUN_SPECULAR_INTENSITY 	= 1.0;
+	MOON_DIFFUSE_COLOR  	= {0.58, 0.5, 1.0},
+	MOON_INTENSITY 			= 2.5;
 
 	CUBEMAP_INTENSITY = 1.0,
 	
@@ -973,9 +988,9 @@ NGraphics = {
 	SUPPLY_CONSUMER_ARROW_HEIGHT_TO_LEN = 0.1,
 	SUPPLY_CONSUMER_ARROW_HEIGHT_MAX = 4.0,
 
-	SUPPLY_UNIT_COUNTER_SHOW_THRESHOLD = 0.75,  -- At what supply threshold will the normal crate be shown on unit counters
-	SUPPLY_UNIT_COUNTER_LOW_THRESHOLD = 0.50,  -- At what supply threshold will the orange crate be shown on unit counters
-	SUPPLY_UNIT_COUNTER_VERY_LOW_THRESHOLD = 0.25,  -- At what supply threshold will the red crate with ! will be shown on unit counters
+	SUPPLY_UNIT_COUNTER_SHOW_THRESHOLD = 0.5,  -- At what supply threshold will the normal crate be shown on unit counters
+	SUPPLY_UNIT_COUNTER_LOW_THRESHOLD = 0.35,  -- At what supply threshold will the orange crate be shown on unit counters
+	SUPPLY_UNIT_COUNTER_VERY_LOW_THRESHOLD = 0.2,  -- At what supply threshold will the red crate with ! will be shown on unit counters
 
 	COUP_GREEN = { 0.0, 1.0, 0.0, 1.0 },
 	COUP_RED = { 1.0, 0.0, 0.0, 1.0 },
@@ -1015,7 +1030,7 @@ NGraphics = {
 	ORDERS_MOUSE_INTERSECT_DISTANCE_MULT = 2.6, 		-- For balancing the collision distance with painted arrows and fronts.
 	FRONTS_MOUSE_INTERSECT_DISTANCE_MULT = 6.6, 		-- For balancing the collision distance with painted arrows and fronts.
 	MOVE_ORDERS_MOUSE_INTERSECT_DISTANCE_MULT = 0.5, 	-- For balancing the collision distance with painted arrows and fronts.
-	TRADE_ROUTE_INTERSECT_DISTANCE_MULT = 10.0,
+	TRADE_ROUTE_INTERSECT_DISTANCE_MULT = 10.0,			-- For balancing the collision distance with painted arrows and trade routes.
 	RAILWAY_INTERSECT_DISTANCE_MULT = 3.0,				-- For balancing the collision distance with painted arrows and railways.
 
 	MINIMUM_PROVINCE_SIZE_IN_PIXELS = 1,			-- Provinces that are smaller than that are just making the game unplayable. It doesn't affect the game, just informs in the error.log
@@ -1045,7 +1060,6 @@ NGraphics = {
 		
 	INTEL_NETWORK_VALID_TARGET_STRIPE_COLOR = { 0.1, 0.5, 0.8, 1.0 },	-- Color of the stripes of painted over a valid state to start building an intel network
 	INTEL_NETWORK_VALID_COUNTRY_TARGET_STRIPE_COLOR = { 0.1, 0.8, 0.5, 0.5 },	-- Color of the stripes painted over valid countries
-
 
 	OCCUPATION_RESISTANCE_NON_INITIALIZED_COLOR = { 1.0, 1.0, 1.0, 0.05 }, -- player owned state color with no resistance
 	
@@ -1123,7 +1137,6 @@ NInterface = {
 	FOCUS_TREE_ZOOM_SPEED = 0.16,				-- zooming speed 
 	FOCUS_TREE_ZOOM_FACTOR = 0.5,				-- zooming factor that will be factored while player scrolls too fast
 
-	
 	TOOLTIP_SCREEN_LEFT_OFFSET_X = 0,				-- Tooltip offset on x axis from left screen border
 	TOOLTIP_SCREEN_RIGHT_OFFSET_X = 0,				-- Tooltip offset on x axis from right screen border
 	TOOLTIP_SCREEN_TOP_OFFSET_Y = 0,				-- Tooltip offset on y axism from top screen border
@@ -1206,17 +1219,17 @@ NInterface = {
 	MISSION_CONVOY_ESCORT_SOFT_REQ_THRESHOLD_DEPTH_CHARGES_SUM = 8,	-- Sum of the stat Depth Charges in the task force
 	MISSION_NAVAL_INVASION_SUPPORT_SOFT_REQ_THRESHOLD_SHORE_BOMBARDMENT = 3,	-- Same, for naval invasion. Sum of the stat Shore Bombardment in the task force
 
-	OPERATIVE_MISSION_EFFICIENCY_ANIMATION_TIME_MIN = 0.1,			-- the minimum duration of a loop in seconds
-	OPERATIVE_MISSION_EFFICIENCY_ANIMATION_TIME_MAX = 2.0,			-- the maximum duration of a loop in seconds
+	OPERATIVE_MISSION_EFFICIENCY_ANIMATION_TIME_MIN = 0.2,			-- the minimum duration of a loop in seconds
+	OPERATIVE_MISSION_EFFICIENCY_ANIMATION_TIME_MAX = 3.0,			-- the maximum duration of a loop in seconds
 
-	OPERATIVE_COUNTER_INTELLIGENCE_DEFENSE_TO_EFFICIENCY_FACTOR = 33.0,	-- Factor multiplied to the defense provided by the operative while on counter intelligence mission to get a score in the range [0,100] that is then used to scale the animation speed
+	OPERATIVE_COUNTER_INTELLIGENCE_DEFENSE_TO_EFFICIENCY_FACTOR = 40.0,	-- Factor multiplied to the defense provided by the operative while on counter intelligence mission to get a score in the range [0,100] that is then used to scale the animation speed
 	OPERATIVE_NETWORK_STRENGTH_GAIN_TO_EFFICIENCY_FACTOR = 12.0,		-- Factor multiplied to the network strength the operative provides while on build network mission to get a score in the range [0,100] that is then used to scale the animation speed
 	OPERATIVE_PROPAGANDA_DRIFT_TO_EFFICIENCY_FACTOR = 130000.0,		-- Factor multiplied to the war support and stability drift to obtain the efficiency score (expected to be in range [0,100])
 	OPERATIVE_BOOST_IDEOLOGY_DRIFT_TO_EFFICIENCY_FACTOR = 500.0,		-- Factor multiplied to the ideology drift caused by the operative in order to get a score in the range [0,100] used to determine the speed of the animation
-	OPERATIVE_ROOT_OUT_RESISTANCE_EFFICIENCY_TO_EFFICIENCY_FACTOR = 75.0,	-- Factor multiplied to the operative's efficiency at the RootOutResistance mission to determine the animation speed
-	OPERATIVE_TRADE_INFLUENCE_DRIFT_TO_EFFICIENCY_FACTOR = 0.75,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
-	OPERATIVE_OPINION_DRIFT_TO_EFFICIENCY_FACTOR = 7500,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
-	OPERATIVE_TENSION_DRIFT_TO_EFFICIENCY_FACTOR = 7500,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
+	OPERATIVE_ROOT_OUT_RESISTANCE_EFFICIENCY_TO_EFFICIENCY_FACTOR = 80.0,	-- Factor multiplied to the operative's efficiency at the RootOutResistance mission to determine the animation speed
+	OPERATIVE_TRADE_INFLUENCE_DRIFT_TO_EFFICIENCY_FACTOR = 135,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
+	OPERATIVE_OPINION_DRIFT_TO_EFFICIENCY_FACTOR = 400,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
+	OPERATIVE_TENSION_DRIFT_TO_EFFICIENCY_FACTOR = 400,		-- Factor multiplied to the operative's trade influence drift to determine the animation speed
 
 	-- Used to convert the activity level to a color:
 	-- ACTIVITY_LEVEL_THRESHOLD_COLOR[ i ] will be used if
@@ -1246,7 +1259,8 @@ NInterface = {
 	NAVY_UNIT_LEADER_ICON_SPRITE_ID = 3,
 	POLITICAL_LEADER_ICON_SPRITE_ID = 13,
 
-	EQUIPMENT_DESIGNER_SHOW_MODULE_FORBIDS_BASE_ROLE_ICON = 0, -- When selecting a module in the tank designer, for each role the module forbids a role icon will be displayed. If this is set to 0 no icon will be displayed if the main tank role is forbidden. If set to 1 the icon will be displayed as normal.
+	-- When selecting a module in the tank designer, for each role the module forbids a role icon may be displayed.
+	EQUIPMENT_DESIGNER_SHOW_MODULE_FORBIDS_BASE_ROLE_ICON = 0, -- If this is set to 0 no icon will be displayed if the main tank role is forbidden. If set to 1 the icon will be displayed as normal.
 	EQUIPMENT_DESIGNER_SHOW_MODULE_FORBIDS_SPECIALIZED_ROLE_ICON = 0, -- If this is set to 0 no icons will be displayed for any forbidden specialized roles. If set to 1 the icons will be displayed as normal.
 
 	SLOW_INTERFACE_THRESHOLD = 5000, -- Show warning "SLOW INTERFACE" in debug when interface refresh takes more that this (in microseconds)
@@ -1305,6 +1319,11 @@ NSound = {
 
 	VOICE_OVER_CATEGORY  = "Voices",
 	VOICE_OVER_COOL_DOWN = 2.8, -- Wait for this many seconds before playing another vo
+},
+
+NFriendGUI = {
+	OFFLINE_COLOR = { 0.7, 0.7, 0.7, 1.0}, -- Text color of offline state
+	ONLINE_COLOR = { 0.56, 0.85, 0.56, 1.0 }, -- Text color of online state
 },
 
 }
