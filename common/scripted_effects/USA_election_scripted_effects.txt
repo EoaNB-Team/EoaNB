@@ -1,3 +1,28 @@
+eoanb_USA_hold_presidential_election = {
+	eoanb_USA_clean_previous_election = yes
+	every_owned_state = {
+		limit = {
+			has_state_flag = is_USA_state
+		}
+		eoanb_USA_setup_state_political_alignment = yes
+		eoanb_USA_presidential_election = yes
+	}
+	ROOT = { eoanb_USA_presidential_election_declare_winner = yes }
+	ROOT = { eoanb_USA_party_popularity_update = yes }
+}
+
+eoanb_USA_update_political_pie_chart = {
+	eoanb_USA_clean_previous_election = yes
+	every_owned_state = {
+		limit = {
+			has_state_flag = is_USA_state
+		}
+		eoanb_USA_setup_state_political_alignment = yes
+		eoanb_USA_presidential_election = yes
+	}
+	ROOT = { eoanb_USA_party_popularity_update = yes }
+}
+
 eoanb_USA_presidential_election_setup = {
 	set_temp_variable = { temp_LIB_popularity = LIB_popularity } #Liberal
 	set_temp_variable = { temp_CON_popularity = CON_popularity } #Conservative
@@ -11,7 +36,7 @@ eoanb_USA_presidential_election_setup = {
 	set_temp_variable = { temp_ANA_popularity = ANA_popularity } #Anarchist
 }
 
-eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
+eoanb_USA_party_popularity_update = {
 	set_variable = { USA_LIB_pie_popularity = USA_LIB_total_votes }
 	set_variable = { USA_CON_pie_popularity = USA_CON_total_votes }
 	set_variable = { USA_EGL_pie_popularity = USA_EGL_total_votes }
@@ -21,6 +46,7 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	set_variable = { USA_FUN_pie_popularity = USA_FUN_total_votes }
 	set_variable = { USA_COM_pie_popularity = USA_COM_total_votes }
 	set_variable = { USA_AUT_pie_popularity = USA_AUT_total_votes }
+	set_variable = { USA_ANA_pie_popularity = USA_ANA_total_votes }
 
 	set_variable = { USA_total_votes_pie = USA_LIB_pie_popularity }
 	add_to_variable = { USA_total_votes_pie = USA_CON_pie_popularity }
@@ -31,6 +57,7 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	add_to_variable = { USA_total_votes_pie = USA_FUN_pie_popularity }
 	add_to_variable = { USA_total_votes_pie = USA_COM_pie_popularity }
 	add_to_variable = { USA_total_votes_pie = USA_AUT_pie_popularity }
+	add_to_variable = { USA_total_votes_pie = USA_ANA_pie_popularity }
 
 	log = "LIBERALS: [?USA_LIB_pie_popularity] CONSERVATIVES: [?USA_CON_pie_popularity]"
 	log = "EGALITARIAN: [?USA_EGL_pie_popularity] PERIPHERAL: [?USA_PER_pie_popularity]"
@@ -45,6 +72,7 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	divide_variable = { USA_FUN_pie_popularity = USA_total_votes_pie }
 	divide_variable = { USA_COM_pie_popularity = USA_total_votes_pie }
 	divide_variable = { USA_AUT_pie_popularity = USA_total_votes_pie }
+	divide_variable = { USA_ANA_pie_popularity = USA_total_votes_pie }
 
 	multiply_variable = { USA_LIB_pie_popularity = 100 }
 	multiply_variable = { USA_CON_pie_popularity = 100 }
@@ -55,16 +83,7 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	multiply_variable = { USA_FUN_pie_popularity = 100 }
 	multiply_variable = { USA_COM_pie_popularity = 100 }
 	multiply_variable = { USA_AUT_pie_popularity = 100 }
-
-	round_variable = USA_LIB_pie_popularity
-	round_variable = USA_CON_pie_popularity
-	round_variable = USA_EGL_pie_popularity
-	round_variable = USA_PER_pie_popularity
-	round_variable = USA_SOC_pie_popularity
-	round_variable = USA_POP_pie_popularity
-	round_variable = USA_FUN_pie_popularity
-	round_variable = USA_COM_pie_popularity
-	round_variable = USA_AUT_pie_popularity
+	multiply_variable = { USA_ANA_pie_popularity = 100 }
 
 	#Sometimes due to rounding it makes it off slightly by 1% or -1%
 
@@ -77,63 +96,67 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	add_to_temp_variable = { USA_total_votes_pie_CHECK = USA_FUN_pie_popularity }
 	add_to_temp_variable = { USA_total_votes_pie_CHECK = USA_COM_pie_popularity }
 	add_to_temp_variable = { USA_total_votes_pie_CHECK = USA_AUT_pie_popularity }
+	add_to_temp_variable = { USA_total_votes_pie_CHECK = USA_ANA_pie_popularity }
 
 	if = {
 		limit = {
-			check_variable = { USA_total_votes_pie_CHECK = 99 }
+			check_variable = { USA_total_votes_pie_CHECK < 100 }
 		}
+		set_temp_variable = { USA_total_votes_pie_CHECK_add = 100 }
+		subtract_from_temp_variable = { USA_total_votes_pie_CHECK_add = USA_total_votes_pie_CHECK }
 		if = {
 			limit = {
 				check_variable = { USA_LIB_pie_popularity > 9 }
 			}
-			add_to_variable = { USA_LIB_pie_popularity = 1 }
+			add_to_variable = { USA_LIB_pie_popularity = USA_total_votes_pie_CHECK_add }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_CON_pie_popularity > 9 }
 			}
-			add_to_variable = { USA_CON_pie_popularity = 1 }
+			add_to_variable = { USA_CON_pie_popularity = USA_total_votes_pie_CHECK_add }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_EGL_pie_popularity > 9 }
 			}
-			add_to_variable = { USA_EGL_pie_popularity = 1 }
+			add_to_variable = { USA_EGL_pie_popularity = USA_total_votes_pie_CHECK_add }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_PER_pie_popularity > 9 }
 			}
-			add_to_variable = { USA_PER_pie_popularity = 1 }
+			add_to_variable = { USA_PER_pie_popularity = USA_total_votes_pie_CHECK_add }
 		}
 	}
 	if = {
 		limit = {
-			check_variable = { USA_total_votes_pie_CHECK = 101 }
+			check_variable = { USA_total_votes_pie_CHECK > 100 }
 		}
+		subtract_from_temp_variable = { USA_total_votes_pie_CHECK = 100 }
 		if = {
 			limit = {
 				check_variable = { USA_LIB_pie_popularity > 9 }
 			}
-			subtract_from_variable = { USA_LIB_pie_popularity = 1 }
+			subtract_from_variable = { USA_LIB_pie_popularity = USA_total_votes_pie_CHECK }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_CON_pie_popularity > 9 }
 			}
-			subtract_from_variable = { USA_CON_pie_popularity = 1 }
+			subtract_from_variable = { USA_CON_pie_popularity = USA_total_votes_pie_CHECK }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_EGL_pie_popularity > 9 }
 			}
-			subtract_from_variable = { USA_EGL_pie_popularity = 1 }
+			subtract_from_variable = { USA_EGL_pie_popularity = USA_total_votes_pie_CHECK }
 		}
 		else_if = {
 			limit = {
 				check_variable = { USA_PER_pie_popularity > 9 }
 			}
-			subtract_from_variable = { USA_PER_pie_popularity = 1 }
+			subtract_from_variable = { USA_PER_pie_popularity = USA_total_votes_pie_CHECK }
 		}
 	}
 
@@ -153,51 +176,7 @@ eoanb_USA_party_popularity_setup_TESTING_DEBUG = {
 	}
 }
 
-eoanb_USA_presidential_election_setup_TESTING_DEBUG = {
-	if = {
-		limit = {
-			has_state_flag = is_free_USA_state
-			NOT = {
-				has_state_flag = is_sub_CAL_USA_state
-				has_state_flag = is_sub_VIR_USA_state
-				has_state_flag = is_sub_MIC_USA_state
-			}
-		}
-		set_temp_variable = { substate_population = 0 }
-
-		set_temp_variable = { temp_LIB_popularity = 100 } #Liberal
-		set_temp_variable = { temp_CON_popularity = 50 } #Conservative
-		set_temp_variable = { temp_EGL_popularity = 10 } #Egalitarian
-		set_temp_variable = { temp_PER_popularity = 1 } #Peripheral
-		set_temp_variable = { temp_SOC_popularity = 0 } #Socialist
-		set_temp_variable = { temp_POP_popularity = 0 } #C Populist
-		set_temp_variable = { temp_FUN_popularity = 0 } #Fundamental
-		set_temp_variable = { temp_COM_popularity = 0 } #Communist
-		set_temp_variable = { temp_AUT_popularity = 0 } #Autocratic
-		set_temp_variable = { temp_ANA_popularity = 0 } #Anarchist
-	}
-	else_if = {
-		limit = {
-			has_state_flag = is_slave_USA_state
-			NOT = {
-				has_state_flag = is_sub_CAL_USA_state
-				has_state_flag = is_sub_VIR_USA_state
-				has_state_flag = is_sub_MIC_USA_state
-			}
-		}
-		set_temp_variable = { substate_population = 0 }
-
-		set_temp_variable = { temp_LIB_popularity = 0 } #Liberal
-		set_temp_variable = { temp_CON_popularity = 50 } #Conservative
-		set_temp_variable = { temp_EGL_popularity = 0 } #Egalitarian
-		set_temp_variable = { temp_PER_popularity = 100 } #Peripheral
-		set_temp_variable = { temp_SOC_popularity = 0 } #Socialist
-		set_temp_variable = { temp_POP_popularity = 0 } #C Populist
-		set_temp_variable = { temp_FUN_popularity = 0 } #Fundamental
-		set_temp_variable = { temp_COM_popularity = 0 } #Communist
-		set_temp_variable = { temp_AUT_popularity = 0 } #Autocratic
-		set_temp_variable = { temp_ANA_popularity = 0 } #Anarchist
-	}
+eoanb_USA_presidential_election = {
 	clr_state_flag = LIB_election_victory
 	clr_state_flag = CON_election_victory
 	clr_state_flag = EGL_election_victory
@@ -220,7 +199,7 @@ eoanb_USA_presidential_election_setup_TESTING_DEBUG = {
 				NOT = { has_state_flag = is_sub_MIC_USA_state }
 			}
 		}
-		eoanb_USA_hold_presidential_election = yes
+		eoanb_USA_hold_presidential_election_vote = yes
 	}
 }
 
@@ -325,7 +304,7 @@ eoanb_USA_afroamerican_vote_count = {
 	log = "[This.GetName] : There are [?afroamerican_population]k African-Americans here"
 }
 
-eoanb_USA_hold_presidential_election = {
+eoanb_USA_hold_presidential_election_vote = {
 	set_temp_variable = { electorate_population = state_population_k }
 	add_to_temp_variable = { electorate_population = substate_population }
 	subtract_from_temp_variable = { electorate_population = afroamerican_population }
@@ -671,7 +650,18 @@ eoanb_USA_hold_presidential_election = {
 		add_to_variable = { total_votes = AUT_total_votes }
 		add_to_variable = { total_votes = ANA_total_votes }
 
-		#Here we declare the winner!
+		add_to_variable = { ROOT.USA_LIB_total_votes = THIS.LIB_total_votes }
+		add_to_variable = { ROOT.USA_CON_total_votes = THIS.CON_total_votes }
+		add_to_variable = { ROOT.USA_EGL_total_votes = THIS.EGL_total_votes }
+		add_to_variable = { ROOT.USA_PER_total_votes = THIS.PER_total_votes }
+		add_to_variable = { ROOT.USA_SOC_total_votes = THIS.SOC_total_votes }
+		add_to_variable = { ROOT.USA_POP_total_votes = THIS.POP_total_votes }
+		add_to_variable = { ROOT.USA_FUN_total_votes = THIS.FUN_total_votes }
+		add_to_variable = { ROOT.USA_COM_total_votes = THIS.COM_total_votes }
+		add_to_variable = { ROOT.USA_AUT_total_votes = THIS.AUT_total_votes }
+		add_to_variable = { ROOT.USA_ANA_total_votes = THIS.ANA_total_votes }
+
+		add_to_variable = { ROOT.USA_total_votes = THIS.total_votes }
 
 		if = {
 			limit = {
@@ -833,28 +823,30 @@ eoanb_USA_hold_presidential_election = {
 			add_to_variable = { ROOT.ANA_electoral_votes = electoral_votes }
 			log = "[This.GetName] : Recieved [?electoral_votes] anarchist electoral votes."
 		}
-
 		log = "[This.GetName] : Voted with [?LIB_total_votes]k liberal votes, making up [?LIB_popularity_percent|%]."
 		log = "[This.GetName] : Voted with [?CON_total_votes]k conservative votes, making up [?CON_popularity_percent|%]."
 		log = "[This.GetName] : Voted with [?EGL_total_votes]k social egalitarian votes, making up [?EGL_popularity_percent|%]."
 		log = "[This.GetName] : Voted with [?PER_total_votes]k periperhal votes, making up [?PER_popularity_percent|%]."
 		log = "[This.GetName] : Total number of votes was [?total_votes]k."
-
-		add_to_variable = { ROOT.USA_LIB_total_votes = THIS.LIB_total_votes }
-		add_to_variable = { ROOT.USA_CON_total_votes = THIS.CON_total_votes }
-		add_to_variable = { ROOT.USA_EGL_total_votes = THIS.EGL_total_votes }
-		add_to_variable = { ROOT.USA_PER_total_votes = THIS.PER_total_votes }
-		add_to_variable = { ROOT.USA_SOC_total_votes = THIS.SOC_total_votes }
-		add_to_variable = { ROOT.USA_POP_total_votes = THIS.POP_total_votes }
-		add_to_variable = { ROOT.USA_FUN_total_votes = THIS.FUN_total_votes }
-		add_to_variable = { ROOT.USA_COM_total_votes = THIS.COM_total_votes }
-		add_to_variable = { ROOT.USA_AUT_total_votes = THIS.AUT_total_votes }
-		add_to_variable = { ROOT.USA_ANA_total_votes = THIS.ANA_total_votes }
-
-		add_to_variable = { ROOT.USA_total_votes = THIS.total_votes }
 	}
 }
-
+eoanb_USA_clean_previous_election = {
+	clear_variable = LIB_electoral_votes
+	clear_variable = CON_electoral_votes
+	clear_variable = EGL_electoral_votes
+	clear_variable = PER_electoral_votes
+	clear_variable = USA_LIB_total_votes
+	clear_variable = USA_CON_total_votes
+	clear_variable = USA_EGL_total_votes
+	clear_variable = USA_PER_total_votes
+	clear_variable = USA_SOC_total_votes
+	clear_variable = USA_POP_total_votes
+	clear_variable = USA_FUN_total_votes
+	clear_variable = USA_COM_total_votes
+	clear_variable = USA_AUT_total_votes
+	clear_variable = USA_ANA_total_votes
+	clear_variable = USA_total_votes
+}
 eoanb_USA_presidential_election_declare_winner = {
 	log = "[This.GetName] : Liberals got [?LIB_electoral_votes] electoral votes. Conservatives got [?CON_electoral_votes] electoral votes."
 	log = "[This.GetName] : Egalitarians got [?EGL_electoral_votes] electoral votes. Peripheral got [?PER_electoral_votes] electoral votes."
@@ -868,4 +860,51 @@ eoanb_USA_allocate_electoral_votes = {
 	round_temp_variable = population_check_temp
 	add_to_variable = { electoral_votes = population_check_temp }
 	add_to_variable = { electoral_votes = 3 }
+}
+
+eoanb_USA_setup_state_political_alignment = {
+	if = {
+		limit = {
+			has_state_flag = is_free_USA_state
+			NOT = {
+				has_state_flag = is_sub_CAL_USA_state
+				has_state_flag = is_sub_VIR_USA_state
+				has_state_flag = is_sub_MIC_USA_state
+			}
+		}
+		set_temp_variable = { substate_population = 0 }
+
+		set_temp_variable = { temp_LIB_popularity = 70 } #Liberal
+		set_temp_variable = { temp_CON_popularity = 50 } #Conservative
+		set_temp_variable = { temp_EGL_popularity = 10 } #Egalitarian
+		set_temp_variable = { temp_PER_popularity = 0 } #Peripheral
+		set_temp_variable = { temp_SOC_popularity = 0 } #Socialist
+		set_temp_variable = { temp_POP_popularity = 30 } #C Populist
+		set_temp_variable = { temp_FUN_popularity = 0 } #Fundamental
+		set_temp_variable = { temp_COM_popularity = 0 } #Communist
+		set_temp_variable = { temp_AUT_popularity = 0 } #Autocratic
+		set_temp_variable = { temp_ANA_popularity = 0 } #Anarchist
+	}
+	else_if = {
+		limit = {
+			has_state_flag = is_slave_USA_state
+			NOT = {
+				has_state_flag = is_sub_CAL_USA_state
+				has_state_flag = is_sub_VIR_USA_state
+				has_state_flag = is_sub_MIC_USA_state
+			}
+		}
+		set_temp_variable = { substate_population = 0 }
+
+		set_temp_variable = { temp_LIB_popularity = 0 } #Liberal
+		set_temp_variable = { temp_CON_popularity = 50 } #Conservative
+		set_temp_variable = { temp_EGL_popularity = 0 } #Egalitarian
+		set_temp_variable = { temp_PER_popularity = 70 } #Peripheral
+		set_temp_variable = { temp_SOC_popularity = 0 } #Socialist
+		set_temp_variable = { temp_POP_popularity = 30 } #C Populist
+		set_temp_variable = { temp_FUN_popularity = 0 } #Fundamental
+		set_temp_variable = { temp_COM_popularity = 0 } #Communist
+		set_temp_variable = { temp_AUT_popularity = 0 } #Autocratic
+		set_temp_variable = { temp_ANA_popularity = 0 } #Anarchist
+	}
 }
