@@ -1430,10 +1430,12 @@ ITA_decisions_category_wars_and_conflicts = {
 					}
 					country_event = {
 						id = austria.526
-					}					#Event enabling Austrian post-war victory content
+					}
+					#Event enabling Austrian post-war victory content
 					country_event = {
 						id = risorgimento.48
-					}					#House of Savoy Flees
+					}
+					#House of Savoy Flees
 					hidden_effect = {
 						set_country_flag = AUS_triumph_in_italy_flag
 						mark_focus_tree_layout_dirty = yes
@@ -1907,10 +1909,12 @@ ITA_decisions_category_wars_and_conflicts = {
 						}
 						country_event = {
 							id = austria.526
-						}						#Event enabling Austrian post-war victory content
+						}
+						#Event enabling Austrian post-war victory content
 						country_event = {
 							id = risorgimento.48
-						}						#House of Savoy Flees
+						}
+						#House of Savoy Flees
 						hidden_effect = {
 							set_country_flag = AUS_triumph_in_italy_flag
 							mark_focus_tree_layout_dirty = yes
@@ -2223,6 +2227,132 @@ ITA_decisions_category_wars_and_conflicts = {
 				PIE = {
 					#transfer_state = 161
 					transfer_state = 157
+				}
+			}
+		}
+	}
+	ITA_War_Mission_PAP_Rome = {
+		allowed = {
+			always = no
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 200
+		available = {
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = ITA_Rome_victory_conditions_PAP_tt1
+					# Victory Condition for Sardinia
+					tag = ITA #Probably PIE though
+					OR = {
+						2 = {
+							is_controlled_by = ITA
+						}
+						PAP = {
+							surrender_progress > 0.5
+						}
+						ITA = {
+							controls_province = 9904 #Rome
+						}
+						
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = ITA_Rome_victory_conditions_PAP_tt2
+					# Victory Condition for Papal States
+					tag = PAP
+					ITA = {
+						surrender_progress > 0.6
+					}
+				}
+			}
+		}
+		complete_effect = {
+			if = {
+				limit = {
+					tag = ITA #Probably PIE though
+					OR = {
+						2 = {
+							is_controlled_by = ITA
+						}
+						PAP = {
+							surrender_progress > 0.5
+						}
+						ITA = {
+							controls_province = 9904 #Rome
+						}
+						
+					}
+				}
+				# Peace Treaty Event 
+				ITA = {
+					transfer_state = 2
+					add_state_core = 2
+					diplomatic_relation = {
+						country = PAP
+						relation = guarantee
+						active = yes
+					}
+					news_event = {
+						id = ita.904
+					}
+					set_temp_variable = {
+						eoanb_prestige_change = 3
+					}
+					eoanb_change_prestige_score = yes
+				}
+			}
+			if = {
+				limit = {
+					tag = PAP
+					PIE = {
+						surrender_progress > 0.6
+					}
+				}
+				PAP = {
+					white_peace = ITA
+					# Eventually maybe reconquer some land?
+				}
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							tag = ITA
+							has_war_with = PAP
+						}
+						AND = {
+							tag = PAP
+							has_war_with = ITA
+						}
+					}
+					date < 1864.12.1
+				}
+				activate_mission = ITA_War_Mission_PAP_Rome
+			}
+			else_if = {
+				limit = {
+					date > 1864.12.1
+				}
+				ITA = {
+					transfer_state = 2
+					add_state_core = 2
+					diplomatic_relation = {
+						country = PAP
+						relation = guarantee
+						active = yes
+					}
+					news_event = {
+						id = ita.904
+					}
+					set_temp_variable = {
+						eoanb_prestige_change = 3
+					}
+					eoanb_change_prestige_score = yes
 				}
 			}
 		}
@@ -4118,6 +4248,7 @@ ITA_decisions_category_TUS_liberalizing_tuscany = {
 		}
 	}
 }
+
 ITA_decisions_category_ITA_legislative_actions = {
 	ITA_PIE_legislative_rattazzi_losing_confidence = {
 		allowed = {
@@ -4133,7 +4264,6 @@ ITA_decisions_category_ITA_legislative_actions = {
 		days_mission_timeout = 120
 		selectable_mission = yes
 		complete_effect = {
-
 		}
 		timeout_effect = {
 			country_event = {
@@ -4142,6 +4272,7 @@ ITA_decisions_category_ITA_legislative_actions = {
 		}
 	}
 }
+
 ITA_decisions_category_PIE_legislative_actions = {
 	ITA_PIE_legislative_alessandria_barracks = {
 		allowed = {
@@ -4414,7 +4545,6 @@ ITA_decisions_category_PIE_diplomatic_endeavors = {
 				has_completed_focus = PIE_Political_Structure_Planning_FT
 				has_country_flag = is_literally_italy
 			}
-			
 		}
 		icon = ENG
 		fire_only_once = yes
@@ -4532,7 +4662,6 @@ ITA_decisions_category_PIE_diplomatic_endeavors = {
 			has_completed_focus = ITA_PIE_focus_Build_Recognition_in_Europe
 		}
 		available = {
-			
 		}
 		icon = FRA
 		fire_only_once = yes
@@ -4570,21 +4699,46 @@ ITA_decisions_category_PIE_diplomatic_endeavors = {
 		remove_effect = {
 			### papal states transfered, cores gained
 			effect_tooltip = {
-				ITA = {
-					transfer_state = 2
-					add_state_core = 2
-					diplomatic_relation = {
-						country = PAP
-						relation = guarantee
-						active = yes
+				if = {
+					limit = {
+						PAP = {
+							has_country_flag = PAP_Decline_Italian_Proposal_FRA
+						}
+					}
+					PAP = {
+						country_event = {
+							id = ita.81
+						}
 					}
 				}
-				### PAP_Decline_Italian_Proposal_FRA = Check
+				else = {
+					ITA = {
+						transfer_state = 2
+						add_state_core = 2
+						diplomatic_relation = {
+							country = PAP
+							relation = guarantee
+							active = yes
+						}
+					}
+				}
 			}
 			hidden_effect = {
 				if = {
 					limit = {
 						tag = ITA
+						NOT = {
+							PAP = {
+								has_country_flag = PAP_Decline_Italian_Proposal_FRA
+							}
+						}
+					}
+					FRA = {
+						diplomatic_relation = {
+							country = PAP
+							relation = guarantee
+							active = no
+						}
 					}
 					ITA = {
 						transfer_state = 2
@@ -4597,11 +4751,32 @@ ITA_decisions_category_PIE_diplomatic_endeavors = {
 						news_event = {
 							id = ita.904
 						}
-						set_temp_variable = { eoanb_prestige_change = 3 }
+						set_temp_variable = {
+							eoanb_prestige_change = 3
+						}
 						eoanb_change_prestige_score = yes
 					}
 				}
-				### Eventually Check for it Papal States Said no!
+				else_if = {
+					limit = {
+						tag = ITA
+						PAP = {
+							has_country_flag = PAP_Decline_Italian_Proposal_FRA
+						}
+					}
+					FRA = {
+						diplomatic_relation = {
+							country = PAP
+							relation = guarantee
+							active = no
+						}
+					}
+					PAP = {
+						country_event = {
+							id = ita.81
+						}
+					}
+				}
 			}
 		}
 	}
