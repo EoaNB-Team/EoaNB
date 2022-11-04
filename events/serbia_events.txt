@@ -14,13 +14,16 @@ add_namespace = SER_politics
 
 		option = {
 			name = SER_politics.1.a
-			set_power_balance = {
-				id = SER_Balance_of_Power
-				left_side = SER_BOP_Karadjordjevic_Strength
-				right_side = SER_BOP_Obrenovic_Strength
-				set_value = 0
+			custom_effect_tooltip = SER_bop_tt
+			hidden_effect = {
+				set_power_balance = {
+					id = SER_Balance_of_Power
+					left_side = SER_BOP_Karadjordjevic_Strength
+					right_side = SER_BOP_Obrenovic_Strength
+					set_value = 0
+				}
+				activate_mission = SER_mission_the_saint_adrews_assembly
 			}
-			activate_mission = SER_mission_the_saint_adrews_assembly
 		}
 	}
 
@@ -41,9 +44,12 @@ add_namespace = SER_politics
 				ideology = centrism
 				popularity = 0.05
 			}
-			set_temp_variable = { political_legitimacy_change = 0.05 }
+			set_temp_variable = { political_legitimacy_change = -0.05 }
 			eoanb_political_legitimacy_change = yes
-			
+			add_power_balance_value = {
+				id = SER_Balance_of_Power
+				value = 0.1
+			}
 			hidden_effect = {
 				country_event = {
 					id = SER_politics.3 #idea of parlamentiarism
@@ -60,9 +66,12 @@ add_namespace = SER_politics
 				ideology = ROOT
 				popularity = 0.05
 			}
-			set_temp_variable = { political_legitimacy_change = -0.05 }
+			set_temp_variable = { political_legitimacy_change = 0.05 }
 			eoanb_political_legitimacy_change = yes
-			
+			add_power_balance_value = {
+				id = SER_Balance_of_Power
+				value = -0.1
+			}
 			hidden_effect = {
 				country_event = {
 					id = SER_politics.6 #turmoil forms in liberal formation
@@ -97,6 +106,10 @@ add_namespace = SER_politics
 			}
 			add_stability = 0.02
 			add_war_support = -0.05
+			add_power_balance_value = {
+				id = SER_Balance_of_Power
+				value = 0.05
+			}
 		}
 	}
 
@@ -111,24 +124,85 @@ add_namespace = SER_politics
 
 		option = {
 			name = SER_politics.4.a
-
 			add_political_power = 25
-			
-			if = {
-				limit = {
-					check_variable = {
-						political_legitimacy < 0.5
+			custom_effect_tooltip = SER_faction_outcome_tt
+			hidden_effect = {
+				if = {
+					limit = {
+						power_balance_value = {
+							id = SER_Balance_of_Power
+							value < -0.14
+						}
+					}
+					country_event = {id = SER_politics.50}
+				}
+				
+				else_if = {
+					limit = {
+						power_balance_value = {
+							id = SER_Balance_of_Power
+							value > 0.14
+						}
+					}
+					country_event = {id = SER_politics.51}
+				}
+				else = {
+					add_stability = -0.05
+					add_political_power = -100
+					random_list = {
+						50 = {
+							country_event = {id = SER_politics.50}
+						}
+						50 = {
+							country_event = {id = SER_politics.51}
+						}
 					}
 				}
-				set_country_flag = SER_karadjordjevic_dynasty
-			}
-			
-			else = {
-				set_country_flag = SER_obrenovic_dynasty
 			}
 		}
 	}
+	country_event = {
+		id = SER_politics.50 #Karadjordjevic Dyansty Won
+		title = SER_politics.50.t
+		desc = SER_politics.50.d
+		picture = lorem_ipsum
 
+			fire_only_once = yes
+
+			is_triggered_only = yes
+
+		option = {
+			name = SER_politics.51.a
+			ai_chance = {
+				factor = 50
+			}
+			set_country_flag = SER_karadjordjevic_dynasty
+			remove_power_balance = {
+				id = SER_Balance_of_Power
+			}
+		}
+	}
+	country_event = {
+		id = SER_politics.51 #Obrenovic Dynasty Won
+		title = SER_politics.51.t
+		desc = SER_politics.51.d
+		picture = lorem_ipsum
+
+			fire_only_once = yes
+
+			is_triggered_only = yes
+
+		option = {
+			name = SER_politics.51.a
+			ai_chance = {
+				factor = 50
+			}
+			set_country_flag = SER_obrenovic_dynasty
+			remove_power_balance = {
+				id = SER_Balance_of_Power
+			}
+		}
+	}
 	country_event = {
 		id = SER_politics.5 # second reign of milos obrenovic
 		title = SER_politics.5.t
@@ -174,6 +248,10 @@ add_namespace = SER_politics
 			add_popularity = {
 				ideology = centrism
 				popularity = -0.1
+			}
+			add_power_balance_value = {
+				id = SER_Balance_of_Power
+				value = -0.05
 			}
 			add_stability = -0.05
 		}
@@ -972,6 +1050,7 @@ country_event = {
 			add_stability = -0.02
 	}
 }
+
 
 ### NEEDS LOCALISATION ###
 ### PREVIOUS NAMESPACE WAS bankrupcy ###
