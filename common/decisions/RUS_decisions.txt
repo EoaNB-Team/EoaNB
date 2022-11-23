@@ -3462,6 +3462,45 @@ RUS_Industrialisation_decisions = {
 			base = 100
 		}
 	}
+	
+	#Hughesovka
+	RUS_decision_hughesovka = {
+
+		#icon = textile
+		
+		#allowed = { tag = RUS }
+
+		available = {
+			has_completed_focus = RUS_vic_urban_reform
+			RUS_john_hughes = { is_advisor = yes }
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+
+		days_remove = 120
+		
+		modifier = {
+			
+		}
+		
+		complete_effect = {
+			
+		}
+
+		remove_effect = {
+			country_event = rossiya.512
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
 }
 
 RUS_Caucasian_decisions = {
@@ -9243,6 +9282,380 @@ RUS_decision_category_education_reform = {
 		remove_effect = {
 			hidden_effect = {
 				clr_country_flag = RUS_education_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+}
+
+RUS_decision_category_fiscal_reform = {
+
+	#Avoid Bankruptcy
+	RUS_mission_avoid_bankruptcy = {
+
+		icon = money
+
+		allowed = { always = no }
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_mission_avoid_bankruptcy_trigger_tt
+				hidden_trigger = {
+					check_variable = { ROOT.debt_level > 49 }
+					has_country_flag = debt_declared_bankruptcy_flag
+				}
+			}
+		}
+		
+		activation = { always = no }
+		
+		priority = 50
+		
+		fire_only_once = no
+		
+		is_good = yes
+		
+		days_mission_timeout = 3650
+
+        timeout_effect = {
+			increase_ps_by_one = yes
+			add_political_power = 250
+			add_stability = 0.15
+			add_war_support = 0.15
+        }
+
+        complete_effect = {
+            decrease_ps_by_two = yes
+			add_political_power = -250
+			add_stability = -0.15
+			add_war_support = -0.15
+        }
+
+        ai_will_do = {
+			base = 2000
+		}
+    }
+	
+	#Make Debt Repayment
+	RUS_decision_debt_repayments = {
+		
+		icon = money
+		
+		available = {
+			num_of_civilian_factories_available_for_projects > 0
+		}
+
+		visible = {
+			has_idea = egy_vic_debt
+			check_variable = { ROOT.debt_level > 0 }
+			NOT = { has_country_flag = paying_debt }
+			NOT = { has_country_flag = debt_free_flag }
+			NOT = { has_country_flag = debt_declared_bankruptcy_flag }
+		}
+
+		fire_only_once = no
+
+		cost = 10
+		
+		complete_effect = {
+			activate_mission = AUS_mission_paying_debt
+			custom_effect_tooltip = AUS_decision_debt_repayments_effect_tt
+			add_ideas = AUS_idea_debt_repayments
+			hidden_effect = {
+				AUS_calculate_debt_time = yes
+				set_country_flag = paying_debt
+			}
+		}
+
+		ai_will_do = {
+			base = 500
+		}
+	}
+	
+	#Made Debt Repayment
+	RUS_decision_debt_repayments_done = {
+	
+		icon = money
+		
+		visible = { always = no }
+		
+		fire_only_once = no
+		
+		complete_effect = {
+			hidden_effect = {
+				if = {
+					limit = {
+						has_country_flag = paying_debt
+					}
+					clr_country_flag = paying_debt
+				}
+				if = {
+					limit = {
+						has_idea = AUS_idea_debt_repayments 
+					}
+					remove_ideas = AUS_idea_debt_repayments
+				}
+			}
+			if = {
+				limit = { 
+					check_variable = { debt_level = 0 }
+				}
+				country_event = { id = austria.902 }
+			}
+			else = {
+				country_event = { id = austria.903 }
+			}
+		}
+	}
+	
+	#Repaying Debt
+	RUS_mission_paying_debt = {
+		
+		icon = money
+		
+		allowed = { always = no }
+		
+		available = {
+			hidden_trigger = { always = no }
+		}
+		
+		activation = { always = no }
+		
+		days_mission_timeout = 180
+		
+		cancel_trigger = {
+			hidden_trigger = { 
+				OR = {
+					has_country_flag = debt_declared_bankruptcy_flag
+					has_country_flag = debt_free_flag
+				}
+			}
+		}
+		
+		is_good = yes
+		
+		timeout_effect = {
+			debt_level_decrease_by_1 = yes
+			hidden_effect = {
+				activate_decision = AUS_decision_debt_repayments_done
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Cancellation of the Poll Tribute
+	RUS_decision_poll_tribute = {
+
+		icon = constitution
+
+		#allowed = { tag = RUS }
+
+		available = {
+			NOT = { has_country_flag = RUS_fiscal_reform_ongoing_flag }
+			has_completed_focus = RUS_vic_state_bank
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+
+		cost = 50 
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			
+		}
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#Transparency in The Economy
+	RUS_decision_transparency_economy = {
+
+		icon = constitution
+
+		#allowed = { tag = RUS }
+
+		available = {
+			NOT = { has_country_flag = RUS_fiscal_reform_ongoing_flag }
+			has_completed_focus = RUS_vic_state_bank
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+
+		cost = 50 
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			
+		}
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#Modern Taxation
+	RUS_decision_modern_taxation = {
+
+		icon = constitution
+
+		#allowed = { tag = RUS }
+
+		available = {
+			NOT = { has_country_flag = RUS_fiscal_reform_ongoing_flag }
+			has_completed_focus = RUS_vic_state_bank
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+
+		cost = 50 
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			
+		}
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#The beginnings of redemption operations
+	RUS_decision_redemption_operations = {
+
+		icon = constitution
+
+		#allowed = { tag = RUS }
+
+		available = {
+			NOT = { has_country_flag = RUS_fiscal_reform_ongoing_flag }
+			has_completed_focus = RUS_vic_state_bank
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+
+		cost = 50 
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			
+		}
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#Creation of the main redemption institution
+	RUS_decision_redemption_institutions = {
+
+		icon = constitution
+
+		#allowed = { tag = RUS }
+
+		available = {
+			NOT = { has_country_flag = RUS_fiscal_reform_ongoing_flag }
+			has_completed_focus = RUS_vic_state_bank
+		}
+
+		visible = {
+			
+		}
+
+		fire_only_once = yes
+
+		cost = 50 
+		
+		days_remove = 30
+		
+		cancel_trigger = {
+			
+		}
+		
+		complete_effect = {
+			hidden_effect = {
+				set_country_flag = RUS_fiscal_reform_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = RUS_fiscal_reform_ongoing_flag
 			}
 		}
 
