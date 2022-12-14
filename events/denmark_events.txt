@@ -375,7 +375,7 @@ country_event = {
 	option = {
 		name = denmark.202.a
 		ai_chance = { base = 100 }
-		add_war_support = 0.01
+		add_war_support = 0.03
 	}
 }
 
@@ -396,7 +396,7 @@ country_event = {
 			}
 			random_list = {
 				10 = {
-					set_country_flag = DEN_1858_elections_leftist_victorious_flag
+					set_country_flag = DEN_1858_elections_social_liberals_victorious_flag
 				}
 				35 = {
 					set_country_flag = DEN_1858_elections_liberals_victorious_flag
@@ -413,7 +413,7 @@ country_event = {
 	}
 }
 
-#The 1858 Folketing Elections - Results
+#The 1858 Folketing Elections - Results (June 1858)
 country_event = {
 	id = denmark.204
 	title = denmark.204.t
@@ -429,9 +429,9 @@ country_event = {
 	desc = {
 		trigger = {
 			is_historical_focus_on = no
-			has_country_flag = DEN_1858_elections_leftist_victorious_flag
+			has_country_flag = DEN_1858_elections_social_liberals_victorious_flag
 		}
-		text = denmark.204.d_althistory_leftist
+		text = denmark.204.d_althistory_social_liberals
 	}
 	desc = {
 		trigger = {
@@ -475,7 +475,7 @@ country_event = {
 		}
 		else_if = {
 			limit = {
-				has_country_flag = DEN_1858_elections_leftist_victorious_flag
+				has_country_flag = DEN_1858_elections_social_liberals_victorious_flag
 			}
 			set_popularities = {
 				social_egalitarianism = 40
@@ -504,7 +504,7 @@ country_event = {
 			}
 		}
 		hidden_effect = {
-			clr_country_flag = DEN_1858_elections_leftist_victorious_flag
+			clr_country_flag = DEN_1858_elections_social_liberals_victorious_flag
 			clr_country_flag = DEN_1858_elections_liberals_victorious_flag
 			clr_country_flag = DEN_1858_elections_conservatives_victorious_flag
 			clr_country_flag = DEN_1858_elections_historical_flag
@@ -513,7 +513,7 @@ country_event = {
 	}
 }
 
-#The Leftist Government
+#The Social Liberal Government
 country_event = {
 	id = denmark.205
 	title = denmark.205.t
@@ -698,6 +698,233 @@ country_event = {
 		remove_country_leader_role = {
 			character = DEN_interim_government
 			ideology = ideology_sub_social_liberal
+		}
+	}
+}
+
+#The Social Liberal Government Fails to Gain Sufficient Support
+country_event = {
+	id = denmark.212
+	title = denmark.212.t
+	desc = denmark.212.d
+		
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = denmark.212.a
+		ai_chance = { base = 100 }
+		add_stability = -0.1
+		decrease_ps_by_two = yes
+		add_popularity = { ideology = ideology_social_liberalism popularity = -0.15 }
+		DEN_interim_government = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_GENERIC_INTERIM_EOANB_DESC"
+					ideology = ideology_sub_social_liberal
+					expire = "1931.1.1"
+					#id = -1
+				}
+			}
+		}
+		remove_country_leader_role = {
+			character = DEN_jens_andersen_hansen
+			ideology = ideology_sub_social_liberal
+		}
+		if = {
+			limit = {
+				has_idea = DEN_anton_frederik_tscherning
+			}
+			remove_ideas = DEN_anton_frederik_tscherning
+		}
+		if = {
+			limit = {
+				has_idea = DEN_advisor_jens_andersen_hansen
+			}
+			remove_ideas = DEN_advisor_jens_andersen_hansen
+		}
+		hidden_effect = {
+			country_event = { id = denmark.213 days = 55 }
+		}
+	}
+}
+
+#Calculating Folketing Re-Election after Social Liberals' Failure (Hidden)
+country_event = {
+	id = denmark.213
+	title = denmark.213.t
+	desc = denmark.213.d
+		
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+	
+	immediate = {
+		random_list = {
+			45 = {
+				set_country_flag = DEN_reelections_national_liberals_victorious_flag
+			}
+			35 = {
+				set_country_flag = DEN_reelections_conservatives_victorious_flag
+			}
+			20 = {
+				set_country_flag = DEN_reelections_tied_flag
+			}
+		}
+		country_event = { id = denmark.214 days = 1 }
+	}
+}
+
+#Folketing Re-Elections - Results
+country_event = {
+	id = denmark.214
+	title = denmark.214.t
+	desc = denmark.214.d
+		
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	immediate = {
+		hidden_effect = {
+			unlock_national_focus = DEN_focus_the_1861_elections
+		}
+	}
+	
+	#The National Liberals are Victorious
+	option = {
+		name = denmark.214.a
+		ai_chance = { base = 100 }
+		trigger = {	has_country_flag = DEN_reelections_national_liberals_victorious_flag }
+		add_popularity = { ideology = centrism popularity = 0.15 }
+		add_popularity = { ideology = traditional_conservatism popularity = 0.03 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = -0.02 }
+		set_politics = { ruling_party = centrism elections_allowed = yes election_frequency = 36 }
+		DEN_carl_christian_hall = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "DEN_CARL_CHRISTIAN_HALL_LEADER_DESC"
+					ideology = market_liberal
+					expire = "1931.1.1"
+					#id = -1
+				}
+			}
+		}
+		remove_country_leader_role = {
+			character = DEN_interim_government
+			ideology = ideology_sub_social_liberal
+		}
+		hidden_effect = {
+			clr_country_flag = DEN_reelections_national_liberals_victorious_flag
+			compute_national_vote = yes
+		}
+	}
+	
+	#The Conservatives are Victorious
+	option = {
+		name = denmark.214.b
+		ai_chance = { base = 100 }
+		trigger = {	has_country_flag = DEN_reelections_conservatives_victorious_flag }
+		add_popularity = { ideology = traditional_conservatism popularity = 0.15 }
+		add_popularity = { ideology = centrism popularity = 0.03 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = -0.02 }
+		set_politics = { ruling_party = traditional_conservatism elections_allowed = yes election_frequency = 36 }
+		DEN_christian_albrecht_bluhme = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_GENERIC_EOANB_DESC"
+					ideology = conserv
+					expire = "1867.1.1"
+					#id = -1
+				}
+			}
+		}
+		remove_country_leader_role = {
+			character = DEN_interim_government
+			ideology = ideology_sub_social_liberal
+		}
+		hidden_effect = {
+			clr_country_flag = DEN_reelections_conservatives_victorious_flag
+			compute_national_vote = yes
+		}
+	}
+	
+	#It's a close call...
+	option = {
+		name = denmark.214.c
+		ai_chance = { base = 100 }
+		trigger = {	has_country_flag = DEN_reelections_tied_flag }
+		add_popularity = { ideology = centrism popularity = 0.08 }
+		add_popularity = { ideology = traditional_conservatism popularity = 0.1 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = -0.02 }
+		country_event = { id = denmark.215 days = 5 }
+		hidden_effect = {
+			clr_country_flag = DEN_reelections_tied_flag
+			compute_national_vote = yes
+		}
+	}
+}
+
+#Who Should Lead the New Government?
+country_event = {
+	id = denmark.215
+	title = denmark.215.t
+	desc = denmark.215.d
+		
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#The National Liberals
+	option = {
+		name = denmark.215.a
+		ai_chance = { base = 90 }
+		add_popularity = { ideology = centrism popularity = 0.02 }
+		set_politics = { ruling_party = centrism elections_allowed = yes election_frequency = 36 }
+		DEN_carl_christian_hall = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "DEN_CARL_CHRISTIAN_HALL_LEADER_DESC"
+					ideology = market_liberal
+					expire = "1931.1.1"
+					#id = -1
+				}
+			}
+		}
+		remove_country_leader_role = {
+			character = DEN_interim_government
+			ideology = ideology_sub_social_liberal
+		}
+		hidden_effect = {
+			compute_national_vote = yes
+		}
+	}
+	
+	#The Conservatives
+	option = {
+		name = denmark.215.b
+		ai_chance = { base = 10 }
+		add_popularity = { ideology = traditional_conservatism popularity = 0.03 }
+		set_politics = { ruling_party = traditional_conservatism elections_allowed = yes election_frequency = 36 }
+		DEN_christian_albrecht_bluhme = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					desc = "POLITICS_GENERIC_EOANB_DESC"
+					ideology = conserv
+					expire = "1867.1.1"
+					#id = -1
+				}
+			}
+		}
+		remove_country_leader_role = {
+			character = DEN_interim_government
+			ideology = ideology_sub_social_liberal
+		}
+		hidden_effect = {
+			compute_national_vote = yes
 		}
 	}
 }
