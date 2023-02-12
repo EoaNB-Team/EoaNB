@@ -68,6 +68,7 @@ eastern_crisis_decision_category =	{
 					}
 				}
 			}
+			clr_global_flag = eastern_crisis_herzegovina_uprising_flag
 		}
 		
 		timeout_effect = {
@@ -99,6 +100,7 @@ eastern_crisis_decision_category =	{
 					puppet = HRZ
 				}
 			}
+			clr_global_flag = eastern_crisis_herzegovina_uprising_flag
 		}
 	}
 	
@@ -246,34 +248,87 @@ eastern_crisis_decision_category =	{
 		}
 
 		available = {
-			HRZ = {
-				exists = yes
-				has_war_with = OTO
+			has_war_support > 0.4
+			custom_trigger_tooltip = {
+				tooltip = eastern_crisis_decision_bosnia_military_operation_trigger_tt
+				hidden_trigger = {
+					NOT = {
+						check_variable = { ROOT.debt_level > 49 }
+						has_country_flag = debt_declared_bankruptcy_flag
+					}
+				}
 			}
 		}
 
 		visible = {
-			has_global_flag = eastern_crisis_herzegovina_uprising_flag
+			NOT = { has_global_flag = eastern_crisis_herzegovina_uprising_flag }
 			has_country_flag = AUS_international_units_in_bosnia_flag
 			has_country_flag = AUS_croatian_refugee_crisis_flag
 		}
 		
 		fire_only_once = yes
 		
-		cost = 50
+		cost = 100
 		
-		days_remove = 90
+		days_remove = 60
 
 		modifier = {
 			political_power_gain = -0.1
-			consumer_goods_factor = 0.05
-		}
-		
-		complete_effect = {
-			
+			consumer_goods_factor = 0.1
 		}
 		
 		remove_effect = {
+			country_event = { id = eastern_crisis.12 }
+			if = {
+				limit = {
+					HRZ = {
+						exists = yes
+						is_puppet_of = OTO
+					}
+				}
+				declare_war_on = {
+					target = HRZ
+					type = annex_everything
+				}
+			}
+			else_if = {
+				limit = {
+					OTO = {
+						owns_state = 104
+						owns_state = 1205
+						owns_state = 1207
+						owns_state = 1208
+						owns_state = 1272
+					}
+				}
+				declare_war_on = {
+					target = OTO
+					type = annex_everything
+				}
+			}
+			else = {
+				every_other_country = {
+					limit = {
+						OR = {
+							owns_state = 104
+							owns_state = 1205
+							owns_state = 1207
+							owns_state = 1208
+							owns_state = 1272
+						}
+					}
+					AUS = {
+						declare_war_on = {
+							target = PREV
+							type = annex_everything
+						}
+						hidden_effect = {
+							PREV = { activate_mission = eastern_crisis_mission_austrian_occupation_of_bosnia }
+						}
+					}
+				}
+			}
+			activate_mission = eastern_crisis_mission_austrian_occupation_of_bosnia
 			hidden_effect = {
 				clr_country_flag = AUS_international_units_in_bosnia_flag
 				clr_country_flag = AUS_croatian_refugee_crisis_flag
@@ -282,6 +337,111 @@ eastern_crisis_decision_category =	{
 		
 		ai_will_do = {
 			base = 1000
+		}
+	}
+	
+	#The Austrian Occupation of Bosnia
+	eastern_crisis_mission_austrian_occupation_of_bosnia = {
+		
+		icon = generic_ignite_civil_war
+		
+		allowed = { always = no }
+		
+		available = {
+			if = {
+				limit = {
+					tag = AUS
+				}
+				### What they need to control
+				has_full_control_of_state = 104
+				has_full_control_of_state = 1205
+				has_full_control_of_state = 1207
+				has_full_control_of_state = 1208
+				has_full_control_of_state = 1272
+			}
+			if = {
+				limit = {
+					NOT = { tag = AUS }
+				}
+				AUS = {
+					surrender_progress > 0.2
+				}
+			}
+		}
+		
+		activation = { always = no }
+		
+		priority = 80
+		
+		is_good = no
+		
+		days_mission_timeout = 150
+		
+		complete_effect = {
+			if = {
+				limit = {
+					tag = AUS
+				}
+				country_event = { id = eastern_crisis.16 }
+				HRZ = {
+					transfer_state = 104
+					transfer_state = 1205
+					transfer_state = 1207
+					transfer_state = 1208
+					transfer_state = 1272
+				}
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = HRZ
+						autonomous_state = autonomy_supervised_state
+						freedom_level = 0.5
+					}
+				}
+				else = {
+					puppet = HRZ
+				}
+				hidden_effect = {
+					white_peace = ENG
+					white_peace = HRZ
+					white_peace = OTO
+				}
+			}
+			if = {
+				limit = {
+					NOT = { tag = AUS }
+				}
+				country_event = { id = eastern_crisis.18 }
+				AUS = { country_event = { id = eastern_crisis.18 } }
+				white_peace = AUS
+			}
+		}
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = AUS
+				}
+				country_event = { id = eastern_crisis.20 }
+				hidden_effect = {
+					white_peace = ENG
+					white_peace = HRZ
+					white_peace = OTO
+				}
+			}
+			if = {
+				limit = {
+					NOT { tag = AUS }
+				}
+				country_event = { id = eastern_crisis.20 }
+				white_peace = AUS
+			}
 		}
 	}
 	
