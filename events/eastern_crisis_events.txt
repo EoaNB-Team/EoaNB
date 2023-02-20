@@ -2148,14 +2148,19 @@ country_event = {
 	picture = GFX_report_event_constantinople_conference
 	
 	is_triggered_only = yes
-		
-	option = {
-		name = eastern_crisis.413.a
+	
+	timeout_days = 7
+	
+	immediate = {
 		hidden_effect = {
+			set_country_flag = eastern_crisis_constantinople_conference_flag
 			if = {
 				limit = {
 					tag = AUS
 				}
+				set_variable = { var = eastern_crisis_cc_status_quo value = 0 }
+				set_variable = { var = eastern_crisis_cc_russian_plan value = 0 }
+				set_variable = { var = eastern_crisis_cc_austrian_plan value = 0 }
 				PRS = { country_event = { id = eastern_crisis.413 } }
 				RUS = { country_event = { id = eastern_crisis.413 } }
 				ENG = { country_event = { id = eastern_crisis.413 } }
@@ -2166,7 +2171,422 @@ country_event = {
 					}
 					country_event = { id = eastern_crisis.413 }
 				}
+				OTO = { country_event = { id = eastern_crisis.413 } }
+				country_event = { id = eastern_crisis.415 days = 14 }
 			}
+		}
+	}
+	
+	#Status quo
+	option = {
+		name = eastern_crisis.413.a
+		trigger = {
+			NOT = { tag = OTO }
+		}
+		ai_chance = {
+			base = 10
+			modifier = {
+				factor = 0
+				OR = {
+					is_historical_focus_on = yes
+					tag = AUS
+					tag = RUS
+				}
+			}
+		}
+		add_political_power = -10
+		hidden_effect = {
+			AUS = { add_to_variable = { var = eastern_crisis_cc_status_quo value = 1 } }
+		}
+	}
+	
+	#Russian plan
+	option = {
+		name = eastern_crisis.413.b
+		trigger = {
+			NOT = { tag = OTO }
+		}
+		ai_chance = {
+			base = 30
+			modifier = {
+				factor = 0
+				OR = {
+					AND = {
+						is_historical_focus_on = yes
+						OR = {
+							tag = ENG
+							tag = PRS
+						}
+					}
+					tag = AUS
+				}
+			}
+		}
+		add_political_power = 10
+		if = {
+			limit = {
+				NOT = { tag = RUS }
+			}
+			add_opinion_modifier = { target = RUS modifier = om_supports_reform_plan }
+			reverse_add_opinion_modifier = { target = RUS modifier = om_supports_reform_plan }
+		}
+		hidden_effect = {
+			AUS = { add_to_variable = { var = eastern_crisis_cc_russian_plan value = 1 } }
+		}
+	}
+	
+	#Austro-Hungarian plan
+	option = {
+		name = eastern_crisis.413.c
+		trigger = {
+			NOT = { tag = OTO }
+		}
+		ai_chance = {
+			base = 60
+			modifier = {
+				factor = 0
+				tag = RUS
+			}
+		}
+		add_political_power = 10
+		if = {
+			limit = {
+				NOT = { tag = AUS }
+			}
+			add_opinion_modifier = { target = AUS modifier = om_supports_reform_plan }
+			reverse_add_opinion_modifier = { target = AUS modifier = om_supports_reform_plan }
+		}
+		hidden_effect = {
+			AUS = { add_to_variable = { var = eastern_crisis_cc_austrian_plan value = 1 } }
+		}
+	}
+	
+	#Ottoman option
+	option = {
+		name = eastern_crisis.413.e
+		trigger = {
+			tag = OTO
+		}
+		add_political_power = -50
+		add_stability = -0.03
+		hidden_effect = {
+			news_event = { id = eastern_crisis.414 days = 1 }
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+}
+
+#The Constantinople Conference (December 1876-January 1877)
+news_event = {
+	id = eastern_crisis.414
+	title = eastern_crisis.414.t
+	desc = eastern_crisis.414.d
+	picture = GFX_news_event_constantinople_conference
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.414.a
+	}
+}
+
+#Hidden Event to Calculate Majority
+country_event = {
+	id = eastern_crisis.415
+	title = eastern_crisis.415.t
+	
+	fire_only_once = yes
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					AND = {
+						check_variable = { eastern_crisis_cc_status_quo > eastern_crisis_cc_russian_plan }
+						check_variable = { eastern_crisis_cc_status_quo > eastern_crisis_cc_austrian_plan }
+					}
+				}
+				every_country = {
+					limit = {
+						has_country_flag = eastern_crisis_constantinople_conference_flag
+					}
+					country_event = { id = eastern_crisis.416 days = 3 }
+				}
+				set_global_flag = eastern_crisis_cc_status_quo_flag
+				OTO = { country_event = { id = eastern_crisis.419 days = 7 } }
+			}
+			else_if = {
+				limit = {
+					AND = {
+						check_variable = { eastern_crisis_cc_russian_plan > eastern_crisis_cc_status_quo }
+						check_variable = { eastern_crisis_cc_russian_plan > eastern_crisis_cc_austrian_plan }
+					}
+				}
+				every_country = {
+					limit = {
+						has_country_flag = eastern_crisis_constantinople_conference_flag
+					}
+					country_event = { id = eastern_crisis.417 days = 3 }
+				}
+				set_global_flag = eastern_crisis_cc_russian_plan_flag
+				OTO = { country_event = { id = eastern_crisis.419 days = 7 } }
+			}
+			else_if = {
+				limit = {
+					AND = {
+						check_variable = { eastern_crisis_cc_austrian_plan > eastern_crisis_cc_status_quo }
+						check_variable = { eastern_crisis_cc_austrian_plan > eastern_crisis_cc_russian_plan }
+					}
+				}
+				every_country = {
+					limit = {
+						has_country_flag = eastern_crisis_constantinople_conference_flag
+					}
+					country_event = { id = eastern_crisis.418 days = 3 }
+				}
+				set_global_flag = eastern_crisis_cc_austrian_plan_flag
+				OTO = { country_event = { id = eastern_crisis.419 days = 7 } }
+			}
+			else = {
+				every_country = {
+					limit = {
+						has_country_flag = eastern_crisis_constantinople_conference_flag
+					}
+					country_event = { id = eastern_crisis.421 days = 3 }
+				}
+				set_global_flag = eastern_crisis_cc_no_majority_flag
+				OTO = { country_event = { id = eastern_crisis.419 days = 7 } }
+			}
+		}
+	}
+}
+
+#The Constantinople Conference - Status Quo
+country_event = {
+	id = eastern_crisis.416
+	title = eastern_crisis.416.t
+	desc = eastern_crisis.416.d
+	picture = GFX_report_event_constantinople_conference
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.416.a
+		add_political_power = -10
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = AUS
+				}
+				clear_variable = eastern_crisis_cc_status_quo
+				clear_variable = eastern_crisis_cc_russian_plan
+				clear_variable = eastern_crisis_cc_austrian_plan
+			}
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+}
+
+#The Constantinople Conference - Russian Plan
+country_event = {
+	id = eastern_crisis.417
+	title = eastern_crisis.417.t
+	desc = eastern_crisis.417.d
+	picture = GFX_report_event_constantinople_conference
+	
+	is_triggered_only = yes
+	
+	#Other GPs
+	option = {
+		name = eastern_crisis.417.a
+		trigger = {
+			NOT = {
+				OR = {
+					tag = AUS
+					tag = RUS
+				}
+			}
+		}
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+	
+	#Russia
+	option = {
+		name = eastern_crisis.417.b
+		trigger = {
+			tag = RUS
+		}
+		add_political_power = 25
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+	
+	#Austria
+	option = {
+		name = eastern_crisis.417.c
+		trigger = {
+			tag = AUS
+		}
+		add_political_power = -25
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+}
+
+#The Constantinople Conference - Austrian Plan
+country_event = {
+	id = eastern_crisis.418
+	title = eastern_crisis.418.t
+	desc = eastern_crisis.418.d
+	picture = GFX_report_event_constantinople_conference
+	
+	is_triggered_only = yes
+	
+	#Other GPs
+	option = {
+		name = eastern_crisis.418.a
+		trigger = {
+			NOT = {
+				OR = {
+					tag = AUS
+					tag = RUS
+				}
+			}
+		}
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+	
+	#Russia
+	option = {
+		name = eastern_crisis.418.b
+		trigger = {
+			tag = RUS
+		}
+		add_political_power = -25
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+	
+	#Austria
+	option = {
+		name = eastern_crisis.418.c
+		trigger = {
+			tag = AUS
+		}
+		add_political_power = 25
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_constantinople_conference_flag
+		}
+	}
+}
+
+#The Constantinople Conference - Ottoman Response
+country_event = {
+	id = eastern_crisis.419
+	title = eastern_crisis.419.t
+	desc = {
+		trigger = { has_global_flag = eastern_crisis_cc_status_quo_flag }
+		text = eastern_crisis.419.d_status_quo
+	}
+	desc = {
+		trigger = { has_global_flag = eastern_crisis_cc_russian_plan_flag }
+		text = eastern_crisis.419.d_russian_plan
+	}
+	desc = {
+		trigger = { has_global_flag = eastern_crisis_cc_austrian_plan_flag }
+		text = eastern_crisis.419.d_austrian_plan
+	}
+	desc = {
+		trigger = { has_global_flag = eastern_crisis_cc_no_majority_flag }
+		text = eastern_crisis.419.d_no_majority
+	}
+	picture = GFX_report_event_constantinople_conference_proposal
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	#Status Quo
+	option = {
+		name = eastern_crisis.419.a
+		trigger = {
+			has_global_flag = eastern_crisis_cc_status_quo_flag
+		}
+		add_political_power = 50
+		add_stability = 0.05
+		hidden_effect = {
+			
+		}
+	}
+	
+	#Accept the Proposal
+	option = {
+		name = eastern_crisis.419.b
+		trigger = {
+			OR = {
+				has_global_flag = eastern_crisis_cc_russian_plan_flag
+				has_global_flag = eastern_crisis_cc_austrian_plan_flag
+			}
+		}
+		add_political_power = -50
+		add_stability = -0.05
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			
+		}
+	}
+	
+	#Reject the Proposal
+	option = {
+		name = eastern_crisis.419.c
+		trigger = {
+			OR = {
+				has_global_flag = eastern_crisis_cc_russian_plan_flag
+				has_global_flag = eastern_crisis_cc_austrian_plan_flag
+			}
+		}
+		add_political_power = 50
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = 2 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			
+		}
+	}
+	
+	#No Majority
+	option = {
+		name = eastern_crisis.419.e
+		trigger = {
+			has_global_flag = eastern_crisis_cc_no_majority_flag
+		}
+		add_political_power = 25
+		add_stability = 0.025
+		hidden_effect = {
+			
 		}
 	}
 }
