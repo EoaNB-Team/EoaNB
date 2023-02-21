@@ -471,41 +471,341 @@ eastern_crisis_decision_category =	{
 		}
 	}
 	
-	eastern_crisis_decision_declare_war = {
-
-		icon = generic_political_discourse
-
+	### BULGARIA ###
+	
+	#Bulgarian Revolt Imminent
+	eastern_crisis_mission_bulgarian_revolt_imminent = {
+		
+		icon = border_war
+		
 		allowed = { always = no }
 		
 		available = {
-			
+			army_manpower_in_state = {
+				amount > 3999
+				state = 211
+			}
+			army_manpower_in_state = {
+				amount > 1999
+				state = 212
+			}
+			army_manpower_in_state = {
+				amount > 1999
+				state = 810
+			}
+			army_manpower_in_state = {
+				amount > 2999
+				state = 963
+			}
+			army_manpower_in_state = {
+				amount > 2999
+				state = 964
+			}
+			army_manpower_in_state = {
+				amount > 9999
+				state = 1023
+			}
 		}
-
-		visible = {
-			
-		}
-
-		fire_only_once = yes
-		cost = 75
-        days_remove = 140
-         
-        modifier = {
-			
-        }  
 		
-       	complete_effect = {
-			
+		activation = { always = no }
+		
+		priority = 90
+		
+		is_good = no
+		
+		days_mission_timeout = 7
+		
+		war_with_on_complete = BUL
+		war_with_on_timeout = BUL
+		
+		complete_effect = {
+			custom_effect_tooltip = eastern_crisis_mission_bulgarian_revolt_imminent_complete_effect_tt
+			hidden_effect = {
+				random_list = {
+					60 = {
+						set_country_flag = OTO_bulgarian_revolt_strong_flag
+					}
+					40 = {
+						set_country_flag = OTO_bulgarian_revolt_very_strong_flag
+					}
+				}
+			}
+			country_event = { id = eastern_crisis.210 }
 		}
 		
-        remove_effect = {
-			
-        }
-       
+		timeout_effect = {
+			custom_effect_tooltip = eastern_crisis_mission_bulgarian_revolt_imminent_timeout_effect_tt
+			hidden_effect = {
+				set_country_flag = OTO_bulgarian_revolt_very_strong_flag
+			}
+			country_event = { id = eastern_crisis.210 }
+		}
+		
 		ai_will_do = {
 			base = 1000
 		}
 	}
 	
+	#The April Uprising
+	eastern_crisis_mission_april_uprising = {
+		
+		icon = generic_ignite_civil_war
+		
+		allowed = { always = no }
+		
+		available = {
+			if = {
+				limit = {
+					tag = BUL
+				}
+				### What they need to control
+				has_full_control_of_state = 48
+				has_full_control_of_state = 211
+				has_full_control_of_state = 963
+				has_full_control_of_state = 1023
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				BUL = {
+					surrender_progress > 0.8
+				}
+			}
+		}
+		
+		activation = { always = no }
+		
+		priority = 90
+		
+		is_good = no
+		
+		days_mission_timeout = 180
+		
+		complete_effect = {
+			if = {
+				limit = {
+					tag = BUL
+				}
+				transfer_state = 48
+				transfer_state = 211
+				transfer_state = 963
+				transfer_state = 1023
+				white_peace = OTO
+				country_event = { id = eastern_crisis.227 days = 5 }
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				OTO = {
+					annex_country = {
+						target = BUL
+					}
+				}
+				country_event = { id = eastern_crisis.225 days = 5 }
+				hidden_effect = {
+					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
+				}
+			}
+			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
+		}
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = BUL
+				}
+				transfer_state = 48
+				transfer_state = 211
+				transfer_state = 963
+				transfer_state = 1023
+				white_peace = OTO
+				hidden_effect = {
+					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
+				}
+			}
+			else_if = {
+				limit = {
+					tag = OTO
+				}
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = BUL
+						autonomous_state = autonomy_khedive
+						freedom_level = 0.7
+					}
+				}
+				else = {
+					puppet = BUL
+				}
+				country_event = { id = eastern_crisis.229 days = 5 }
+			}
+			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
+		}
+	}
+	
+	### SERBIA & MONTENEGRO ###
+	
+	#The Time for Freedom Has Come
+	eastern_crisis_decision_time_for_freedom = {
+
+		icon = generic_independence
+
+		allowed = {
+			tag = SER
+		}
+		
+		available = {
+			has_war_support > 0.4
+		}
+
+		visible = {
+			date > 1876.05.15
+			SER = {
+				exists = yes
+				is_subject = yes
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+		days_remove = 30
+		
+		war_with_on_remove = OTO
+		
+		cancel_trigger = {
+			NOT = {
+				SER = { is_subject = yes }
+			}
+		}
+		
+		modifier = {
+			war_support_weekly = 0.02
+			weekly_manpower = 500
+		}
+		
+		remove_effect = {
+			country_event = { id = eastern_crisis.101 }
+		}
+		
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#The Serbian-Ottoman War
+	eastern_crisis_mission_serbian_ottoman_war = {
+		
+		icon = generic_ignite_civil_war
+		
+		allowed = { always = no }
+		
+		available = {
+			if = {
+				limit = {
+					tag = SER
+				}
+				OTO = {
+					surrender_progress > 0.2
+				}
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				SER = {
+					surrender_progress > 0.75
+				}
+			}
+		}
+		
+		activation = { always = no }
+		
+		priority = 90
+		
+		is_good = no
+		
+		days_mission_timeout = 210
+		
+		complete_effect = {
+			if = {
+				limit = {
+					tag = SER
+				}
+				white_peace = OTO
+				#country_event = { id = eastern_crisis.227 days = 5 }
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				OTO = {
+					annex_country = {
+						target = BUL
+					}
+				}
+				country_event = { id = eastern_crisis.225 days = 5 }
+				hidden_effect = {
+					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
+				}
+			}
+			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
+		}
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = BUL
+				}
+				transfer_state = 48
+				transfer_state = 211
+				transfer_state = 963
+				transfer_state = 1023
+				white_peace = OTO
+				hidden_effect = {
+					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
+				}
+			}
+			else_if = {
+				limit = {
+					tag = OTO
+				}
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = BUL
+						autonomous_state = autonomy_khedive
+						freedom_level = 0.7
+					}
+				}
+				else = {
+					puppet = BUL
+				}
+				country_event = { id = eastern_crisis.229 days = 5 }
+			}
+			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
+		}
+	}
+	
+	### RUSSO-TURKISH WAR ###
+	
+	#
 	eastern_crisis_decision_western_bulgaria_recruits = {
 
 		icon = generic_political_discourse
@@ -716,187 +1016,6 @@ eastern_crisis_decision_category =	{
        
 		ai_will_do = {
 			base = 1000
-		}
-	}
-	
-	### BULGARIA ###
-	
-	#Bulgarian Revolt Imminent
-	eastern_crisis_mission_bulgarian_revolt_imminent = {
-		
-		icon = border_war
-		
-		allowed = { always = no }
-		
-		available = {
-			army_manpower_in_state = {
-				amount > 3999
-				state = 211
-			}
-			army_manpower_in_state = {
-				amount > 1999
-				state = 212
-			}
-			army_manpower_in_state = {
-				amount > 1999
-				state = 810
-			}
-			army_manpower_in_state = {
-				amount > 2999
-				state = 963
-			}
-			army_manpower_in_state = {
-				amount > 2999
-				state = 964
-			}
-			army_manpower_in_state = {
-				amount > 9999
-				state = 1023
-			}
-		}
-		
-		activation = { always = no }
-		
-		priority = 90
-		
-		is_good = no
-		
-		days_mission_timeout = 7
-		
-		war_with_on_complete = BUL
-		war_with_on_timeout = BUL
-		
-		complete_effect = {
-			custom_effect_tooltip = eastern_crisis_mission_bulgarian_revolt_imminent_complete_effect_tt
-			hidden_effect = {
-				random_list = {
-					60 = {
-						set_country_flag = OTO_bulgarian_revolt_strong_flag
-					}
-					40 = {
-						set_country_flag = OTO_bulgarian_revolt_very_strong_flag
-					}
-				}
-			}
-			country_event = { id = eastern_crisis.210 }
-		}
-		
-		timeout_effect = {
-			custom_effect_tooltip = eastern_crisis_mission_bulgarian_revolt_imminent_timeout_effect_tt
-			hidden_effect = {
-				set_country_flag = OTO_bulgarian_revolt_very_strong_flag
-			}
-			country_event = { id = eastern_crisis.210 }
-		}
-		
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#The April Uprising
-	eastern_crisis_mission_april_uprising = {
-		
-		icon = generic_ignite_civil_war
-		
-		allowed = { always = no }
-		
-		available = {
-			if = {
-				limit = {
-					tag = BUL
-				}
-				### What they need to control
-				has_full_control_of_state = 48
-				has_full_control_of_state = 211
-				has_full_control_of_state = 963
-				has_full_control_of_state = 1023
-			}
-			if = {
-				limit = {
-					tag = OTO
-				}
-				BUL = {
-					surrender_progress > 0.8
-				}
-			}
-		}
-		
-		activation = { always = no }
-		
-		priority = 90
-		
-		is_good = no
-		
-		days_mission_timeout = 180
-		
-		complete_effect = {
-			if = {
-				limit = {
-					tag = BUL
-				}
-				transfer_state = 48
-				transfer_state = 211
-				transfer_state = 963
-				transfer_state = 1023
-				white_peace = OTO
-				country_event = { id = eastern_crisis.227 days = 5 }
-			}
-			if = {
-				limit = {
-					tag = OTO
-				}
-				OTO = {
-					annex_country = {
-						target = BUL
-					}
-				}
-				country_event = { id = eastern_crisis.225 days = 5 }
-				hidden_effect = {
-					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
-				}
-			}
-			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
-		}
-		
-		timeout_effect = {
-			if = {
-				limit = {
-					tag = BUL
-				}
-				transfer_state = 48
-				transfer_state = 211
-				transfer_state = 963
-				transfer_state = 1023
-				white_peace = OTO
-				hidden_effect = {
-					ROM = { country_event = { id = eastern_crisis.223 days = 60 random_days = 30 } }
-				}
-			}
-			else_if = {
-				limit = {
-					tag = OTO
-				}
-				if = {
-					limit = {
-						OR = {
-							has_dlc = "Together for Victory"
-							has_dlc = "Waking the Tiger"
-							has_dlc = "Death or Dishonor"
-						}
-					}
-					set_autonomy = {
-						target = BUL
-						autonomous_state = autonomy_khedive
-						freedom_level = 0.7
-					}
-				}
-				else = {
-					puppet = BUL
-				}
-				country_event = { id = eastern_crisis.229 days = 5 }
-			}
-			clr_global_flag = eastern_crisis_bulgaria_april_uprising_flag
 		}
 	}
 }

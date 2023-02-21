@@ -1,12 +1,13 @@
 add_namespace = eastern_crisis
 
-#eastern_crisis.1-200		Serbia, Montenegro, Herzegovina, Bosnia Events
+#eastern_crisis.1-100		Bosnia and Herzegovina Events
+#eastern_crisis.101-200		Serbia and Montenegro Events
 #eastern_crisis.201-400		Bulgaria Events
 #eastern_crisis.401-600		Russo-Turkish War Events
 #eastern_crisis.601-700		Albania Events
 #eastern_crisis.701-800		Greece Events
 
-##### SERBIA, MONTENEGRO, HERZEGOVINA, BOSNIA EVENTS (eastern_crisis.1-200) #####
+##### BOSNIA AND HERZEGOVINA EVENTS (eastern_crisis.1-100) #####
 
 #Memorandum of the Association for Serbian Liberation and Unification (12.09.1871)
 country_event = {
@@ -152,6 +153,7 @@ country_event = {
 					}
 				}
 			}
+			set_global_flag = eastern_crisis_ongoing_flag
 			set_global_flag = eastern_crisis_herzegovina_uprising_flag
 		}
 	}
@@ -789,6 +791,403 @@ country_event = {
 		hidden_effect = {
 			news_event = { id = eastern_crisis.19 days = 1 }
 		}
+	}
+}
+
+##### SERBIA AND MONTENEGRO EVENTS (eastern_crisis.101-200) #####
+
+#The Serbian-Ottoman War (30.06.1876)
+country_event = {
+	id = eastern_crisis.101
+	title = eastern_crisis.101.t
+	desc = eastern_crisis.101.d
+	picture = GFX_report_event_serbian_ottoman_war_outbreak
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	immediate = {
+		hidden_effect = {
+			set_autonomy = {
+				target = MNT
+				autonomy_state = autonomy_free
+			}
+			set_autonomy = {
+				target = SER
+				autonomy_state = autonomy_free
+			}
+			create_faction = faction_serbia_montenegro
+			add_to_faction = MNT
+			MNT = { country_event = { id = eastern_crisis.102 } }
+			OTO = { country_event = { id = eastern_crisis.102 } }
+			set_global_flag = eastern_crisis_serbian_ottoman_war_flag
+		}
+	}
+		
+	option = {
+		name = eastern_crisis.101.a
+		add_war_support = 0.05
+		add_manpower = 20000
+		activate_mission = eastern_crisis_mission_serbian_ottoman_war
+		declare_war_on = {
+			target = OTO
+			type = annex_everything
+		}
+		MNT = {
+			add_to_war = {
+				targeted_alliance = SER
+				enemy = OTO
+			}
+		}
+		news_event = { id = eastern_crisis.103 days = 1 }
+	}
+}
+
+#The Serbian-Ottoman War (30.06.1876)
+country_event = {
+	id = eastern_crisis.102
+	title = eastern_crisis.102.t
+	desc = eastern_crisis.102.d
+	picture = GFX_report_event_serbian_ottoman_war_outbreak
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.102.a
+		trigger = {
+			tag = OTO
+		}
+		add_stability = -0.05
+		add_war_support = 0.05
+		activate_mission = eastern_crisis_mission_serbian_ottoman_war
+	}
+	
+	option = {
+		name = eastern_crisis.102.b
+		trigger = {
+			tag = MNT
+		}
+		add_war_support = 0.05
+		add_manpower = 5000
+	}
+}
+
+#The Serbian-Ottoman War (01.07.1876)
+news_event = {
+	id = eastern_crisis.103
+	title = eastern_crisis.103.t
+	desc = eastern_crisis.103.d
+	picture = GFX_news_event_serbian_ottoman_war_outbreak
+	
+	trigger = {
+		NOT = {
+			OR = {
+				tag = MNT
+				tag = OTO
+			}
+		}
+	}
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.103.a
+	}
+}
+
+#Serbian Advance into Ottoman Territory
+country_event = {
+	id = eastern_crisis.104
+	title = eastern_crisis.104.t
+	desc = eastern_crisis.104.d
+	picture = GFX_report_event_serbian_mhc
+	
+	fire_only_once = yes
+	
+	trigger = {
+		tag = SER
+		has_war_with = OTO
+		OTO = { surrender_progress > 0.05 }
+	}
+	
+	option = {
+		name = eastern_crisis.104.a
+		add_stability = 0.01
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			MNT = { country_event = { id = eastern_crisis.105 days = 1 } }
+			OTO = { country_event = { id = eastern_crisis.105 days = 1 } }
+			RUS = { country_event = { id = eastern_crisis.105 days = 1 } }
+		}
+	}
+}
+
+#Serbian Advance into Ottoman Territory
+country_event = {
+	id = eastern_crisis.105
+	title = eastern_crisis.105.t
+	desc = eastern_crisis.105.d
+	picture = GFX_report_event_serbian_mhc
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.105.a
+		trigger = {
+			tag = OTO
+		}
+		add_stability = -0.02
+		add_war_support = -0.02
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+	}
+	
+	option = {
+		name = eastern_crisis.105.b
+		trigger = {
+			tag = MNT
+		}
+		add_stability = 0.01
+		add_war_support = 0.02
+	}
+	
+	option = {
+		name = eastern_crisis.105.c
+		trigger = {
+			tag = RUS
+		}
+		add_political_power = 10
+	}
+}
+
+#A Russian Ultimatum
+country_event = {
+	id = eastern_crisis.106
+	title = eastern_crisis.106.t
+	desc = eastern_crisis.106.d
+	picture = GFX_report_event_peterhof_palace
+	
+	fire_only_once = yes
+	
+	trigger = {
+		tag = RUS
+		SER = {
+			has_war_with = OTO
+			surrender_progress > 0.35
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.106.a
+		add_stability = -0.02
+		add_war_support = -0.05
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.107 days = 1 } }
+			SER = { country_event = { id = eastern_crisis.107 days = 1 } }
+			MNT = { country_event = { id = eastern_crisis.107 days = 1 } }
+		}
+	}
+}
+
+#A Russian Ultimatum
+country_event = {
+	id = eastern_crisis.107
+	title = eastern_crisis.107.t
+	desc = eastern_crisis.107.d
+	picture = GFX_report_event_peterhof_palace
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Accept the ultimatum
+	option = {
+		name = eastern_crisis.107.a
+		trigger = {
+			tag = OTO
+		}
+		custom_effect_tooltip = OTO_russian_ultimatum_accept_effect_tt
+		add_stability = -0.02
+		add_war_support = -0.02
+		white_peace = MNT
+		white_peace = SER
+		hidden_effect = {
+			remove_mission = eastern_crisis_mission_serbian_ottoman_war
+			SER = { remove_mission = eastern_crisis_mission_serbian_ottoman_war }
+			RUS = { country_event = { id = eastern_crisis.108 } }
+		}
+	}
+	
+	#Reject the ultimatum
+	option = {
+		name = eastern_crisis.107.b
+		trigger = {
+			tag = OTO
+		}
+		custom_effect_tooltip = OTO_russian_ultimatum_reject_effect_tt
+		add_stability = -0.04
+		add_war_support = 0.02
+		hidden_effect = {
+			RUS = { country_event = { id = eastern_crisis.111 } }
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.107.c
+		trigger = {
+			OR = {
+				tag = MNT
+				tag = SER
+			}
+		}
+		add_stability = 0.01
+		add_war_support = -0.03
+	}
+}
+
+#The Ottomans Accept the Ultimatum
+country_event = {
+	id = eastern_crisis.108
+	title = eastern_crisis.108.t
+	desc = eastern_crisis.108.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.108.a
+		add_political_power = 50
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			MNT = { country_event = { id = eastern_crisis.109 } }
+			SER = { country_event = { id = eastern_crisis.109 } }
+			news_event = { id = eastern_crisis.110 days = 1 }
+		}
+	}
+}
+
+#Serbo-Turkish Armistice
+country_event = {
+	id = eastern_crisis.109
+	title = eastern_crisis.109.t
+	desc = eastern_crisis.109.d
+	picture = GFX_report_event_serbian_ottoman_war_armistice
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.109.a
+		add_stability = 0.02
+		add_war_support = -0.1
+	}
+}
+
+#Serbo-Turkish Armistice
+news_event = {
+	id = eastern_crisis.110
+	title = eastern_crisis.110.t
+	desc = eastern_crisis.110.d
+	picture = GFX_news_event_serbian_ottoman_war_armistice
+	
+	trigger = {
+		NOT = {
+			OR = {
+				tag = MNT
+				tag = OTO
+				tag = SER
+			}
+		}
+	}
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.110.a
+	}
+}
+
+#The Ottomans Reject the Ultimatum
+country_event = {
+	id = eastern_crisis.111
+	title = eastern_crisis.111.t
+	desc = eastern_crisis.111.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.111.a
+		add_political_power = -25
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+		add_to_war = {
+			targeted_alliance = SER
+			enemy = OTO
+		}
+		hidden_effect = {
+			MNT = { country_event = { id = eastern_crisis.112 } }
+			SER = { country_event = { id = eastern_crisis.112 } }
+			news_event = { id = eastern_crisis.113 days = 1 }
+		}
+	}
+}
+
+#Alliance with Russia
+country_event = {
+	id = eastern_crisis.112
+	title = eastern_crisis.112.t
+	desc = eastern_crisis.112.d
+	picture = GFX_report_event_serbian_ottoman_war_armistice
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.112.a
+		add_political_power = 25
+		add_stability = 0.03
+		add_war_support = 0.05
+	}
+}
+
+#Russia Joins the Serbian-Ottoman War
+news_event = {
+	id = eastern_crisis.113
+	title = eastern_crisis.113.t
+	desc = eastern_crisis.113.d
+	picture = GFX_news_event_serbian_ottoman_war_armistice
+	
+	trigger = {
+		NOT = {
+			OR = {
+				tag = MNT
+				tag = OTO
+				tag = SER
+			}
+		}
+	}
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.113.a
 	}
 }
 
@@ -2692,7 +3091,7 @@ country_event = {
 						}
 						set_autonomy = {
 							target = BUL
-							autonomous_state = autonomy_khedive
+							autonomous_state = autonomy_eyalet
 							freedom_level = 0.7
 						}
 					}
@@ -2719,7 +3118,7 @@ country_event = {
 						}
 						set_autonomy = {
 							target = ERU
-							autonomous_state = autonomy_khedive
+							autonomous_state = autonomy_eyalet
 							freedom_level = 0.7
 						}
 					}
