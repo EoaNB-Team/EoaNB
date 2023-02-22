@@ -808,18 +808,21 @@ country_event = {
 	
 	immediate = {
 		hidden_effect = {
-			set_autonomy = {
-				target = MNT
-				autonomy_state = autonomy_free
-			}
-			set_autonomy = {
-				target = SER
-				autonomy_state = autonomy_free
+			OTO = {
+				set_autonomy = {
+					target = MNT
+					autonomy_state = autonomy_free
+				}
+				set_autonomy = {
+					target = SER
+					autonomy_state = autonomy_free
+				}
 			}
 			create_faction = faction_serbia_montenegro
 			add_to_faction = MNT
 			MNT = { country_event = { id = eastern_crisis.102 } }
 			OTO = { country_event = { id = eastern_crisis.102 } }
+			RUS = { country_event = { id = eastern_crisis.426 days = 14 } }
 			set_global_flag = eastern_crisis_serbian_ottoman_war_flag
 		}
 	}
@@ -991,6 +994,7 @@ country_event = {
 			OTO = { country_event = { id = eastern_crisis.107 days = 1 } }
 			SER = { country_event = { id = eastern_crisis.107 days = 1 } }
 			MNT = { country_event = { id = eastern_crisis.107 days = 1 } }
+			country_event = { id = eastern_crisis.114 days = 90 }
 		}
 	}
 }
@@ -1188,6 +1192,31 @@ news_event = {
 	
 	option = {
 		name = eastern_crisis.113.a
+	}
+}
+
+#The 'Marche Slave' by Tchaikovsky
+country_event = {
+	id = eastern_crisis.114
+	title = eastern_crisis.114.t
+	desc = eastern_crisis.114.d
+	picture = GFX_report_event_tchaikovsky
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.114.a
+		if = {
+			limit = {
+				tag = RUS
+			}
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			hidden_effect = {
+				MNT = { country_event = { id = eastern_crisis.114 } }
+				SER = { country_event = { id = eastern_crisis.114 } }
+			}
+		}
 	}
 }
 
@@ -3375,6 +3404,162 @@ country_event = {
 				}
 			}
 		}
+	}
+}
+
+#RUS - The Reichstadt Agreement
+country_event = {
+	id = eastern_crisis.426
+	title = eastern_crisis.426.t
+	desc = eastern_crisis.426.d
+	picture = GFX_report_event_reichstadt_castle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.426.a
+		AUS = { country_event = { id = eastern_crisis.427 days = 2 } }
+		if = {
+			limit = {
+				NOT = { has_completed_focus = RUS_reichstadt_agreement }
+			}
+			unlock_national_focus = RUS_reichstadt_agreement
+		}
+	}
+}
+
+#AUS - Signing the Reichstadt Agreement?
+country_event = {
+	id = eastern_crisis.427
+	title = eastern_crisis.427.t
+	desc = eastern_crisis.427.d
+	picture = GFX_report_event_reichstadt_castle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Sign the agreement
+	option = {
+		name = eastern_crisis.427.a
+		ai_chance = {
+			base = 90
+			modifier = {
+				add = 5
+				has_opinion = {
+					target = RUS
+					value > 50
+				}
+			}
+		}
+		custom_effect_tooltip = AUS_reichstadt_agreement_signed_effect_tt
+		add_political_power = 25
+		RUS = { country_event = { id = eastern_crisis.428 days = 2 } }
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = eastern_crisis_reichstadt_agreement_signed_flag
+			RUS = { set_country_flag = eastern_crisis_reichstadt_agreement_signed_flag }
+		}
+	}
+	
+	#Don't sign the agreement
+	option = {
+		name = eastern_crisis.427.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = -5
+				has_opinion = {
+					target = RUS
+					value > 50
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = AUS_reichstadt_agreement_refused_effect_tt
+		add_political_power = -25
+		RUS = { country_event = { id = eastern_crisis.429 days = 2 } }
+		hidden_effect = {
+			RUS = { unlock_national_focus = RUS_budapest_convention }
+		}
+	}
+}
+
+#RUS - Austria Signed the Reichstadt Agreement
+country_event = {
+	id = eastern_crisis.428
+	title = eastern_crisis.428.t
+	desc = eastern_crisis.428.d
+	picture = GFX_report_event_reichstadt_castle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.428.a
+		add_political_power = 25
+		add_opinion_modifier = { target = AUS modifier = eoanb_om_RUS_reichstadt_agreement }
+		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_RUS_reichstadt_agreement }
+	}
+}
+
+#RUS - Austria Refused to Sign the Reichstadt Agreement
+country_event = {
+	id = eastern_crisis.429
+	title = eastern_crisis.429.t
+	desc = eastern_crisis.429.d
+	picture = GFX_report_event_reichstadt_castle
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.429.a
+		add_political_power = -50
+		add_stability = -0.03
+		add_war_support = -0.03
+		add_opinion_modifier = { target = AUS modifier = eoanb_om_RUS_decrease_small }
+		reverse_add_opinion_modifier = { target = AUS modifier = eoanb_om_RUS_decrease_small }
+	}
+}
+
+#RUS - The Budapest Convention
+country_event = {
+	id = eastern_crisis.430
+	title = eastern_crisis.430.t
+	desc = eastern_crisis.430.d
+	picture = GFX_report_event_budapest_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.430.a
+		add_political_power = 25
+		add_stability = 0.025
+		add_opinion_modifier = { target = AUS modifier = eoanb_om_RUS_increase_small }
+		AUS = { country_event = { id = eastern_crisis.431 days = 1 } }
+	}
+}
+
+#AUS - Russia Reaffirms Agreements Regarding the Balkans
+country_event = {
+	id = eastern_crisis.431
+	title = eastern_crisis.431.t
+	desc = eastern_crisis.431.d
+	picture = GFX_report_event_budapest_1
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.431.a
+		add_political_power = 25
+		add_stability = 0.025
+		add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_increase_small }
 	}
 }
 
