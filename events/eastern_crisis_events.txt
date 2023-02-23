@@ -162,7 +162,7 @@ country_event = {
 		name = eastern_crisis.5.a
 		declare_war_on = {
 			target = HRZ
-			type = annex_everything
+			type = wargoal_herzegovina_uprising
 		}
 		activate_mission = eastern_crisis_mission_herzegovina_uprising_of_1875
 		hidden_effect = {
@@ -834,7 +834,7 @@ country_event = {
 		activate_mission = eastern_crisis_mission_serbian_ottoman_war
 		declare_war_on = {
 			target = OTO
-			type = annex_everything
+			type = wargoal_serbian_ottoman_war
 		}
 		MNT = {
 			add_to_war = {
@@ -1589,7 +1589,7 @@ country_event = {
 		name = eastern_crisis.210.a
 		declare_war_on = {
 			target = BUL
-			type = annex_everything
+			type = wargoal_april_uprising_war
 		}
 		activate_mission = eastern_crisis_mission_april_uprising
 		hidden_effect = {
@@ -3596,15 +3596,22 @@ country_event = {
 					value > 50
 				}
 			}
+			modifier = {
+				add = -85
+				NOT = { has_completed_focus = ROM_cross_danube }
+			}
 		}
-		custom_effect_tooltip = ROM_treaty_with_russia_effect_tt
+		custom_effect_tooltip = ROM_bucharest_treaty_signed_effect_tt
 		add_political_power = 25
 		give_military_access = RUS
 		RUS = { country_event = { id = eastern_crisis.433 } }
 		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = eastern_crisis_bucharest_treaty_signed_flag
+		}
 	}
 	
-	#We don't need a treaty
+	#We don't need a treaty - political situation not stable?
 	option = {
 		name = eastern_crisis.432.b
 		ai_chance = {
@@ -3617,12 +3624,20 @@ country_event = {
 				}
 			}
 			modifier = {
+				add = 85
+				NOT = { has_completed_focus = ROM_cross_danube }
+			}
+			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
+		custom_effect_tooltip = ROM_bucharest_treaty_refused_effect_tt
 		add_political_power = -25
 		RUS = { country_event = { id = eastern_crisis.434 } }
+		hidden_effect = {
+			set_country_flag = eastern_crisis_bucharest_treaty_rejected_flag
+		}
 	}
 }
 
@@ -3643,7 +3658,7 @@ country_event = {
 		reverse_add_opinion_modifier = { target = ROM modifier = eoanb_om_RUS_bucharest_treaty }
 		unlock_decision_tooltip = eastern_crisis_decision_declare_war_on_the_ottomans
 		hidden_effect = {
-			set_country_flag = eastern_crisis_romanian_treaty_signed_flag
+			set_country_flag = eastern_crisis_bucharest_treaty_signed_flag
 		}
 	}
 }
@@ -3667,8 +3682,104 @@ country_event = {
 		reverse_add_opinion_modifier = { target = ROM modifier = eoanb_om_RUS_decrease_small }
 		unlock_decision_tooltip = eastern_crisis_decision_declare_war_on_the_ottomans
 		hidden_effect = {
-			set_country_flag = eastern_crisis_romanian_treaty_rejected_flag
+			set_country_flag = eastern_crisis_bucharest_treaty_rejected_flag
 		}
+	}
+}
+
+#RUS - The Russo-Turkish War
+country_event = {
+	id = eastern_crisis.435
+	title = eastern_crisis.435.t
+	desc = eastern_crisis.435.d
+	picture = GFX_report_event_russo_turkish_war_russian_crossing
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.435.a
+		add_stability = -0.02
+		add_war_support = 0.05
+		declare_war_on = {
+			target = OTO
+			type = wargoal_russo_turkish_war
+		}
+		activate_mission = eastern_crisis_mission_russo_turkish_war
+		hidden_effect = {
+			create_faction = faction_russian_allies
+			OTO = {
+				country_event = { id = eastern_crisis.436 }
+				activate_mission = eastern_crisis_mission_russo_turkish_war
+			}
+			if = {
+				limit = {
+					ROM = { has_country_flag = eastern_crisis_bucharest_treaty_signed_flag }
+				}
+				ROM = { country_event = { id = eastern_crisis.436 } }
+			}
+			news_event = { id = eastern_crisis.437 days = 1 }
+		}
+	}
+}
+
+#OTO/ROM - The Russo-Turkish War
+country_event = {
+	id = eastern_crisis.436
+	title = eastern_crisis.436.t
+	desc = eastern_crisis.436.d
+	picture = GFX_report_event_russo_turkish_war_russian_crossing
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.436.a
+		trigger = {
+			tag = OTO
+		}
+		add_stability = -0.1
+		add_war_support = 0.05
+	}
+	
+	option = {
+		name = eastern_crisis.436.b
+		trigger = {
+			tag = ROM
+		}
+		add_stability = -0.02
+		add_war_support = 0.05
+		RUS = { add_to_faction = ROM }
+		add_to_war = {
+			targeted_alliance = RUS
+			enemy = OTO
+		}
+		hidden_effect = {
+			clr_country_flag = eastern_crisis_bucharest_treaty_signed_flag
+		}
+	}
+}
+
+#The Russo-Turkish War
+news_event = {
+	id = eastern_crisis.437
+	title = eastern_crisis.437.t
+	desc = eastern_crisis.437.d
+	picture = GFX_news_event_russo_turkish_war_russian_crossing
+	
+	trigger = {
+		NOT = {
+			tag = OTO
+		}
+	}
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.437.a
 	}
 }
 
