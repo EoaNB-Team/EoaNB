@@ -20,9 +20,14 @@ country_event = {
 		
 	option = {
 		name = eastern_crisis.1.a
-		hidden_effect = {
-			MNT = { country_event = { id = eastern_crisis.1 } }
-			OTO = { country_event = { id = eastern_crisis.2 days = 1 } }
+		if = {
+			limit = {
+				tag = SER
+			}
+			hidden_effect = {
+				MNT = { country_event = { id = eastern_crisis.1 } }
+				OTO = { country_event = { id = eastern_crisis.2 days = 1 } }
+			}
 		}
 	}
 }
@@ -43,7 +48,7 @@ country_event = {
 		custom_effect_tooltip = OTO_nationalist_resistance_eastern_crisis_effect_tt
 		hidden_effect = {
 			every_owned_state = {
-				limit = { 
+				limit = {
 					OR = {
 						is_core_of = BOS
 						is_core_of = MNT
@@ -171,6 +176,7 @@ country_event = {
 				set_capital = { state = 1207 }
 			}
 			news_event = { id = eastern_crisis.6 days = 1 }
+			country_event = { id = eastern_crisis.601 days = 350 random_days = 100 }
 		}
 	}
 }
@@ -849,7 +855,14 @@ country_event = {
 #The Serbian-Ottoman War (30.06.1876)
 country_event = {
 	id = eastern_crisis.102
-	title = eastern_crisis.102.t
+	title = {
+		trigger = { tag = OTO }
+		text = eastern_crisis.102.t_ottoman
+	}
+	title = {
+		trigger = { tag = MNT }
+		text = eastern_crisis.102.t_montenegro
+	}
 	desc = eastern_crisis.102.d
 	picture = GFX_report_event_serbian_ottoman_war_outbreak
 	
@@ -974,6 +987,7 @@ country_event = {
 		SER = {
 			has_war_with = OTO
 			surrender_progress > 0.35
+			has_active_mission = eastern_crisis_mission_serbian_ottoman_war
 		}
 	}
 	
@@ -1010,11 +1024,13 @@ country_event = {
 		custom_effect_tooltip = OTO_russian_ultimatum_accept_effect_tt
 		add_stability = -0.02
 		add_war_support = -0.02
-		white_peace = MNT
 		white_peace = SER
 		hidden_effect = {
 			remove_mission = eastern_crisis_mission_serbian_ottoman_war
-			SER = { remove_mission = eastern_crisis_mission_serbian_ottoman_war }
+			SER = {
+				remove_mission = eastern_crisis_mission_serbian_ottoman_war
+				remove_from_faction = MNT
+			}
 			RUS = { country_event = { id = eastern_crisis.108 } }
 		}
 	}
@@ -1080,8 +1096,22 @@ country_event = {
 	
 	option = {
 		name = eastern_crisis.109.a
+		trigger = {
+			tag = SER
+		}
 		add_stability = 0.02
-		add_war_support = -0.1
+		add_war_support = -0.15
+	}
+	
+	option = {
+		name = eastern_crisis.109.b
+		trigger = {
+			tag = MNT
+		}
+		add_stability = -0.05
+		add_war_support = -0.05
+		add_manpower = 5000
+		#activate_mission = 
 	}
 }
 
@@ -1310,6 +1340,119 @@ country_event = {
 	option = {
 		name = eastern_crisis.119.a
 		add_war_support = -0.02
+	}
+}
+
+#MNT - Battle of Vučji Do
+country_event = {
+	id = eastern_crisis.120
+	title = eastern_crisis.120.t
+	desc = eastern_crisis.120.d
+	picture = GFX_report_event_battle_of_vucji_do
+	
+	fire_only_once = yes
+	
+	trigger = {
+		tag = MNT
+		MNT = { has_war_with = OTO }
+		OTO = {
+			has_active_mission = eastern_crisis_mission_serbian_ottoman_war
+			NOT = { controls_province = 13779 }
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.120.a
+		add_war_support = 0.1
+		add_manpower = 2000
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.121 } }
+			SER = { country_event = { id = eastern_crisis.121 } }
+		}
+	}
+}
+
+#OTO/SER - Battle of Vučji Do
+country_event = {
+	id = eastern_crisis.121
+	title = eastern_crisis.121.t
+	desc = eastern_crisis.121.d
+	picture = GFX_report_event_battle_of_vucji_do
+	
+	is_triggered_only = yes
+		
+	option = {
+		name = eastern_crisis.121.a
+		trigger = {
+			tag = OTO
+		}
+		add_war_support = -0.05
+	}
+	
+	option = {
+		name = eastern_crisis.121.b
+		trigger = {
+			tag = SER
+		}
+		add_war_support = 0.03
+	}
+}
+
+#The Podgorica Slaughter (15.10.1874)
+country_event = {
+	id = eastern_crisis.122
+	title = eastern_crisis.122.t
+	desc = eastern_crisis.122.d
+	picture = GFX_report_event_montenegrin_rebels
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		OTO = { owns_state = 225 }
+	}
+	
+	option = {
+		name = eastern_crisis.122.a
+		add_war_support = 0.05
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = MNT
+				}
+				SER = { country_event = { id = eastern_crisis.122 } }
+				OTO = { country_event = { id = eastern_crisis.123 days = 1 } }
+			}
+		}
+	}
+}
+
+#OTO - The Podgorica Slaughter (16.10.1874)
+country_event = {
+	id = eastern_crisis.123
+	title = eastern_crisis.123.t
+	desc = eastern_crisis.123.d
+	picture = GFX_report_event_montenegrin_rebels
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+		
+	option = {
+		name = eastern_crisis.123.a
+		add_stability = -0.03
+		custom_effect_tooltip = OTO_nationalist_resistance_eastern_crisis_effect_tt
+		hidden_effect = {
+			every_owned_state = {
+				limit = { 
+					OR = {
+						is_core_of = BOS
+						is_core_of = MNT
+					}
+				}
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 5
+			}
+		}
 	}
 }
 
@@ -3830,11 +3973,17 @@ country_event = {
 				}
 				ROM = { country_event = { id = eastern_crisis.436 } }
 			}
-			news_event = { id = eastern_crisis.437 days = 1 }
+			news_event = { id = eastern_crisis.437 }
 			country_event = { id = eastern_crisis.438 days = 30 random_days = 3 }
 			country_event = { id = eastern_crisis.440 days = 14 random_days = 7 }
 			country_event = { id = eastern_crisis.441 days = 70 random_days = 14 }
 			country_event = { id = eastern_crisis.443 days = 7 random_days = 5 }
+			if = {
+				limit = {
+					is_ai = no
+				}
+				set_variable = { super_event_displayed = 27 }
+			}
 		}
 	}
 }
@@ -3925,6 +4074,14 @@ news_event = {
 	
 	option = {
 		name = eastern_crisis.437.a
+		hidden_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				set_variable = { super_event_displayed = 27 }
+			}
+		}
 	}
 }
 
@@ -4826,7 +4983,7 @@ country_event = {
 	id = eastern_crisis.461
 	title = eastern_crisis.461.t
 	desc = eastern_crisis.461.d
-	picture = GFX_report_event_bayezid_conquest
+	picture = GFX_report_event_battle_of_shipka
 	
 	fire_only_once = yes
 	
@@ -4857,7 +5014,7 @@ country_event = {
 	id = eastern_crisis.462
 	title = eastern_crisis.462.t
 	desc = eastern_crisis.462.d
-	picture = GFX_report_event_bayezid_conquest
+	picture = GFX_report_event_battle_of_shipka
 	
 	is_triggered_only = yes
 		
@@ -5727,3 +5884,95 @@ country_event = {
 }
 
 ##### ALBANIA EVENTS (eastern_crisis.601-700) #####
+
+#Albanians Rebel Against Tax Collection
+country_event = {
+	id = eastern_crisis.601
+	title = eastern_crisis.601.t
+	desc = eastern_crisis.601.d
+	picture = GFX_report_event_albanian_uprising
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		ALB = { exists = no }
+	}
+		
+	option = {
+		name = eastern_crisis.601.a
+		every_owned_state = {
+			limit = {
+				is_core_of = ALB
+			}
+			force_enable_resistance = OTO
+			start_resistance = OTO
+			set_resistance = 10
+			set_garrison_strength = 0.5
+		}
+		hidden_effect = {
+			country_event = { id = eastern_crisis.602 days = 150 random_days = 100 }
+		}
+	}
+}
+
+#Albanians Rebel Against Tax Collection Again
+country_event = {
+	id = eastern_crisis.602
+	title = eastern_crisis.602.t
+	desc = eastern_crisis.602.d
+	picture = GFX_report_event_albanian_uprising
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		ALB = { exists = no }
+	}
+		
+	option = {
+		name = eastern_crisis.602.a
+		every_owned_state = {
+			limit = {
+				is_core_of = ALB
+			}
+			force_enable_resistance = OTO
+			start_resistance = OTO
+			set_resistance = 10
+			set_garrison_strength = 0.5
+		}
+		hidden_effect = {
+			country_event = { id = eastern_crisis.603 days = 200 random_days = 100 }
+		}
+	}
+}
+
+#Albanians Rebel Against Conscription
+country_event = {
+	id = eastern_crisis.603
+	title = eastern_crisis.603.t
+	desc = eastern_crisis.603.d
+	picture = GFX_report_event_albanian_uprising
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	trigger = {
+		ALB = { exists = no }
+		has_war = yes
+	}
+		
+	option = {
+		name = eastern_crisis.603.a
+		add_manpower = -2000
+		every_owned_state = {
+			limit = {
+				is_core_of = ALB
+			}
+			force_enable_resistance = OTO
+			start_resistance = OTO
+			set_resistance = 10
+			set_garrison_strength = 0.5
+		}
+	}
+}
