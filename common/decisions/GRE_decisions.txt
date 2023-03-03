@@ -526,6 +526,7 @@ GRE_decision_category_cretan_revolution = {
 				limit = {
 					tag = OTO
 				}
+				custom_effect_tooltip = cretan_revolution_ottoman_trigger_tt
 				CET = {
 					surrender_progress > 0.8
 				}
@@ -577,7 +578,10 @@ GRE_decision_category_cretan_revolution = {
 		}
 		
 		timeout_effect = {
-			OTO = {
+			if = {
+				limit = {
+					tag = OTO
+				}
 				white_peace = CET
 				if = {
 					limit = {
@@ -985,6 +989,10 @@ GRE_decision_category_cretan_revolution = {
 
 		ai_will_do = {
 			base = 1000
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
 	}
 
@@ -1015,6 +1023,8 @@ GRE_decision_category_cretan_revolution = {
 
 		days_remove = 90
 
+		war_with_on_remove = OTO
+
 		cancel_trigger = {
 			CET = {
 				OR = {
@@ -1043,47 +1053,70 @@ GRE_decision_category_cretan_revolution = {
 		}
 	}
 
-	OTO_decision_war_greece_crete_revolt = { #dec greece
+	#Violate Greek Sovereignty
+	OTO_decision_violate_greek_sovereignty = {
 
-		visible = {
-		  tag = OTO
-		  has_global_flag = cretan_revolution_ongoing_flag
-		  GRE = {
-		        has_country_flag = GRE_Crete_Support_Yes
-		  }
-          OTO = { has_country_flag = OTO_Crete_Greece_Support_Yes }
+		icon = generic_ignite_civil_war
+		
+		allowed = { tag = OTO }
+
+		available = {
+			has_war = no
+			has_war_support > 0.5
+			has_opinion_modifier = GRE_CRETAN_HELP_OTO_3_REL
 		}
-
-		allowed = { tag = GRE }
-
-		cost = 150
+		
+		visible = {
+			has_global_flag = cretan_revolution_ongoing_flag
+			has_war_with = CET
+			#GRE = {
+			#	has_country_flag = GRE_Crete_Support_Yes
+			#}
+			#has_country_flag = OTO_Crete_Greece_Support_Yes
+		}
 
 		fire_only_once = yes
 
-		war_with_on_complete = GRE
+		custom_cost_trigger = {
+			has_political_power > 99.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_100_command_power_50
+
+		days_remove = 30
+
+		war_with_on_remove = GRE
+
+		cancel_trigger = {
+			NOT = { has_war_with = CET }
+		}
 
 		complete_effect = {
-		    # declare_war_on = {
-                # target = GRE
-                # type = annex_everything
-            # }
-			##replacing the above with a border war to avoid larger issues
+			add_political_power = -100
+			add_command_power = -50
+		}
+
+		remove_effect = {
 			start_border_war = {
 				change_state_after_war = no
-				attacker = {
-					state = 811
-					num_provinces = 4
-					on_win = GRE_diplomacy.14
-					on_lose = GRE_diplomacy.15
-					on_cancel = GRE_diplomacy.16
-				}
-
-				defender = {
-					state = 47
-					num_provinces = 3
-					on_win = GRE_diplomacy.15
-					on_lose = GRE_diplomacy.17
-					on_cancel = GRE_diplomacy.16
+				if = {
+					limit = {
+						OTO = { owns_state = 811 }
+					}
+					attacker = {
+						state = 811
+						num_provinces = 4
+						on_win = GRE_diplomacy.14
+						on_lose = GRE_diplomacy.15
+						on_cancel = GRE_diplomacy.16
+					}
+					defender = {
+						state = 47
+						num_provinces = 3
+						on_win = GRE_diplomacy.15
+						on_lose = GRE_diplomacy.17
+						on_cancel = GRE_diplomacy.16
+					}
 				}
 			}
 		}
@@ -1093,7 +1126,8 @@ GRE_decision_category_cretan_revolution = {
 		}
 	}
 
-	GRE_decision_request_british_mediation = { #Request British help
+	#Request British Help
+	GRE_decision_request_british_mediation = {
 
 		visible = {
 		  tag = GRE
@@ -1126,7 +1160,8 @@ GRE_decision_category_cretan_revolution = {
 		}
 	}
 
-	GRE_decision_request_austrian_mediation = { #Request Austrian help
+	#Request Austrian Help
+	GRE_decision_request_austrian_mediation = {
 
 		visible = {
 		  tag = GRE
