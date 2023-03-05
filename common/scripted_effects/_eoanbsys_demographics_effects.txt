@@ -11,3 +11,134 @@ eoanbsys_demographic_bookmark_adjustment = {
 		add_manpower = population_temp
 	}
 }
+pop_state_update ={
+	every_country = {
+		every_owned_state = {
+			if = {
+				limit = { has_dynamic_modifier = {modifier = primary_culture} }
+				remove_dynamic_modifier = { modifier = primary_culture }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = accepted_culture} }
+				remove_dynamic_modifier = { modifier = accepted_culture }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = default_culture} }
+				remove_dynamic_modifier = { modifier = default_culture }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = default_culture} }
+				remove_dynamic_modifier = { modifier = marginalized_culture }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = primary_religion} }
+				remove_dynamic_modifier = { modifier = primary_religion }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = accepted_religion} }
+				remove_dynamic_modifier = { modifier = accepted_religion }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = default_religion} }
+				remove_dynamic_modifier = { modifier = default_religion }
+			}
+			if = {
+				limit = { has_dynamic_modifier = {modifier = default_religion} }
+				remove_dynamic_modifier = { modifier = marginalized_religion }
+			}
+			set_temp_variable = { culture_sum = 0 }
+			set_temp_variable = { religion_sum = 0 }
+			for_each_loop = {
+    				array = state_culture_array
+    				value = v
+				index = i
+				set_temp_variable = { temp_sum = state_culture_array_num^i }
+    				if = {
+					limit = { OWNER = { is_in_array = { national_culture_array = v} } }
+					multiply_temp_variable = { temp_sum = 3.0 }
+					add_to_temp_variable = { culture_sum = temp_sum }
+				}
+				else_if = {
+					limit = { OWNER = { is_in_array = { accepted_culture_array = v} } }
+					multiply_temp_variable = { temp_sum = 2.0 }
+					add_to_temp_variable = { culture_sum = temp_sum }
+				}
+				else_if = {
+					limit = { OWNER = { is_in_array = { marginalised_culture_array = v} } }
+				}
+				else = {
+					add_to_temp_variable = { culture_sum = temp_sum }
+				}
+			}
+			for_each_loop = {
+    				array = state_religion_array
+    				value = v
+				index = i
+				set_temp_variable = { temp_sum = state_religion_array_num^i }
+    				if = {
+					limit = { OWNER = { is_in_array = { national_religion_array = v} } }
+					multiply_temp_variable = { temp_sum = 3.0 }
+					add_to_temp_variable = { religion_sum = temp_sum }
+				}
+				else_if = {
+					limit = { OWNER = { is_in_array = { accepted_religion_array = v} } }
+					multiply_temp_variable = { temp_sum = 2.0 }
+					add_to_temp_variable = { religion_sum = temp_sum }
+				}
+				else_if = {
+					limit = { OWNER = { is_in_array = { marginalised_religion_array = v} } }
+					multiply_temp_variable = { temp_sum = 0 }
+				}
+				else = {
+					add_to_temp_variable = { religion_sum = temp_sum }
+				}
+			}
+			if = {
+				limit = { check_variable = { culture_sum > 1.99 } }
+				add_dynamic_modifier = {
+					modifier = primary_culture
+				}
+			}
+			else_if = {
+				limit = { check_variable = { culture_sum > 1.49 } }
+				add_dynamic_modifier = {
+					modifier = accepted_culture
+				}
+			}
+			else_if = {
+				limit = { check_variable = { culture_sum > 0.99 } }
+				add_dynamic_modifier = {
+					modifier = default_culture
+				}
+			}
+			else = {
+				add_dynamic_modifier = {
+					modifier = marginalized_culture
+				}
+			}
+			if = {
+				limit = { check_variable = { religion_sum > 1.99 } }
+				add_dynamic_modifier = {
+					modifier = primary_religion
+				}
+			}
+			else_if = {
+				limit = { check_variable = { religion_sum > 1.49 } }
+				add_dynamic_modifier = {
+					modifier = accepted_religion
+				}
+			}
+			else_if = {
+				limit = { check_variable = { religion_sum > 0.99 } }
+				add_dynamic_modifier = {
+					modifier = default_religion
+				}
+			}
+			else = {
+				add_dynamic_modifier = {
+					modifier = marginalized_religion
+				}
+			}
+		}
+	}
+}
