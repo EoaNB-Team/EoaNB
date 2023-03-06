@@ -3978,7 +3978,10 @@ country_event = {
 			country_event = { id = eastern_crisis.440 days = 14 random_days = 7 }
 			country_event = { id = eastern_crisis.441 days = 70 random_days = 14 }
 			country_event = { id = eastern_crisis.443 days = 7 random_days = 5 }
-			GRE = { country_event = { id = eastern_crisis.701 days = 7 random_days = 7 } }
+			GRE = {
+				country_event = { id = eastern_crisis.701 days = 7 random_days = 7 }
+				country_event = { id = eastern_crisis.719 days = 60 random_days = 15 }
+			}
 			if = {
 				limit = {
 					is_ai = no
@@ -4090,7 +4093,8 @@ country_event = {
 				}
 				is_locked = yes
 			}
-			#country_event = { id = eastern_crisis.118 days = 14 }
+			set_country_flag = eastern_crisis_russo_turkish_war_participant
+			country_event = { id = eastern_crisis.719 days = 7 random_days = 3 }
 		}
 	}
 }
@@ -5260,6 +5264,13 @@ country_event = {
 				white_peace = ROM
 				white_peace = SER
 				country_event = { id = eastern_crisis.469 }
+				if = {
+					limit = {
+						GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+					}
+					white_peace = GRE
+					GRE = { country_event = { id = eastern_crisis.469 } }
+				}
 			}
 			MNT = { country_event = { id = eastern_crisis.469 } }
 			ROM = { country_event = { id = eastern_crisis.469 } }
@@ -5317,11 +5328,15 @@ country_event = {
 			}
 			news_event = { id = eastern_crisis.477 days = 1 }
 			country_event = { id = eastern_crisis.478 days = 31 }
+			GRE = {
+				country_event = { id = eastern_crisis.715 days = 8 random_days = 5 }
+				country_event = { id = eastern_crisis.717 days = 14 random_days = 5 }
+			}
 		}
 	}
 }
 
-#OTO/MNT/ROM/SER/BUL - The Truce of Adrianople
+#OTO/GRE/MNT/ROM/SER/BUL - The Truce of Adrianople
 country_event = {
 	id = eastern_crisis.469
 	title = eastern_crisis.469.t
@@ -5363,7 +5378,7 @@ country_event = {
 		set_temp_variable = { eoanb_prestige_change = -5 }
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
-			#set_country_flag = eastern_crisis_war_participant
+			#set_country_flag = eastern_crisis_russo_turkish_war_participant
 		}
 	}
 	
@@ -5398,7 +5413,7 @@ country_event = {
 		set_temp_variable = { eoanb_prestige_change = 3 }
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
-			#set_country_flag = eastern_crisis_war_participant
+			#set_country_flag = eastern_crisis_russo_turkish_war_participant
 		}
 	}
 }
@@ -5445,6 +5460,20 @@ country_event = {
 			NOT = { tag = OTO }
 		}
 		add_stability = 0.02
+		if = {
+			limit = {
+				tag = RUS
+			}
+			hidden_effect = {
+				OTO = { country_event = { id = eastern_crisis.470 } }
+				if = {
+					limit = {
+						country_exists = BUL
+					}
+					BUL = { country_event = { id = eastern_crisis.470 } }
+				}
+			}
+		}
 	}
 	
 	option = {
@@ -5736,6 +5765,14 @@ country_event = {
 			transfer_state = 1116
 			transfer_state = 1122
 			transfer_state = 1126
+		}
+		#Greece
+		if = {
+			limit = {
+				GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			}
+			transfer_state = 185
+			transfer_state = 811
 		}
 		hidden_effect = {
 			OTO = { country_event = { id = eastern_crisis.478 days = 1 } }
@@ -6244,8 +6281,19 @@ country_event = {
 		}
 		hidden_effect = {
 			set_global_flag = eastern_crisis_greco_ottoman_war_ongoing_flag
+			set_country_flag = eastern_crisis_greece_declared_war_flag
 			OTO = { activate_mission = eastern_crisis_mission_greco_ottoman_war }
 			news_event = { id = eastern_crisis.706 }
+			country_event = { id = eastern_crisis.715 days = 15 random_days = 7 }
+			country_event = { id = eastern_crisis.717 days = 23 random_days = 7 }
+			country_event = { id = eastern_crisis.719 days = 7 random_days = 3 }
+			division_template = {
+				name = "Greek Rebels"
+				regiments = {
+					irregular_infantry = { x = 0 y = 0 }
+				}
+				is_locked = yes
+			}
 		}
 	}
 }
@@ -6601,14 +6649,651 @@ country_event = {
 country_event = {
 	id = eastern_crisis.715
 	title = eastern_crisis.715.t
-	desc = eastern_crisis.715.d
+	desc = {
+		trigger = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+		text = eastern_crisis.715.d_russo_turkish_war
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			has_country_flag = eastern_crisis_greece_declared_war_flag
+		}
+		text = eastern_crisis.715.d_greco_ottoman_war
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+		}
+		text = eastern_crisis.715.d_historical
+	}
 	picture = GFX_report_event_macedonian_rebellion
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	trigger = {
+		if = {
+			limit = {
+				OR = {
+					has_country_flag = eastern_crisis_russo_turkish_war_participant
+					NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+				}
+			}
+			185 = {
+				OR = {
+					is_controlled_by = BUL
+					is_controlled_by = OTO
+				}
+			}
+			731 = {
+				OR = {
+					is_controlled_by = BUL
+					is_controlled_by = OTO
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				has_country_flag = eastern_crisis_greece_declared_war_flag
+			}
+			has_war_with = OTO
+			OR = {
+				185 = { is_controlled_by = OTO }
+				731 = { is_controlled_by = OTO }
+			}
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.715.a
+		trigger = {
+			has_country_flag = eastern_crisis_russo_turkish_war_participant
+		}
+		if = {
+			limit = {
+				has_war_with = OTO
+			}
+			185 = {
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 966
+				}
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 966
+				}
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 3844
+				}
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 3844
+				}
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 13868
+				}
+				create_unit = {
+					division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 13868
+				}
+			}
+			hidden_effect = {
+				OTO = { country_event = { id = eastern_crisis.716 days = 1 } }
+			}
+		}
+		else = {
+			if = {
+				limit = {
+					731 = { is_controlled_by = BUL }
+				}
+				185 = {
+					force_enable_resistance = OTO
+					start_resistance = OTO
+					add_resistance = 15
+				}
+				731 = {
+					force_enable_resistance = BUL
+					start_resistance = BUL
+					add_resistance = 10
+				}
+				hidden_effect = {
+					BUL = { country_event = { id = eastern_crisis.716 days = 1 } }
+					RUS = { country_event = { id = eastern_crisis.716 days = 1 } }
+				}
+			}
+			else = {
+				185 = {
+					force_enable_resistance = OTO
+					start_resistance = OTO
+					add_resistance = 15
+				}
+				731 = {
+					force_enable_resistance = OTO
+					start_resistance = OTO
+					add_resistance = 10
+				}
+				hidden_effect = {
+					OTO = { country_event = { id = eastern_crisis.716 days = 1 } }
+				}
+			}
+		}
+		add_war_support = 0.03
+	}
+
+	option = {
+		name = eastern_crisis.715.b
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			has_country_flag = eastern_crisis_greece_declared_war_flag
+		}
+		185 = {
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 966
+			}
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 966
+			}
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 3844
+			}
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 3844
+			}
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 13868
+			}
+			create_unit = {
+				division = "name = \"Macedonian Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+				owner = GRE
+				prioritize_location = 13868
+			}
+		}
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.716 days = 1 } }
+		}
+	}
+
+	option = {
+		name = eastern_crisis.715.c
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+		}
+		if = {
+			limit = {
+				731 = { is_controlled_by = BUL }
+			}
+			185 = {
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 15
+			}
+			731 = {
+				force_enable_resistance = BUL
+				start_resistance = BUL
+				add_resistance = 10
+			}
+			hidden_effect = {
+				BUL = { country_event = { id = eastern_crisis.716 days = 1 } }
+				RUS = { country_event = { id = eastern_crisis.716 days = 1 } }
+			}
+		}
+		else = {
+			185 = {
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 15
+			}
+			731 = {
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 10
+			}
+			hidden_effect = {
+				OTO = { country_event = { id = eastern_crisis.716 days = 1 } }
+			}
+		}
+	}
+}
+
+#The Macedonian Rebellion
+country_event = {
+	id = eastern_crisis.716
+	title = eastern_crisis.716.t
+	desc = eastern_crisis.716.d
+	picture = GFX_report_event_macedonian_rebellion
+
+	is_triggered_only = yes
+	
+	#OTO - Greece took part in the Russo-Turkish War
+	option = {
+		name = eastern_crisis.716.a
+		trigger = {
+			tag = OTO
+			GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+		}
+		add_stability = -0.03
+		custom_effect_tooltip = OTO_nationalist_resistance_eastern_crisis_effect_tt
+		hidden_effect = {
+			BUL = { country_event = { id = eastern_crisis.716 } }
+			RUS = { country_event = { id = eastern_crisis.716 } }
+		}
+	}
+
+	#BUL/RUS - Greece took part in the Russo-Turkish War
+	option = {
+		name = eastern_crisis.716.b
+		trigger = {
+			NOT = { tag = OTO }
+			GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+		}
+		add_stability = -0.03
+		if = {
+			limit = {
+				tag = BUL
+			}
+			custom_effect_tooltip = BUL_eastern_crisis_macedonian_rebellion_effect_tt
+		}
+	}
+	
+	#OTO - Greece declared the Greco-Ottoman War
+	option = {
+		name = eastern_crisis.716.c
+		trigger = {
+			tag = OTO
+			GRE = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+		}
+		add_stability = -0.05
+		add_war_support = -0.03
+		custom_effect_tooltip = OTO_eastern_crisis_macedonian_rebellion_effect_tt
+	}
+
+	#OTO - Greece did not participate in a war against the Ottomans
+	option = {
+		name = eastern_crisis.716.e
+		trigger = {
+			tag = OTO
+			GRE = {
+				NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+				NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+			}
+		}
+		add_stability = -0.05
+		custom_effect_tooltip = OTO_nationalist_resistance_eastern_crisis_effect_tt
+		hidden_effect = {
+			BUL = { country_event = { id = eastern_crisis.716 } }
+			RUS = { country_event = { id = eastern_crisis.716 } }
+		}
+	}
+
+	#BUL/RUS - Greece did not participate in a war against the Ottomans
+	option = {
+		name = eastern_crisis.716.f
+		trigger = {
+			NOT = { tag = OTO }
+			GRE = {
+				NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+				NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+			}
+		}
+		add_stability = -0.03
+		if = {
+			limit = {
+				tag = BUL
+			}
+			custom_effect_tooltip = BUL_eastern_crisis_macedonian_rebellion_effect_tt
+		}
+	}
+}
+
+#The Epirus Revolt
+country_event = {
+	id = eastern_crisis.717
+	title = eastern_crisis.717.t
+	desc = {
+		trigger = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+		text = eastern_crisis.717.d_russo_turkish_war
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			has_country_flag = eastern_crisis_greece_declared_war_flag
+		}
+		text = eastern_crisis.717.d_greco_ottoman_war
+	}
+	desc = {
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+		}
+		text = eastern_crisis.717.d_historical
+	}
+	picture = GFX_report_event_greek_rebels_flag
 	
 	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
-		name = eastern_crisis.715.a
+		name = eastern_crisis.717.a
+		trigger = {
+			OR = {
+				has_country_flag = eastern_crisis_russo_turkish_war_participant
+				has_country_flag = eastern_crisis_greece_declared_war_flag
+			}
+		}
+		if = {
+			limit = {
+				has_war_with = OTO
+			}
+			185 = {
+				create_unit = {
+					division = "name = \"Epirote Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 9805
+				}
+			}
+			811 = {
+				create_unit = {
+					division = "name = \"Epirote Rebels\" division_template = \"Greek Rebels\" start_experience_factor = 0.01"
+					owner = GRE
+					prioritize_location = 9916
+				}
+			}
+		}
+		else = {
+			185 = {
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 8
+			}
+			811 = {
+				force_enable_resistance = OTO
+				start_resistance = OTO
+				add_resistance = 8
+			}
+		}
+		add_war_support = 0.01
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.718 days = 1 } }
+		}
+	}
+
+	option = {
+		name = eastern_crisis.717.b
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+			NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+		}
+		185 = {
+			force_enable_resistance = OTO
+			start_resistance = OTO
+			add_resistance = 8
+		}
+		811 = {
+			force_enable_resistance = OTO
+			start_resistance = OTO
+			add_resistance = 8
+		}
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.718 days = 1 } }
+		}
+	}
+}
+
+#The Epirus Revolt
+country_event = {
+	id = eastern_crisis.718
+	title = eastern_crisis.718.t
+	desc = eastern_crisis.718.d
+	picture = GFX_report_event_greek_rebels_flag
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#At peace
+	option = {
+		name = eastern_crisis.718.a
+		trigger = {
+			NOT = { has_war_with = GRE }
+		}
+		add_stability = -0.01
+		custom_effect_tooltip = OTO_nationalist_resistance_eastern_crisis_effect_tt
+	}
+	
+	#At war
+	option = {
+		name = eastern_crisis.718.b
+		trigger = {
+			has_war_with = GRE
+		}
+		add_stability = -0.02
 		add_war_support = -0.01
+		custom_effect_tooltip = OTO_eastern_crisis_epirote_rebellion_effect_tt
+	}
+}
+
+#GRE - The Cretan Revolt of 1878
+country_event = {
+	id = eastern_crisis.719
+	title = eastern_crisis.719.t
+	desc = eastern_crisis.719.d
+	picture = GFX_report_event_cretan_revolt_flag
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			NOT = { country_exists = CET }
+			CET = { is_puppet_of = OTO }
+		}
+	}
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					country_exists = CET
+				}
+				OTO = { release_puppet = CET }
+			}
+			else = {
+				182 = {
+					add_core_of = CET
+				}
+				1242 = {
+					add_core_of = CET
+				}
+				OTO = { release = CET }
+			}
+			CET = { 
+				add_ideas = CET_idea_cretan_spirit
+				set_cosmetic_tag = CET_Cretan_Rebels
+				load_oob = CET_rebellion_2
+				declare_war_on = {
+					target = OTO
+					type = wargoal_cretan_revolution
+				}
+			}
+			set_global_flag = eastern_crisis_cretan_revolt_ongoing_flag
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.719.a
+		add_war_support = 0.02
+		unlock_decision_tooltip = eastern_crisis_decision_support_the_cretan_rebels
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.720 } }
+		}
+	}
+}
+
+#OTO - The Cretan Revolt of 1878
+country_event = {
+	id = eastern_crisis.720
+	title = eastern_crisis.720.t
+	desc = eastern_crisis.720.d
+	picture = GFX_report_event_cretan_revolt_flag
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Declare War on the Rebels
+	option = {
+		name = eastern_crisis.720.a
+		activate_mission = eastern_crisis_mission_cretan_revolt
+		hidden_effect = {
+			CET = { activate_mission = eastern_crisis_mission_cretan_revolt }
+		}
+	}
+
+	#Take Control of the Rebels
+	option = {
+		name = eastern_crisis.720.b
+		trigger = {
+			is_ai = no
+		}
+		activate_mission = eastern_crisis_mission_cretan_revolt
+		CET = {
+			activate_mission = eastern_crisis_mission_cretan_revolt
+			change_tag_from = ROOT
+		}
+	}
+}
+
+#CET - Greek Help Arrives
+country_event = {
+	id = eastern_crisis.721
+	title = eastern_crisis.721.t
+	desc = eastern_crisis.721.d
+	picture = GFX_report_event_cretan_revolt_flag
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.721.a
+		add_manpower = 500
+		add_war_support = 0.1
+		army_experience = 25
+	}
+}
+
+#CET - The Pact of Halepa (Historical - Greece did not declare war on the Ottomans)
+country_event = {
+	id = eastern_crisis.722
+	title = eastern_crisis.722.t
+	desc = eastern_crisis.722.d
+	picture = GFX_report_event_crete_island
+
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.722.a
+		trigger = {
+			tag = CET
+		}
+		custom_effect_tooltip = CET_ottoman_khedive_effect_tt
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.722 } }
+		}
+	}
+
+	option = {
+		name = eastern_crisis.722.b
+		trigger = {
+			tag = OTO
+		}
+		if = {
+			limit = {
+				OR = {
+					has_dlc = "Together for Victory"
+					has_dlc = "Waking the Tiger"
+					has_dlc = "Death or Dishonor"
+				}
+			}
+			set_autonomy = {
+				target = CET
+				autonomous_state = autonomy_khedive
+				freedom_level = 0.6
+			}
+		}
+		else = {
+			puppet = CET
+		}
+	}
+}
+
+#CET - Unification with Greece (Alt-history - Greece declared war on the Ottomans)
+country_event = {
+	id = eastern_crisis.723
+	title = eastern_crisis.723.t
+	desc = eastern_crisis.723.d
+	picture = GFX_report_event_crete_island
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				GRE = {
+					change_tag_from = ROOT
+				}
+			}
+		}
+	}
+	
+	option = {
+		name = eastern_crisis.723.a
+		GRE = {
+			transfer_state = 182
+			transfer_state = 1242
+		}
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.723 } }
+		}
+	}
+}
+
+#OTO - Crete Unites with Greece (Alt-history - Greece declared war on the Ottomans)
+country_event = {
+	id = eastern_crisis.724
+	title = eastern_crisis.724.t
+	desc = eastern_crisis.724.d
+	picture = GFX_report_event_crete_island
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.724.a
+		add_stability = -0.05
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
+		OTO_sicker_man_of_europe = yes
 	}
 }

@@ -988,7 +988,7 @@ eastern_crisis_decision_category =	{
 		}
 	}
 	
-	#The Russo-Turkish War
+	#The Russo-Turkish War - UNFINISHED
 	eastern_crisis_mission_russo_turkish_war = {
 		
 		icon = generic_ignite_civil_war
@@ -1061,7 +1061,7 @@ eastern_crisis_decision_category =	{
 					tag = RUS
 				}
 				white_peace = OTO
-				country_event = { id = eastern_crisis.468 days = 3 }
+				country_event = { id = eastern_crisis.468 }
 			}
 			#if = {
 			#	limit = {
@@ -1726,38 +1726,202 @@ eastern_crisis_decision_category =	{
 		}
 	}
 	
-	eastern_crisis_decision_greek_support = {
+	#Support the Cretan Rebels (1878)
+	eastern_crisis_decision_support_the_cretan_rebels = {
 
-		icon = generic_political_discourse
+		icon = generic_industry
 
-		allowed = { always = no }
-		
+		allowed = {
+			tag = GRE
+		}
+
 		available = {
-			
+			has_global_flag = eastern_crisis_cretan_revolt_ongoing_flag
+			has_equipment = {
+				infantry_equipment > 499
+			}
+			has_equipment = {
+				uniform_equipment > 499
+			}
+			has_equipment = {
+				cannon_equipment > 23
+			}
 		}
 
 		visible = {
-			
+			CET = {
+				has_war_with = OTO
+				has_active_mission = eastern_crisis_mission_cretan_revolt
+			}
 		}
 
 		fire_only_once = yes
-		cost = 75
-		 days_remove = 140
-		  
-		 modifier = {
-			
-		 }  
-		
-			complete_effect = {
-			
+
+		custom_cost_trigger = {
+			has_political_power > 19.9
+			command_power > 49.99
 		}
-		
-		 remove_effect = {
-			
-		 }
-		
+		custom_cost_text = eoanb_political_power_20_command_power_50
+
+		days_remove = 14
+
+		cancel_trigger = {
+			CET = {
+				OR = {
+					NOT = { has_war_with = OTO }
+					exists = no
+				}
+			}
+		}
+
+		complete_effect = {
+			add_political_power = -20
+			add_command_power = -50
+		}
+
+		remove_effect = {
+			CET = { country_event = { id = eastern_crisis.721 } }
+			send_equipment = {
+				equipment = infantry_equipment
+				amount = 500
+				target = CET
+			}
+			send_equipment = {
+				equipment = uniform_equipment
+				amount = 500
+				target = CET
+			}
+			send_equipment = {
+				equipment = cannon_equipment
+				amount = 24
+				target = CET
+			}
+		}
+
 		ai_will_do = {
 			base = 1000
+		}
+	}
+
+	#The Cretan Revolt of 1878
+	eastern_crisis_mission_cretan_revolt = {
+		
+		icon = generic_ignite_civil_war
+		
+		allowed = { always = no }
+		
+		available = {
+			if = {
+				limit = {
+					tag = CET
+				}
+				surrender_progress < 0.8
+				OR = {
+					controls_province = 9940
+					controls_province = 12058
+				}
+				#OTO has peace with Russia?
+				custom_trigger_tooltip = {
+					tooltip = eastern_crisis_mission_cretan_revolt_trigger_tt
+					hidden_trigger = {
+						has_global_flag = {
+							flag = eastern_crisis_cretan_revolt_ongoing_flag
+							days > 300
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				CET = {
+					surrender_progress > 0.8
+				}
+			}
+		}
+		
+		activation = { always = no }
+		
+		priority = 70
+		
+		is_good = no
+		
+		days_mission_timeout = 365
+		
+		complete_effect = {
+			if = {
+				limit = {
+					tag = CET
+				}
+				white_peace = OTO
+				if = {
+					limit = {
+						GRE = {
+							NOT = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
+							NOT = { has_country_flag = eastern_crisis_greece_declared_war_flag }
+						}
+					}
+					country_event = { id = eastern_crisis.722 }
+				}
+				else_if = {
+					limit = {
+						GRE = {
+							OR = {
+								has_country_flag = eastern_crisis_russo_turkish_war_participant
+								has_country_flag = eastern_crisis_greece_declared_war_flag
+							}
+						}
+					}
+					country_event = { id = eastern_crisis.723 }
+					hidden_effect = {
+						OTO = { country_event = { id = eastern_crisis.724 } }
+					}
+				}
+				hidden_effect = {
+					clr_global_flag = eastern_crisis_cretan_revolt_ongoing_flag
+				}
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+				annex_country = {
+					target = CET
+				}
+				hidden_effect = {
+					clr_global_flag = eastern_crisis_cretan_revolt_ongoing_flag
+				}
+			}
+		}
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = OTO
+				}
+				white_peace = CET
+				if = {
+					limit = {
+						OR = {
+							has_dlc = "Together for Victory"
+							has_dlc = "Waking the Tiger"
+							has_dlc = "Death or Dishonor"
+						}
+					}
+					set_autonomy = {
+						target = CET
+						autonomous_state = autonomy_khedive
+						freedom_level = 0.3
+					}
+				}
+				else = {
+					puppet = CET
+				}
+			}
+			hidden_effect = {
+				clr_global_flag = eastern_crisis_cretan_revolt_ongoing_flag
+			}
 		}
 	}
 	
