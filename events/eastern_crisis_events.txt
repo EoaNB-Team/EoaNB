@@ -3,7 +3,8 @@ add_namespace = eastern_crisis
 #eastern_crisis.1-100		Bosnia and Herzegovina Events
 #eastern_crisis.101-200		Serbia and Montenegro Events
 #eastern_crisis.201-400		Bulgaria Events
-#eastern_crisis.401-600		Russo-Turkish War Events
+#eastern_crisis.401-500		Russo-Turkish War Events
+#eastern_crisis.501-600		Berlin Congress Events
 #eastern_crisis.601-700		Albania Events
 #eastern_crisis.701-800		Greece Events
 
@@ -1029,7 +1030,7 @@ country_event = {
 			remove_mission = eastern_crisis_mission_serbian_ottoman_war
 			SER = {
 				remove_mission = eastern_crisis_mission_serbian_ottoman_war
-				remove_from_faction = MNT
+				dismantle_faction = yes
 			}
 			RUS = { country_event = { id = eastern_crisis.108 } }
 		}
@@ -4082,7 +4083,6 @@ country_event = {
 			limit = {
 				country_exists = CET
 			}
-			create_faction = faction_greek_allies
 			CET = { country_event = { id = eastern_crisis.707 days = 2 } }
 		}
 		hidden_effect = {
@@ -5263,6 +5263,7 @@ country_event = {
 				white_peace = MNT
 				white_peace = ROM
 				white_peace = SER
+				dismantle_faction = yes
 				country_event = { id = eastern_crisis.469 }
 				if = {
 					limit = {
@@ -5777,6 +5778,29 @@ country_event = {
 		hidden_effect = {
 			OTO = { country_event = { id = eastern_crisis.478 days = 1 } }
 			news_event = { id = eastern_crisis.479 days = 1 }
+			#Reaction of the Great Powers
+			AUS = { country_event = { id = eastern_crisis.501 days = 7 } }
+			ENG = { country_event = { id = eastern_crisis.501 days = 7 } }
+			FRA = { country_event = { id = eastern_crisis.501 days = 7 } }
+			PRS = { country_event = { id = eastern_crisis.501 days = 7 } }
+			every_other_country = {
+				limit = {
+					OR = {
+						has_country_flag = is_literally_italy
+						tag = PIE
+					}
+				}
+				country_event = { id = eastern_crisis.501 days = 7 }
+			}
+			#Reaction of the Balkan Countries
+			GRE = { country_event = { id = eastern_crisis.502 days = 7 } }
+			MNT = { country_event = { id = eastern_crisis.502 days = 7 } }
+			ROM = { country_event = { id = eastern_crisis.502 days = 7 } }
+			SER = { country_event = { id = eastern_crisis.502 days = 7 } }
+			RUS = {
+				country_event = { id = eastern_crisis.503 days = 14 }
+				set_variable = { var = eastern_crisis_berlin_congress_pressure value = 0 }
+			}
 		}
 	}
 	
@@ -5952,6 +5976,355 @@ country_event = {
 			remove_dynamic_modifier = {
 				modifier = mass_immigration
 			}
+		}
+	}
+}
+
+##### BERLIN CONGRESS EVENTS (eastern_crisis.501-600) #####
+
+#The Treaty of San Stefano - Reaction of the Great Powers
+country_event = {
+	id = eastern_crisis.501
+	title = eastern_crisis.501.t
+	desc = eastern_crisis.501.d
+	picture = GFX_report_event_treaty_of_san_stefano
+	
+	is_triggered_only = yes
+
+	timeout_days = 5
+	
+	#Challenge the treaty
+	option = {
+		name = eastern_crisis.501.a
+		ai_chance = {
+			base = 90
+			modifier = {
+				add = 5
+				OR = {
+					tag = FRA
+					tag = PRS
+				}
+			}
+		}
+		custom_effect_tooltip = eastern_crisis_challenge_san_stefano_treaty_effect_tt
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			RUS = { add_to_variable = { var = eastern_crisis_berlin_congress_pressure value = 1 } }
+		}
+	}
+	
+	#Accept the treaty
+	option = {
+		name = eastern_crisis.501.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = -5
+				OR = {
+					tag = FRA
+					tag = PRS
+				}
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					tag = AUS
+					tag = ENG
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+}
+
+#The Treaty of San Stefano - Reaction of the Balkan Countries
+country_event = {
+	id = eastern_crisis.502
+	title = eastern_crisis.502.t
+	desc = eastern_crisis.502.d
+	picture = GFX_report_event_treaty_of_san_stefano
+	
+	is_triggered_only = yes
+
+	timeout_days = 5
+	
+	#Outrageous
+	option = {
+		name = eastern_crisis.502.a
+		ai_chance = { base = 95 }
+		add_stability = -0.05
+		add_war_support = 0.03
+		add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_san_stefano_treaty }
+		reverse_add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_san_stefano_treaty }
+		custom_effect_tooltip = historical_option
+	}
+	
+	#We can live with these decisions
+	option = {
+		name = eastern_crisis.502.b
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_stability = 0.05
+		add_war_support = -0.03
+	}
+}
+
+#Hidden Event to Calculate Pressure on Russia
+country_event = {
+	id = eastern_crisis.503
+	title = eastern_crisis.503.t
+	
+	fire_only_once = yes
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = {
+					check_variable = {
+						var = eastern_crisis_berlin_congress_pressure
+						value = 4
+						compare = greater_than_or_equals
+					}
+				}
+				country_event = { id = eastern_crisis.504 days = 3 }
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						var = eastern_crisis_berlin_congress_pressure
+						value = 4
+						compare = less_than
+					}
+				}
+				country_event = { id = eastern_crisis.505 days = 3 }
+			}
+		}
+	}
+}
+
+#The Great Powers Challenge the Treaty of San Stefano
+country_event = {
+	id = eastern_crisis.504
+	title = eastern_crisis.504.t
+	desc = eastern_crisis.504.d
+	picture = GFX_report_event_peterhof_palace
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Give in to their pressure
+	option = {
+		name = eastern_crisis.504.a
+		ai_chance = { base = 95 }
+		decrease_ps_by_one = yes
+		add_stability = -0.05
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			clear_variable = eastern_crisis_berlin_congress_pressure
+			AUS = { country_event = { id = eastern_crisis.506 days = 3 } }
+			ENG = { country_event = { id = eastern_crisis.506 days = 3 } }
+			FRA = { country_event = { id = eastern_crisis.506 days = 3 } }
+			PRS = { country_event = { id = eastern_crisis.506 days = 3 } }
+			every_other_country = {
+				limit = {
+					OR = {
+						has_country_flag = is_literally_italy
+						tag = PIE
+					}
+				}
+				country_event = { id = eastern_crisis.506 days = 3 }
+			}
+		}
+	}
+	
+	#Resist against the international pressure
+	option = {
+		name = eastern_crisis.504.b
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		decrease_ps_by_two = yes
+		add_political_power = -500
+		add_stability = -0.15
+		add_war_support = -0.05
+		hidden_effect = {
+			clear_variable = eastern_crisis_berlin_congress_pressure
+			AUS = { country_event = { id = eastern_crisis.507 days = 3 } }
+			ENG = { country_event = { id = eastern_crisis.507 days = 3 } }
+			FRA = { country_event = { id = eastern_crisis.507 days = 3 } }
+			PRS = { country_event = { id = eastern_crisis.507 days = 3 } }
+			every_other_country = {
+				limit = {
+					OR = {
+						has_country_flag = is_literally_italy
+						tag = PIE
+					}
+				}
+				country_event = { id = eastern_crisis.507 days = 3 }
+			}
+		}
+	}
+}
+
+#The Great Powers Challenge are Divided over the Treaty of San Stefano
+country_event = {
+	id = eastern_crisis.505
+	title = eastern_crisis.505.t
+	desc = eastern_crisis.505.d
+	picture = GFX_report_event_peterhof_palace
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.505.a
+		add_stability = 0.03
+		hidden_effect = {
+			clear_variable = eastern_crisis_berlin_congress_pressure
+			AUS = { country_event = { id = eastern_crisis.507 days = 3 } }
+			ENG = { country_event = { id = eastern_crisis.507 days = 3 } }
+			FRA = { country_event = { id = eastern_crisis.507 days = 3 } }
+			PRS = { country_event = { id = eastern_crisis.507 days = 3 } }
+			every_other_country = {
+				limit = {
+					OR = {
+						has_country_flag = is_literally_italy
+						tag = PIE
+					}
+				}
+				country_event = { id = eastern_crisis.507 days = 3 }
+			}
+		}
+	}
+}
+
+#Russia Agrees to Renegotiate the Treaty
+country_event = {
+	id = eastern_crisis.506
+	title = eastern_crisis.506.t
+	desc = eastern_crisis.506.d
+	picture = GFX_report_event_peterhof_palace
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.506.a
+		add_stability = 0.01
+		if = {
+			limit = {
+				PRS_trigger_formed_germany = yes
+			}
+			if = {
+				limit = {
+					tag = PRS
+				}
+				country_event = { id = eastern_crisis.508 days = 3 }
+			}
+		}
+		else_if = {
+			if = {
+				limit = {
+					tag = ENG
+				}
+				country_event = { id = eastern_crisis.508 days = 3 }
+			}
+		}
+	}
+}
+
+#Russia Refuses to Renegotiate the Treaty
+country_event = {
+	id = eastern_crisis.507
+	title = eastern_crisis.507.t
+	desc = eastern_crisis.507.d
+	picture = GFX_report_event_peterhof_palace
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.507.a
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = 0.05
+	}
+}
+
+#Host the Congress at Berlin/London
+country_event = {
+	id = eastern_crisis.508
+	title = eastern_crisis.508.t
+	desc = eastern_crisis.508.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.508.a
+		add_political_power = 50
+		hidden_effect = {
+			AUS = { country_event = { id = eastern_crisis.509 days = 3 } }
+			FRA = { country_event = { id = eastern_crisis.509 days = 3 } }
+			RUS = { country_event = { id = eastern_crisis.509 days = 3 } }
+			every_other_country = {
+				limit = {
+					OR = {
+						has_country_flag = is_literally_italy
+						tag = PIE
+					}
+				}
+				country_event = { id = eastern_crisis.509 days = 3 }
+			}
+			OTO = { country_event = { id = eastern_crisis.509 days = 3 } }
+			GRE = { country_event = { id = eastern_crisis.509 days = 3 } }
+			MNT = { country_event = { id = eastern_crisis.509 days = 3 } }
+			ROM = { country_event = { id = eastern_crisis.509 days = 3 } }
+			SER = { country_event = { id = eastern_crisis.509 days = 3 } }
+			if = {
+				limit = {
+					tag = PRS
+				}
+				ENG = { country_event = { id = eastern_crisis.509 days = 3 } }
+			}
+			else = {
+				PRS = { country_event = { id = eastern_crisis.509 days = 3 } }
+			}
+			country_event = { id = eastern_crisis.510 days = 14 }
+		}
+	}
+}
+
+#Germany/Britain Invites us to a Congress at Berlin/London
+country_event = {
+	id = eastern_crisis.509
+	title = eastern_crisis.509.t
+	desc = eastern_crisis.509.d
+	picture = GFX_event_wilhelmstrasse_staatsministerium
+	
+	is_triggered_only = yes
+
+	timeout_days = 10
+	
+	option = {
+		name = eastern_crisis.509.a
+		hidden_effect = {
+			set_country_flag = eastern_crisis_berlin_congress_participant_flag
 		}
 	}
 }
@@ -6452,6 +6825,7 @@ country_event = {
 		hidden_effect = {
 			remove_mission = eastern_crisis_mission_greco_ottoman_war
 			OTO = { remove_mission = eastern_crisis_mission_greco_ottoman_war }
+			dismantle_faction = yes
 			news_event = { id = eastern_crisis.711 days = 1 }
 		}
 	}
@@ -6528,7 +6902,10 @@ country_event = {
 	immediate = {
 		hidden_effect = {
 			remove_mission = eastern_crisis_mission_greco_ottoman_war
-			GRE = { remove_mission = eastern_crisis_mission_greco_ottoman_war }
+			GRE = {
+				remove_mission = eastern_crisis_mission_greco_ottoman_war
+				dismantle_faction = yes
+			}
 			news_event = { id = eastern_crisis.713 days = 1 }
 		}
 	}
@@ -6622,7 +6999,9 @@ country_event = {
 		set_temp_variable = { eoanb_prestige_change = -1 }
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
+			remove_mission = eastern_crisis_mission_greco_ottoman_war
 			OTO = { country_event = { id = eastern_crisis.714 } }
+			dismantle_faction = yes
 		}
 	}
 	
@@ -6642,6 +7021,9 @@ country_event = {
 		}
 		add_stability = 0.02
 		add_war_support = -0.05
+		hidden_effect = {
+			remove_mission = eastern_crisis_mission_greco_ottoman_war
+		}
 	}
 }
 
