@@ -6060,6 +6060,9 @@ country_event = {
 		add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_san_stefano_treaty }
 		reverse_add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_san_stefano_treaty }
 		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = eastern_crisis_san_stefano_outrage_flag
+		}
 	}
 	
 	#We can live with these decisions
@@ -6144,6 +6147,7 @@ country_event = {
 				}
 				country_event = { id = eastern_crisis.506 days = 3 }
 			}
+			OTO = { country_event = { id = eastern_crisis.506 days = 3 } }
 		}
 	}
 	
@@ -6244,6 +6248,15 @@ country_event = {
 				country_event = { id = eastern_crisis.508 days = 3 }
 			}
 		}
+		if = {
+			limit = {
+				tag = OTO
+			}
+			unlock_decision_tooltip = eastern_crisis_decision_anglo_ottoman_convention
+			hidden_effect = {
+				set_country_flag = eastern_crisis_ottoman_convention_with_britain_flag
+			}
+		}
 	}
 }
 
@@ -6326,6 +6339,270 @@ country_event = {
 		hidden_effect = {
 			set_country_flag = eastern_crisis_berlin_congress_participant_flag
 		}
+	}
+}
+
+#Open the Berlin/London Congress
+country_event = {
+	id = eastern_crisis.510
+	title = eastern_crisis.510.t
+	desc = eastern_crisis.510.d
+	picture = GFX_report_event_berlin_congress
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.510.a
+		activate_mission = eastern_crisis_mission_berlin_congress
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					has_country_flag = eastern_crisis_berlin_congress_participant_flag
+				}
+				country_event = { id = eastern_crisis.511 days = 1 }
+			}
+		}
+	}
+}
+
+#The Berlin/London Congress Commences
+country_event = {
+	id = eastern_crisis.511
+	title = eastern_crisis.511.t
+	desc = eastern_crisis.511.d
+	picture = GFX_report_event_berlin_congress
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.511.a
+	}
+}
+
+#OTO - An Anglo-Ottoman Convention?
+country_event = {
+	id = eastern_crisis.512
+	title = eastern_crisis.512.t
+	desc = eastern_crisis.512.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 3
+	
+	#Offer them Cyprus
+	option = {
+		name = eastern_crisis.512.a
+		trigger = {
+			owns_state = 183
+			owns_state = 1240
+		}
+		ai_chance = { base = 97 }
+		ENG = {
+			country_event = { id = eastern_crisis.513 days = 1 }
+			hidden_effect = {
+				set_country_flag = eastern_crisis_cyprus_offered_flag
+			}
+		}
+		custom_effect_tooltip = historical_option
+	}
+	
+	#Offer them Crete
+	option = {
+		name = eastern_crisis.512.b
+		trigger = {
+			owns_state = 182
+			owns_state = 1242
+		}
+		ai_chance = {
+			base = 3
+			modifier = {
+				factor = 0
+				OR = {
+					GRE = { has_idea = GRE_Alfred_I }
+					is_historical_focus_on = yes
+				}
+			}
+		}
+		ENG = {
+			country_event = { id = eastern_crisis.513 days = 1 }
+			hidden_effect = {
+				set_country_flag = eastern_crisis_crete_offered_flag
+			}
+		}
+	}
+
+	#Offer them the Suez Kanal
+	option = {
+		name = eastern_crisis.512.c
+		trigger = {
+			OR = {
+				owns_state = 749
+				any_other_country = {
+					limit = {
+						is_subject_of = OTO
+					}
+					owns_state = 749
+				}
+			}
+		}
+		ai_chance = { base = 0 }
+		ENG = {
+			country_event = { id = eastern_crisis.513 days = 1 }
+			hidden_effect = {
+				set_country_flag = eastern_crisis_suez_offered_flag
+			}
+		}
+	}
+}
+
+#ENG - An Anglo-Ottoman Convention?
+country_event = {
+	id = eastern_crisis.513
+	title = eastern_crisis.513.t
+	desc = {
+		trigger = { has_country_flag = eastern_crisis_cyprus_offered_flag }
+		text = eastern_crisis.513.d_cyprus
+	}
+	desc = {
+		trigger = { has_country_flag = eastern_crisis_crete_offered_flag }
+		text = eastern_crisis.513.d_crete
+	}
+	desc = {
+		trigger = { has_country_flag = eastern_crisis_suez_offered_flag }
+		text = eastern_crisis.513.d_suez
+	}
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 3
+	
+	#Accept their offer
+	option = {
+		name = eastern_crisis.513.a
+		ai_chance = {
+			base = 100
+			modifier = {
+				add = -90
+				NOT = { has_country_flag = eastern_crisis_cyprus_offered_flag }
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+				NOT = { has_country_flag = eastern_crisis_cyprus_offered_flag }
+			}
+		}
+		OTO = { country_event = { id = eastern_crisis.515 days = 3 } }
+		if = {
+			limit = {
+				has_country_flag = eastern_crisis_cyprus_offered_flag
+			}
+			custom_effect_tooltip = historical_option
+		}
+		hidden_effect = {
+			country_event = { id = eastern_crisis.515 days = 3 }
+		}
+	}
+	
+	#Outright reject their offer 
+	option = {
+		name = eastern_crisis.513.b
+		ai_chance = { base = 0 }
+		add_political_power = -25
+		OTO = { country_event = { id = eastern_crisis.516 days = 3 } }
+	}
+
+	#Ask for Cyprus instead
+	option = {
+		name = eastern_crisis.513.b
+		trigger = {
+			NOT = { has_country_flag = eastern_crisis_cyprus_offered_flag }
+		}
+		ai_chance = { base = 90 }
+		OTO = { country_event = { id = eastern_crisis.514 days = 1 } }
+		custom_effect_tooltip = historical_option
+	}
+}
+
+#OTO - Britain Asks for Cyprus Instead
+country_event = {
+	id = eastern_crisis.514
+	title = eastern_crisis.514.t
+	desc = eastern_crisis.514.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 3
+	
+	#Accept their conditions
+	option = {
+		name = eastern_crisis.514.a
+		ai_chance = { base = 97 }
+		add_political_power = -10
+		ENG = { country_event = { id = eastern_crisis.515 days = 3 } }
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			country_event = { id = eastern_crisis.515 days = 3 }
+		}
+	}
+	
+	#Reject their conditions
+	option = {
+		name = eastern_crisis.514.b
+		ai_chance = {
+			base = 3
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_stability = -0.02
+		ENG = { country_event = { id = eastern_crisis.516 days = 3 } }
+		hidden_effect = {
+			country_event = { id = eastern_crisis.516 days = 3 }
+		}
+	}
+}
+
+#ENG/OTO - Conclusion of the Anglo-Ottoman Convention
+country_event = {
+	id = eastern_crisis.515
+	title = eastern_crisis.515.t
+	desc = eastern_crisis.515.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.515.a
+		add_political_power = 25
+		custom_effect_tooltip = eastern_crisis_anglo_ottoman_convention_effect_tt
+		hidden_effect = {
+			set_global_flag = eastern_crisis_anglo_ottoman_convention_flag
+		}
+	}
+}
+
+#ENG/OTO - Collapse of the Anglo-Ottoman Convention
+country_event = {
+	id = eastern_crisis.516
+	title = eastern_crisis.516.t
+	desc = eastern_crisis.516.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.516.a
+		add_political_power = -25
 	}
 }
 
