@@ -5807,9 +5807,7 @@ country_event = {
 			limit = {
 				GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
 			}
-			transfer_state = 185
 			transfer_state = 811
-			set_province_name = { id = 3914 name = "Ioannina" }
 			set_province_name = { id = 3973 name = "Volos" }
 		}
 		hidden_effect = {
@@ -8193,8 +8191,8 @@ country_event = {
 				limit = {
 					GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
 				}
-				transfer_state = 1200
-				set_province_name = { id = 6900 name = "Korytsá" }
+				transfer_state = 185
+				set_province_name = { id = 3914 name = "Ioannina" }
 			}
 			#Add a condition for Austria in Bosnia
 		}
@@ -8353,8 +8351,8 @@ country_event = {
 					limit = {
 						GRE = { has_country_flag = eastern_crisis_russo_turkish_war_participant }
 					}
-					transfer_state = 1200
-					set_province_name = { id = 6900 name = "Korytsá" }
+					transfer_state = 185
+					set_province_name = { id = 3914 name = "Ioannina" }
 				}
 			}
 			#Add a condition for Austria in Bosnia
@@ -8783,7 +8781,7 @@ country_event = {
 		custom_effect_tooltip = eastern_crisis_refuse_albanian_letter_effect_tt
 		custom_effect_tooltip = historical_option
 		hidden_effect = {
-			country_event = { id = eastern_crisis.609 days = 3 }
+			country_event = { id = eastern_crisis.609 days = 30 }
 		}
 	}
 
@@ -8799,7 +8797,7 @@ country_event = {
 		}
 		custom_effect_tooltip = eastern_crisis_support_albanian_letter_effect_tt
 		hidden_effect = {
-			country_event = { id = eastern_crisis.610 days = 3 }
+			country_event = { id = eastern_crisis.610 days = 30 }
 		}
 	}
 }
@@ -8830,25 +8828,51 @@ country_event = {
 		}
 	}
 	
-	trigger = {
-		ALB = { exists = no }
-	}
-	
+	#Declare War on the Rebels
 	option = {
 		name = eastern_crisis.609.a
 		add_manpower = -5000
+		ALB = { add_manpower = 5000 }
 		activate_mission = eastern_crisis_mission_albanian_revolt
 		declare_war_on = {
 			target = ALB
 			type = wargoal_albanian_revolt
 		}
 		hidden_effect = {
-			ALB = { activate_mission = eastern_crisis_mission_albanian_revolt }
+			ALB = {
+				activate_mission = eastern_crisis_mission_albanian_revolt
+				if = {
+					limit = {
+						MNT = { owns_state = 225 }
+					}
+					country_event = { id = eastern_crisis.613 days = 3 }
+				}
+			}
+			news_event = { id = eastern_crisis.612 days = 1 }
+		}
+	}
+
+	#Take Control of the Rebels
+	option = {
+		name = eastern_crisis.609.b
+		trigger = {
+			is_ai = no
+		}
+		add_manpower = -5000
+		activate_mission = eastern_crisis_mission_albanian_revolt
+		declare_war_on = {
+			target = ALB
+			type = wargoal_albanian_revolt
+		}
+		ALB = {
+			add_manpower = 5000
+			activate_mission = eastern_crisis_mission_albanian_revolt
+			change_tag_from = ROOT
 		}
 	}
 }
 
-#An Albanian Vilayet
+#Establish an Albanian Vilayet
 country_event = {
 	id = eastern_crisis.610
 	title = eastern_crisis.610.t
@@ -8865,9 +8889,48 @@ country_event = {
 	option = {
 		name = eastern_crisis.610.a
 		ALB = {
-			transfer_state = 44
-			transfer_state = 105
-			transfer_state = 1201
+			if = {
+				limit = {
+					OTO = { owns_state = 44 }
+				}
+				transfer_state = 44
+				add_state_core = 44
+			}
+			if = {
+				limit = {
+					OTO = { owns_state = 105 }
+				}
+				transfer_state = 105
+				add_state_core = 105
+			}
+			if = {
+				limit = {
+					OTO = { owns_state = 966 }
+				}
+				transfer_state = 966
+				add_state_core = 966
+			}
+			if = {
+				limit = {
+					OTO = { owns_state = 1200 }
+				}
+				transfer_state = 1200
+				add_state_core = 1200
+			}
+			if = {
+				limit = {
+					OTO = { owns_state = 1201 }
+				}
+				transfer_state = 1201
+				add_state_core = 1201
+			}
+			if = {
+				limit = {
+					OTO = { owns_state = 1202 }
+				}
+				transfer_state = 1202
+				add_state_core = 1202
+			}
 		}
 		if = {
 			limit = {
@@ -8886,6 +8949,143 @@ country_event = {
 		else = {
 			puppet = ALB
 		}
+		hidden_effect = {
+			ALB = { country_event = { id = eastern_crisis.611 days = 1 } }
+		}
+	}
+}
+
+#ALB - An Albanian Vilayet
+country_event = {
+	id = eastern_crisis.611
+	title = eastern_crisis.611.t
+	desc = eastern_crisis.611.d
+	picture = GFX_report_event_albanian_vilayet
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.611.a
+		add_political_power = 150
+		add_stability = 0.1
+		add_war_support = 0.05
+	}
+}
+
+#The League of Prizren Revolts
+news_event = {
+	id = eastern_crisis.612
+	title = eastern_crisis.612.t
+	desc = eastern_crisis.612.d
+	picture = GFX_news_event_albanian_uprising
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+	
+	option = {
+		name = eastern_crisis.612.a
+	}
+}
+
+#ALB - Declare War on Montenegro?
+country_event = {
+	id = eastern_crisis.613
+	title = eastern_crisis.613.t
+	desc = eastern_crisis.613.d
+	picture = GFX_report_event_albanian_vilayet
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	trigger = {
+		MNT = { owns_state = 225 }
+	}
+	
+	#Try to liberate Podgorica
+	option = {
+		name = eastern_crisis.613.a
+		declare_war_on = {
+			target = MNT
+			type = annex_everything
+		}
+		add_war_support = 0.05
+	}
+
+	#Leave it be
+	option = {
+		name = eastern_crisis.613.b
+		add_stability = 0.05
+		add_war_support = -0.05
+	}
+}
+
+#ALB - Victory for Albania
+country_event = {
+	id = eastern_crisis.614
+	title = eastern_crisis.614.t
+	desc = eastern_crisis.614.d
+	picture = GFX_report_event_albanian_nationalism
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.614.a
+		add_political_power = 150
+		add_stability = 0.2
+		add_war_support = -0.2
+		set_temp_variable = { eoanb_prestige_change = 5 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			OTO = { country_event = { id = eastern_crisis.615 } }
+		}
+	}
+}
+
+#OTO - Victory for Albania
+country_event = {
+	id = eastern_crisis.615
+	title = eastern_crisis.615.t
+	desc = eastern_crisis.615.d
+	picture = GFX_report_event_albanian_nationalism
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.615.a
+		add_political_power = -75
+		add_stability = -0.1
+		add_war_support = -0.1
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#The End of the League of Prizren
+country_event = {
+	id = eastern_crisis.616
+	title = eastern_crisis.616.t
+	desc = eastern_crisis.616.d
+	picture = GFX_report_event_ottoman_high_porte
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = eastern_crisis.616.a
+		annex_country = {
+			target = ALB
+		}
+		add_political_power = 50
+		add_stability = 0.05
+		add_war_support = -0.05
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
@@ -9300,6 +9500,8 @@ country_event = {
 		name = eastern_crisis.710.a
 		transfer_state = 185
 		transfer_state = 811
+		set_province_name = { id = 3914 name = "Ioannina" }
+		set_province_name = { id = 3973 name = "Volos" }
 		increase_ps_by_one = yes
 		add_stability = 0.05
 		add_war_support = -0.25
