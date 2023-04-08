@@ -10,7 +10,7 @@ tags={
 	"National Focuses"
 	"Technologies"
 }
-name="End of a New Beginning - Official Steam Edition"
+name="End of a New Beginning - Official Steam Version"
 picture="thumbnail.png"
 replace_path="common/abilities"
 replace_path="common/ai_areas"
