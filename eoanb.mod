@@ -1,4 +1,4 @@
-version="0.3 Terra Slavica"
+version="0.3.2b Terra Slavica"
 tags={
 	"Alternative History"
 	"Events"
