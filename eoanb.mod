@@ -1,4 +1,4 @@
-version="0.3.2b Terra Slavica"
+version="0.4"
 tags={
 	"Alternative History"
 	"Events"
@@ -10,7 +10,7 @@ tags={
 	"National Focuses"
 	"Technologies"
 }
-name="End of a New Beginning - Official Steam Version"
+name="End of a New Beginning - Official GitHub Version"
 picture="thumbnail.png"
 replace_path="common/abilities"
 replace_path="common/ai_areas"
