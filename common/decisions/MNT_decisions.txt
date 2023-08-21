@@ -1517,9 +1517,7 @@ MNT_decision_category_economy = {
 		}
 		
         complete_effect = {
-			hidden_effect = {
-				set_country_flag = SAX_industry_development_ongoing_flag
-			}
+		
 		}
 		
 		remove_effect = {
@@ -2110,6 +2108,7 @@ MNT_decision_category_army = {
 		}
        
         remove_effect = {
+			set_country_flag = prepared_defensive_line
 			unlock_decision_tooltip = MNT_decision_go_back_todefensive_line
 			add_manpower = 200
 	 	}
@@ -2152,6 +2151,7 @@ MNT_decision_category_army = {
 		}
        
         remove_effect = {
+		set_country_flag = perecision_artillery_support
 			unlock_decision_tooltip = MNT_decision_precision_artillery_support
 			add_manpower = 100
 			add_equipment_to_stockpile = {
@@ -2178,7 +2178,7 @@ MNT_decision_category_army = {
 
 		visible = {
 			has_completed_focus = MNT_focus_war_preparation_plans
-			#has_completed_decision = MNT_decision_artillery_position_preparation
+			has_country_flag = prepared_defensive_line
 		}
 
 		fire_only_once = yes
@@ -2217,7 +2217,7 @@ MNT_decision_category_army = {
 
 		visible = {
 			has_completed_focus = MNT_focus_war_preparation_plans
-			#has_completed_decision = MNT_decision_artillery_position_preparation
+			has_country_flag = perecision_artillery_support
 		}
 
 		fire_only_once = yes
@@ -2579,11 +2579,12 @@ MNT_decision_category_negotiation_with_ottomans = {
 
 MNT_decision_category_Herzegovinian_uprising_1857	= {
 
-MNT_send_volunteers_to_the_herzegovina = {
+	SER_send_Pero_matamovic = {
 
 		icon = feudal_warriors
 		
 		allowed = {
+		tag = SER
 		}
 
 		available = {
@@ -2591,9 +2592,62 @@ MNT_send_volunteers_to_the_herzegovina = {
 		}
 
 		visible = {
-			has_completed_focus = MNT_focus_guerrilla_war
+
+		}
+		
+		fire_only_once = yes
+		cost = 30
+        days_remove = 30
+         
+        modifier = {
+            
+        }        
+       
+		complete_effect = {
+		set_country_flag = SER_support_herzegovina_uprising
+		}
+	   
+        remove_effect = {
+		custom_effect_tooltip = matamovic_join_vukalovic
+		add_to_variable = {
+		var = MNT.herzegovina_rebels
+		value = 200
+		tooltip = add_200_rebels
+        }
+        }
+       
+		ai_will_do = {
+			base = 100000
+		}
+	}
+	
+	
+	
+MNT_send_volunteers_to_the_herzegovina = {
+
+		icon = feudal_warriors
+		
+		allowed = {
+		OR = {
+		tag = MNT
+		tag = SER
+			}
 		}
 
+		available = {
+		has_equipment = {
+		infantry_equipment > 50
+		}
+		}
+
+		visible = {
+			OR = {
+			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
+		}
+
+		fire_only_once = no
 		cost = 20
         days_remove = 30
 		days_re_enable = 50
@@ -2604,12 +2658,17 @@ MNT_send_volunteers_to_the_herzegovina = {
        
 		complete_effect = {
 		942 = { add_manpower  = -200 }
+		add_equipment_to_stockpile = {
+		type = infantry_equipment
+		amount = -50
+			}
 		}
 	   
         remove_effect = {
 		add_to_variable = {
 		var = herzegovina_rebels
 		value = 200
+		tooltip = add_200_rebels
         }
 		}
        
@@ -2617,19 +2676,28 @@ MNT_send_volunteers_to_the_herzegovina = {
 			base = 100000
 		}
 	}
-MNT_sabotage_the_infrastructure = {
+	MNT_sabotage_the_infrastructure = {
 
 		icon = feudal_warriors
 		
 		allowed = {
+		OR = {
+		tag = MNT
+		tag = SER
+			}
 		}
 
 		available = {
-
+		has_equipment = {
+		infantry_equipment > 50
+		}
 		}
 
 		visible = {
+						OR = {
 			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
 		}
 		
 		cost = 10
@@ -2641,24 +2709,26 @@ MNT_sabotage_the_infrastructure = {
         }        
        
 		complete_effect = {
+		add_equipment_to_stockpile = {
+		type = infantry_equipment
+		amount = -50
+			}
 		}
 
 	   
         remove_effect = {
 			random_list = {
 			10 = {
-				random_state = {
-				prioritize = { 1204 1272 1208 }
+				 1205 = {
 				add_resistance = 2 
 				damage_building = {type = infrastructure	damage = 1}
 					}
 				}
-			}
 			10 = {
 			custom_effect_tooltip = 50_rebels_died
 				MNT = {
 					add_to_variable = {
-					var = var:MNT.herzegovina_rebels
+					var = MNT.herzegovina_rebels
 					value = -50
 					}
 				}
@@ -2668,7 +2738,6 @@ MNT_sabotage_the_infrastructure = {
 					limit = { 
 						OTO = {
 							army_manpower_in_state = {
-							type = support
 							amount > 10000
 							state = 1205
 								}
@@ -2678,7 +2747,7 @@ MNT_sabotage_the_infrastructure = {
 				custom_effect_tooltip = 50_rebels_died
 				MNT = {
 					add_to_variable = {
-					var = var:MNT.herzegovina_rebels
+					var = MNT.herzegovina_rebels
 					value = -50
 					}
 				}
@@ -2688,17 +2757,75 @@ MNT_sabotage_the_infrastructure = {
 					NOT = {
 						OTO = {
 							army_manpower_in_state = {
-							type = support
 							amount > 10000
 							state = 1205
 								}
 							}
 						}
 					}
-				random_state = {
-				prioritize = { 1204 1272 1208 }
+				1205 = {
 				add_resistance = 2 
 				damage_building = {type = infrastructure	damage = 1}
+				}
+			}
+		}
+	}
+		}
+       
+		ai_will_do = {
+			base = 100000
+			}
+		}
+		
+		MNT_use_agitators = {
+
+		icon = feudal_warriors
+		
+		allowed = {
+		OR = {
+		tag = MNT
+		tag = SER
+			}
+		}
+
+		available = {
+		
+		}
+
+		visible = {
+			OR = {
+			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
+		}
+		
+		cost = 30
+        days_remove = 30
+		days_re_enable = 60
+         
+        modifier = {
+          
+	  }        
+       
+		complete_effect = {
+		
+		}
+
+	   
+        remove_effect = {
+		random_list = {
+		50 = {	
+		custom_effect_tooltip = growth_increase_by_1
+		add_to_variable = {
+		var = herzegovina_growth
+		value = -1
+				}
+			}
+		50 = {
+		custom_effect_tooltip = 50_rebels_died		
+		add_to_variable = {
+		var = herzegovina_rebels
+		value = -50
 				}
 			}
 		}
@@ -2706,6 +2833,924 @@ MNT_sabotage_the_infrastructure = {
        
 		ai_will_do = {
 			base = 100000
+			}
+		}
+		MNT_provoke_fights_and_riots = {
+
+		icon = feudal_warriors
+		
+		allowed = {
+		OR = {
+		tag = MNT
+		tag = SER
+			}
+		}
+
+		available = {
+		has_equipment = {
+		infantry_equipment > 50
+		}
+		}
+
+		visible = {
+			OR = {
+			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
+		}
+		
+		cost = 8
+        days_remove = 30
+		days_re_enable = 60
+         
+        modifier = {
+          
+	  }        
+       
+		complete_effect = {
+		add_equipment_to_stockpile = {
+		type = infantry_equipment
+		amount = -50
+			}
+		}
+
+	   
+        remove_effect = {
+		random_list = {
+		50 = {	
+		custom_effect_tooltip = intensity_drop_by_3
+		add_to_variable = {
+		var = herzegovina_intesity
+		value = -3
+				}
+			}
+		50 = {
+		custom_effect_tooltip = 50_rebels_died		
+		add_to_variable = {
+		var = herzegovina_rebels
+		value = -50
+				}
+			}
+		}
+	}
+       
+		ai_will_do = {
+			base = 100000
+			}
+		}
+################################
+########## OTTOMANS ############
+################################
+	OTO_mission_herzegovina_uprising_1857 = {
+		#war with montenegro and herzegovina rebels
+
+        icon = generic_political_discourse
+
+        allowed = { tag = OTO }
+
+        available = {
+	OR = {
+        check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 4
+		compare = less_than_or_equals
+			}
+	OR = {
+        check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 21
+		compare = greater_than_or_equals
+			}
+		check_variable = {
+		var = MNT.herzegovina_rebels
+		value = 1
+		compare = less_than
+			}
+        }
+	}
+}
+
+        activation = {
+            always = no
+        }
+
+        is_good = yes
+
+        days_mission_timeout = 14
+
+        timeout_effect = {
+		set_variable = {
+		var = MNT.herzegovina_losses
+		value = var:MNT.herzegovina_rebels
+		}
+		divide_variable = {
+		var = MNT.herzegovina_losses
+		value = MNT.herzegovina_intesity
+			}
+		round_variable = MNT.herzegovina_losses
+		
+		add_to_variable = {
+		var = casualites
+		value = MNT.herzegovina_losses
+		}
+		
+		multiply_variable = {
+		var = MNT.herzegovina_losses
+		value = -1
+			}
+		
+		add_to_variable = {
+		var = MNT.herzegovina_intesity
+		value = MNT.herzegovina_growth
+			}	
+		country_event = { id = OTO_battleofgrahovac.10 }
+		custom_effect_tooltip = OTO_herzegovina_mission_notification
+		if = { 
+			limit = { 
+				check_variable = {
+				var = MNT.herzegovina_intesity
+				value = 18
+				compare = less_than_or_equals
+					}
+				}			
+		random = {
+		chance = 10
+		1205 = { damage_building = {type = infrastructure	damage = 1}
+			}
+        }
+	}
+}
+	
+    complete_effect = {
+	if = { 
+		limit = {
+        check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 4
+		compare = less_than_or_equals
+			}
+		}
+		country_event = OTO_battleofgrahovac.15
+        add_stability = -0.03   
+        }
+	if = {
+		limit = {
+			OR = {
+        check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 21
+		compare = greater_than_or_equals
+			}
+		check_variable = {
+		var = MNT.herzegovina_rebels
+		value = 1
+		compare = less_than
+					}
+				}
+			}	
+		country_event = OTO_battleofgrahovac.17
+		}
+	}
+}
+	
+	OTO_mission_herzegovina_uprising_1857_final = {
+	#war with montenegro and herzegovina rebels
+
+        icon = generic_political_discourse
+
+        allowed = { tag = OTO }
+
+        available = {
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 21
+		compare = greater_than_or_equals
+			}
+		check_variable = {
+		var = MNT.herzegovina_rebels
+		value = 1
+		compare = less_than
+			}
+        }
+
+        activation = {
+            always = no
+        }
+
+        is_good = yes
+
+        days_mission_timeout = 170
+
+        timeout_effect = {
+		country_event = { id = OTO_battleofgrahovac.11 }
+		if = { 
+			limit = { 
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 5
+		compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = OTO_total_loss
+		}
+		else_if = { 
+		limit = { 
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 7
+		compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = OTO_loss
+		}
+		else_if = { 
+		limit = { 
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 10
+		compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = OTO_disadvantage
+		}
+		else_if = { 
+		limit = { 
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 13
+		compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = OTO_equilibrium
+		}
+		else_if = { 
+		limit = { 
+		check_variable = {
+		var = MNT.herzegovina_intesity
+		value = 17
+		compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = OTO_adventage
+		}
+	}
+	
+        complete_effect = {
+        add_stability = 0.01   
+		clr_country_flag = OTO_herzegovina_uprising_1857
+        }
+	}
+	
+	OTO_send_an_army_against_the_rebels = {
+
+		icon = generic_political_discourse
+
+		available = {
+		army_manpower_in_state = {
+		amount > 10000
+		state = 1205
+			}
+		has_country_flag = OTO_herzegovina_uprising_1857
+		has_active_mission = OTO_mission_herzegovina_uprising_1857_final
+		}
+
+		visible = {
+		has_country_flag = OTO_herzegovina_uprising_1857
+		}
+		
+		allowed = { 
+		tag = OTO
+		}
+
+		fire_only_once = no
+		cost = 5
+        days_remove = 15
+         
+        modifier = {
+
+        }        
+       
+	  complete_effect = {
+		add_command_power = -10
+		random_list = {
+			10 = {
+				add_manpower = -100
+				}
+			10 = {
+				1205 = { add_resistance = -2}
+				}
+			}
+		}
+		
+       remove_effect = {
+	   custom_effect_tooltip = 200_rebels_death
+	   MNT = {
+		add_to_variable = {
+		var = MNT.herzegovina_rebels
+		value = -200
+			}
+        }
+	}
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	
+		OTO_expand_herzegovina_spy_network = {
+
+		icon = generic_political_discourse
+
+		available = {
+		has_active_mission = OTO_mission_herzegovina_uprising_1857_final
+		}
+
+		visible = {
+		has_country_flag = OTO_herzegovina_uprising_1857
+		}
+		
+		allowed = { 
+		tag = OTO
+		}
+		
+		fire_only_once = no
+		cost = 0
+        days_remove = 15
+         
+        modifier = {
+		production_speed_buildings_factor = -0.025
+        }        
+       
+	  complete_effect = {
+		
+			}
+		
+       remove_effect = {
+	   custom_effect_tooltip = add_spies_5
+		if = {
+			limit = { NOT = { has_variable = var:herzegovina_spy } }
+			set_variable = {
+			var = herzegovina_spy
+			value = 5
+				}
+			}
+			else_if = {
+			limit = { has_variable = var:herzegovina_spy }
+			add_to_variable = {
+			var = herzegovina_spy
+			value = 5
+				}
+			}
+        }
+       
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	OTO_arrest_the_rebel_leader = {
+
+		icon = generic_political_discourse
+
+		available = {
+		has_active_mission = OTO_mission_herzegovina_uprising_1857_final
+		custom_trigger_tooltip = {
+		tooltip = has_10_spies		
+		check_variable = {
+		var = herzegovina_spy
+		value = 10
+		compare = greater_than_or_equals
+					}
+				}
+			}
+
+		visible = {
+		has_country_flag = OTO_herzegovina_uprising_1857
+		}
+		
+		allowed = { 
+		tag = OTO
+		}
+		
+		fire_only_once = no
+		cost = 5
+        days_remove = 10
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		}
+		
+		remove_effect = {
+		random_list = {
+		10 = {
+		#country_event = 	
+		}
+		30 = {
+		MNT = {
+		add_to_variable = {
+		var = MNT.herzegovina_growth
+		value = 1
+				}
+			}
+		custom_effect_tooltip = reduce_the_growth_of_uprising
+		custom_effect_tooltip = spies_return
+		}
+		10 = {
+		add_manpower = -10	
+		custom_effect_tooltip = the_spies_will_be_killed
+		}
+		30 = {
+		add_to_variable = {
+		var = MNT.herzegovina_intesity 
+		vaule = 2
+		custom_effect_tooltip = spies_return	
+		}
+			}
+				}
+					}
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		########################
+		######## AUSTRIA #######
+		########################
+		
+		AUS_regulate_rifle_export_with_montenegro = {
+
+		icon = generic_political_discourse
+
+		available = {
+		
+		}
+		
+		visible = {
+		tag = AUS
+		OR = {
+		has_idea = AUS_arms_export_to_montenegro_2
+		has_idea = AUS_arms_export_to_montenegro_3
+			}
+		}
+		
+		allowed = { 
+		tag = AUS
+		}
+		
+		fire_only_once = no
+		cost = 10
+        days_remove = 15
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		if =  {
+			limit = {
+			has_idea = AUS_arms_export_to_montenegro_3
+			}
+			swap_ideas = { remove_idea = AUS_arms_export_to_montenegro_3 add_idea = AUS_arms_export_to_montenegro_2 }
+		}
+		else_if =  {
+			limit = {
+			has_idea = AUS_arms_export_to_montenegro_2
+			}
+			swap_ideas = { remove_idea = AUS_arms_export_to_montenegro_2 add_idea = AUS_arms_export_to_montenegro_1 }
+		}
+	}
+		
+		remove_effect = {
+		
+			}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+		AUS_ban_rifle_export_to_montenegro = {
+
+		icon = generic_political_discourse
+
+		available = {
+		
+		}
+		
+		visible = {
+		tag = AUS
+		has_idea = AUS_arms_export_to_montenegro_1
+			}
+		
+		allowed = { 
+		tag = AUS
+		}
+		
+		fire_only_once = no
+		cost = 10
+        days_remove = 15
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		remove_ideas = AUS_arms_export_to_montenegro_1
+	}
+		
+		remove_effect = {
+		
+			}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+#############################
+##### montenegro revolt######
+#############################
+
+		MNT_provokate_on_borders = {
+
+		icon = generic_political_discourse
+
+		available = {
+		
+		}
+		
+		visible = {
+		OTO = { has_active_mission = OTO_mission_herzegovina_uprising_1857_final }
+		MNT = { has_completed_focus = MNT_focus_outbreak_of_the_pro_Montenegro_revolt }
+		}
+		
+		allowed = {
+		OR = {
+		tag = MNT
+		tag = OTO
+			}
+		}
+		
+		fire_only_once = no
+		cost = 20
+        days_remove = 5
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+
+	}
+		
+		remove_effect = {
+		increase_tension_by_1 = yes
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+
+		MNT_withhold_taxes_from_rebel_areas	= {
+
+		icon = generic_political_discourse
+
+		available = {
+		
+		}
+		
+		visible = {
+		tag = MNT
+		OTO = { has_active_mission = OTO_mission_herzegovina_uprising_1857_final }
+		MNT = { has_completed_focus = MNT_focus_outbreak_of_the_pro_Montenegro_revolt }
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = no
+		cost = 25
+        days_remove = 7
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		add_ideas = MNT_idea_withheld_taxes
+	}
+		
+		remove_effect = {
+		OTO = {
+		country_event = OTO_battleofgrahovac.6
+			}
+		custom_effect_tooltip = withhold_taxes
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+############################################
+##### Motenegro-ottomans Neogotiations #####
+############################################
+
+
+	OTO_mission_mostar_conference = {
+	#noegotions
+
+        icon = generic_political_discourse
+
+        allowed = { 
+		OR = {
+		tag = OTO 
+		tag = MNT
+		tag = FRA
+		tag = RUS
+		tag = AUS
+			}
+		}
+
+        available = {
+		custom_trigger_tooltip = {
+		tooltip = independence_was_negotiated
+		OR = {
+		has_country_flag = have_indenpendence_montengro
+		has_country_flag = not_gained_independence
+				}
+			}
+		}
+
+        activation = {
+            always = no
+        }
+
+        is_good = yes
+
+        days_mission_timeout = 140
+		
+		cancel_trigger = {
+		MNT = { 
+		has_border_war = yes
+			}
+        }
+        cancel_effect = {
+		clr_global_flag = montenegro_ottomans_neogotiations
+		MNT = {
+		country_event = OTO_battleofgrahovac.23
+			}
+        }
+
+        timeout_effect = {
+		clr_global_flag = montenegro_ottomans_neogotiations
+		MNT = {
+		country_event = OTO_battleofgrahovac.23
+			}
+		}
+	
+		complete_effect = {
+		clr_global_flag = montenegro_ottomans_neogotiations
+		MNT = {
+		country_event = OTO_battleofgrahovac.24
+			}
+		}
+	}
+		MNT_neogotiate_indenpendence = {
+
+		icon = generic_political_discourse
+
+		available = {
+		custom_trigger_tooltip = {
+		tooltip = has_another_neogotiation
+		NOT = { has_country_flag = has_negotiations }
+		}
+		check_variable = {
+		var = MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_indenpendence_price
+		compare = greater_than_or_equals
+			}
+		}
+		
+		visible = {
+		NOT = { has_country_flag = not_gained_independence }
+			MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
+			has_global_flag = montenegro_ottomans_neogotiations
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = yes
+		cost = 0
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		set_country_flag = have_indenpendence_montengro	
+		subtract_from_variable = {
+		var = MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_indenpendence_price
+		tooltip = purchase_independence
+		}
+	}
+		
+		remove_effect = {
+		
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+		MNT_give_up_indenpendence_claims = {
+		
+		icon = generic_political_discourse
+
+		available = {
+		custom_trigger_tooltip = {
+		tooltip = has_another_neogotiation
+		NOT = { has_country_flag = has_negotiations }
+			}
+		}
+		
+		visible = {
+			NOT = { has_country_flag = have_indenpendence_montengro }
+			MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
+			has_global_flag = montenegro_ottomans_neogotiations
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = yes
+		cost = 0
+		days_remove = 16
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		set_country_flag = has_negotiations
+		custom_effect_tooltip = MNT_gain_2
+		OTO = { 
+		country_event = OTO_battleofgrahovac.26
+		}
+	}
+		
+		remove_effect = {
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+		MNT_neogotiate_new_territory = {
+
+		icon = generic_political_discourse
+
+		available = {
+		check_variable = {
+		var =  MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_new_territoy_price
+		compare = greater_than_or_equals
+			}
+		}
+		
+		visible = {
+			NOT = { has_country_flag = not_gained_outer_montenegro }
+			MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
+			has_global_flag = montenegro_ottomans_neogotiations
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = yes
+		cost = 0
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		set_country_flag = have_outer_montengro	
+		subtract_from_variable = {
+		var = MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_new_territoy_price
+		tooltip = purchase_new_territory
+		}
+	}
+		
+		remove_effect = {
+		
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+		MNT_give_up_territory_claims = {
+		
+		icon = generic_political_discourse
+
+		available = {
+		custom_trigger_tooltip = {
+		tooltip = has_another_neogotiation
+		NOT = { has_country_flag = has_negotiations }
+			}
+		}
+		
+		visible = {
+			NOT = { has_country_flag = have_outer_montengro }
+			MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
+			has_global_flag = montenegro_ottomans_neogotiations
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = yes
+		cost = 0
+		days_remove = 16
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		set_country_flag = has_negotiations
+		custom_effect_tooltip = MNT_gain_3
+		OTO = { 
+		country_event = OTO_battleofgrahovac.29
+		}
+	}
+		
+		remove_effect = {
+		}
+			
+		ai_will_do = {
+			base = 1000
+			}
+		}
+		
+		MNT_neogotiate_arms_import = {
+
+		icon = generic_political_discourse
+
+		available = {
+		check_variable = {
+		var =  MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_arms_import_price
+		compare = greater_than_or_equals
+			}
+		}
+		
+		visible = {
+			MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
+			has_global_flag = montenegro_ottomans_neogotiations
+		}
+		
+		allowed = { 
+		tag = MNT
+		}
+		
+		fire_only_once = yes
+		cost = 0
+         
+        modifier = {
+
+        }        
+       
+		complete_effect = {
+		set_country_flag = have_arms_import	
+		subtract_from_variable = {
+		var = MNT.MNT_neogotions
+		value = MNT.MNT_neogotions_arms_import_price
+		tooltip = purchase_arms_import
+		}
+	}
+		
+		remove_effect = {
+		
+		}
+			
+		ai_will_do = {
+			base = 1000
 			}
 		}
 	}
@@ -2726,7 +3771,10 @@ MNT_decision_category_Herzegovinian_uprising = {
 		}
 
 		visible = {
-			has_completed_focus = MNT_focus_support_the_uprising_in_herzegovina
+						OR = {
+			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
 		}
 
 		fire_only_once = yes
@@ -2782,7 +3830,10 @@ MNT_decision_category_Herzegovinian_uprising = {
 		}
 
 		visible = {
-		has_completed_focus = MNT_focus_support_the_uprising_in_herzegovina
+					OR = {
+			has_completed_focus = MNT_focus_guerrilla_war
+			has_country_flag = SER_support_herzegovina_uprising
+			}
 		}
 
 		fire_only_once = yes
@@ -3049,32 +4100,7 @@ MNT_decision_category_agriculture = {
 		}
 		
         remove_effect = {
-			if = {
-                limit = {
-					NOT = {
-						has_idea = MNT_mechanised_agriculture
-					}
-                }
-                add_ideas = MNT_mechanised_agriculture 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture add_idea = MNT_mechanised_agriculture1 } 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture1
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture1 add_idea = MNT_mechanised_agriculture2 } 
-                }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture2
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture2 add_idea = MNT_mechanised_agriculture3 } 
-			}
+		improve_mechanized_agriculture = yes
 	    }
 
 		ai_will_do = {
@@ -3107,32 +4133,7 @@ MNT_decision_category_agriculture = {
 		}
 		
         remove_effect = {
-			if = {
-                limit = {
-					NOT = {
-						has_idea = MNT_mechanised_agriculture
-					}
-                }
-                add_ideas = MNT_mechanised_agriculture 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture add_idea = MNT_mechanised_agriculture1 } 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture1
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture1 add_idea = MNT_mechanised_agriculture2 } 
-                }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture2
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture2 add_idea = MNT_mechanised_agriculture3 } 
-			}
+		improve_mechanized_agriculture = yes
 	    }
 
 		ai_will_do = {
@@ -3165,32 +4166,7 @@ MNT_decision_category_agriculture = {
 		}
 		
         remove_effect = {
-			if = {
-                limit = {
-					NOT = {
-						has_idea = MNT_mechanised_agriculture
-					}
-                }
-                add_ideas = MNT_mechanised_agriculture 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture add_idea = MNT_mechanised_agriculture1 } 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture1
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture1 add_idea = MNT_mechanised_agriculture2 } 
-                }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture2
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture2 add_idea = MNT_mechanised_agriculture3 } 
-			}
+		improve_mechanized_agriculture = yes
 	    }
 
 		ai_will_do = {
@@ -3223,32 +4199,7 @@ MNT_decision_category_agriculture = {
 		}
 		
         remove_effect = {
-			if = {
-                limit = {
-					NOT = {
-						has_idea = MNT_mechanised_agriculture
-					}
-                }
-                add_ideas = MNT_mechanised_agriculture 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture add_idea = MNT_mechanised_agriculture1 } 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture1
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture1 add_idea = MNT_mechanised_agriculture2 } 
-                }
-            else_if = {
-                limit = {
-                    has_idea = MNT_mechanised_agriculture2
-                }
-                swap_ideas = { remove_idea = MNT_mechanised_agriculture2 add_idea = MNT_mechanised_agriculture3 } 
-			}
+		improve_mechanized_agriculture = yes
 	    }
 
 		ai_will_do = {
@@ -3379,8 +4330,11 @@ MNT_decision_category_agriculture = {
 
 		icon = generic_political_discourse
 
-		available = {
-		
+		available = {	
+		OR = {
+		has_full_control_of_state = 542 
+		has_full_control_of_state = 1203
+			}
 		}
 
 		visible = {
@@ -3414,7 +4368,10 @@ MNT_decision_category_agriculture = {
 		icon = generic_political_discourse
 
 		available = {
-			
+		OR = {
+		has_full_control_of_state = 542
+		has_full_control_of_state = 1203	
+			}
 		}
 
 		visible = {
@@ -3509,24 +4466,7 @@ MNT_decision_category_agriculture = {
         }
 		
         remove_effect = {  
-		    if = {
-                limit = {
-                    has_idea = MNT_Nonexistent_education_system
-                }
-                swap_ideas = { remove_idea = MNT_Nonexistent_education_system add_idea = MNT_Nonexistent_education_system1 } 
-            }
-            else_if = {
-                limit = {
-                    has_idea = MNT_Nonexistent_education_system1
-                }
-                swap_ideas = { remove_idea = MNT_Nonexistent_education_system1 add_idea = MNT_Nonexistent_education_system2 } 
-                }
-            else_if = {
-                limit = {
-                    has_idea = MNT_Nonexistent_education_system2
-                }
-                swap_ideas = { remove_idea = MNT_Nonexistent_education_system2 add_idea = MNT_Nonexistent_education_system3 } 
-	      }
+		improve_education_system = yes
 		}  
        
 		ai_will_do = {
@@ -3632,33 +4572,7 @@ MNT_decision_category_agriculture = {
         }
 		
         remove_effect = {  
-			if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system
-					add_idea = MNT_Nonexistent_education_system1
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system1
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system1
-					add_idea = MNT_Nonexistent_education_system2
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system2
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system2
-					add_idea = MNT_Nonexistent_education_system3
-				}
-			}
+		improve_education_system = yes
 		}
        
 		ai_will_do = {
@@ -3692,33 +4606,7 @@ MNT_decision_category_agriculture = {
         }
 		
         remove_effect = {  
-			if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system
-					add_idea = MNT_Nonexistent_education_system1
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system1
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system1
-					add_idea = MNT_Nonexistent_education_system2
-				}
-			}
-			else_if = {
-				limit = {
-					has_idea = MNT_Nonexistent_education_system2
-				}
-				swap_ideas = {
-					remove_idea = MNT_Nonexistent_education_system2
-					add_idea = MNT_Nonexistent_education_system3
-				}
-			}
+		improve_education_system = yes
 		}
        
 		ai_will_do = {
