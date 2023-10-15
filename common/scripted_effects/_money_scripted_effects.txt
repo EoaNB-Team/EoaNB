@@ -1,0 +1,796 @@
+# example usage:
+## set_temp_variable = { money_to_gain = 100 }
+## add_money_with_tooltip_effect = yes
+add_money_with_tooltip_effect = {
+	if = {
+		limit = {
+			check_variable = { money_to_gain < 0 }
+		}
+		custom_effect_tooltip = LOSE_MONEY_TT
+	}
+	else = {
+		custom_effect_tooltip = GAIN_MONEY_TT
+	}
+	hidden_effect = {
+		set_temp_variable = { money_temp = money }
+		add_to_variable = { money = money_to_gain }
+		clamp_variable = {
+			var = money
+			min = -2000000
+			max = 2000000
+		}
+		if = {
+			limit = {
+				check_variable = { money_to_gain > 0 }
+				check_variable = { money < money_temp }
+			}
+			set_variable = { money = 2000000 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { money_to_gain < 0 }
+				check_variable = { money > money_temp }
+			}
+			set_variable = { money = -2000000 }
+		}
+	}
+}
+
+# example usage:
+## set_temp_variable = { money_to_gain = 100 }
+## add_money_with_inflation_included_with_tooltip_effect = yes
+add_money_with_inflation_included_with_tooltip_effect = {
+	set_temp_variable = { inflation_calc_temp = 1 }
+	add_to_temp_variable = { inflation_calc_temp = current_inflation }
+	multiply_temp_variable = { money_to_gain = inflation_calc_temp }
+	if = {
+		limit = {
+			check_variable = { money_to_gain < 0 }
+		}
+		custom_effect_tooltip = LOSE_MONEY_TT
+	}
+	else = {
+		custom_effect_tooltip = GAIN_MONEY_TT
+	}
+	hidden_effect = {
+		set_temp_variable = { money_temp = money }
+		add_to_variable = { money = money_to_gain }
+		clamp_variable = {
+			var = money
+			min = -2000000
+			max = 2000000
+		}
+		if = {
+			limit = {
+				check_variable = { money_to_gain > 0 }
+				check_variable = { money < money_temp }
+			}
+			set_variable = { money = 2000000 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { money_to_gain < 0 }
+				check_variable = { money > money_temp }
+			}
+			set_variable = { money = -2000000 }
+		}
+	}
+}
+
+# example usage:
+## set_temp_variable = { inflation_to_gain = 100 }
+## add_inflation_with_tooltip_effect = yes
+add_inflation_with_tooltip_effect = {
+	if = {
+		limit = {
+			check_variable = { inflation_to_gain < 0 }
+		}
+		custom_effect_tooltip = LOSE_INFLATION_TT
+	}
+	else = {
+		custom_effect_tooltip = GAIN_INFLATION_TT
+	}
+	add_to_variable = { current_inflation = inflation_to_gain }
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { current_inflation < 0 }
+			}
+			set_variable = { current_inflation = 0 }
+		}
+		else_if = {
+			limit = {
+				check_variable = { current_inflation > 20000 }
+			}
+			set_variable = { current_inflation = 20000 }
+		}
+		set_variable = { inflation_effect_var = current_inflation }
+		divide_variable = { inflation_effect_var = -2 }
+		force_update_dynamic_modifier = yes
+	}
+}
+
+# example usage:
+## set_temp_variable = { unemployment_value = 0.5 }
+## set_unemployment_effect = yes
+set_unemployment_effect = {
+	clamp_temp_variable = {
+		var = unemployment_value
+		min = 0
+		max = 1
+	}
+	custom_effect_tooltip = SET_UNEMPLOYMENT_EFFECT_TT
+	hidden_effect = {
+		set_variable = { current_unemployment = unemployment_value }
+		clamp_variable = {
+			var = current_unemployment
+			min = 0
+			max = 1
+		}
+		update_unemployment_modifier = yes
+	}
+}
+
+# example usage:
+## set_temp_variable = { unemployment_value = 0.5 }
+## add_unemployment_effect = yes
+add_unemployment_effect = {
+	clamp_temp_variable = {
+		var = unemployment_value
+		min = -1
+		max = 1
+	}
+	if = {
+		limit = {
+			NOT = { check_variable = { current_unemployment = 0 } }
+		}
+		custom_effect_tooltip = ADD_UNEMPLOYMENT_EFFECT_TT
+	}
+	hidden_effect = {
+		add_to_variable = { current_unemployment = unemployment_value }
+		clamp_variable = {
+			var = current_unemployment
+			min = 0
+			max = 1
+		}
+		update_unemployment_modifier = yes
+	}
+}
+
+# example usage:
+## update_unemployment_modifier = yes
+update_unemployment_modifier = {
+	set_temp_variable = { unemployment_value_modifier_temp = 1 }
+	add_to_temp_variable = { unemployment_value_modifier_temp = unemployment_value_modifier }
+	add_to_temp_variable = { unemployment_value_modifier_temp = modifier@unemployment_value_factor }
+	if = {
+		limit = {
+			check_variable = { unemployment_value_modifier_temp < 0 }
+		}
+		set_temp_variable = { unemployment_value_modifier_temp = 0 }
+	}
+	if = {
+		limit = {
+			NOT = { check_variable = { current_unemployment = 0 } }
+		}
+		set_temp_variable = { current_unemployment_temp = current_unemployment }
+		multiply_temp_variable = { current_unemployment_temp = unemployment_value_modifier_temp }
+		set_variable = { unemployment_modifier_negative_var = current_unemployment_temp }
+		multiply_variable = { unemployment_modifier_negative_var = -1 }
+		set_variable = { unemployment_modifier_half_negative_var = current_unemployment_temp }
+		divide_variable = { unemployment_modifier_half_negative_var = -2 }
+		if = {
+			limit = {
+				NOT = { has_dynamic_modifier = { modifier = unemployment_dynamic_modifier } }
+			}
+			add_dynamic_modifier = { modifier = unemployment_dynamic_modifier }
+		}
+		else = {
+			force_update_dynamic_modifier = yes
+		}
+	}
+	else = {
+		clear_variable = current_unemployment
+		clear_variable = unemployment_modifier_negative_var
+		clear_variable = unemployment_modifier_half_negative_var
+		if = {
+			limit = {
+				has_dynamic_modifier = { modifier = unemployment_dynamic_modifier }
+			}
+			remove_dynamic_modifier = { modifier = unemployment_dynamic_modifier }
+		}
+	}
+}
+
+# example usage:
+## set_temp_variable = { modifier_value = 0.1 }
+## change_unemployment_value_modifier = yes
+change_unemployment_value_modifier = {
+	set_temp_variable = { current_value = unemployment_value_modifier }
+	add_to_temp_variable = { current_value = modifier@unemployment_value_factor }
+	if = {
+		limit = {
+			check_variable = { current_value < -1 }
+		}
+		set_temp_variable = { current_value = -1 }
+	}
+	custom_effect_tooltip = CHANGE_UNEMPLOYMENT_VALUE_MODIFIER_TT
+	hidden_effect = {
+		add_to_variable = { unemployment_value_modifier = modifier_value }
+		clamp_variable = {
+			var = unemployment_value_modifier
+			min = -20000
+			max = 20000
+		}
+		update_unemployment_modifier = yes
+	}
+}
+
+# example usage:
+## set_temp_variable = { loans_amount = 1 }
+## take_loan_effect = yes
+take_loan_effect = {
+	custom_effect_tooltip = TAKE_LOAN_EFFECT_TT
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { loans_amount < 1000 }
+			}
+			for_loop_effect = {
+				start = 0
+				end = loans_amount
+				set_temp_variable = { loan_size = 100 }
+				add_to_variable = { current_loans_sum = loan_size }
+				set_temp_variable = { money_to_gain = loan_size }
+				add_money_with_tooltip_effect = yes
+				set_temp_variable = { inflation_to_gain = 0.015 }
+				add_inflation_with_tooltip_effect = yes
+			}
+		}
+		else = {
+			set_temp_variable = { first_loop = loans_amount }
+			divide_temp_variable = { first_loop = 1000 }
+			if = {
+				limit = {
+					check_variable = { first_loop < 1000 }
+				}
+				divide_temp_variable = { loans_amount = first_loop }
+				for_loop_effect = {
+					start = 0
+					end = first_loop
+					for_loop_effect = {
+						start = 0
+						end = loans_amount
+						set_temp_variable = { loan_size = 100 }
+						add_to_variable = { current_loans_sum = loan_size }
+						set_temp_variable = { money_to_gain = loan_size }
+						add_money_with_tooltip_effect = yes
+						set_temp_variable = { inflation_to_gain = 0.015 }
+						add_inflation_with_tooltip_effect = yes
+					}
+				}
+				multiply_temp_variable = { loans_amount = first_loop }
+			}
+			else = {
+				set_temp_variable = { second_loop = first_loop }
+				divide_temp_variable = { second_loop = 1000 }
+				divide_temp_variable = { loans_amount = first_loop }
+				divide_temp_variable = { loans_amount = second_loop }
+				for_loop_effect = {
+					start = 0
+					end = second_loop
+					for_loop_effect = {
+						start = 0
+						end = first_loop
+						for_loop_effect = {
+							start = 0
+							end = loans_amount
+							set_temp_variable = { loan_size = 100 }
+							add_to_variable = { current_loans_sum = loan_size }
+							set_temp_variable = { money_to_gain = loan_size }
+							add_money_with_tooltip_effect = yes
+							set_temp_variable = { inflation_to_gain = 0.015 }
+							add_inflation_with_tooltip_effect = yes
+						}
+					}
+				}
+				multiply_temp_variable = { loans_amount = first_loop }
+				multiply_temp_variable = { loans_amount = second_loop }
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { current_loans_sum < 0 }
+			}
+			# if you overflow loans, you automatically become bankrupt
+			become_bankrupt_effect = yes
+		}
+	}
+	effect_tooltip = {
+		set_temp_variable = { loan_size = 100 }
+		add_to_variable = { current_loans_sum = loan_size }
+		set_temp_variable = { money_to_gain = loan_size }
+		add_money_with_tooltip_effect = yes
+		set_temp_variable = { inflation_to_gain = 0.015 }
+		add_inflation_with_tooltip_effect = yes
+	}
+}
+
+# example usage:
+## become_bankrupt_effect = yes
+become_bankrupt_effect = {
+	custom_effect_tooltip = REMOVE_ALL_LOANS_GET_RID_OF_DEBTS
+	hidden_effect = {
+		set_variable = { current_loans_sum = 0 }
+		set_variable = { money = 0 }
+		set_temp_variable = { inflation_to_gain = -20000 } # set to 0
+		add_inflation_with_tooltip_effect = yes
+	}
+	add_political_power = -300
+	add_timed_idea = {
+		idea = bankruptcy
+		days = 180
+	}
+	hidden_effect = {
+		activate_mission = can_become_bankrupt_mission
+		remove_mission = can_become_bankrupt_mission
+		if = {
+			limit = {
+				is_ai = no
+			}
+			set_variable = { show_bankruptcy_popup = 1 }
+		}
+	}
+}
+
+# example usage:
+## decrease_slider_taxes = yes
+decrease_slider_taxes = {
+	if = {
+		limit = {
+			NOT = { has_idea = taxation_level_1 }
+		}
+		if = {
+			limit = {
+				has_idea = taxation_level_2
+			}
+			swap_ideas = {
+				add_idea = taxation_level_1
+				remove_idea = taxation_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_3
+			}
+			swap_ideas = {
+				add_idea = taxation_level_2
+				remove_idea = taxation_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_4
+			}
+			swap_ideas = {
+				add_idea = taxation_level_3
+				remove_idea = taxation_level_4
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_5
+			}
+			swap_ideas = {
+				add_idea = taxation_level_4
+				remove_idea = taxation_level_5
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_LOWER_TAXATION_LEVEL_TT
+	}
+}
+
+# example usage:
+## increase_slider_taxes = yes
+increase_slider_taxes = {
+	if = {
+		limit = {
+			NOT = { has_idea = taxation_level_5 }
+		}
+		if = {
+			limit = {
+				has_idea = taxation_level_1
+			}
+			swap_ideas = {
+				add_idea = taxation_level_2
+				remove_idea = taxation_level_1
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_2
+			}
+			swap_ideas = {
+				add_idea = taxation_level_3
+				remove_idea = taxation_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_3
+			}
+			swap_ideas = {
+				add_idea = taxation_level_4
+				remove_idea = taxation_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = taxation_level_4
+			}
+			swap_ideas = {
+				add_idea = taxation_level_5
+				remove_idea = taxation_level_4
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_INCREASE_TAXATION_LEVEL_TT
+	}
+}
+
+# example usage:
+## decrease_slider_social_spending = yes
+decrease_slider_social_spending = {
+	if = {
+		limit = {
+			NOT = { has_idea = social_spending_level_1 }
+		}
+		if = {
+			limit = {
+				has_idea = social_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_1
+				remove_idea = social_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_2
+				remove_idea = social_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_3
+				remove_idea = social_spending_level_4
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_5
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_4
+				remove_idea = social_spending_level_5
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_LOWER_SOCIAL_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## increase_slider_social_spending = yes
+increase_slider_social_spending = {
+	if = {
+		limit = {
+			NOT = { has_idea = social_spending_level_5 }
+		}
+		if = {
+			limit = {
+				has_idea = social_spending_level_1
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_2
+				remove_idea = social_spending_level_1
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_3
+				remove_idea = social_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_4
+				remove_idea = social_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = social_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = social_spending_level_5
+				remove_idea = social_spending_level_4
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_INCREASE_SOCIAL_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## decrease_slider_research_spending = yes
+decrease_slider_research_spending = {
+	if = {
+		limit = {
+			NOT = { has_idea = research_spending_level_1 }
+		}
+		if = {
+			limit = {
+				has_idea = research_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_1
+				remove_idea = research_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_2
+				remove_idea = research_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_3
+				remove_idea = research_spending_level_4
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_5
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_4
+				remove_idea = research_spending_level_5
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_LOWER_RESEARCH_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## increase_slider_research_spending = yes
+increase_slider_research_spending = {
+	if = {
+		limit = {
+			NOT = { has_idea = research_spending_level_5 }
+		}
+		if = {
+			limit = {
+				has_idea = research_spending_level_1
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_2
+				remove_idea = research_spending_level_1
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_3
+				remove_idea = research_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_4
+				remove_idea = research_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = research_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = research_spending_level_5
+				remove_idea = research_spending_level_4
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_INCREASE_RESEARCH_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## decrease_slider_army = yes
+decrease_slider_army = {
+	if = {
+		limit = {
+			NOT = { has_idea = army_spending_level_1 }
+		}
+		if = {
+			limit = {
+				has_idea = army_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_1
+				remove_idea = army_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_2
+				remove_idea = army_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_3
+				remove_idea = army_spending_level_4
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_5
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_4
+				remove_idea = army_spending_level_5
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_LOWER_ARMY_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## increase_slider_army = yes
+increase_slider_army = {
+	if = {
+		limit = {
+			NOT = { has_idea = army_spending_level_5 }
+		}
+		if = {
+			limit = {
+				has_idea = army_spending_level_1
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_2
+				remove_idea = army_spending_level_1
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_2
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_3
+				remove_idea = army_spending_level_2
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_3
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_4
+				remove_idea = army_spending_level_3
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = army_spending_level_4
+			}
+			swap_ideas = {
+				add_idea = army_spending_level_5
+				remove_idea = army_spending_level_4
+			}
+		}
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_INCREASE_ARMY_SPENDING_LEVEL_TT
+	}
+}
+
+# example usage:
+## lock_slider_army_spending = yes
+lock_slider_army_spending = {
+	set_country_flag = army_spending_slider_increase_blocked
+	set_country_flag = army_spending_slider_decrease_blocked
+}
+
+# example usage:
+## lock_slider_research_spending = yes
+lock_slider_research_spending = {
+	set_country_flag = research_spending_slider_increase_blocked
+	set_country_flag = research_spending_slider_decrease_blocked
+}
+
+# example usage:
+## lock_slider_social_spending = yes
+lock_slider_social_spending = {
+	set_country_flag = social_spending_slider_increase_blocked
+	set_country_flag = social_spending_slider_decrease_blocked
+}
+# example usage:
+## lock_slider_taxes_spending = yes
+lock_slider_taxes_spending = {
+	set_country_flag = taxes_slider_increase_blocked
+	set_country_flag = taxes_slider_decrease_blocked
+}
+
+
+
+# example usage:
+## unlock_slider_army_spending = yes
+unlock_slider_army_spending = {
+	clr_country_flag = army_spending_slider_increase_blocked
+	clr_country_flag = army_spending_slider_decrease_blocked
+	custom_effect_tooltip = army_spending_slider_unlocked
+}
+
+# example usage:
+## unlock_slider_research_spending = yes
+unlock_slider_research_spending = {
+	clr_country_flag = research_spending_slider_increase_blocked
+	clr_country_flag = research_spending_slider_decrease_blocked
+	custom_effect_tooltip = research_spending_slider_unlocked
+}
+
+# example usage:
+## unlock_slider_social_spending = yes
+unlock_slider_social_spending = {
+	clr_country_flag = social_spending_slider_increase_blocked
+	clr_country_flag = social_spending_slider_decrease_blocked
+	custom_effect_tooltip = social_spending_slider_unlocked
+}
+# example usage:
+## unlock_slider_taxes_spending = yes
+unlock_slider_taxes_spending = {
+	clr_country_flag = taxes_slider_increase_blocked
+	clr_country_flag = taxes_slider_decrease_blocked
+	custom_effect_tooltip = tax_spending_slider_unlocked
+}

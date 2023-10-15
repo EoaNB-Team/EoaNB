@@ -1,0 +1,536 @@
+# example usage:
+## has_taken_a_loan = yes
+has_taken_a_loan = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_TAKEN_A_LOAN
+		check_variable = { current_loans_sum > 0 }
+	}
+}
+
+# example usage:
+## set_temp_variable = { loan_size_to_check = 100 }
+## has_specific_loan_size = yes
+has_specific_loan_size = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_SPECIFIC_LOAN_SIZE
+		NOT = { check_variable = { current_loans_sum < loan_size_to_check } }
+	}
+}
+
+# example usage:
+## set_temp_variable = { loan_size_to_check = 100 }
+## has_less_than_specific_loan_size = yes
+has_less_than_specific_loan_size = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_LESS_THAN_SPECIFIC_LOAN_SIZE
+		check_variable = { current_loans_sum < loan_size_to_check }
+	}
+}
+
+# example usage:
+## set_temp_variable = { amount_of_money_to_check = 100 }
+## has_specific_amount_of_money = yes
+has_specific_amount_of_money = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_SPECIFIC_AMOUNT_OF_MONEY
+		NOT = { check_variable = { money < amount_of_money_to_check } }
+	}
+}
+
+# example usage:
+## set_temp_variable = { amount_of_money_to_check = 100 }
+## has_less_than_specific_amount_of_money = yes
+has_less_than_specific_amount_of_money = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_LESS_THAN_SPECIFIC_AMOUNT_OF_MONEY
+		check_variable = { money < amount_of_money_to_check }
+	}
+}
+
+# example usage:
+## set_temp_variable = { amount_of_money_to_check = 100 }
+## has_specific_amount_of_money_with_inflation_included = yes
+has_specific_amount_of_money_with_inflation_included = {
+	set_temp_variable = { inflation_calc_temp = 1 }
+	add_to_temp_variable = { inflation_calc_temp = current_inflation }
+	multiply_temp_variable = { amount_of_money_to_check = inflation_calc_temp }
+	custom_trigger_tooltip = {
+		tooltip = HAS_SPECIFIC_AMOUNT_OF_MONEY
+		NOT = { check_variable = { money < amount_of_money_to_check } }
+	}
+}
+
+# example usage:
+## set_temp_variable = { amount_of_money_to_check = 100 }
+## has_less_than_specific_amount_of_money_with_inflation_included = yes
+has_less_than_specific_amount_of_money_with_inflation_included = {
+	set_temp_variable = { inflation_calc_temp = 1 }
+	add_to_temp_variable = { inflation_calc_temp = current_inflation }
+	multiply_temp_variable = { amount_of_money_to_check = inflation_calc_temp }
+	custom_trigger_tooltip = {
+		tooltip = HAS_LESS_THAN_SPECIFIC_AMOUNT_OF_MONEY
+		check_variable = { money < amount_of_money_to_check }
+	}
+}
+
+# example usage:
+## set_temp_variable = { unemployment_value = 1 }
+## has_at_least_unemployment_value = yes
+has_at_least_unemployment_value = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_AT_LEAST_UNEMPLOYMENT_VALUE_TT
+		NOT = { check_variable = { current_unemployment < unemployment_value } }
+	}
+}
+
+# example usage:
+## set_temp_variable = { unemployment_value = 1 }
+## has_less_than_unemployment_value = yes
+has_less_than_unemployment_value = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_LESS_THAN_UNEMPLOYMENT_VALUE_TT
+		check_variable = { current_unemployment < unemployment_value }
+	}
+}
+
+# example usage:
+## has_balance_in_positive = yes
+has_balance_in_positive = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_BALANCE_IN_POSITIVE
+		calculate_money_balance = yes
+		check_variable = { total_balance_temp > 0 }
+	}
+}
+
+# example usage:
+## has_balance_in_negative = yes
+has_balance_in_negative = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_BALANCE_IN_NEGATIVE
+		calculate_money_balance = yes
+		check_variable = { total_balance_temp < 0 }
+	}
+}
+
+# example usage:
+## set_temp_variable = { income_value = 1 }
+## has_more_than_income = yes
+has_more_than_income = {
+	custom_trigger_tooltip = {
+		tooltip = HAS_MORE_THAN_INCOME
+		calculate_money_balance = yes
+		check_variable = { income_value < total_balance_temp }
+	}
+}
+
+# example usage:
+## calculate_money_balance = yes
+calculate_money_balance = {
+	set_temp_variable = { total_balance_temp = 0 }
+
+	# Income:
+	calculate_money_income = yes
+
+	# Expenses:
+	calculate_money_expenses = yes
+
+	# Balance:
+	add_to_temp_variable = { total_balance_temp = total_income_temp }
+	add_to_temp_variable = { total_balance_temp = total_expenses_temp }
+}
+
+# example usage:
+## calculate_inflation_change = yes
+calculate_inflation_change = {
+	set_temp_variable = { daily_inflation_change = 0 }
+
+	# Flat Inflation Change Modifiers:
+	add_to_temp_variable = { daily_inflation_change = modifier@inflation_change }
+	# Clamp Inflation Change Factor Modifiers:
+	set_temp_variable = { daily_inflation_change_factor = 1 }
+	add_to_temp_variable = { daily_inflation_change_factor = modifier@inflation_change_factor }
+	if = {
+		limit = {
+			check_variable = { daily_inflation_change_factor < 0 }
+		}
+		set_temp_variable = { daily_inflation_change_factor = 0 }
+	}
+	# Apply Inflation Change Factor Modifiers:
+	multiply_temp_variable = { daily_inflation_change = daily_inflation_change_factor }
+
+	# Setting Display Variable:
+	set_temp_variable = { daily_inflation_change_factor_display = modifier@inflation_change_factor }
+	set_temp_variable = { daily_inflation_change_factor_from_ideas = modifier@inflation_change_factor_from_ideas }
+	set_temp_variable = { daily_inflation_change_factor_from_decisions = modifier@inflation_change_factor_from_decisions }
+	set_temp_variable = { daily_inflation_change_factor_from_other = daily_inflation_change_factor_display }
+	subtract_from_temp_variable = { daily_inflation_change_factor_from_other = daily_inflation_change_factor_from_ideas }
+	subtract_from_temp_variable = { daily_inflation_change_factor_from_other = daily_inflation_change_factor_from_decisions }
+	if = {
+		limit = {
+			check_variable = { daily_inflation_change_factor_display < -1 }
+		}
+		set_temp_variable = { daily_inflation_change_factor_display = -1 }
+	}
+}
+
+# example usage:
+## calculate_money_income = yes
+calculate_money_income = {
+	set_temp_variable = { total_income_temp = 0 }
+
+	# Taxes
+	set_temp_variable = { income_from_our_taxes = 0 }
+	set_temp_variable = { income_from_our_taxes_core = 0 }
+	set_temp_variable = { income_from_our_taxes_non_core = 0 }
+	hidden_trigger = {
+		all_owned_state = {
+			OR = {
+				AND = {
+					is_core_of = PREV
+					add_to_temp_variable = { income_from_our_taxes_core = state_population_k }
+				}
+				AND = {
+					NOT = { is_core_of = PREV }
+					add_to_temp_variable = { income_from_our_taxes_non_core = state_population_k }
+				}
+			}
+		}
+	}
+	divide_temp_variable = { income_from_our_taxes_core = 9000 }
+	divide_temp_variable = { income_from_our_taxes_non_core = 300000 }
+	add_to_temp_variable = { income_from_our_taxes = income_from_our_taxes_core }
+	add_to_temp_variable = { income_from_our_taxes = income_from_our_taxes_non_core }
+	multiply_temp_variable = { income_from_our_taxes = 7 } # money is now weekly
+	if = {
+		limit = {
+			check_variable = { income_from_our_taxes < 0 }
+		}
+		set_temp_variable = { income_from_our_taxes = 2147483 }
+	}
+
+	# Tax Affecting Modifiers:
+	calculate_tax_modifiers = yes
+
+	# Consumer Goods Factories:
+	set_temp_variable = { income_from_our_consumer_goods_factories = num_of_civilian_factories }
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = modifier@consumer_goods_factor }
+	round_temp_variable = income_from_our_consumer_goods_factories
+	if = {
+		limit = {
+			check_variable = { income_from_our_consumer_goods_factories < 0 }
+		}
+		set_temp_variable = { income_from_our_consumer_goods_factories = 0 }
+	}
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = 0.3 }
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = 7 } # money is now weekly
+
+	# Consumer Goods Factories Modifiers:
+	calculate_consumer_goods_modifiers = yes
+
+	# Free Civilian Factories:
+	set_temp_variable = { income_from_our_free_civilian_factories = num_of_available_civilian_factories }
+	multiply_temp_variable = { income_from_our_free_civilian_factories = 0.08 }
+	multiply_temp_variable = { income_from_our_free_civilian_factories = 7 } # money is now weekly
+	add_to_temp_variable = { total_income_temp = income_from_our_free_civilian_factories }
+
+	# Other Income:
+	set_temp_variable = { income_from_other_sources = modifier@money_income }
+	if = {
+		limit = {
+			check_variable = { income_from_other_sources < 0 }
+		}
+		set_temp_variable = { income_from_other_sources = 0 }
+	}
+	add_to_temp_variable = { total_income_temp = income_from_other_sources }
+
+	# Income Affecting Modifiers:
+	calculate_money_income_modifiers = yes
+}
+
+# example usage:
+## calculate_tax_modifiers = yes
+calculate_tax_modifiers = {
+	# Tax Modifiers:
+	set_temp_variable = { tax_efficiency_modifier = 1 }
+	add_to_temp_variable = { tax_efficiency_modifier = modifier@tax_efficiency_factor }
+	if = {
+		limit = {
+			check_variable = { tax_efficiency_modifier < 0 }
+		}
+		set_temp_variable = { tax_efficiency_modifier = 0 }
+	}
+	multiply_temp_variable = { income_from_our_taxes = tax_efficiency_modifier }
+	add_to_temp_variable = { total_income_temp = income_from_our_taxes }
+
+	# Setting Display Variable:
+	set_temp_variable = { tax_modifier = modifier@tax_efficiency_factor }
+	set_temp_variable = { tax_modifier_from_ideas = modifier@tax_efficiency_factor_from_ideas }
+	set_temp_variable = { tax_modifier_from_decisions = modifier@tax_efficiency_factor_from_decisions }
+	set_temp_variable = { tax_modifier_from_other = tax_modifier }
+	subtract_from_temp_variable = { tax_modifier_from_other = tax_modifier_from_ideas }
+	subtract_from_temp_variable = { tax_modifier_from_other = tax_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { tax_modifier < -1 }
+		}
+		set_temp_variable = { tax_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_consumer_goods_modifiers = yes
+calculate_consumer_goods_modifiers = {
+	# Consumer Goods Factories Modifiers:
+	set_temp_variable = { consumer_goods_income_modifier = 1 }
+	add_to_temp_variable = { consumer_goods_income_modifier = modifier@consumer_goods_income_factor }
+	if = {
+		limit = {
+			check_variable = { consumer_goods_income_modifier < 0 }
+		}
+		set_temp_variable = { consumer_goods_income_modifier = 0 }
+	}
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = consumer_goods_income_modifier }
+	add_to_temp_variable = { total_income_temp = income_from_our_consumer_goods_factories }
+
+	# Setting Display Variable:
+	set_temp_variable = { consumer_goods_modifier = modifier@consumer_goods_income_factor }
+	set_temp_variable = { consumer_goods_modifier_from_ideas = modifier@consumer_goods_income_factor_from_ideas }
+	set_temp_variable = { consumer_goods_modifier_from_decisions = modifier@consumer_goods_income_factor_from_decisions }
+	set_temp_variable = { consumer_goods_modifier_from_other = consumer_goods_modifier }
+	subtract_from_temp_variable = { consumer_goods_modifier_from_other = consumer_goods_modifier_from_ideas }
+	subtract_from_temp_variable = { consumer_goods_modifier_from_other = consumer_goods_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { consumer_goods_modifier < -1 }
+		}
+		set_temp_variable = { consumer_goods_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_money_income_modifiers = yes
+calculate_money_income_modifiers = {
+	# Calculation:
+	set_temp_variable = { income_modifier_calculation = 1 }
+
+	# Other Sources:
+	add_to_temp_variable = { income_modifier_calculation = modifier@money_income_factor }
+
+	if = {
+		limit = {
+			check_variable = { income_modifier_calculation < 0 }
+		}
+		set_temp_variable = { income_modifier_calculation = 0 }
+	}
+	multiply_temp_variable = { total_income_temp = income_modifier_calculation }
+
+	# Setting Display Variable:
+	set_temp_variable = { income_modifier = modifier@money_income_factor }
+	set_temp_variable = { income_modifier_from_ideas = modifier@money_income_factor_from_ideas }
+	set_temp_variable = { income_modifier_from_decisions = modifier@money_income_factor_from_decisions }
+	set_temp_variable = { income_modifier_from_other = income_modifier }
+	subtract_from_temp_variable = { income_modifier_from_other = income_modifier_from_ideas }
+	subtract_from_temp_variable = { income_modifier_from_other = income_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { income_modifier < -1 }
+		}
+		set_temp_variable = { income_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_money_expenses = yes
+calculate_money_expenses = {
+	set_temp_variable = { total_expenses_temp = 0 }
+
+	# Social Spending:
+	set_temp_variable = { expenses_from_our_social_spending = 0 }
+	hidden_trigger = {
+		all_owned_state = {
+			OR = {
+				NOT = { is_core_of = PREV }
+				AND = {
+					is_core_of = PREV
+					add_to_temp_variable = { expenses_from_our_social_spending = state_population_k }
+				}
+			}
+		}
+	}
+	divide_temp_variable = { expenses_from_our_social_spending = 2000 }
+	multiply_temp_variable = { expenses_from_our_social_spending = -0.05 }
+	multiply_temp_variable = { expenses_from_our_social_spending = 7 } # money is now weekly
+
+	# Social Spending Affecting Modifiers:
+	calculate_social_spending_modifiers = yes
+
+	# Research and Education Spending:
+	set_temp_variable = { expenses_from_our_research_spending = amount_research_slots }
+	multiply_temp_variable = { expenses_from_our_research_spending = -0.2 }
+	multiply_temp_variable = { expenses_from_our_research_spending = 7 } # money is now weekly
+
+	# Research and Education Spending Affecting Modifiers:
+	calculate_research_spending_modifiers = yes
+
+	# Army Spending:
+	set_temp_variable = { expenses_from_our_army_spending = num_battalions }
+	multiply_temp_variable = { expenses_from_our_army_spending = -0.003 }
+	multiply_temp_variable = { expenses_from_our_army_spending = 7 } # money is now weekly
+
+	# Army Spending Affecting Modifiers:
+	calculate_army_spending_modifiers = yes
+
+	# Used Military Factories:
+	set_temp_variable = { expenses_from_our_used_mil_factories = num_of_military_factories }
+	subtract_from_temp_variable = { expenses_from_our_used_mil_factories = num_of_available_military_factories }
+	round_temp_variable = expenses_from_our_used_mil_factories
+	multiply_temp_variable = { expenses_from_our_used_mil_factories = -0.085 }
+	multiply_temp_variable = { expenses_from_our_used_mil_factories = 7 } # money is now weekly
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_used_mil_factories }
+
+	# Interests from Loans:
+	set_temp_variable = { expenses_from_loans = current_loans_sum }
+	divide_temp_variable = { expenses_from_loans = -1000 }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_loans }
+
+	# Other Expanses:
+	set_temp_variable = { expenses_from_other_sources = modifier@money_expenses }
+	if = {
+		limit = {
+			check_variable = { expenses_from_other_sources > 0 }
+		}
+		set_temp_variable = { expenses_from_other_sources = 0 }
+	}
+	add_to_temp_variable = { total_expenses_temp = expenses_from_other_sources }
+
+	# Expenses Affecting Modifiers:
+	calculate_money_expenses_modifiers = yes
+}
+
+# example usage:
+## calculate_social_spending_modifiers = yes
+calculate_social_spending_modifiers = {
+	# Social Spending Modifiers:
+	set_temp_variable = { social_spending_modifier = 1 }
+	add_to_temp_variable = { social_spending_modifier = modifier@social_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { social_spending_modifier < 0 }
+		}
+		set_temp_variable = { social_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_social_spending = social_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_social_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { social_spending_cost_modifier = modifier@social_spending_cost_factor }
+	set_temp_variable = { social_spending_cost_modifier_from_ideas = modifier@social_spending_cost_factor_from_ideas }
+	set_temp_variable = { social_spending_cost_modifier_from_decisions = modifier@social_spending_cost_factor_from_decisions }
+	set_temp_variable = { social_spending_cost_modifier_from_other = social_spending_cost_modifier }
+	subtract_from_temp_variable = { social_spending_cost_modifier_from_other = social_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { social_spending_cost_modifier_from_other = social_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { social_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { social_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_research_spending_modifiers = yes
+calculate_research_spending_modifiers = {
+	# Research and Education Spending Modifiers:
+	set_temp_variable = { research_spending_modifier = 1 }
+	add_to_temp_variable = { research_spending_modifier = modifier@research_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { research_spending_modifier < 0 }
+		}
+		set_temp_variable = { research_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_research_spending = research_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_research_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { research_spending_cost_modifier = modifier@research_spending_cost_factor }
+	set_temp_variable = { research_spending_cost_modifier_from_ideas = modifier@research_spending_cost_factor_from_ideas }
+	set_temp_variable = { research_spending_cost_modifier_from_decisions = modifier@research_spending_cost_factor_from_decisions }
+	set_temp_variable = { research_spending_cost_modifier_from_other = research_spending_cost_modifier }
+	subtract_from_temp_variable = { research_spending_cost_modifier_from_other = research_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { research_spending_cost_modifier_from_other = research_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { research_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { research_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_army_spending_modifiers = yes
+calculate_army_spending_modifiers = {
+	# Army Spending Modifiers:
+	set_temp_variable = { army_spending_modifier = 1 }
+	add_to_temp_variable = { army_spending_modifier = modifier@army_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { army_spending_modifier < 0 }
+		}
+		set_temp_variable = { army_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_army_spending = army_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_army_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { army_spending_cost_modifier = modifier@army_spending_cost_factor }
+	set_temp_variable = { army_spending_cost_modifier_from_ideas = modifier@army_spending_cost_factor_from_ideas }
+	set_temp_variable = { army_spending_cost_modifier_from_decisions = modifier@army_spending_cost_factor_from_decisions }
+	set_temp_variable = { army_spending_cost_modifier_from_other = army_spending_cost_modifier }
+	subtract_from_temp_variable = { army_spending_cost_modifier_from_other = army_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { army_spending_cost_modifier_from_other = army_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { army_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { army_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_money_expenses_modifiers = yes
+calculate_money_expenses_modifiers = {
+	# Calculation:
+	set_temp_variable = { expenses_modifier_calculation = 1 }
+
+	# Inflation:
+	add_to_temp_variable = { expenses_modifier_calculation = current_inflation }
+
+	# Other Sources:
+	add_to_temp_variable = { expenses_modifier_calculation = modifier@money_expenses_factor }
+
+	if = {
+		limit = {
+			check_variable = { expenses_modifier_calculation < 0 }
+		}
+		set_temp_variable = { expenses_modifier_calculation = 0 }
+	}
+	multiply_temp_variable = { total_expenses_temp = expenses_modifier_calculation }
+
+	# Setting Display Variable:
+	set_temp_variable = { expenses_modifier = modifier@money_expenses_factor }
+	add_to_temp_variable = { expenses_modifier = current_inflation }
+	set_temp_variable = { expenses_modifier_from_ideas = modifier@money_expenses_factor_from_ideas }
+	set_temp_variable = { expenses_modifier_from_decisions = modifier@money_expenses_factor_from_decisions }
+	set_temp_variable = { expenses_modifier_from_other = expenses_modifier }
+	subtract_from_temp_variable = { expenses_modifier_from_other = expenses_modifier_from_ideas }
+	subtract_from_temp_variable = { expenses_modifier_from_other = expenses_modifier_from_decisions }
+	subtract_from_temp_variable = { expenses_modifier_from_other = current_inflation }
+	if = {
+		limit = {
+			check_variable = { expenses_modifier < -1 }
+		}
+		set_temp_variable = { expenses_modifier = -1 }
+	}
+}

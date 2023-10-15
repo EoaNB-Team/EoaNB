@@ -1,0 +1,1122 @@
+scripted_gui = {
+	topbar_money_info_window = {
+		context_type = player_context
+
+		window_name = "topbar_money_info_window"
+		#parent_window_token = top_bar
+
+		visible = {
+			always = yes
+			if = {
+				limit = {
+					is_ai = no
+				}
+				calculate_money_balance = yes
+				calculate_inflation_change = yes
+			}
+			set_temp_variable = { balance_indicator_icon_frame = 1 }
+			if = {
+				limit = {
+					check_variable = { total_balance_temp < 0 }
+				}
+				set_temp_variable = { balance_indicator_icon_frame = 2 }
+			}
+			else_if = {
+				limit = {
+					check_variable = { total_balance_temp = 0 }
+				}
+				set_temp_variable = { balance_indicator_icon_frame = 3 }
+			}
+		}
+
+		triggers = {
+			balance_indicator_icon_visible = {
+				is_ai = no
+			}
+		}
+
+		properties = {
+			balance_indicator_icon = {
+				frame = balance_indicator_icon_frame
+			}
+		}
+	}
+
+	open_economy_window = {
+		context_type = player_context
+
+		window_name = "open_economy_window"
+		parent_window_token = politics_tab
+
+		visible = {
+			is_ai = no
+		}
+
+		effects = {
+			open_button_click = {
+				if = {
+					limit = {
+						has_variable = show_economy_window
+					}
+					clear_variable = show_economy_window
+				}
+				else = {
+				#	clear_variable = show_parliament_political_tab_window
+					set_variable = { show_economy_window = 1 }
+				}
+			}
+		}
+	}
+
+	economy_panel_window = {
+		context_type = player_context
+
+		window_name = "economy_panel_window"
+		parent_window_token = politics_tab
+
+		visible = {
+			always = yes
+		}
+
+		ai_enabled = {
+			always = no
+		}
+	}
+
+	economy_window = {
+		context_type = player_context
+
+		window_name = "economy_window"
+		parent_window_name = "economy_panel_window_instance"
+
+		visible = {
+			OR = {
+				is_ai = yes
+				check_variable = { show_economy_window > 0 }
+			}
+			if = {
+				limit = {
+					is_ai = no
+				}
+				calculate_money_balance = yes
+				calculate_inflation_change = yes
+			}
+		}
+
+		effects = {
+			close_button_click = {
+				clear_variable = show_economy_window
+			}
+			pay_loan_button_click = {
+				set_temp_variable = { loan_size = -100 }
+				add_to_variable = { current_loans_sum = loan_size }
+				set_temp_variable = { money_to_gain = loan_size }
+				add_money_with_tooltip_effect = yes
+			}
+			pay_loan_button_shift_click = {
+				set_temp_variable = { loan_size = current_loans_sum }
+				if = {
+					limit = {
+						check_variable = { money < loan_size }
+					}
+					set_temp_variable = { loan_size = money }
+					divide_temp_variable = { loan_size = 100 }
+					subtract_from_temp_variable = { loan_size = 0.5 }
+					round_temp_variable = loan_size
+					multiply_temp_variable = { loan_size = 100 }
+				}
+				multiply_temp_variable = { loan_size = -1 }
+				add_to_variable = { current_loans_sum = loan_size }
+				set_temp_variable = { money_to_gain = loan_size }
+				add_money_with_tooltip_effect = yes
+			}
+			take_loan_button_click = {
+				hidden_effect = {
+					set_temp_variable = { loans_amount = 1 }
+					take_loan_effect = yes
+				}
+				effect_tooltip = {
+					set_temp_variable = { loan_size = 100 }
+					add_to_variable = { current_loans_sum = loan_size }
+					set_temp_variable = { money_to_gain = loan_size }
+					add_money_with_tooltip_effect = yes
+					set_temp_variable = { inflation_to_gain = 0.015 }
+					add_inflation_with_tooltip_effect = yes
+				}
+			}
+			take_loan_button_control_click = {
+				set_temp_variable = { loans_amount = 10 }
+				take_loan_effect = yes
+			}
+			take_loan_button_shift_click = {
+				set_temp_variable = { loans_amount = 100 }
+				take_loan_effect = yes
+			}
+
+			# Sliders:
+			## Taxation Level:
+			income_entry_taxes_slider_icon_1_click = {
+				set_temp_variable = { taxation_level = 1 }
+				show_ideas_tooltip = taxation_level_1
+				if = {
+					limit = {
+						has_idea = taxation_level_1
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_INCOME_ENTRY_TAXES_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_taxes_slider_icon_2_click = {
+				set_temp_variable = { taxation_level = 2 }
+				show_ideas_tooltip = taxation_level_2
+				if = {
+					limit = {
+						has_idea = taxation_level_2
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_INCOME_ENTRY_TAXES_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_taxes_slider_icon_3_click = {
+				set_temp_variable = { taxation_level = 3 }
+				show_ideas_tooltip = taxation_level_3
+				if = {
+					limit = {
+						has_idea = taxation_level_3
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_INCOME_ENTRY_TAXES_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_taxes_slider_icon_4_click = {
+				set_temp_variable = { taxation_level = 4 }
+				show_ideas_tooltip = taxation_level_4
+				if = {
+					limit = {
+						has_idea = taxation_level_4
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_INCOME_ENTRY_TAXES_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_taxes_slider_icon_5_click = {
+				set_temp_variable = { taxation_level = 5 }
+				show_ideas_tooltip = taxation_level_5
+				if = {
+					limit = {
+						has_idea = taxation_level_5
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_INCOME_ENTRY_TAXES_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_taxes_slider_left_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = taxation_level_1 }
+					}
+					add_political_power = -50
+				}
+				decrease_slider_taxes = yes
+			}
+			income_entry_taxes_slider_right_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = taxation_level_5 }
+					}
+					add_political_power = -50
+				}
+				increase_slider_taxes = yes
+			}
+			## Social Spending Level:
+			income_entry_social_spending_slider_icon_1_click = {
+				set_temp_variable = { social_spending_level = 1 }
+				show_ideas_tooltip = social_spending_level_1
+				if = {
+					limit = {
+						has_idea = social_spending_level_1
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_SOCIAL_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_social_spending_slider_icon_2_click = {
+				set_temp_variable = { social_spending_level = 2 }
+				show_ideas_tooltip = social_spending_level_2
+				if = {
+					limit = {
+						has_idea = social_spending_level_2
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_SOCIAL_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_social_spending_slider_icon_3_click = {
+				set_temp_variable = { social_spending_level = 3 }
+				show_ideas_tooltip = social_spending_level_3
+				if = {
+					limit = {
+						has_idea = social_spending_level_3
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_SOCIAL_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_social_spending_slider_icon_4_click = {
+				set_temp_variable = { social_spending_level = 4 }
+				show_ideas_tooltip = social_spending_level_4
+				if = {
+					limit = {
+						has_idea = social_spending_level_4
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_SOCIAL_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_social_spending_slider_icon_5_click = {
+				set_temp_variable = { social_spending_level = 5 }
+				show_ideas_tooltip = social_spending_level_5
+				if = {
+					limit = {
+						has_idea = social_spending_level_5
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_SOCIAL_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_social_spending_slider_left_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = social_spending_level_1 }
+					}
+					add_political_power = -50
+				}
+				decrease_slider_social_spending = yes
+			}
+			income_entry_social_spending_slider_right_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = social_spending_level_5 }
+					}
+					add_political_power = -50
+				}
+				increase_slider_social_spending = yes
+			}
+			## Research and Education Spending Level:
+			income_entry_research_spending_slider_icon_1_click = {
+				set_temp_variable = { research_spending_level = 1 }
+				show_ideas_tooltip = research_spending_level_1
+				if = {
+					limit = {
+						has_idea = research_spending_level_1
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_RESEARCH_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_research_spending_slider_icon_2_click = {
+				set_temp_variable = { research_spending_level = 2 }
+				show_ideas_tooltip = research_spending_level_2
+				if = {
+					limit = {
+						has_idea = research_spending_level_2
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_RESEARCH_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_research_spending_slider_icon_3_click = {
+				set_temp_variable = { research_spending_level = 3 }
+				show_ideas_tooltip = research_spending_level_3
+				if = {
+					limit = {
+						has_idea = research_spending_level_3
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_RESEARCH_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_research_spending_slider_icon_4_click = {
+				set_temp_variable = { research_spending_level = 4 }
+				show_ideas_tooltip = research_spending_level_4
+				if = {
+					limit = {
+						has_idea = research_spending_level_4
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_RESEARCH_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_research_spending_slider_icon_5_click = {
+				set_temp_variable = { research_spending_level = 5 }
+				show_ideas_tooltip = research_spending_level_5
+				if = {
+					limit = {
+						has_idea = research_spending_level_5
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_RESEARCH_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_research_spending_slider_left_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = research_spending_level_1 }
+					}
+					add_political_power = -50
+				}
+				decrease_slider_research_spending = yes
+			}
+			income_entry_research_spending_slider_right_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = research_spending_level_5 }
+					}
+					add_political_power = -50
+				}
+				increase_slider_research_spending = yes
+			}
+			## Army Spending Level:
+			income_entry_army_spending_slider_icon_1_click = {
+				set_temp_variable = { army_spending_level = 1 }
+				show_ideas_tooltip = army_spending_level_1
+				if = {
+					limit = {
+						has_idea = army_spending_level_1
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_ARMY_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_army_spending_slider_icon_2_click = {
+				set_temp_variable = { army_spending_level = 2 }
+				show_ideas_tooltip = army_spending_level_2
+				if = {
+					limit = {
+						has_idea = army_spending_level_2
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_ARMY_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_army_spending_slider_icon_3_click = {
+				set_temp_variable = { army_spending_level = 3 }
+				show_ideas_tooltip = army_spending_level_3
+				if = {
+					limit = {
+						has_idea = army_spending_level_3
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_ARMY_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_army_spending_slider_icon_4_click = {
+				set_temp_variable = { army_spending_level = 4 }
+				show_ideas_tooltip = army_spending_level_4
+				if = {
+					limit = {
+						has_idea = army_spending_level_4
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_ARMY_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_army_spending_slider_icon_5_click = {
+				set_temp_variable = { army_spending_level = 5 }
+				show_ideas_tooltip = army_spending_level_5
+				if = {
+					limit = {
+						has_idea = army_spending_level_5
+					}
+					custom_effect_tooltip = ECONOMY_WINDOW_EXPENSES_ENTRY_ARMY_SPENDING_SLIDER_ICON_ACTIVE_TT
+				}
+			}
+			income_entry_army_spending_slider_left_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = army_spending_level_1 }
+					}
+					add_political_power = -10
+				}
+				decrease_slider_army = yes
+			}
+			income_entry_army_spending_slider_right_button_click = {
+				if = {
+					limit = {
+						is_ai = no
+						NOT = { has_idea = army_spending_level_5 }
+					}
+					add_political_power = -50
+				}
+				increase_slider_army = yes
+			}
+		}
+
+		triggers = {
+			pay_loan_button_click_enabled = {
+				set_temp_variable = { loan_size = current_loans_sum }
+				if = {
+					limit = {
+						check_variable = { money < loan_size }
+					}
+					set_temp_variable = { loan_size = money }
+					divide_temp_variable = { loan_size = 100 }
+					subtract_from_temp_variable = { loan_size = 0.5 }
+					round_temp_variable = loan_size
+					multiply_temp_variable = { loan_size = 100 }
+				}
+				set_temp_variable = { possible_max_money_to_repay = loan_size }
+				if = {
+					limit = {
+						has_taken_a_loan = yes
+					}
+					set_temp_variable = { amount_of_money_to_check = 100 }
+					has_specific_amount_of_money = yes
+				}
+				else = {
+					has_taken_a_loan = yes
+				}
+			}
+			pay_loan_button_shift_click_enabled = {
+				if = {
+					limit = {
+						has_taken_a_loan = yes
+					}
+					set_temp_variable = { amount_of_money_to_check = 100 }
+					has_specific_amount_of_money = yes
+				}
+				else = {
+					has_taken_a_loan = yes
+				}
+			}
+			take_loan_button_click_enabled = {
+				set_temp_variable = { loan_size = 100 }
+				set_temp_variable = { amount_of_money_to_check = 2000000 }
+				subtract_from_temp_variable = { amount_of_money_to_check = loan_size }
+				set_temp_variable = { loan_size_to_check = amount_of_money_to_check }
+				if = {
+					limit = {
+						has_specific_loan_size = yes
+					}
+					has_less_than_specific_loan_size = yes
+				}
+				else = {
+					if = {
+						limit = {
+							has_specific_amount_of_money = yes
+						}
+						has_less_than_specific_amount_of_money = yes
+					}
+					else = {
+						NOT = { has_idea = bankruptcy }
+					}
+				}
+			}
+			take_loan_button_control_click_enabled = {
+				set_temp_variable = { loan_size = 1000 }
+				set_temp_variable = { amount_of_money_to_check = 2000000 }
+				subtract_from_temp_variable = { amount_of_money_to_check = loan_size }
+				set_temp_variable = { loan_size_to_check = amount_of_money_to_check }
+				if = {
+					limit = {
+						has_specific_loan_size = yes
+					}
+					has_less_than_specific_loan_size = yes
+				}
+				else = {
+					if = {
+						limit = {
+							has_specific_amount_of_money = yes
+						}
+						has_less_than_specific_amount_of_money = yes
+					}
+					else = {
+						NOT = { has_idea = bankruptcy }
+					}
+				}
+			}
+			take_loan_button_shift_click_enabled = {
+				set_temp_variable = { loan_size = 5000 }
+				set_temp_variable = { amount_of_money_to_check = 2000000 }
+				subtract_from_temp_variable = { amount_of_money_to_check = loan_size }
+				set_temp_variable = { loan_size_to_check = amount_of_money_to_check }
+				if = {
+					limit = {
+						has_specific_loan_size = yes
+					}
+					has_less_than_specific_loan_size = yes
+				}
+				else = {
+					if = {
+						limit = {
+							has_specific_amount_of_money = yes
+						}
+						has_less_than_specific_amount_of_money = yes
+					}
+					else = {
+						NOT = { has_idea = bankruptcy }
+					}
+				}
+			}
+
+			# Sliders:
+			## Taxation Level:
+			income_entry_taxes_slider_icon_1_click_enabled = {
+				always = no
+			}
+			income_entry_taxes_slider_icon_2_click_enabled = {
+				always = no
+			}
+			income_entry_taxes_slider_icon_3_click_enabled = {
+				always = no
+			}
+			income_entry_taxes_slider_icon_4_click_enabled = {
+				always = no
+			}
+			income_entry_taxes_slider_icon_5_click_enabled = {
+				always = no
+			}
+			income_entry_taxes_slider_icon_visible = {
+				set_temp_variable = { income_entry_taxes_slider_icon_x_position = 0 }
+				if = {
+					limit = {
+						has_idea = taxation_level_1
+					}
+					set_temp_variable = { income_entry_taxes_slider_icon_x_position = 0 }
+				}
+				else_if = {
+					limit = {
+						has_idea = taxation_level_2
+					}
+					set_temp_variable = { income_entry_taxes_slider_icon_x_position = 52 }
+				}
+				else_if = {
+					limit = {
+						has_idea = taxation_level_3
+					}
+					set_temp_variable = { income_entry_taxes_slider_icon_x_position = 105 }
+				}
+				else_if = {
+					limit = {
+						has_idea = taxation_level_4
+					}
+					set_temp_variable = { income_entry_taxes_slider_icon_x_position = 158 }
+				}
+				else_if = {
+					limit = {
+						has_idea = taxation_level_5
+					}
+					set_temp_variable = { income_entry_taxes_slider_icon_x_position = 210 }
+				}
+			}
+			income_entry_taxes_slider_left_button_click_enabled = {
+				NOT = { has_idea = taxation_level_1 }
+				NOT = { has_country_flag = taxes_slider_decrease_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			income_entry_taxes_slider_right_button_click_enabled = {
+				NOT = { has_idea = taxation_level_5 }
+				NOT = { has_country_flag = taxes_slider_increase_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			## Social Spending Level:
+			income_entry_social_spending_slider_icon_1_click_enabled = {
+				always = no
+			}
+			income_entry_social_spending_slider_icon_2_click_enabled = {
+				always = no
+			}
+			income_entry_social_spending_slider_icon_3_click_enabled = {
+				always = no
+			}
+			income_entry_social_spending_slider_icon_4_click_enabled = {
+				always = no
+			}
+			income_entry_social_spending_slider_icon_5_click_enabled = {
+				always = no
+			}
+			income_entry_social_spending_slider_icon_visible = {
+				set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 0 }
+				if = {
+					limit = {
+						has_idea = social_spending_level_1
+					}
+					set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 0 }
+				}
+				else_if = {
+					limit = {
+						has_idea = social_spending_level_2
+					}
+					set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 52 }
+				}
+				else_if = {
+					limit = {
+						has_idea = social_spending_level_3
+					}
+					set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 105 }
+				}
+				else_if = {
+					limit = {
+						has_idea = social_spending_level_4
+					}
+					set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 158 }
+				}
+				else_if = {
+					limit = {
+						has_idea = social_spending_level_5
+					}
+					set_temp_variable = { income_entry_social_spending_slider_icon_x_position = 210 }
+				}
+			}
+			income_entry_social_spending_slider_left_button_click_enabled = {
+				NOT = { has_idea = social_spending_level_1 }
+				NOT = { has_country_flag = social_spending_slider_decrease_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			income_entry_social_spending_slider_right_button_click_enabled = {
+				NOT = { has_idea = social_spending_level_5 }
+				NOT = { has_country_flag = social_spending_slider_increase_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			## Research and Education Spending Level:
+			income_entry_research_spending_slider_icon_1_click_enabled = {
+				always = no
+			}
+			income_entry_research_spending_slider_icon_2_click_enabled = {
+				always = no
+			}
+			income_entry_research_spending_slider_icon_3_click_enabled = {
+				always = no
+			}
+			income_entry_research_spending_slider_icon_4_click_enabled = {
+				always = no
+			}
+			income_entry_research_spending_slider_icon_5_click_enabled = {
+				always = no
+			}
+			income_entry_research_spending_slider_icon_visible = {
+				set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 0 }
+				if = {
+					limit = {
+						has_idea = research_spending_level_1
+					}
+					set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 0 }
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_2
+					}
+					set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 52 }
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_3
+					}
+					set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 105 }
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_4
+					}
+					set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 158 }
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_5
+					}
+					set_temp_variable = { income_entry_research_spending_slider_icon_x_position = 210 }
+				}
+			}
+			income_entry_research_spending_slider_left_button_click_enabled = {
+				NOT = { has_idea = research_spending_level_1 }
+				NOT = { has_country_flag = research_spending_slider_increase_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			income_entry_research_spending_slider_right_button_click_enabled = {
+				NOT = { has_idea = research_spending_level_5 }
+				NOT = { has_country_flag = research_spending_slider_decrease_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			## Army Spending Level:
+			income_entry_army_spending_slider_icon_1_click_enabled = {
+				always = no
+			}
+			income_entry_army_spending_slider_icon_2_click_enabled = {
+				always = no
+			}
+			income_entry_army_spending_slider_icon_3_click_enabled = {
+				always = no
+			}
+			income_entry_army_spending_slider_icon_4_click_enabled = {
+				always = no
+			}
+			income_entry_army_spending_slider_icon_5_click_enabled = {
+				always = no
+			}
+			income_entry_army_spending_slider_icon_visible = {
+				set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 0 }
+				if = {
+					limit = {
+						has_idea = army_spending_level_1
+					}
+					set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 0 }
+				}
+				else_if = {
+					limit = {
+						has_idea = army_spending_level_2
+					}
+					set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 52 }
+				}
+				else_if = {
+					limit = {
+						has_idea = army_spending_level_3
+					}
+					set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 105 }
+				}
+				else_if = {
+					limit = {
+						has_idea = army_spending_level_4
+					}
+					set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 158 }
+				}
+				else_if = {
+					limit = {
+						has_idea = army_spending_level_5
+					}
+					set_temp_variable = { income_entry_army_spending_slider_icon_x_position = 210 }
+				}
+			}
+			income_entry_army_spending_slider_left_button_click_enabled = {
+				NOT = { has_idea = army_spending_level_1 }
+				NOT = { has_country_flag = army_spending_slider_decrease_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+			income_entry_army_spending_slider_right_button_click_enabled = {
+				NOT = { has_idea = army_spending_level_5 }
+				NOT = { has_country_flag = army_spending_slider_increase_blocked }
+				OR = {
+					is_ai = yes
+					has_political_power > 50
+				}
+			}
+		}
+
+		properties = {
+			income_entry_taxes_slider_icon = {
+				x = income_entry_taxes_slider_icon_x_position
+			}
+			income_entry_social_spending_slider_icon = {
+				x = income_entry_social_spending_slider_icon_x_position
+			}
+			income_entry_army_spending_slider_icon = {
+				x = income_entry_army_spending_slider_icon_x_position
+			}
+
+			income_entry_research_spending_slider_icon = {
+				x = income_entry_research_spending_slider_icon_x_position
+			}
+		}
+
+		ai_enabled = {
+			tag = GER
+			always = yes
+		}
+
+		ai_test_interval = 48
+		ai_test_variance = 1
+
+		ai_check = {
+			has_taken_a_loan = yes
+		}
+
+		ai_weights = {
+			close_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			pay_loan_button_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						add = 100
+						set_temp_variable = { amount_of_money_to_check = 200 }
+						has_specific_amount_of_money = yes
+					}
+				}
+			}
+			pay_loan_button_shift_click = {
+				ai_will_do = {
+					factor = 0
+					modifier = {
+						add = 1000
+						set_temp_variable = { loan_size = current_loans_sum }
+						set_temp_variable = { money_temp = money }
+						add_to_temp_variable = { money_temp = 100 }
+						check_variable = { money_temp > loan_size }
+					}
+				}
+			}
+			take_loan_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			take_loan_button_control_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			take_loan_button_shift_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+
+			# Sliders:
+			## Taxation Level:
+			income_entry_taxes_slider_icon_1_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_icon_2_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_icon_3_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_icon_4_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_icon_5_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_left_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_taxes_slider_right_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			## Social Spending Level:
+			income_entry_social_spending_slider_icon_1_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_icon_2_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_icon_3_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_icon_4_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_icon_5_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_left_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_social_spending_slider_right_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			## Research and Education Spending Level:
+			income_entry_research_spending_slider_icon_1_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_icon_2_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_icon_3_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_icon_4_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_icon_5_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_left_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_research_spending_slider_right_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			## Army Spending Level:
+			income_entry_army_spending_slider_icon_1_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_icon_2_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_icon_3_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_icon_4_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_icon_5_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_left_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+			income_entry_army_spending_slider_right_button_click = {
+				ai_will_do = {
+					factor = 0
+				}
+			}
+		}
+	}
+
+	research_tab_research_level_information_window = {
+		context_type = player_context
+
+		window_name = "research_tab_research_level_information_window"
+		parent_window_token = technology_tab
+
+		visible = {
+			is_ai = no
+		}
+
+		effects = {
+			research_level_button_click = {
+				if = {
+					limit = {
+						has_idea = research_spending_level_1
+					}
+					show_ideas_tooltip = research_spending_level_1
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_2
+					}
+					show_ideas_tooltip = research_spending_level_2
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_3
+					}
+					show_ideas_tooltip = research_spending_level_3
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_4
+					}
+					show_ideas_tooltip = research_spending_level_4
+				}
+				else_if = {
+					limit = {
+						has_idea = research_spending_level_5
+					}
+					show_ideas_tooltip = research_spending_level_5
+				}
+			}
+		}
+
+		triggers = {
+			research_level_button_visible = {
+				always = no
+			}
+		}
+	}
+
+	automatic_loan_popup_window = {
+		context_type = player_context
+
+		window_name = "automatic_loan_popup_window"
+
+		visible = {
+			is_ai = no
+			check_variable = { show_automatic_loan_popup > 0 }
+		}
+
+		effects = {
+			ok_button_click = {
+				clear_variable = show_automatic_loan_popup
+				clear_variable = automatic_loan_amount
+			}
+		}
+	}
+
+	bankruptcy_popup_window = {
+		context_type = player_context
+
+		window_name = "bankruptcy_popup_window"
+
+		visible = {
+			is_ai = no
+			check_variable = { show_bankruptcy_popup > 0 }
+		}
+
+		effects = {
+			ok_button_click = {
+				clear_variable = show_bankruptcy_popup
+				effect_tooltip = {
+					become_bankrupt_effect = yes
+				}
+			}
+		}
+	}
+}
