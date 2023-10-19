@@ -11,6 +11,7 @@ scripted_diplomatic_actions = {
 				set_temp_variable = { amount_of_money_to_check = 1 }
 				has_specific_amount_of_money = yes
 			}
+			NOT = { is_embargoed_by = THIS }
 			NOT = { has_war_with = ROOT }
 		}
 
@@ -37,19 +38,119 @@ scripted_diplomatic_actions = {
 		send_scripted_gui = send_money_gift_gui
 		reset_send_effect = {
 			ROOT = {
-				set_variable = { send_money_value = 1 }
+				set_variable = { take_loan_value = 1 }
 			}
 		}
 		can_be_sent = {
 			ROOT = {
-				check_variable = { send_money_value > 0 }
-				set_temp_variable = { amount_of_money_to_check = send_money_value }
+				check_variable = { take_loan_value > 0 }
+				set_temp_variable = { amount_of_money_to_check = take_loan_value }
 				has_specific_amount_of_money = yes
 			}
 		}
 
 		accept_title = SEND_MONEY_GIFT_ACCEPT_TITLE
 		accept_description = SEND_MONEY_GIFT_ACCEPT_DESC
+
+		ai_desire = {
+			base = 0
+		}
+	}
+	take_on_loan = {
+		allowed = {
+			always = yes
+		}
+		visible = {
+			always = yes
+		}
+		selectable = {
+			THIS = {
+				has_taken_a_loan = yes
+			}
+			NOT = { is_embargoed_by = THIS }
+			NOT = { has_war_with = ROOT }
+		}
+
+		requires_acceptance = yes
+
+		icon = 1
+
+		on_sent_effect = {
+		}
+
+		complete_effect = {
+			
+			THIS = {
+				set_temp_variable = { loan_size = current_loans_sum }
+				if = {
+					limit = {
+						check_variable = { money < loan_size }
+					}
+					set_temp_variable = { loan_size = money }
+					divide_temp_variable = { loan_size = 100 }
+					subtract_from_temp_variable = { loan_size = 0.5 }
+					round_temp_variable = loan_size
+					multiply_temp_variable = { loan_size = 100 }
+				}
+				multiply_temp_variable = { loan_size = -1 }
+				add_to_variable = { current_loans_sum = loan_size }
+			}
+			ROOT = {
+				set_temp_variable = { money_to_gain = loan_size }
+				add_money_with_tooltip_effect = yes
+			}
+			add_opinion_modifier = {
+				target = THIS
+				modifier = paid_our_debts
+			}
+		}
+
+		send_scripted_gui = take_on_loan_gui
+
+		accept_title = TAKE_ON_LOAN_ACCEPT_TITLE
+		accept_description = TAKE_ON_LOAN_ACCEPT_DESC
+
+		ai_desire = {
+			base = 0
+		}
+	}
+	customs_union = {
+		allowed = {
+			always = yes
+		}
+		visible = {
+			always = yes
+		}
+		selectable = {
+			THIS = {
+				has_opinion = {
+					target = ROOT
+					value > 80
+				}
+			}
+			NOT = { has_idea = closed_economy }
+			NOT = { is_embargoed_by = THIS }
+			THIS = {
+				is_not_great_power = yes
+			}
+			NOT = { has_war_with = ROOT }
+		}
+
+		requires_acceptance = yes
+
+		icon = 1
+
+		on_sent_effect = {
+		}
+
+		complete_effect = {
+			THIS = {
+				set_variable = sphereling
+			}
+		}
+
+		accept_title = CUSTOMS_UNION_ACCEPT_TITLE
+		accept_description = CUSTOMS_UNION_ACCEPT_DESC
 
 		ai_desire = {
 			base = 0
