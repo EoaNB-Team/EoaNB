@@ -1,0 +1,139 @@
+create_sphere_of_influence = {
+	# creates a new sphere of influence 
+	ROOT = {
+		set_variable = {
+			sphere_overlord = ROOT 
+		}
+	}
+	custom_effect_tooltip = create_sphere_of_influence_tip
+}
+
+add_nation_to_sphere = {
+  	# Adds a country to this nation's sphere
+  	# Current scope - sphere overlord
+  	# country_temp - sphereling
+	# How to add a nation to a sphere: 
+		# set_temp_variable = { country_temp = TAG }
+		# var:country_temp = { set_variable = { sphere_membership_level = x } } x can either be 1, 2 or 3
+		# add_nation_to_sphere = yes
+	ROOT = {
+		if = {
+			limit = {
+				NOT = {
+					has_idea = sphere_leader
+				}
+			}
+			create_sphere_of_influence = yes
+			hidden_effect = {
+				add_ideas = sphere_leader
+			}
+		}
+	}
+
+    add_to_array = { spherelings = country_temp }
+
+    var:country_temp = {
+		set_variable = { sphere_overlord = PREV }
+
+		if = {
+			limit = {
+				NOT = {
+					OR = {
+						has_idea = sphere_member_level_1
+						has_idea = sphere_member_level_2
+						has_idea = sphere_member_level_3
+					}
+				}
+			}
+			hidden_effect = {
+				if = {
+					limit = {
+						has_variable = sphere_overlord
+						check_variable = {
+							sphere_membership_level = 1
+						}
+					}
+					add_ideas = sphere_member_level_1
+				}
+				else_if = {
+					limit = {
+						has_variable = sphere_overlord
+						check_variable = {
+							sphere_membership_level = 2
+						}
+					}
+					add_ideas = sphere_member_level_2
+				}
+				else_if = {
+					limit = {
+						has_variable = sphere_overlord
+						check_variable = {
+							sphere_membership_level = 3
+						}
+					}
+					add_ideas = sphere_member_level_3
+					if = {
+						limit = {
+							NOT = {
+								var:country_temp = {
+									is_subject = yes
+								}
+							}
+						}
+						keep_current_politics = yes
+						ROOT = {
+							set_autonomy = {
+								target = var:country_temp
+								autonomy_state = autonomy_puppet
+								end_wars = no
+								end_civil_wars = no
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	#custom_effect_tooltip = add_nation_to_sphere_tip
+}
+
+# add_modifiers_to_sphere_any_countries = {
+# 	# adds the relation modifier to all other countries in a sphere when added to one
+# 	if = {
+# 		limit = {
+# 			any_country = {
+# 				has_country_flag = is_sphereling
+# 				#has_variable = { sphere_overlord = PRS.id }
+# 				or = {
+# 					has_idea = sphere_member_level_1 
+# 					has_idea = sphere_member_level_2
+# 					has_idea = sphere_member_level_3
+# 				}
+# 			}
+# 		}
+# 		add_relation_modifier = {
+# 			target = PREV
+# 			modifier = custom_union_accepted_member
+# 		}
+# 		add_stability = -0.2
+# 	}
+# 	# if = {
+# 	# 	limit = {
+# 	# 		any_country = {
+# 	# 			has_variable = { sphere_overlord = PRS.id }
+# 	# 			NOT = PREV
+# 	# 			or = {
+# 	# 				has_idea = sphere_member_level_1 
+# 	# 				has_idea = sphere_member_level_2
+# 	# 				has_idea = sphere_member_level_3
+# 	# 			}
+# 	# 		}
+# 	# 	}
+# 	# 	add_relation_modifier = {
+# 	# 		target = PREV
+# 	# 		modifier = custom_union_accepted_member
+# 	# 	}
+# 	# }
+# }
+
+# # has_variable = { sphere_overlord = ROOT.id }

@@ -1,57 +1,118 @@
 scripted_diplomatic_actions = {
-	send_money_gift = {
-		allowed = {
-			always = yes
-		}
-		visible = {
-			always = yes
-		}
+	bankroll = {
+		allowed = {}
 		selectable = {
+			NOT = {
+				ROOT={ has_country_flag = eoanb_is_bankrolling }
+			}
 			ROOT = {
-				set_temp_variable = { amount_of_money_to_check = 1 }
+				set_temp_variable = { amount_of_money_to_check = PREV.money }
 				has_specific_amount_of_money = yes
+			}
+			ROOT = {
+				NOT = {
+					has_taken_a_loan = yes
+				}
 			}
 			NOT = { is_embargoed_by = THIS }
-			NOT = { has_war_with = ROOT }
+			NOT = { has_war_with = THIS }
+		}
+		visible = {
+			NOT = {
+				check_variable = {
+					ROOT.bankrolled = THIS.id
+				}
+			}
+			ROOT = {
+				has_balance_in_positive = yes
+			}
 		}
 
-		requires_acceptance = no
+		#cost = 5
 
-		icon = 1
+		icon = 3
 
-		on_sent_effect = {
-		}
+		requires_acceptance = yes
+		show_acceptance_on_action_button = yes   
 
 		complete_effect = {
-			set_temp_variable = { money_to_gain = ROOT.send_money_value }
-			add_money_with_tooltip_effect = yes
+			THIS = {
+				calculate_money_balance = yes
+				set_temp_variable = { money_send_temp = THIS.money }
+				multiply_temp_variable = { money_send_temp = 0.3 }
+				set_variable = { bankrolled_recieving = money_send_temp }
+				add_dynamic_modifier = {
+					modifier = bankrolling_recieving_money
+				}
+				ROOT = {
+					set_variable = {
+						var = bankrolled
+						value = PREV.id
+					}
+				}
+			}
 			ROOT = {
-				set_temp_variable = { money_to_gain = send_money_value }
-				multiply_temp_variable = { money_to_gain = -1 }
-				add_money_with_tooltip_effect = yes
-				clear_variable = send_money_value
+				set_country_flag = eoanb_is_bankrolling
+				set_temp_variable = { money_send_temp = PREV.money }
+				multiply_temp_variable = { money_send_temp = 0.3 }
+				multiply_temp_variable = { money_send_temp = -1 }
+				set_variable = { bankrolled_giving = money_send_temp }
+				add_dynamic_modifier = {
+					modifier = bankrolling_giving_money
+				}
 			}
 		}
 
-		# SEND POPUP CUSTOMIZATION
-		# use diplomatic_action as context in scripted gui
-		send_scripted_gui = send_money_gift_gui
-		reset_send_effect = {
-			ROOT = {
-				set_variable = { take_loan_value = 1 }
-			}
+		#reject_effect = {} # runs when the action is properly sent and rejected
+		#can_be_sent = {} # send button will be disabled if no
+		send_description = eoanb_bankrolling_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
+		#reset_receive_effect = {}
+		#can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = eoanb_bankrolling_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
+		ai_desire = {
+			base = 0
 		}
-		can_be_sent = {
-			ROOT = {
-				check_variable = { take_loan_value > 0 }
-				set_temp_variable = { amount_of_money_to_check = take_loan_value }
-				has_specific_amount_of_money = yes
+	}
+	bankroll_remove = {
+		allowed = {}
+		visible = {
+			check_variable = {
+				ROOT.bankrolled = THIS.id
 			}
 		}
 
-		accept_title = SEND_MONEY_GIFT_ACCEPT_TITLE
-		accept_description = SEND_MONEY_GIFT_ACCEPT_DESC
+		cost = 5
 
+		icon = 3
+
+		requires_acceptance = no
+		show_acceptance_on_action_button = no
+
+		complete_effect = {
+			THIS = {
+				remove_dynamic_modifier = {
+					modifier = bankrolling_recieving_money
+				}
+			}
+			ROOT = {
+				hidden_effect = {
+					clr_country_flag = eoanb_is_bankrolling
+				}
+				remove_dynamic_modifier = {
+					modifier = bankrolling_giving_money
+				}
+				clear_variable = ROOT.bankrolled
+			}
+		}
+
+		#reject_effect = {} # runs when the action is properly sent and rejected
+		#can_be_sent = {} # send button will be disabled if no
+		send_description = eoanb_clear_bankrolling_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
+		#reset_receive_effect = {}
+		#can_be_accepted = { always = no } # accept button will be disabled if no
+		receive_description = eoanb_clear_bankrolling_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
+		# ai_will_do to decide if AI should send this action or not
 		ai_desire = {
 			base = 0
 		}
@@ -68,7 +129,7 @@ scripted_diplomatic_actions = {
 				has_taken_a_loan = yes
 			}
 			NOT = { is_embargoed_by = THIS }
-			NOT = { has_war_with = ROOT }
+			NOT = { has_war_with = THIS }
 		}
 
 		requires_acceptance = yes
@@ -120,6 +181,10 @@ scripted_diplomatic_actions = {
 		}
 		visible = {
 			always = yes
+			is_not_great_power = yes
+			ROOT = {
+				is_great_power = yes
+			}
 		}
 		selectable = {
 			THIS = {
@@ -128,15 +193,19 @@ scripted_diplomatic_actions = {
 					value > 80
 				}
 			}
-			NOT = { has_idea = closed_economy }
 			NOT = { is_embargoed_by = THIS }
 			THIS = {
 				is_not_great_power = yes
 			}
-			NOT = { has_war_with = ROOT }
+			NOT = { is_not_sphere_member = yes }
+			is_neighbor_of = ROOT
+			NOT = { has_war_with = THIS }
 		}
 
 		requires_acceptance = yes
+		show_acceptance_on_action_button = yes
+
+		cost = 25
 
 		icon = 1
 
@@ -145,7 +214,24 @@ scripted_diplomatic_actions = {
 
 		complete_effect = {
 			THIS = {
-				set_variable = sphereling
+				add_modifiers_to_sphere_any_countries = yes
+				set_country_flag = is_sphereling
+				add_ideas = sphere_market_2_modifier
+				add_ideas = { sphere_member_level_2 }
+				set_variable = { sphere_overlord = ROOT.id }
+				add_relation_modifier = {
+					target = ROOT
+					modifier = custom_union_accepted_leader
+				}
+			}
+			ROOT = {
+				add_modifiers_to_sphere_any_countries = yes
+				add_ideas = sphere_market_leader_modifier
+				add_nation_to_sphere = yes
+				add_relation_modifier = {
+                    target = PREV
+                    modifier = custom_union_accepted_member
+                }
 			}
 		}
 
