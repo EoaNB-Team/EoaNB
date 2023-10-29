@@ -381,6 +381,43 @@ calculate_money_expenses = {
 	# Army Spending Affecting Modifiers:
 	calculate_army_spending_modifiers = yes
 
+	# Navy Spending:
+	set_temp_variable = { expenses_from_our_navy_spending = num_ships }
+	multiply_temp_variable = { expenses_from_our_navy_spending = -0.003 }
+	multiply_temp_variable = { expenses_from_our_navy_spending = 7 } # money is now weekly
+
+	# Navy Spending Affecting Modifiers:
+	calculate_navy_spending_modifiers = yes
+
+	# Road Spending:
+	set_temp_variable = { expenses_from_our_road_spending = 0 }
+	hidden_trigger = {
+		all_owned_state = {
+			OR = {
+				NOT = { is_core_of = ROOT }
+				AND = {
+					is_core_of = ROOT
+					add_to_temp_variable = { expenses_from_our_road_spending = infrastructure_level }
+				}
+			}
+		}
+	}
+	multiply_temp_variable = { expenses_from_our_road_spending = -0.003 }
+	multiply_temp_variable = { expenses_from_our_road_spending = 7 } # money is now weekly
+
+	# Road Spending Affecting Modifiers:
+	calculate_road_spending_modifiers = yes
+
+	# Law Spending: I NEED TO COME BACK TO THIS, IT CURRENTLY DOES IT IN REVERSE
+    set_temp_variable = { stab_temp = 0.50 }
+    subtract_from_temp_variable = { stab_temp = stability }
+    set_temp_variable = { expenses_from_our_law_spending = stab_temp }
+    multiply_temp_variable = { expenses_from_our_law_spending = -0.05 }
+    multiply_temp_variable = { expenses_from_our_law_spending = 7 } # money is now weekly
+
+	# Law Spending Affecting Modifiers:
+	calculate_law_spending_modifiers = yes
+
 	# Used Military Factories:
 	set_temp_variable = { expenses_from_our_used_mil_factories = num_of_military_factories }
 	subtract_from_temp_variable = { expenses_from_our_used_mil_factories = num_of_available_military_factories }
@@ -495,6 +532,96 @@ calculate_army_spending_modifiers = {
 			check_variable = { army_spending_cost_modifier < -1 }
 		}
 		set_temp_variable = { army_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_navy_spending_modifiers = yes
+calculate_navy_spending_modifiers = {
+	# Army Spending Modifiers:
+	set_temp_variable = { navy_spending_modifier = 1 }
+	add_to_temp_variable = { navy_spending_modifier = modifier@navy_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { navy_spending_modifier < 0 }
+		}
+		set_temp_variable = { navy_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_navy_spending = navy_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_navy_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { navy_spending_cost_modifier = modifier@navy_spending_cost_factor }
+	set_temp_variable = { navy_spending_cost_modifier_from_ideas = modifier@navy_spending_cost_factor_from_ideas }
+	set_temp_variable = { navy_spending_cost_modifier_from_decisions = modifier@navy_spending_cost_factor_from_decisions }
+	set_temp_variable = { navy_spending_cost_modifier_from_other = navy_spending_cost_modifier }
+	subtract_from_temp_variable = { navy_spending_cost_modifier_from_other = navy_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { navy_spending_cost_modifier_from_other = navy_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { navy_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { navy_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_road_spending_modifiers = yes
+calculate_road_spending_modifiers = {
+	# Army Spending Modifiers:
+	set_temp_variable = { road_spending_modifier = 1 }
+	add_to_temp_variable = { road_spending_modifier = modifier@road_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { road_spending_modifier < 0 }
+		}
+		set_temp_variable = { road_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_road_spending = road_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_road_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { road_spending_cost_modifier = modifier@road_spending_cost_factor }
+	set_temp_variable = { road_spending_cost_modifier_from_ideas = modifier@road_spending_cost_factor_from_ideas }
+	set_temp_variable = { road_spending_cost_modifier_from_decisions = modifier@road_spending_cost_factor_from_decisions }
+	set_temp_variable = { road_spending_cost_modifier_from_other = road_spending_cost_modifier }
+	subtract_from_temp_variable = { road_spending_cost_modifier_from_other = road_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { road_spending_cost_modifier_from_other = road_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { road_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { road_spending_cost_modifier = -1 }
+	}
+}
+
+# example usage:
+## calculate_law_spending_modifiers = yes
+calculate_law_spending_modifiers = {
+	# Army Spending Modifiers:
+	set_temp_variable = { law_spending_modifier = 1 }
+	add_to_temp_variable = { law_spending_modifier = modifier@law_spending_cost_factor }
+	if = {
+		limit = {
+			check_variable = { law_spending_modifier < 0 }
+		}
+		set_temp_variable = { law_spending_modifier = 0 }
+	}
+	multiply_temp_variable = { expenses_from_our_law_spending = law_spending_modifier }
+	add_to_temp_variable = { total_expenses_temp = expenses_from_our_law_spending }
+
+	# Setting Display Variable:
+	set_temp_variable = { law_spending_cost_modifier = modifier@law_spending_cost_factor }
+	set_temp_variable = { law_spending_cost_modifier_from_ideas = modifier@law_spending_cost_factor_from_ideas }
+	set_temp_variable = { law_spending_cost_modifier_from_decisions = modifier@law_spending_cost_factor_from_decisions }
+	set_temp_variable = { law_spending_cost_modifier_from_other = law_spending_cost_modifier }
+	subtract_from_temp_variable = { law_spending_cost_modifier_from_other = law_spending_cost_modifier_from_ideas }
+	subtract_from_temp_variable = { law_spending_cost_modifier_from_other = law_spending_cost_modifier_from_decisions }
+	if = {
+		limit = {
+			check_variable = { law_spending_cost_modifier < -1 }
+		}
+		set_temp_variable = { law_spending_cost_modifier = -1 }
 	}
 }
 
