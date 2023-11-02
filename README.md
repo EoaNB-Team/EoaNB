@@ -81,7 +81,7 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 If you wish to contribute to the development of the mod, support us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
 
 ### Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `(0.3)-Ars-Bellica` branch.
+- Current General Development for EoaNB shall be pushed onto the `(0.4)-Ars-Bellica` branch.
 - All code should be error-checked before pushed onto the Github
 - Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
 - If procedural pushing (including incomplete content) is crucial to development, request a new branch.
@@ -93,12 +93,8 @@ If you wish to contribute to the development of the mod, support us on Patreon o
 <table>
 <tr>
 <td align="center">
-  <a href = "https://github.com/ChrisSGD"><strong>ChrisSGD</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075039432724/chris.png" width="80px;" alt="ChrisSGD"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/Sir-DEM0"><strong>Dem0</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="Dem0"/>
+  <a href = "https://github.com/Sir-DEM0"><strong>DEM0</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="DEM0"/>
 </td>
 <td align="center">
   <a href = "https://github.com/Imperialism1"><strong>Imperialism</strong></a>
@@ -109,24 +105,20 @@ If you wish to contribute to the development of the mod, support us on Patreon o
   <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075802775562/kuba.png" width="80px;" alt="Kuba"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Coggernaut"><strong>Coggernaut</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075349782628/cogg.png" width="80px;" alt="Coggernaut"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/toadsess"><strong>toadsess</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/469981670141853699/fb3081404173ce844580025574c17751.webp" width="80px;" alt="toadsess"/>
+  <a href = "https://github.com/harakiribesttradition"><strong>Harakiri</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/65631634?v=4" width="80px;" alt="Harakiri"/>
 </td>
 <td align="center">
   <a href = "https://github.com/FloridaMayhem"><strong>EnzoC9083</strong></a>
   <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730076272533544/enzo.png" width="80px;" alt="EnzoC9083"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/TheFunkymenStudio"><strong>Funkyman</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/183277104769662977/5d4846e2317051328c8317f03ad4422b.webp" width="80px;" alt="Funkyman"/>
+  <a href = "https://github.com/Kenhel"><strong>Kenhel</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/90184185?v=4" width="80px;" alt="Kenhel"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Makkkkus"><strong>Makkkkus</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/37084190" width="80px;" alt="Makkkkus"/>
+  <a href = "https://github.com/Barendd1975"><strong>Barendd</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/26018531?v=4" width="80px;" alt="Barendd"/>
 </td>
 </tr>
 </table>
