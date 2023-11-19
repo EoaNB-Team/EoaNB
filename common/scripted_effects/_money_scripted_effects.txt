@@ -315,6 +315,87 @@ take_loan_effect = {
 		add_inflation_with_tooltip_effect = yes
 	}
 }
+# example usage:
+## set_temp_variable = { loans_amount = 1 }
+## take_loan_without_inflation_effect = yes
+take_loan_without_inflation_effect = {
+	custom_effect_tooltip = TAKE_LOAN_EFFECT_TT
+	hidden_effect = {
+		if = {
+			limit = {
+				check_variable = { loans_amount < 1000 }
+			}
+			for_loop_effect = {
+				start = 0
+				end = loans_amount
+				set_temp_variable = { loan_size = 100 }
+				add_to_variable = { current_loans_sum = loan_size }
+				set_temp_variable = { money_to_gain = loan_size }
+				add_money_with_tooltip_effect = yes
+			}
+		}
+		else = {
+			set_temp_variable = { first_loop = loans_amount }
+			divide_temp_variable = { first_loop = 1000 }
+			if = {
+				limit = {
+					check_variable = { first_loop < 1000 }
+				}
+				divide_temp_variable = { loans_amount = first_loop }
+				for_loop_effect = {
+					start = 0
+					end = first_loop
+					for_loop_effect = {
+						start = 0
+						end = loans_amount
+						set_temp_variable = { loan_size = 100 }
+						add_to_variable = { current_loans_sum = loan_size }
+						set_temp_variable = { money_to_gain = loan_size }
+						add_money_with_tooltip_effect = yes
+					}
+				}
+				multiply_temp_variable = { loans_amount = first_loop }
+			}
+			else = {
+				set_temp_variable = { second_loop = first_loop }
+				divide_temp_variable = { second_loop = 1000 }
+				divide_temp_variable = { loans_amount = first_loop }
+				divide_temp_variable = { loans_amount = second_loop }
+				for_loop_effect = {
+					start = 0
+					end = second_loop
+					for_loop_effect = {
+						start = 0
+						end = first_loop
+						for_loop_effect = {
+							start = 0
+							end = loans_amount
+							set_temp_variable = { loan_size = 100 }
+							add_to_variable = { current_loans_sum = loan_size }
+							set_temp_variable = { money_to_gain = loan_size }
+							add_money_with_tooltip_effect = yes
+						}
+					}
+				}
+				multiply_temp_variable = { loans_amount = first_loop }
+				multiply_temp_variable = { loans_amount = second_loop }
+			}
+		}
+		if = {
+			limit = {
+				check_variable = { current_loans_sum < 0 }
+			}
+			# if you overflow loans, you automatically become bankrupt
+			become_bankrupt_effect = yes
+		}
+	}
+	effect_tooltip = {
+		set_temp_variable = { loan_size = 100 }
+		add_to_variable = { current_loans_sum = loan_size }
+		set_temp_variable = { money_to_gain = loan_size }
+		add_money_with_tooltip_effect = yes
+	}
+}
 
 # example usage:
 ## become_bankrupt_effect = yes
