@@ -390,7 +390,7 @@ NDefines = {
 			0.0, -- army leaders
 			0.0, -- navy leaders
 			0.0, -- air leaders
-			1.0, -- operatives
+			0.5, -- operatives
 		},
 
 		CONVOYS_SUNK_MULTIPLIER_FOR_WAR_SUPPORT = 0.2,	-- once a trade convoy ship sunk, you will get a larger negative impact on your war support
