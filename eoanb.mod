@@ -62,5 +62,5 @@ replace_path="scenario_tests/effects"
 replace_path="scenario_tests/tests"
 replace_path="scenario_tests/triggers"
 supported_version="1.13.*"
-path="mod/EoaNB"
+
 remote_file_id="2856963714"
