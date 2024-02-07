@@ -25,7 +25,7 @@ country_event = {
 	}
 	
 country_event = {
-	#border move outer montenegro mnt
+	#chose your complexity
 	id = MNT_guide_gui.1
 	title = MNT_guide_gui.1.t
 	desc = MNT_guide_gui.1.d
@@ -36,9 +36,10 @@ country_event = {
 		option = {#keep easy mechanics
 		name =  MNT_guide_gui.1.a
 			trigger = {
-			has_game_rule = { rule = MNT_mechanic_complexity  option = DEFAULT }
+				has_game_rule = { rule = MNT_mechanic_complexity  option = DEFAULT }
 			}
 				set_global_flag = MNT_easy_mechanic_complexity
+				mark_focus_tree_layout_dirty = yes
 		}
 		
 		option = {#keep hard mechanics
@@ -47,6 +48,7 @@ country_event = {
 				has_game_rule = { rule = MNT_mechanic_complexity  option = MNT_complex_mechanic }
 			}
 				set_global_flag = MNT_hard_mechanic_complexity
+				mark_focus_tree_layout_dirty = yes
 		}
 	}
 country_event = {
@@ -405,7 +407,7 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	immediate = {
-		set_country_flag = OTO_herzegovina_uprising_1857
+		set_global_flag = OTO_herzegovina_uprising_1857
 	}
 	option = {
 		name = OTO_battleofgrahovac.9.a
@@ -878,6 +880,21 @@ country_event = {
 	option = { #play you honestly yes or no ?
 		name = OTO_battleofgrahovac.21.a
 		ai_chance = { factor = 150 }
+			if = {
+				limit = {
+					has_country_flag = MNT_easy_mechanic_complexity
+				}
+				if = {
+					limit = {
+						OR = {
+							NOT = { has_completed_focus = MNT_focus_recognize_our_status_under_the_ottomans_easy_mechanic }
+							NOT = { has_completed_focus = MNT_focus_strike_a_deal_with_the_ottomans_easy_mechanic }
+							NOT = { has_completed_focus = MNT_focus_the_mostar_convention_easy_mechanic }
+						}
+					}
+				}
+				complete_national_focus = MNT_focus_strike_a_deal_with_the_ottomans_easy_mechanic
+			}
 		clr_country_flag = play_honestly_1
 		clr_country_flag = play_dishonestly_1
 		}
@@ -1109,7 +1126,10 @@ country_event = {
 		var = MNT.MNT_neogotions
 		value = 2
 		}
-		set_global_flag = not_gained_independence
+		set_global_flag = { 
+			flag = not_gained_independence	
+			value = -1
+		}
 		clr_country_flag = has_negotiations
 		}
 	}
@@ -1845,7 +1865,7 @@ country_event = {
 					value = 0
 				}
 				add_to_temp_variable = { add_negotiations_bonus = not_gained_independence  }
-				add_to_temp_variable = { add_negotiations_bonus = montenegro_ottomans_neogotiations }
+				add_to_temp_variable = { add_negotiations_bonus = have_indenpendence_montengro }
 				add_to_temp_variable = { add_negotiations_bonus = have_outer_montenegro }
 				add_to_temp_variable = { add_negotiations_bonus = not_gained_outer_montenegro }
 				add_to_temp_variable = { add_negotiations_bonus = have_arms_import }
@@ -2731,6 +2751,30 @@ country_event = {
 	}
 }
 
+country_event = { #MNT lose OTO win
+	id = montenegro.37
+	title  = montenegro.37.t
+	desc = montenegro.37.d
+		is_triggered_only  = yes
+		
+		option = { 
+		name = montenegro.37.a
+		ai_chance = { factor = 100 }
+			if = { 
+				limit = {
+					tag = MNT
+				}
+				complete_national_focus = MNT_focus_mostar_convention_easy_mechanic
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+			add_stability = -0.03
+		}
+	}
+}
+
 country_event = {#foregin power can support MNT or OTO
     id = montenegro.38
     title = montenegro.38.t
@@ -2741,7 +2785,7 @@ country_event = {#foregin power can support MNT or OTO
     
     option = { #support MNT
     name = montenegro.38.a
-    {ai_will_do = 100}
+		ai_chance = { factor = 100 }
     	add_political_power = -30
     	set_variable = {
         	var = support_side
@@ -2750,14 +2794,14 @@ country_event = {#foregin power can support MNT or OTO
     	}
     }
     
-    option = {#do nothing
+    option = { #do nothing
     name = montenegro.38.b
-    {ai_will_do = 100}
+		ai_chance = { factor = 100 }
     }
     
-    option = {#support OTO
+    option = { #support OTO
     name = montenegro.38.c
-    {ai_will_do = 100}
+		ai_chance = { factor = 100 }
     	 add_political_power = -30
     	set_variable = {
         	var = support_side
@@ -2777,21 +2821,21 @@ country_event = {#foregin power can support MNT or OTO
     
     option = { #supporter of MNT
     name = montenegro.39.a
-    {ai_will_do = 100}
+	ai_chance = { factor = 100 }
     	if = { 
     		limit = { 
     			MNT = { has_completed_focus = MNT_focus_strike_a_deal_with_the_ottomans_easy_mechanic }
     		}
     		if = {
     			limit = { 
-					has_variable = { var = support_side value = 1 }
+					check_variable = { support_side = 1 }
 				}			
     			set_temp_variable = { eoanb_prestige_change = 2 }
 				eoanb_change_prestige_score = yes
     		}
     	if = {
     		limit = { 
-				has_variable = { var = support_side value = 2 }
+					check_variable = { support_side = 2 }
     		}
     			set_temp_variable = { eoanb_prestige_change = -2 }
 				eoanb_change_prestige_score = yes
@@ -2802,20 +2846,21 @@ country_event = {#foregin power can support MNT or OTO
     			MNT = { has_completed_focus = MNT_focus_the_mostar_convention_easy_mechanic }}
    	 if = { 
     		limit = { 
-    			has_variable = { var = support_side value = 1 }
+					check_variable = { support_side = 1 }
  			}
     			set_temp_variable = { eoanb_prestige_change = -2 }
 				eoanb_change_prestige_score = yes
     	}
       if = { 
     	limit = { 
-    		has_variable = { var = support_side value = 2 }
+					check_variable = { support_side = 2 }
    	}
     			set_temp_variable = { eoanb_prestige_change = 2 }
 				eoanb_change_prestige_score = yes
     	}
     	clear_variable = support_side
-    }
+		}
+	}
 }
 
 
@@ -2829,31 +2874,51 @@ country_event = {#foregin power can support MNT or OTO
     
     option = { #accept demands
     name = montenegro.40.a
-    {ai_will_do = 100}
+		ai_chance = { factor = 100 }
 		MNT = { complete_national_focus =  MNT_focus_path_of_peace_easy_mechainc }
-		custom_effect_tooltip = 
-		add_stability = -0.03
+		custom_effect_tooltip =  MNT_accept_demands
+		add_stability = -0.02
 
 		}
 	option = { #need compromis
     name = montenegro.40.b
-    {ai_will_do = 100}
-		MNT = { country_event = }
-		custom_effect_tooltip = 
-		add_stability = -0.03
+		ai_chance = { factor = 100 }
+		MNT = { country_event =  montenegro.41 }
+		custom_effect_tooltip = MNT_press_on_compromis
 
 		}
-	option = { #sena army
+	option = { #send army
     name = montenegro.40.c
-    {ai_will_do = 100}
-		MNT = { complete_national_focus =  MNT_focus_recognize_our_status_under_the_ottomans_easy_mechanic }
-		custom_effect_tooltip = 
-		add_stability = -0.03
+		ai_chance = { factor = 100 }
+		MNT = { country_event = montenegro.42 }
+		custom_effect_tooltip = MNT_send_army
+		add_stability = 0.02
+		effect_tooltip = {#only to MNT see
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 1204
+					num_provinces = 1
+					on_win = montenegro.45
+					on_lose = montenegro.44
+					on_cancel = montenegro.113
+					modifier = 0.1
+				}
+				defender = {
+					state = 942
+					num_provinces = 1
+					on_win = montenegro.44
+					on_lose = montenegro.45
+					on_cancel = montenegro.116
+					modifier = 0.5
+				}
+			}
+		}
 
 		}
 	}
 	
-    country_event = {#noegotions side of MNT
+    country_event = {#noegotions side of MNT reaction on montenegro.40.b
     id = montenegro.41
     title = montenegro.41.t
     desc = montenegro.41.d
@@ -2863,18 +2928,133 @@ country_event = {#foregin power can support MNT or OTO
     
     option = { #accept demands
     name = montenegro.41.a
-    {ai_will_do = 100}
-
+		ai_chance = { factor = 100 }
+		set_global_flag = protect_muslim_landlords
+		MNT = { complete_national_focus = MNT_focus_recognize_our_status_under_the_ottomans_easy_mechanic }
+			
 		}
-	option = { #need compromis
+	option = { #reject compromis
     name = montenegro.41.b
-    {ai_will_do = 100}
-
+		ai_chance = { factor = 100 }
+		OTO = { country_event = montenegro.43 }
+			effect_tooltip = {#only to MNT see
+				start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 942
+					num_provinces = 1
+					on_win = montenegro.44
+					on_lose = montenegro.45
+					on_cancel = montenegro.113
+					modifier = 0.1
+				}
+				defender = {
+					state = 1204
+					num_provinces = 1
+					on_win = montenegro.45
+					on_lose = montenegro.44
+					on_cancel = montenegro.116
+					modifier = 0.1
+				}
+			}
 		}
 	}
+}
+	
+    country_event = { #ottomans send army MNT inform
+    id = montenegro.42
+    title = montenegro.42.t
+    desc = montenegro.42.d
+    
+    fire_only_once = no
+    is_triggered_only = yes 
+    
+    option = { #to arms
+    name = montenegro.42.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 1204
+					num_provinces = 1
+					on_win = montenegro.45
+					on_lose = montenegro.44
+					on_cancel = montenegro.113
+					modifier = 0.1
+				}
+				defender = {
+					state = 942
+					num_provinces = 1
+					on_win = montenegro.44
+					on_lose = montenegro.45
+					on_cancel = montenegro.116
+					modifier = 0.5
+				}
+			}
+		}
+	}
+}
 
+    country_event = {#MNT reject OTO inform
+    id = montenegro.43
+    title = montenegro.43.t
+    desc = montenegro.43.d
+    
+    fire_only_once = no
+    is_triggered_only = yes 
+    
+    option = { #to arms
+    name = montenegro.43.a
+		ai_chance = { factor = 100 }
+		hidden_effect = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 1204
+					num_provinces = 1
+					on_win = montenegro.45
+					on_lose = montenegro.44
+					on_cancel = montenegro.113
+					modifier = 0.1
+				}
+				defender = {
+					state = 942
+					num_provinces = 1
+					on_win = montenegro.44
+					on_lose = montenegro.45
+					on_cancel = montenegro.116
+					modifier = 0.5
+				}
+			}
+		}
+	}
+}
 
-
+country_event = { #MNT win OTO lose
+	id = montenegro.44
+	title  = montenegro.44.t
+	desc = montenegro.44.d
+		is_triggered_only  = yes
+		
+		option = { 
+		name = montenegro.116.a
+		ai_chance = { factor = 100 }
+			if = { 
+				limit = {
+					tag = MNT
+				}
+				complete_national_focus = MNT_focus_strike_deal_with_ottomans_easy_mechanic
+			}
+			if = {
+				limit = {
+					tag = OTO
+				}
+			add_stability = -0.03
+		}
+	}
+}
+				
 #an event where the OTO decides the fate of the herzegovina
 country_event = {
 	id = montenegro.45
@@ -3270,55 +3450,7 @@ country_event = {
 	}
 }
 
-country_event = { #MNT win OTO lose
-	id = montenegro.116
-	title  = montenegro.116.t
-	desc = montenegro.116.d
-		is_triggered_only  = yes
-		
-		option = { 
-		name = montenegro.116.a
-		{ai_will_do  = 100}
-			if = { 
-				limit = {
-					tag = MNT
-				}
-				complete_focus = MNT_focus_strike_deal_with_ottomans_easy_mechanic
-			}
-			if = {
-				limit = {
-					tag = OTO
-				}
-			add_stability = -0.03
-		}
-	}
-}
-				
-	
-	
-country_event = { #MNT lose OTO win
-	id = montenegro.117
-	title  = montenegro.117.t
-	desc = montenegro.117.d
-		is_triggered_only  = yes
-		
-		option = { 
-		name = montenegro.117.a
-		{ai_will_do  = 100}
-			if = { 
-				limit = {
-					tag = MNT
-				}
-				complete_focus = MNT_focus_mostar_convention_easy_mechanic
-			}
-			if = {
-				limit = {
-					tag = OTO
-				}
-			add_stability = -0.03
-		}
-	}
-}
+
 
 
 #send jaroši batalions
@@ -3635,9 +3767,9 @@ country_event = {
 	trigger = {
 		tag = MNT
 		OR = {
-			has_completed_focus = MNT_focus_recognize_our_status_under_the_ottomans
-			has_completed_focus = MNT_focus_strike_a_deal_with_the_ottomans
-			has_completed_focus = MNT_focus_the_mostar_convention
+			has_completed_focus = MNT_focus_recognize_our_status_under_the_ottomans_easy_mechanic
+			has_completed_focus = MNT_focus_strike_a_deal_with_the_ottomans_easy_mechanic
+			has_completed_focus = MNT_focus_the_mostar_convention_easy_mechanic
 		}
 	}
 	
