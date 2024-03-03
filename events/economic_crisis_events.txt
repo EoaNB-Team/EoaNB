@@ -48,7 +48,7 @@ news_event = {
 	immediate = {
 		hidden_effect = {
 			every_country = {
-				limit = { 
+				limit = {
 					OR = {
 						owns_state = 357
 						owns_state = 960
@@ -66,7 +66,7 @@ news_event = {
 			set_variable = { super_event_displayed = 3 }
 		}
 		if = {
-			limit = { 
+			limit = {
 				NOT = { tag = USA }
 				OR = {
 					NOT = { has_idea = agrarian }
@@ -413,97 +413,853 @@ add_namespace = eighteenseventhreecrisis
 #TRIGGERS FROM AND EFFECTS TO OTHER NATIONS TO BE ADDED
 #FACTORY EVENTS TO BE ADDED
 #WORKER ANGER LEVEL TO BE ADDED
-#LONG DEPRESSION TO BE ADDED
-#Crisis doesn't necessarily start in 1873, it is triggered by Germany abandoning silver
-#The Crisis starts
+
+#AUS - The Vienna Stock Exchange Crash - May 1873
 country_event = {
 	id = eighteenseventhreecrisis.1
 	title = eighteenseventhreecrisis.1.t
 	desc = eighteenseventhreecrisis.1.d
-	picture = GFX_report_event_worker_protests
+	picture = GFX_report_event_vienna_stock_exchange_crash
 	
 	is_triggered_only = yes
-	fire_only_once = yes
-	
-	#Blocked due to incompleteness with a date trigger
-	trigger = {
-		tag = PRS
-		date > 2200.1.1
-		PRS_trigger_formed_germany = yes
-		PRS = { has_completed_focus = GER_focus_historical_gold_standard }
-		PRS = { has_completed_focus = GER_focus_historical_state_railways }
-	}
 	
 	option = {
 		name = eighteenseventhreecrisis.1.a
-		ai_chance = { factor = 100 }
-		remove_ideas = GER_idea_gold_standard
-		add_ideas = GER_idea_1873_crash_gold
+		trigger = {
+			tag = AUS
+		}
+		ai_chance = { base = 100 }
+		decrease_ps_by_two = yes
+		add_ideas = eoanb_idea_panic_of_1873_substantial
 		hidden_effect = {
-			PRS = { complete_national_focus = GER_focus_historical_zusammenbruch }
+			news_event = news.47
+			ENG = { country_event = { days = 1 id = eighteenseventhreecrisis.1 } }
+			FRA = { country_event = { days = 1 id = eighteenseventhreecrisis.1 } }
+			PRS = { country_event = { days = 1 id = eighteenseventhreecrisis.1 } }
+			USA = { country_event = { days = 1 id = eighteenseventhreecrisis.1 } }
+			#USA = { country_event = { days = 133 random_days = 14 id = eighteenseventhreecrisis.X } } #New York Stock Exchange Panic
 		}
 	}
-	
+
+	option = {
+		name = eighteenseventhreecrisis.1.b
+		trigger = {
+			NOT = { tag = AUS }
+		}
+		ai_chance = { base = 100 }
+		decrease_ps_by_one = yes
+		add_ideas = eoanb_idea_panic_of_1873_minor
+	}
 }
 
-#Declare the Crisis to be over
+#Strousberg Businesses Forced into Liquidation
 country_event = {
 	id = eighteenseventhreecrisis.2
 	title = eighteenseventhreecrisis.2.t
 	desc = eighteenseventhreecrisis.2.d
-	picture = GFX_report_event_generic_military_parade
+	picture = GFX_report_event_strousberg
 	
 	is_triggered_only = yes
 	fire_only_once = yes
 	
-	trigger = {
-		TAG = PRS
-		PRS_trigger_formed_germany = yes
-		NOT = {
-			PRS_is_in_1873_crisis = yes
-		}
-		PRS = { has_completed_focus = GER_focus_historical_fight_crisis }
-		OR = {
-			PRS = { has_completed_focus = GER_focus_historical_protective_tariffs }
-			PRS = { has_completed_focus = GER_focus_historical_balanced_tarriffs }
-			PRS = { has_completed_focus = GER_focus_historical_lower_tarriffs }
-		}
-	}
-	
 	option = {
 		name = eighteenseventhreecrisis.2.a
-		ai_chance = { factor = 100 }
+		ai_chance = { base = 100 }
+		add_stability = -0.02
+		swap_ideas = {
+			remove_idea = eoanb_idea_panic_of_1873_minor
+			add_idea = eoanb_idea_panic_of_1873_modest
+		}
+		custom_effect_tooltip = GER_damage_railways_effect_tt
+		#advisor
 		hidden_effect = {
-			PRS = { complete_national_focus = GER_focus_historical_crisis_is_over }
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 3
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 3
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 3
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			every_owned_state = {
+				limit = { 
+					has_state_flag = AUS_the_panic_of_1873_rail
+				}
+				clr_state_flag = AUS_the_panic_of_1873_rail
+			}
 		}
 	}
-	
 }
 
-#Remove national spirit (Temp Event as long as this chain isn't finished)
+#PRS - The Crisis Starts in Berlin - October 1873
 country_event = {
 	id = eighteenseventhreecrisis.3
 	title = eighteenseventhreecrisis.3.t
 	desc = eighteenseventhreecrisis.3.d
-	picture = GFX_report_event_usa_election_generic
+	picture = GFX_report_event_berliner_borse
 	
 	is_triggered_only = yes
 	fire_only_once = yes
 	
-	trigger = {
-		TAG = PRS
-		PRS_trigger_formed_germany = yes
-		OR = {
-			PRS = { has_completed_focus = GER_focus_historical_protective_tariffs }
-			PRS = { has_completed_focus = GER_focus_historical_balanced_tarriffs }
-			PRS = { has_completed_focus = GER_focus_historical_lower_tarriffs }
+	option = {
+		name = eighteenseventhreecrisis.3.a
+		ai_chance = { base = 100 }
+		decrease_ps_by_two = yes
+		swap_ideas = {
+			remove_idea = eoanb_idea_panic_of_1873_modest
+			add_idea = eoanb_idea_panic_of_1873_substantial
 		}
+		complete_national_focus = GER_focus_historical_gruenderkrach
+		activate_mission_tooltip = GER_mission_panic_of_1873
+		custom_effect_tooltip = eighteenseventhreecrisis_panic_of_1873_damage_tt
+		hidden_effect = {
+			mark_focus_tree_layout_dirty = yes
+			activate_mission = GER_mission_panic_of_1873
+			country_event = { days = 60 id = eighteenseventhreecrisis.4 }
+			### Civilian Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				prioritize = { 951 }
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			### Civilian Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				prioritize = { 951 }
+				limit = {
+					industrial_complex > 0
+					OR = {
+						AND = {
+							NOT = { has_state_flag = AUS_the_panic_of_1873_civ }
+							NOT = { has_state_flag = AUS_the_panic_of_1873_civr }
+						}
+						THIS = 951
+					}
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			### Railways in trouble
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 1
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 1
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 1
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			### Military Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					arms_factory > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_mil
+							has_state_flag = AUS_the_panic_of_1873_milr
+						}
+					}
+				}
+				damage_building = {
+					type = arms_factory
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_mil
+			}
+			random_owned_controlled_state = {
+				limit = {
+					arms_factory > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_mil
+							has_state_flag = AUS_the_panic_of_1873_milr
+						}
+					}
+				}
+				damage_building = {
+					type = arms_factory
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_mil
+			}
+			### Military Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					arms_factory > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_mil
+							has_state_flag = AUS_the_panic_of_1873_milr
+						}
+					}
+				}
+				remove_building = {
+					type = arms_factory
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_milr
+			}
+			random_owned_controlled_state = {
+				limit = {
+					arms_factory > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_mil
+							has_state_flag = AUS_the_panic_of_1873_milr
+						}
+					}
+				}
+				remove_building = {
+					type = arms_factory
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_milr
+			}
+			### Naval Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					dockyard > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_nav
+							has_state_flag = AUS_the_panic_of_1873_navr
+						}
+					}
+				}
+				damage_building = {
+					type = dockyard
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_nav
+			}
+			random_owned_controlled_state = {
+				limit = {
+					dockyard > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_nav
+							has_state_flag = AUS_the_panic_of_1873_navr
+						}
+					}
+				}
+				damage_building = {
+					type = dockyard
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_nav
+			}
+			### Naval Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					dockyard > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_nav
+							has_state_flag = AUS_the_panic_of_1873_navr
+						}
+					}
+				}
+				remove_building = {
+					type = dockyard
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_nav
+			}
+			### Textile Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					fabric_weavery > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_tex
+							has_state_flag = AUS_the_panic_of_1873_texr
+						}
+					}
+				}
+				damage_building = {
+					type = fabric_weavery
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_tex
+			}
+			### Textile Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					fabric_weavery > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_tex
+							has_state_flag = AUS_the_panic_of_1873_texr
+						}
+					}
+				}
+				remove_building = {
+					type = fabric_weavery
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_texr
+			}
+			### Coal Mines - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					coal_mine > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_coal
+							has_state_flag = AUS_the_panic_of_1873_coalr
+						}
+					}
+				}
+				damage_building = {
+					type = coal_mine
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_coal
+			}
+			### Coal Mines - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					coal_mine > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_coal
+							has_state_flag = AUS_the_panic_of_1873_coalr
+						}
+					}
+				}
+				remove_building = {
+					type = coal_mine
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_coalr
+			}
+			### Steel Mills - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					steel_mill > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_steel
+							has_state_flag = AUS_the_panic_of_1873_steelr
+						}
+					}
+				}
+				damage_building = {
+					type = steel_mill
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_steel
+			}
+			random_owned_controlled_state = {
+				limit = {
+					steel_mill > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_steel
+							has_state_flag = AUS_the_panic_of_1873_steelr
+						}
+					}
+				}
+				damage_building = {
+					type = steel_mill
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_steel
+			}
+			### Steel Mills - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					steel_mill > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_steel
+							has_state_flag = AUS_the_panic_of_1873_steelr
+						}
+					}
+				}
+				remove_building = {
+					type = steel_mill
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_steelr
+			}
+		}
+	}
+}
+
+#The Crisis Worsens
+country_event = {
+	id = eighteenseventhreecrisis.4
+	title = eighteenseventhreecrisis.4.t
+	desc = eighteenseventhreecrisis.4.d
+	picture = GFX_report_event_worker_protests
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eighteenseventhreecrisis.4.a
+		ai_chance = { base = 100 }
+		decrease_ps_by_one = yes
+		swap_ideas = {
+			remove_idea = eoanb_idea_panic_of_1873_substantial
+			add_idea = eoanb_idea_panic_of_1873_severe
+		}
+		custom_effect_tooltip = eighteenseventhreecrisis_panic_of_1873_damage_tt
+		hidden_effect = {
+			country_event = { days = 60 id = eighteenseventhreecrisis.5 }
+			### Civilian Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			### Civilian Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					has_state_flag = AUS_the_panic_of_1873_civ
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				clr_state_flag = AUS_the_panic_of_1873_civ
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					has_state_flag = AUS_the_panic_of_1873_civ
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				clr_state_flag = AUS_the_panic_of_1873_civ
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			### Railways in trouble
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 1
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			### Textile Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					fabric_weavery > 0
+					has_state_flag = AUS_the_panic_of_1873_tex
+				}
+				remove_building = {
+					type = fabric_weavery
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_texr
+			}
+			### Coal Mines - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					coal_mine > 0
+					has_state_flag = AUS_the_panic_of_1873_coal
+				}
+				remove_building = {
+					type = coal_mine
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_coalr
+			}
+		}
+	}
+}
+
+#More Businesses Collapse
+country_event = {
+	id = eighteenseventhreecrisis.5
+	title = eighteenseventhreecrisis.5.t
+	desc = eighteenseventhreecrisis.5.d
+	picture = GFX_report_event_worker_protests
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eighteenseventhreecrisis.5.a
+		ai_chance = { base = 100 }
+		decrease_ps_by_one = yes
+		swap_ideas = {
+			remove_idea = eoanb_idea_panic_of_1873_severe
+			add_idea = eoanb_idea_panic_of_1873_dramatic
+		}
+		custom_effect_tooltip = eighteenseventhreecrisis_panic_of_1873_damage_tt
+		hidden_effect = {
+			### Civilian Industry - Businesses in trouble
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				damage_building = {
+					type = industrial_complex
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_civ
+			}
+			### Civilian Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					industrial_complex > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_civ
+							has_state_flag = AUS_the_panic_of_1873_civr
+						}
+					}
+				}
+				remove_building = {
+					type = industrial_complex
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_civr
+			}
+			### Railways in trouble
+			random_owned_controlled_state = {
+				limit = {
+					rail_way > 1
+					NOT = { has_state_flag = AUS_the_panic_of_1873_rail }
+				}
+				damage_building = {
+					type = rail_way
+					damage = 0.95
+				}
+				set_state_flag = AUS_the_panic_of_1873_rail
+			}
+			### Textile Industry - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					fabric_weavery > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_tex
+							has_state_flag = AUS_the_panic_of_1873_texr
+						}
+					}
+				}
+				remove_building = {
+					type = fabric_weavery
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_texr
+			}
+			### Coal Mines - Businesses going bankrupt
+			random_owned_controlled_state = {
+				limit = {
+					coal_mine > 0
+					NOT = {
+						OR = {
+							has_state_flag = AUS_the_panic_of_1873_coal
+							has_state_flag = AUS_the_panic_of_1873_coalr
+						}
+					}
+				}
+				remove_building = {
+					type = coal_mine
+					level = 1
+				}
+				set_state_flag = AUS_the_panic_of_1873_coalr
+			}
+			### Clear temporary flags
+			every_owned_state = {
+				limit = { 
+					OR = {
+						has_state_flag = AUS_the_panic_of_1873_civ
+						has_state_flag = AUS_the_panic_of_1873_rail
+						has_state_flag = AUS_the_panic_of_1873_mil
+						has_state_flag = AUS_the_panic_of_1873_nav
+						has_state_flag = AUS_the_panic_of_1873_tex
+						has_state_flag = AUS_the_panic_of_1873_coal
+						has_state_flag = AUS_the_panic_of_1873_steel
+					}
+				}
+				clr_state_flag = AUS_the_panic_of_1873_civ
+				clr_state_flag = AUS_the_panic_of_1873_rail
+				clr_state_flag = AUS_the_panic_of_1873_mil
+				clr_state_flag = AUS_the_panic_of_1873_nav
+				clr_state_flag = AUS_the_panic_of_1873_tex
+				clr_state_flag = AUS_the_panic_of_1873_coal
+				clr_state_flag = AUS_the_panic_of_1873_steel
+			}
+		}
+	}
+}
+
+#The Crisis is over
+country_event = {
+	id = eighteenseventhreecrisis.24
+	title = eighteenseventhreecrisis.24.t
+	desc = eighteenseventhreecrisis.24.d
+	picture = GFX_report_event_generic_military_parade
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = eighteenseventhreecrisis.24.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = AUS
+		}
+		#remove_ideas = eoanb_idea_panic_of_1873_substantial
+		#complete_national_focus = GER_focus_historical_the_crisis_ends
+	}
+
+	option = {
+		name = eighteenseventhreecrisis.24.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		swap_ideas = {
+			remove_idea = eoanb_idea_panic_of_1873_modest
+			add_idea = eoanb_idea_panic_of_1873_minor
+		}
+		complete_national_focus = GER_focus_historical_the_crisis_ends
+	}
+}
+
+#Industry Stabilizing
+country_event = {
+	id = eighteenseventhreecrisis.25
+	title = eighteenseventhreecrisis.25.t
+	desc = eighteenseventhreecrisis.25.d
+	picture = GFX_report_event_usa_election_generic
+	
+	is_triggered_only = yes
+	
+	trigger = {
+		Country_is_in_1873_crisis = no
 	}
 	
 	option = {
-		name = eighteenseventhreecrisis.3.a
-		ai_chance = { factor = 100 }
-		remove_ideas = GER_idea_1873_crash_gold
+		name = eighteenseventhreecrisis.25.a
+		ai_chance = { base = 100 }
+		increase_ps_by_one = yes
+		add_stability = 0.05
+		remove_ideas = eoanb_idea_panic_of_1873_minor
+		hidden_effect = {
+			### Clear all remaining flags
+			every_owned_state = {
+				limit = { 
+					OR = {
+						has_state_flag = AUS_the_panic_of_1873_civr
+						has_state_flag = AUS_the_panic_of_1873_milr
+						has_state_flag = AUS_the_panic_of_1873_navr
+						has_state_flag = AUS_the_panic_of_1873_texr
+						has_state_flag = AUS_the_panic_of_1873_coalr
+						has_state_flag = AUS_the_panic_of_1873_steelr
+					}
+				}
+				clr_state_flag = AUS_the_panic_of_1873_civr
+				clr_state_flag = AUS_the_panic_of_1873_milr
+				clr_state_flag = AUS_the_panic_of_1873_navr
+				clr_state_flag = AUS_the_panic_of_1873_texr
+				clr_state_flag = AUS_the_panic_of_1873_coalr
+				clr_state_flag = AUS_the_panic_of_1873_steelr
+			}
+		}
 	}
-	
 }
