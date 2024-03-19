@@ -1,5 +1,5 @@
 political_actions = {
-	#Offer Guns to the Americans
+	#Offer Guns to the Union
 	PRS_decision_offer_guns_USA = {
 		icon = ger_military_buildup
 		allowed = {
@@ -25,25 +25,19 @@ political_actions = {
 		visible = {
 			has_war = no
 			has_global_flag = ACW_American_Civil_War
+			USA = { exists = yes }
 			NOT = {
 				OR = {
-					has_country_flag = PRS_USA_sell_guns_flag
-					has_country_flag = PRS_CSA_sell_guns_flag
-				}
-			}
-			NOT = {
-				AND = {
+					has_country_flag = PRS_weapons_deal_proposed
 					has_country_flag = PRS_USA_sell_guns_rejected_flag
-					has_country_flag = PRS_CSA_sell_guns_rejected_flag
+					has_country_flag = PRS_weapons_deal_successful
 				}
-			}
-			NOT = {
-				has_country_flag = PRS_weapons_deal_proposed
 			}
 		}
+		fire_only_once = yes
 		cost = 10
 		complete_effect = {
-			PRS = {
+			USA = {
 				country_event = {
 					id = prussia.513
 				}
@@ -56,8 +50,8 @@ political_actions = {
 			base = 100
 		}
 	}
-	#Sell Guns to the Americans
-	PRS_decision_sell_guns_USA = {
+	#Offer Guns to the Confederates
+	PRS_decision_offer_guns_CSA = {
 		icon = ger_military_buildup
 		allowed = {
 			tag = PRS
@@ -77,72 +71,34 @@ political_actions = {
 					infantry_equipment > 4999
 				}
 			}
-			date < 1863.8.1
+			date < 1863.7.1
 		}
 		visible = {
 			has_war = no
 			has_global_flag = ACW_American_Civil_War
-			OR = {
-				has_country_flag = PRS_USA_sell_guns_flag
-				has_country_flag = PRS_CSA_sell_guns_flag
+			CSA = { exists = yes }
+			NOT = {
+				OR = {
+					has_country_flag = PRS_weapons_deal_proposed
+					has_country_flag = PRS_CSA_sell_guns_rejected_flag
+					has_country_flag = PRS_weapons_deal_successful
+				}
 			}
 		}
 		fire_only_once = yes
-		cost = 0
-		days_remove = 365
+		cost = 10
 		complete_effect = {
-			add_offsite_building = {
-				type = industrial_complex
-				level = 1
-			}
-			if = {
-				limit = {
-					is_ai = yes
-				}
-				add_equipment_to_stockpile = {
-					type = infantry_equipment
-					amount = -3000
-					producer = PRS
+			CSA = {
+				country_event = {
+					id = prussia.513
 				}
 			}
-			else = {
-				add_equipment_to_stockpile = {
-					type = infantry_equipment
-					amount = -5000
-					producer = PRS
-				}
-			}
-			if = {
-				limit = {
-					has_country_flag = PRS_USA_sell_guns_flag
-				}
-				USA = {
-					country_event = {
-						days = 21
-						id = prussia.517
-					}
-				}
-			}
-			else_if = {
-				limit = {
-					has_country_flag = PRS_CSA_sell_guns_flag
-				}
-				CSA = {
-					country_event = {
-						days = 21
-						id = prussia.517
-					}
-				}
-			}
-		}
-		remove_effect = {
-			add_offsite_building = {
-				type = industrial_complex
-				level = -1
+			hidden_effect = {
+				set_country_flag = PRS_weapons_deal_proposed
 			}
 		}
 		ai_will_do = {
-			base = 1000
+			base = 100
 		}
 	}
 	#Sending Scheibert as an observer to ACW
@@ -2459,13 +2415,16 @@ PRS_decision_category_projects = {
 			base = 1000
 		}
 	}
-	#Build the Siegessäule
+	#Build the Siegessäule (cost around 350,000 Prussian Thaler = £50,000)
 	PRS_decision_build_siegessaeule = {
 		icon = siegessaeule
 		#allowed = { tag = PRS }
 		available = {
-			num_of_civilian_factories_available_for_projects > 2
 			has_stability > 0.49
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		visible = {
 			PRS_trigger_formed_germany = yes
@@ -2480,6 +2439,8 @@ PRS_decision_category_projects = {
 		days_remove = 1095
 		complete_effect = {
 			custom_effect_tooltip = PRS_decision_build_siegessaeule_effect_tt
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_tooltip_effect = yes
 			hidden_effect = {
 				PRS = {
 					country_event = {
@@ -2488,9 +2449,6 @@ PRS_decision_category_projects = {
 					}
 				}
 			}
-		}
-		modifier = {
-			civilian_factory_use = 2
 		}
 		remove_effect = {
 			add_stability = 0.03
@@ -2559,10 +2517,10 @@ PRS_decision_category_projects = {
 			custom_effect_tooltip = PRS_decision_plan_siegessaeule_effect_tt
 			hidden_effect = {
 				PRS = {
-					country_event = {
-						days = 90
-						id = prussia.175
-					}
+					#country_event = {
+					#	days = 90
+					#	id = prussia.175
+					#}
 				}
 			}
 		}
@@ -2570,7 +2528,7 @@ PRS_decision_category_projects = {
 			add_stability = 0.01
 			add_war_support = 0.01
 			hidden_effect = {
-				set_country_flag = PRS_decision_plan_siegessaeule_flag
+				#set_country_flag = PRS_decision_plan_siegessaeule_flag
 			}
 		}
 		ai_will_do = {
@@ -2583,19 +2541,20 @@ PRS_decision_category_industrialisation = {
 	#Fund Coal Mining in Westfalen
 	PRS_decision_westfalen_coal = {
 		icon = coal
-		allowed = { tag = PRS }
+		#allowed = { tag = PRS }
 		available = {
 			NOT = {
 				has_idea = bankruptcy
 			}
 			has_tech = machine_tools_1
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		visible = {
 			PRS = {
 				has_full_control_of_state = 57
-			}
-			check_variable = {
-				money > 0
 			}
 			NOT = {
 				57 = {
@@ -2612,19 +2571,16 @@ PRS_decision_category_industrialisation = {
 			}
 		}
 		fire_only_once = no
-		days_re_enable = 730
-		cost = 0
-		days_remove = 180
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 5
+				amount_of_money_to_check = 0.25
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		modifier = {
-		}
+		days_re_enable = 730
+		days_remove = 180
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -5 }
+			set_temp_variable = { money_to_gain = -0.25 }
 			add_money_with_tooltip_effect = yes
 		}
 		remove_effect = {
@@ -2639,7 +2595,13 @@ PRS_decision_category_industrialisation = {
 			}
 		}
 		ai_will_do = {
-			base = 1
+			base = 0
+			modifier = {
+				add = 100
+				check_variable = {
+					money > 50
+				}
+			}
 		}
 	}
 	#Expand Berliner Börse
@@ -2647,20 +2609,27 @@ PRS_decision_category_industrialisation = {
 		icon = generic_construction
 		#allowed = { tag = PRS }
 		available = {
-			num_of_civilian_factories_available_for_projects > 2
 			has_completed_focus = PRS_focus_berliner_borse
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		visible = {
 			owns_state = 951
 			has_completed_focus = PRS_focus_economy
 		}
 		fire_only_once = yes
-		cost = 50
-		modifier = {
-			civilian_factory_use = 2
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
 		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		days_remove = 150
 		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
 		}
 		remove_effect = {
 			add_ideas = PRS_Berlin_Stock_Exchange_1
@@ -2678,21 +2647,28 @@ PRS_decision_category_industrialisation = {
 		icon = money
 		#allowed = { tag = PRS }
 		available = {
-			num_of_civilian_factories_available_for_projects > 2
 			has_idea = PRS_Berlin_Stock_Exchange_1
 			has_completed_focus = PRS_focus_prussian_consortium
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		visible = {
 			owns_state = 951
 			has_completed_focus = PRS_focus_economy
 		}
 		fire_only_once = yes
-		cost = 50
-		modifier = {
-			civilian_factory_use = 2
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
 		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		days_remove = 150
 		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes
 		}
 		remove_effect = {
 			swap_ideas = {
@@ -2708,10 +2684,14 @@ PRS_decision_category_industrialisation = {
 			base = 100
 		}
 	}
+	#Berlin-Anhalt Railway Network
 	PRS_mission_berlin_anhalt_rail = {
-		icon = railway
+		icon = train_2
 		allowed = { always = no }
 		available = {
+			has_equipment = {
+				train_equipment > 24
+			}
 			has_railway_level = {
 				state = 64
 				level = 2
@@ -2720,7 +2700,7 @@ PRS_decision_category_industrialisation = {
 				state = 951
 				level = 2
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Berlin-Magdeburg
 				tooltip = PRS_mission_berlin_anhalt_rail_trigger_tt_1
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2729,7 +2709,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Berlin-Halle
 				tooltip = PRS_mission_berlin_anhalt_rail_trigger_tt_2
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2738,7 +2718,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Magdeburg-Halle
 				tooltip = PRS_mission_berlin_anhalt_rail_trigger_tt_3
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2832,10 +2812,71 @@ PRS_decision_category_industrialisation = {
 			base = 100
 		}
 	}
-	PRS_mission_silesia_rail = {
+	#Expand the Berlin-Anhalt Railway Network
+	PRS_decision_expand_berlin_anhalt_rail = {
 		icon = railway
+		#allowed = { tag = PRS }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		visible = {
+			has_completed_focus = PRS_focus_berlin_anhalt_rail
+		}
+		priority = 39
+		highlight_states = {
+			highlight_state_targets = {
+				state = 64
+				state = 951
+			}
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 200
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -5 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { #Berlin-Potsdam-Halle
+				level = 1
+				path = { 6521 3499 9560 }
+				start_province = 6521
+				target_province = 9560
+			}
+			build_railway = { #Potsdam-Magdeburg
+				level = 1
+				path = { 3499 9456 3522 }
+				start_province = 3499
+				target_province = 3522
+			}
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 5
+				check_variable = {
+					money > 50
+				}
+			}
+		}
+	}
+	#Silesian Railway Network
+	PRS_mission_silesia_rail = {
+		icon = train_2
 		allowed = { always = no }
 		available = {
+			has_equipment = {
+				train_equipment > 29
+			}
 			has_railway_level = {
 				state = 66
 				level = 2
@@ -2855,7 +2896,7 @@ PRS_decision_category_industrialisation = {
 			}
 		}
 		activation = { always = no }
-		priority = 39
+		priority = 38
 		highlight_states = {
 			highlight_state_targets = {
 				state = 66
@@ -2938,15 +2979,76 @@ PRS_decision_category_industrialisation = {
 			base = 100
 		}
 	}
-	PRS_mission_ostbahn_rail = {
+	#Expand the Silesian Railway Network
+	PRS_decision_expand_silesia_rail = {
 		icon = railway
+		#allowed = { tag = PRS }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		visible = {
+			has_completed_focus = PRS_focus_silesia_rail
+		}
+		priority = 37
+		highlight_states = {
+			highlight_state_targets = {
+				state = 66
+				state = 67
+			}
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 200
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -5 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { #Breslau-Oppeln
+				level = 1
+				path = { 9570 6512 9511 }
+				start_province = 9570
+				target_province = 9511
+			}
+			build_railway = { #Glogau-Lissa
+				level = 1
+				path = { 552 3510 }
+				start_province = 552
+				target_province = 3510
+			}
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 5
+				check_variable = {
+					money > 50
+				}
+			}
+		}
+	}
+	#Preußische Ostbahn
+	PRS_mission_ostbahn_rail = {
+		icon = train_2
 		allowed = { always = no }
 		available = {
+			has_equipment = {
+				train_equipment > 34
+			}
 			has_railway_level = {
 				state = 951
 				level = 2
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Landsberg-Kreuz
 				tooltip = PRS_mission_ostbahn_rail_trigger_tt_1
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2955,7 +3057,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Berlin-Danzig
 				tooltip = PRS_mission_ostbahn_rail_trigger_tt_2
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2964,7 +3066,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Danzig-Königsberg
 				tooltip = PRS_mission_ostbahn_rail_trigger_tt_3
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2973,7 +3075,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Königsberg-Eydtkuhnen
 				tooltip = PRS_mission_ostbahn_rail_trigger_tt_4
 				hidden_trigger = {
 					has_railway_connection = {
@@ -2984,7 +3086,7 @@ PRS_decision_category_industrialisation = {
 			}
 		}
 		activation = { always = no }
-		priority = 38
+		priority = 36
 		highlight_states = {
 			highlight_state_targets = {
 				state = 5
@@ -3097,10 +3199,79 @@ PRS_decision_category_industrialisation = {
 			base = 100
 		}
 	}
-	PRS_mission_rhineland_rail = {
+	#Finish the Preußische Ostbahn
+	PRS_decision_finish_ostbahn_rail = {
 		icon = railway
+		#allowed = { tag = PRS }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		visible = {
+			has_completed_focus = PRS_focus_ostbahn_rail
+		}
+		priority = 35
+		highlight_states = {
+			highlight_state_targets = {
+				state = 5
+				state = 85
+				state = 951
+				state = 1001
+			}
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 300
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { #Landsberg-Kreuz
+				level = 1
+				path = { 537 6236 9387 }
+				start_province = 537
+				target_province = 9387
+			}
+			build_railway = { #Danzig-Königsberg link
+				level = 1
+				path = { 389 3380 }
+				start_province = 389
+				target_province = 3380
+			}
+			build_railway = { #Königsberg-Eydtkuhnen
+				level = 1
+				path = { 6332 395 3384 }
+				start_province = 6332
+				target_province = 3384
+			}
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 5
+				check_variable = {
+					money > 50
+				}
+			}
+		}
+	}
+	#Rhineland Railway Network
+	PRS_mission_rhineland_rail = {
+		icon = train_2
 		allowed = { always = no }
 		available = {
+			has_equipment = {
+				train_equipment > 39
+			}
 			has_railway_level = {
 				state = 51
 				level = 2
@@ -3117,7 +3288,7 @@ PRS_decision_category_industrialisation = {
 				state = 984
 				level = 1
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Cologne-Koblenz
 				tooltip = PRS_mission_rhineland_rail_trigger_tt_1
 				hidden_trigger = {
 					has_railway_connection = {
@@ -3126,7 +3297,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Koblenz-Mainz
 				tooltip = PRS_mission_rhineland_rail_trigger_tt_2
 				hidden_trigger = {
 					has_railway_connection = {
@@ -3135,7 +3306,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Cologne-Trier
 				tooltip = PRS_mission_rhineland_rail_trigger_tt_3
 				hidden_trigger = {
 					has_railway_connection = {
@@ -3144,7 +3315,7 @@ PRS_decision_category_industrialisation = {
 					}
 				}
 			}
-			custom_trigger_tooltip = {
+			custom_trigger_tooltip = { #Trier-Saarbrücken
 				tooltip = PRS_mission_rhineland_rail_trigger_tt_4
 				hidden_trigger = {
 					has_railway_connection = {
@@ -3155,11 +3326,12 @@ PRS_decision_category_industrialisation = {
 			}
 		}
 		activation = { always = no }
-		priority = 37
+		priority = 34
 		highlight_states = {
 			highlight_state_targets = {
 				state = 51
 				state = 57
+				state = 984
 				state = 1009
 			}
 		}
@@ -3170,6 +3342,7 @@ PRS_decision_category_industrialisation = {
 			OR = {
 				NOT = { owns_state = 51 }
 				NOT = { owns_state = 57 }
+				NOT = { owns_state = 984 }
 				NOT = { owns_state = 1009 }
 			}
 		}
@@ -3187,6 +3360,9 @@ PRS_decision_category_industrialisation = {
 				add_extra_state_shared_building_slots = 1
 			}
 			57 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			984 = {
 				add_extra_state_shared_building_slots = 1
 			}
 			1009 = {
@@ -3241,6 +3417,71 @@ PRS_decision_category_industrialisation = {
 		}
 		ai_will_do = {
 			base = 100
+		}
+	}
+	#Expand Rhineland Railway Network
+	PRS_decision_expand_rhineland_rail = {
+		icon = railway
+		#allowed = { tag = PRS }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		visible = {
+			has_completed_focus = PRS_focus_rhineland_rail
+		}
+		priority = 33
+		highlight_states = {
+			highlight_state_targets = {
+				state = 51
+				state = 57
+				state = 984
+				state = 1009
+			}
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 300
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { #Dortmund-Essen-Düsseldorf-Cologne
+				level = 1
+				path = { 495 6469 6570 587 }
+				start_province = 495
+				target_province = 587
+			}
+			build_railway = { #Bonn-Koblenz-Mainz link
+				level = 1
+				path = { 3547 11494 3423 }
+				start_province = 3547
+				target_province = 3423
+			}
+			build_railway = { #Bonn-Saarbrücken
+				level = 1
+				path = { 3547 9575 11470 11531 }
+				start_province = 3547
+				target_province = 11531
+			}
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+			modifier = {
+				factor = 5
+				check_variable = {
+					money > 50
+				}
+			}
 		}
 	}
 	PRS_decision_rheinland_steel = {
