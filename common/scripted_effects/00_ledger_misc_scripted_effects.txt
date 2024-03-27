@@ -1,0 +1,305 @@
+# Randomized Iterative Quicksort by Yard1
+
+# Feel free to use in your mods, but give credits to Yard1 (both in code, with comments; and on your download page)
+
+create_GDP_sorted_array = {
+	if = {
+		limit = {
+			check_variable = { last_sort_var = sort_var }
+		}
+		set_variable = { middle = global.GDP_list_array^num }
+		set_temp_variable = { len = global.GDP_list_array^num }
+		subtract_from_temp_variable = { len = 1 }
+		divide_variable = { middle = 2 }
+		round_variable = middle
+		for_loop_effect = {
+            start = 0
+            end = middle
+
+			set_temp_variable = { reverse = len }
+			subtract_from_temp_variable = { reverse = v }
+			set_temp_variable = { swap = global.GDP_list_array^v }
+			set_variable = { global.GDP_list_array^v = global.GDP_list_array^reverse }
+			set_variable = { global.GDP_list_array^reverse = swap }
+		}
+		clear_variable = middle
+		set_variable = { last_sort_var = 0 }
+	}
+
+	else = {
+		set_temp_variable = { temp_array_sort = 4 }
+		set_temp_variable = { temp_value_sort = 2 }
+		scoped_quicksort = yes
+		set_variable = { last_sort_var = sort_var }
+	}
+}
+
+create_GDP_per_capita_sorted_array = {
+	if = {
+		limit = {
+			check_variable = { last_sort_var = sort_var }
+		}
+		set_variable = { middle = global.GDP_list_array^num }
+		set_temp_variable = { len = global.GDP_list_array^num }
+		subtract_from_temp_variable = { len = 1 }
+		divide_variable = { middle = 2 }
+		round_variable = middle
+		for_loop_effect = {
+            start = 0
+            end = middle
+
+			set_temp_variable = { reverse = len }
+			subtract_from_temp_variable = { reverse = v }
+			set_temp_variable = { swap = global.GDP_list_array^v }
+			set_variable = { global.GDP_list_array^v = global.GDP_list_array^reverse }
+			set_variable = { global.GDP_list_array^reverse = swap }
+		}
+		clear_variable = middle
+		set_variable = { last_sort_var = 0 }
+	}
+	else = {
+		set_temp_variable = { temp_array_sort = 4 }
+		set_temp_variable = { temp_value_sort = 3 }
+		scoped_quicksort = yes
+		set_variable = { last_sort_var = sort_var }
+	}
+}
+# Randomized Iterative Quicksort by Yard1
+# Feel free to use in your mods, but give credits to Yard1 (both in code, with comments; and on your download page)
+# I added a meta effect & scripted loc to take in array arguments - reimu
+scoped_quicksort = {
+	meta_effect = {
+		text = {
+			set_variable = { high = [SORTARRAY]^num }
+			subtract_from_variable = { high = 1 }
+			set_variable = { low = 0 }
+
+			set_temp_variable = { stack_size = high }
+			subtract_from_temp_variable = { stack_size = low }
+			add_to_temp_variable = { stack_size = 1 }
+
+			resize_temp_array = {
+				array = stack
+				value = 0
+				size = stack_size
+			}
+
+			set_temp_variable = { top = 0 }
+			set_temp_variable = { stack^top = low }
+			add_to_temp_variable = { top = 1 }
+			set_temp_variable = { stack^top = high }
+
+			while_loop_effect = {
+				limit = { 
+					check_variable = {
+						var = top
+						value = 0
+						compare = greater_than_or_equals
+					}
+				}
+				set_variable = { high = stack^top }
+				subtract_from_temp_variable = { top = 1 }
+				set_variable = { low = stack^top }
+				subtract_from_temp_variable = { top = 1 }
+
+				set_variable = { random_pivot = random }
+				multiply_variable = { random_pivot = high }
+				round_variable = random_pivot
+				add_to_variable = { random_pivot = low }
+				clamp_variable = {
+					var = random_pivot
+					min = low
+					max = high
+				}
+				set_temp_variable = { swap = [SORTARRAY]^high }
+				set_variable = { [SORTARRAY]^high = [SORTARRAY]^random_pivot }
+				set_variable = { [SORTARRAY]^random_pivot = swap }
+
+				set_temp_variable = { idx = low }
+				subtract_from_temp_variable = { idx = 1 }
+
+				var:[SORTARRAY]^high = {
+					set_variable = { PREV.minimum = [SORTVALUE] }
+				}
+
+				for_loop_effect = {
+					start = low
+					end = high
+					var:[SORTARRAY]^v = {
+						set_variable = { PREV.tmp = [SORTVALUE] }
+					}
+					if = {
+						limit = {
+							check_variable = {
+								var = tmp
+								value = minimum
+								compare = greater_than_or_equals
+							}
+						}
+						add_to_temp_variable = { idx = 1 }
+						set_temp_variable = { swap = [SORTARRAY]^idx }
+						set_variable = { [SORTARRAY]^idx = [SORTARRAY]^v }
+						set_variable = { [SORTARRAY]^v = swap }
+					}
+				}
+
+				add_to_temp_variable = { idx = 1 }
+				set_temp_variable = { swap = [SORTARRAY]^idx }
+				set_variable = { [SORTARRAY]^idx = [SORTARRAY]^high }
+				set_variable = { [SORTARRAY]^high = swap }
+
+				set_temp_variable = { qs_partition_return = idx }
+
+				set_temp_variable = { qs_partition_return_plus_1 = qs_partition_return }
+				set_temp_variable = { qs_partition_return_minus_1 = qs_partition_return }
+				add_to_temp_variable = { qs_partition_return_plus_1 = 1 } 
+				subtract_from_temp_variable = { qs_partition_return_minus_1 = 1 } 
+
+				if = {
+					limit = { check_variable = { qs_partition_return_minus_1 > low } }
+					add_to_temp_variable = { top = 1 }
+					set_temp_variable = { stack^top = low }
+					add_to_temp_variable = { top = 1 }
+					set_temp_variable = { stack^top = qs_partition_return_minus_1 }
+				}
+				if = {
+					limit = { check_variable = { qs_partition_return_plus_1 < high } }
+					add_to_temp_variable = { top = 1 }
+					set_temp_variable = { stack^top = qs_partition_return_plus_1 }
+					add_to_temp_variable = { top = 1 }
+					set_temp_variable = { stack^top = high }
+				}
+			}
+			clear_variable = minimum
+			clear_variable = tmp
+			clear_variable = random_pivot
+		}
+		SORTARRAY = "[ROOT.GetSortArray]"
+		SORTVALUE = "[ROOT.GetSortValue]"
+	}
+}
+
+
+math_square_root = {
+	set_temp_variable = { math_sqrt_output = 1 }
+
+	for_loop_effect = {
+		start = 0
+		end = 10 # probably can converge way less before the end but keep at 10 just in case - maho
+
+		set_temp_variable = { sqrt_temp = math_sqrt_number }
+		divide_temp_variable = { sqrt_temp = math_sqrt_output }
+		add_to_temp_variable = { math_sqrt_output = sqrt_temp }
+		divide_temp_variable = { math_sqrt_output = 2 }
+	}
+}
+
+sum_cap = {
+	subtract_from_temp_variable = { temp_index = 1 }
+
+	# check to see if result overflows
+	set_temp_variable = { temp = temp_value_array^temp_index }
+	add_to_temp_variable = { temp = temp_value }
+
+	if = {
+		limit = {
+			check_variable = { temp > max }
+		}
+		subtract_from_temp_variable = { temp = max }
+		subtract_from_temp_variable = { temp_value = temp }
+	}
+	else_if = {
+		limit = {
+			check_variable = { temp < 0 }
+		}
+		multiply_temp_variable = { temp = -1 }
+		subtract_from_temp_variable = { temp_value = temp }
+	}
+
+	# adds all parties to temp_array
+	for_loop_effect = {
+		start = 0
+		end = temp_value_array^num
+
+		add_to_temp_array = { temp_array = v }
+	}
+
+	# remove from list of parties the party to be added/subtracted
+	remove_from_temp_array = { array = temp_array value = temp_index }
+
+	# give party new seat value
+	add_to_variable = { temp_value_array^temp_index = temp_value }
+
+	# if its add
+	if = {
+		limit = {
+			check_variable = { temp_value > 0 }
+		}
+		# loop until seats to be added is 0
+		while_loop_effect = {
+			limit = {
+				check_variable = { temp_value > 0 }
+			}
+
+			# loops through remaining parties, subtracting 1 seat each time
+			for_loop_effect = {
+				start = 0
+				end = temp_array^num
+
+				if = {
+					limit = {
+						check_variable = { temp_value_array^temp_array^v > 0 } # party must have more than 0 seats to be subtracted
+						check_variable = { temp_value > 0 } # seats to be added is bigger than 0 currently
+					}
+					subtract_from_variable = { temp_value_array^temp_array^v = 1 } # subtract from party 1 seat
+					subtract_from_temp_variable = { temp_value = 1 } # subtract from seats to be added
+				}
+			}
+		}
+	}
+	# if its subtract
+	else_if = {
+		limit = {
+			check_variable = { temp_value < 0 }
+		}
+		# loop until seats to be subtracted is 0
+		while_loop_effect = {
+			limit = {
+				check_variable = { temp_value < 0 }
+			}
+
+			# loops through remaining parties, adding 1 seat each time
+			for_loop_effect = {
+				start = 0
+				end = temp_array^num
+
+				if = {
+					limit = {
+						check_variable = { temp_value_array^temp_array^v < max } # party must have less than max seats to be added
+						check_variable = { temp_value < 0 } # seats to be subtracted is less than 0 currently
+					}
+					add_to_variable = { temp_value_array^temp_array^v = 1 } # add to party 1 seat
+					add_to_temp_variable = { temp_value = 1 } # add to seats to be subtracted
+				}
+			}
+		}
+	}
+}
+
+example_sum_cap_usage = {
+	set_temp_variable = { max = 100 } # maximum total of all variables
+	set_temp_variable = { temp_value = 10 } # value to add
+	set_temp_variable = { temp_index = 2 } # which variable to add it to (second variable in this case)
+
+	add_to_array = { temp_value_array = variable_1 } # first variable added
+	add_to_array = { temp_value_array = variable_2 } # second variable added
+	add_to_array = { temp_value_array = variable_3 } # third variable added
+
+	sum_cap = yes
+
+	set_variable = { variable_1 = temp_value_array^0 } # new first variable
+	set_variable = { variable_2 = temp_value_array^1 } # new second variable
+	set_variable = { variable_3 = temp_value_array^2 } # new third variable
+
+	clear_array = temp_value_array # not used anymore good practice to throw it away
+}

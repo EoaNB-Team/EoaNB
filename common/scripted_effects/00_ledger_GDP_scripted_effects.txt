@@ -1,0 +1,1025 @@
+
+calculate_GDP = {
+
+
+	set_variable = { country_GDP = 0 }
+	set_temp_variable = { temp_civ = 0 }
+	set_temp_variable = { temp_mil = 0 }
+	set_temp_variable = { temp_doc = num_of_naval_factories }
+
+	set_variable = { country_GDP_M = 0 }
+	set_variable = { country_GDP_B = 0 }
+	
+	set_temp_variable = { actual_core_manpower_k = 0 }
+	set_temp_variable = { actual_core_manpower_nocore_k = 0 }
+	clr_country_flag = gdp_menu
+	every_owned_state = {
+		limit = { is_core_of = PREV }
+		add_to_temp_variable = { PREV.actual_core_manpower_k = state_population_k }
+	}
+
+		every_owned_state = {
+			#limit = { is_full_controlled_by = PREV }
+			add_to_temp_variable = { actual_manpower_k = state_population_k }
+		}
+
+		every_owned_state = {
+			limit = {
+				NOT = {
+					is_core_of = PREV 
+				} 
+			}
+			add_to_temp_variable = { PREV.actual_core_manpower_nocore_k = state_population_k }
+		}
+
+	
+
+
+
+
+		every_country = {
+			set_variable = {
+				This.country_category_factor = 0
+			}
+			
+			set_variable = {
+				This.country_num_states = This.num_core_states
+			}
+
+		}	
+		every_state = {
+			limit = {
+				is_core_of = PREV
+			}
+			set_variable = { state_category_factor = 1 }
+			if = {
+				limit = { 
+					OR = { 
+						has_state_category = megalopolis 
+						has_state_category = twelve
+					}
+				}
+				multiply_variable = { state_category_factor = 3 }
+			}
+			else_if = {
+				limit = { 
+					OR = {
+						has_state_category = metropolis 
+						has_state_category = eleven
+						has_state_category = nine
+					}
+				}
+				multiply_variable = { state_category_factor = 2 }
+			}
+			else_if = {
+				limit = { 
+					OR = {
+						has_state_category = large_city 
+						has_state_category = eight
+						has_state_category = seven 
+					}
+				}
+				multiply_variable = { state_category_factor = 1.5 }
+			}
+			else_if = {
+				limit = { 
+					OR = {
+							has_state_category = city 
+							has_state_category = major_port 
+							has_state_category = six
+					}
+				}
+				multiply_variable = { state_category_factor = 1.25 }
+			}
+			else_if = {
+				limit = { 
+					OR = {
+						has_state_category = large_town 
+						has_state_category = port 
+						has_state_category = minor_port 
+						has_state_category = five
+						
+					}
+				}
+				multiply_variable = { state_category_factor = 1 }
+			}
+			else_if = {
+				limit = { 
+					OR = { 
+						has_state_category = town 
+						has_state_category = four 
+					}
+				}
+				multiply_variable = { state_category_factor = 0.75 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						has_state_category = rural
+						has_state_category = three
+					}  
+				}
+				multiply_variable = { state_category_factor = 0.6 }
+			}
+			else_if = {
+				limit = { 
+					OR = {
+						has_state_category = pastoral 
+						has_state_category = two
+					}
+				}
+				multiply_variable = { state_category_factor = 0.25 }
+			}
+			else = {
+				multiply_variable = { state_category_factor = 0.1 }
+			}
+			OWNER = {
+				add_to_variable = { This.country_category_factor = Prev.state_category_factor }
+			}
+
+		}
+		every_country = {
+			divide_variable = { This.country_category_factor = This.country_num_states }
+			subtract_from_variable = { country_category_factor = 1 }
+			divide_variable = { country_category_factor = 10 }
+			set_variable = { country_category_factor_1 = 1 }
+			add_to_variable = { country_category_factor_1 = country_category_factor }
+		}	
+
+		set_variable = { temp_8 = country_category_factor_1 }
+
+
+		every_country = {
+			set_variable = {
+				This.country_average_inf = 0
+			}
+			set_variable = {
+				This.country_num_states = This.num_owned_states
+			}
+		}	
+		every_state = {
+			set_variable = {
+				state_inf = 0
+			}
+			add_to_variable = { state_inf = This.infrastructure_level }
+			OWNER = {
+				add_to_variable = { This.country_average_inf = Prev.state_inf }
+			}
+		}
+		every_country = {
+			divide_variable = { This.country_average_inf = This.country_num_states }
+		}	
+
+
+		
+		every_country = {
+			set_variable = {
+				This.country_civ = 0
+			}
+		}
+		every_state = {
+			set_variable = {
+				state_civ = 0
+			}
+			add_to_variable = { state_civ = This.industrial_complex_level }
+			controller = {
+				add_to_variable = { This.country_civ = Prev.state_civ }
+			}
+		}	
+		every_country = {
+			set_variable = {
+				This.country_civ_own = 0
+			}
+		}
+		every_state = {
+			set_variable = {
+				state_civ_own = 0
+			}
+			add_to_variable = { state_civ_own = This.industrial_complex_level }
+			OWNER = {
+				add_to_variable = { This.country_civ_own = Prev.state_civ_own }
+			}
+		}	
+	
+		every_country = {
+			set_variable = {
+				This.country_civ_core = 0
+			}
+		}
+		every_state = {
+			limit = {
+				is_core_of = PREV
+			}
+			set_variable = {
+				state_civ_core = 0
+			}
+			add_to_variable = { state_civ_core = This.industrial_complex_level }
+			OWNER = {
+				add_to_variable = { This.country_civ_core = Prev.state_civ_core }
+			}
+		}	
+		set_variable = { country_civ_con = 0 }
+		add_to_variable = { country_civ_con = country_civ }
+
+
+		set_variable = { country_civ_ocp_temp = country_civ }
+		set_variable = { country_civ_coreown_temp = country_civ_core }
+		set_variable = { country_civ_noncore_temp = country_civ_own }
+		set_variable = { country_civ_core_temp = country_civ_core }
+		subtract_from_variable = { country_civ_ocp_temp = country_civ_own }
+		subtract_from_variable = { country_civ_noncore_temp  = country_civ_core_temp }
+		subtract_from_variable = { country_civ_con  = country_civ_noncore_temp }
+		
+		subtract_from_variable = { country_civ_ocp_temp = country_civ_noncore_temp }
+		clamp_variable = { var = country_civ_ocp_temp min = 0}
+
+		set_temp_variable = { temp_9 = country_civ_ocp_temp }
+		
+		subtract_from_variable = { country_civ_con = temp_9 }
+
+
+
+		set_temp_variable = { temp_civ_con = country_civ_con }
+		add_to_temp_variable = { temp_civ = temp_civ_con }
+		add_to_variable = { country_GDP = temp_civ }
+
+		
+		set_variable = { temp_civ_all = num_of_civilian_factories }
+		subtract_from_variable = { temp_civ_all = country_civ }
+		clamp_variable = { var = temp_civ_all min = 0}
+
+		set_temp_variable = { temp_2 = temp_civ_all }
+		divide_temp_variable = { temp_2 = 1 }
+		add_to_temp_variable = { temp_civ = temp_2 }
+
+		#if = {
+			#limit = { 
+				#check_variable = { country_civ_ocp_temp_1 > 0 }
+		#	}
+			
+
+		#}
+
+
+		
+		set_temp_variable = { temp_4 = country_civ_ocp_temp }
+		divide_temp_variable = { temp_4 = 10 }
+
+		set_temp_variable = { temp_6 = country_civ_noncore_temp }
+		divide_temp_variable = { temp_6 = 1.5 }
+
+
+
+		add_to_temp_variable = { temp_civ = temp_4 } 
+		
+		add_to_temp_variable = { temp_civ = temp_6 }
+
+
+
+
+
+		every_country = {
+			set_variable = {
+				This.country_arms = 0
+			}
+		}	
+		every_state = {
+			set_variable = {
+				state_arms = 0
+			}
+			add_to_variable = { state_arms = This.arms_factory_level }
+			controller = {
+				add_to_variable = { This.country_arms = Prev.state_arms }
+			}
+		}
+
+
+		every_country = {
+			set_variable = {
+				This.country_arms_own = 0
+			}
+		}
+		every_state = {
+			set_variable = {
+				state_arms_own = 0
+			}
+			add_to_variable = { state_arms_own = This.arms_factory_level }
+			OWNER = {
+				add_to_variable = { This.country_arms_own = Prev.state_arms_own }
+			}
+		}	
+	
+		every_country = {
+			set_variable = {
+				This.country_arms_core = 0
+			}
+		}
+		every_state = {
+			limit = {
+				is_core_of = PREV
+			}
+			set_variable = {
+				state_arms_core = 0
+			}
+			add_to_variable = { state_arms_core = This.arms_factory_level }
+			OWNER = {
+				add_to_variable = { This.country_arms_core = Prev.state_arms_core }
+			}
+		}	
+	
+	
+		set_variable = { country_arms_con = 0 }
+		add_to_variable = { country_arms_con = country_arms }
+
+	
+		set_variable = { country_arms_ocp_temp = country_arms }
+		set_variable = { country_arms_coreown_temp = country_arms_core }
+		set_variable = { country_arms_noncore_temp = country_arms_own }
+		set_variable = { country_arms_core_temp = country_arms_core }
+	
+		subtract_from_variable = { country_arms_ocp_temp = country_arms_coreown_temp }
+
+		subtract_from_variable = { country_arms_noncore_temp  = country_arms_core_temp }
+
+		subtract_from_variable = { country_arms_con = country_arms_noncore_temp }
+
+		subtract_from_variable = { country_arms_ocp_temp = country_arms_noncore_temp }
+
+		clamp_variable = { var = country_arms_ocp_temp min = 0}
+		set_temp_variable = { temp_10 = country_civ_ocp_temp }
+		
+		subtract_from_variable = { country_arms_con = temp_10 }
+
+
+
+		set_temp_variable = { temp_arms_con = country_arms_con }
+		add_to_temp_variable = { temp_mil = temp_arms_con }
+
+		set_temp_variable = { temp_5 = country_arms_ocp_temp }
+		divide_temp_variable = { temp_5 = 20 }
+
+		set_temp_variable = { temp_7 = country_arms_noncore_temp }
+		divide_temp_variable = { temp_7 = 2.5 }
+
+
+		add_to_temp_variable = { temp_mil = temp_5 } #
+
+		add_to_temp_variable = { temp_mil = temp_7 } #
+		#is_full_controlled_by
+
+
+
+
+		
+
+		set_variable = { overlord_factor = 1 }
+		set_variable = { overlord_factor_2 = modifier@cic_to_overlord_factor }
+		multiply_variable = { overlord_factor_2 = 0.99 }
+		subtract_from_variable = { overlord_factor = overlord_factor_2 }
+		multiply_variable = { temp_civ = overlord_factor }
+	
+		set_variable = { m_overlord_factor = 1 }
+		set_variable = { m_overlord_factor_2 = modifier@mic_to_overlord_factor }
+		multiply_variable = { m_overlord_factor_2 = 0.99 }
+		subtract_from_variable = { m_overlord_factor = m_overlord_factor_2 }
+		multiply_variable = { temp_mil = m_overlord_factor }
+		if = {
+			limit = {
+				has_idea = free_trade
+			}
+			multiply_temp_variable = { temp_civ = 1 }
+			multiply_temp_variable = { temp_mil = 1 }
+			multiply_temp_variable = { temp_doc = 1 }
+		}
+		else_if = {
+			 limit = {
+				  has_idea = export_focus
+			}
+			multiply_temp_variable = { temp_civ = 0.97 }
+			multiply_temp_variable = { temp_mil = 0.97 }
+			multiply_temp_variable = { temp_doc = 0.97 }
+		}
+		else_if = {
+			limit = {
+			has_idea = limited_exports
+			}
+			multiply_temp_variable = { temp_civ = 0.95 }
+			multiply_temp_variable = { temp_mil = 0.95 }
+			multiply_temp_variable = { temp_doc = 0.95 }
+		}
+		else_if = {
+			limit = {
+				has_idea = closed_economy
+			}
+			multiply_temp_variable = { temp_civ = 0.9 }
+			multiply_temp_variable = { temp_mil = 0.9 }
+			multiply_temp_variable = { temp_doc = 0.9 }
+		}
+		else_if = {
+			limit = {
+				has_idea = uncontrolled_exports
+			}
+			multiply_temp_variable = { temp_civ = 0.95 }
+			multiply_temp_variable = { temp_mil = 0.95 }
+			multiply_temp_variable = { temp_doc = 0.95 }
+		}
+	
+		if = {
+			limit = {
+				has_idea = tot_economic_mobilisation
+			}
+			multiply_temp_variable = { temp_civ = 0.9 }
+			multiply_temp_variable = { temp_mil = 0.99 }
+			multiply_temp_variable = { temp_doc = 0.98 }
+		}
+		else_if = {
+			limit = {
+				has_idea = isolation
+			}
+			multiply_temp_variable = { temp_civ = 0.95 }
+			multiply_temp_variable = { temp_mil = 0.95 }
+			multiply_temp_variable = { temp_doc = 0.95 }
+		}
+		else_if = {
+			limit = {
+				has_idea = war_economy
+			}
+			multiply_temp_variable = { temp_civ = 0.93 }
+			multiply_temp_variable = { temp_mil = 0.98 }
+			multiply_temp_variable = { temp_doc = 0.96 }
+		}
+		else_if = {
+			limit = {
+				has_idea = partial_economic_mobilisation
+			}
+			multiply_temp_variable = { temp_civ = 0.96 }
+			multiply_temp_variable = { temp_mil = 0.93 }
+			multiply_temp_variable = { temp_doc = 0.93 }
+		}
+		else_if = {
+			limit = {
+				has_idea = undisturbed_isolation
+			}
+			multiply_temp_variable = { temp_civ  = 1 }
+			multiply_temp_variable = { temp_mil = 0.9 }
+			multiply_temp_variable = { temp_doc = 0.9 }
+		}
+		else_if = {
+			limit = {
+				has_idea = low_economic_mobilisation
+			}
+			multiply_temp_variable = { temp_civ  = 0.98 }
+			multiply_temp_variable = { temp_mil = 0.92 }
+			multiply_temp_variable = { temp_doc = 0.92 }
+		}
+	
+		else_if = {
+			limit = {
+				has_idea = civilian_economy
+			}
+			multiply_temp_variable = { temp_civ = 1 }
+			multiply_temp_variable = { temp_mil = 0.9 }
+			multiply_temp_variable = { temp_doc = 0.9 }
+		}
+		if = {
+			limit = {
+				has_idea = service_by_requirement
+			}
+			multiply_temp_variable = { temp_civ = 0.98 }
+			multiply_temp_variable = { temp_mil = 0.9 }
+			multiply_temp_variable = { temp_doc = 0.9 }
+		}
+		else_if = {
+			limit = {
+				has_idea = all_adults_serve
+			}
+			multiply_temp_variable = { temp_civ = 0.95 }
+			multiply_temp_variable = { temp_mil = 0.85 }
+			multiply_temp_variable = { temp_doc = 0.85 }
+		}
+		else_if = {
+			limit = {
+				has_idea = scraping_the_barrel
+			}
+			multiply_temp_variable = { temp_civ = 0.7 }
+			multiply_temp_variable = { temp_mil = 0.5 }
+			multiply_temp_variable = { temp_doc = 0.5 }
+		}
+		else_if = {
+			limit = {
+				has_idea = ETH_chitet_law
+				original_tag = ETH
+			}
+			multiply_temp_variable = { temp_civ = 0.9 }
+			multiply_temp_variable = { temp_mil = 0.9 }
+			multiply_temp_variable = { temp_doc = 0.9 }
+		}
+		else_if = {
+			limit = {
+				has_idea = TUR_debt_council
+				original_tag = TUR
+			}
+			multiply_temp_variable = { temp_civ = 0.95 }
+			multiply_temp_variable = { temp_mil = 0.95 }
+			multiply_temp_variable = { temp_doc = 0.95 }
+		}
+		
+
+
+		#set_variable = { population_noncore_modifier = 1 }
+		#set_variable = { population_noncore_state = actual_manpower_k }
+		#divide_variable = { population_noncore_state = 5000 }
+		#divide_variable = { population_noncore_state = 5000 }
+	
+		
+		#add_to_variable = { population_noncore_modifier = population_noncore_state }
+		#multiply_variable = { country_GDP = population_noncore_modifier }
+
+	
+		#set_temp_variable = { temp_civ_modifier = 1 }
+
+
+		#set_temp_variable = { temp_mil_all = num_of_military_factories }
+		#subtract_from_variable = { temp_mil_all = country_arms }
+		#set_temp_variable = { temp_mil_modifier = 1 }
+		#set_temp_variable = { temp_off = num_of_offices }
+
+		#set_temp_variable = { temp_doc_modifier = 1 }
+		
+		set_temp_variable = { temp_0 = temp_mil }
+		multiply_temp_variable = { temp_0 = 3 }
+		divide_temp_variable = { temp_0 = 2 }
+
+
+		set_temp_variable = { temp_1 = temp_doc }
+		multiply_temp_variable = { temp_1 = 3 }
+		divide_temp_variable = { temp_1 = 2 }
+
+		add_to_variable = { country_GDP = temp_0 }
+		add_to_variable = { country_GDP = temp_1 }
+
+
+		#set_temp_variable = { temp_3 = temp_mil_all }
+		#divide_temp_variable = { temp_3 = 20 }
+
+	
+		
+
+
+
+
+	#set_temp_variable = { temp_adjust = temp_civ }
+	#multiply_temp_variable = { temp_adjust = 1000 }
+	#subtract_from_temp_variable = { temp_adjust = actual_core_manpower_k }
+	
+
+
+	set_variable = { population_modifier = 1 }
+	set_variable = { population_modifier_civ = 1 }
+	set_variable = { population_core_state = actual_core_manpower_k }
+	set_variable = { population_core_state_1 = actual_core_manpower_k }
+
+	set_variable = { population_modifier_1 = -1 }
+	set_variable = { temp_nocore =  actual_core_manpower_nocore_k }
+	divide_variable = { temp_nocore = 1.5 } #5M
+	add_to_variable = { population_core_state = temp_nocore }
+
+	divide_variable = { population_core_state = 3500 } #3.5M
+
+
+
+	add_to_variable = { population_modifier_1 = population_core_state }
+
+	if = { 
+		limit = {
+			check_variable = { population_core_state > 0.999 }
+		}
+
+		divide_variable = { population_modifier_1 = 500 }
+
+	}
+
+	add_to_variable = { population_modifier = population_modifier_1 }
+	divide_variable = { population_core_state_1 = 3500 }
+	divide_variable = { population_core_state_1 = 100 }
+	add_to_variable = { population_modifier_civ = population_core_state_1 }
+
+	clamp_variable = { var = population_modifier min = 0  max = 1.25 }
+
+	multiply_variable = { country_GDP = population_modifier }
+
+
+
+	clamp_variable = { var = population_modifier_civ min = 0  max = 5 }
+	multiply_temp_variable = { temp_civ = population_modifier_civ }
+
+	
+	#set_variable = { saturation_value = 1.5 }
+	#set_variable = { napier_1 = 87 }
+	#set_variable = { napier = napier_1^2 }
+	#set_variable = { n0 = 1 }
+	#divide_variable = { napier = 32 }
+
+
+	
+
+
+
+
+
+
+
+
+	#multiply_temp_variable = { temp_civ = 3 }
+
+	#multiply_temp_variable = { temp_doc = 3 }
+	#multiply_temp_variable = { temp_mil = 3 }
+
+
+
+
+		#Why does Malaysia have so many factories, and so many resources?
+		#if = {
+			#limit = { 
+  	  	   # original_tag = MAL
+			#is_ai = yes
+  	 		#} 
+				#multiply_temp_variable = { temp_civ = 0.3 }
+				#multiply_temp_variable = { temp_mil = 0.5 }
+				#multiply_variable= { temp_doc = 0.5 }
+		#}
+		#Temporary...
+		#if = {
+			#limit = { 
+  	  	  #  original_tag = TRK
+		#	is_ai = yes
+  	 	#	} 
+			  # multiply_variable = { country_GDP = 0.1 }	
+		#}
+
+		#if = {
+			#limit = { 
+  	  	    #original_tag = KYR
+			#is_ai = yes
+  	 		#} 
+
+			   #multiply_variable = { country_GDP = 0.1 }	
+		#}
+
+
+
+		#if = { 
+   		 #limit = { 
+  	      #has_idea = GEA_colonial_question
+  	 	# } 
+			#multiply_temp_variable = { temp_civ = 0.9 }
+			#multiply_temp_variable = { temp_mil = 0.9 }
+			#multiply_variable= { temp_doc = 0.9 }
+		#}
+
+
+		#if = {
+			#limit = {
+			#check_variable = { actual_manpower_k < 5000 }
+
+			#}
+			#multiply_temp_variable = { temp_civ = 1 }
+			#multiply_temp_variable = { temp_mil = 1 }
+		#}
+
+
+
+
+		#divide_temp_variable = { temp_adjust = 1000 }
+		#clamp_temp_variable = { var = temp_civ min = 0 }
+	
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+	#set_variable = { tstvar = actual_core_manpower_k }
+
+	set_variable = { country_average_inf_1 = 1 }
+	#set_variable = { actual_infra_manpower_k_1 = 1 }
+	#set_variable = { actual_infra_manpower_k = actual_core_manpower_k }
+	#divide_variable = { actual_infra_manpower_k = 9900000 }
+	#add_to_variable = { actual_infra_manpower_k_1 = actual_infra_manpower_k }
+	multiply_variable = { country_average_inf = 0.1 }
+	add_to_variable = { country_average_inf_1 = country_average_inf }
+	multiply_variable = { country_average_inf_1  = population_modifier }
+	multiply_variable = { country_GDP = country_average_inf_1 }
+
+	#add_to_variable = { country_GDP_per_capita = 0 }
+
+	multiply_variable = { temp_8 = population_modifier }
+	multiply_variable = { country_GDP = temp_8 }
+
+	multiply_temp_variable = { temp_civ = 3 }
+
+
+
+
+
+
+
+
+	
+
+	#if = {
+	#	limit = {
+	#		has_idea = low_economic_mobilisation
+	#	}
+	#	multiply_temp_variable = { temp_civ  = 0.99 }
+	#	multiply_temp_variable = { temp_mil = 0.9 }
+	#}
+
+
+
+	#set_variable = { temp_adjust_check = temp_civ }
+
+
+
+		set_variable = { temp_civ_resource = 1 }
+		set_variable = { temp_civ_resource_1 = temp_civ }
+		multiply_variable = { temp_civ_resource_1 = 0.5 }
+		add_to_variable = { temp_civ_resource = temp_civ_resource_1 }
+	
+	
+		set_temp_variable = { math_sqrt_number = resource_produced@oil }
+		divide_temp_variable = { math_sqrt_number = 2000 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+	
+		set_temp_variable = { math_sqrt_number = resource_produced@aluminium }
+		divide_temp_variable = { math_sqrt_number = 2000 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+	
+		set_temp_variable = { math_sqrt_number = resource_produced@rubber }
+		divide_temp_variable = { math_sqrt_number = 3500 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+	
+		set_temp_variable = { math_sqrt_number = resource_produced@tungsten }
+		divide_temp_variable = { math_sqrt_number = 2500 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+	
+		set_temp_variable = { math_sqrt_number = resource_produced@steel }
+		divide_temp_variable = { math_sqrt_number = 2000 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+		
+		set_temp_variable = { math_sqrt_number = resource_produced@chromium }
+		divide_temp_variable = { math_sqrt_number = 3000 }
+		math_square_root = yes
+		multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		add_to_variable = { country_GDP = math_sqrt_output }
+		
+		
+		#set_temp_variable = { math_sqrt_number = resource_produced@coal }
+		#divide_temp_variable = { math_sqrt_number = 1000 }
+		#divide_temp_variable = { math_sqrt_number = 10 }
+		#math_square_root = yes
+		#multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		#add_to_variable = { country_GDP = math_sqrt_output }
+	
+		#set_temp_variable = { math_sqrt_number = resource_produced@iron }
+		#divide_temp_variable = { math_sqrt_number = 5000 }
+		#math_square_root = yes
+		#multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		#add_to_variable = { country_GDP = math_sqrt_output }
+	
+		#set_temp_variable = { math_sqrt_number = resource_produced@bauxite }
+		#divide_temp_variable = { math_sqrt_number = 2000 }
+		#math_square_root = yes
+		#multiply_temp_variable = { math_sqrt_output = temp_civ_resource }
+		#add_to_variable = { country_GDP = math_sqrt_output }
+	
+
+	
+
+
+		#2
+		set_temp_variable = { math_sqrt_number = resource_exported@oil }
+		divide_temp_variable = { math_sqrt_number = 50 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		set_temp_variable = { math_sqrt_number = resource_exported@aluminium }
+		divide_temp_variable = { math_sqrt_number = 50 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		set_temp_variable = { math_sqrt_number = resource_exported@rubber }
+		divide_temp_variable = { math_sqrt_number = 100 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		set_temp_variable = { math_sqrt_number = resource_exported@tungsten }
+		divide_temp_variable = { math_sqrt_number = 50 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		set_temp_variable = { math_sqrt_number = resource_exported@steel }
+		divide_temp_variable = { math_sqrt_number = 50 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		set_temp_variable = { math_sqrt_number = resource_exported@chromium }
+		divide_temp_variable = { math_sqrt_number = 50 }
+		math_square_root = yes
+
+		add_to_variable = { country_GDP = math_sqrt_output }
+
+		#set_temp_variable = { math_sqrt_number = resource_exported@coal }
+		#divide_temp_variable = { math_sqrt_number = 200 }
+		#math_square_root = yes
+
+		#add_to_variable = { country_GDP = math_sqrt_output }
+
+		#set_temp_variable = { math_sqrt_number = resource_exported@iron }
+		#divide_temp_variable = { math_sqrt_number = 100 }
+		#math_square_root = yes
+
+		#add_to_variable = { country_GDP = math_sqrt_output }
+
+		#set_temp_variable = { math_sqrt_number = resource_exported@bauxite }
+		#divide_temp_variable = { math_sqrt_number = 100 }
+		#math_square_root = yes
+
+		#add_to_variable = { country_GDP = math_sqrt_output }
+
+
+
+
+
+		clamp_temp_variable = { var = temp_civ min = 1 }
+		#add_to_variable = { country_GDP = 0.01 }
+
+	
+		
+
+
+
+
+	set_variable = { factory_output = 1 }
+	set_variable = { factory_output_2 = modifier@industrial_capacity_factory }
+	multiply_variable = { factory_output_2 = 0.2 }
+	add_to_variable = { factory_output = factory_output_2 }
+	clamp_variable = { var = factory_output min = 0.5 max = 1.5 }
+	multiply_variable = { country_GDP = factory_output }
+
+
+
+
+	#set_variable = { monthly_population = 1 }
+	#set_variable = { monthly_2_population = modifier@monthly_population }
+
+	#add_to_variable = { monthly_population = monthly_2_population }
+	#clamp_variable = { var = monthly_population min = 0.5 max = 1.5 }
+	#multiply_variable = { country_GDP = monthly_population }
+
+
+
+
+
+	
+
+	multiply_variable = { country_GDP = 0.107 }
+	
+	set_variable = { percentage_of_GDP = country_GDP }
+	multiply_variable = { percentage_of_GDP = 100 }
+	divide_variable = { percentage_of_GDP = global.GDP_total }
+	clamp_variable = { var = percentage_of_GDP min = 0 }
+	clamp_variable = { var = country_GDP min = 0 }
+
+
+	set_variable = { country_GDP_per_capita = country_GDP }
+	multiply_variable = { country_GDP_per_capita = 1000 }
+	divide_variable = { country_GDP_per_capita = actual_core_manpower_k }
+	multiply_variable = { country_GDP_per_capita = 1000 }
+	clamp_variable = { var = country_GDP_per_capita min = 0 }
+
+
+	
+
+	if = {
+		limit = {
+			all_country = {
+				is_in_array = { global.GDP_list_array = THIS }
+			}
+		}
+		update_position = yes
+	}
+	#set_temp_variable = { country_GDP_a = country_GDP }
+	#set_variable = { country_GDP_b = country_GDP }
+	add_to_variable = { country_GDP_B = country_GDP }
+	add_to_variable = { country_GDP_M = country_GDP }
+	add_to_variable = { country_GDP_T = country_GDP }
+	multiply_variable = { country_GDP_M = 1000 }
+	multiply_variable = { country_GDP_T = 0.001 }
+
+
+
+}
+
+
+
+
+
+update_position = {
+	clear_array = global.top_ten_GDP_array
+	clear_variable = global.GDP_total
+	clear_variable = global.GDP_per_capita_total
+	
+	set_temp_variable = { position = 0 }
+	set_variable = { sort_var = 1 }
+	set_variable = { last_sort_var = 0 }
+	create_GDP_sorted_array = yes
+
+	for_each_scope_loop = {
+		array = global.GDP_list_array
+
+		add_to_temp_variable = { position = 1 }
+		set_variable = { THIS.GDP_position = position }
+
+		if = {
+			limit = {
+				check_variable = { THIS.GDP_position < 11 }
+			}
+			add_to_array = { global.top_ten_GDP_array = THIS }
+		}
+		add_to_variable = { global.GDP_total = country_GDP }
+		add_to_variable = { global.GDP_per_capita_total = country_GDP_per_capita }
+	}
+
+	set_variable = { global.average_GDP = global.GDP_total }
+	divide_variable = { global.average_GDP = global.GDP_list_array^num }
+	set_variable = { global.average_GDP_per_capita = global.GDP_per_capita_total }
+	divide_variable = { global.average_GDP_per_capita = global.GDP_list_array^num }
+
+	force_update_map_mode = { mapmode = TWR_GDP_map_mode }
+	force_update_map_mode = { mapmode = TWR_GDP_per_capita_map_mode }
+}
+
+GDP_growth_calculation = { 
+	
+	set_variable = { GDP_growth_value = country_GDP }
+	
+	multiply_variable = { GDP_growth_value = 100 }
+	
+	divide_variable = { GDP_growth_value = gdp_value_last }
+	if = {
+	   limit = {
+		   OR = { 
+			   check_variable = {
+				   var = GDP_growth_value
+				   value = 100
+			   }
+			   check_variable = {
+				   var = GDP_growth_value
+				   value = 0
+			   }
+		   }
+	   
+	   }
+		subtract_from_variable = { GDP_growth_value = 100 }
+	}
+	if = {
+		limit = {
+			check_variable = { GDP_growth_value = -0.001 }
+		}
+		multiply_variable = { GDP_growth_value = 0 }
+	}
+	multiply_variable = { GDP_growth_value = 1 }
+	
+	set_variable = { gdp_value_last = country_GDP }
+
+}
