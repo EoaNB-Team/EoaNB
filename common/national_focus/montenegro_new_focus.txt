@@ -4838,190 +4838,76 @@ focus_tree = {
 		x = 0
 		y = 2
 		cost = 70
-		available = {
-			custom_trigger_tooltip = {
-				tooltip = GENERIC_Triggered_By_Event_tt
-				always = no
-			}
-		}
-		search_filters = {
-			#
-		}
-		bypass = {
-		has_completed_focus = MNT_focus_the_scutari_convention
-		}
-		prerequisite = {
-			focus = MNT_focus_smuggle_weapons_into_herzegovina
-		}
-		prerequisite = {
-			focus = MNT_focus_send_jarosi_battalions
-		}
-		prerequisite = {
-			focus = MNT_focus_appoint_more_loyal_leaders
-		}
-		ai_will_do = {
-			base = 100
-		}
+
+		available = { always = no }
+		bypass = { has_completed_focus = MNT_focus_the_scutari_convention }
+
+		prerequisite = { focus = MNT_focus_smuggle_weapons_into_herzegovina }
+		prerequisite = { focus = MNT_focus_send_jarosi_battalions }
+		prerequisite = { focus = MNT_focus_appoint_more_loyal_leaders }
+
+		ai_will_do = { base = 100 }
+
 		completion_reward = {
+			# Define states
+			set_temp_variable = { herzegovina = 1202 }
+			set_temp_variable = { podgorica = 225 }
+			set_temp_variable = { outer_montenegro = 1204 }
+
+			# Check controlled states
+			set_temp_variable = { controlled_states = 0 }
 			if = {
-				limit = {
-					NOT = {
-						has_full_control_of_state = 1202
-					}
-					NOT = {
-						has_full_control_of_state = 225
-					}
-					NOT = {
-						has_full_control_of_state = 1204
-					}
-				}
-				add_ideas = {
-					MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_defeat
-				}
+				limit = { has_full_control_of_state = herzog }
+				add_to_temp_variable = { controlled_states = 1 }
+			}
+			if = {
+				limit = { has_full_control_of_state = podgorica }
+				add_to_temp_variable = { controlled_states = 1 }
+			}
+			if = {
+				limit = { has_full_control_of_state = outer_montenegro }
+				add_to_temp_variable = { controlled_states = 1 }
+			}
+
+			# Determine outcome
+			if = {
+				limit = { check_variable = { controlled_states = 0 } }
+				add_ideas = MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_defeat
 				complete_national_focus = MNT_focus_the_scutari_convention
 			}
 			else_if = {
-				limit = {
-					OR = {
-						has_full_control_of_state = 1202
-						has_full_control_of_state = 225
-						has_full_control_of_state = 1204
-					}
-				}
-				add_ideas = {
-					MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_Equilibrium
-				}
+				limit = { check_variable = { controlled_states = 1 } }
+				add_ideas = MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_Equilibrium
 				complete_national_focus = MNT_focus_the_scutari_convention
 			}
 			else_if = {
-				limit = {
-					has_full_control_of_state = 1204
-					OR = {
-						has_full_control_of_state = 1202
-						has_full_control_of_state = 225
-					}
-				}
-				add_ideas = {
-					MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_Advantage
-				}
+				limit = { check_variable = { controlled_states = 2 } }
+				add_ideas = MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_Advantage
 				complete_national_focus = MNT_focus_the_scutari_convention
 			}
-			else_if = {
-				limit = {
-					has_full_control_of_state = 1202
-					has_full_control_of_state = 1204
-					has_full_control_of_state = 225
-				}
+			else = {
 				add_ideas = MNT_Montenegrin_Herzegovinian_war_against_the_Ottomans_win
 				complete_national_focus = MNT_focus_take_what_we_deserve
 			}
+
+			# Remove war idea
 			remove_ideas = MNT_WAR
-			if = { #if by any chance there were active wars
-				limit = { 
-				has_border_war_between = { #triggered by MNT side
-                attacker = 942
-                defender = 1204
+
+			# Cancel all border wars
+			every_state = {
+				limit = {
+					OR = {
+						state = 942  # Inner Montenegro
+						state = 1204 # Outer Montenegro
+						state = 1202 # Western Sandjak
+						state = 225  # Podgorica
+						state = 44   # Albania
 					}
 				}
-				cancel_border_war = {
-				dont_fire_events = yes
-				attacker = 942
-				defender = 1204
-					}
-				}
-		else_if = {
-		limit = { 
-				has_border_war_between = { #triggered by MNT side
-                attacker = 942
-                defender = 1202
-				}
-			}
-				cancel_border_war = {
-				dont_fire_events = yes
-				attacker = 942
-				defender = 1202
-			}
-		}
-		else_if = {
-				limit = { 
-				has_border_war_between = { #triggered by MNT side
-                attacker = 942
-                defender = 225
-				}
-			}
-				cancel_border_war = {
-				dont_fire_events = yes
-				attacker = 942
-				defender = 225
-			}
-		}
-		else_if = {
-			limit = { 
-				has_border_war_between = { #triggered by OTO side
-                attacker = 225
-                defender = 942
-				}
-			}
-				cancel_border_war = { 
-				dont_fire_events = yes
-				attacker = 225
-				defender = 942
-			}
-		}
-		else_if = {
-			limit = { 
-				has_border_war_between = { #triggered by OTO side
-                attacker = 225
-                defender = 1204
-				}
-			}
-				cancel_border_war = { 
-				dont_fire_events = yes
-				attacker = 225
-				defender = 1204
-			}
-		}
-		else_if = {
-			limit = { 
-				has_border_war_between = { #triggered by OTO side
-                attacker = 44
-                defender = 1202
-				}
-			}
-				cancel_border_war = { 
-				dont_fire_events = yes
-				attacker = 44
-				defender = 1202
-			}
-		}
-		else_if = {
-			limit = { 
-				has_border_war_between = { #triggered by OTO side
-                attacker = 44
-                defender = 1202
-				}
-			}
-				cancel_border_war = { 
-				dont_fire_events = yes
-				attacker = 44
-				defender = 1202
-			}
-		}
-		else_if = {
-			limit = { 
-				has_border_war_between = { #triggered by OTO side
-                attacker = 44
-                defender = 225
-				}
-			}
-				cancel_border_war = {
-				dont_fire_events = yes
-				attacker = 44
-				defender = 225
+				cancel_border_war = { dont_fire_events = yes }
 			}
 		}
 	}
-}
 	#Take what we Deserve
 	focus = {
 		id = MNT_focus_take_what_we_deserve
