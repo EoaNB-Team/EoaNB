@@ -102,7 +102,11 @@ If you wish to contribute to the development of the mod, support us on Patreon o
 </td>
 <td align="center">
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075802775562/kuba.png" width="80px;" alt="Kuba"/>
+  <img src="https://avatars.githubusercontent.com/u/34871134?v=4" width="80px;" alt="Kuba"/>
+</td>
+  <td align="center">
+  <a href = "https://github.com/aquamarinespitfire"><strong>Aquamarine</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/135063414?v=4" width="80px;" alt="Aquamarine"/>
 </td>
 <td align="center">
   <a href = "https://github.com/gsbr20"><strong>gsbr</strong></a>
