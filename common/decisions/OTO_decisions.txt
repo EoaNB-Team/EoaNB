@@ -250,7 +250,7 @@ eoanb_category_diplomatic_actions={
 		allowed = { 
 			TAG = OTO
 		}
-		visible={
+		visible={ 
 			tag = OTO
 			MOL={has_autonomy_state = autonomy_personal_union}
 			NOT={
@@ -262,7 +262,6 @@ eoanb_category_diplomatic_actions={
 				has_completed_focus = ROM_move_away_from_Ottomans
 			}
 		}
-        cost = 25
         fire_only_once = yes
         complete_effect = {
 			ROM={
@@ -271,7 +270,7 @@ eoanb_category_diplomatic_actions={
 			}
 		}
 		ai_will_do = {
-			factor = 100
+			factor = 250
 			modifier = {#not before historical date
 				factor = 0
 				AND = {
@@ -620,7 +619,7 @@ OTO_decision_category_vilayet = {
 		complete_effect = {
 			country_event = {
 				days = 8
-				id = OTO_events.60
+				id = OTO_events.61
 			}
 			748 = {add_resistance = -5}
 			1241 = {add_resistance = -5}
@@ -636,6 +635,473 @@ OTO_decision_category_vilayet = {
 		}
 		ai_will_do = {
 			base = 100
+		}
+	}
+}
+
+#Lebanon Intervention
+OTO_category_lebanon_intervention = {
+	decision_lebanon_arm_marionites = {
+		icon = generic_political_discourse
+		allowed = {
+			OR = {
+				original_tag = FRA
+				original_tag = ENG 
+				original_tag = PRS
+				original_tag = RUS
+				original_tag = AUS
+			}
+		}
+
+		visible = {
+			OR = {
+				original_tag = FRA
+				original_tag = ENG 
+				original_tag = PRS
+				original_tag = RUS
+				original_tag = AUS
+			}
+
+			OTO = {
+				NOT = {
+					has_country_flag = lebanon_ultimatum_accepted
+				}
+				owns_state = 553
+				owns_state = 878
+			}
+			has_global_flag = occupation_beirut
+			has_country_flag = lebanon_intervention
+		}
+		custom_cost_text = decision_cost_ie_2000
+		custom_cost_trigger = {
+			has_equipment = { infantry_equipment > 1999 }
+		}
+
+		available = { 
+			OR = {
+				original_tag = FRA
+				original_tag = ENG 
+				original_tag = PRS
+				original_tag = RUS
+				original_tag = AUS
+			}
+
+ 			has_equipment = { infantry_equipment > 1999 }
+			OTO = {
+				NOT = {
+					has_country_flag = lebanon_ultimatum_accepted
+				}
+			}
+			has_global_flag = occupation_beirut
+		}
+
+		ai_will_do = {
+			base = 3
+			modifier = {
+				add = 10
+				tag = FRA
+			}
+		}
+
+		highlight_states = {
+			highlight_state_targets = { state = 553 }
+			highlight_state_targets = { state = 878 }
+		}
+
+		complete_effect = {
+			553 = {
+				add_resistance = 10
+				add_compliance = -10
+			}
+
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = -2000
+			}
+
+			878 = {
+				add_resistance = 10
+				add_compliance = -10
+			}
+		}
+	}
+
+	Lebanon_Revolt_Peace_Treaty_Mission = {
+		icon = generic_political_actions
+		allowed = { always = no }
+		activation = { always = no }
+
+		is_good = no
+		days_mission_timeout = 500
+
+		available = {
+			# Victory Condition for X_country
+			AND = {
+				LEB = { 
+					OR = {
+						has_capitulated = yes 
+						exists = no
+					}
+				}
+				IF = {
+					limit = {
+						PAL = {
+							exists = yes
+						}
+					}
+
+					PAL = { has_capitulated = yes }
+				}
+			}
+		}
+
+
+		complete_effect = {
+			if = {
+				limit = {
+					tag = OTO
+				}
+				# Peace Treaty Event for X_country victory
+				OTO = { 
+					set_country_flag = defeat_lebanon_war
+					clr_country_flag = stalemate_lebanon_war
+					clr_country_flag = won_lebanon_war
+					country_event = { id = OTO_events.60 } 
+				}
+				
+			}
+		}
+
+		timeout_effect = {
+			if = {
+				limit = {
+					LEB = {
+						surrender_progress > 15
+					}
+				}
+				# Peace Treaty for Y_country victory
+				OTO = { 
+					set_country_flag = stalemate_lebanon_war
+					clr_country_flag = defeat_lebanon_war
+					clr_country_flag = won_lebanon_war
+					country_event = { id = OTO_events.60 }  
+				}
+			}
+
+			if = {
+				limit = {
+					LEB = {
+						surrender_progress < 16
+					}
+				}
+				# Peace Treaty for Y_country victory
+				OTO = { 
+					set_country_flag = won_lebanon_war
+					clr_country_flag = stalemate_lebanon_war
+					clr_country_flag = defeat_lebanon_war
+					country_event = { id = OTO_events.60 }  
+				}
+			}
+		}
+	}
+}
+
+#Economy
+eoanb_category_economic = {
+	OTO_develop_industry_in_central_anatolia = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_develop_mechanized_production_ca
+		}
+		
+		fire_only_once = yes
+		days_remove = 60
+		custom_cost_trigger = {
+			if = {
+				limit = {
+					has_idea = egy_vic_debt
+				}
+				check_variable = {
+					debt_level < 50
+				}
+			}
+			else = {
+				has_political_power > 100
+			}
+		}
+		custom_cost_text = eoanb_decision_building_slot_victorian_cost
+		complete_effect = {
+			set_temp_variable = { loans_amount = 1 }
+			take_loan_effect = yes
+		}
+		remove_effect = {
+		
+			346 = {
+				add_extra_state_shared_building_slots = 2
+				
+				add_building_construction = {
+					type = industrial_complex
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
+	}
+	
+	OTO_invest_on_galata_institutions = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_invest_galata_institutions
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 2 }
+			take_loan_effect = yes
+		}
+		remove_effect = {
+		
+			957 = {
+				add_extra_state_shared_building_slots = 4
+				
+				add_building_construction = {
+					type = industrial_complex
+					level = 2
+					instant_build = yes
+				}
+				
+				add_building_construction = {
+					type = arms_factory
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
+	}
+	OTO_organize_guilds = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_organise_rural_guilds
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		remove_effect = {
+			348 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = farm
+					level = 2
+					instant_build = yes
+				}
+			}
+			
+			342 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = cotton_farm
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+	OTO_consolidate_cotton_farms = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_consolidate_cotton_farms
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 60
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 2 }
+			take_loan_effect = yes
+		}
+		
+		remove_effect = {
+
+			356 = {
+				add_extra_state_shared_building_slots = 3
+				
+				add_building_construction = {
+					type = cotton_farm
+					level = 3
+					instant_build = yes
+				}
+			}
+		}
+	}
+	OTO_create_agroindustries_syria = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_create_agroindustries_syria
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 2 }
+			take_loan_effect = yes
+		}
+		
+		remove_effect = {
+		
+			677 = {
+				add_extra_state_shared_building_slots = 2
+				
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+				
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			
+			554 = {
+				add_extra_state_shared_building_slots = 4
+				
+				add_building_construction = {
+					type = logging_camp
+					level = 2
+					instant_build = yes
+				}
+				
+				add_building_construction = {
+					type = farm
+					level = 2
+					instant_build = yes
+				}
+			}
+		}
+	}
+	OTO_fund_mining_expeditions = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_fund_mining_epeditions_anatolia	
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 2 }
+			take_loan_effect = yes
+		}
+		
+		remove_effect = {
+		
+			add_resource = { type = coal amount = 5 state = 354}
+			add_resource = { type = iron amount = 3 state = 345}
+			add_resource = { type = iron amount = 2 state = 349}
+		}
+	}
+	OTO_invest_ironworks_south_east = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_invest_ironworks_south_east
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 2 }
+			take_loan_effect = yes
+		}
+		
+		remove_effect = {
+			
+			add_resource = { type = iron amount = 3 state = 350}
+			add_resource = { type = iron amount = 2 state = 352}
+			
+			add_tech_bonus = {bonus = 0.5 uses = 1 technology = industrial_blast_furnace}
+			add_tech_bonus = {bonus = 0.5 uses = 1 technology = cast_iron_industrialization}
+		}
+	}
+	OTO_establish_naval_works_lybia = {
+		allowed = {
+			tag = OTO
+		}
+		
+		visible = {
+			has_completed_focus = OTO_focus_establish_naval_works_lybia
+		}
+		
+		fire_only_once = yes
+		
+		days_remove = 90
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 1 }
+			take_loan_effect = yes
+		}
+		
+		remove_effect = {
+			
+			 450 = {
+				add_extra_state_shared_building_slots = 2
+				add_building_construction = {
+					type = dockyard
+					level = 2
+					instant_build = yes
+				}
+			}
+			
+			449 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+			}
+			449 = {
+				set_building_level = {
+					type = naval_base
+					level = 1
+					province = {
+						id = 4047
+					}
+				}
+			}
 		}
 	}
 }
