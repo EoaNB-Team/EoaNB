@@ -332,6 +332,429 @@ country_event = { #The Beyiang Fleet - Expansion
     }
 }
 
+country_event = { #Imperial maritime Customs Service 
+	id = qing.707
+	title = qing.707.t
+	desc = qing.707.d 
+	
+	#picture = 
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	option = { #WOW!!!!!!
+		name = qing.707.a 
+		add_ideas = QNG_imperial_maritime_custom_service_idea
+	}
+}
+country_event = { #China Merchants Steam Navigation Company
+	id = qing.708
+	title = qing.708.t
+	desc = qing.708.d 
+	
+	#picture = 
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = { #WOW!!!!!!
+		name = qing.708.a 
+		add_ideas = QNG_merchant_steam_navigation_company_idea
+	}
+}
+country_event = { #Imperial Chinese Telegraph Administration
+	id = qing.709
+	title = qing.709.t
+	desc = qing.709.d 
+	
+	#picture = 
+	is_triggered_only = yes
+	
+	fire_only_once = yes
+	option = { #WOW!!!!!!
+		name = qing.709.a 
+		add_ideas = QNG_imperial_chinese_telegraph_administration_idea
+	}
+}
+
+country_event = { #Qing request tribute events 
+    id = qing.710
+    title = qing.710.t
+    desc = qing.710.d
+
+    is_triggered_only = yes
+
+    option = {
+        name = qing.710.a
+		custom_effect_tooltip = tributary_gives_pp_tt
+		set_global_flag = QNG_requests_for_pp_flag
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				country_Event = qing.711
+			} 
+		}
+    }
+	option = {
+        name = qing.710.b
+		custom_effect_tooltip = tributary_gives_mp_tt
+		set_global_flag = QNG_requests_for_mp_flag
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				country_Event = qing.711
+			} 
+		}
+    }
+	option = {
+        name = qing.710.c
+		custom_effect_tooltip = tributary_gives_stab_tt
+		set_global_flag = QNG_requests_for_stab_flag
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				country_Event = qing.711
+			} 
+		}
+    }
+}
+
+country_event = { #tribute countries receives request for tribute
+    id = qing.711
+    title = qing.711.t
+    desc = qing.711.d
+
+    is_triggered_only = yes
+
+    option = {
+        name = qing.711.a #Yes
+		ai_chance = {
+			base = 100
+		}
+		if = {
+			limit = {
+				has_global_flag = QNG_requests_for_pp_flag
+			}
+			QNG = {add_political_power = 50}
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				add_political_power = -50 
+				clr_country_flag = tribute_payment_in_process
+			}  
+			clr_global_flag = QNG_requests_for_pp_flag
+		
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_mp_flag
+				}
+				QNG = {add_manpower = 1000 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_manpower = -1000
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_mp_flag  
+			}
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_stab_flag
+				}
+				QNG =  {add_stability = 0.01 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_stability = -0.01
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_stab_flag  
+			}
+		}
+		
+    }
+	option = {
+        name = qing.711.b #No
+		ai_chance = { base = -100 }
+		add_political_power = 25
+		QNG = {
+			country_Event = qing.712
+		}
+    }
+	option = {
+        name = qing.711.c #Im ending the tribute payment 
+		add_stability = 0.01
+		ai_chance = { base = -100 }
+		QNG = {
+			country_Event = qing.713
+		}
+		clr_global_flag = QNG_requests_for_pp_flag
+		clr_global_flag = QNG_requests_for_mp_flag
+		clr_global_flag = QNG_requests_for_stab_flag
+    }
+}
+
+country_event = { #denied request from tribute country 
+    id = qing.712
+    title = qing.712.t
+    desc = qing.712.d
+
+    is_triggered_only = yes
+
+    option = {
+        name = qing.712.a #Dont escalate
+		add_political_power = -50
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+    }
+	option = {
+        name = qing.712.b #Escalate it
+		FROM = {
+			country_Event = qing.714
+		}
+    }
+}
+
+country_event = { #tributary backed out  
+    id = qing.713
+    title = qing.713.t
+    desc = qing.713.d
+
+    is_triggered_only = yes
+
+    option = {
+        name = qing.713.a #ok
+		add_political_power = -50
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+		 
+    }
+	option = {
+        name = qing.713.b #Cancel diplomatic ties!
+		FROM = {
+			country_Event = qing.716
+		}
+    }
+}
+
+country_event = { #diplomatic incident between qing and tribute country
+    id = qing.714
+    title = qing.714.t
+    desc = qing.714.d
+
+    is_triggered_only = yes
+
+    option = {
+        name = qing.714.a #damn 
+		add_political_power = -50
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		}
+    }
+	option = {
+        name = qing.714.b #pay tribute 
+		QNG = {
+			country_Event = qing.717
+		}
+		if = {
+			limit = {
+				has_global_flag = QNG_requests_for_pp_flag
+			}
+			QNG = {add_political_power = 50}
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				add_political_power = -50 
+				clr_country_flag = tribute_payment_in_process
+			}  
+			clr_global_flag = QNG_requests_for_pp_flag
+		
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_mp_flag
+				}
+				QNG = {add_manpower = 1000 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_manpower = -1000
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_mp_flag  
+			}
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_stab_flag
+				}
+				QNG =  {add_stability = 0.01 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_stability = -0.01
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_stab_flag  
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+    }
+	option = {
+        name = qing.714.c #end tribute payment 
+		QNG = {
+			country_Event = qing.713
+		}
+    }
+}
+
+country_event = { #tributary restored
+    id = qing.715
+    title = qing.15.t
+    desc = qing.715.d
+
+    is_triggered_only = yes
+    fire_only_once = yes
+
+    option = {
+        name = qing.715.a #good 
+		add_political_power = 50
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+    }
+	option = {
+        name = qing.715.b #punish them for trying to stop tribute payment! 
+		FROM = {
+			add_political_power = -100
+		}
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+    }
+}
+
+country_event = { #diplomatic ties end 
+    id = qing.716
+    title = qing.716.t
+    desc = qing.716.d
+
+    is_triggered_only = yes
+    fire_only_once = yes
+
+    option = {
+        name = qing.716.a #ok
+		add_political_power = -50
+		hidden_effect = {
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				clr_country_flag = tribute_payment_in_process
+			}
+		} 
+    }
+}
+
+country_event = { #tributary backs down from refusal 
+    id = qing.717
+    title = qing.717.t
+    desc = qing.717.d
+
+    is_triggered_only = yes
+    fire_only_once = yes
+
+    option = {
+        name = qing.717.a #good 
+		 if = {
+			limit = {
+				has_global_flag = QNG_requests_for_pp_flag
+			}
+			QNG = {add_political_power = 50}
+			every_country = {
+				limit = {
+					has_country_flag = tribute_payment_in_process
+				}
+				add_political_power = -50 
+				clr_country_flag = tribute_payment_in_process
+			}  
+			clr_global_flag = QNG_requests_for_pp_flag
+		
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_mp_flag
+				}
+				QNG = {add_manpower = 1000 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_manpower = -1000
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_mp_flag  
+			}
+			else_if = {
+				limit = {
+					has_global_flag = QNG_requests_for_stab_flag
+				}
+				QNG =  {add_stability = 0.01 }
+				every_country = {
+					limit = {
+						has_country_flag = tribute_payment_in_process
+					}
+					add_stability = -0.01
+					clr_country_flag = tribute_payment_in_process
+				}
+				clr_global_flag = QNG_requests_for_stab_flag  
+			}
+		}
+    }
+}
+
+
 ### Old style id events
 country_event = { #Mudan Incident (Japanese in Taiwan)
     id = qing.1
@@ -1010,9 +1433,6 @@ country_event = { #The crumbling empire
 	title = qing.29.t
 	desc = qing.29.d 
 	
-	trigger = {
-		tag = QNG
-	}
 
 	fire_only_once = yes
 	is_triggered_only = yes 
@@ -1127,6 +1547,7 @@ country_event = { #White hao army revolt
 		date > 1858.1.18
 		date < 1870.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1179,6 +1600,7 @@ country_event = { #Shuntian revolt
 		date > 1859.1.18
 		date < 1870.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1242,6 +1664,7 @@ country_event = { #Tianshun revolt
 		date > 1861.2.10
 		date < 1870.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1287,6 +1710,7 @@ country_event = { #Tianshun 2nd revolt
 		date > 1861.10.1
 		date < 1870.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1348,6 +1772,7 @@ country_event = { #Tianshun 3rd revolt
 		date > 1863.5.1
 		date < 1870.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1453,6 +1878,7 @@ country_event = { #Pugunhui revolt
 		date > 1862.4.18
 		date < 1865.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -1505,6 +1931,7 @@ country_event = { #Bai Linga revolt
 		date > 1861.3.1
 		date < 1865.1.1
 		has_country_flag = true_china
+		has_idea = QNG_idea_han_nationalism
 	}
 
     fire_only_once = yes
@@ -3686,13 +4113,19 @@ country_event = { #Rebels losing momentum
 	
 	picture = GFX_report_event_election_vote
 
-	is_triggered_only = yes
 	trigger = {
-		tag = TAI
+		has_country_flag = rebel_uprisisng
+		has_war_with = QNG
+		date > 1865.1.1
+		date < 1875.1.1 
 	}
 
+	mean_time_to_happen = { days = 700 }
+
 	option = {
+		ai_chance={ base = 100 }
 		name = qing_reb.52.a
+		rebels_lose_momentum = yes 
 	}
 }
 country_event = { #taiping introduction
@@ -3732,48 +4165,7 @@ country_event = { #disbanding ever victorious army
 	}
 }
 	
-country_event = { #Imperial maritime Customs Service 
-	id = qing.707
-	title = qing.707.t
-	desc = qing.707.d 
-	
-	#picture = 
-	is_triggered_only = yes
-	
-	fire_only_once = yes
-	option = { #WOW!!!!!!
-		name = qing.707.a 
-		add_ideas = QNG_imperial_maritime_custom_service_idea
-	}
-}
-country_event = { #China Merchants Steam Navigation Company
-	id = qing.708
-	title = qing.708.t
-	desc = qing.708.d 
-	
-	#picture = 
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = { #WOW!!!!!!
-		name = qing.708.a 
-		add_ideas = QNG_merchant_steam_navigation_company_idea
-	}
-}
-country_event = { #Imperial Chinese Telegraph Administration
-	id = qing.709
-	title = qing.709.t
-	desc = qing.709.d 
-	
-	#picture = 
-	is_triggered_only = yes
-	
-	fire_only_once = yes
-	option = { #WOW!!!!!!
-		name = qing.709.a 
-		add_ideas = QNG_imperial_chinese_telegraph_administration_idea
-	}
-}
+
 
 country_event = { #Ye Mingchen’s remains return to China
 	id = qing.201
