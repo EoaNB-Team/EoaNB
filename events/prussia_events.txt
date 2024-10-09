@@ -6905,7 +6905,7 @@ country_event = {
 
 ### NAVY EVENTS (prussia.826-900) ###
 
-#Issue Navy Bonds to Finance Fleet Expansion 1
+#Issue Navy Bonds to Finance Fleet Expansion
 country_event = {
 	id = prussia.826
 	title = prussia.826.t
@@ -6913,11 +6913,13 @@ country_event = {
 	
 	is_triggered_only = yes
 	
+	#Issue the bonds
 	option = {
 		name = prussia.826.a
 		ai_chance = { base = 90 }
-		add_political_power = -100
+		add_political_power = -50
 		add_stability = -0.02
+		add_war_support = 0.02
 		set_temp_variable = { loans_amount = 1 }
 		take_loan_without_inflation_effect = yes
 		unlock_decision_tooltip = PRS_decision_order_warships_domestically_1
@@ -6928,6 +6930,7 @@ country_event = {
 		}
 	}
 	
+	#Don't issue the bonds
 	option = {
 		name = prussia.826.b
 		ai_chance = { 
@@ -6940,6 +6943,7 @@ country_event = {
 		custom_effect_tooltip = PRS_navy_bonds_warning_effect_tt
 		add_political_power = 50
 		add_stability = 0.02
+		add_war_support = -0.02
 	}
 }
 
@@ -7035,6 +7039,7 @@ country_event = {
 	
 	is_triggered_only = yes
 	
+	#Accept
 	option = {
 		name = prussia.829.a
 		ai_chance = { base = 95 }
@@ -7042,23 +7047,22 @@ country_event = {
 		hidden_effect = {
 			add_opinion_modifier = { target = FROM modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL }
 			reverse_add_opinion_modifier = { target = FROM modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL }
-		}
-		hidden_effect = {
 			if = { 
 				limit = { 
 					tag = ENG 
 				}
-				PRS = { country_event = { id = prussia.830 } }
+				PRS = { country_event = { id = prussia.830 days = 3 } }
 			}
 			if = {
 				limit = {
 					tag = FRA
 				}
-				PRS = { country_event = { id = prussia.831 } }
+				PRS = { country_event = { id = prussia.831 days = 3 } }
 			}
 		}
 	}
 	
+	#Refuse
 	option = {
 		name = prussia.829.b
 		ai_chance = { 
@@ -7069,10 +7073,18 @@ country_event = {
 			}
 		}
 		custom_effect_tooltip = PRS_refused_ship_purchase_event_tt
+		add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
+		if = {
+			limit = {
+				has_opinion_modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL
+			}
+			remove_opinion_modifier = {
+				target = PRS
+				modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL
+			}
+		}
 		hidden_effect = {
-			add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
-			reverse_add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
-			PRS = { country_event = { days = 1 id = prussia.839 } }
+			PRS = { country_event = { id = prussia.839 days = 3 } }
 		}
 	}
 }
@@ -7090,33 +7102,33 @@ country_event = {
 		ai_chance = { base = 100 }
 		if = {
 			limit = {
-				date < 1864.1.1
+				has_country_flag = PRS_ask_britain_for_ships_flag_1
 			}
 			unlock_decision_tooltip = PRS_decision_order_ships_from_ENG_1
+			hidden_effect = {
+				set_country_flag = PRS_britain_agrees_navy_flag_1
+				clr_country_flag = PRS_ask_britain_for_ships_flag_1
+			}
 		}
 		else_if = {
 			limit = {
-				date > 1864.1.1
-				date < 1867.1.1
+				has_country_flag = PRS_ask_britain_for_ships_flag_2
 			}
 			unlock_decision_tooltip = PRS_decision_order_ships_from_ENG_2
+			hidden_effect = {
+				set_country_flag = PRS_britain_agrees_navy_flag_2
+				clr_country_flag = PRS_ask_britain_for_ships_flag_2
+			}
 		}
-		else = { 
+		else_if = { 
+			limit = {
+				has_country_flag = PRS_ask_britain_for_ships_flag_3
+			}
 			unlock_decision_tooltip = PRS_decision_order_ships_from_ENG_3
-		}
-		hidden_effect = {
-			if = {
-				limit = { date < 1864.1.1 }
-				PRS = { set_country_flag = PRS_britain_agrees_navy_flag_1 }
+			hidden_effect = {
+				set_country_flag = PRS_britain_agrees_navy_flag_3
+				clr_country_flag = PRS_ask_britain_for_ships_flag_3
 			}
-			else_if = {
-				limit = { 
-					date > 1864.1.1
-					date < 1867.1.1
-				}
-				PRS = { set_country_flag = PRS_britain_agrees_navy_flag_2 }
-			}
-			else = { PRS = { set_country_flag = PRS_britain_agrees_navy_flag_3 } }
 		}
 	}
 }
@@ -7134,24 +7146,22 @@ country_event = {
 		ai_chance = { base = 100 }
 		if = {
 			limit = {
-				date < 1866.1.1
+				has_country_flag = PRS_ask_france_for_ships_flag_1
 			}
 			unlock_decision_tooltip = PRS_decision_order_ships_from_FRA_1
+			hidden_effect = {
+				set_country_flag = PRS_france_agrees_navy_flag_1
+				clr_country_flag = PRS_ask_france_for_ships_flag_1
+			}
 		}
 		else_if = {
 			limit = {
-				date > 1866.1.1
+				has_country_flag = PRS_ask_france_for_ships_flag_2
 			}
 			unlock_decision_tooltip = PRS_decision_order_ships_from_FRA_2
-		}
-		hidden_effect = {
-			if = {
-				limit = { date < 1866.1.1 }
-				PRS = { set_country_flag = PRS_france_agrees_navy_flag_1 }
-			}
-			else_if = {
-				limit = { date > 1866.1.1 }
-				PRS = { set_country_flag = PRS_france_agrees_navy_flag_2 }
+			hidden_effect = {
+				set_country_flag = PRS_france_agrees_navy_flag_2
+				clr_country_flag = PRS_ask_france_for_ships_flag_2
 			}
 		}
 	}
@@ -7176,7 +7186,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.4 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		else_if = {
 			limit = {
@@ -7185,7 +7195,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.1 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		else_if = {
 			limit = {
@@ -7194,7 +7204,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.3 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		else_if = {
 			limit = {
@@ -7203,7 +7213,16 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.4 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		else_if = {
+			limit = {
+				PRS = {
+					has_country_flag = PRS_britain_agrees_navy_flag_3
+				}
+			}
+			set_temp_variable = { money_to_gain = 1.4 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 	}
 }
@@ -7219,8 +7238,6 @@ country_event = {
 	option = {
 		name = prussia.833.a
 		ai_chance = { base = 100 }
-		set_temp_variable = { money_to_gain = 0.5 }
-		add_money_with_tooltip_effect = yes
 		if = {
 			limit = {
 				PRS = {
@@ -7228,7 +7245,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.4 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			hidden_effect = {
 				PRS = {
 					clr_country_flag = PRS_britain_agrees_navy_flag_1
@@ -7242,7 +7259,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.1 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			hidden_effect = {
 				PRS = {
 					clr_country_flag = PRS_france_agrees_navy_flag_1
@@ -7256,7 +7273,7 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.3 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			hidden_effect = {
 				PRS = {
 					clr_country_flag = PRS_britain_agrees_navy_flag_2
@@ -7270,10 +7287,24 @@ country_event = {
 				}
 			}
 			set_temp_variable = { money_to_gain = 0.4 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			hidden_effect = {
 				PRS = {
 					clr_country_flag = PRS_france_agrees_navy_flag_2
+				}
+			}
+		}
+		else_if = {
+			limit = {
+				PRS = {
+					has_country_flag = PRS_britain_agrees_navy_flag_3
+				}
+			}
+			set_temp_variable = { money_to_gain = 1.4 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = {
+				PRS = {
+					clr_country_flag = PRS_britain_agrees_navy_flag_3
 				}
 			}
 		}
@@ -7515,47 +7546,73 @@ country_event = {
 		name = prussia.839.a
 		ai_chance = { base = 100 }
 		add_political_power = -10
+		add_opinion_modifier = { target = FROM modifier = PRS_REJECTED_SHIP_PURCHASE_REL }
+		if = {
+			limit = {
+				has_opinion_modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL
+			}
+			remove_opinion_modifier = {
+				target = FROM
+				modifier = PRS_ACCEPTED_SHIP_PURCHASE_REL
+			}
+		}
 	}
 }
 
-#Expand Naval Infrastructure successful - Stage 1
+#Issue Navy Bonds to Finance Bundesflotte
 country_event = {
 	id = prussia.840
 	title = prussia.840.t
 	desc = prussia.840.d
 	
 	is_triggered_only = yes
-	fire_only_once = yes
 	
+	#Issue the bonds
 	option = {
 		name = prussia.840.a
-		ai_chance = { base = 100 }
-		swap_ideas = {
-			remove_idea = PRS_idea_high_fleet_2
-			add_idea = PRS_idea_high_fleet_3
+		ai_chance = { base = 90 }
+		add_political_power = -50
+		add_stability = -0.03
+		add_war_support = 0.03
+		set_temp_variable = { loans_amount = 1 }
+		take_loan_without_inflation_effect = yes
+		if = {
+			limit = {
+				has_idea = PRS_idea_high_sea_fleet_1
+			}
+			swap_ideas = {
+				remove_idea = PRS_idea_high_sea_fleet_1
+				add_idea = PRS_idea_high_sea_fleet_2
+			}
+		}
+		else = {
+			add_ideas = PRS_idea_high_sea_fleet_2
+		}
+		unlock_decision_tooltip = PRS_decision_ask_ENG_for_ships_3
+		unlock_decision_tooltip = PRS_decision_establish_wilhelmshaven_war_port
+		unlock_decision_tooltip = PRS_decision_establish_kiel_war_port
+		unlock_decision_tooltip = PRS_decision_invest_into_kiel_dockyards
+		unlock_decision_tooltip = PRS_decision_invest_into_danzig_dockyards
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_issue_bonds_for_navy_ngc_flag
 		}
 	}
-}
-
-#Expand Naval Infrastructure successful - Stage 2
-country_event = {
-	id = prussia.841
-	title = prussia.841.t
-	desc = prussia.841.d
 	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
+	#Don't issue the bonds
 	option = {
-		name = prussia.841.a
-		ai_chance = { base = 100 }
-		swap_ideas = {
-			remove_idea = PRS_idea_high_fleet_3
-			add_idea = PRS_idea_high_fleet_4
+		name = prussia.840.b
+		ai_chance = { 
+			base = 10
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
-		hidden_effect = {
-			clear_variable = PRS_naval_infrastructure
-		}
+		custom_effect_tooltip = PRS_navy_bonds_ngc_warning_effect_tt
+		add_political_power = 50
+		add_stability = 0.03
+		add_war_support = -0.03
 	}
 }
 
