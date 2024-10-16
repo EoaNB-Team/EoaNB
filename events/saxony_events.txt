@@ -6,7 +6,7 @@ add_namespace = saxony
 #saxony.701-900	Military Events
 #saxony.901-999	Parliamentary Events
 
-##### STARTING, GENERAL INFO AND FLAVOUR EVENTS (saxony.1-200) #####
+##### STARTING, GENERAL INFO AND FLAVOR EVENTS (saxony.1-200) #####
 
 ### STARTING EVENTS (saxony.1-10) ###
 
@@ -23,6 +23,8 @@ country_event = {
 	option = {
 		name = saxony.1.a
 		ai_chance = { base = 100 }
+		add_political_power = 10
+		add_stability = 0.02
 	}
 }
 
@@ -39,6 +41,29 @@ country_event = {
 	option = {
 		name = saxony.2.a
 		ai_chance = { base = 100 }
+		add_political_power = 10
+		add_war_support = 0.02
+	}
+}
+
+### GENERAL INFORMATION AND FLAVOR EVENTS (saxony.11-100) ###
+
+#The Discovery of the Element Indium
+country_event = {
+	id = saxony.11
+	title = saxony.11.t
+	desc = saxony.11.d
+	picture = GFX_report_event_saxony_indium
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = saxony.11.a
+		ai_chance = { base = 100 }
+		add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
 	}
 }
 
@@ -174,11 +199,6 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	trigger = {
-		tag = PRS
-		#date > 1857.7.1
-	}
-	
 	option = {
 		name = saxony.205.a
 		ai_chance = { base = 100 }
@@ -196,11 +216,6 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
-	
-	trigger = {
-		tag = PRS
-		#date > 1857.11.1
-	}
 	
 	option = {
 		name = saxony.206.a
@@ -221,8 +236,6 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		tag = PRS
-		#date > 1858.5.11
 		NOT = { has_completed_focus = SAX_focus_full_equality_for_sorbs }
 	}
 	
@@ -245,8 +258,6 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		tag = PRS
-		#date > 1862.4.1
 		NOT = { has_completed_focus = SAX_focus_full_equality_for_sorbs }
 	}
 	
@@ -269,8 +280,6 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		tag = PRS
-		#date > 1863.1.20
 		NOT = { has_completed_focus = SAX_focus_full_equality_for_sorbs }
 	}
 	
@@ -293,8 +302,6 @@ country_event = {
 	is_triggered_only = yes
 	
 	trigger = {
-		tag = PRS
-		#date > 1865.8.14
 		NOT = { has_completed_focus = SAX_focus_full_equality_for_sorbs }
 	}
 	
@@ -316,11 +323,6 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	trigger = {
-		tag = PRS
-		#date > 1866.3.1
-	}
-	
 	option = {
 		name = saxony.211.a
 		ai_chance = { base = 100 }
@@ -337,11 +339,6 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
-	
-	trigger = {
-		tag = PRS
-		#date > 1866.6.1
-	}
 	
 	option = {
 		name = saxony.212.a
@@ -374,6 +371,7 @@ country_event = {
 		}
 	}
 	
+	#Prussia is the enemy
 	option = {
 		name = saxony.301.a
 		ai_chance = { base = 90 }
@@ -383,6 +381,7 @@ country_event = {
 		}
 	}
 	
+	#We need to reconcile
 	option = {
 		name = saxony.301.b
 		ai_chance = { base = 10 }
@@ -414,6 +413,7 @@ country_event = {
 		}
 	}
 	
+	#Austria is our friend
 	option = {
 		name = saxony.302.a
 		ai_chance = { base = 75 }
@@ -423,6 +423,7 @@ country_event = {
 		}
 	}
 	
+	#We need to be neutral
 	option = {
 		name = saxony.302.b
 		ai_chance = { base = 25 }
@@ -1173,43 +1174,91 @@ country_event = {
 country_event = {
 	id = saxony.323
 	title = saxony.323.t
-	desc = saxony.323.d
+	desc = {
+		trigger = {
+			NOT = {
+				OR = {
+					tag = AUS
+					tag = PRS
+				}
+			}
+		}
+		text = saxony.323.d_middle_states
+	}
+	desc = {
+		trigger = {
+			OR = {
+				tag = AUS
+				tag = PRS
+			}
+		}
+		text = saxony.323.d_great_powers
+	}
 	picture = GFX_event_saxony_coat_of_arms
 	
 	is_triggered_only = yes
 	
+	#Saxony
 	option = {
 		name = saxony.323.a
 		ai_chance = { base = 100 }
-		if = {
-			limit = {
-				tag = SAX
+		trigger = {
+			tag = SAX
+		}
+		add_political_power = 25
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = 0.05
+		}
+		add_power_balance_modifier = {
+			id = SAX_Balance_of_Power_Trias
+			modifier = SAX_Balance_of_Power_Trias_active_talks
+		}
+		hidden_effect = {
+			country_event = { id = saxony.324 days = 5 }
+			every_other_country = {
+				limit = {
+					has_country_flag = SAX_attend_third_wurzburg_conference_flag
+				}
+				country_event = { id = saxony.323 }
 			}
-			add_political_power = 25
-			add_power_balance_value = {
-				id = SAX_Balance_of_Power_Trias
-				value = 0.05
-			}
-			add_power_balance_modifier = {
-				id = SAX_Balance_of_Power_Trias
-				modifier = SAX_Balance_of_Power_Trias_active_talks
-			}
-			hidden_effect = {
-				country_event = { id = saxony.324 days = 5 }
-				every_other_country = {
-					limit = {
-						has_country_flag = SAX_attend_third_wurzburg_conference_flag
-					}
-					country_event = { id = saxony.323 }
+		}
+	}
+
+	#Middle States
+	option = {
+		name = saxony.323.b
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = {
+				OR = {
+					tag = SAX
+					tag = AUS
+					tag = PRS
 				}
 			}
 		}
-		else = {
-			add_political_power = 10
-			hidden_effect = {
-				clr_country_flag = SAX_attend_second_wurzburg_conference_flag
-				clr_country_flag = SAX_reject_second_wurzburg_conference_flag
+		add_political_power = 10
+		hidden_effect = {
+			clr_country_flag = SAX_attend_second_wurzburg_conference_flag
+			clr_country_flag = SAX_reject_second_wurzburg_conference_flag
+		}
+	}
+
+	#AUS/PRS
+	option = {
+		name = saxony.323.c
+		ai_chance = { base = 100 }
+		trigger = {
+			OR = {
+				tag = AUS
+				tag = PRS
 			}
+		}
+		add_political_power = 10
+		hidden_effect = {
+			clr_country_flag = SAX_attend_second_wurzburg_conference_flag
+			clr_country_flag = SAX_reject_second_wurzburg_conference_flag
 		}
 	}
 }
@@ -1241,7 +1290,8 @@ country_event = {
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_second_wurzburg_conference_flag
-				set_country_flag = SAX_third_wurzburg_conference_flag
+				clr_country_flag = SAX_third_wurzburg_conference_flag
+				set_country_flag = SAX_third_wurzburg_conference_finished_flag
 				every_other_country = {
 					limit = {
 						has_country_flag = SAX_attend_third_wurzburg_conference_flag
@@ -1696,6 +1746,427 @@ country_event = {
 			HES = { clr_country_flag = SAX_support_comprehensive_constitutional_reform_flag }
 			HSD = { clr_country_flag = SAX_support_comprehensive_constitutional_reform_flag }
 			WUR = { clr_country_flag = SAX_support_comprehensive_constitutional_reform_flag }
+		}
+	}
+}
+
+#Saxony - Second and Third Würzburg Conference - Also Invite Austria and Prussia?
+country_event = {
+	id = saxony.336
+	title = {
+		trigger = { NOT = { has_country_flag = SAX_third_wurzburg_conference_flag } }
+		text = saxony.336.t_second_conference
+	}
+	title = {
+		trigger = { has_country_flag = SAX_third_wurzburg_conference_flag }
+		text = saxony.336.t_third_conference
+	}
+	desc = {
+		trigger = { NOT = { has_country_flag = SAX_third_wurzburg_conference_flag } }
+		text = saxony.336.d_second_conference
+	}
+	desc = {
+		trigger = { has_country_flag = SAX_third_wurzburg_conference_flag }
+		text = saxony.336.d_third_conference
+	}
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	#Invite both, Austria and Prussia
+	option = {
+		name = saxony.336.a
+		ai_chance = {
+			base = 100
+			modifier = {
+				factor = 0.8
+				OR = {
+					has_completed_focus = SAX_focus_mend_divide
+					has_completed_focus = SAX_focus_strengthen_bond
+				}
+			}
+			modifier = {
+				factor = 0.25
+				OR = {
+					has_completed_focus = SAX_focus_improve_relations_prs
+					has_completed_focus = SAX_focus_improve_relations_aus
+				}
+			}
+		}
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = SAX_third_wurzburg_conference_flag }
+				}
+				AUS = { country_event = { id = saxony.337 days = 7 } }
+				PRS = { country_event = { id = saxony.337 days = 7 } }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = SAX_third_wurzburg_conference_flag
+				}
+				AUS = { country_event = { id = saxony.341 days = 7 } }
+				PRS = { country_event = { id = saxony.341 days = 7 } }
+			}
+		}
+	}
+
+	#Only invite Austria
+	option = {
+		name = saxony.336.b
+		ai_chance = {
+			base = 0
+			modifier = {
+				add = 20
+				has_completed_focus = SAX_focus_deepen_rift
+			}
+			modifier = {
+				add = 60
+				has_completed_focus = SAX_focus_claim_former_saxon_lands
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = SAX_no_invitation_for_prussia_effect_tt
+		add_political_power = -5
+		add_stability = -0.01
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = -0.01
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = SAX_third_wurzburg_conference_flag }
+				}
+				AUS = { country_event = { id = saxony.337 days = 7 } }
+				PRS = { country_event = { id = saxony.338 days = 90 } }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = SAX_third_wurzburg_conference_flag
+				}
+				AUS = { country_event = { id = saxony.341 days = 7 } }
+				PRS = { country_event = { id = saxony.338 days = 90 } }
+			}
+		}
+	}
+
+	#Only invite Prussia
+	option = {
+		name = saxony.336.c
+		ai_chance = {
+			base = 0
+			modifier = {
+				add = 20
+				has_completed_focus = SAX_focus_mend_divide
+			}
+			modifier = {
+				add = 60
+				has_completed_focus = SAX_focus_improve_relations_prs
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = SAX_no_invitation_for_austria_effect_tt
+		add_political_power = -5
+		add_stability = -0.01
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = -0.01
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = SAX_third_wurzburg_conference_flag }
+				}
+				PRS = { country_event = { id = saxony.337 days = 7 } }
+				AUS = { country_event = { id = saxony.338 days = 90 } }
+			}
+			else_if = {
+				limit = {
+					has_country_flag = SAX_third_wurzburg_conference_flag
+				}
+				PRS = { country_event = { id = saxony.341 days = 7 } }
+				AUS = { country_event = { id = saxony.338 days = 90 } }
+			}
+		}
+	}
+
+	#Don't invite the two Great Powers
+	option = {
+		name = saxony.336.e
+		ai_chance = {
+			base = 0
+			modifier = {
+				add = 20
+				OR = {
+					has_completed_focus = SAX_focus_deepen_rift
+					has_completed_focus = SAX_focus_loosen_ties
+				}
+			}
+			modifier = {
+				add = 60
+				OR = {
+					has_completed_focus = SAX_focus_claim_former_saxon_lands
+					has_completed_focus = SAX_focus_neutral_stance
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		custom_effect_tooltip = SAX_no_invitation_for_austria_and_prussia_effect_tt
+		add_political_power = -10
+		add_stability = -0.02
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = -0.02
+		}
+		hidden_effect = {
+			PRS = { country_event = { id = saxony.338 days = 90 } }
+			AUS = { country_event = { id = saxony.338 days = 90 } }
+		}
+	}
+}
+
+#AUS/PRS - Invitation to Conference in Würzburg
+country_event = {
+	id = saxony.337
+	title = saxony.337.t
+	desc = saxony.337.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	#Accept the Invitation
+	option = {
+		name = saxony.337.a
+		ai_chance = {
+			base = 90
+			modifier = {
+				add = -10
+				tag = PRS
+			}
+		}
+		add_political_power = 10
+		SAX = { country_event = { id = saxony.339 days = 7 random_days = 7 } }
+		hidden_effect = {
+			set_country_flag = SAX_attend_second_wurzburg_conference_flag
+		}
+	}
+	
+	#Reject the Invitation
+	option = {
+		name = saxony.337.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 10
+				tag = PRS
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -10
+		SAX = { country_event = { id = saxony.340 days = 7 random_days = 7 } }
+		hidden_effect = {
+			set_country_flag = SAX_reject_second_wurzburg_conference_flag
+		}
+	}
+}
+
+#AUS/PRS - Left out of Würzburg Conference
+country_event = {
+	id = saxony.338
+	title = {
+		trigger = { NOT = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL } }
+		text = saxony.338.t_first_time
+	}
+	title = {
+		trigger = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+		text = saxony.338.t_second_time
+	}
+	desc = {
+		trigger = { NOT = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL } }
+		text = saxony.338.d_first_time
+	}
+	desc = {
+		trigger = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+		text = saxony.338.d_second_time
+	}
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	#Second Würzburg Conference - First Time
+	option = {
+		name = saxony.338.a
+		trigger = {
+			NOT = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+		}
+		ai_chance = { base = 100 }
+		add_political_power = -15
+		add_opinion_modifier = { target = SAX modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+	}
+
+	#Third Würzburg Conference - First or Second Time
+	option = {
+		name = saxony.338.b
+		trigger = {
+			has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL
+		}
+		ai_chance = { base = 100 }
+		add_political_power = -30
+		remove_opinion_modifier = { target = SAX modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+		add_opinion_modifier = { target = SAX modifier = SAX_NO_INVITATION_TO_THIRD_WURZBURG_CONFERENCE_REL }
+	}
+}
+
+#Saxony - AUS/PRS Accepts Invitation to Second Würzburg Conference
+country_event = {
+	id = saxony.339
+	title = saxony.339.t
+	desc = saxony.339.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = saxony.339.a
+		ai_chance = { base = 100 }
+		add_political_power = 5
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = 0.01
+		}
+	}
+}
+
+#Saxony - AUS/PRS Rejects Invitation to Second Würzburg Conference
+country_event = {
+	id = saxony.340
+	title = saxony.340.t
+	desc = saxony.340.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = saxony.340.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = -0.03
+		}
+	}
+}
+
+#AUS/PRS - Invitation to Another Conference in Würzburg
+country_event = {
+	id = saxony.341
+	title = saxony.341.t
+	desc = saxony.341.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	timeout_days = 7
+	
+	#Accept the Invitation
+	option = {
+		name = saxony.341.a
+		ai_chance = {
+			base = 90
+			modifier = {
+				add = -10
+				tag = PRS
+			}
+			modifier = {
+				add = 10
+				has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL
+			}
+		}
+		add_political_power = 15
+		SAX = { country_event = { id = saxony.342 days = 7 random_days = 7 } }
+		hidden_effect = {
+			set_country_flag = SAX_attend_third_wurzburg_conference_flag
+		}
+	}
+	
+	#Reject the Invitation
+	option = {
+		name = saxony.341.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				add = 10
+				tag = PRS
+			}
+			modifier = {
+				add = -10
+				NOT = { has_opinion_modifier = SAX_NO_INVITATION_TO_SECOND_WURZBURG_CONFERENCE_REL }
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -15
+		SAX = { country_event = { id = saxony.343 days = 7 random_days = 7 } }
+		hidden_effect = {
+			set_country_flag = SAX_reject_third_wurzburg_conference_flag
+		}
+	}
+}
+
+#Saxony - AUS/PRS Accepts Invitation to Third Würzburg Conference
+country_event = {
+	id = saxony.342
+	title = saxony.342.t
+	desc = saxony.342.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = saxony.342.a
+		ai_chance = { base = 100 }
+		add_political_power = 5
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = 0.01
+		}
+	}
+}
+
+#Saxony - AUS/PRS Rejects Invitation to Third Würzburg Conference
+country_event = {
+	id = saxony.343
+	title = saxony.343.t
+	desc = saxony.343.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = saxony.343.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = -0.03
 		}
 	}
 }
