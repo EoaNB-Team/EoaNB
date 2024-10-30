@@ -1,18 +1,767 @@
-OTO_balkan_affairs = {
+OTO_decision_category_balkan_affairs = {
+	
+	#Create the Danubian Vilayet
+	OTO_decision_create_danubian_vilayet = {
+
+		icon = constitution
+
+		#allowed = { tag = OTO }
+
+		available = {
+			has_war = no
+			48 = { compliance > 10 }
+			77 = { compliance > 10 }
+			108 = { compliance > 10 }
+			211 = { compliance > 10 }
+			748 = { compliance > 10 }
+			965 = { compliance > 10 }
+			1241 = { compliance > 10 }
+			1273 = { compliance > 10 }
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_balkan_development
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+
+		days_remove = 120
+
+		complete_effect = {
+			unlock_decision_tooltip = OTO_decision_appoint_midhad_pasha
+			add_political_power = -50
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			48 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			77 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			108 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			211 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			748 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			965 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			1241 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			1273 = {
+				add_resistance = -10
+				add_compliance = 10
+			}
+			hidden_effect = {
+				set_country_flag = OTO_danubian_vilayet_established_flag
+			}
+		}
+		
+		remove_effect = {
+			country_event = { id = OTO_events.61 }
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Appoint Midhad Pasha
+	OTO_decision_appoint_midhad_pasha = {
+
+		icon = politics
+
+		#allowed = { tag = OTO }
+
+		available = {
+			has_country_flag = OTO_danubian_vilayet_established_flag
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+
+		cost = 10
+
+		days_remove = 10
+
+		complete_effect = {
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					amount_taken_ideas = {
+						amount < 6
+						slots = {
+							political_advisor
+						}
+					}
+				}
+				activate_advisor = OTO_advisor_midhad_pasha
+			}
+			else = {
+				custom_effect_tooltip = OTO_decision_appoint_midhad_pasha_effect_tt
+				add_stability = 0.05
+			}
+		}
+
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Assimilate Protestants
+	OTO_decision_assimilate_protestants = {
+
+		icon = protestantism
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			#
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_protestant_assimilation
+		}
+
+		fire_only_once = yes
+
+		cost = 25
+		
+		days_remove = 1
+		
+		complete_effect = {
+			#
+		}
+		
+		remove_effect = {
+			add_stability = 0.02
+			every_owned_state = {
+				limit = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v > 0.01 }
+						check_variable = { state_religion_array^i = global.protestant }
+					}
+				}
+				custom_effect_tooltip = OTO_decision_assimilate_protestants_effect_tt
+				set_temp_variable = {
+					type_temp = global.protestant
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Increase Cultural Autonomy
+	OTO_decision_increase_cultural_autonomy = {
+
+		icon = border_war
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_stability > 0.2
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_questions_cultural_autonomy
+			NOT = { has_country_flag = OTO_reduce_cultural_autonomy_flag }
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_command_power_50
+		
+		days_remove = 120
+		
+		complete_effect = {
+			add_command_power = -50
+			hidden_effect = {
+				set_country_flag = OTO_increase_cultural_autonomy_flag
+			}
+		}
+		
+		remove_effect = {
+			add_political_power = -50
+			add_stability = 0.05
+			EOANBSYS_institutions_humanitive_add_five = yes
+			add_popularity = { ideology = centrism popularity = 0.1 }
+			every_owned_state = {
+				limit = {
+					NOT = { is_core_of = OTO }
+				}
+				add_compliance = 15
+				add_resistance = -10
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Reduce Cultural Autonomy
+	OTO_decision_reduce_cultural_autonomy = {
+
+		icon = border_war
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_stability > 0.2
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_questions_cultural_autonomy
+			NOT = { has_country_flag = OTO_increase_cultural_autonomy_flag }
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_command_power_50
+		
+		days_remove = 120
+		
+		complete_effect = {
+			add_command_power = -50
+			hidden_effect = {
+				set_country_flag = OTO_reduce_cultural_autonomy_flag
+			}
+		}
+		
+		remove_effect = {
+			add_political_power = 150
+			add_stability = -0.05
+			EOANBSYS_institutions_humanitive_add_five = yes
+			add_popularity = { ideology = autocracy popularity = 0.1 }
+			every_owned_state = {
+				limit = {
+					NOT = { is_core_of = OTO }
+				}
+				add_compliance = -5
+				add_resistance = 10
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Invite Eugène-Henri Gavand
+	OTO_decision_invite_eugene_henri_gavand = {
+
+		icon = generic_factory
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			NOT = { has_war_with = FRA }
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_hire_foreign_advisors
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 60
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			EOANBSYS_institutions_innovative_add_two = yes
+			hidden_effect = {
+				set_country_flag = OTO_character_eugene_henri_gavand_ready_flag
+			}
+			if = {
+				limit = {
+					amount_taken_ideas = {
+						amount < 6
+						slots = {
+							political_advisor
+						}
+					}
+				}
+				activate_advisor = OTO_advisor_eugene_henri_gavand
+			}
+			else = {
+				custom_effect_tooltip = OTO_decision_invite_eugene_henri_gavand_effect_tt
+				add_tech_bonus = { bonus = 0.25 uses = 1 category = process_engineering_tech }
+				add_tech_bonus = { bonus = 0.25 uses = 1 category = mechanical_engineering_tech }
+			}
+		} 
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Revive the Selanik Mines - SHOULD BE MOVED TO OTHER CATEGORY?
+	OTO_decision_revive_selanik_mines = {
+
+		icon = iron
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_tech = machine_tools_1
+			controls_state = 1274
+		}
+
+		visible = {
+			#has_completed_focus = OTO_focus_revive_siderokavsia
+		}
+
+		fire_only_once = yes
+		
+		highlight_states = {
+			highlight_state_targets = {
+				state = 1274
+			}
+		}
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 180
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			1274 = {
+				add_resource = {
+					type = iron
+					amount = 3
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 1
+			}
+			eoanb_change_prestige_score = yes
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Invest into Tokat Copper Mine
+	OTO_decision_invest_tokat_copper_mine = {
+
+		icon = copper
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_tech = machine_tools_1
+			controls_state = 355
+		}
+
+		visible = {
+			has_country_flag = OTO_invest_into_tokat_copper_mine_flag
+		}
+
+		fire_only_once = yes
+		
+		highlight_states = {
+			highlight_state_targets = {
+				state = 355
+			}
+		}
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 180
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			355 = {
+				add_resource = {
+					type = iron
+					amount = 3
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 1
+			}
+			eoanb_change_prestige_score = yes
+			clr_country_flag = OTO_invest_into_tokat_copper_mine_flag
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Expand the Zonguldak Coal Mine
+	OTO_decision_expand_zonguldak_coal_mine = {
+
+		icon = coal
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_tech = machine_tools_1
+			controls_state = 347
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_mines_act
+		}
+
+		fire_only_once = yes
+		
+		highlight_states = {
+			highlight_state_targets = {
+				state = 347
+			}
+		}
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 180
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			347 = {
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Invite the Prussian Mine Engineer Ernst Weiss
+	OTO_decision_invite_ernst_weiss = {
+
+		icon = coal
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			NOT = { has_war_with = PRS }
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_mines_act
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 60
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				set_country_flag = OTO_character_ernst_weiss_ready_flag
+			}
+			add_opinion_modifier = { target = PRS modifier = eoanb_minor_opinion_boost }
+			reverse_add_opinion_modifier = { target = PRS modifier = eoanb_minor_opinion_boost }
+			if = {
+				limit = {
+					amount_taken_ideas = {
+						amount < 6
+						slots = {
+							political_advisor
+						}
+					}
+				}
+				activate_advisor = OTO_advisor_ernst_weiss
+			}
+			else = {
+				custom_effect_tooltip = OTO_decision_invite_ernst_weiss_effect_tt
+				add_tech_bonus = { bonus = 0.25 uses = 1 category = process_engineering_tech }
+				add_tech_bonus = { bonus = 0.25 uses = 1 category = mechanical_engineering_tech }
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Redistribute the Land
+	OTO_decision_redistribute_the_land = {
+
+		icon = generic_operation
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_full_control_of_state = 48
+			has_full_control_of_state = 211
+			has_full_control_of_state = 1023
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_grace_peasantry
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 120
+
+		modifier = {
+			civilian_factory_use = 1
+		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			48 = {
+				add_extra_state_shared_building_slots = 1
+				add_compliance = 5
+			}
+			211 = {
+				add_extra_state_shared_building_slots = 1
+				add_compliance = 5
+			}
+			1023 = {
+				add_extra_state_shared_building_slots = 1
+				add_compliance = 5
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Support Small and Medium-Sized Landowners
+	OTO_decision_support_landowners = {
+
+		icon = cow
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_full_control_of_state = 48
+			has_full_control_of_state = 211
+			has_full_control_of_state = 1023
+			num_of_civilian_factories_available_for_projects > 0
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_grace_peasantry
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 120
+
+		modifier = {
+			civilian_factory_use = 1
+		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			swap_ideas = {
+				remove_idea = OTO_idea_general_agricultural_funds_1
+				add_idea = OTO_idea_general_agricultural_funds_2
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#The Agrarian Class
+	OTO_decision_the_agrarian_class = {
+
+		icon = generic_factory
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			has_full_control_of_state = 48
+			has_full_control_of_state = 211
+			has_full_control_of_state = 1023
+			num_of_civilian_factories_available_for_projects > 0
+		}
+
+		visible = {
+			has_completed_focus = OTO_focus_agrarian_class
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+		
+		days_remove = 180
+		
+		modifier = {
+			civilian_factory_use = 1
+		}
+		
+		complete_effect = {
+			add_political_power = -50
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			211 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			1023 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			swap_ideas = {
+				remove_idea = OTO_idea_general_agricultural_funds_2
+				add_idea = OTO_idea_general_agricultural_funds_3
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
 	#Strengthen the Serbian Border
-	OTO_mission_bolster_our_defenses_serbia = {
+	OTO_mission_strengthen_serbian_border = {
 
 		icon = fort
 
 		allowed = { always = no }
 
 		available = {
-			OTO = {
-				owns_state = 48
-				owns_state = 108
-			}
+			owns_state = 48
+			owns_state = 108
 			custom_trigger_tooltip = {
-				tooltip = OTO_mission_bolster_our_defenses_serbia_trigger_tt
+				tooltip = OTO_mission_strengthen_serbian_border_trigger_tt
 				hidden_trigger = {
 					48 = {
 						any_province_building_level = {
@@ -54,30 +803,86 @@ OTO_balkan_affairs = {
 		days_mission_timeout = 365
 
 		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				decrease_ps_by_one = yes
-				add_stability = -0.05
-				add_war_support = -0.1
-				add_command_power = -50
-			}
+			add_political_power = -25
+			add_stability = -0.02
+			add_war_support = -0.05
+			add_command_power = -25
+			SER = { add_autonomy_score = { value = 50 } }
 		}
 
 		complete_effect = {
-			add_political_power = 50
-			add_stability = 0.05
-			add_war_support = 0.01
+			add_political_power = 25
+			add_stability = 0.02
+			add_war_support = 0.05
 			add_command_power = 25
+			SER = { add_autonomy_score = { value = -30 } }
 		}
 
 		ai_will_do = {
-			base = 100
+			base = 200
+		}
+	}
+
+	#Construct Forts on the Serbian Border
+	OTO_decision_construct_forts_on_the_serbian_border = {
+
+		icon = fort
+
+		#allowed = { tag = OTO }
+		
+		available = {
+			owns_state = 48
+			owns_state = 108
+		}
+
+		visible = {
+			has_active_mission = OTO_mission_strengthen_serbian_border
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_money_and_command_power_50
+		
+		days_remove = 180
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_command_power = -50
+		}
+		
+		remove_effect = {
+			48 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					instant_build = yes
+					province = 13674 #Vidin
+				}
+			}
+			108 = {
+				add_building_construction = {
+					type = bunker
+					level = 1
+					instant_build = yes
+					province = 9906 #Nis
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
 	
-	#Pernik Coal Mine
+	#The Pernik Coal Mine
 	OTO_decision_pernik_coal_mines = {
 
 		icon = coal
@@ -87,10 +892,10 @@ OTO_balkan_affairs = {
 		available = {
 			has_tech = machine_tools_1
 			set_temp_variable = {
-				amount_of_money_to_check = 0.25
+				amount_of_money_to_check = 1
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
-			controls_state = 48
+			owns_state = 48
 		}
 
 		visible = {
@@ -107,209 +912,25 @@ OTO_balkan_affairs = {
 		
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 180
-		
-		modifier = {
-			consumer_goods_expected_value = 0.02
-		}
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.25 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			add_resource = {
-				type = coal
-				amount = 6
-				state = 48
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Expand the Zonguldak Coalfield
-	OTO_decision_expand_zonguldak_coalfield = {
-
-		icon = coal
-
-		#allowed = { tag = OTO }
-		
-		available = {
-			has_tech = machine_tools_1
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			controls_state = 347
-		}
-
-		visible = {
-			has_completed_focus = OTO_focus_mines_act
-		}
-		
-		highlight_states = {
-			highlight_state_targets = {
-				state = 347
-			}
-		}
-
-		fire_only_once = yes
-		
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 180
-		
-		modifier = {
-			consumer_goods_expected_value = 0.02
-		}
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.25 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			add_resource = {
-				type = coal
-				amount = 3
-				state = 347
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Revive the Siderokavsia
-	OTO_decision_revive_siderokavsia = {
-
-		icon = coal
-
-		#allowed = { tag = OTO }
-		
-		available = {
-			has_tech = machine_tools_1
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			controls_state = 1274
-		}
-
-		visible = {
-			has_completed_focus = OTO_focus_revive_siderokavsia
-		}
-		
-		highlight_states = {
-			highlight_state_targets = {
-				state = 1274
-			}
-		}
-
-		fire_only_once = yes
-		
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 180
-		
-		modifier = {
-			consumer_goods_expected_value = 0.02
-		}
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.25 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			add_resource = {
-				type = iron
-				amount = 2
-				state = 1274
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Invite the Prussian Mine Engineer Ernst Weiss
-	OTO_decision_invite_ernst_weiss = {
-
-		icon = coal
-
-		#allowed = { tag = OTO }
-		
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = OTO_focus_mines_act
-		}
-
-		fire_only_once = yes
-		
-		custom_cost_trigger = {
-			set_temp_variable = {
 				amount_of_money_to_check = 1
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		
-		days_remove = 60
-		
-		modifier = {
-			
-		}
+		days_remove = 180
 
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -1 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
-			add_opinion_modifier = { target = SER modifier = eoanb_minor_opinion_boost }
-			reverse_add_opinion_modifier = { target = SER modifier = eoanb_minor_opinion_boost }
-			OTO_character_ernst_weiss = {
-				add_advisor_role = {
-					advisor = {
-						slot = political_advisor
-						idea_token = OTO_advisor_ernst_weiss
-						research_bonus = {
-							
-						}
-						traits = {
-							OTO_trait_ernst_weiss
-						}
-						ai_will_do = {
-							factor = 5
-						}
-					}
+			48 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = coal_mine
+					level = 1
+					instant_build = yes
 				}
 			}
 		}
@@ -318,130 +939,826 @@ OTO_balkan_affairs = {
 			base = 1000
 		}
 	}
+}
+
+#Ottoman Railway Projects
+OTO_decision_category_railway_projects = {
+
+	#Construct Izmir-Aidyn Railway
+	OTO_decision_construct_izmir_aydin_railway = {
+
+		icon = railway
 	
-	#The Agrarian Class
-	OTO_decision_the_agrarian_class = {
-
-		icon = generic_factory
-
 		#allowed = { tag = OTO }
-		
+	
 		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
+			owns_state = 339
+			owns_state = 342
+			has_completed_focus = OTO_focus_develop_izmir_aydin_railway
 		}
-
+	
 		visible = {
-			has_completed_focus = OTO_focus_agrarien_class
+			owns_state = 339
+			owns_state = 342
 		}
 
 		fire_only_once = yes
 
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.5
+				amount_of_money_to_check = 3
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 280
-		
-		modifier = {
-			consumer_goods_expected_value = 0.05
+
+		days_remove = 400
+	
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 339 }
+				NOT = { owns_state = 342 }
+			}
 		}
-		
+
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			build_railway = {
+				level = 1
+				path = { 4112 7130 10038 9929 }
+				start_province = 4112
+				target_province = 9929
+			}
+			342 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			342 = {
+				add_building_construction = {
+					type = supply_node
+					province = 9929
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#The Ruse-Varna Railway Line
+	OTO_mission_ruse_varna_railway_line = {
+
+		icon = railway
+
+		allowed = { always = no }
+
+		available = { always = no }
+		
+		activation = { always = no }
+
+		priority = 50
+		
+		highlight_states = {
+			highlight_state_targets = {
+				state = 211
+			}
+		}
+
+		fire_only_once = yes
+		
+		is_good = no
+		
+		days_mission_timeout = 1825
+	
+		cancel_trigger = {
+			NOT = { owns_state = 211 }
+		}
+
+		timeout_effect = {
+			#
+		}
+	
+		complete_effect = {
+			build_railway = {
+				level = 1
+				path = { 9612 9769 13744 9783 }
+				start_province = 9612
+				target_province = 9783
+			}
+			211 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+			}
+			country_event = { id = OTO_events.72 days = 3 }
+			hidden_effect = {
+				clr_country_flag = OTO_ruse_varna_railway_british_flag
+				clr_country_flag = OTO_ruse_varna_railway_french_flag
+			}
+		}
+	
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Invite Foreign Experts to Assist Construction
+	OTO_decision_invite_foreign_experts = {
+
+		icon = generic_operation
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_active_mission = OTO_mission_ruse_varna_railway_line
+			OR = {
+				has_country_flag = OTO_ruse_varna_railway_british_flag
+				has_country_flag = OTO_ruse_varna_railway_french_flag
+			}
+		}
+
+		fire_only_once = yes
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.25
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+	
+		days_remove = 90
+	
+		cancel_trigger = {
+			NOT = { has_active_mission = OTO_mission_ruse_varna_railway_line }
+		}
+
+		modifier = {
+			political_power_factor = -0.05
+			political_power_gain = -0.05
+		}
+	
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.25 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
+			add_days_mission_timeout = {
+				mission = OTO_mission_ruse_varna_railway_line
+				days = -150
+			}
+			hidden_effect = {
+				clr_country_flag = OTO_ruse_varna_railway_british_flag
+				clr_country_flag = OTO_ruse_varna_railway_french_flag
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Invest Money to Encourage Faster Construction
+	OTO_decision_invest_more_money = {
+
+		icon = money
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_active_mission = OTO_mission_ruse_varna_railway_line
+		}
+
+		fire_only_once = yes
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+	
+		days_remove = 90
+	
+		cancel_trigger = {
+			NOT = { has_active_mission = OTO_mission_ruse_varna_railway_line }
+		}
+	
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			add_days_mission_timeout = {
+				mission = OTO_mission_ruse_varna_railway_line
+				days = -150
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Use the Local Labor Force for Construction
+	OTO_decision_local_labor_force = {
+
+		#icon = money
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_active_mission = OTO_mission_ruse_varna_railway_line
+		}
+
+		fire_only_once = yes
+	
+		cost = 0
+	
+		days_remove = 90
+	
+		cancel_trigger = {
+			NOT = { has_active_mission = OTO_mission_ruse_varna_railway_line }
+		}
+	
+		complete_effect = {
+			211 = {
+				add_manpower = -1000
+				add_resistance = 5
+			}
+		}
+		
+		remove_effect = {
+			add_days_mission_timeout = {
+				mission = OTO_mission_ruse_varna_railway_line
+				days = -100
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+}
+
+#Rhodope Islamization
+OTO_decision_category_islamization = {
+
+	#Tear down the Orthodox Churches in the Rhodopes
+	OTO_decision_tear_down_orthodox_churches_rhodopes = {
+
+		icon = orthodoxy_no
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			has_full_control_of_state = 184
+			has_full_control_of_state = 964
+			has_full_control_of_state = 1199
+		}
+	
+		visible = {
+			hidden_trigger = {
+				184 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+				964 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+				1199 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+			}
+		}
+
+		fire_only_once = yes
+	
+		custom_cost_trigger = {
+			has_political_power > 39.9
+			command_power > 24.99
+		}
+		custom_cost_text = eoanb_political_power_40_command_power_25
+	
+		days_remove = 180
+
+		days_re_enable = 180
+	
+		cancel_trigger = {
+			NOT = { has_full_control_of_state = 184 }
+			NOT = { has_full_control_of_state = 964 }
+			NOT = { has_full_control_of_state = 1199 }
+		}
+	
+		complete_effect = {
+			add_political_power = -40
+			add_command_power = -25
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = OTO_decision_tear_down_orthodox_churches_rhodopes_effect_tt
+			184 = {
+				add_resistance = 5
+				add_manpower = -400
+
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+			964 = {
+				add_resistance = 5
+				add_manpower = -200
+
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+			1199 = {
+				add_resistance = 5
+				add_manpower = -400
+
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Raid Isolated Bulgarian Settlements
+	OTO_decision_raid_bulgarian_settlements = {
+
+		icon = oppression_bul
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			has_full_control_of_state = 184
+			has_full_control_of_state = 964
+			has_full_control_of_state = 1199
+			num_divisions_in_states = {
+				count > 2
+				states = { 184 964 1199 }
+			}
+		}
+	
+		visible = {
+			hidden_trigger = {
+				184 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+				964 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+				1199 = {
+					any_of = {
+						array = state_religion_array_num
+						value = religion_check_v
+						index = i
+						
+						check_variable = { religion_check_v < 0.6 }
+						check_variable = { state_religion_array^i = global.sunni }
+					}
+				}
+			}
+		}
+	
+		custom_cost_trigger = {
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_command_power_50
+	
+		days_remove = 90
+
+		days_re_enable = 180
+	
+		cancel_trigger = {
+			NOT = { has_full_control_of_state = 184 }
+			NOT = { has_full_control_of_state = 964 }
+			NOT = { has_full_control_of_state = 1199 }
+		}
+	
+		complete_effect = {
+			add_command_power = -50
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = OTO_decision_raid_bulgarian_settlements_effect_tt
+			184 = {
+				add_resistance = 10
+				add_manpower = -800
+
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_culture = yes
+
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+			964 = {
+				add_resistance = 10
+				add_manpower = -400
+
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_culture = yes
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+			1199 = {
+				add_resistance = 10
+				add_manpower = -800
+
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_culture = yes
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.05
+				}
+				pops_decrease_religion = yes
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Establish New Municipal Boundaries
+	OTO_decision_establish_new_municipal_boundaries = {
+
+		icon = administration
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			has_full_control_of_state = 184
+			has_full_control_of_state = 964
+			has_full_control_of_state = 1199
+		}
+	
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+	
+		custom_cost_trigger = {
+			has_political_power > 39.9
+			command_power > 24.99
+		}
+		custom_cost_text = eoanb_political_power_40_command_power_25
+	
+		days_remove = 180
+	
+		cancel_trigger = {
+			NOT = { has_full_control_of_state = 184 }
+			NOT = { has_full_control_of_state = 964 }
+			NOT = { has_full_control_of_state = 1199 }
+		}
+	
+		complete_effect = {
+			add_political_power = -40
+			add_command_power = -25
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = OTO_decision_establish_new_municipal_boundaries_effect_tt
+			184 = {
+				add_compliance = 5
+
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+
+				set_temp_variable = {
+					type_temp = global.sunni
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_increase_religion = yes
+			}
+			964 = {
+				add_compliance = 5
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+
+				set_temp_variable = {
+					type_temp = global.sunni
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_increase_religion = yes
+			}
+			1199 = {
+				add_compliance = 5
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+
+				set_temp_variable = {
+					type_temp = global.sunni
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_increase_religion = yes
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Collect Additional Taxes from Bulgarians
+	OTO_decision_collect_additional_taxes_from_bulgarians = {
+
+		icon = money
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			has_full_control_of_state = 184
+			has_full_control_of_state = 964
+			has_full_control_of_state = 1199
+			num_divisions_in_states = {
+				count > 1
+				states = { 184 964 1199 }
+			}
+		}
+	
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+	
+		custom_cost_trigger = {
+			has_political_power > 39.9
+			command_power > 24.99
+		}
+		custom_cost_text = eoanb_political_power_40_command_power_25
+	
+		days_remove = 90
+	
+		cancel_trigger = {
+			NOT = { has_full_control_of_state = 184 }
+			NOT = { has_full_control_of_state = 964 }
+			NOT = { has_full_control_of_state = 1199 }
+		}
+	
+		complete_effect = {
+			add_political_power = -40
+			add_command_power = -25
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = OTO_decision_collect_additional_taxes_from_bulgarians_effect_tt
+			set_temp_variable = { money_to_gain = 0.5 }
+			add_money_with_tooltip_effect = yes
+			184 = {
+				add_resistance = 5
+
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_culture = yes
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+			}
+			964 = {
+				add_resistance = 5
+				
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_culture = yes
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+			}
+			1199 = {
+				add_resistance = 5
+				
+				set_temp_variable = {
+					type_temp = global.bulgarian
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_culture = yes
+				
+				set_temp_variable = {
+					type_temp = global.orthodoxy
+				}
+				set_temp_variable = {
+					percentage_temp = 0.01
+				}
+				pops_decrease_religion = yes
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Contact Michał Czajkowski
+	OTO_decision_contact_michal_czajkowski = {
+
+		icon = islam
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			has_full_control_of_state = 184
+			has_full_control_of_state = 964
+			has_full_control_of_state = 1199
+		}
+	
+		visible = {
+			NOT = { has_war_with = POL }
+		}
+
+		fire_only_once = yes
+	
+		cost = 50
+	
+		days_remove = 90
+	
+		cancel_trigger = {
+			NOT = { has_full_control_of_state = 184 }
+			NOT = { has_full_control_of_state = 964 }
+			NOT = { has_full_control_of_state = 1199 }
+		}
+		
+		remove_effect = {
+			hidden_effect = {
+				set_country_flag = OTO_character_mehmet_sadyk_pasha_ready_flag
+			}
 			if = {
 				limit = {
-					any_owned_state= {
-						is_in_bulgaria = yes
+					amount_taken_ideas = {
+						amount < 6
+						slots = {
+							political_advisor
+						}
 					}
 				}
+				activate_advisor = OTO_advisor_mehmet_sadyk_pasha
 			}
-			add_offsite_building = { type = industrial_complex level = 1 }
-		} 
-
-		ai_will_do = {
-			base = 1000
+			else = {
+				custom_effect_tooltip = OTO_decision_contact_michal_czajkowski_effect_tt
+				add_stability = 0.03
+			}
+			184 = {
+				add_compliance = 5
+			}
+			964 = {
+				add_compliance = 5
+			}
+			1199 = {
+				add_compliance = 5
+			}
 		}
-
-		cancel_trigger = {
-			
-		}
-	}
 	
-	#Invite Eugène-Henri Gavand to Help with Infrastructure Matters
-	OTO_decision_invite_eugene_gavand = {
-
-		icon = generic_factory
-
-		#allowed = { tag = OTO }
-		
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.15
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = OTO_focus_hire_foreign_advisors
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.15
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 60
-		
-		modifier = {
-			
-		}
-		
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.15 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			EOANBSYS_institutions_innovative_add_two = yes
-			OTO_character_eugene_gavand = {
-				add_advisor_role = {
-					advisor = {
-						slot = political_advisor
-						idea_token = OTO_advisor_eugene_gavand
-						research_bonus = {
-							
-						}
-						traits = {
-							
-						}
-						ai_will_do = {
-							factor = 5
-						}
-					}
-				}
-			}
-		} 
-
 		ai_will_do = {
-			base = 1000
-		}
-
-		cancel_trigger = {
-			
+			base = 200
 		}
 	}
 }
@@ -818,8 +2135,8 @@ OTO_first_consitutional_era={
 #Enforce the Islahat Fermani decision category
 OTO_decision_category_islahat_fermani = {
 
-	#Education mission
-	OTO_mission_step_up_education = {
+	#Improvements in the Education System
+	OTO_mission_improve_education_system = {
 
 		allowed = {
 			always = no
@@ -835,7 +2152,7 @@ OTO_decision_category_islahat_fermani = {
 
 		}
 
-		icon = money
+		icon = education
 
 		is_good = yes
 
@@ -855,10 +2172,10 @@ OTO_decision_category_islahat_fermani = {
 		}
 	}
 
-	#PP for removing days from Education mission
-	OTO_decision_education_invest_pp = {
+	#Use Administrative Resources
+	OTO_decision_use_administrative_resoruces = {
 
-		icon = money
+		icon = administration
 	
 		#allowed = { tag = OTO }
 	
@@ -867,26 +2184,26 @@ OTO_decision_category_islahat_fermani = {
 		}
 	
 		visible = {
-			has_completed_focus = OTO_focus_stepping_up_education
+			has_active_mission = OTO_mission_improve_education_system
 			NOT = {
 				has_idea = open_schools
 			}
 		}
-	
-		days_re_enable  = 14
+
+		fire_only_once = yes
 	
 		cost = 50
 	
 		days_remove = 30
 	
 		cancel_trigger = {
-				
+			NOT = { has_active_mission = OTO_mission_improve_education_system }
 		}
 	
 		remove_effect = {
 			add_days_mission_timeout = {
-				mission = OTO_mission_step_up_education
-				days = -30
+				mission = OTO_mission_improve_education_system
+				days = -200
 			}
 		}
 	
@@ -895,10 +2212,10 @@ OTO_decision_category_islahat_fermani = {
 		}
 	}
 
-	#PP gain for removing days from Education mission
-	OTO_decision_education_invest_pp_cost = {
+	#Remove Bureaucratic Barriers
+	OTO_decision_remove_bureaucratic_barriers = {
 
-		icon = money
+		icon = justice
 	
 		#allowed = { tag = OTO }
 	
@@ -907,30 +2224,31 @@ OTO_decision_category_islahat_fermani = {
 		}
 	
 		visible = {
-			has_completed_focus = OTO_focus_stepping_up_education
+			has_active_mission = OTO_mission_improve_education_system
 			NOT = {
 				has_idea = open_schools
 			}
 		}
-	
-		days_re_enable  = 30
+
+		fire_only_once = yes
 	
 		cost = 0
 	
 		days_remove = 30
 
 		modifier = {
-			political_power_gain = -0.25
+			political_power_gain = -0.5
+			political_power_factor = -0.25
 		}
 	
 		cancel_trigger = {
-				
+			NOT = { has_active_mission = OTO_mission_improve_education_system }
 		}
 	
 		remove_effect = {
 			add_days_mission_timeout = {
-				mission = OTO_mission_step_up_education
-				days = -45
+				mission = OTO_mission_improve_education_system
+				days = -200
 			}
 		}
 	
@@ -939,8 +2257,8 @@ OTO_decision_category_islahat_fermani = {
 		}
 	}
 
-	#Money for removing days from Education mission
-	OTO_decision_education_invest_money_cost = {
+	#Allocate Additional Funding
+	OTO_decision_allocate_additional_funding = {
 
 		icon = money
 	
@@ -951,44 +2269,406 @@ OTO_decision_category_islahat_fermani = {
 		}
 	
 		visible = {
-			has_completed_focus = OTO_focus_stepping_up_education
+			has_active_mission = OTO_mission_improve_education_system
 			NOT = {
 				has_idea = open_schools
 			}
 		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 30
 	
-		days_re_enable  = 60
+		cancel_trigger = {
+			NOT = { has_active_mission = OTO_mission_improve_education_system }
+		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
 	
-		cost = 0
+		remove_effect = {
+			add_days_mission_timeout = {
+				mission = OTO_mission_improve_education_system
+				days = -200
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+}
+
+#Ottoman Military Reforms
+OTO_decision_category_military_reforms = {
+
+	#Expand Arms Production
+	OTO_decision_expand_arms_production_constantinople = {
+
+		icon = generic_factory
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_stepping_up_production
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 400
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			957 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Construct New Arms Factory in Konya
+	OTO_decision_konya_arms_factory = {
+
+		icon = generic_factory
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_open_new_factory_konya
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 400
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			346 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_2
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_2
+					add_idea = OTO_idea_non_existing_arms_industry_3
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_3
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_3
+					add_idea = OTO_idea_non_existing_arms_industry_4
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_4
+				}
+				remove_ideas = OTO_idea_non_existing_arms_industry_4
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Construct New Arms Factory in Adalia
+	OTO_decision_adalia_arms_factory = {
+
+		icon = generic_factory
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_continue_industrialisation_in_ege
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 400
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			342 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_2
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_2
+					add_idea = OTO_idea_non_existing_arms_industry_3
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_3
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_3
+					add_idea = OTO_idea_non_existing_arms_industry_4
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_4
+				}
+				remove_ideas = OTO_idea_non_existing_arms_industry_4
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Construct New Arms Factory in Smyrna
+	OTO_decision_smyrna_arms_factory = {
+
+		icon = generic_factory
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_continue_industrialisation_in_ege
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 400
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			339 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_2
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_2
+					add_idea = OTO_idea_non_existing_arms_industry_3
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_3
+				}
+				swap_ideas = {
+					remove_idea = OTO_idea_non_existing_arms_industry_3
+					add_idea = OTO_idea_non_existing_arms_industry_4
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = OTO_idea_non_existing_arms_industry_4
+				}
+				remove_ideas = OTO_idea_non_existing_arms_industry_4
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Construct Artillery Foundry in Bursa
+	OTO_decision_bursa_artillery_foundry = {
+
+		icon = artillery
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_producing_our_own
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 400
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			340 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			remove_ideas = OTO_idea_non_existing_artillery_industry
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Import British Rifles
+	OTO_decision_import_british_rifles = {
+
+		icon = generic_industry
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			NOT = { has_war_with = ENG }
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_british_rifles
+		}
 
 		custom_cost_trigger = {
 			set_temp_variable = {
 				amount_of_money_to_check = 1
-			  	}
+			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		days_remove = 60
+
+		days_re_enable = 365
 
 		modifier = {
 			political_power_gain = -0.05
 		}
 	
 		cancel_trigger = {
-				
+			has_war_with = ENG				
 		}
 
 		complete_effect = {
-			set_temp_variable = { loan_size = -1 }
-			add_to_variable = { current_loans_sum = loan_size}
-			set_temp_variable = { money_to_gain = loan_size }
-			add_money_with_tooltip_effect = yes
+			ENG = {
+				add_opinion_modifier = {
+					target = OTO
+					modifier = ENG_ottoman_infantry_arms_deal
+				}
+			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 	
 		remove_effect = {
-			add_days_mission_timeout = {
-				mission = OTO_mission_step_up_education
-				days = -45
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1500
+				producer = ENG
 			}
 		}
 	
@@ -997,10 +2677,242 @@ OTO_decision_category_islahat_fermani = {
 		}
 	}
 
-	#Money for removing days from Education mission
-	OTO_decision_construct_izmir_aidyn_railway = {
+	#Import French Rifles
+	OTO_decision_import_french_rifles = {
 
-		icon = money
+		icon = generic_industry
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			NOT = { has_war_with = FRA }
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_french_rifles
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 60
+
+		days_re_enable = 365
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+	
+		cancel_trigger = {
+			has_war_with = FRA				
+		}
+
+		complete_effect = {
+			FRA = {
+				add_opinion_modifier = {
+					target = OTO
+					modifier = fra_ottoman_infantry_arms_deal
+				}
+			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1500
+				producer = FRA
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Import American Rifles
+	OTO_decision_import_american_rifles = {
+
+		icon = generic_industry
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			NOT = { has_war_with = USA }
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_american_rifles
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 120
+
+		days_re_enable = 365
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+	
+		cancel_trigger = {
+			has_war_with = USA				
+		}
+
+		complete_effect = {
+			USA = {
+				add_opinion_modifier = {
+					target = OTO
+					modifier = usa_ottoman_infantry_arms_deal
+				}
+			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			add_equipment_to_stockpile = {
+				type = infantry_equipment
+				amount = 1500
+				producer = USA
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Import German Artillery
+	OTO_decision_import_german_artillery = {
+
+		icon = artillery
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			NOT = { has_war_with = PRS }
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_krupp_guns
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 60
+
+		days_re_enable = 365
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+	
+		cancel_trigger = {
+			has_war_with = PRS				
+		}
+
+		complete_effect = {
+			PRS = {
+				add_opinion_modifier = {
+					target = OTO
+					modifier = PRS_OTTOMAN_ARMS_DEAL
+				}
+			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			add_equipment_to_stockpile = {
+				type = cannon_equipment
+				amount = 60
+				producer = PRS
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Import American Artillery
+	OTO_decision_import_american_artillery = {
+
+		icon = artillery
+	
+		#allowed = { tag = OTO }
+	
+		available = {
+			NOT = { has_war_with = USA }
+		}
+	
+		visible = {
+			has_completed_focus = OTO_focus_american_field_guns
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 120
+
+		days_re_enable = 365
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+	
+		cancel_trigger = {
+			has_war_with = USA				
+		}
+
+		complete_effect = {
+			USA = {
+				add_opinion_modifier = {
+					target = OTO
+					modifier = usa_ottoman_infantry_arms_deal
+				}
+			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+	
+		remove_effect = {
+			add_equipment_to_stockpile = {
+				type = cannon_equipment
+				amount = 60
+				producer = USA
+			}
+		}
+	
+		ai_will_do = {
+			base = 200
+		}
+	}
+	
+	#Expand Constantinopole Shipyards
+	OTO_decision_expand_shipyards_constantinople = {
+
+		icon = generic_factory
 	
 		#allowed = { tag = OTO }
 	
@@ -1009,51 +2921,30 @@ OTO_decision_category_islahat_fermani = {
 		}
 	
 		visible = {
-			has_completed_focus = OTO_focus_develop_izmir_aydin_railway
+			has_completed_focus = OTO_focus_militarise_sirket_hayriye
 		}
-	
-		cost = 0
+
+		fire_only_once = yes
 
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 2
-			  	}
+				amount_of_money_to_check = 3
+			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		days_remove = 400
 
-		modifier = {
-		}
-	
-		cancel_trigger = {				
-		}
-
 		complete_effect = {
-			set_temp_variable = { loan_size = -2 }
-			add_to_variable = { current_loans_sum = loan_size}
-			set_temp_variable = { money_to_gain = loan_size }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 	
 		remove_effect = {
-			build_railway = {
-				level = 1
-				path = { 4112 7130 10038 9929 }
-				start_province = 4112
-				target_province = 9929
-		  	}
-			342 = {
+			957 = {
+				add_extra_state_shared_building_slots = 1
 				add_building_construction = {
-					type = infrastructure
-					level = 1
-					instant_build = yes
-				}
-			}
-			342 = {
-				add_building_construction = {
-					type = supply_node
-					province = 9929
+					type = dockyard
 					level = 1
 					instant_build = yes
 				}
@@ -1287,54 +3178,6 @@ OTO_decision_category_Herzegovinian_uprising = {
 	}
 }
 
-#Create the Danubian Vilayet
-OTO_decision_category_vilayet = {
-	OTO_decision_create_danubian_vilayet = {
-		icon = generic_construction
-		#allowed = { tag = OTO }
-		available = {
-			has_completed_focus = OTO_focus_balkan_development
-			num_of_civilian_factories_available_for_projects > 1
-			#748 = {add_resistance = -5}
-			#1241 = {add_resistance = -5}
-			#77 = {add_resistance = -5}
-			#211 = {add_resistance = -5}
-			#48 = {add_resistance = -5}
-			#1273 = {add_resistance = -5}
-			#965 = {add_resistance = -5}
-			#108 = {add_resistance = -5}
-		}
-		visible = {
-			has_completed_focus = OTO_focus_balkan_development
-		}
-		fire_only_once = yes
-		days_remove = 120
-		modifier = {
-			civilian_factory_use = 1
-		}
-		complete_effect = {
-			country_event = {
-				days = 8
-				id = OTO_events.61
-			}
-			748 = {add_resistance = -5}
-			1241 = {add_resistance = -5}
-			77 = {add_resistance = -5}
-			211 = {add_resistance = -5}
-			48 = {add_resistance = -5}
-			1273 = {add_resistance = -5}
-			965 = {add_resistance = -5}
-			108 = {add_resistance = -5}
-			
-		}
-		remove_effect = {
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-}
-
 #Lebanon Intervention
 OTO_category_lebanon_intervention = {
 	decision_lebanon_arm_marionites = {
@@ -1513,10 +3356,7 @@ eoanb_category_economic = {
 		allowed = { tag = OTO }
 		
 		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 6.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
+			#
 		}
 
 		visible = {
@@ -1540,7 +3380,7 @@ eoanb_category_economic = {
 		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -6.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
@@ -1593,10 +3433,7 @@ eoanb_category_economic = {
 		allowed = { tag = OTO }
 		
 		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
+			#
 		}
 
 		visible = {
@@ -1620,7 +3457,7 @@ eoanb_category_economic = {
 		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -3.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
@@ -1660,10 +3497,7 @@ eoanb_category_economic = {
 		allowed = { tag = OTO }
 		
 		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 6.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
+			#
 		}
 
 		visible = {
@@ -1687,7 +3521,7 @@ eoanb_category_economic = {
 		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -6.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
@@ -1731,10 +3565,7 @@ eoanb_category_economic = {
 		allowed = { tag = OTO }
 		
 		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 6.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
+			#
 		}
 
 		visible = {
@@ -1758,7 +3589,7 @@ eoanb_category_economic = {
 		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -6.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 		
 		remove_effect = {
