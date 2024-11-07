@@ -234,7 +234,7 @@
 # hidden_effect = {
 # set_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag 
 # var:ROOT.afr_empire_politics_foreign_diplomacy_target = { 
-# country_event = { id = afr_empire_politics_foreign_diplomacy_event.1 }
+# country_event = { id = RCE_afr_regional_power.8 }
 # }
 # }
 # }
@@ -554,13 +554,6 @@ eoanb_category_economic = {
 		}
 		ai_will_do = {
 			base = 1
-			#modifier = {
-			#	factor = 0
-			#	has_idea = egy_vic_debt
-			#	check_variable = {
-			#		debt_level > 10
-			#	}
-			#}
 			modifier = {
 				factor = 0
 				tag = PRS
@@ -671,7 +664,7 @@ eoanb_category_economic = {
 		}
 		modifier = {
 			industrial_capacity_dockyard = 0.2
-			civilian_factory_use = 2
+			#civilian_factory_use = 2
 		}
 		ai_will_do = {
 			base = 1
@@ -741,35 +734,18 @@ eoanb_category_economic = {
 			has_stability > 0.5
 			has_tech = interchange_parts
 			num_of_factories > 5
+			set_temp_variable = { loan_size_to_check = 50 }
+			has_less_than_specific_loan_size = yes
 		}
 		fire_only_once = yes
 		days_remove = 700
 		custom_cost_trigger = {
-			if = {
-				limit = {
-					has_idea = egy_vic_debt
-				}
-				check_variable = {
-					debt_level < 50
-				}
-			}
-			else = {
-				has_political_power > 250
-			}
+			set_temp_variable = { amount_of_money_to_check = 1 }
 		}
-		custom_cost_text = eoanb_decision_generic_start_industrializing_cost
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		complete_effect = {
-			hidden_effect = {
-				if = {
-					limit = {
-						has_idea = egy_vic_debt
-					}
-					debt_level_increase_by_10 = yes
-				}
-				else = {
-					add_political_power = -250
-				}
-			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
 		}
 		remove_effect = {
 			custom_effect_tooltip = eoanb_tt_decision_industrializing
@@ -791,13 +767,6 @@ eoanb_category_economic = {
 				factor = 200
 				date > 1880.1.1
 			}
-			modifier = {
-				factor = 0
-				has_idea = egy_vic_debt
-				check_variable = {
-					debt_level > 10
-				}
-			}
 		}
 	}
 	#finish Industrializing
@@ -809,6 +778,8 @@ eoanb_category_economic = {
 			has_tech = mechanical_production_2
 			has_tech = factory_industry_2
 			num_of_factories > 10
+			set_temp_variable = { loan_size_to_check = 50 }
+			has_less_than_specific_loan_size = yes
 		}
 		visible = {
 			has_idea = industrializing
@@ -823,37 +794,18 @@ eoanb_category_economic = {
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			if = {
-				limit = {
-					has_idea = egy_vic_debt
-				}
-				check_variable = {
-					debt_level < 50
-				}
-			}
-			else = {
-				has_political_power > 250
-			}
+			set_temp_variable = { amount_of_money_to_check = 1 }
 		}
-		custom_cost_text = eoanb_decision_generic_industrialiation_cost
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		complete_effect = {
-			hidden_effect = {
-				if = {
-					limit = {
-						has_idea = egy_vic_debt
-					}
-					debt_level_increase_by_20 = yes
-				}
-				else = {
-					add_political_power = -250
-				}
-			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect =  {
 			custom_effect_tooltip = eoanb_tt_decision_industrializing
-			hidden_effect = {
-				swap_ideas = {
-					remove_idea = industrializing
-					add_idea = industrialized
-				}
+			swap_ideas = {
+				remove_idea = industrializing
+				add_idea = industrialized
 			}
 		}
 		ai_will_do = {
@@ -865,13 +817,6 @@ eoanb_category_economic = {
 			modifier = {
 				factor = 200
 				date > 1880.1.1
-			}
-			modifier = {
-				factor = 0
-				has_idea = egy_vic_debt
-				check_variable = {
-					debt_level > 20
-				}
 			}
 		}
 	}
@@ -915,7 +860,7 @@ eoanb_category_economic = {
 	}
 	create_public_works = {
 		icon = GFX_decision_GENERIC_Create_Public_Works
-		days_remove = 60
+		days_remove = 65
 		days_re_enable = 30
 		visible = {
 			check_variable = {
@@ -997,25 +942,14 @@ eoanb_category_economic = {
 			}
 			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
-		remove_effect = {
-			set_temp_variable = {
-				unemployment_value = -0.005
-			}
-			add_unemployment_effect = yes
-			random_owned_state = {
-				limit = {
-					is_controlled_by = ROOT
-					free_building_slots = {
-						building = industrial_complex
-						size > 0
-						include_locked = no
-					}
-				}
-				add_building_construction = {
-					type = industrial_complex
-					level = 1
-					instant_build = yes
-				}
+
+		modifier = {
+			political_power_cost = 1
+			inflation_change = -0.001
+			money_income_factor = -0.1
+			production_speed_buildings_factor = 0.35
+			hidden_modifier = {
+				money_income_factor_from_decisions = -0.1
 			}
 		}
 		ai_will_do = {
@@ -1708,6 +1642,19 @@ eoanb_category_politics_internal = {
 		}
 		complete_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_arrest_opposition_leaders_tt
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				add_political_power = -50
+			}
+			else = {
+				add_political_power = -75
+			}
 			set_country_flag = parl_political_action_in_progress
 		}
 		modifier = {
@@ -1788,6 +1735,19 @@ eoanb_category_politics_internal = {
 		}
 		complete_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_ban_opposition_party_tt
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				add_political_power = -75
+			}
+			else = {
+				add_political_power = -100
+			}
 			set_country_flag = parl_political_action_in_progress
 		}
 		modifier = {
@@ -2657,6 +2617,79 @@ eoanb_category_military = {
 		#Might make the AI do this later
 		ai_will_do = {
 			base = 0
+		}
+	}
+
+	### Switching from Tradtinional Army to Napoleonic army
+	eoanb_decision_advance_to_the_napoleonic_age = {
+		icon = naval_base
+		fire_only_once = yes
+		custom_cost_trigger = {
+			has_political_power > 9.9
+			command_power > 74.99
+		}
+		custom_cost_text = eoanb_political_power_10_command_power_75
+
+		visible = {
+			OR = {
+				has_idea = law_pre_industrial_army
+				has_idea = law_pre_industrial_army_chinese
+			}
+		}
+
+		available = {
+			AND = {
+				OR = {
+					has_idea = law_pre_industrial_army
+					has_idea = law_pre_industrial_army_chinese
+				}
+				AND = {
+					has_tech = vic_army_cloth
+					has_tech = improved_cavalry
+					has_tech = rifle_equipment2
+					OR ={
+						has_tech = rbl_field_gun
+						has_tech = rifled_howitzer
+					}
+				}
+			}
+		}
+
+		days_remove = 180
+
+		modifier = {
+			consumer_goods_expected_value = 0.1
+		}
+
+
+		complete_effect = {
+			add_political_power = -10
+			add_command_power = -75
+		}
+
+		remove_effect = {
+			if = {
+				limit = {
+					has_idea = law_pre_industrial_army
+				}
+				swap_ideas = {
+					remove_idea = law_pre_industrial_army
+					add_idea = doctrine_napoleonic_army_1
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = law_pre_industrial_army_chinese
+				}
+				swap_ideas = {
+					remove_idea = law_pre_industrial_army_chinese
+					add_idea = doctrine_napoleonic_army_1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
 }

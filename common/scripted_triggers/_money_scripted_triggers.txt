@@ -1,3 +1,4 @@
+# MONEY SYSTEM #
 # example usage:
 ## has_taken_a_loan = yes
 has_taken_a_loan = {
@@ -98,8 +99,7 @@ has_less_than_unemployment_value = {
 has_balance_in_positive = {
 	custom_trigger_tooltip = {
 		tooltip = HAS_BALANCE_IN_POSITIVE
-		calculate_money_balance = yes
-		check_variable = { total_balance_temp > 0 }
+		check_variable = { money > 0 }
 	}
 }
 
@@ -108,21 +108,20 @@ has_balance_in_positive = {
 has_balance_in_negative = {
 	custom_trigger_tooltip = {
 		tooltip = HAS_BALANCE_IN_NEGATIVE
-		calculate_money_balance = yes
-		check_variable = { total_balance_temp < 0 }
+		check_variable = { money < 0 }
 	}
 }
 
 # example usage:
 ## set_temp_variable = { income_value = 1 }
 ## has_more_than_income = yes
-has_more_than_income = {
-	custom_trigger_tooltip = {
-		tooltip = HAS_MORE_THAN_INCOME
-		calculate_money_balance = yes
-		check_variable = { income_value < total_balance_temp }
-	}
-}
+#has_more_than_income = {
+#	custom_trigger_tooltip = {
+#		tooltip = HAS_MORE_THAN_INCOME
+#		calculate_money_balance = yes
+#		check_variable = { income_value < total_balance_temp }
+#	}
+#}
 
 # example usage:
 ## calculate_money_balance = yes
@@ -212,27 +211,108 @@ calculate_money_income = {
 	# Tax Affecting Modifiers:
 	calculate_tax_modifiers = yes
 
-	# Consumer Goods Factories:
-	set_temp_variable = { income_from_our_consumer_goods_factories = num_of_civilian_factories }
-	multiply_temp_variable = { income_from_our_consumer_goods_factories = modifier@consumer_goods_factor }
-	round_temp_variable = income_from_our_consumer_goods_factories
+	# Consumer Goods Factories:																										# Example: Prussia
+	set_temp_variable = { income_from_our_consumer_goods_factories = num_of_civilian_factories }									# 10 total civs at game start						= income 10
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = modifier@consumer_goods_expected_value }					# Expected civs at game start 30% (10 x 0.3) 		= income 3
+	round_temp_variable = income_from_our_consumer_goods_factories																	# Nothing to round here								= income 3
 	if = {
 		limit = {
 			check_variable = { income_from_our_consumer_goods_factories < 0 }
 		}
 		set_temp_variable = { income_from_our_consumer_goods_factories = 0 }
 	}
-	multiply_temp_variable = { income_from_our_consumer_goods_factories = 0.3 }
-	multiply_temp_variable = { income_from_our_consumer_goods_factories = 3 } # money is now weekly
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = 0.3 }														# Income decreased to one third (3 x 0.3)			= income 0.9
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = 3 } # money is now weekly									# Income increased by three (0.3 x 3)				= income 2.7
 
 	# Consumer Goods Factories Modifiers:
-	calculate_consumer_goods_modifiers = yes
+	calculate_consumer_goods_modifiers = yes																						# There are modifiers that modify the total income from civs, read below.
 
 	# Free Civilian Factories:
 	set_temp_variable = { income_from_our_free_civilian_factories = num_of_available_civilian_factories }
 	multiply_temp_variable = { income_from_our_free_civilian_factories = 0.08 }
 	multiply_temp_variable = { income_from_our_free_civilian_factories = 3 } # money is now weekly
 	add_to_temp_variable = { total_income_temp = income_from_our_free_civilian_factories }
+
+	# Possible income from tariffs:
+	#if = {
+	#	limit = {
+	#		num_of_factories > num_of_owned_factories
+	#	}
+	#	set_temp_variable = { income_from_tariffs = num_of_factories }
+	#	subtract_from_temp_variable = { income_from_tariffs = num_of_owned_factories }
+	#	if = {
+	#		limit = {
+	#			has_idea = free_trade
+	#		}
+	#		multiply_temp_variable = { income_from_tariffs = 0.05 }
+	#	}
+	#	else_if = {
+	#		limit = {
+	#			has_idea = export_focus
+	#		}
+	#		multiply_temp_variable = { income_from_tariffs = 0.15 }
+	#	}
+	#	else_if = {
+	#		limit = {
+	#			has_idea = limited_exports
+	#		}
+	#		multiply_temp_variable = { income_from_tariffs = 0.3 }
+	#	}
+	#	else_if = {
+	#		limit = {
+	#			has_idea = closed_economy
+	#		}
+	#		multiply_temp_variable = { income_from_tariffs = 0.75 }
+	#	}
+	#}
+	#add_to_temp_variable = { total_income_temp = income_from_tariffs }
+
+	# Possible income from trading goods:
+	#set_temp_variable = { income_from_trading_natural_resources = resource_exported@cotton }
+	#add_to_temp_variable = { income_from_trading_natural_resources = resource_exported@wood }
+	#multiply_temp_variable = { income_from_trading_natural_resources = 0.02 }
+	#
+	#set_temp_variable = { income_from_trading_minerals = resource_exported@coal }
+	#add_to_temp_variable = { income_from_trading_minerals = resource_exported@iron }
+	#multiply_temp_variable = { income_from_trading_minerals = 0.04 }
+	#
+	#set_temp_variable = { income_from_refined_materials = resource_exported@steel }
+	#add_to_temp_variable = { income_from_refined_materials = resource_exported@fabric }
+	#multiply_temp_variable = { income_from_refined_materials = 0.08 }
+	#
+	#set_temp_variable = { income_from_manufactured_goods = resource_exported@machine_parts }
+	#multiply_temp_variable = { income_from_manufactured_goods = 0.16 }
+	#
+	#set_temp_variable = { income_from_trading_goods = income_from_trading_natural_resources }
+	#add_to_temp_variable = { income_from_trading_goods = income_from_trading_minerals }
+	#add_to_temp_variable = { income_from_trading_goods = income_from_refined_materials }
+	#add_to_temp_variable = { income_from_trading_goods = income_from_manufactured_goods }
+	#
+	#if = {
+	#	limit = {
+	#		has_idea = free_trade
+	#	}
+	#	multiply_temp_variable = { income_from_trading_goods = 0.05 }
+	#}
+	#else_if = {
+	#	limit = {
+	#		has_idea = export_focus
+	#	}
+	#	multiply_temp_variable = { income_from_trading_goods = 0.15 }
+	#}
+	#else_if = {
+	#	limit = {
+	#		has_idea = limited_exports
+	#	}
+	#	multiply_temp_variable = { income_from_trading_goods = 0.3 }
+	#}
+	#else_if = {
+	#	limit = {
+	#		has_idea = closed_economy
+	#	}
+	#	multiply_temp_variable = { income_from_trading_goods = 0.75 }
+	#}
+	#add_to_temp_variable = { total_income_temp = income_from_trading_goods }
 
 	# Other Income:
 	set_temp_variable = { income_from_other_sources = modifier@money_income }
@@ -281,17 +361,17 @@ calculate_tax_modifiers = {
 # example usage:
 ## calculate_consumer_goods_modifiers = yes
 calculate_consumer_goods_modifiers = {
-	# Consumer Goods Factories Modifiers:
-	set_temp_variable = { consumer_goods_income_modifier = 1 }
-	add_to_temp_variable = { consumer_goods_income_modifier = modifier@consumer_goods_income_factor }
-	if = {
-		limit = {
+	# Consumer Goods Factories Modifiers:																							# Example: Prussia
+	set_temp_variable = { consumer_goods_income_modifier = 1 }																		# Income modifier at start = 1 (no change at all)	= income modified by 1
+	add_to_temp_variable = { consumer_goods_income_modifier = modifier@consumer_goods_income_factor }								# Income modified by consumer goods income factors (read below):
+	if = {																															# Prussia has two ideas that increase the income from civ factories by
+		limit = {																													# 5% (Zollverein) and 10% (Gewerbefreiheit) respectively - the income modifier is 1.15
 			check_variable = { consumer_goods_income_modifier < 0 }
 		}
 		set_temp_variable = { consumer_goods_income_modifier = 0 }
 	}
-	multiply_temp_variable = { income_from_our_consumer_goods_factories = consumer_goods_income_modifier }
-	add_to_temp_variable = { total_income_temp = income_from_our_consumer_goods_factories }
+	multiply_temp_variable = { income_from_our_consumer_goods_factories = consumer_goods_income_modifier }							# Current income of 2.7 is modified by the factors from ideas etc. - 2.7 x 1.15 = 3.105
+	add_to_temp_variable = { total_income_temp = income_from_our_consumer_goods_factories }											# Income of 3.105 is added to the total income
 
 	# Setting Display Variable:
 	set_temp_variable = { consumer_goods_modifier = modifier@consumer_goods_income_factor }
@@ -431,7 +511,7 @@ calculate_money_expenses = {
 
 	# Interests from Loans:
 	set_temp_variable = { expenses_from_loans = current_loans_sum }
-	divide_temp_variable = { expenses_from_loans = -1000 }
+	divide_temp_variable = { expenses_from_loans = -100 }
 	add_to_temp_variable = { total_expenses_temp = expenses_from_loans }
 
 	# Other Expanses:

@@ -315,7 +315,7 @@ DEN_decision_category_military  = {
 			add_political_power = 50
 			add_stability = 0.05
 			add_war_support = 0.05
-			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = doctrine_victorian_innovative_tech }
+			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = doctrine_napoleonic_innovative_highcommand_tech }
 			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = naval_doctrine }
 		}
 		
@@ -337,30 +337,25 @@ DEN_decision_category_military  = {
 
 		visible = {
 			has_active_mission = DEN_mission_krigsministre_lundbyes_acts
-			NOT = {
-				OR = {
-					has_country_flag = MHC_military_junta_army
-					has_country_flag = MHC_military_junta_airforce
-					has_country_flag = MHC_military_junta_navy
-				}
-			}
 		}
 
 		fire_only_once = yes
 
-		cost = 25
+		custom_cost_trigger = {
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_20_command_power_50
 		
 		days_remove = 180
-
-		modifier = {
-			political_power_gain = -0.1
-		}
 		
 		cancel_trigger = {
 			NOT = { has_active_mission = DEN_mission_krigsministre_lundbyes_acts }
 		}
 		
 		complete_effect = {
+			add_political_power = -20
+			add_command_power = -50
 			add_stability = -0.03
 			decrease_ps_by_one = yes
 		}
@@ -412,7 +407,11 @@ DEN_decision_category_military  = {
 
 		fire_only_once = yes
 
-		cost = 50
+		custom_cost_trigger = {
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_20_command_power_50
 		
 		days_remove = 180
 
@@ -426,6 +425,8 @@ DEN_decision_category_military  = {
 		}
 		
 		complete_effect = {
+			add_political_power = -20
+			add_command_power = -50
 			if = {
 				limit = {
 					has_government = centrism
@@ -602,7 +603,7 @@ DEN_decision_category_military  = {
 			add_political_power = 100
 			add_stability = 0.1
 			add_war_support = 0.1
-			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = doctrine_victorian_innovative_tech }
+			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = doctrine_napoleonic_innovative_highcommand_tech }
 			add_doctrine_cost_reduction = { cost_reduction = 0.25 uses = 1 category = naval_doctrine }
 		}
 	}
@@ -3272,16 +3273,43 @@ DEN_decision_category_economy = {
 
 		fire_only_once = yes
 		
-		cost = 50
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		
 		days_remove = 365
 		 
 		modifier = {
 			political_power_gain = -0.05
-			consumer_goods_expected_value = 0.05
-			production_speed_buildings_factor = -0.05
 		}
-	   
+
+		complete_effect = {
+			if = {
+				limit = { 
+					has_idea = road_spending_level_1 
+				} 
+				swap_ideas = { remove_idea = road_spending_level_1 add_idea = road_spending_level_2 }
+			}
+			else_if = {
+				limit = {
+					has_idea = road_spending_level_2
+				}
+				swap_ideas = { remove_idea = road_spending_level_2 add_idea = road_spending_level_3 } 
+			}
+			else_if = {
+				limit = {
+					has_idea = road_spending_level_3
+				}
+				swap_ideas = { remove_idea = road_spending_level_3 add_idea = road_spending_level_4 } 
+			}
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+			
 		remove_effect = {
 			swap_ideas = { remove_idea = NA_B_small_scale_railways add_idea = NA_B_medium_scale_railways }
 			set_temp_variable = {
@@ -3289,6 +3317,10 @@ DEN_decision_category_economy = {
 			}
 			eoanb_change_prestige_score = yes
 			EOANBSYS_institutions_innovative_add_one = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
 		}
 	   
 		ai_will_do = {
