@@ -1,4 +1,4 @@
-version="0.5.3"
+version="0.5.1"
 tags={
 	"Alternative History"
 	"Events"
@@ -61,6 +61,6 @@ replace_path="scenario_tests"
 replace_path="scenario_tests/effects"
 replace_path="scenario_tests/tests"
 replace_path="scenario_tests/triggers"
-supported_version="1.15.*"
+supported_version="1.14.*"
 path="mod/EOANB/EoaNB"
 remote_file_id="2856963714"
