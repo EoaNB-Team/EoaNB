@@ -20,46 +20,6 @@ on_actions = {
 				add_unemployment_effect = yes
 			}
 			eoanb_political_legitimacy_drift = yes
-			if = {
-				limit = {
-					mhc_system_active_trigger = yes
-					has_capitulated = no
-				}
-				mhc_raise_power_collector = yes
-				mhc_lower_power_collector = yes
- 				mhc_get_results_collector = yes
-				mhc_get_results_effects_collector = yes
-				mhc_junta_collector = yes
-				
-				mhc_alerts_collector = yes
-                
-				if = {
-					limit = {
-						is_ai = yes
-						has_country_flag = mhc_ai_is_active
-					}
-					if = {
-						limit = {
-							NOT = { has_country_flag = mhc_ai_decision_active_army }
-						}
-						mhc_ai_army_initiate_activate = yes
-					}
-					if = {
-						limit = {
-							mhc_airforce_tab_enabled = yes
-							NOT = { has_country_flag = mhc_ai_decision_active_airforce }
-						}
-						mhc_ai_airforce_initiate_activate = yes
-					}
-					if = {
-						limit = {
-							mhc_navy_tab_enabled = yes
-							NOT = { has_country_flag = mhc_ai_decision_active_navy }
-						}
-						mhc_ai_navy_initiate_activate = yes
-					}
-				}
-			}
 		}        
 	}
 	
@@ -123,7 +83,33 @@ on_actions = {
 				}
 				# MONEY SYSTEM #
 				set_temp_variable = { gained_money = 0 }
-				calculate_money_balance = yes # calculates the money
+				if = {
+					limit = {
+						calculate_money_balance = yes # calculates the money
+						OR = {
+							check_variable = { money < 2000000 }
+							NOT = { check_variable = { total_balance_temp > 0 } }
+						}
+						OR = {
+							check_variable = { money > -2000000 }
+							NOT = { check_variable = { total_balance_temp < 0 } }
+						}
+					}
+					set_temp_variable = { gained_money = total_balance_temp }
+					add_to_variable = { money = gained_money }
+				}
+				if = {
+					limit = {
+						check_variable = { money > 2000000 }
+					}
+					set_variable = { money = 2000000 }
+				}
+				else_if = {
+					limit = {
+						check_variable = { money < -2000000 }
+					}
+					set_variable = { money = -2000000 }
+				}
 				if = {
 					limit = {
 						calculate_inflation_change = yes # calculates the inflation change
@@ -199,11 +185,6 @@ on_actions = {
 					clr_country_flag = eoanb_is_bankrolling
 					clear_variable = bankrolled_giving
 				}
-				# update static vars
-				# this is kinda tarded but it works
-				set_variable = { total_income_temp = total_income_temp }
-				set_variable = { total_expenses_temp = total_expenses_temp }
-				set_variable = { total_balance_temp = total_balance_temp }
 			}
 			if = {
 				limit = {
