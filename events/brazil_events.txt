@@ -283,146 +283,170 @@ country_event = {
 		}
  }
 
- country_event = {
-	id = brazil.25
-	title = brazil.25.t
-	desc = {
-		trigger = {	BRA = { has_completed_focus = BRA_direct_intervention}	}
-		text = brazil.25.d
-	}
-	desc = {
-		trigger = {	BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
-		text = brazil.25.d_b
-	}
-	picture = GFX_report_event_amazonas
+country_event = {
+    id = brazil.25
+    title = brazil.25.t
+    desc = {
+        trigger = { BRA = { has_completed_focus = BRA_direct_intervention } }
+        text = brazil.25.d
+    }
+    desc = {
+        trigger = { BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
+        text = brazil.25.d_b
+    }
+    picture = GFX_report_event_amazonas
+    is_triggered_only = yes
 
-	is_triggered_only = yes
+    # Empire historical
+    option = {
+        name = brazil.25.a
+        trigger = { 
+            original_tag = BRA 
+            NOT = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        BRA = {
+            add_political_power = 35
+            load_oob = "BRA_volunteers2"
+            add_equipment_to_stockpile = {
+                type = cavalry_equipment
+                amount = 1000
+                producer = BRA
+            }
+        }
+        declare_war_on = {
+            target = URG
+            type = annex_everything
+        }
+    }
 
-	#  Empire historical
-	option = {
-		name = brazil.25.a
-		trigger = { 
-			original_tag = BRA 
-			NOT={has_completed_focus = BRA_the_second_cisplatine_war}
-		}
-		BRA = {
-			add_political_power = 35
-			load_oob = "BRA_volunteers2"
-			add_equipment_to_stockpile = {
-				type = cavalry_equipment
-				amount = 1000
-				producer = BRA
-			}
-		}
-		declare_war_on = {
-			target = URG
-			type = annex_everything
-		}
-	}
-	option = {#Empire traditionalist
-		name = brazil.25.a2
-		trigger = {
-			original_tag = BRA
-			has_completed_focus = BRA_the_second_cisplatine_war
-		}
-		add_political_power = 35
-		add_manpower = -18000
-		declare_war_on = {
-			target = URG
-			type = annex_everything
-		}
-		declare_war_on = {
-			target = URC
-			type = annex_everything
-		}
-	}
-	##  Uraguay conflict starts 
-	option = { 
-		name = brazil.25.b
-		trigger = { 
-			original_tag = URG 
-			BRA = { NOT={has_completed_focus = BRA_the_second_cisplatine_war }}
-		}
-		add_political_power = -25
-		add_stability = -0.5
-		remove_ideas = {URG_colorado_blanco_war}
-		URC = { ## add BRA desire volunters
-			transfer_state = 1097
-			transfer_state = 1094
-			load_oob = "URC_1857"
-			inherit_technology = URG
-			every_state = {
-				limit = {
-					is_core_of = URG
-				}
-				add_core_of = URC
-			}
-		}
-		declare_war_on = {
-			target = URC
-			type = civil_war
-		}
-		add_civil_war_target = URC
-	}
-	option = {
-		trigger = {
-			original_tag = URG
-			BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
-		}
-		remove_ideas = {URG_colorado_blanco_war}
-		URC = {
-			transfer_state = 1094
-			inherit_technology = URG
-			load_oob = "URC_1857-alt"
-			every_state = {
-				limit = {
-					is_core_of = URG
-				}
-				add_core_of = URC
-			}
-		}
-		URG = {
-			declare_war_on = {
-				target = URC
-				type = civil_war
-			}
-			add_civil_war_target = URC
-		}
-	}
-	option = { #  everyone else
-		name = brazil.25.c
-		trigger = {
-			NOT = { original_tag = URG }
-			NOT = { original_tag = BRA }
-			NOT = { original_tag = ARG }
-		}
-	}
+    option = {#Empire traditionalist
+        name = brazil.25.a2
+        trigger = {
+            original_tag = BRA
+            has_completed_focus = BRA_the_second_cisplatine_war
+        }
+        add_political_power = 35
+        add_manpower = -18000
+        
+        # Create URC first if it doesn't exist
+        if = {
+            limit = { NOT = { country_exists = URC } }
+            URG = {
+                URC = {
+                    transfer_state = 1094
+                    inherit_technology = URG
+                    load_oob = "URC_1857-alt"
+                    every_state = {
+                        limit = {
+                            is_core_of = URG
+                        }
+                        add_core_of = URC
+                    }
+                }
+            }
+        }
+        
+        # Now declare wars after ensuring URC exists
+        declare_war_on = {
+            target = URG
+            type = annex_everything
+        }
+        declare_war_on = {
+            target = URC
+            type = annex_everything
+        }
+    }
 
-	option = { #  Argentinan asstance
-		name = brazil.25.d1
-		trigger = { original_tag = ARG }
-		add_manpower = -2000
-		URC = { add_manpower = 2000 }
-	}
-	option = {
-		name = brazil.25.d2
-		trigger = {
-			original_tag = ARG
-			BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
-		}
-		ARG = {
-			add_manpower = -2000
-		}
-		URC = {
-			add_manpower = 2000
-			load_oob = "URC_army_rebels"
-			add_equipment_to_stockpile = {
-				type = infantry_equipment
-				amount = 1000
-				producer = ARG
-			}
-		}
-	}
+    ##  Uruguay conflict starts 
+    option = { 
+        name = brazil.25.b
+        trigger = { 
+            original_tag = URG 
+            BRA = { NOT = { has_completed_focus = BRA_the_second_cisplatine_war } }
+        }
+        add_political_power = -25
+        add_stability = -0.5
+        remove_ideas = { URG_colorado_blanco_war }
+        URC = { ## add BRA desire volunters
+            transfer_state = 1097
+            transfer_state = 1094
+            load_oob = "URC_1857"
+            inherit_technology = URG
+            every_state = {
+                limit = {
+                    is_core_of = URG
+                }
+                add_core_of = URC
+            }
+        }
+        declare_war_on = {
+            target = URC
+            type = civil_war
+        }
+        add_civil_war_target = URC
+    }
+
+    option = {
+        trigger = {
+            original_tag = URG
+            BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        remove_ideas = { URG_colorado_blanco_war }
+        URC = {
+            transfer_state = 1094
+            inherit_technology = URG
+            load_oob = "URC_1857-alt"
+            every_state = {
+                limit = {
+                    is_core_of = URG
+                }
+                add_core_of = URC
+            }
+        }
+        URG = {
+            declare_war_on = {
+                target = URC
+                type = civil_war
+            }
+            add_civil_war_target = URC
+        }
+    }
+
+    option = { #  everyone else
+        name = brazil.25.c
+        trigger = {
+            NOT = { original_tag = URG }
+            NOT = { original_tag = BRA }
+            NOT = { original_tag = ARG }
+        }
+    }
+
+    option = { #  Argentinan assistance
+        name = brazil.25.d1
+        trigger = { original_tag = ARG }
+        add_manpower = -2000
+        URC = { add_manpower = 2000 }
+    }
+
+    option = {
+        name = brazil.25.d2
+        trigger = {
+            original_tag = ARG
+            BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        ARG = {
+            add_manpower = -2000
+        }
+        URC = {
+            add_manpower = 2000
+            load_oob = "URC_army_rebels"
+            add_equipment_to_stockpile = {
+                type = infantry_equipment
+                amount = 1000
+                producer = ARG
+            }
+        }
+    }
 }
 
 country_event = {
