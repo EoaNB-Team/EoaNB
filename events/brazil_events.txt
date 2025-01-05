@@ -284,146 +284,170 @@ country_event = {
 		}
  }
 
- country_event = {
-	id = brazil.25
-	title = brazil.25.t
-	desc = {
-		trigger = {	BRA = { has_completed_focus = BRA_direct_intervention}	}
-		text = brazil.25.d
-	}
-	desc = {
-		trigger = {	BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
-		text = brazil.25.d_b
-	}
-	picture = GFX_report_event_amazonas
+country_event = {
+    id = brazil.25
+    title = brazil.25.t
+    desc = {
+        trigger = { BRA = { has_completed_focus = BRA_direct_intervention } }
+        text = brazil.25.d
+    }
+    desc = {
+        trigger = { BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
+        text = brazil.25.d_b
+    }
+    picture = GFX_report_event_amazonas
+    is_triggered_only = yes
 
-	is_triggered_only = yes
+    # Empire historical
+    option = {
+        name = brazil.25.a
+        trigger = { 
+            original_tag = BRA 
+            NOT = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        BRA = {
+            add_political_power = 35
+            load_oob = "BRA_volunteers2"
+            add_equipment_to_stockpile = {
+                type = cavalry_equipment
+                amount = 1000
+                producer = BRA
+            }
+        }
+        declare_war_on = {
+            target = URG
+            type = annex_everything
+        }
+    }
 
-	#  Empire historical
-	option = {
-		name = brazil.25.a
-		trigger = { 
-			original_tag = BRA 
-			NOT={has_completed_focus = BRA_the_second_cisplatine_war}
-		}
-		BRA = {
-			add_political_power = 35
-			load_oob = "BRA_volunteers2"
-			add_equipment_to_stockpile = {
-				type = cavalry_equipment
-				amount = 1000
-				producer = BRA
-			}
-		}
-		declare_war_on = {
-			target = URG
-			type = annex_everything
-		}
-	}
-	option = {#Empire traditionalist
-		name = brazil.25.a2
-		trigger = {
-			original_tag = BRA
-			has_completed_focus = BRA_the_second_cisplatine_war
-		}
-		add_political_power = 35
-		add_manpower = -18000
-		declare_war_on = {
-			target = URG
-			type = annex_everything
-		}
-		declare_war_on = {
-			target = URC
-			type = annex_everything
-		}
-	}
-	##  Uraguay conflict starts 
-	option = { 
-		name = brazil.25.b
-		trigger = { 
-			original_tag = URG 
-			BRA = { NOT={has_completed_focus = BRA_the_second_cisplatine_war }}
-		}
-		add_political_power = -25
-		add_stability = -0.5
-		remove_ideas = {URG_colorado_blanco_war}
-		URC = { ## add BRA desire volunters
-			transfer_state = 1097
-			transfer_state = 1094
-			load_oob = "URC_1857"
-			inherit_technology = URG
-			every_state = {
-				limit = {
-					is_core_of = URG
-				}
-				add_core_of = URC
-			}
-		}
-		declare_war_on = {
-			target = URC
-			type = civil_war
-		}
-		add_civil_war_target = URC
-	}
-	option = {
-		trigger = {
-			original_tag = URG
-			BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
-		}
-		remove_ideas = {URG_colorado_blanco_war}
-		URC = {
-			transfer_state = 1094
-			inherit_technology = URG
-			load_oob = "URC_1857-alt"
-			every_state = {
-				limit = {
-					is_core_of = URG
-				}
-				add_core_of = URC
-			}
-		}
-		URG = {
-			declare_war_on = {
-				target = URC
-				type = civil_war
-			}
-			add_civil_war_target = URC
-		}
-	}
-	option = { #  everyone else
-		name = brazil.25.c
-		trigger = {
-			NOT = { original_tag = URG }
-			NOT = { original_tag = BRA }
-			NOT = { original_tag = ARG }
-		}
-	}
+    option = {#Empire traditionalist
+        name = brazil.25.a2
+        trigger = {
+            original_tag = BRA
+            has_completed_focus = BRA_the_second_cisplatine_war
+        }
+        add_political_power = 35
+        add_manpower = -18000
+        
+        # Create URC first if it doesn't exist
+        if = {
+            limit = { NOT = { country_exists = URC } }
+            URG = {
+                URC = {
+                    transfer_state = 1094
+                    inherit_technology = URG
+                    load_oob = "URC_1857-alt"
+                    every_state = {
+                        limit = {
+                            is_core_of = URG
+                        }
+                        add_core_of = URC
+                    }
+                }
+            }
+        }
+        
+        # Now declare wars after ensuring URC exists
+        declare_war_on = {
+            target = URG
+            type = annex_everything
+        }
+        declare_war_on = {
+            target = URC
+            type = annex_everything
+        }
+    }
 
-	option = { #  Argentinan asstance
-		name = brazil.25.d1
-		trigger = { original_tag = ARG }
-		add_manpower = -2000
-		URC = { add_manpower = 2000 }
-	}
-	option = {
-		name = brazil.25.d2
-		trigger = {
-			original_tag = ARG
-			BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
-		}
-		ARG = {
-			add_manpower = -2000
-		}
-		URC = {
-			add_manpower = 2000
-			load_oob = "URC_army_rebels"
-			add_equipment_to_stockpile = {
-				type = infantry_equipment
-				amount = 1000
-				producer = ARG
-			}
-		}
-	}
+    ##  Uruguay conflict starts 
+    option = { 
+        name = brazil.25.b
+        trigger = { 
+            original_tag = URG 
+            BRA = { NOT = { has_completed_focus = BRA_the_second_cisplatine_war } }
+        }
+        add_political_power = -25
+        add_stability = -0.5
+        remove_ideas = { URG_colorado_blanco_war }
+        URC = { ## add BRA desire volunters
+            transfer_state = 1097
+            transfer_state = 1094
+            load_oob = "URC_1857"
+            inherit_technology = URG
+            every_state = {
+                limit = {
+                    is_core_of = URG
+                }
+                add_core_of = URC
+            }
+        }
+        declare_war_on = {
+            target = URC
+            type = civil_war
+        }
+        add_civil_war_target = URC
+    }
+
+    option = {
+        trigger = {
+            original_tag = URG
+            BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        remove_ideas = { URG_colorado_blanco_war }
+        URC = {
+            transfer_state = 1094
+            inherit_technology = URG
+            load_oob = "URC_1857-alt"
+            every_state = {
+                limit = {
+                    is_core_of = URG
+                }
+                add_core_of = URC
+            }
+        }
+        URG = {
+            declare_war_on = {
+                target = URC
+                type = civil_war
+            }
+            add_civil_war_target = URC
+        }
+    }
+
+    option = { #  everyone else
+        name = brazil.25.c
+        trigger = {
+            NOT = { original_tag = URG }
+            NOT = { original_tag = BRA }
+            NOT = { original_tag = ARG }
+        }
+    }
+
+    option = { #  Argentinan assistance
+        name = brazil.25.d1
+        trigger = { original_tag = ARG }
+        add_manpower = -2000
+        URC = { add_manpower = 2000 }
+    }
+
+    option = {
+        name = brazil.25.d2
+        trigger = {
+            original_tag = ARG
+            BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
+        }
+        ARG = {
+            add_manpower = -2000
+        }
+        URC = {
+            add_manpower = 2000
+            load_oob = "URC_army_rebels"
+            add_equipment_to_stockpile = {
+                type = infantry_equipment
+                amount = 1000
+                producer = ARG
+            }
+        }
+    }
 }
 
 country_event = {
@@ -1843,59 +1867,25 @@ country_event = {
 	picture = GFX_report_event_generic_sign_treaty2
 	is_triggered_only = yes
 	option = {
-		trigger = {
-			tag = PAR
-		}
-
-		ai_chance = { base = 50 }
-
 		name = brazil.304.a
 		add_opinion_modifier = { 
 			target = PAR
 			modifier = BRA_trade_treaty
 		}
-		add_opinion_modifier = {
+		add_opinion_modifier = { 
 			target = PAR
 			modifier = BRA_friendship_treaty
 		}
-		add_opinion_modifier = {
-			target = PAR
-			modifier = BRA_boundary_treaty
-		}
 		PAR = {
-			add_opinion_modifier = { 
+			country_event = { id = brazil.305 }
+			add_opinion_modifier = {
 				target = BRA
 				modifier = BRA_trade_treaty
 			}
-			add_opinion_modifier = {
+			add_opinion_modifier = { 
 				target = BRA
 				modifier = BRA_friendship_treaty
 			}
-			add_opinion_modifier = {
-				target = BRA
-				modifier = BRA_boundary_treaty
-			}
-		}
-		BRA = {
-			country_event = { id = brazil.305 days = 0}
-		}
-	}
-	option = {
-		trigger = {
-			tag = PAR
-		}
-
-		ai_chance = {
-			base = 0
-			modifier = {
-				is_historical_focus_on = no
-				add = 50
-			}
-		}
-
-		name = brazil.304.b
-		BRA = {
-			country_event = { id = brazil.326 days = 0}
 		}
 	}
 }
@@ -1918,59 +1908,25 @@ country_event = {
 	picture = GFX_report_event_generic_sign_treaty2
 	is_triggered_only = yes
 	option = {
-		trigger = {
-			tag = ARG
-		}
-		ai_chance = {
-			base = 50
-		}
-
 		name = brazil.306.a
 		add_opinion_modifier = { 
 			target = ARG
 			modifier = BRA_trade_treaty
 		}
-		add_opinion_modifier = {
+		add_opinion_modifier = { 
 			target = ARG
 			modifier = BRA_friendship_treaty
 		}
-		add_opinion_modifier = {
-			target = ARG
-			modifier = BRA_boundary_treaty
-		}
 		ARG = {
+			country_event = { id = brazil.305 }
 			add_opinion_modifier = { 
 				target = BRA
 				modifier = BRA_trade_treaty
 			}
-			add_opinion_modifier = {
+			add_opinion_modifier = { 
 				target = BRA
 				modifier = BRA_friendship_treaty
 			}
-			add_opinion_modifier = {
-				target = BRA
-				modifier = BRA_boundary_treaty
-			}
-		}
-		BRA = {
-			country_event = { id = brazil.307 days = 0}
-		}
-	}
-	option = {
-		trigger = {
-			tag = ARG
-		}
-		ai_chance = {
-			base = 0
-			modifier = {
-				is_historical_focus_on = no
-				add = 50
-			}
-		}
-
-		name = brazil.306.b
-		BRA = {
-			country_event = { id = brazil.325 days = 0}
 		}
 	}
 }
@@ -2545,28 +2501,6 @@ country_event = {
 			}
 			news_event = { id = brazil_news.24 }
 		}
-	}
-}
-
-country_event = {
-	id = brazil.325
-	title = brazil.325.t
-	desc = brazil.325.d
-	picture = GFX_report_event_generic_sign_treaty2
-	is_triggered_only = yes
-	option = {
-		name = brazil.325.a
-	}
-}
-
-country_event = {
-	id = brazil.326
-	title = brazil.326.t
-	desc = brazil.326.d
-	picture = GFX_report_event_generic_sign_treaty2
-	is_triggered_only = yes
-	option = {
-		name = brazil.326.a
 	}
 }
 
@@ -3851,7 +3785,7 @@ country_event = {
 			deactivate_advisor = BRA_viscount_of_caravelas_finance
 			deactivate_advisor = BRA_joao_pedro_dias_vieira_foreign
 			deactivate_advisor = BRA_baron_of_pinto_lima_navy_chief
-			deactivate_advisor = BRA_Henrique_de_Beaurepaire_Rohan_army_chief
+			deactivate_advisor = BRA_henrique_de_beaurepaire_rohan_high_command
     		remove_country_leader_role = { ideology = conserv_liberal }
 			clr_country_flag = brazil_liberal
 		}
@@ -4033,7 +3967,7 @@ country_event = {
 		activate_advisor = BRA_viscount_of_caravelas_finance
 		activate_advisor = BRA_joao_pedro_dias_vieira_foreign
 		activate_advisor = BRA_baron_of_pinto_lima_navy_chief
-		activate_advisor = BRA_Henrique_de_Beaurepaire_Rohan_army_chief
+		activate_advisor = BRA_henrique_de_beaurepaire_rohan_high_command
 	}
 	option = {
 		name = brazil.205.e
