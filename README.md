@@ -97,8 +97,8 @@ If you wish to contribute to the development of the mod, support us on Patreon o
   <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="DEM0"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Imperialism1"><strong>Imperialism</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/37026198" width="80px;" alt="Imperialism"/>
+  <a href = "https://github.com/Syrexx-x"><strong>Syrexx</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/138278445?v=4" width="80px;" alt="Syrexx"/>
 </td>
 <td align="center">
   <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
