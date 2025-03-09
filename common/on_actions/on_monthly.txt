@@ -1,7 +1,7 @@
 on_actions = {
 	on_monthly = {
 		effect = {
-			# UNEMPLOYMENT SYSTEM #
+
 			set_temp_variable = { unemployment_value = modifier@monthly_unemployment_change }
 			if = {
 				limit = {
@@ -20,72 +20,14 @@ on_actions = {
 				add_unemployment_effect = yes
 			}
 			eoanb_political_legitimacy_drift = yes
-		}        
-	}
-	
-	#on_monthly_AUS = {
-	#	effect = {
-	#		if = {
-	#			limit = {
-	#				army_manpower_in_state = {
-	#					amount > 20000
-	#					state = 159
-	#				}
-	#				army_manpower_in_state = {
-	#					amount > 20000
-	#					state = 160
-	#				}
-	#			}
-	#			add_to_variable = {
-	#				AUS_ITA_Unrest_risk_change = -0.01
-	#			}
-	#		}
-	#		if = {
-	#			limit = {
-	#				has_variable = AUS_ITA_Unrest_risk_change
-	#			}
-	#			add_to_variable = {
-	#				ITA_UPROAR_RISK = modifier@AUS_Italian_Uproar_Risk_Modifier
-	#			}
-	#		}
-	#	}
-	#}
-	
-	
-	on_monthly_KOR = {
-		effect = {
-			add_to_variable = { andong_kim_power = modifier@KOR_Angdon_Kim_Modifier }
-		}
-	}
 
-	on_monthly_NOR = {
-		effect = {
-			NOR = {
-				if = {
-					limit = {
-						has_idea = NOR_idea_christiania_repairing
-					}
-
-					add_to_variable = { var = NOR_var_christiana_repairing value = 1.25 }
-					NOR_scripted_effect_christiania_repairing = yes
-				}
-			}
-		}
-	}
-
-	on_monthly = {
-		effect = {
 			if = {
-				limit = {
-					NOT = {
-						has_country_flag = Country_Optimised	#Blacklist or Whitelist (performance is better for whitelist)
-					}
-				}
-				# MONEY SYSTEM #
+				limit = { NOT = { has_country_flag = Country_Optimised } }
+				
 				set_temp_variable = { gained_money = 0 }
 				if = {
 					limit = {
-						calculate_money_balance = yes # calculates the money
+						calculate_money_balance = yes
 						OR = {
 							check_variable = { money < 2000000 }
 							NOT = { check_variable = { total_balance_temp > 0 } }
@@ -99,37 +41,29 @@ on_actions = {
 					add_to_variable = { money = gained_money }
 				}
 				if = {
-					limit = {
-						check_variable = { money > 2000000 }
-					}
+					limit = { check_variable = { money > 2000000 } }
 					set_variable = { money = 2000000 }
 				}
 				else_if = {
-					limit = {
-						check_variable = { money < -2000000 }
-					}
+					limit = { check_variable = { money < -2000000 } }
 					set_variable = { money = -2000000 }
 				}
 				if = {
-					limit = {
-						calculate_inflation_change = yes # calculates the inflation change
-					}
+					limit = { calculate_inflation_change = yes }
 					add_to_variable = { current_inflation = daily_inflation_change }
 					set_variable = { inflation_effect_var = current_inflation }
 					divide_variable = { inflation_effect_var = -10 }
 				}
 				if = {
-					limit = {
-						check_variable = { current_inflation < 0 }
-					}
+					limit = { check_variable = { current_inflation < 0 } }
 					set_variable = { current_inflation = 0 }
 				}
 				else_if = {
-					limit = {
-						check_variable = { current_inflation > 20000 }
-					}
+					limit = { check_variable = { current_inflation > 20000 } }
 					set_variable = { current_inflation = 20000 }
 				}
+				
+
 				if = {
 					limit = {
 						is_ai = no
@@ -150,6 +84,7 @@ on_actions = {
 						set_variable = { automatic_loan_amount = loans_amount }
 					}
 				}
+
 				if = {
 					limit = {
 						is_ai = yes
@@ -157,6 +92,7 @@ on_actions = {
 					}
 					add_to_variable = { money = 200 }
 				}
+
 				if = {
 					limit = {
 						is_ai = yes
@@ -164,38 +100,29 @@ on_actions = {
 					}
 					set_variable = { current_inflation = 0 }
 				}
-				# Bankrolling #
+
 				if = {
 					limit = {
 						has_taken_a_loan = yes
-						has_dynamic_modifier = {
-							modifier = bankrolling_giving_money
-						}
+						has_dynamic_modifier = { modifier = bankrolling_giving_money }
 					}
-					remove_dynamic_modifier = {
-						modifier = bankrolling_giving_money
-					}
-					var:bankrolled = { 
-						remove_dynamic_modifier = {
-							modifier = bankrolling_recieving_money
-						}
+					remove_dynamic_modifier = { modifier = bankrolling_giving_money }
+					var:bankrolled = {
+						remove_dynamic_modifier = { modifier = bankrolling_recieving_money }
 						clear_variable = bankrolled_recieving
 					}
 					clear_variable = bankrolled
 					clr_country_flag = eoanb_is_bankrolling
 					clear_variable = bankrolled_giving
 				}
-			}
+			}  # End Money System block
+
 			if = {
-				limit = {
-					has_taken_a_loan = yes
-				}
+				limit = { has_taken_a_loan = yes }
 				add_ideas = debt_idea
 			}
 			else_if = {
-				limit = {
-					has_idea = bankruptcy
-				}
+				limit = { has_idea = bankruptcy }
 				remove_ideas = debt_idea
 			}
 			else_if = {
@@ -207,4 +134,39 @@ on_actions = {
 			}
 		}
 	}
+
+	on_monthly_KOR = {
+		effect = {
+			add_to_variable = { andong_kim_power = modifier@KOR_Angdon_Kim_Modifier }
+		}
+	}
+
+	on_monthly_NOR = {
+		effect = {
+			NOR = {
+				if = {
+					limit = { has_idea = NOR_idea_christiania_repairing }
+					add_to_variable = { var = NOR_var_christiana_repairing value = 1.25 }
+					NOR_scripted_effect_christiania_repairing = yes
+				}
+			}
+		}
+	}
+
+	# The AUS-specific block remains commented out (can be enabled if needed)
+	# on_monthly_AUS = {
+	# 	effect = {
+	# 		if = {
+	# 			limit = {
+	# 				army_manpower_in_state = { amount > 20000 state = 159 }
+	# 				army_manpower_in_state = { amount > 20000 state = 160 }
+	# 			}
+	# 			add_to_variable = { AUS_ITA_Unrest_risk_change = -0.01 }
+	# 		}
+	# 		if = {
+	# 			limit = { has_variable = AUS_ITA_Unrest_risk_change }
+	# 			add_to_variable = { ITA_UPROAR_RISK = modifier@AUS_Italian_Uproar_Risk_Modifier }
+	# 		}
+	# 	}
+	# }
 }
