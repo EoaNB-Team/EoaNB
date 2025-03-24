@@ -1,4 +1,4 @@
-﻿add_namespace = boer_states
+add_namespace = boer_states
 
 country_event = { #OFS asks for recognition
 	id = boer_states.1
@@ -569,19 +569,25 @@ country_event = { #OFS - UK Mediates peace
 	}
 }
 
-country_event = { #OFS - Boshoff Resigns... again
-	id = boer_states.26
-	title = boer_states.26.t
-	desc = boer_states.26.d
-	is_triggered_only=yes
-	option = { #
-		name = boer_states.26.a
-		ai_chance = { factor = 100 }
-		add_stability = -0.1
-		add_political_power = -100
-		retire_character = OFS_Jacobus_Nicolaas_Boshoff
-		promote_character = OFS_Volksraad
-	}
+country_event = {
+    id = boer_states.26
+    title = boer_states.26.t
+    desc = boer_states.26.d
+    is_triggered_only = yes
+    
+    trigger = {
+        tag = OFS
+    }
+
+    option = {
+        name = boer_states.26.a
+        ai_chance = { factor = 100 }
+        add_stability = -0.1
+        add_political_power = -100
+
+        promote_character = OFS_Volksraad
+        retire_character  = OFS_Jacobus_Nicolaas_Boshoff
+    }
 }
 
 #############################################################
@@ -1111,27 +1117,50 @@ country_event = { #TRV - Schoeman attempts coup
 	}
 }
 
-country_event = { #TRV - Schoeman stars civil war
-	id = boer_states.43
-	title = boer_states.43.t
-	desc = boer_states.43.d
+country_event = {
+    id = boer_states.43
+    title = boer_states.43.t
+    desc = boer_states.43.d
+    is_triggered_only = yes
+    
+    option = {
+        name = boer_states.43.a
+        ai_chance = { factor = 75 }
+        
+        # First release NIR and set it as fully independent
+        TRV = { 
+            release = NIR
+            end_puppet = NIR  # Explicitly end the puppet relationship
+        }
+        
+        # Small delay to ensure independence is processed
+        hidden_effect = {
+            NIR = {
+                country_event = {
+                    id = boer_states.80  # New event for war declaration
+                    days = 1
+                }
+            }
+        }
+        
+        set_country_flag = TRV_civil_War
+    }
+}
 
-	is_triggered_only=yes
-
-	option = {
-		name = boer_states.43.a
-		ai_chance = { factor = 75 }
-		release_puppet = NIR
-		NIR = {
-			declare_war_on = {
-				target = TRV
-				type = annex_everything
-			}
-		}
-		hidden_effect = {
-			set_country_flag = TRV_civil_War
-		}
-	}
+# New event to handle the war declaration after independence
+country_event = {
+    id = boer_states.80
+    title = boer_states.80.t
+    desc = boer_states.80.d
+    hidden = yes
+    is_triggered_only = yes
+    
+    immediate = {
+        declare_war_on = {
+            target = TRV
+            type = annex_everything
+        }
+    }
 }
 
 country_event = { #TRV - Elections are held
