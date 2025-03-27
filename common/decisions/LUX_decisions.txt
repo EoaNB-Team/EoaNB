@@ -1,52 +1,12 @@
 LUX_Industrialization_Luxembourg = {
-
-		LUX_mission_investment = {
-
-		icon = money
-
-		allowed = { always = no }
-
-		available = {
-			always = no
-		}
-
-		activation = { always = no }
-
-		priority = 99
-
-		fire_only_once = yes
-
-		is_good = no
-
-		days_mission_timeout = 350
-
-
-		timeout_effect = {
-
-		}
-
-		complete_effect = {
-			8 = {
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = industrial_complex
-					level = 1
-					instant_build = yes
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
 	
-	LUX_lux_antwerp_route = {
+	#Luxembourg Antwerp Route
+	LUX_decision_lux_antwerp_route = {
 		
-		icon = money
+		icon = railway
 		
 		allowed = {
-			original_tag = LUX
+			#original_tag = LUX
 		}
 		
 		visible = {
@@ -54,7 +14,7 @@ LUX_Industrialization_Luxembourg = {
 		}
 		
 		available = {
-			set_temp_variable = { amount_of_money_to_check = 3 }
+			set_temp_variable = { amount_of_money_to_check = 1.5 }
 			has_specific_amount_of_money = yes
 			has_idea = LUX_Compagnie_Chemins_lest
 		}
@@ -68,8 +28,15 @@ LUX_Industrialization_Luxembourg = {
 		}
 		
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -3 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -1.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
+		}
+		
+		remove_effect = {
 			build_railway = {
 				level = 1
 				fallback = yes
@@ -77,12 +44,18 @@ LUX_Industrialization_Luxembourg = {
 				start_province = 6583
 				target_province = 6537
 			}
+			EOANBSYS_institutions_innovative_add_one = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
 		}
 	}
 	
-	LUX_metz_cologne_route = {
+	#Metz Cologne Route
+	LUX_decision_metz_cologne_route = {
 		
-		icon = money
+		icon = railway
 		
 		allowed = {
 			original_tag = LUX
@@ -109,6 +82,13 @@ LUX_Industrialization_Luxembourg = {
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -2 }
 			add_money_with_tooltip_effect = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
+		}
+		
+		remove_effect = {
 			build_railway = {
 				level = 1
 				fallback = yes
@@ -116,6 +96,11 @@ LUX_Industrialization_Luxembourg = {
 				start_province = 9559
 				target_province = 3547
 			}
+			EOANBSYS_institutions_innovative_add_one = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
 		}
 	}
 	
@@ -406,11 +391,11 @@ LUX_Industrialization_Luxembourg = {
 		#allowed = { tag = LUX }
 		
 		available = {
-			has_completed_focus = LUX_Administrations_Bridges_Roads
+			
 		}
 
 		visible = {
-			#
+			has_completed_focus = LUX_Administrations_Bridges_Roads
 		}
 
 		fire_only_once = yes
@@ -447,13 +432,13 @@ LUX_Industrialization_Luxembourg = {
 		available = {
 			set_temp_variable = { amount_of_money_to_check = 0.1 }
 			has_specific_amount_of_money = yes
+			LUX_Norbert_Metz = {
+				is_hired_as_advisor = yes
+			}
 		}
 
 		visible = {
 			has_completed_focus = LUX_Metz_Foundry
-			LUX_Norbert_Metz = {
-				is_hired_as_advisor = yes
-			}
 		}
 
 		fire_only_once = yes
@@ -819,12 +804,93 @@ LUX_Industrialization_Luxembourg = {
 		}
 	}
 	
-	LUX_lux_Trier_Route = {
+	#Expand Railway Network
+	LUX_mission_railway_expansion = {
+
+		icon = railway
+
+		allowed = { always = no }
+
+		available = {
+			has_railway_level = {
+				state = 8
+				level = 2
+			}
+			custom_trigger_tooltip = { #Metz-Cologne
+				tooltip = LUX_mission_railway_expansion_trigger_tt_1
+				hidden_trigger = {
+					has_railway_connection = {
+						start_province = 9559
+						target_province = 3547
+					}
+				}
+			}
+			custom_trigger_tooltip = { #Luxembourg-Antwerp
+				tooltip = LUX_mission_railway_expansion_trigger_tt_2
+				hidden_trigger = {
+					has_railway_connection = {
+						start_province = 6583
+						target_province = 6537
+					}
+				}
+			}
+			custom_trigger_tooltip = { #Luxembourg-Trier
+				tooltip = LUX_mission_railway_expansion_trigger_tt_3
+				hidden_trigger = {
+					has_railway_connection = {
+						start_province = 6583
+						target_province = 9575
+					}
+				}
+			}
+		}
 		
-		icon = money
+		activation = { always = no }
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 8
+			}
+		}
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1200
+		
+		cancel_trigger = {
+			NOT = { owns_state = 8 }
+		}
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		
+		complete_effect = {
+			8 = { add_extra_state_shared_building_slots = 1 }
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = transport_tech }
+			EOANBSYS_institutions_innovative_add_three = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Luxembourg Trier Route
+	LUX_decision_lux_Trier_Route = {
+		
+		icon = railway
 		
 		allowed = {
-			original_tag = LUX
+			#original_tag = LUX
 		}
 		
 		visible = {
@@ -832,7 +898,7 @@ LUX_Industrialization_Luxembourg = {
 		}
 		
 		available = {
-			set_temp_variable = { amount_of_money_to_check = 2 }
+			set_temp_variable = { amount_of_money_to_check = 1.5 }
 			has_specific_amount_of_money = yes
 		}
 		
@@ -845,8 +911,15 @@ LUX_Industrialization_Luxembourg = {
 		}
 		
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -2 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -1.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
+		}
+		
+		remove_effect = {
 			build_railway = {
 				level = 1
 				fallback = yes
@@ -854,6 +927,91 @@ LUX_Industrialization_Luxembourg = {
 				start_province = 6583
 				target_province = 9575
 			}
+			EOANBSYS_institutions_innovative_add_one = yes
+			set_temp_variable = {
+				unemployment_value = -0.0001
+			}
+			add_unemployment_effect = yes
+		}
+	}
+	
+	#Railway Upgrade
+	LUX_decision_railway_upgrade = {
+
+		icon = railway
+		
+		#allowed = { tag = LUX }
+
+		available = {
+			has_completed_focus = LUX_Prince_Henry_Railway_Company
+			8 = { infrastructure > 7 }
+			has_railway_level = {
+				state = 65
+				level = 2
+			}
+			has_tech = steam_locomotive_3
+			has_tech = standardized_gauge
+			has_tech = train_1855
+		}
+
+		visible = {
+			has_idea = NA_B_small_scale_railways
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 365
+		 
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			if = {
+				limit = {
+					has_idea = road_spending_level_1 
+				}
+				swap_ideas = { remove_idea = road_spending_level_1 add_idea = road_spending_level_2 }
+			}
+			else_if = {
+				limit = {
+					has_idea = road_spending_level_2
+				}
+				swap_ideas = { remove_idea = road_spending_level_2 add_idea = road_spending_level_3 }
+			}
+			else_if = {
+				limit = {
+					has_idea = road_spending_level_3
+				}
+				swap_ideas = { remove_idea = road_spending_level_3 add_idea = road_spending_level_4 }
+			}
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			swap_ideas = { remove_idea = NA_B_small_scale_railways add_idea = NA_B_medium_scale_railways }
+			set_temp_variable = {
+				eoanb_prestige_change = 1
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_one = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+		}
+		
+		ai_will_do = {
+			base = 1000
 		}
 	}
 	
