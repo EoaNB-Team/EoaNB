@@ -1,0 +1,235 @@
+# Dynamic modifier management system from Extremis Ultimis
+# Lotta boilerplate further down in this file, which can be generated from the code for the wiki Modifiers page using ripgrep
+
+####################################
+### DEFINE MODIFIER ARRAYS BELOW ###
+####################################
+
+get_modifiers_array_for_dyn_mod = {
+  clear_temp_array = temp_tokens
+  meta_trigger = {
+    text = { [IDEA_NAME]_return_modifiers = yes }
+    IDEA_NAME = "[?param_token.GetTokenKey]"
+  }
+  all_of = { array = ret_tokens add_to_temp_array = { temp_tokens = v } }
+  clear_temp_array = ret_tokens
+}
+
+get_modifiers_array_for_past_dyn_mod = {
+  clear_temp_array = temp_past_tokens
+  meta_trigger = {
+    text = { [IDEA_NAME]_return_modifiers = yes }
+    IDEA_NAME = "[?param_past_token.GetTokenKey]"
+  }
+  all_of = { array = ret_tokens add_to_temp_array = { temp_past_tokens = v } }
+  clear_temp_array = ret_tokens
+}
+
+RAJ_the_states_army_idea_return_modifiers = {
+  clear_temp_array = ret_tokens
+  #add_to_temp_array = { ret_tokens = token:production_speed_factor }
+  add_to_temp_array = { ret_tokens = token:stability_factor }
+  add_to_temp_array = { ret_tokens = token:planning_speed }
+  add_to_temp_array = { ret_tokens = token:max_planning }
+  add_to_temp_array = { ret_tokens = token:army_org_factor }
+  add_to_temp_array = { ret_tokens = token:army_attack_factor }
+  add_to_temp_array = { ret_tokens = token:army_defence_factor }
+  add_to_temp_array = { ret_tokens = token:supply_consumption_factor }
+  add_to_temp_array = { ret_tokens = token:land_reinforce_rate }
+  add_to_temp_array = { ret_tokens = token:recon_factor }
+}
+
+RAJ_industrialization_idea_return_modifiers = {
+  clear_temp_array = ret_tokens
+  add_to_temp_array = { ret_tokens = token:consumer_goods_factor }
+  add_to_temp_array = { ret_tokens = token:production_factory_max_efficiency_factor }
+  add_to_temp_array = { ret_tokens = token:production_factory_start_efficiency_factor }
+  add_to_temp_array = { ret_tokens = token:research_speed_factor }
+  add_to_temp_array = { ret_tokens = token:production_speed_industrial_complex_factor }
+}
+
+RAJ_agrarianism_idea_return_modifiers = {
+  clear_temp_array = ret_tokens
+  add_to_temp_array = { ret_tokens = token:political_power_factor }
+  add_to_temp_array = { ret_tokens = token:monthly_population }
+  add_to_temp_array = { ret_tokens = token:conscription_factor }
+  add_to_temp_array = { ret_tokens = token:consumer_goods_factor }
+  add_to_temp_array = { ret_tokens = token:research_speed_factor }
+  add_to_temp_array = { ret_tokens = token:global_building_slots_factor }
+  add_to_temp_array = { ret_tokens = token:production_factory_efficiency_gain_factor }
+}
+
+##################
+### INTERNALS ####
+##################
+
+start_dyn_mod = {
+  if = { limit = { check_variable = { param_token = 0 } } log = "Invalid param_token: [?param_token]" always = no }
+  meta_trigger = { # Retrieve the _name companion token for param_token, which is needed because param_token itself is already localized to the token of the dynamic modifier
+    text = { set_temp_variable = { dyn_mod = token:[IDEA_TOKEN]_name } }
+    IDEA_TOKEN = "[?param_token.GetTokenKey]"
+  }
+  if = { limit = { check_variable = { dyn_mod = 0 } } log = "No _name token associated with token \"[?param_token.GetTokenKey]\"" always = no }
+  if = { limit = { NOT = { AND = { get_modifiers_array_for_dyn_mod = yes check_variable = { temp_tokens^num > 0 } } } } log = "No _return_modifiers scripted trigger defined for \"[?param_token.GetTokenKey]\"" always = no }
+  clear_temp_array = temp_prev_vals
+  clear_temp_array = temp_tokens_exclude
+  resize_temp_array = { temp_tokens_exclude = temp_tokens^num }
+  if = { # If this is a new dyn mod, then all variables should start off at 0
+    limit = { check_variable = { param_op = token:new_dyn_mod } }
+    all_of = {
+      array = temp_tokens
+      meta_trigger = { # Prepare the temp variables we will be acting on, to ensure that this works for tooltips
+        text = { 
+          set_temp_variable = { temp_prev_val = 0 }
+          set_temp_variable = { [SUBMOD_TOKEN]_[DYN_MOD_NAME_TOKEN_INT] = temp_prev_val } 
+          add_to_temp_array = { temp_prev_vals = temp_prev_val }
+        }
+        SUBMOD_TOKEN = "[?v.GetTokenKey]"
+        DYN_MOD_NAME_TOKEN_INT = "[?dyn_mod|0]"
+        PARAM_TOKEN_INT = "[?param_token|0]"
+      }
+    }
+  } else_if = { # If this is an existing dyn mod, load the existing values of the variables that control each modifier
+    limit = { check_variable = { param_op = token:change_dyn_mod } }
+    all_of = {
+      array = temp_tokens
+      meta_trigger = { # Prepare the temp variables we will be acting on, to ensure that this works for tooltips
+        text = { 
+          set_temp_variable = { temp_prev_val = [SUBMOD_TOKEN]_[PARAM_TOKEN_INT] }
+          set_temp_variable = { [SUBMOD_TOKEN]_[DYN_MOD_NAME_TOKEN_INT] = temp_prev_val } 
+          add_to_temp_array = { temp_prev_vals = temp_prev_val }
+        }
+        SUBMOD_TOKEN = "[?v.GetTokenKey]"
+        DYN_MOD_NAME_TOKEN_INT = "[?dyn_mod|0]"
+        PARAM_TOKEN_INT = "[?param_token|0]"
+      }
+    }
+  } else_if = { # If we are inheriting from a previous dyn mod, query its variables instead
+    limit = { OR = { check_variable = { param_op = token:transpose_dyn_mod } check_variable = { param_op = token:transmute_dyn_mod } } }
+    if = { limit = { check_variable = { param_past_token = 0 } } log = "Invalid param_past_token: [?param_past_token]" always = no }
+    meta_trigger = { # Retrieve the _name companion token for param_past_token, which is needed because param_past_token itself is already localized to the token of the dynamic modifier
+      text = { set_temp_variable = { past_dyn_mod = token:[IDEA_TOKEN]_name } }
+      IDEA_TOKEN = "[?param_past_token.GetTokenKey]"
+    }
+    if = { limit = { check_variable = { past_dyn_mod = 0 } } log = "No _name token associated with token \"[?param_past_token.GetTokenKey]\"" always = no }
+    if = { limit = { NOT = { AND = { get_modifiers_array_for_past_dyn_mod = yes check_variable = { temp_past_tokens^num > 0 } } } } log = "No _return_modifiers scripted trigger defined for \"[?param_past_token.GetTokenKey]\"" always = no }
+    # Compute the union of the two token sets, along with a parallel array indicating 
+    # whether or not a modifier only exists in the old token set (so should be excluded from the final commit)
+    all_of = { 
+      array = temp_past_tokens 
+      if = { 
+        limit = { NOT = { is_in_array = { temp_tokens = v } } }
+        add_to_temp_array = { temp_tokens = v } 
+        add_to_temp_array = { temp_tokens_exclude = 1 }
+      } 
+    } 
+    all_of = {
+      array = temp_tokens
+      meta_trigger = { # If we are inheriting from a previous dyn mod, query its variables instead
+        text = { 
+          set_temp_variable = { temp_prev_val = [SUBMOD_TOKEN]_[PAST_PARAM_TOKEN_INT] }
+          if = {
+            limit = { check_variable = { temp_tokens_exclude^i = 0 } }
+            set_temp_variable = { [SUBMOD_TOKEN]_[DYN_MOD_NAME_TOKEN_INT] = temp_prev_val }
+          }
+          add_to_temp_array = { temp_prev_vals = temp_prev_val }
+        }
+        SUBMOD_TOKEN = "[?v.GetTokenKey]"
+        DYN_MOD_NAME_TOKEN_INT = "[?dyn_mod|0]"
+        PAST_PARAM_TOKEN_INT = "[?param_past_token|0]"
+      }
+    }
+  } else = { # Invalid param_op
+    log = "Invalid param_op: [?param_op]"
+    always = no
+  }
+}
+
+end_dyn_mod = {
+  clear_temp_array = temp_new_vals
+  all_of = { # Populate the new vals array with the values put in by the user during the clause
+    array = temp_tokens
+    if = { # But only do this for tokens that are actually supposed to be present in the resulting dynmod's set.
+      limit = { check_variable = { temp_tokens_exclude^i = 0 } }
+      meta_trigger = { # Pull from the temp variables instead of the real ones, or else it won't work for tooltips
+        text = { add_to_temp_array = { temp_new_vals = [SUBMOD_TOKEN]_[DYN_MOD_NAME_TOKEN_INT] } }
+        SUBMOD_TOKEN = "[?v.GetTokenKey]"
+        PARAM_TOKEN_INT = "[?param_token|0]"
+        DYN_MOD_NAME_TOKEN_INT = "[?dyn_mod|0]"
+      }
+    } else = { # If it's excluded, then we're supposed to present it as being zeroed out
+      add_to_temp_array = { temp_new_vals = 0 }
+    }
+  }
+  # Filter out the tokens of the modifiers that didn't change so they don't end up in the tooltip
+  clear_temp_array = final_tokens
+  clear_temp_array = final_prev_vals
+  clear_temp_array = final_new_vals
+  all_of = {
+    array = temp_tokens
+    set_temp_variable = { temp_difference = temp_new_vals^i }
+    subtract_from_temp_variable = { temp_difference = temp_prev_vals^i }
+    if = {
+      limit = { NOT = { check_variable = { temp_difference = 0 } } }
+      add_to_temp_array = { final_tokens = v }
+      add_to_temp_array = { final_prev_vals = temp_prev_vals^i }
+      add_to_temp_array = { final_new_vals = temp_new_vals^i } 
+    }
+  }
+}
+
+remove_dyn_mod_trigger = {
+  if = { limit = { check_variable = { param_token = 0 } } log = "Invalid param_token: [?param_token]" always = no }
+  meta_trigger = { # Retrieve the _name companion token for param_token, which is needed because param_token itself is already localized to the token of the dynamic modifier
+    text = { set_temp_variable = { dyn_mod = token:[IDEA_TOKEN]_name } }
+    IDEA_TOKEN = "[?param_token.GetTokenKey]"
+  }
+  if = { limit = { check_variable = { dyn_mod = 0 } } log = "No _name token associated with token \"[?param_token.GetTokenKey]\"" always = no }
+  if = { limit = { NOT = { AND = { get_modifiers_array_for_dyn_mod = yes check_variable = { temp_tokens^num > 0 } } } } log = "No _return_modifiers scripted trigger defined for \"[?param_token.GetTokenKey]\"" always = no }
+  clear_temp_array = temp_prev_vals
+  clear_temp_array = temp_new_vals
+  all_of = { # Load the values from the country scope
+    array = temp_tokens
+    add_to_temp_array = { temp_prev_vals = 0 } # No prev values since we want to report the absolute values
+    meta_trigger = { # Pull from the temp variables instead of the real ones, or else it won't work for tooltips
+      text = { add_to_temp_array = { temp_new_vals = [SUBMOD_TOKEN]_[PARAM_TOKEN_INT] } }
+      SUBMOD_TOKEN = "[?v.GetTokenKey]"
+      PARAM_TOKEN_INT = "[?param_token|0]"
+    }
+  }
+  # Filter out the tokens of the modifiers that are set to 0 so they don't end up in the tooltip
+  clear_temp_array = final_tokens
+  clear_temp_array = final_prev_vals
+  clear_temp_array = final_new_vals
+  all_of = {
+    array = temp_tokens
+    set_temp_variable = { temp_difference = temp_new_vals^i }
+    subtract_from_temp_variable = { temp_difference = temp_prev_vals^i }
+    if = {
+      limit = { NOT = { check_variable = { temp_difference = 0 } } }
+      add_to_temp_array = { final_tokens = v }
+      add_to_temp_array = { final_prev_vals = temp_prev_vals^i }
+      add_to_temp_array = { final_new_vals = temp_new_vals^i } 
+    }
+  }
+}
+
+#############################################
+### DEFINE MODIFIER CHARACTERISTICS BELOW ###
+#############################################
+
+modifier_is_flat = {
+  is_in_array = { global.flat_modifiers = temp_modifier }
+}
+
+modifier_is_boolean = { 
+  is_in_array = { global.boolean_modifiers = temp_modifier }
+}
+
+modifier_is_negative = { 
+  is_in_array = { global.negative_modifiers = temp_modifier }
+}
+
+modifier_is_ambivalent = { 
+  is_in_array = { global.ambivalent_modifiers = temp_modifier }
+}
