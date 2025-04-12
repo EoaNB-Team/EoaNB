@@ -96,15 +96,12 @@ country_event = {
 		GRE_provisional_goverment = {
 			add_country_leader_role = {
 				country_leader = {
-					expire = "1899.1.1"
 					ideology = despotism
-					traits = {
-						#
-					}
+					desc = "POLITICS_GENERIC_EOANB_DESC"
+					expire = "1999.5.11.1"
+					traits = { GRE_trait_three_men_comitee }
 				}
 			}
-			promote_character = yes
-			promote_character = autocracy
 		}
 		complete_national_focus = GRE_nation_divided
 		add_ideas = {
@@ -114,6 +111,7 @@ country_event = {
 			GRE = {
 				white_peace = AOR
 				set_state_owner = 186
+				set_state_owner = 47
 			}
 		}
 	}
@@ -265,7 +263,7 @@ country_event = { #Alfred for King - UK
 				is_historical_focus_on = yes
 			}
 		}
-		
+		custom_effect_tooltip = historical_option
 		GRE = {	
 			country_event = {
 				id = greece.8 #Alfred does not become King 
@@ -301,13 +299,22 @@ country_event = { #Alfred not King
 	
 	is_triggered_only = yes 	
 
-	
 	option = { #King George chosen 
 		name = greece.8.a 
 		
 		GRE = {	
 			country_event = {
 				id = greece.9 #George chosen  
+				days = 50 
+			}
+		}
+	}
+	option = { #King Leopold chosen 
+		name = greece.8.b
+		
+		GRE = {	
+			country_event = {
+				id = greece.10 #Leopold chosen  
 				days = 50 
 			}
 		}
@@ -1148,41 +1155,48 @@ country_event = {
 		retire_character = GRE_dimitrios_grivas
 	}
 }
-
+ #Assasination Attempt on Queen Amalia
 country_event = {
 	id = greece.31
-	title = greece.31.t #Assasination Attempt on Queen Amalia  
+	title = greece.31.t
 	desc = greece.31.d 
 	picture = GFX_report_event_gre_amalia_1 
 
 	fire_only_once = yes
-	
-	trigger = {
-		TAG = GRE
-		date > 1861.08.29 
-		GRE = {
-			check_variable = {
-				var = GRE_otto_support_var
-				value = 0
-				compare = greater_than_or_equals 
-			}	 
-		}		
-	}	
-	
-	option = {
-		 name = greece.31.a #  
-		 
-		 hidden_effect = {
-			GRE = {
-				subtract_from_variable = {
-					var = GRE_otto_support_var
-					value = 1
-				}
-			}
-		}	
-	} 
-}
 
+	#Sentence the shooter to death
+	option = {
+		 name = greece.31.a
+
+		subtract_from_variable = {
+			var = GRE_otto_support_var
+			value = 4
+		}
+		add_stability = 0.5
+		custom_effect_tooltip = GRE_amalia_assasination_atempt_tt
+	}
+	#Let the shooter live freely
+	option = {
+		 name = greece.31.b
+
+		country_event = {
+			id = greece.97
+			days = 55
+		}
+		custom_effect_tooltip = GRE_amalia_assasination_atempt_tt
+	}
+	option = {
+		 name = greece.31.c
+
+		custom_effect_tooltip = historical_option
+		add_to_variable = {
+			var = GRE_otto_support_var
+			value = 1
+		}
+		add_stability = -0.01
+		custom_effect_tooltip = GRE_amalia_assasination_atempt_tt
+	}
+}
  #The famous tobacco Company George karelias and sons is founded
 country_event = {
 	id = greece.32
@@ -2708,8 +2722,7 @@ country_event = { #Otto dead
 					expire = "1999.5.11.1"
 					traits = { GRE_trait_three_men_comitee }
 				}
-			}			
-			
+			}
 		}
 		complete_national_focus = GRE_ottos_expulsion
 		GRE = {
@@ -2793,11 +2806,7 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 
-	option = { 
-		name = greece.92.a
-
-		decrease_ps_by_one = yes
-
+	immediate = {
 		hidden_effect = {
 			GRE = {
 				start_civil_war = {
@@ -2813,6 +2822,7 @@ country_event = {
 				set_province_controller = 7127
 				set_province_controller = 11895
 				set_province_controller = 5078
+				activate_mission = GRE_stop_the_insurgents_in_epirus
 			}
 			random_other_country = {	# Needed to define tag
 				limit = {
@@ -2853,9 +2863,23 @@ country_event = {
 						}
 					}
 				}
+				activate_mission = AOR_mission_dethrone_otto
 			}
 		}
-		activate_mission = GRE_stop_the_insurgents_in_epirus
+	}
+
+	option = { 
+		name = greece.92.a
+
+		decrease_ps_by_one = yes
+
+	}
+	option = { 
+		name = greece.92.b
+
+		decrease_ps_by_one = yes
+		AOR = { change_tag_from = ROOT }
+		set_country_flag = GRE_player_is_aor_flag
 	}
 }
 #The uprising spreads to Peloponnese
@@ -2926,6 +2950,27 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 
+	immediate = {
+		hidden_effect = {
+			if = {
+				limit = { has_country_flag = GRE_player_is_aor_flag }
+			}
+			AOR = {
+				set_province_controller = 4109
+				1251 = {
+					create_unit = {
+						division = "name = \"Greek Infantry Battalion\" division_template = \"Greek Infantry Battalion\" start_experience_factor = 0.1 start_equipment_factor = 1"
+						owner = AOR
+					}
+					create_unit = {
+						division = "name = \"Greek Infantry Battalion\" division_template = \"Greek Infantry Battalion\" start_experience_factor = 0.1 start_equipment_factor = 1"
+						owner = AOR
+					}
+				}
+			}
+		}
+	}
+
 	#There is nothing we can do
 	option = { 
 		name = greece.94.a
@@ -2948,8 +2993,143 @@ country_event = {
 
 		add_stability = -0.05
 		add_war_support = 0.1
+		activate_mission = GRE_stop_the_revolution
+		add_ideas = GRE_idea_for_the_king
+		AOR = { add_ideas = AOR_idea_for_the_freedom }
+	}
+}
+#Athenians rebels against Otto I of Greece	For ENG
+country_event = {
+	id = greece.95
+	title = greece.95.t			
+	desc = greece.95.d
 
-		
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Greece needs to be protected!
+	option = { 
+		name = greece.95.a
+
+		GRE = {
+			country_event = { id = greece.96 days = 3 }
+		}
+		custom_effect_tooltip = historical_option
+	}
+	#This doesn't concern us
+	option = { 
+		name = greece.95.b
+
+		GRE = {
+			country_event = { id = greece.3 days = 3 }
+		}
+	}
+}
+#An Offer from the British?
+country_event = {
+	id = greece.96
+	title = greece.96.t			
+	desc = greece.96.d
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Accept it
+	option = { 
+		name = greece.96.a
+
+		GRE = {
+			country_event = { id = greece.3 days = 1 }
+		}
+		custom_effect_tooltip = historical_option
+	}
+	#We should listen to Amalia
+	option = { 
+		name = greece.96.b
+
+		GRE = {
+			country_event = { id = greece.97 days = 2 }
+		}
+		activate_mission = GRE_stop_the_revolution
+		add_ideas = GRE_idea_for_the_king
+		AOR = { add_ideas = AOR_idea_for_the_freedom }
+	}
+}
+#Rising tensions in Amalia's Proximity
+country_event = {
+	id = greece.97
+	title = greece.97.t
+	desc = greece.97.d 
+	picture = GFX_report_event_gre_amalia_1 
+
+	fire_only_once = yes
+
+	#Worrying
+	option = {
+		 name = greece.97.a
+
+		subtract_from_variable = {
+			var = GRE_otto_support_var
+			value = 1
+		}
+		add_stability = -0.5
+	}
+}
+#The Government supports Amalia
+country_event = {
+	id = greece.98
+	title = greece.98.t
+	desc = greece.98.d 
+	picture = GFX_report_event_gre_amalia_1 
+
+	fire_only_once = yes
+
+	#nice
+	option = {
+		 name = greece.98.a
+
+		add_to_variable = {
+			var = GRE_otto_support_var
+			value = 1
+		}
+	}
+}
+#Public Demonstrations in defense of Amalia 
+country_event = {
+	id = greece.99
+	title = greece.99.t
+	desc = greece.99.d 
+	picture = GFX_report_event_gre_amalia_1 
+
+	fire_only_once = yes
+
+	#nice
+	option = {
+		 name = greece.99.a
+
+		add_to_variable = {
+			var = GRE_otto_support_var
+			value = 3
+		}
+	}
+}
+#Public Demonstrations in defense of Amalia 
+country_event = {
+	id = greece.100
+	title = greece.100.t
+	desc = greece.100.d 
+	picture = GFX_report_event_gre_amalia_1 
+
+	fire_only_once = yes
+
+	#nice
+	option = {
+		 name = greece.100.a
+
+		add_to_variable = {
+			var = GRE_otto_support_var
+			value = 1
+		}
 	}
 }
 #Question of Phalanx  
