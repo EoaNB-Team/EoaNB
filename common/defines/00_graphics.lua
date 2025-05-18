@@ -608,6 +608,7 @@ NAirGfx = {
 	AIRPLANES_BANK_STRENGTH = 210.0, 				-- Multiplier of how much the curve affects the wings banking. (angle limited by the following value)
 	AIRPLANES_BANK_ANGLE_LIMIT = 55.0, 				-- Bank angle limit.
 	AIRPLANES_GROUND_COLLISION_OFFSET_Y = -5.0, 		-- Lets the 3d airplanes disappear after going a bit under the ground.
+	AIRPLANES_GROUND_EXPLOSION_TIME_DELAY = 0.6,	-- Time in seconds to play explosion animation when plane hit ground before the plane entity is deleted
 	AIRPLANES_1_FIGHTER_PATROL_ANIM = 1, 			-- Number of fighters needed for a single instance of this animation
 	AIRPLANES_3_FIGHTER_PATROL_ANIM = 3,			-- Number of fighters needed for a single instance of this animation
 	AIRPLANES_1_BOMBER_BOMBING_ANIM = 1, 			-- Number of bombers needed for a single instance of this animation
