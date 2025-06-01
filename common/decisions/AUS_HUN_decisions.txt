@@ -5379,6 +5379,80 @@ AUH_decision_category_reichsrat = {
 		}
 	}
 
+	# Semi-Trialism for Bohemia
+	AUS_mission_semi_trialism_for_bohemia = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_voting_mission_tt
+			}
+			hidden_trigger = {
+				always = no
+			}
+		}
+		activation = { always = no }
+		priority = 100
+		fire_only_once = yes
+		is_good = yes
+		days_mission_timeout = 220
+		timeout_effect = {
+			AUS_decide_parliament_votes = yes
+			clear_variable = AUS_bribe_reveal_chance
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	# The Inevitable...
+	AUS_mission_the_inevitable = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			NOT = {
+				has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
+			}
+		}
+		activation = { always = no }
+		priority = 100
+		fire_only_once = yes
+		is_good = yes
+		days_mission_timeout = 80
+		timeout_effect = {
+			complete_national_focus = AUS_the_liberals_back_away_from_our_government
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	# Vote On The Status Of The Bohemian Crownland
+	AUS_mission_vote_on_the_status_of_the_bohemian_crownland = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_voting_mission_tt
+			}
+			hidden_trigger = {
+				always = no
+			}
+		}
+		activation = { always = no }
+		priority = 100
+		fire_only_once = yes
+		is_good = yes
+		days_mission_timeout = 180
+		timeout_effect = {
+			AUS_decide_parliament_votes = yes
+			clear_variable = AUS_bribe_reveal_chance
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
 	### General Decisions ###
 
 	# Meet with the Liberal representatives
@@ -5393,7 +5467,7 @@ AUH_decision_category_reichsrat = {
 		visible = {
 			AND = {
 				OR = {
-					# And all the other missions except "The Big Day..."
+					has_active_mission = AUS_mission_semi_trialism_for_bohemia
 				}
 				OR = {
 					has_country_leader = {
@@ -5450,7 +5524,7 @@ AUH_decision_category_reichsrat = {
 		visible = {
 			AND = {
 				OR = {
-					# And all the other missions except "The Big Day..."
+					has_active_mission = AUS_mission_semi_trialism_for_bohemia
 				}
 				NOT = {
 					OR = {
@@ -5508,7 +5582,7 @@ AUH_decision_category_reichsrat = {
 
 		visible = {
 			OR = {
-				# And all the other missions except "The Big Day..."
+				has_active_mission = AUS_mission_semi_trialism_for_bohemia
 			}
 		}
 
@@ -5553,7 +5627,7 @@ AUH_decision_category_reichsrat = {
 
 		visible = {
 			OR = {
-				# And all the other missions except "The Big Day..."
+				has_active_mission = AUS_mission_semi_trialism_for_bohemia
 			}
 		}
 
@@ -5602,7 +5676,7 @@ AUH_decision_category_reichsrat = {
 		visible = {
 			OR = {
 				has_active_mission = AUS_mission_the_big_day
-				# And all the other missions
+				has_active_mission = AUS_mission_semi_trialism_for_bohemia
 			}
 		}
 
@@ -5618,7 +5692,7 @@ AUH_decision_category_reichsrat = {
 			set_temp_variable = { money_to_gain = -1.5 }
 			add_money_with_tooltip_effect = yes
 			add_timed_idea = {
-				idea = AUS_minor_corruption
+				idea = AUS_idea_minor_corruption
 				days = 80
 			}
 		}
@@ -5732,8 +5806,8 @@ AUH_decision_category_reichsrat = {
 					}
 				}
 				swap_ideas = {
-					remove_idea = AUS_minor_corruption
-					add_idea = AUS_major_corruption_scandal
+					remove_idea = AUS_idea_minor_corruption
+					add_idea = AUS_idea_major_corruption_scandal
 				}
 			}
 		}
@@ -5908,6 +5982,148 @@ AUH_decision_category_reichsrat = {
 						var = AUS_random_support
 						min = 0.20
 						max = 0.25
+					}
+					add_to_variable = {
+						var = AUS_proposal_support
+						value = AUS_random_support
+					}
+					clamp_variable = {
+						var = AUS_proposal_support
+						min = 0
+						max = 1
+					}
+				}
+			}
+		}
+	}
+
+	# Rally The Conservative Support
+	AUS_decision_rally_the_conservative_support = { 
+		available = { 
+			custom_trigger_tooltip = {
+				tooltip = AUS_reichsrat_decision_ongoing_tt
+				NOT = { has_country_flag = AUS_reichsrat_decision_ongoing }
+			}
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
+		}
+
+		cost = 50
+		days_remove = 20
+		days_re_enable = 15
+
+		complete_effect = {
+			set_country_flag = AUS_reichsrat_decision_ongoing
+		}
+		
+		remove_effect = {
+			clr_country_flag = AUS_reichsrat_decision_ongoing
+			add_days_mission_timeout = {
+				mission = AUS_mission_the_inevitable
+				days = 30
+			}
+			custom_effect_tooltip = AUS_give_support_ten_tt
+			hidden_effect = {
+				add_to_variable = {
+					var = AUS_proposal_support
+					value = 10
+				}
+				clamp_variable = {
+					var = AUS_proposal_support
+					min = 0
+					max = 1
+				}
+			}
+		}
+	}
+
+	# Strike A Deal With The Liberals
+	AUS_decision_strike_a_deal_with_the_liberals = { 
+		available = { 
+			custom_trigger_tooltip = {
+				tooltip = AUS_reichsrat_decision_ongoing_tt
+				NOT = { has_country_flag = AUS_reichsrat_decision_ongoing }
+			}
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_the_inevitable
+		}
+
+		cost = 80
+		days_remove = 30
+		fire_only_once = yes
+
+		complete_effect = {
+			set_country_flag = AUS_reichsrat_decision_ongoing
+		}
+		
+		remove_effect = {
+			clr_country_flag = AUS_reichsrat_decision_ongoing
+			add_days_mission_timeout = {
+				mission = AUS_mission_the_inevitable
+				days = 30
+			}
+			custom_effect_tooltip = AUS_give_support_between_five_and_eight_tt
+			hidden_effect = {
+				set_temp_variable_to_random = {
+					var = AUS_random_support
+					min = 0.05
+					max = 0.08
+				}
+				add_to_variable = {
+					var = AUS_proposal_support
+					value = AUS_random_support
+				}
+				clamp_variable = {
+					var = AUS_proposal_support
+					min = 0
+					max = 1
+				}
+			}
+		}
+	}
+
+	# Try To Convince The Hard-Liner Liberals
+	AUS_decision_try_to_convince_the_hard_liner_liberals = { 
+		available = { 
+			custom_trigger_tooltip = {
+				tooltip = AUS_reichsrat_decision_ongoing_tt
+				NOT = { has_country_flag = AUS_reichsrat_decision_ongoing }
+			}
+		}
+
+		visible = {
+			has_active_mission = AUS_mission_the_inevitable
+		}
+
+		cost = 120
+		days_remove = 30
+		fire_only_once = yes
+
+		complete_effect = {
+			set_country_flag = AUS_reichsrat_decision_ongoing
+		}
+		
+		remove_effect = {
+			clr_country_flag = AUS_reichsrat_decision_ongoing
+			add_days_mission_timeout = {
+				mission = AUS_mission_the_inevitable
+				days = 80
+			}
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_tooltip_effect = yes
+			random = {
+				chance = 40
+
+				custom_effect_tooltip = AUS_give_support_between_ten_and_fifteen_tt
+				hidden_effect = {
+					set_temp_variable_to_random = {
+						var = AUS_random_support
+						min = 0.10
+						max = 0.15
 					}
 					add_to_variable = {
 						var = AUS_proposal_support
