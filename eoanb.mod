@@ -1,4 +1,4 @@
-version="0.5.8"
+version="0.5.9"
 tags={
 	"Alternative History"
 	"Events"
@@ -57,6 +57,7 @@ replace_path="history/general"
 replace_path="history/states"
 replace_path="history/units"
 replace_path="map/strategicregions"
+replace_path="portraits"
 replace_path="scenario_tests"
 replace_path="scenario_tests/effects"
 replace_path="scenario_tests/tests"
