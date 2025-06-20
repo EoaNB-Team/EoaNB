@@ -212,6 +212,7 @@ NDefines = {
 		ATTACHE_TO_SUBJECT_EFFECT = -0.05,				-- If overlord sent attaches to the subject it losses autonomy
 		ATTACHE_TO_OVERLORD_EFFECT = 0.05,				-- If subject sent attaches to the overlord it gains autonomy
 		
+		AUTONOMY_LEVEL_CHANGE_SANCTUARY = 30,			-- The number of days post autonomy level has changed where neither side can increase nor decrease the autonomy level.
 		AUTONOMY_LEVEL_CHANGE_PP_COST_BASE = 50.0,		-- Base cost of changing level of autonomy
 		AUTONOMY_LEVEL_CHANGE_PP_ANNEX = 300,			-- Annexation cost
 		AUTONOMY_LEVEL_CHANGE_PP_FREE = 300,			-- Break free cost
