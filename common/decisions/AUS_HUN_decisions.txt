@@ -4354,6 +4354,8 @@ AUH_decision_category_imperial_and_royal_army = {
 		days_mission_timeout = 190
 		timeout_effect = {
 			clr_country_flag = AUS_HUN_administrative_6_months
+			add_war_support = -0.05
+			add_political_power = -30
 		}
 		complete_effect = {
 			clr_country_flag = AUS_HUN_administrative_6_months
@@ -4476,7 +4478,10 @@ AUH_decision_category_imperial_and_royal_army = {
 	AUH_decision_abolish_military_frontiner = { 
 	
 		available = {
-			has_cosmetic_tag = AUS_HUN_dual
+			OR = {
+				has_cosmetic_tag = AUS_HUN_dual
+				has_cosmetic_tag = AUH_dual
+			}
 		}
 
 		visible = {
@@ -4501,7 +4506,10 @@ AUH_decision_category_imperial_and_royal_army = {
 	AUH_decision_expand_military_frontiner = { 
 	
 		available = {
-			has_cosmetic_tag = AUS_HUN_dual
+			OR = {
+				has_cosmetic_tag = AUS_HUN_dual
+				has_cosmetic_tag = AUH_dual
+			}
 		}
 
 		visible = {
@@ -4528,7 +4536,10 @@ AUH_decision_category_imperial_and_royal_army = {
 	AUH_decision_buy_british_guns = { 
 	
 		available = {
-			has_cosmetic_tag = AUS_HUN_dual
+			OR = {
+				has_cosmetic_tag = AUS_HUN_dual
+				has_cosmetic_tag = AUH_dual
+			}
 		}
 
 		visible = {
@@ -4570,7 +4581,10 @@ AUH_decision_category_imperial_and_royal_army = {
 	AUH_decision_buy_french_guns = { 
 	
 		available = {
-			has_cosmetic_tag = AUS_HUN_dual
+			OR = {
+				has_cosmetic_tag = AUS_HUN_dual
+				has_cosmetic_tag = AUH_dual
+			}
 		}
 
 		visible = {
@@ -4612,7 +4626,10 @@ AUH_decision_category_imperial_and_royal_army = {
 	AUH_decision_buy_russian_guns = { 
 	
 		available = {
-			has_cosmetic_tag = AUS_HUN_dual
+			OR = {
+				has_cosmetic_tag = AUS_HUN_dual
+				has_cosmetic_tag = AUH_dual
+			}
 		}
 
 		visible = {
@@ -4650,54 +4667,27 @@ AUH_decision_category_imperial_and_royal_army = {
 		}
 	}
 
-	# Buy Russian Guns
-	AUH_decision_buy_russian_guns = { 
-
-		available = {
-			has_cosmetic_tag = AUS_HUN_dual
-		}
-
-		visible = {
-			has_completed_focus = AUS_HUN_foregin_arms_purchase
-			#NOT = {
-			#	has_dlc = "Arms Against Tyranny"
-			#}
-		}
-
-		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.25 }
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.25 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			add_equipment_to_stockpile = {
-				type = infantry_equipment
-				amount = 2500
-				producer = RUS
-			}
-		}
-
-		days_remove = 180
-
-		icon = RUS
-		fire_only_once = yes
-
-		ai_will_do ={
-			base = 1
-		}
-	}
-
 	AUH_mission_skoda_artillery = {
 		icon = generic_army_support
 		allowed = { always = no }
 		available = {
-			9 = {
-				arms_factory > 1
+			if = {
+				limit = {
+					tag = AUS
+				}
+
+				9 = {
+					arms_factory > 1
+				}
+			}
+			if = {
+				limit = {
+					tag = HUN
+				}
+
+				43 = {
+					arms_factory > 1
+				}
 			}
 		}
 		priority = 50
@@ -4705,7 +4695,9 @@ AUH_decision_category_imperial_and_royal_army = {
 		is_good = yes
 		days_mission_timeout = 225
 		timeout_effect = {
-
+			add_political_power = -30
+			add_stability = -0.02
+			add_war_support = -0.03
 		}
 		complete_effect = {
 			custom_effect_tooltip = AUS_skoda_unlocked_tt
@@ -4720,8 +4712,23 @@ AUH_decision_category_imperial_and_royal_army = {
 		icon = generic_army_support
 		allowed = { always = no }
 		available = {
-			152 = {
-				arms_factory > 0
+			if = {
+				limit = {
+					tag = AUS
+				}
+
+				152 = {
+					arms_factory > 0
+				}
+			}
+			if = {
+				limit = {
+					tag = HUN
+				}
+
+				155 = {
+					arms_factory > 0
+				}
 			}
 		}
 		priority = 50
@@ -5381,6 +5388,11 @@ AUH_decision_category_reichsrat = {
 				always = no
 			}
 		}
+		cancel_trigger = {
+			hidden_trigger = {
+				has_completed_focus = AUS_we_have_lost_all_support
+			}
+		}
 		activation = { always = no }
 		priority = 50
 		fire_only_once = yes
@@ -5388,6 +5400,9 @@ AUH_decision_category_reichsrat = {
 		days_mission_timeout = 5100
 		timeout_effect = {
 			AUS_decide_cabinet_mission_effect = yes
+		}
+		cancel_effect = {
+			hidden_effect = { AUS_decide_cabinet_mission_effect = yes }
 		}
 		ai_will_do = {
 			base = 100
@@ -5909,6 +5924,67 @@ AUH_decision_category_reichsrat = {
 		}
 	}
 
+	AUS_mission_first_election_reform_taaffe = {
+		icon = generic_factory
+		allowed = { always = no }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_voting_mission_tt
+			}
+			hidden_trigger = {
+				always = no
+			}
+		}
+		priority = 5000
+		fire_only_once = yes
+		is_good = yes
+		days_mission_timeout = 150
+		timeout_effect = {
+			AUS_decide_parliament_votes = yes
+			clear_variable = AUS_bribe_reveal_chance
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	AUS_mission_second_election_reform_taaffe = {
+		icon = generic_factory
+		allowed = { always = no }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = AUS_voting_mission_tt
+			}
+			hidden_trigger = {
+				always = no
+			}
+		}
+		cancel_trigger = {
+			check_variable = {
+				var = AUS_proposal_support
+				value = 0.05
+				compare = less_than_or_equals
+				tooltip = AUS_less_than_five_percent_support_tt
+			}
+		}
+		priority = 5000
+		fire_only_once = yes
+		is_good = yes
+		days_mission_timeout = 100
+		timeout_effect = {
+			AUS_decide_parliament_votes = yes
+			clear_variable = AUS_bribe_reveal_chance
+		}
+		cancel_effect = {
+			complete_national_focus = AUS_the_law_is_denied_by_the_aristocrats
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
 	### General Decisions ###
 
 	# Meet with the Liberal representatives
@@ -5928,6 +6004,7 @@ AUH_decision_category_reichsrat = {
 					has_active_mission = AUS_mission_budget_law
 					has_active_mission = AUS_mission_minor_compromise_hohenwart
 					has_active_mission = AUS_mission_full_compromise_with_the_czechs
+					has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
 				}
 				OR = {
 					has_country_leader = {
@@ -5993,6 +6070,9 @@ AUH_decision_category_reichsrat = {
 					has_active_mission = AUS_mission_trade_code_ammendment
 					has_active_mission = AUS_mission_health_insurance_law
 					has_active_mission = AUS_mission_accident_insurance_act
+					has_active_mission = AUS_mission_first_election_reform_taaffe
+					has_active_mission = AUS_mission_second_election_reform_taaffe
+					has_active_mission = AUS_mission_the_may_laws
 				}
 				NOT = {
 					OR = {
@@ -6063,6 +6143,10 @@ AUH_decision_category_reichsrat = {
 				has_active_mission = AUS_mission_trade_code_ammendment
 				has_active_mission = AUS_mission_health_insurance_law
 				has_active_mission = AUS_mission_accident_insurance_act
+				has_active_mission = AUS_mission_first_election_reform_taaffe
+				has_active_mission = AUS_mission_second_election_reform_taaffe
+				has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
+				has_active_mission = AUS_mission_the_may_laws
 			}
 		}
 
@@ -6120,6 +6204,10 @@ AUH_decision_category_reichsrat = {
 				has_active_mission = AUS_mission_trade_code_ammendment
 				has_active_mission = AUS_mission_health_insurance_law
 				has_active_mission = AUS_mission_accident_insurance_act
+				has_active_mission = AUS_mission_first_election_reform_taaffe
+				has_active_mission = AUS_mission_second_election_reform_taaffe
+				has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
+				has_active_mission = AUS_mission_the_may_laws
 			}
 		}
 
@@ -6181,6 +6269,10 @@ AUH_decision_category_reichsrat = {
 				has_active_mission = AUS_mission_trade_code_ammendment
 				has_active_mission = AUS_mission_health_insurance_law
 				has_active_mission = AUS_mission_accident_insurance_act
+				has_active_mission = AUS_mission_first_election_reform_taaffe
+				has_active_mission = AUS_mission_second_election_reform_taaffe
+				has_active_mission = AUS_mission_vote_on_the_status_of_the_bohemian_crownland
+				has_active_mission = AUS_mission_the_may_laws
 			}
 		}
 
@@ -7728,7 +7820,7 @@ AUH_decision_category_reichsrat = {
 	AUS_decision_pay_all_the_damages_to_the_labourers = { 
 
 		visible = {
-			has_completed_focus = AUS_major_consessions
+			has_completed_focus = AUS_major_concessions
 		}
 		
 		custom_cost_trigger = {
@@ -7739,8 +7831,8 @@ AUH_decision_category_reichsrat = {
 			set_temp_variable = { money_to_gain = -3 }
 			add_money_with_tooltip_effect = yes
 		}
-		days_remove = 15
-		days_re_enable = 25
+		days_remove = 10
+		days_re_enable = 15
 
 		remove_effect = {
 			add_stability = 0.08
@@ -7759,7 +7851,7 @@ AUH_decision_category_reichsrat = {
 	AUS_decision_pay_half_of_the_damages_to_the_labourers = { 
 
 		visible = {
-			has_completed_focus = AUS_major_consessions
+			has_completed_focus = AUS_major_concessions
 		}
 		
 		custom_cost_trigger = {
@@ -7770,13 +7862,120 @@ AUH_decision_category_reichsrat = {
 			set_temp_variable = { money_to_gain = -1.5 }
 			add_money_with_tooltip_effect = yes
 		}
-		days_remove = 15
-		days_re_enable = 25
+		days_remove = 10
+		days_re_enable = 15
 
 		remove_effect = {
 			add_stability = 0.04
 			remove_power_balance = {
 				id = AUS_Balance_Of_Power_Struggles_Of_The_Working_Class
+			}
+		}
+
+		#icon = generic_mountain_fortification
+
+		ai_will_do ={
+			base = 1
+		}
+	}
+
+	# Convincing The Liberal Representatives
+	AUS_decision_convincing_the_liberal_representatives = { 
+
+		visible = {
+			has_completed_focus = AUS_try_to_win_them_back
+		}
+		
+		cost = 35
+		days_remove = 40
+		fire_only_once = yes
+
+		remove_effect = {
+			random = {
+				chance = 60
+				if = {
+					limit = {
+						has_country_flag = AUS_eduard_von_taaffe_stays_a_liberal
+					}
+	
+					add_popularity = {
+						ideology = centrism
+						popularity = 0.02
+					}
+				}
+				else = {
+					add_popularity = {
+						ideology = traditional_conservatism
+						popularity = 0.02
+					}
+				}
+				increase_ps_by_one = yes
+			}
+		}
+
+		#icon = generic_mountain_fortification
+
+		ai_will_do ={
+			base = 1
+		}
+	}
+
+	AUS_decision_placate_the_lower_classes = { 
+
+		visible = {
+			has_completed_focus = AUS_get_support_from_the_lower_class_citizens
+		}
+		
+		cost = 20
+		days_remove = 35
+		fire_only_once = yes
+
+		remove_effect = {
+			random = {
+				chance = 80
+				
+				custom_effect_tooltip = AUS_give_support_five_tt
+				set_country_flag = AUS_placated_the_lower_classes
+			}
+		}
+
+		#icon = generic_mountain_fortification
+
+		ai_will_do ={
+			base = 1
+		}
+	}
+
+	AUS_decision_placate_the_aristocrats = { 
+
+		visible = {
+			has_completed_focus = AUS_try_to_get_consessions_for_the_aristocrats
+		}
+		
+		cost = 50
+		days_remove = 20
+		fire_only_once = yes
+
+		remove_effect = {
+			if = {
+				limit = {
+					has_completed_focus = AUS_deny_their_requests
+				}
+
+				random = {
+					chance = 50
+					
+					custom_effect_tooltip = AUS_give_support_five_tt
+					set_country_flag = AUS_placated_the_aristocrats_1
+				}
+			}
+			else = {
+				random = {
+					chance = 70
+					
+					custom_effect_tooltip = AUS_give_support_eight_tt
+					set_country_flag = AUS_placated_the_aristocrats_2
+				}
 			}
 		}
 
@@ -32347,6 +32546,7 @@ AUS_Struggles_Of_The_Working_Class_category_decisions = {
 	
 		cost = 30
 		days_remove = 20
+		days_re_enable = 15
 		
 		remove_effect = {
 			set_country_flag = {
@@ -32379,6 +32579,7 @@ AUS_Struggles_Of_The_Working_Class_category_decisions = {
 	
 		cost = 30
 		days_remove = 20
+		days_re_enable = 15
 		
 		remove_effect = {
 			set_country_flag = {
@@ -32390,6 +32591,98 @@ AUS_Struggles_Of_The_Working_Class_category_decisions = {
 				value = 0.05
 				tooltip_side = AUS_BOP_Labourers_Strength_Strenght
 			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+}
+
+AUS_The_Emperors_Support_category_decisions = {
+	AUS_decision_praise_the_emperor = {
+		icon = GFX_decision_train
+	
+		cost = 20
+		days_remove = 10
+		days_re_enable = 15
+		
+		remove_effect = {
+			add_power_balance_value = {
+				id = AUS_Balance_Of_Power_The_Emperors_Support
+				value = 0.03
+				tooltip_side = AUS_BOP_Emperor_Is_With_Us
+			}
+			add_popularity = {
+				ideology = autocracy
+				popularity = 0.02
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	AUS_decision_promise_the_emperor_full_loyalty = {
+		icon = GFX_decision_train
+	
+		cost = 50
+		days_remove = 20
+		fire_only_once = yes
+		
+		remove_effect = {
+			add_power_balance_value = {
+				id = AUS_Balance_Of_Power_The_Emperors_Support
+				value = 0.10
+				tooltip_side = AUS_BOP_Emperor_Is_With_Us
+			}
+			add_popularity = {
+				ideology = autocracy
+				popularity = 0.05
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	AUS_decision_proise_the_emperor_more_loyalty = {
+		icon = GFX_decision_train
+	
+		cost = 35
+		days_remove = 15
+		days_re_enable = 20
+		
+		remove_effect = {
+			add_power_balance_value = {
+				id = AUS_Balance_Of_Power_The_Emperors_Support
+				value = 0.05
+				tooltip_side = AUS_BOP_Emperor_Is_With_Us
+			}
+			increase_legitimacy_by_two = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	AUS_decision_hold_speaches_about_the_matter = {
+		icon = GFX_decision_train
+	
+		cost = 25
+		days_remove = 5
+		days_re_enable = 10
+		
+		remove_effect = {
+			add_power_balance_value = {
+				id = AUS_Balance_Of_Power_The_Emperors_Support
+				value = 0.02
+				tooltip_side = AUS_BOP_Emperor_Is_With_Us
+			}
+			add_political_power = -10
 		}
 
 		ai_will_do = {
