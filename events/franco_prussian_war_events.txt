@@ -73,7 +73,12 @@ news_event = {
 	option = {
 		name = fraprswar.3.a
 		trigger = {
-			NOT = { tag = FRA }
+			NOT = {
+				OR = {
+					tag = FRA
+					tag = SPR
+				}
+			}
 		}
 	}
 
@@ -83,6 +88,19 @@ news_event = {
 		trigger = {
 			tag = FRA
 		}
+		add_political_power = -20
+		add_stability = -0.02
+		add_war_support = 0.05
+	}
+
+	#Will we finally have a new king?
+	option = {
+		name = fraprswar.3.c
+		trigger = {
+			tag = SPR
+		}
+		add_political_power = 20
+		add_stability = 0.02
 	}
 }
 
@@ -117,7 +135,7 @@ country_event = {
 		add_political_power = -500
 		add_stability = -0.25
 		add_war_support = -0.1
-		decrease_ps_by_two = yes
+		decrease_ps_by_three = yes
 	}
 }
 
@@ -131,165 +149,146 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
-	#Agree to 
+	#Agree to back down.
 	option = {
 		name = fraprswar.5.a
 		ai_chance = { factor = 100 }
-		FRA = { country_event = { days = 1 id = fraprswar.6 } }
-		custom_effect_tooltip = PRS_mobilize_divisions_effect_tt
+		add_political_power = 25
+		add_stability = 0.03
+		add_war_support = -0.03
+		FRA = { country_event = { days = 3 id = fraprswar.6 } }
 		custom_effect_tooltip = historical_option
-		hidden_effect = { #Deutscher Bund
-			create_faction = faction_german_front
-			load_oob = "PRS_7WW_mobilization"
+		hidden_effect = {
+			if = {
+				limit = {
+					BAD = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				BAD = { country_event = { days = 3 id = fraprswar.8 } }
+			}
+			if = {
+				limit = {
+					BAV = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				BAV = { country_event = { days = 3 id = fraprswar.8 } }
+			}
+			if = {
+				limit = {
+					HSD = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				HSD = { country_event = { days = 3 id = fraprswar.8 } }
+			}
+			if = {
+				limit = {
+					WUR = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				WUR = { country_event = { days = 3 id = fraprswar.8 } }
+			}
 		}
 	}
 	
-	#
+	#Refuse to back down.
 	option = {
 		name = fraprswar.5.b
 		ai_chance = { factor = 0 }
-		FRA = { country_event = { days = 1 id = fraprswar.8 } }
+		FRA = { country_event = { days = 3 id = fraprswar.7 } }
+		create_faction = faction_german_front
+		custom_effect_tooltip = PRS_refuse_to_back_down_effect_tt
 		custom_effect_tooltip = PRS_mobilize_divisions_effect_tt
-		hidden_effect = { #Deutscher Bund
-			create_faction = faction_german_front
-			load_oob = "PRS_7WW_mobilization"
+		load_oob = "PRS_7WW_mobilization"
+		hidden_effect = {
+			if = {
+				limit = {
+					BAD = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				BAD = { country_event = { days = 3 id = fraprswar.9 } }
+			}
+			if = {
+				limit = {
+					BAV = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				BAV = { country_event = { days = 3 id = fraprswar.9 } }
+			}
+			if = {
+				limit = {
+					HSD = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				HSD = { country_event = { days = 3 id = fraprswar.9 } }
+			}
+			if = {
+				limit = {
+					WUR = { has_idea = GC_idea_schutz_und_trutz }
+				}
+				WUR = { country_event = { days = 3 id = fraprswar.9 } }
+			}
 		}
 	}
-	
 }
 
-#Leopold says No
+#FRA - Leopold Backs Down
 country_event = {
 	id = fraprswar.6
 	title = fraprswar.6.t
 	desc = fraprswar.6.d
 	picture = GFX_report_event_finnish_letter
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Demand the guarantee for all time!
 	option = {
 		name = fraprswar.6.a
 		ai_chance = { factor = 100 }
-		PRS = { country_event = { days = 1 id = fraprswar.5 } }
+		add_political_power = 20
+		add_war_support = 0.02
+		PRS = { country_event = { days = 1 id = fraprswar.10 } }
+		custom_effect_tooltip = FRA_demand_guarantee_effect_tt
+		custom_effect_tooltip = historical_option
 	}
 	
+	#Accept the situation as it is.
 	option = {
 		name = fraprswar.6.b
 		ai_chance = { factor = 0 }
-		add_political_power = -200
-		add_stability = -0.2
-		hidden_effect = {
-			PRS = {
-				if = {
-					limit = {
-						has_template = "Landsturm-Regiment"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Landsturm-Regiment"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Infanterie-Division (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Infanterie-Division (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Landwehr-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Landwehr-Regiment (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Füsilier-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Füsilier-Regiment (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Husaren-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Husaren-Regiment (mob.)"
-					}
-				}
-			}
-		}
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.05
+		decrease_ps_by_one = yes
+		PRS = { country_event = { days = 1 id = fraprswar.11 } }
 	}
-	
 }
 
-#The French Demands
+#FRA - The Hohenzollern Refuse to back down
 country_event = {
 	id = fraprswar.7
 	title = fraprswar.7.t
 	desc = fraprswar.7.d
 	picture = GFX_report_event_generic_read_write
 	
+	fire_only_once = yes
 	is_triggered_only = yes
-	
-	option = {
-		name = fraprswar.7.a
-		ai_chance = { factor = 100 }
+
+	immediate = {
 		hidden_effect = {
-			set_global_flag = eoanb_flag_franco_prussian_war_ongoing
-		}
-		declare_war_on = { target = FRA type = wargoal_franco_prussian_war }
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			PRS = { add_ideas = PRS_idea_fp_mil_boost }
-		}
-		else_if = {
-			limit = {
-				is_historical_focus_on = no
-			}
-			random_list = {
-				50 = {
-					PRS = { add_ideas = PRS_idea_fp_mil_boost }
-				}
-				50 = {
-					#
-				}
-			}
-		}
-		activate_mission = PRS_mission_franco_prussian_war
-		FRA = { activate_mission = PRS_mission_franco_prussian_war }
-		hidden_effect = {
-			add_named_threat = { 
-				threat = 5 
-				name = eoanb_threat_fp_war
-			}
-			news_event = news.10
-			BAV = { country_event = { days = 1 id = fraprswar.12 } }
-			BAD = { country_event = { days = 1 id = fraprswar.12 } }
-			WUR = { country_event = { days = 1 id = fraprswar.12 } }
-			HSD = { country_event = { days = 1 id = fraprswar.12 } }
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-					PRS = { is_ai = yes }
-					FRA = { is_ai = yes }
-				}
-				PRS = { add_ideas = hidden_idea_historical_PRS_victory }
-			}
+			set_country_flag = FRA_escalate_the_crisis_flag
 		}
 	}
 	
+	#This means war!
+	option = {
+		name = fraprswar.7.a
+		ai_chance = { factor = 100 }
+		activate_decision = FRA_decision_declare_war_on_prussia
+	}
+	
+	#Perhaps we've gone too far, accept their refusal.
 	option = {
 		name = fraprswar.7.b
 		ai_chance = { factor = 0 }
-		add_political_power = -200
-		add_stability = -0.2
-		add_war_support = -0.2
+		custom_effect_tooltip = eoanb_accept_leopolds_backing_off_effect_tt
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.1
+		decrease_ps_by_one = yes
 		hidden_effect = {
 			PRS = {
 				if = {
@@ -333,9 +332,9 @@ country_event = {
 					}
 				}
 			}
+			clr_country_flag = FRA_escalate_the_crisis_flag
 		}
 	}
-	
 }
 
 #Leopold backs off
@@ -420,7 +419,7 @@ country_event = {
 		hidden_effect = {
 			add_named_threat = { 
 				threat = 5 
-				name = eoanb_threat_fp_war
+				name = eoanb_threat_franco_prussian_war
 			}
 			if = {
 				limit = {
@@ -497,7 +496,7 @@ country_event = {
 		hidden_effect = {
 			add_named_threat = { 
 				threat = 5 
-				name = eoanb_threat_fp_war
+				name = eoanb_threat_franco_prussian_war
 			}
 			if = {
 				limit = {
