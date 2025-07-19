@@ -9281,7 +9281,7 @@ PRS_decision_category_german_war = {
 
 PRS_decision_category_franco_prussian_war = {
 	
-	#Support Leopold's Candidacy for the Spanish Throne
+	#PRS - Support Leopold's Candidacy for the Spanish Throne
 	PRS_decision_support_leopolds_candidacy = {
 		icon = eng_abdication_crisis
 		allowed = { tag = PRS }
@@ -9319,18 +9319,50 @@ PRS_decision_category_franco_prussian_war = {
 		}
 	}
 
-	#Declare War on Prussia
+	#FRA - Denounce Prussia for Provoking France
+	FRA_decision_denounce_prussia_for_provoking_france = {
+		icon = generic_speech
+		allowed = { tag = FRA }
+		available = {
+			has_war = no
+			has_war_support > 0.2
+		}
+		visible = {
+			has_country_flag = FRA_leopold_claims_spanish_throne_flag
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_franco_prussian_war_ongoing
+					PRS = { has_country_flag = eoanb_flag_won_fra_prs_war }
+					#Add condition for French victory
+				}
+			}
+		}
+		fire_only_once = yes
+		cost = 10
+		complete_effect = {
+			add_war_support = 0.05
+			hidden_effect = {
+				clr_country_flag = FRA_leopold_claims_spanish_throne_flag
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#FRA - Declare War on Prussia
 	FRA_decision_declare_war_on_prussia = {
 		icon = generic_prepare_civil_war
 		allowed = { tag = FRA }
 		available = {
-			always = no
+			has_country_flag = FRA_escalate_the_crisis_flag
+			has_war_support > 0.4
 		}
 		visible = {
 			has_country_flag = FRA_escalate_the_crisis_flag
 		}
 		fire_only_once = yes
-		cost = 0
+		cost = 25
 		days_remove = 7
 		complete_effect = {
 			add_war_support = 0.05
@@ -9413,12 +9445,122 @@ PRS_decision_category_franco_prussian_war = {
 					}
 					PRS = { add_ideas = hidden_idea_historical_PRS_victory }
 				}
+				clr_country_flag = FRA_escalate_the_crisis_flag
 			}
 			activate_mission = PRS_mission_franco_prussian_war
 			PRS = { activate_mission = PRS_mission_franco_prussian_war }
 		}
 		ai_will_do = {
 			base = 1000
+		}
+	}
+
+	#PRS - Declare War on France
+	PRS_decision_declare_war_on_france = {
+		icon = generic_prepare_civil_war
+		allowed = { tag = PRS }
+		available = {
+			has_country_flag = PRS_escalate_the_crisis_flag
+			has_war_support > 0.4
+		}
+		visible = {
+			has_country_flag = PRS_escalate_the_crisis_flag
+		}
+		fire_only_once = yes
+		cost = 25
+		days_remove = 7
+		complete_effect = {
+			add_war_support = 0.05
+			hidden_effect = {
+				add_ai_strategy = {
+					type = prepare_for_war
+					id = FRA
+					value = 200
+				}
+				FRA = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = PRS
+						value = 200
+					}
+				}
+				BAD = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = FRA
+						value = 200
+					}
+				}
+				BAV = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = FRA
+						value = 200
+					}
+				}
+				HSD = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = FRA
+						value = 200
+					}
+				}
+				WUR = {
+					add_ai_strategy = {
+						type = prepare_for_war
+						id = FRA
+						value = 200
+					}
+				}
+			}
+		}
+		remove_effect = {
+			declare_war_on = { target = FRA type = wargoal_franco_prussian_war }
+			news_event = { days = 1 id = news.10 }
+			hidden_effect = {
+				set_global_flag = eoanb_flag_franco_prussian_war_ongoing
+				add_named_threat = { 
+					threat = 5 
+					name = eoanb_threat_franco_prussian_war
+				}
+				if = {
+					limit = {
+						is_historical_focus_on = yes
+					}
+					PRS = { add_ideas = PRS_idea_fp_mil_boost }
+				}
+				else_if = {
+					limit = {
+						is_historical_focus_on = no
+					}
+					random_list = {
+						50 = {
+							PRS = { add_ideas = PRS_idea_fp_mil_boost }
+						}
+						50 = {
+							#
+						}
+					}
+				}
+				if = {
+					limit = {
+						is_historical_focus_on = yes
+						PRS = { is_ai = yes }
+						FRA = { is_ai = yes }
+					}
+					PRS = { add_ideas = hidden_idea_historical_PRS_victory }
+				}
+				clr_country_flag = PRS_escalate_the_crisis_flag
+			}
+			activate_mission = PRS_mission_franco_prussian_war
+			FRA = { activate_mission = PRS_mission_franco_prussian_war }
+		}
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
 	}
 	
@@ -9672,7 +9814,7 @@ PRS_decision_category_franco_prussian_war = {
 				#hidden_effect = {
 					#AUS = {
 						country_event = {
-							id = fraprswar.14
+							id = fraprswar.34
 						}
 					#}
 				#}
