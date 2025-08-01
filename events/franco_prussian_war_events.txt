@@ -1,7 +1,7 @@
 ﻿add_namespace = fraprswar
 
 #----------------------------------------------------------------------------------------------
-# 1870 FRANCO PRUSSIAN WAR - BACKGROUND (could be expanded if Hohenzollern-Sigmaringen were its own country)
+# FRANCO-PRUSSIAN WAR - BACKGROUND (could be expanded if Hohenzollern-Sigmaringen were its own country)
 #----------------------------------------------------------------------------------------------
 
 #SPR - Leopold Designated as Candidate for the Spanish Throne
@@ -746,7 +746,7 @@ country_event = {
 }
 
 #----------------------------------------------------------------------------------------------
-# 1870 FRANCO PRUSSIAN WAR - WARTIME AND DEVELOPMENT (French Third Republic/Imperial events partly in file france_events)
+# FRANCO-PRUSSIAN WAR - WARTIME AND DEVELOPMENT (French Third Republic/Imperial events partly in file france_events)
 #----------------------------------------------------------------------------------------------
 
 #South German States - Join Prussia against France?
@@ -933,7 +933,7 @@ country_event = {
 		add_war_support = 0.05
 		increase_ps_by_one = yes
 		hidden_effect = {
-			FRA = { country_event = third_rep_france.006 }
+			FRA = { country_event = nap_france.34 }
 			BAD = { country_event = nap_france.34 }
 			BAV = { country_event = nap_france.34 }
 			HSD = { country_event = nap_france.34 }
@@ -943,6 +943,31 @@ country_event = {
 
 	option = {
 		name = fraprswar.34.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		activate_mission = FRA_mission_break_paris_siege
+		decrease_ps_by_one = yes
+		hidden_effect = {
+			set_country_flag = FRA_paris_besieged_flag
+			country_event = {
+				days = 12
+				id = fraprswar.101
+			}
+			country_event = {
+				days = 55
+				id = third_rep_france.009
+			}
+			country_event = {
+				days = 1
+				id = third_rep_france.0081
+			}
+		}
+	}
+
+	option = {
+		name = fraprswar.34.c
 		ai_chance = { base = 100 }
 		trigger = {
 			NOT = { tag = PRS }
@@ -955,7 +980,7 @@ country_event = {
 	}
 
 	option = {
-		name = fraprswar.34.c
+		name = fraprswar.34.e
 		ai_chance = { base = 100 }
 		trigger = {
 			NOT = { tag = PRS }
@@ -1293,10 +1318,189 @@ country_event = {
 }
 
 #----------------------------------------------------------------------------------------------
-# 1870 FRANCO PRUSSIAN WAR - REPUBLICAN PART
+# FRANCO-PRUSSIAN WAR - PEACE OPTIONS
 #----------------------------------------------------------------------------------------------
 
+#HISTORICAL PATH - THIRD REPUBLIC
 
+#FRA - Inquire for Peace with the Prussians
+country_event = {
+	id = fraprswar.101
+	title = fraprswar.101.t
+	desc = fraprswar.101.d
+	picture = GFX_report_event_napoleon_iii_death
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Go for it.
+	option = {
+		name = fraprswar.101.a
+		ai_chance = { base = 100 }
+		PRS = {
+			country_event = {
+				days = 2
+				id = fraprswar.102
+			}
+		}
+		add_stability = 0.05
+		custom_effect_tooltip = historical_option
+	}
+
+	#No chance!
+	option = {
+		name = fraprswar.101.b
+		ai_chance = { base = 0 }
+		add_war_support = 0.01
+	}
+}
+
+#PRS - France Inquires about Peace Conditions
+country_event = {
+	id = fraprswar.102
+	title = fraprswar.102.t
+	desc = fraprswar.102.d
+	picture = GFX_report_event_bismarck_favre_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Demand Alsace-Lorraine.
+	option = {
+		name = fraprswar.102.a
+		ai_chance = { base = 100 }
+		FRA = {
+			country_event = {
+				id = fraprswar.103
+			}
+		}
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_demand_alsace_fpw_flag
+		}
+	}
+
+	#Demand only war reparations.
+	option = {
+		name = fraprswar.102.b
+		ai_chance = { base = 0 }
+		FRA = {
+			country_event = {
+				id = fraprswar.104
+			}
+		}
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.05
+	}
+}
+
+#FRA - The Prussian Demands (historical)
+country_event = {
+	id = fraprswar.103
+	title = fraprswar.103.t
+	desc = fraprswar.103.d
+	picture = GFX_report_event_bismarck_favre_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Refuse these outrageous demands!
+	option = {
+		name = fraprswar.103.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.03
+		add_stability = 0.02
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.105
+			}
+		}
+		custom_effect_tooltip = historical_option
+	}
+
+	#A price has to be paid...
+	option = {
+		ai_chance = { base = 0 }
+		name = fraprswar.103.b
+		add_war_support = -0.02
+		add_stability = -0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.106
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice
+				}
+			}
+		}
+	}
+}
+
+#FRA - The Prussian Demands (alt-history)
+country_event = {
+	id = fraprswar.104
+	title = fraprswar.104.t
+	desc = fraprswar.104.d
+	picture = GFX_report_event_bismarck_favre_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Accept their demands.
+	option = {
+		name = fraprswar.104.a
+		ai_chance = { base = 100 }
+		add_war_support = -0.05
+		add_stability = 0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.106
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice alt-history
+				}
+			}
+		}
+	}
+
+	#Reject these ridiculous demands!
+	option = {
+		ai_chance = { base = 0 }
+		name = fraprswar.104.b
+		add_war_support = -0.02
+		add_stability = -0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.105
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice alt-history
+				}
+			}
+		}
+	}
+}
+
+#----------------------------------------------------------------------------------------------
+# FRANCO-PRUSSIAN WAR - AFTERMATH
+#----------------------------------------------------------------------------------------------
 
 #Prussia forms the German Empire
 country_event = {
