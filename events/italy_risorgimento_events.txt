@@ -9138,6 +9138,20 @@ country_event = {
 			factor = 100
 		}
 		set_country_flag = NSC_carlo_filangieri_recruited
+		effect_tooltip = {
+			add_advisor_role = {
+				character = NSC_carlo_filangieri
+				activate = yes
+				advisor = {
+					slot = political_advisor
+					idea_token = NSC_carlo_filangieri_advisor
+					cost = 50
+					traits = {
+						NSC_trait_carlo_filangieri
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -9157,6 +9171,7 @@ country_event = {
 		ai_chance = {
 			factor = 100
 		}
+		custom_effect_tooltip = historical_option
 		set_power_balance = {
 			id = NSC_Balance_of_Power_New_Monarch
 			left_side = NSC_BOP_francis_II
@@ -9346,6 +9361,7 @@ country_event = {
 		add_ideas = {
 			NSC_vic_idea_francis_II
 		}
+		set_country_flag = NSC_francis_ii_is_hos
 		country_event = {
 			id = risorgimento.623
 			days = 3
@@ -9406,6 +9422,13 @@ country_event = {
 		add_popularity = {
 			ideology = ideology_social_liberalism
 			popularity = 0.02
+		}
+		hidden_effect = {
+			remove_ideas = {
+				NSC_vic_idea_The_Reale_Societa_Segreta
+				NSC_vic_idea_Murattiani
+				NSC_vic_idea_1848_Rev
+			}
 		}
 	}
 	option = {
@@ -9644,6 +9667,14 @@ country_event = {
 		}
 		add_political_power = 10
 		add_stability = 0.02
+		swap_ideas = {
+			remove_idea = pp_underground_parties
+			add_idea = pp_limited_party_freedom
+		}
+		swap_ideas = {
+			remove_idea = foa_state_only
+			add_idea = foa_restricted_attendance
+		}
 	}
 }
 
@@ -10410,6 +10441,11 @@ country_event = {
 		ai_chance = {
 			factor = 100
 		}
+		PIE = {
+			create_faction = "Alliance of Italian States"
+			add_to_faction = NSC
+		}
+		hidden_effect = { set_country_flag = NSC_sardinia_alliance_accepted }
 	}
 }
 
@@ -10429,6 +10465,8 @@ country_event = {
 		ai_chance = {
 			factor = 100
 		}
+		PIE = { add_opinion_modifier = { target = NSC modifier = small_decrease } }
+		add_opinion_modifier = { target = PIE modifier = small_decrease }
 	}
 }
 
@@ -10612,13 +10650,19 @@ country_event = {
 			factor = 100
 		}
 		PIE = {
+			add_ideas = { NSC_vic_idea_naples_and_sicily }
+			if = {
+				limit = {
+					NSC = {
+						has_idea = NSC_francis_ii_is_hos
+					}
+				}
+
+				add_ideas = { NSC_vic_idea_francis_II }
+			}
 			annex_country = {
 				target = NSC
 				transfer_troops = yes
-			}
-			add_ideas = {
-				NSC_vic_idea_naples_and_sicily
-				NSC_vic_idea_francis_II
 			}
 		}
 	}
@@ -10781,16 +10825,64 @@ country_event = {
 	option = {
 		name = risorgimento.668.a
 		ai_chance = {
-			factor = 100
+			factor = 20
+			modifier = {
+				factor = 3
+				is_historical_focus_on = yes
+			}
 		}
 		set_politics = {
 			ruling_party = centrism
 		}
-		add_ideas = {
-			NSC_vic_idea_francis_II
+		if = {
+			limit = {
+				has_country_leader = {
+					character = NSC_alfonso_i
+					ruling_only = yes
+				}
+			}
+
+			add_ideas = {
+				NSC_vic_idea_alfonso_I
+			}
 		}
+		else = {
+			add_ideas = {
+				NSC_vic_idea_francis_II
+			}
+		}
+		hidden_effect = {
+			remove_ideas = {
+				NSC_vic_idea_The_Reale_Societa_Segreta
+				NSC_vic_idea_Murattiani
+				NSC_vic_idea_1848_Rev
+			}
+		}
+		set_country_flag = NSC_francis_ii_is_hos
 		add_stability = 0.1
 		increase_legitimacy_by_ten = yes
+		set_popularities = {
+			anarchism = 0
+			ideology_social_liberalism = 40
+			ideology_radical_socialism = 0
+			social_egalitarianism = 0
+			centrism = 60
+			traditional_conservatism = 0
+			radical_democracy = 0
+			chauvinist_populism = 0
+			autocracy = 0
+			fundamentalism = 0
+		}
+	}
+	option = {
+		name = risorgimento.668.b
+		ai_chance = {
+			factor = 80
+			modifier = {
+				factor = 0.3
+				is_historical_focus_on = yes
+			}
+		}
 	}
 }
 
@@ -11457,6 +11549,25 @@ country_event = {
 	}
 }
 
+#State of Our Navy
+country_event = {
+	id = risorgimento.691
+	title = risorgimento.691.t
+	desc = risorgimento.691.d
+	picture = GFX_event_NSC_stazioni_napoli
+	fire_only_once = yes
+	is_triggered_only = yes
+	trigger = {
+		tag = NSC
+	}
+	option = {
+		name = risorgimento.691.a
+		ai_chance = {
+			factor = 100
+		}
+	}
+}
+
 #Discontent in the Navy
 country_event = {
 	id = risorgimento.692 
@@ -11570,6 +11681,8 @@ country_event = {
 		annex_country = {
 			target = CBI
 		}
+		custom_effect_tooltip = "[PIE.GetFlag] §YSardinia-Piedmont§! won't send an §Rultimatum§! to you!"
+		set_global_flag = NSC_sardinian_ultimatum_cancelled
 	}
 }
 
@@ -11589,6 +11702,50 @@ country_event = {
 		ai_chance = {
 			factor = 100
 		}
+	}
+}
+
+#Sardinian Ultimatum
+country_event = {
+	id = risorgimento.697
+	title = risorgimento.697.t
+	desc = risorgimento.697.d
+	picture = GFX_event_ITA_napoleon_victor
+	fire_only_once = yes
+	is_triggered_only = yes
+	trigger = {
+		tag = NSC
+		has_completed_focus = NSC_focus_constitutional_compromise
+		has_global_flag = NSC_sardinian_ultimatum_cancelled
+	}
+	option = { #We shall obey them!
+		name = risorgimento.697.a
+		ai_chance = {
+			factor = 25
+		}
+
+		PIE = {
+			annex_country = {
+				target = NSC
+				transfer_troops = yes
+			}
+			ITA_Formation_of_Italy = yes
+			set_cosmetic_tag = NSC_ITA_confederation
+		}
+		PIE = { 
+			change_tag_from = NSC 
+		}
+		hidden_effect = {
+			set_global_flag = PIE_hide_garibaldi_decisions
+		}
+	}
+	option = { #Face the Consequences!
+		name = risorgimento.697.b
+		ai_chance = {
+			factor = 25
+		}
+
+		custom_effect_tooltip = "§RThe Expedition of the Thousand will be inevitable!§!"
 	}
 }
 
