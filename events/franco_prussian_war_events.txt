@@ -1,8 +1,10 @@
-﻿#Namespace for ahistorical paths
-add_namespace = fraprswarah
-add_namespace = fraprswar
+﻿add_namespace = fraprswar
 
-#Leopold becomes Spanish Throne Candidate
+#----------------------------------------------------------------------------------------------
+# FRANCO-PRUSSIAN WAR - BACKGROUND (could be expanded if Hohenzollern-Sigmaringen were its own country)
+#----------------------------------------------------------------------------------------------
+
+#SPR - Leopold Designated as Candidate for the Spanish Throne
 country_event = {
 	id = fraprswar.1
 	title = fraprswar.1.t
@@ -10,10 +12,11 @@ country_event = {
 	picture = GFX_report_event_royal_visit
 	
 	fire_only_once = yes
+
+	#should later be triggered by Spanish content
 	
 	trigger = {
-		TAG = PRS
-		#PRS = { owns_state = 1033 }
+		tag = SPR
 		PRS = {
 			OR = {
 				has_country_flag = eoanb_flag_won_7_weeks_war
@@ -22,249 +25,258 @@ country_event = {
 			NOT = { has_country_flag = eoanb_flag_won_luxembourg_crisis }
 			NOT = { has_completed_focus = PRS_focus_king_deposed }
 		}
-		date > 1870.4.10
+		date > 1870.5.1
 	}
 	
 	option = {
 		name = fraprswar.1.a
-		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_PRS_claims_SPR_leopold
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		custom_effect_tooltip = eoanb_leopold_spanish_throne_candidate_effect_tt
 		hidden_effect = {
-			FRA = { 
-				country_event = { days = 3 id = fraprswar.2 } 
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = PRS
-					value = 110
-				}		
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = BAV
-					value = 110
-				}		
-				add_ai_strategy = {
-					type = prepare_for_war
-					id = BAD
-					value = 110
-				}
-				add_ai_strategy = {
-					type = area_priority
-					id = africa
-					value = -100
-				}
-				add_ai_strategy = {
-					type = area_priority
-					id = europe
-					value = 4000 #more focus here
-				} 
-			}			
+			PRS = { country_event = { days = 7 id = fraprswar.2 } }
 		}
 	}
-	
 }
 
-#Leopold claims Spanish Throne
+#PRS - Leopold Designated as Candidate for the Spanish Throne
 country_event = {
 	id = fraprswar.2
 	title = fraprswar.2.t
 	desc = fraprswar.2.d
-	picture = GFX_report_event_journalists_speech
+	picture = GFX_report_event_royal_visit
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = fraprswar.2.a
-		ai_chance = { factor = 100 }
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			custom_effect_tooltip = eoanb_tt_option_is_historical
-		}
-		custom_effect_tooltip = eoanb_tt_FRA_contests_PRS_SPR
+		ai_chance = { base = 100 }
+		unlock_decision_tooltip = PRS_decision_support_leopolds_candidacy
 		hidden_effect = {
-			PRS = { country_event = { days = 2 id = fraprswar.3 } }
-			FRA = { add_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 } }
-			FRA = { add_opinion_modifier = { target = BAV modifier = fra_diplomatic_incident_1870 }	}
-			FRA = { add_opinion_modifier = { target = BAD modifier = fra_diplomatic_incident_1870 }	}	
+			set_country_flag = PRS_support_leopolds_candidacy_flag
 		}
 	}
-	
-	option = {
-		name = fraprswar.2.b
-		ai_chance = { factor = 0 }
-		add_political_power = -500
-		add_stability = -0.25
-		add_war_support = -0.25
-		custom_effect_tooltip = eoanb_tt_FRA_allows_leopold_SPR
-	}
-	
 }
 
-#France demands that Leopold backs off
-country_event = {
+#News event - Prussia Supports Leopold's Candidacy for the Spanish Throne
+news_event = {
 	id = fraprswar.3
 	title = fraprswar.3.t
 	desc = fraprswar.3.d
-	picture = GFX_report_event_generic_sign_treaty1
+	picture = GFX_news_event_leopolds_candidacy
+	
+	major = yes
 	
 	is_triggered_only = yes
+
+	fire_for_sender = no
 	
+	#This might cause trouble...
 	option = {
 		name = fraprswar.3.a
-		ai_chance = { factor = 100 }
-		custom_effect_tooltip = eoanb_tt_option_is_historical
-		FRA = { country_event = { days = 1 id = fraprswar.6 } }
-		custom_effect_tooltip = PRS_mobilize_divisions_effect_tt
-		hidden_effect = { #Deutscher Bund
-			create_faction = faction_german_front
-			load_oob = "PRS_7WW_mobilization"
+		trigger = {
+			NOT = {
+				OR = {
+					tag = FRA
+					tag = SPR
+				}
+			}
 		}
 	}
-	
+
+	#Outrageous!
 	option = {
 		name = fraprswar.3.b
-		ai_chance = { factor = 0 }
-		FRA = { country_event = { days = 1 id = fraprswar.4 } }
-		custom_effect_tooltip = PRS_mobilize_divisions_effect_tt
-		hidden_effect = { #Deutscher Bund
-			create_faction = faction_german_front
-			load_oob = "PRS_7WW_mobilization"
+		trigger = {
+			tag = FRA
 		}
+		add_political_power = -20
+		add_stability = -0.02
+		add_war_support = 0.05
 	}
-	
+
+	#Will we finally have a new king?
+	option = {
+		name = fraprswar.3.c
+		trigger = {
+			tag = SPR
+		}
+		add_political_power = 20
+		add_stability = 0.02
+	}
 }
 
-#Leopold says No
+#FRA - Leopold von Hohenzollern lays Claim to the Spanish Throne
 country_event = {
 	id = fraprswar.4
 	title = fraprswar.4.t
 	desc = fraprswar.4.d
-	picture = GFX_report_event_finnish_letter
+	picture = GFX_report_event_journalists_speech
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Contest Leopold's Candidacy.
 	option = {
 		name = fraprswar.4.a
-		ai_chance = { factor = 100 }
-		PRS = { country_event = { days = 1 id = fraprswar.5 } }
-	}
-	
-	option = {
-		name = fraprswar.4.b
-		ai_chance = { factor = 0 }
-		add_political_power = -200
-		add_stability = -0.2
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = eoanb_contest_leopolds_candidacy_effect_tt
+		unlock_decision_tooltip = FRA_decision_denounce_prussia_for_provoking_france
+		add_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+		reverse_add_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+		custom_effect_tooltip = historical_option
 		hidden_effect = {
-			PRS = {
-				if = {
-					limit = {
-						has_template = "Landsturm-Regiment"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Landsturm-Regiment"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Infanterie-Division (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Infanterie-Division (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Landwehr-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Landwehr-Regiment (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Füsilier-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Füsilier-Regiment (mob.)"
-					}
-				}
-				if = {
-					limit = {
-						has_template = "Husaren-Regiment (mob.)"
-					}
-					delete_unit_template_and_units = {
-						division_template = "Husaren-Regiment (mob.)"
-					}
-				}
-			}
+			set_country_flag = FRA_leopold_claims_spanish_throne_flag
+			PRS = { country_event = { days = 5 id = fraprswar.5 } }
 		}
 	}
 	
+	#Accept Leopold's Candidacy.
+	option = {
+		name = fraprswar.4.b
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = eoanb_accept_leopolds_candidacy_effect_tt
+		add_political_power = -500
+		add_stability = -0.25
+		add_war_support = -0.1
+		decrease_ps_by_three = yes
+	}
 }
 
-#The French Demands
+#PRS - France Demands Leopold to back off
 country_event = {
 	id = fraprswar.5
 	title = fraprswar.5.t
 	desc = fraprswar.5.d
-	picture = GFX_report_event_generic_read_write
+	picture = GFX_report_event_generic_sign_treaty1
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Agree to back down.
 	option = {
 		name = fraprswar.5.a
-		ai_chance = { factor = 100 }
+		ai_chance = { base = 100 }
+		add_political_power = 25
+		add_stability = 0.03
+		add_war_support = -0.03
+		FRA = { country_event = { days = 1 id = fraprswar.6 } }
+		custom_effect_tooltip = historical_option
 		hidden_effect = {
-			set_global_flag = eoanb_flag_franco_prussian_war_ongoing
-		}
-		declare_war_on = { target = FRA type = wargoal_franco_prussian_war }
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			PRS = { add_ideas = PRS_idea_fp_mil_boost }
-		}
-		else_if = {
-			limit = {
-				is_historical_focus_on = no
-			}
-			random_list = {
-				50 = {
-					PRS = { add_ideas = PRS_idea_fp_mil_boost }
-				}
-				50 = {
-					#
-				}
-			}
-		}
-		hidden_effect = {
-			add_named_threat = { 
-				threat = 5 
-				name = eoanb_threat_fp_war
-			}
-			news_event = news.10
-			BAV = { country_event = { days = 1 id = fraprswar.12 } }
-			BAD = { country_event = { days = 1 id = fraprswar.12 } }
-			WUR = { country_event = { days = 1 id = fraprswar.12 } }
-			HSD = { country_event = { days = 1 id = fraprswar.12 } }
-			if = {
+			every_other_country = {
 				limit = {
-					is_historical_focus_on = yes
-					PRS = { is_ai = yes }
-					FRA = { is_ai = yes }
+					NOT = { tag = FRA }
 				}
-				PRS = { add_ideas = hidden_idea_historical_PRS_victory }
+				news_event = { days = 1 id = fraprswar.8 }
 			}
 		}
 	}
 	
+	#Refuse to back down.
 	option = {
 		name = fraprswar.5.b
-		ai_chance = { factor = 0 }
-		add_political_power = -200
-		add_stability = -0.2
-		add_war_support = -0.2
+		ai_chance = { base = 0 }
+		unlock_decision_tooltip = PRS_decision_declare_war_on_france
+		FRA = { country_event = { days = 1 id = fraprswar.7 } }
+		create_faction = faction_german_front	#move to decisions
+		custom_effect_tooltip = PRS_refuse_to_back_down_effect_tt
+		custom_effect_tooltip = PRS_mobilize_divisions_effect_tt
+		load_oob = "PRS_7WW_mobilization"
+		hidden_effect = {
+			set_country_flag = PRS_escalate_the_crisis_flag
+			every_other_country = {
+				limit = {
+					NOT = { tag = FRA }
+				}
+				news_event = { days = 1 id = fraprswar.9 }
+			}
+		}
+	}
+}
+
+#FRA - Leopold Backs Down
+country_event = {
+	id = fraprswar.6
+	title = fraprswar.6.t
+	desc = fraprswar.6.d
+	picture = GFX_report_event_finnish_letter
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Demand an apology and a guarantee!
+	option = {
+		name = fraprswar.6.a
+		ai_chance = { base = 95 }
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+		add_political_power = 20
+		add_war_support = 0.02
+		PRS = { country_event = { days = 1 id = fraprswar.10 } }
+		custom_effect_tooltip = FRA_demand_guarantee_effect_tt
+		custom_effect_tooltip = historical_option
+	}
+	
+	#Accept the situation as it is.
+	option = {
+		name = fraprswar.6.b
+		ai_chance = {
+			base = 5
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.05
+		decrease_ps_by_one = yes
+		PRS = { country_event = { days = 1 id = fraprswar.11 } }
+	}
+}
+
+#FRA - The Hohenzollern Refuse to back down
+country_event = {
+	id = fraprswar.7
+	title = fraprswar.7.t
+	desc = fraprswar.7.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#This means war! - Start FPW
+	option = {
+		name = fraprswar.7.a
+		ai_chance = { base = 100 }
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+		unlock_decision_tooltip = FRA_decision_declare_war_on_prussia
+		add_opinion_modifier = { target = PRS modifier = fra_diplomatic_insult_1870 }
+		PRS = { country_event = { days = 1 id = fraprswar.18 } }
+		hidden_effect = {
+			remove_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+			PRS = { remove_opinion_modifier = { target = FRA modifier = fra_diplomatic_incident_1870 } }
+			set_country_flag = FRA_escalate_the_crisis_flag
+		}
+	}
+	
+	#Perhaps we've gone too far, accept their refusal.
+	option = {
+		name = fraprswar.7.b
+		ai_chance = { base = 0 }
+		set_temp_variable = { eoanb_prestige_change = -2 }
+		eoanb_change_prestige_score = yes
+		custom_effect_tooltip = eoanb_accept_leopolds_backing_off_effect_tt
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.1
+		decrease_ps_by_one = yes
+		remove_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+		PRS = { country_event = { days = 1 id = fraprswar.13 } }
 		hidden_effect = {
 			PRS = {
 				if = {
@@ -310,224 +322,1220 @@ country_event = {
 			}
 		}
 	}
-	
 }
 
-#Leopold backs off
-country_event = {
-	id = fraprswar.6
-	title = fraprswar.6.t
-	desc = fraprswar.6.d
-	picture = GFX_report_event_soviet_purge_trial
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = fraprswar.6.a
-		ai_chance = { factor = 100 }
-		PRS = { country_event = { days = 1 id = fraprswar.7 } }
-	}
-	
-}
-
-#France demands no further claims from Prussia
-country_event = {
-	id = fraprswar.7
-	title = fraprswar.7.t
-	desc = fraprswar.7.d
-	picture = GFX_report_event_saf_soldiers_2
-	
-	is_triggered_only = yes
-	
-	option = {
-		name = fraprswar.7.a
-		ai_chance = { factor = 0 }
-		custom_effect_tooltip = eoanb_tt_FRA_will_probably_war
-		FRA = { country_event = { days = 1 id = fraprswar.8 } }
-	}
-	
-	option = {
-		name = fraprswar.7.b
-		ai_chance = { factor = 100 }
-		PRS = { country_event = { days = 1 id = fraprswar.9 } }
-		custom_effect_tooltip = eoanb_tt_option_is_historical
-	}
-	
-}
-
-#French Ultimatum after Refusal leads to War
-country_event = {
+#Leopold Renounces Claim to the Spanish Throne
+news_event = {
 	id = fraprswar.8
 	title = fraprswar.8.t
 	desc = fraprswar.8.d
-	picture = GFX_report_event_romanian_soldiers
+	picture = GFX_event_berliner_schloss
+	
+	major = yes
 	
 	is_triggered_only = yes
+
+	fire_for_sender = no
 	
+	#This should de-escalate the situation.
 	option = {
 		name = fraprswar.8.a
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			set_global_flag = eoanb_flag_franco_prussian_war_ongoing
-		}
-		declare_war_on = { target = PRS type = wargoal_franco_prussian_war }
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			PRS = { add_ideas = PRS_idea_fp_mil_boost }
-		}
-		else_if = {
-			limit = {
-				is_historical_focus_on = no
-			}
-			random_list = {
-				50 = {
-					PRS = { add_ideas = PRS_idea_fp_mil_boost }
-				}
-				50 = {
-					#
+		trigger = {
+			NOT = {
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HSD
+					tag = WUR
 				}
 			}
-		}
-		hidden_effect = {
-			add_named_threat = { 
-				threat = 5 
-				name = eoanb_threat_fp_war
-			}
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-					PRS = { is_ai = yes }
-					FRA = { is_ai = yes }
-				}
-				PRS = { add_ideas = hidden_idea_historical_PRS_victory }
-			}
-			news_event = news.10
-			BAV = { country_event = { days = 1 id = fraprswar.12 } }
-			BAD = { country_event = { days = 1 id = fraprswar.12 } }
-			WUR = { country_event = { days = 1 id = fraprswar.12 } }
-			HSD = { country_event = { days = 1 id = fraprswar.12 } }
 		}
 	}
 
+	#This should de-escalate the situation.
+	option = {
+		name = fraprswar.8.b
+		trigger = {
+			OR = {
+				tag = BAD
+				tag = BAV
+				tag = HSD
+				tag = WUR
+			}
+		}
+		if = {
+			limit = {
+				has_idea = GC_idea_schutz_und_trutz
+			}
+			custom_effect_tooltip = south_germans_leopold_renounces_claim_effect_tt
+			hidden_effect = {
+				set_country_flag = south_germans_leopold_renounces_claim_flag
+			}
+		}
+	}
 }
 
-#The Ems Dispatch
-country_event = {
+#Leopold Forces Claim to the Spanish Throne
+news_event = {
 	id = fraprswar.9
 	title = fraprswar.9.t
 	desc = fraprswar.9.d
-	picture = GFX_report_event_generic_sign_treaty2
+	picture = GFX_event_berliner_schloss
+	
+	major = yes
 	
 	is_triggered_only = yes
-	
+
+	fire_for_sender = no
+
+	#This might escalate the crisis...
 	option = {
 		name = fraprswar.9.a
-		ai_chance = { factor = 100 }
-		FRA = { country_event = { days = 1 id = fraprswar.10 } }
+		trigger = {
+			NOT = {
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HSD
+					tag = WUR
+				}
+			}
+		}
 	}
-	
+
+	#This might escalate the crisis...
+	option = {
+		name = fraprswar.9.b
+		trigger = {
+			OR = {
+				tag = BAD
+				tag = BAV
+				tag = HSD
+				tag = WUR
+			}
+		}
+		if = {
+			limit = {
+				has_idea = GC_idea_schutz_und_trutz
+			}
+			custom_effect_tooltip = south_germans_leopold_forces_claim_effect_tt
+			hidden_effect = {
+				set_country_flag = south_germans_leopold_forces_claim_flag
+			}
+		}
+	}
 }
 
-#France mobilizes and declares War
+#PRS - France Demands an Apology and a Guarantee
 country_event = {
 	id = fraprswar.10
 	title = fraprswar.10.t
 	desc = fraprswar.10.d
-	picture = GFX_report_event_ANZAC_day
+	picture = GFX_report_event_ems_meeting_benedetti
 	
+	fire_only_once = yes
 	is_triggered_only = yes
+
+	timeout_days = 7
 	
+	#Respectfully reject their demands.
 	option = {
 		name = fraprswar.10.a
-		ai_chance = { factor = 100 }
-		hidden_effect = {
-			set_global_flag = eoanb_flag_franco_prussian_war_ongoing
-		}
-		declare_war_on = { target = PRS type = wargoal_franco_prussian_war }
-		if = {
-			limit = {
-				is_historical_focus_on = yes
-			}
-			PRS = { add_ideas = PRS_idea_fp_mil_boost }
-		}
-		else_if = {
-			limit = {
-				is_historical_focus_on = no
-			}
-			random_list = {
-				50 = {
-					PRS = { add_ideas = PRS_idea_fp_mil_boost }
-				}
-				50 = {
-					#
-				}
-			}
-		}
-		hidden_effect = {
-			add_named_threat = { 
-				threat = 5 
-				name = eoanb_threat_fp_war
-			}
-			if = {
-				limit = {
-					is_historical_focus_on = yes
-					PRS = { is_ai = yes }
-					FRA = { is_ai = yes }
-				}
-				PRS = { add_ideas = hidden_idea_historical_PRS_victory }
-			}
-			news_event = news.10
-			BAV = { country_event = { days = 1 id = fraprswar.12 } }
-			BAD = { country_event = { days = 1 id = fraprswar.12 } }
-			WUR = { country_event = { days = 1 id = fraprswar.12 } }
-			HSD = { country_event = { days = 1 id = fraprswar.12 } }
-		}
+		ai_chance = { base = 100 }
+		FRA = { country_event = { hours = 4 id = fraprswar.11 } }
+		custom_effect_tooltip = historical_option
 	}
 	
+	#Give in to their demands.
+	option = {
+		name = fraprswar.10.b
+		ai_chance = { base = 0 }
+		add_political_power = -100
+		add_stability = -0.05
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
+		decrease_ps_by_one = yes
+		FRA = { country_event = { hours = 4 id = fraprswar.12 } }
+	}
 }
 
-#Join Prussia
+#FRA - Prussia Rejects our Demands
+country_event = {
+	id = fraprswar.11
+	title = fraprswar.11.t
+	desc = fraprswar.11.d
+	picture = GFX_report_event_ems_meeting_benedetti
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Force them to provide the guarantee!
+	option = {
+		name = fraprswar.11.a
+		ai_chance = { base = 100 }
+		PRS = { country_event = { hours = 4 id = fraprswar.14 } }
+		custom_effect_tooltip = historical_option
+	}
+	
+	#Accept their refusal.
+	option = {
+		name = fraprswar.11.b
+		ai_chance = { base = 0 }
+		add_political_power = -100
+		add_stability = -0.05
+		set_temp_variable = { eoanb_prestige_change = -2 }
+		eoanb_change_prestige_score = yes
+		PRS = { country_event = { hours = 4 id = fraprswar.15 } }
+	}
+}
+
+#FRA - Prussia Accepts our Demands
 country_event = {
 	id = fraprswar.12
 	title = fraprswar.12.t
 	desc = fraprswar.12.d
-	picture = GFX_report_event_usa_election_generic
+	picture = GFX_report_event_ems_meeting_benedetti
 	
+	fire_only_once = yes
 	is_triggered_only = yes
 	
 	option = {
 		name = fraprswar.12.a
-		ai_chance = { factor = 100 }
-		add_to_war = { targeted_alliance = PRS enemy = FRA }
-		PRS = {
-			add_to_faction = ROOT
+		ai_chance = { base = 100 }
+		add_political_power = 150
+		add_stability = 0.05
+		increase_ps_by_one = yes
+		set_temp_variable = { eoanb_prestige_change = 5 }
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					NOT = { tag = PRS }
+				}
+				news_event = { days = 1 id = fraprswar.13 }
+			}
 		}
-		add_war_support = 0.15
-		set_temp_variable = { eoanb_prestige_change = 1 }
-		eoanb_change_prestige_score = yes
-	}
-	
-	option = {
-		name = fraprswar.12.b
-		ai_chance = { factor = 0 }
-		decrease_ps_by_one = yes
-		add_stability = -0.05
-		add_war_support = -0.05
-		set_temp_variable = { eoanb_prestige_change = -1 }
-		eoanb_change_prestige_score = yes
 	}
 }
 
-#ARMISTICE AND FRENCH EVENT CAN BE FOUND IN 00_nap_france.txt on the category :
-# 1870 FRANCO PRUSSIAN WAR - REPUBLICAN PART
-
-#Prussia forms the German Empire
-country_event = {
+#The Prussians Apologise and Provide a Guarantee
+news_event = {
 	id = fraprswar.13
 	title = fraprswar.13.t
 	desc = fraprswar.13.d
+	picture = GFX_news_event_ems_meeting_benedetti
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		name = fraprswar.13.a
+	}
+}
+
+#PRS - France Tries to Force us into Obedience - Ems Dispatch
+country_event = {
+	id = fraprswar.14
+	title = fraprswar.14.t
+	desc = fraprswar.14.d
+	picture = GFX_report_event_ems_meeting_benedetti
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 3
+	
+	#Let Bismarck handle the situation.
+	option = {
+		name = fraprswar.14.a
+		ai_chance = { base = 100 }
+		unlock_decision_tooltip = PRS_decision_publish_the_ems_dispatch
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_publish_ems_dispatch_flag
+		}
+	}
+	
+	#Concede our diplomatic defeat...
+	option = {
+		name = fraprswar.14.b
+		ai_chance = { base = 0 }
+		add_political_power = -200
+		add_stability = -0.1
+		add_war_support = -0.1
+		decrease_ps_by_two = yes
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+		FRA = { country_event = { days = 1 id = fraprswar.12 } }
+	}
+}
+
+#PRS - France Accepts our Refusal
+country_event = {
+	id = fraprswar.15
+	title = fraprswar.15.t
+	desc = fraprswar.15.d
+	picture = GFX_report_event_ems_meeting_benedetti
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#Publish an inflammatory dispatch.
+	option = {
+		name = fraprswar.15.a
+		ai_chance = { base = 100 }
+		unlock_decision_tooltip = PRS_decision_publish_the_ems_dispatch
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_publish_ems_dispatch_flag
+		}
+	}
+
+	#Accept the status quo.
+	option = {
+		name = fraprswar.15.b
+		ai_chance = { base = 0 }
+		unlock_decision_tooltip = PRS_decision_publish_the_ems_dispatch
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_publish_ems_dispatch_flag
+		}
+	}
+}
+
+#FRA - Prussia Publishes Insulting Dispatch (alt-history Ems Dispatch)
+country_event = {
+	id = fraprswar.16
+	title = fraprswar.16.t
+	desc = fraprswar.16.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 5
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = FRA_escalate_the_crisis_flag
+		}
+	}
+	
+	#This means war! - Start FPW
+	option = {
+		name = fraprswar.16.a
+		ai_chance = { base = 100 }
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
+		activate_decision = FRA_decision_declare_war_on_prussia
+		add_opinion_modifier = { target = PRS modifier = fra_ems_dispatch_1870 }
+		PRS = { country_event = { days = 3 id = fraprswar.18 } }
+		hidden_effect = {
+			remove_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+			PRS = { remove_opinion_modifier = { target = FRA modifier = fra_diplomatic_incident_1870 } }
+		}
+	}
+}
+
+#FRA - Prussia Publishes Insulting Dispatch (historical Ems Dispatch)
+country_event = {
+	id = fraprswar.17
+	title = fraprswar.17.t
+	desc = fraprswar.17.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	timeout_days = 5
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = FRA_escalate_the_crisis_flag
+		}
+	}
+	
+	#This means war! - Start FPW
+	option = {
+		name = fraprswar.17.a
+		ai_chance = { base = 100 }
+		set_temp_variable = { eoanb_prestige_change = -1 }
+		eoanb_change_prestige_score = yes
+		activate_decision = FRA_decision_declare_war_on_prussia
+		add_opinion_modifier = { target = PRS modifier = fra_ems_dispatch_1870 }
+		PRS = { country_event = { days = 3 id = fraprswar.18 } }
+		hidden_effect = {
+			remove_opinion_modifier = { target = PRS modifier = fra_diplomatic_incident_1870 }
+			PRS = { remove_opinion_modifier = { target = FRA modifier = fra_diplomatic_incident_1870 } }
+		}
+	}
+}
+
+#PRS - France Prepares for War
+country_event = {
+	id = fraprswar.18
+	title = fraprswar.18.t
+	desc = fraprswar.18.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.18.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.01
+	}
+}
+
+#The Prussians Apologise and Provide a Guarantee
+news_event = {
+	id = fraprswar.19
+	title = fraprswar.19.t
+	desc = fraprswar.19.d
+	picture = GFX_news_event_ems_meeting_benedetti
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		name = fraprswar.19.a
+	}
+}
+
+#FRA - The Chassepot Gap
+country_event = {
+	id = fraprswar.28
+	title = fraprswar.28.t
+	desc = fraprswar.28.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.28.a
+		ai_chance = { base = 100 }
+		add_ideas = FRA_idea_chassepot_gap
+		add_war_support = 0.01
+	}
+}
+
+#PRS - Krupp Artillery
+country_event = {
+	id = fraprswar.29
+	title = fraprswar.29.t
+	desc = fraprswar.29.d
+	picture = GFX_report_event_generic_read_write
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.29.a
+		ai_chance = { base = 100 }
+		add_ideas = PRS_idea_krupp_artillery
+		add_war_support = 0.01
+	}
+}
+
+#----------------------------------------------------------------------------------------------
+# FRANCO-PRUSSIAN WAR - WARTIME AND DEVELOPMENT (French Third Republic/Imperial events partly in file france_events)
+#----------------------------------------------------------------------------------------------
+
+#South German States - Join Prussia against France?
+country_event = {
+	id = fraprswar.31
+	title = fraprswar.31.t
+	desc = {
+		trigger = { 
+			has_country_flag = south_germans_leopold_forces_claim_flag
+		}
+		text = fraprswar.31.d_forced_claim
+	}
+	desc = {
+		trigger = { 
+			has_country_flag = south_germans_leopold_renounces_claim_flag
+		}
+		text = fraprswar.31.d_renounced_claim
+	}
+	picture = GFX_report_event_usa_election_generic
+	
+	is_triggered_only = yes
+	
+	#We will stand by their side.
+	option = {
+		name = fraprswar.31.a
+		ai_chance = {
+			base = 75
+			modifier = {
+				add = -25
+				has_country_flag = south_germans_leopold_forces_claim_flag
+			}
+		}
+		add_to_war = { targeted_alliance = PRS enemy = FRA }
+		PRS = { add_to_faction = ROOT }
+		add_war_support = 0.15
+		decrease_ps_by_one = yes
+		set_temp_variable = { eoanb_prestige_change = 1 }
+		eoanb_change_prestige_score = yes
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = south_germans_participate_in_fpw_flag
+		}
+	}
+	
+	#This is not our war to fight.
+	option = {
+		name = fraprswar.31.b
+		ai_chance = {
+			base = 25
+			modifier = {
+				add = 25
+				has_country_flag = south_germans_leopold_forces_claim_flag
+			}
+			modifier = {
+				factor = 0
+				has_country_flag = south_germans_leopold_renounces_claim_flag
+			}
+		}
+		if = {
+			limit = {
+				has_country_flag = south_germans_leopold_forces_claim_flag
+			}
+			add_political_power = -75
+			add_stability = -0.05
+			add_war_support = -0.02
+			decrease_ps_by_one = yes
+			set_temp_variable = { eoanb_prestige_change = -1 }
+			eoanb_change_prestige_score = yes
+		}
+		else = {
+			add_political_power = -150
+			add_stability = -0.1
+			add_war_support = -0.03
+			decrease_ps_by_two = yes
+			set_temp_variable = { eoanb_prestige_change = -2 }
+			eoanb_change_prestige_score = yes
+		}
+		custom_effect_tooltip = south_germans_refuse_to_join_FPW_effect_tt
+	}
+}
+
+#PRS/South German States - French Army Defeated and Napoleon III Captured (historically at Sedan)
+country_event = {
+	id = fraprswar.32
+	title = fraprswar.32.t
+	desc = fraprswar.32.d
+	picture = GFX_report_event_nap_france_exile_napoleon_iii
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.32.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		activate_mission = PRS_mission_besiege_paris
+		add_political_power = 50
+		add_stability = 0.02
+		add_war_support = 0.05
+		increase_ps_by_one = yes
+		hidden_effect = {
+			FRA = { country_event = nap_france.397 }
+			BAD = { country_event = fraprswar.32 }
+			BAV = { country_event = fraprswar.32 }
+			HSD = { country_event = fraprswar.32 }
+			WUR = { country_event = fraprswar.32 }
+			every_other_country = {
+				limit = {
+					NOT = {
+						OR = {
+							tag = FRA
+							tag = BAD
+							tag = BAV
+							tag = HSD
+							tag = WUR
+						}
+					}
+				}
+				news_event = { days = 1 id = fraprswar.33 }
+			}
+		}
+	}
+
+	option = {
+		name = fraprswar.32.b
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = 25
+		add_stability = 0.02
+		add_war_support = 0.05
+		increase_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.32.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = -50
+		add_stability = -0.05
+	}
+}
+
+#French Army Defeated and Napoleon III Captured (historically at Sedan)
+news_event = {
+	id = fraprswar.33
+	title = fraprswar.33.t
+	desc = fraprswar.33.d
+	picture = GFX_news_event_napoleon_iii_captured
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		name = fraprswar.33.a
+	}
+}
+
+#PRS/South German States - Paris under Siege
+country_event = {
+	id = fraprswar.34
+	title = fraprswar.34.t
+	desc = fraprswar.34.d
+	picture = GFX_report_event_siege_of_paris
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.34.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		add_political_power = 50
+		add_stability = 0.02
+		add_war_support = 0.05
+		increase_ps_by_one = yes
+		hidden_effect = {
+			FRA = { country_event = fraprswar.34 }
+			BAD = { country_event = fraprswar.34 }
+			BAV = { country_event = fraprswar.34 }
+			HSD = { country_event = fraprswar.34 }
+			WUR = { country_event = fraprswar.34 }
+		}
+	}
+
+	option = {
+		name = fraprswar.34.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		activate_mission = FRA_mission_break_paris_siege
+		decrease_ps_by_one = yes
+		hidden_effect = {
+			set_country_flag = FRA_paris_besieged_flag
+			country_event = {
+				days = 55
+				id = third_rep_france.009
+			}
+			country_event = {
+				days = 1
+				id = third_rep_france.0081
+			}
+		}
+	}
+
+	option = {
+		name = fraprswar.34.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = 25
+		add_stability = 0.01
+		add_war_support = 0.025
+		increase_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.34.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = -25
+		add_stability = -0.025
+	}
+}
+
+#FRA/PRS/South German States - Paris Siege Broken!
+country_event = {
+	id = fraprswar.35
+	title = fraprswar.35.t
+	desc = fraprswar.35.d
+	picture = GFX_report_event_siege_of_paris_broken
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.35.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		activate_mission = FRA_mission_push_back_the_germans
+		add_political_power = 100
+		add_stability = 0.05
+		add_war_support = 0.15
+		increase_ps_by_one = yes
+		hidden_effect = {
+			PRS = { country_event = fraprswar.35 }
+			BAD = { country_event = fraprswar.35 }
+			BAV = { country_event = fraprswar.35 }
+			HSD = { country_event = fraprswar.35 }
+			WUR = { country_event = fraprswar.35 }
+		}
+	}
+
+	option = {
+		name = fraprswar.35.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.1
+	}
+
+	option = {
+		name = fraprswar.35.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = -25
+		add_stability = -0.025
+		add_war_support = -0.1
+	}
+
+	option = {
+		name = fraprswar.35.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = 25
+		add_stability = 0.01
+	}
+}
+
+#FRA/PRS/South German States - French Army Pushes German Troops out of France
+country_event = {
+	id = fraprswar.36
+	title = fraprswar.36.t
+	desc = fraprswar.36.d
+	picture = GFX_report_event_siege_of_paris_broken
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.36.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		activate_mission = FRA_mission_seize_forts_along_the_border
+		add_political_power = 150
+		add_stability = 0.1
+		add_war_support = 0.2
+		hidden_effect = {
+			PRS = { country_event = fraprswar.36 }
+			BAD = { country_event = fraprswar.36 }
+			BAV = { country_event = fraprswar.36 }
+			HSD = { country_event = fraprswar.36 }
+			WUR = { country_event = fraprswar.36 }
+		}
+	}
+
+	option = {
+		name = fraprswar.36.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.15
+		decrease_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.36.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.15
+		decrease_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.36.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = 50
+		add_stability = 0.02
+	}
+}
+
+#FRA/PRS/South German States - French Army Pushes German Troops over the Rhine
+country_event = {
+	id = fraprswar.37
+	title = fraprswar.37.t
+	desc = fraprswar.37.d
+	picture = GFX_report_event_siege_of_paris_broken
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.37.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		add_political_power = 150
+		add_stability = 0.1
+		add_war_support = 0.2
+		increase_ps_by_one = yes
+		hidden_effect = {
+			PRS = { country_event = fraprswar.37 }
+			BAD = { country_event = fraprswar.37 }
+			BAV = { country_event = fraprswar.37 }
+			HSD = { country_event = fraprswar.37 }
+			WUR = { country_event = fraprswar.37 }
+		}
+	}
+
+	option = {
+		name = fraprswar.37.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.15
+		decrease_ps_by_two = yes
+	}
+
+	option = {
+		name = fraprswar.37.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = -100
+		add_stability = -0.1
+		add_war_support = -0.15
+		decrease_ps_by_two = yes
+	}
+
+	option = {
+		name = fraprswar.37.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+	}
+}
+
+#FRA/PRS/South German States - French Army Conquers Forts along the Border
+country_event = {
+	id = fraprswar.38
+	title = fraprswar.38.t
+	desc = fraprswar.38.d
+	picture = GFX_report_event_siege_of_paris_broken
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.38.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		activate_mission = FRA_mission_push_the_germans_behind_the_rhine
+		add_political_power = 75
+		add_stability = 0.05
+		add_war_support = 0.1
+		hidden_effect = {
+			PRS = { country_event = fraprswar.38 }
+			BAD = { country_event = fraprswar.38 }
+			BAV = { country_event = fraprswar.38 }
+			HSD = { country_event = fraprswar.38 }
+			WUR = { country_event = fraprswar.38 }
+		}
+	}
+
+	option = {
+		name = fraprswar.38.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		add_political_power = -75
+		add_stability = -0.05
+		add_war_support = -0.1
+		decrease_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.38.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.1
+		decrease_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.38.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = 20
+		add_stability = 0.01
+	}
+}
+
+#PRS/FRA/South German States - German Troops Push French Army out of Germany
+country_event = {
+	id = fraprswar.39
+	title = fraprswar.39.t
+	desc = fraprswar.39.d
+	picture = GFX_report_event_siege_of_paris
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.39.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = PRS
+		}
+		activate_mission = PRS_mission_seize_forts_up_to_sedan
+		add_political_power = 100
+		add_stability = 0.1
+		add_war_support = 0.15
+		hidden_effect = {
+			FRA = { country_event = fraprswar.39 }
+			BAD = { country_event = fraprswar.39 }
+			BAV = { country_event = fraprswar.39 }
+			HSD = { country_event = fraprswar.39 }
+			WUR = { country_event = fraprswar.39 }
+		}
+	}
+
+	option = {
+		name = fraprswar.39.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = FRA
+		}
+		add_political_power = -75
+		add_stability = -0.1
+		add_war_support = -0.1
+		decrease_ps_by_one = yes
+	}
+
+	option = {
+		name = fraprswar.39.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			has_war_with = FRA
+		}
+		add_political_power = 75
+		add_stability = 0.1
+		add_war_support = 0.15
+	}
+
+	option = {
+		name = fraprswar.39.e
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = PRS }
+			NOT = { has_war_with = FRA }
+		}
+		add_political_power = -50
+		add_stability = -0.05
+	}
+}
+
+#Francs-Tireurs
+country_event = {
+	id = fraprswar.40
+	title = fraprswar.40.t
+	desc = fraprswar.40.d
+	picture = GFX_report_event_francstireurs
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = fraprswar.40.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.01
+		add_ideas = PRS_idea_francstireurs
+		hidden_effect = {
+			if = {
+				limit = {
+					tag = PRS
+				}
+				every_other_country = {
+					limit = {
+						has_country_flag = south_germans_participate_in_fpw_flag
+					}
+					country_event = fraprswar.40
+				}
+			}
+		}
+	}
+}
+
+#----------------------------------------------------------------------------------------------
+# FRANCO-PRUSSIAN WAR - PEACE OPTIONS
+#----------------------------------------------------------------------------------------------
+
+#HISTORICAL PATH - THIRD REPUBLIC
+
+#FRA - Inquire for Peace with the Prussians?
+country_event = {
+	id = fraprswar.101
+	title = fraprswar.101.t
+	desc = fraprswar.101.d
+	picture = GFX_report_event_napoleon_iii_death
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Go for it.
+	option = {
+		name = fraprswar.101.a
+		ai_chance = { base = 100 }
+		PRS = {
+			country_event = {
+				days = 3
+				id = fraprswar.102
+			}
+		}
+		add_stability = 0.05
+		custom_effect_tooltip = historical_option
+	}
+
+	#No chance!
+	option = {
+		name = fraprswar.101.b
+		ai_chance = { base = 0 }
+		add_war_support = 0.01
+	}
+}
+
+#PRS - France Inquires about Peace Conditions
+country_event = {
+	id = fraprswar.102
+	title = fraprswar.102.t
+	desc = fraprswar.102.d
+	picture = GFX_report_event_favre_bismarck_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Demand Alsace-Lorraine.
+	option = {
+		name = fraprswar.102.a
+		ai_chance = { base = 100 }
+		FRA = {
+			country_event = {
+				id = fraprswar.103
+			}
+		}
+		custom_effect_tooltip = historical_option
+		hidden_effect = {
+			set_country_flag = PRS_demand_alsace_fpw_flag
+		}
+	}
+
+	#Demand only war reparations.
+	option = {
+		name = fraprswar.102.b
+		ai_chance = { base = 0 }
+		FRA = {
+			country_event = {
+				id = fraprswar.104
+			}
+		}
+		add_political_power = -50
+		add_stability = -0.05
+		add_war_support = -0.05
+	}
+}
+
+#FRA - The Prussian Demands (historical)
+country_event = {
+	id = fraprswar.103
+	title = fraprswar.103.t
+	desc = fraprswar.103.d
+	picture = GFX_report_event_favre_bismarck_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Refuse these outrageous demands!
+	option = {
+		name = fraprswar.103.a
+		ai_chance = { base = 100 }
+		add_war_support = 0.03
+		add_stability = 0.02
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.105
+			}
+		}
+		custom_effect_tooltip = historical_option
+	}
+
+	#A price has to be paid...
+	option = {
+		ai_chance = { base = 0 }
+		name = fraprswar.103.b
+		add_war_support = -0.02
+		add_stability = -0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.106
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice
+				}
+			}
+		}
+	}
+}
+
+#FRA - The Prussian Demands (alt-history)
+country_event = {
+	id = fraprswar.104
+	title = fraprswar.104.t
+	desc = fraprswar.104.d
+	picture = GFX_report_event_favre_bismarck_meeting
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Accept their demands.
+	option = {
+		name = fraprswar.104.a
+		ai_chance = { base = 60 }
+		add_war_support = -0.05
+		add_stability = 0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.106
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice alt-history
+				}
+			}
+		}
+	}
+
+	#Reject these ridiculous demands!
+	option = {
+		ai_chance = { base = 40 }
+		name = fraprswar.104.b
+		add_war_support = -0.02
+		add_stability = -0.05
+		PRS = {
+			country_event = {
+				days = 1
+				id = fraprswar.105
+			}
+		}
+		hidden_effect = {
+			FRA = {
+				country_event = {
+					days = 8
+					id = third_rep_france.011 #Armistice alt-history
+				}
+			}
+		}
+	}
+}
+
+#----------------------------------------------------------------------------------------------
+# FRANCO-PRUSSIAN WAR - AFTERMATH
+#----------------------------------------------------------------------------------------------
+
+#Prussia forms the German Empire
+country_event = {
+	id = fraprswar.64
+	title = fraprswar.64.t
+	desc = fraprswar.64.d
 	picture = GFX_report_event_albanian_partisans
 	
 	fire_only_once = yes
@@ -535,13 +1543,54 @@ country_event = {
     is_triggered_only = yes #triggered in on_state_control_changed on_action
 	
 	option = {
-		name = fraprswar.13.a
-		ai_chance = { factor = 100 }
+		name = fraprswar.64.a
+		ai_chance = { base = 100 }
 		add_timed_idea = {
 			idea = PRS_idea_french_war_reparations
 			days = 730
 		}
+		unlock_decision_category_tooltip = GER_category_elsass_integration
 		hidden_effect = {
+			remove_mission = PRS_FRA_mission_franco_prussian_war
+			FRA = { remove_mission = PRS_FRA_mission_franco_prussian_war }
+			PRS = {
+				add_dynamic_modifier = {
+					modifier = GER_elsass_integration_national
+					scope = PRS
+				}
+				28 = {
+					add_dynamic_modifier = {
+						modifier = GER_elsass_integration_state
+						scope = PRS
+					}
+				}
+				set_variable = { GER_elsass_pp_gain = 0 }
+				set_variable = { GER_Elsass_Germanization_Speed = 1 }
+				set_variable = { GER_Elsass_Acceptance = 0 }
+				set_variable = { GER_Elsass_Germanization_Count = 10 }
+				set_variable = { GER_Elsass_Acceptance_Speed = 0.01 }
+				set_variable = { GER_elsass_resource = 0 }
+				set_variable = { GER_elsass_building_speed = 0 }
+				set_variable = { GER_elsass_stability = 0 }
+				set_variable = { GER_elsass_stability_l = 0 }
+				set_variable = { GER_elsass_pp_gain_l = 0 }
+				set_variable = { GER_elsass_building_speed_l = 0 }
+				set_variable = { GER_elsass_resource_l = 0 }
+				set_variable = { GER_Elsass_Germanization_Speed_l = 0 }
+			}
+			set_variable = { GER_elsass_german_pop = 28.state_population }
+			multiply_variable = { GER_elsass_german_pop = 28.state_culture_array_num^0 }
+			set_variable = { GER_elsass_french_pop = 28.state_population }
+			multiply_variable = { GER_elsass_french_pop = 28.state_culture_array_num^1 }
+			set_variable = { GER_elsass_jewish_pop = 28.state_population }
+			multiply_variable = { GER_elsass_jewish_pop = 28.state_culture_array_num^2 }
+			round_variable = GER_elsass_german_pop
+			round_variable = GER_elsass_french_pop
+			round_variable = GER_elsass_jewish_pop
+			GER_Elsass_Acceptance_Calc = yes
+			activate_mission = eoanb_mission_GER_elsass_integration_weekly
+			activate_mission = eoanb_mission_GER_elsass_integration_monthly
+			activate_mission = eoanb_mission_GER_elsass_integration_yearly
 			PRS = { dismantle_faction = yes }
 			PRS = { set_country_flag = eoanb_flag_won_fra_prs_war }
 			PRS = { annex_country = { target = BAV transfer_troops = yes } }
@@ -551,6 +1600,7 @@ country_event = {
 			PRS = {
 				add_ideas = GER_idea_winners_of_fp
 			}
+			remove_ideas = PRS_idea_francstireurs
 			if = {
 				limit = {
 					PRS = {
@@ -627,9 +1677,9 @@ country_event = {
 
 #France has to pay war reparations
 country_event = {
-	id = fraprswar.14
-	title = fraprswar.14.t
-	desc = fraprswar.14.d
+	id = fraprswar.65
+	title = fraprswar.65.t
+	desc = fraprswar.65.d
 	picture = GFX_report_event_albanian_partisans
 	
 	fire_only_once = yes
@@ -637,8 +1687,8 @@ country_event = {
     is_triggered_only = yes
 	
 	option = {
-		name = fraprswar.14.a
-		ai_chance = { factor = 100 }
+		name = fraprswar.65.a
+		ai_chance = { base = 100 }
 		add_political_power = -25
 		add_timed_idea = {
 			idea = FRA_idea_prussian_war_reparations
