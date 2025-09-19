@@ -2575,20 +2575,18 @@ country_event = {
 
 # Gambetta's Balloon Adventures (7 Oct 1870)
 country_event = {
-	id = third_rep_france.0080
-	title = third_rep_france.0080.t
-	desc = third_rep_france.0080.d
-	picture = GFX_report_event_napoleon_iii_death
+	id = france.321
+	title = france.321.t
+	desc = france.321.d
+	picture = GFX_report_event_gambettas_balloon_adventures
+
+	#fire from Tours event
+
 	fire_only_once = yes
 	is_triggered_only = yes
-	trigger = {
-		AND = {
-			has_country_flag = FRA_paris_besieged_flag
-			has_country_flag = FRA_military_baloon_tag
-		}
-	}
+
 	option = {
-		name = third_rep_france.0080.a
+		name = france.321.a
 		hidden_effect = {
 			set_country_flag = Gambetta_Trip
 		}
@@ -2660,84 +2658,204 @@ country_event = {
 	}
 }
 
+### Paris Commune Events (france.551-600)
+
+# Insurrections in Paris
 country_event = {
-	# Insurrections in Paris
-	id = third_rep_france.009
-	title = third_rep_france.009.t
-	desc = third_rep_france.009.d
-	picture = GFX_report_event_napoleon_iii_death
+	id = france.551
+	title = france.551.t
+	desc = france.551.d
+	picture = GFX_report_event_paris_insurrection_1870
+
 	fire_only_once = yes
 	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			OR = {
+				has_government = anarchism
+				has_government = ideology_radical_socialism
+				has_government = radical_democracy
+			}
+		}
+	}
+
+	# Send the National Guard to put them down.
 	option = {
-		# Put down this insurrection
-		name = third_rep_france.009.a
-		add_political_power = -20
+		name = france.551.a
+		ai_chance = { base = 90 }
+		add_political_power = -25
 		hidden_effect = {
 			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				country_event = {
+					id = france.552
+					days = 2
+				}
+			}
+			else = {
+				random_list = {
+					90 = {
+						country_event = {
+							id = france.552
+							days = 2
+						}
+					}
+					10 = {
+						country_event = {
+							id = france.553
+							days = 2
+						}
+					}
+				}
+			}
+		}
+	}
+
+	# Leave them be.
+	option = {
+		name = france.551.b
+		ai_chance = {
+			base = 10
+			modifier = {
+				factor = 0.5
+				OR = {
+					has_government = autocracy
+					has_government = fundamentalism
+					has_government = traditional_conservatism
+					has_government = centrism
+				}
+			}
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+		add_political_power = -10
+		add_stability = -0.03
+		hidden_effect = {
+			#alt_history here
+		}
+	}
+}
+
+# The National Guard Restores Order in Paris
+country_event = {
+	id = france.552
+	title = france.552.t
+	desc = france.552.d
+	picture = GFX_report_event_national_guard_mobile
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	# Hold a plebiscite.
+	option = {
+		name = france.552.a
+		ai_chance = { base = 100 }
+		add_stability = 0.01
+		hidden_effect = {
+			if = {
+				limit = {
+					is_historical_focus_on = yes
+				}
+				country_event = {
+					id = france.554
+					days = 2
+				}
+			}
+			else_if = {
 				limit = {
 					surrender_progress < 0.65
 				}
 				country_event = {
-					id = third_rep_france.0101
+					id = france.554
 					days = 2
 				}
 			}
 			else = {
 				country_event = {
-					id = third_rep_france.0102
+					id = france.555
 					days = 2
 				}
 			}
 		}
 	}
-}
 
-country_event = {
-	# Plebiscite Result in Paris : WIN
-	id = third_rep_france.0101
-	title = third_rep_france.0101.t
-	desc = third_rep_france.0101.d
-	picture = GFX_report_event_napoleon_iii_death
-	fire_only_once = yes
-	is_triggered_only = yes
+	# Not necessary.
 	option = {
-		name = third_rep_france.0101.a
-		complete_national_focus = FRA_plebicite
-	}
-}
-
-country_event = {
-	# Plebiscite Result in Paris : LOOSE
-	id = third_rep_france.0102
-	title = third_rep_france.0102.t
-	desc = third_rep_france.0102.d
-	picture = GFX_report_event_napoleon_iii_death
-	fire_only_once = yes
-	is_triggered_only = yes
-	option = {
-		name = third_rep_france.0102.a
-		country_event = {
-			days = 1
-			id = third_rep_france.0103
+		name = france.552.b
+		ai_chance = { base = 0 }
+		add_political_power = -20
+		add_stability = -0.02
+		hidden_effect = {
+			#possible alt-history
 		}
 	}
 }
 
+#france.553 for alt-history
+
+# Plebiscite Result in Paris: Victory for the Government
 country_event = {
-	# Trochu steps down
-	id = third_rep_france.0103
-	title = third_rep_france.0103.t
-	desc = third_rep_france.0103.d
-	picture = GFX_report_event_napoleon_iii_death
+	id = france.554
+	title = france.554.t
+	desc = france.554.d
+	picture = GFX_report_event_proclamation_french_republic_3
+
 	fire_only_once = yes
 	is_triggered_only = yes
+
 	option = {
-		name = third_rep_france.0103.a
+		name = france.554.a
+		add_stability = 0.025
+		#complete_national_focus = FRA_plebicite	(Does this even exist?)
+	}
+}
+
+# Plebiscite Result in Paris: Defeat for the Government
+country_event = {
+	id = france.555
+	title = france.555.t
+	desc = france.555.d
+	picture = GFX_report_event_siege_of_paris
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = france.555.a
+		add_political_power = -25
+		add_stability = -0.025
+		hidden_effect = {
+			country_event = {
+				days = 1
+				id = france.556
+			}
+		}
+	}
+}
+
+# Trochu Steps Down
+country_event = {
+	id = france.556
+	title = france.556.t
+	desc = france.556.d
+	picture = GFX_report_event_proclamation_french_republic_1
+
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = france.556.a
 		hidden_effect = {
 			country_event = {
 				days = 1
 				id = third_rep_france.011
 			}
+			# replace with Commune
 		}
 		FRA_provisional_government = {
 			add_country_leader_role = {
@@ -2753,6 +2871,124 @@ country_event = {
 			}
 		}
 		retire_character = FRA_louis_jules_trochu
+	}
+}
+
+# Formation of the Paris Commune
+country_event = {
+	id = france.560
+	title = france.560.t
+	desc = france.560.d
+	picture = GFX_report_event_paris_commune
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			CPR = {
+				add_state_core = 814
+				set_politics = {
+					ruling_party = ideology_radical_socialism
+					name = FRA_CPR_ideology_radical_socialism_party
+				}
+			}
+		}
+	}
+
+	#We will crush them!
+	option = {
+		name = france.560.a
+		add_popularity = {
+			ideology = ideology_radical_socialism
+			popularity = 0.1
+		}
+		remove_country_leader_role = {
+			character = FRA_provisional_government
+			ideology = conserv
+		}
+		FRA_eugene_chevandier_de_valdrome = {
+			add_country_leader_role = {
+				country_leader = {
+					expire = "1879.1.1"
+					desc = "POLITICS_TEMP_DESC"
+					ideology = conserv
+					traits = {
+						#
+					}
+				}
+			}
+		}
+		release = CPR
+		hidden_effect = {
+			news_event = {
+				days = 1
+				id = france.561
+			}
+		}
+	}
+
+	#Vive la Commune!
+	option = {
+		name = france.560.b
+		add_popularity = {
+			ideology = ideology_radical_socialism
+			popularity = 0.1
+		}
+		remove_country_leader_role = {
+			character = FRA_provisional_government
+			ideology = conserv
+		}
+		FRA_eugene_chevandier_de_valdrome = {
+			add_country_leader_role = {
+				country_leader = {
+					expire = "1879.1.1"
+					desc = "POLITICS_TEMP_DESC"
+					ideology = conserv
+					traits = {
+						#
+					}
+				}
+			}
+		}
+		release = CPR
+		CPR = { change_tag_from = FRA }
+		hidden_effect = {
+			news_event = {
+				days = 1
+				id = france.561
+			}
+		}
+	}
+}
+
+# The Proclamation of the Paris Commune
+news_event = {
+	id = france.561
+	title = france.561.t
+	desc = france.561.d
+	picture = GFX_news_event_paris_commune
+	
+	major = yes
+	
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		trigger = {
+			NOT = { has_war_with = FRA }
+		}
+		name = france.561.a
+		ai_chance = { base = 100 }
+	}
+
+	option = {
+		trigger = {
+			has_war_with = FRA
+		}
+		name = france.561.b
+		ai_chance = { base = 100 }
 	}
 }
 
