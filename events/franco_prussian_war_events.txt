@@ -1350,7 +1350,7 @@ country_event = {
 # FRANCO-PRUSSIAN WAR - PEACE OPTIONS
 #----------------------------------------------------------------------------------------------
 
-#HISTORICAL PATH - THIRD REPUBLIC
+#HISTORICAL PATH - THIRD REPUBLIC (fraprswar.101-150)
 
 #FRA - Inquire for Peace with the Prussians?
 country_event = {
@@ -1465,7 +1465,7 @@ country_event = {
 			FRA = {
 				country_event = {
 					days = 8
-					id = third_rep_france.011 #Armistice
+					id = fraprswar.201 #Armistice
 				}
 			}
 		}
@@ -1498,7 +1498,7 @@ country_event = {
 			FRA = {
 				country_event = {
 					days = 8
-					id = third_rep_france.011 #Armistice alt-history
+					id = fraprswar.203 #Armistice alt-history
 				}
 			}
 		}
@@ -1506,8 +1506,8 @@ country_event = {
 
 	#Reject these ridiculous demands!
 	option = {
-		ai_chance = { base = 40 }
 		name = fraprswar.104.b
+		ai_chance = { base = 40 }
 		add_war_support = -0.02
 		add_stability = -0.05
 		PRS = {
@@ -1520,16 +1520,226 @@ country_event = {
 			FRA = {
 				country_event = {
 					days = 8
-					id = third_rep_france.011 #Armistice alt-history
+					id = fraprswar.203 #Armistice alt-history
 				}
 			}
 		}
 	}
 }
 
+#ALT-HISTORY PATH - FRENCH ARMY IS UTTERLY DEFEATED BEFORE ARMISTICE IS SIGNED (fraprswar.151-200)
+
+# French Army Defeated
+country_event = {
+	id = fraprswar.151
+	title = fraprswar.151.t
+	desc = fraprswar.151.d
+	picture = GFX_report_event_french_army_defeated
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.151.a
+		ai_chance = { base = 100 }
+		hidden_effect = {
+			country_event = {
+				id = fraprswar.201
+				days = 1
+			}
+		}
+	}
+}
+
+# Paris Captured by Prussians
+country_event = {
+	id = fraprswar.152
+	title = fraprswar.152.t
+	desc = fraprswar.152.d
+	picture = GFX_report_event_siege_of_paris_complete
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.152.a
+		ai_chance = { base = 100 }
+		set_temp_variable = {
+			eoanb_prestige_change = -3
+		}
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			country_event = {
+				id = fraprswar.201
+				days = 1
+			}
+		}
+	}
+}
+
 #----------------------------------------------------------------------------------------------
-# FRANCO-PRUSSIAN WAR - AFTERMATH
+# FRANCO-PRUSSIAN WAR - AFTERMATH (fraprswar.201-300)
 #----------------------------------------------------------------------------------------------
+
+# FRA - Armistice Signed
+country_event = {
+	id = fraprswar.201
+	title = fraprswar.201.t
+	desc = fraprswar.201.d
+	picture = GFX_report_event_armistice_1871
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = fraprswar.201.a
+		ai_chance = { base = 100 }
+		add_stability = 0.02
+		add_war_support = -0.2
+		custom_effect_tooltip = FRA_armistice_fraprswar_effect_tt
+		hidden_effect = {
+			PRS = {
+				country_event = {
+					id = fraprswar.202
+				}
+			}
+			country_event = {
+				days = 2
+				id = third_rep_france.012
+			}
+			country_event = {
+				days = 3
+				id = third_rep_france.013
+			}
+			country_event = {
+				days = 5
+				id = third_rep_france.014
+			}
+			country_event = {
+				days = 60
+				id = third_rep_france.016
+			}
+			country_event = {
+				days = 1
+				id = third_rep_france.0111
+			}
+			give_military_access = PRS
+			white_peace = PRS
+			country_event = {
+				id = fraprswar.65
+				days = 10
+			}
+			clr_country_flag = FRA_national_assembly_bordeaux_flag
+			clr_country_flag = FRA_government_in_tours_flag
+			clr_country_flag = FRA_paris_besieged_flag
+			clr_global_flag = eoanb_flag_franco_prussian_war_ongoing
+		}
+	}
+}
+
+# PRS - Armistice Signed
+country_event = {
+	id = fraprswar.202
+	title = fraprswar.202.t
+	desc = fraprswar.202.d
+	picture = GFX_report_event_armistice_1871
+
+	is_triggered_only = yes
+
+	#Prussia
+	option = {
+		name = fraprswar.202.a
+		trigger = {
+			tag = PRS
+		}
+		ai_chance = { base = 100 }
+		add_political_power = 50
+		add_stability = 0.03
+		add_war_support = -0.2
+		custom_effect_tooltip = PRS_armistice_fraprswar_effect_tt
+		hidden_effect = {
+			transfer_state = 28
+			transfer_state = 972
+			transfer_state = 18
+			transfer_state = 976
+			transfer_state = 29
+			if = {
+				limit = {
+					FRA = { controls_state = 8 }
+				}
+				transfer_state = 8
+			}
+			#	transfer_state = 1151
+			country_event = {
+				id = fraprswar.65
+				days = 10
+			}
+			country_event = {
+				days = 1
+				id = third_rep_france.0112
+			}
+			every_other_country = {
+				limit = {
+					has_country_flag = south_germans_participate_in_fpw_flag
+				}
+				country_event = {
+					id = fraprswar.202
+				}
+			}
+			#set_global_flag = GER_Winner_of_FPW
+		}
+	}
+
+	#Other German states
+	option = {
+		name = fraprswar.202.b
+		trigger = {
+			NOT = { tag = PRS }
+		}
+		ai_chance = { base = 100 }
+		add_political_power = 50
+		add_stability = 0.03
+		add_war_support = -0.2
+	}
+}
+
+
+
+# German Army March in Paris (France) - AFTER PEACE
+country_event = {
+	id = third_rep_france.0111
+	title = third_rep_france.0111.t
+	desc = third_rep_france.0111.d
+	picture = GFX_report_event_napoleon_iii_death
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = third_rep_france.0111.a
+		set_temp_variable = {
+			eoanb_prestige_change = -1
+		}
+		eoanb_change_prestige_score = yes
+	}
+}
+
+country_event = {
+	# German Army March in Paris (Germany)
+	id = third_rep_france.0112
+	title = third_rep_france.0112.t
+	desc = third_rep_france.0112.d
+	picture = GFX_report_event_napoleon_iii_death
+	fire_only_once = yes
+	is_triggered_only = yes
+	option = {
+		name = third_rep_france.0112.a
+		set_temp_variable = {
+			eoanb_prestige_change = 1
+		}
+		eoanb_change_prestige_score = yes
+	}
+}
+
+
 
 #Prussia forms the German Empire
 country_event = {
