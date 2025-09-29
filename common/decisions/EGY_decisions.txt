@@ -62,31 +62,33 @@ political_actions = {
 	}
 }
 
-afr_suez_construction ={
+afr_suez_construction = {
+	
+	#Dedicate Military Forces as Workers
 	EGY_dedicate_military_workers = {
 		icon = generic_construction
 
 		allowed = { always = yes }
+
 		available = {
+			has_manpower > 999
+		}
+
+		visible = {
 			check_variable = {
 				var = EGY.suez_inprogress_total
 				value = EGY.suez_progress_max
 				compare = less_than
 			}
-			has_manpower > 999
-		}
-		visible={
 			has_country_flag = suez_constructor_flag
 			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
 		}
+
 		cost = 0
-		ai_will_do = {
-			factor = 100
-		}
-		modifier = {
-			political_power_gain = -0.05
-		}
+
 		days_remove = 240
+		days_re_enable = 10
+
 		cancel_trigger = {
 			check_variable = {
 				var = EGY.suez_progress
@@ -94,6 +96,20 @@ afr_suez_construction ={
 				compare = greater_than_or_equals
 			}
 		}
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+
+		complete_effect = {
+			##increase suez progress
+			add_manpower = -1000
+			add_to_variable = { EGY.suez_inprogress = 1 }
+			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
+			custom_effect_tooltip = EGY_suez_construct_1
+		}
+
 		remove_effect = {
 			##increase suez progress
 			if = { 
@@ -104,26 +120,38 @@ afr_suez_construction ={
 						compare = less_than
 					}
 				}
-				add_to_variable = {EGY.suez_progress = 2}
-				add_to_variable = {suez_investment = 2}
+				add_to_variable = { EGY.suez_progress = 1 }
+				add_to_variable = { suez_investment = 1 }
 				clamp_variable = {
 					var = EGY.suez_progress
 					min = 0
 					max = EGY.suez_progress_max
 				}
 			}
-			add_to_variable = {EGY.suez_inprogress = -2}
-			add_manpower = 1000
+			add_to_variable = { EGY.suez_inprogress = -1 }
+			add_manpower = 900
 		}
-		complete_effect = {
-			##increase suez progress
-			add_manpower = -1000
-			add_to_variable = {EGY.suez_inprogress = 2}
-			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
-			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
-			custom_effect_tooltip = EGY_suez_construct_2
+		
+
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				has_manpower < 5000
+			}
+			modifier = {
+				factor = 0.1
+				NOT = {
+					OR = {
+						has_government = autocracy
+						has_government = chauvinist_populism
+						has_government = radical_democracy
+					}
+				}
+			}
 		}
 	}
+
 	EGY_corvee_workers_alexandria = {
 		icon = generic_construction
 		fixed_random_seed = no
@@ -184,7 +212,7 @@ afr_suez_construction ={
 			}
 			add_to_variable = {suez_inprogress = -2}
 			447={
-				add_manpower = 10000
+				add_manpower = 9000
 			}
 		}
 		complete_effect = {
@@ -260,7 +288,7 @@ afr_suez_construction ={
 			}
 			add_to_variable = {suez_inprogress = -2}
 			456={
-				add_manpower = 10000
+				add_manpower = 9000
 			}
 		}
 		complete_effect = {
@@ -335,7 +363,7 @@ afr_suez_construction ={
 			add_to_variable = {suez_progress = 2}
 			add_to_variable = {suez_investment = 2}
 			446={
-				add_manpower = 10000
+				add_manpower = 9000
 			}
 		}
 		complete_effect = {
@@ -350,32 +378,38 @@ afr_suez_construction ={
 			custom_effect_tooltip = EGY_suez_construct_2
 		}
 	}
+
+	#Dedicate Industrial Power
 	EGY_dedicate_industrial_power = {
 		icon = generic_construction
+
 		allowed = { always = yes }
+
 		available = {
+			num_of_civilian_factories_available_for_projects > 1
+		}
+
+		visible = {
 			has_country_flag = suez_constructor_flag
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
+			NOT = { has_global_flag = SUEZ_CANAL_BUILT }
 			check_variable = {
 				var = EGY.suez_inprogress_total
 				value = EGY.suez_progress_max
 				compare = less_than
 			}
-			num_of_civilian_factories_available_for_projects > 1
 		}
-		visible={
-			has_country_flag = suez_constructor_flag
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		cost = 0
-		ai_will_do = {
-			factor = 100
-		}
-		modifier = {
-			civilian_factory_use = 2
-		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
 		days_remove = 240
 		days_re_enable = 10
+
 		cancel_trigger = {
 			check_variable = {
 				var = EGY.suez_progress
@@ -383,6 +417,21 @@ afr_suez_construction ={
 				compare = greater_than_or_equals
 			}
 		}
+
+		modifier = {
+			civilian_factory_use = 2
+		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			##increase suez progress
+			add_to_variable = { EGY.suez_inprogress = 2 }
+			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
+			custom_effect_tooltip = EGY_suez_construct_2
+		}
+
 		remove_effect = {
 			##increase suez progress
 			if = {
@@ -393,48 +442,51 @@ afr_suez_construction ={
 						compare = less_than
 					}
 				}
-				add_to_variable = {EGY.suez_progress = 2}
-				add_to_variable = {suez_investment = 2}
+				add_to_variable = { EGY.suez_progress = 2 }
+				add_to_variable = { suez_investment = 2 }
 				clamp_variable = {
 					var = EGY.suez_progress
 					min = 0
 					max = EGY.suez_progress_max
 				}
 			}
-			add_to_variable = {EGY.suez_inprogress = -2}
+			add_to_variable = { EGY.suez_inprogress = -2 }
 		}
-		complete_effect = {
-			##increase suez progress
-			add_to_variable = {EGY.suez_inprogress = 2}
-			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
-			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
-			custom_effect_tooltip = EGY_suez_construct_2
+
+		ai_will_do = {
+			base = 100
 		}
 	}
+
+	#Build Access Routes to the Suez Canal Sites
 	EGY_prepare_the_site = {
 		icon = generic_construction
+
 		available = {
 			has_manpower > 999
-			tag = EGY
 		}
+
 		allowed = { 
-			TAG = EGY
-		}
-		visible={
-			NOT={has_country_flag = suez_constructor_flag}
-			has_variable = suez_progress
 			tag = EGY
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
 		}
-		cost = 10
-		ai_will_do = {
-			factor = 100
+
+		visible = {
+			NOT = { has_country_flag = suez_constructor_flag }
+			has_country_flag = suez_contributor_flag
 		}
-		modifier = {
-			political_power_gain = -0.05
-		}
-		days_remove = 240
+
 		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 100
+
 		cancel_trigger = {
 			check_variable = {
 				var = suez_progress
@@ -442,6 +494,18 @@ afr_suez_construction ={
 				compare = greater_than_or_equals
 			}
 		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			##increase suez progress
+			add_manpower = -1000
+			add_to_variable = { EGY.suez_inprogress = 2 }
+			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
+			custom_effect_tooltip = EGY_suez_construct_2
+		}
+
 		remove_effect = {
 			##increase suez progress
 			if = {
@@ -452,14 +516,14 @@ afr_suez_construction ={
 						compare = less_than
 					}
 				}
-				add_to_variable = { EGY.suez_progress = 2}
-				add_to_variable = {suez_investment = 2}
+				add_to_variable = { EGY.suez_progress = 2 }
+				add_to_variable = { suez_investment = 2 }
 				clamp_variable = {
 					var = suez_progress
 					min = 0
 					max = suez_progress_max
 				}
-				749={
+				749 = {
 					add_building_construction = {
 						type = infrastructure
 						level = 1
@@ -467,44 +531,50 @@ afr_suez_construction ={
 					}
 				}
 			}
-			add_to_variable = {EGY.suez_inprogress = -2}
-			add_manpower = 1000
+			add_to_variable = { EGY.suez_inprogress = -2 }
+			add_manpower = 900
 		}
-		complete_effect = {
-			##increase suez progress
-			add_manpower = -1000
-			add_to_variable = {EGY.suez_inprogress = 2}
-			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
-			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
-			custom_effect_tooltip = EGY_suez_construct_2
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
+
+	#Build Port Said (northern harbour)
 	EGY_build_northern_harbor = {
-		icon = generic_construction
+		icon = naval_base
+
 		available = {
 			has_manpower > 3999
-			tag = EGY
 			check_variable = {
 				var = suez_inprogress_total
 				value = suez_progress_max
 				compare = less_than
 			}
 		}
+
 		allowed = { 
-			TAG = EGY
+			tag = EGY
 		}
-		visible={
+
+		visible = {
 			has_country_flag = suez_constructor_flag
 			has_variable = suez_progress
-			tag = EGY
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
+			NOT = { has_global_flag = SUEZ_CANAL_BUILT }
 		}
-		cost = 100
-		ai_will_do = {
-			factor = 100
-		}
-		days_remove = 480
+
 		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 480
+
 		cancel_trigger = {
 			check_variable = {
 				var = suez_progress
@@ -512,6 +582,18 @@ afr_suez_construction ={
 				compare = greater_than_or_equals
 			}
 		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			##increase suez progress
+			add_manpower = -4000
+			add_to_variable = { EGY.suez_inprogress = 5 }
+			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
+			custom_effect_tooltip = EGY_suez_construct_5
+		}
+
 		remove_effect = {
 			##increase suez progress
 			if = { 
@@ -522,60 +604,73 @@ afr_suez_construction ={
 						compare = less_than
 					}
 				}
-				add_to_variable = {EGY.suez_progress = 5}
-				add_to_variable = {suez_investment = 5}
+				add_to_variable = { EGY.suez_progress = 5 }
+				add_to_variable = { suez_investment = 5 }
 				clamp_variable = {
 					var = suez_progress
 					min = 0
 					max = suez_progress_max
 				}
-				749={
-					add_building_construction = {
-						type = naval_base
-						level = 2
-						province = 12049
-						instant_build = yes
-					}
+			}
+			set_victory_points = {
+				province = 12049
+				value = 3
+			}
+			749 = {
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					province = 12049
+					instant_build = yes
 				}
 			}
-			add_to_variable = {EGY.suez_inprogress = -5}
-			add_manpower = 4000
+			add_to_variable = { EGY.suez_inprogress = -5 }
+			add_manpower = 3600
+			hidden_effect = {
+				set_province_name = { id = 12049 name = "Port Said" }
+			}
 		}
-		complete_effect = {
-			##increase suez progress
-			add_manpower = -4000
-			add_to_variable = {EGY.suez_inprogress = 5}
-			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
-			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
-			custom_effect_tooltip = EGY_suez_construct_5
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
+
+	#Build Port Tawfiq (southern harbour)
 	EGY_build_southern_harbor = {
-		icon = generic_construction
+		icon = naval_base
+
 		available = {
 			has_manpower > 3999
-			tag = EGY
 			check_variable = {
 				var = suez_inprogress_total
 				value = suez_progress_max
 				compare = less_than
 			}
 		}
+
 		allowed = { 
-			TAG = EGY
+			tag = EGY
 		}
-		visible={
+
+		visible = {
 			has_country_flag = suez_constructor_flag
 			has_variable = suez_progress
-			tag = EGY
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
+			NOT = { has_global_flag = SUEZ_CANAL_BUILT }
 		}
-		cost = 100
-		ai_will_do = {
-			factor = 100
-		}
-		days_remove = 480
+
 		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		days_remove = 480
+
 		cancel_trigger = {
 			check_variable = {
 				var = suez_progress
@@ -583,10 +678,21 @@ afr_suez_construction ={
 				compare = greater_than_or_equals
 			}
 		}
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			##increase suez progress
+			add_manpower = -4000
+			add_to_variable = { EGY.suez_inprogress = 5 }
+			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
+			custom_effect_tooltip = EGY_suez_construct_5
+		}
 		
 		remove_effect = {
 			##increase suez progress
-			if = {
+			if = { 
 				limit = {
 					check_variable = {
 						var = suez_progress
@@ -594,38 +700,43 @@ afr_suez_construction ={
 						compare = less_than
 					}
 				}
-				add_to_variable = {EGY.suez_progress = 5}
-				add_to_variable = {suez_investment = 5}
+				add_to_variable = { EGY.suez_progress = 5 }
+				add_to_variable = { suez_investment = 5 }
 				clamp_variable = {
 					var = suez_progress
 					min = 0
 					max = suez_progress_max
 				}
-				749={
-					add_building_construction = {
-						type = naval_base
-						level = 2
-						province = 12049
-						instant_build = yes
-					}
+			}
+			set_victory_points = {
+				province = 4073
+				value = 2
+			}
+			749 = {
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					province = 4073
+					instant_build = yes
 				}
 			}
-			add_to_variable = {suez_inprogress = -5}
-			add_manpower = 4000
+			add_to_variable = { EGY.suez_inprogress = -5 }
+			add_manpower = 3600
+			hidden_effect = {
+				set_province_name = { id = 4073 name = "Port Tawfiq" }
+			}
 		}
-		complete_effect = {
-			##increase suez progress
-			add_manpower = -4000
-			add_to_variable = {EGY.suez_inprogress = 5}
-			set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
-			add_to_variable = { EGY.suez_inprogress_total = EGY.suez_inprogress }
-			custom_effect_tooltip = EGY_suez_construct_5
+		
+		ai_will_do = {
+			base = 1000
 		}
 	}
+
+	#Declare the Suez Canal Open
 	EGY_open_the_canal = {
-		icon = generic_operation
+		icon = canal
+
 		available = {
-			tag = EGY
 			custom_trigger_tooltip = {
 				tooltip = suez_canal_completed_trigger_tt
 				check_variable = {
@@ -635,23 +746,29 @@ afr_suez_construction ={
 				}
 			}
 		}
+
 		allowed = { 
-			TAG = EGY
+			tag = EGY
 		}
-		visible={
-			NOT = {has_global_flag = SUEZ_CANAL_BUILT}
+
+		visible = {
+			#
 		}
-		cost = 10
-		ai_will_do = {
-			factor = 100
-		}
-		#days_remove = 240
+
+		fire_only_once = yes
+
+		cost = 0
+
 		complete_effect = {
-			##increase suez progress
 			set_global_flag = SUEZ_CANAL_BUILT
-			EGY = { news_event ={id = afr_EGY_vic.20}}
+			news_event = { id = afr_EGY_vic.20 days = 3 }
+		}
+
+		ai_will_do = {
+			base = 1000
 		}
 	}
+
 	FRA_suez_processing_of_the_report = {
 		icon = GFX_decision_administration
 		allowed = {
@@ -689,11 +806,10 @@ afr_suez_construction ={
 		remove_effect = {
 			##block the canal
 			set_global_flag = SUEZ_CANAL_BLOCKED
-			#EGY = { news_event ={id = afr_EGY_vic.20}}
 		}
 	}
 	EGY_un_block_the_canal = {
-		icon = generic_operation
+		icon = canal
 		allowed = { always = yes }
 		available = {
 			controls_state = 749
@@ -711,7 +827,6 @@ afr_suez_construction ={
 		remove_effect = {
 			##block the canal
 			clr_global_flag = SUEZ_CANAL_BLOCKED
-			#EGY = { news_event ={id = afr_EGY_vic.20}}
 		}
 		modifier = {
 			civilian_factory_use = 2
