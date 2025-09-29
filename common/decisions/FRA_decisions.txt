@@ -147,44 +147,141 @@ political_actions = {
 	}
 }
 
-FRA_decision_category_colonial_actions = {
-	FRA_war_mission_KBY = {
-		allowed = {
-			always = no
+FRA_decision_category_luxembourg_crisis = {
+	
+	#Attempt to Buy Luxembourg
+	FRA_decision_attempt_to_buy_luxembourg = {
+		icon = border_war
+		available = {
+			has_stability > 0.25
+			has_war_support > 0.25
+			set_temp_variable = {
+				amount_of_money_to_check = 25
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		visible = {
+			OR = {
+				8 = { is_controlled_by = HOL }
+				AND = {
+					country_exists = LUX
+					LUX = { is_subject_of = HOL }
+				}
+			}
+		}
+		fire_only_once = yes
+		cost = 25
+		days_remove = 21
+		modifier = {
+			political_power_gain = -0.1
+		}
+		complete_effect = {
+			hidden_effect = {
+				LUX = { country_event = { id = lux_crisis.1 days = 7 } }
+			}
+		}
+		remove_effect = {
+			HOL = { country_event = { id = lux_crisis.2 } }
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Escalate the Luxembourg Crisis
+	FRA_decision_escalate_luxembourg_crisis = {
+		icon = generic_prepare_civil_war
+		available = {
+			has_war_support > 0.3
+		}
+		visible = {
+			has_country_flag = lux_crisis_london_conference_not_ratified_flag
+		}
+		fire_only_once = yes
+		cost = 0
+		days_remove = 14
+		war_with_on_remove = ENG
+		war_with_on_remove = PRS
+		complete_effect = {
+			add_war_support = 0.15
+			custom_effect_tooltip = FRA_lux_crisis_ultimatum_effect_tt
+			hidden_effect = {
+				ENG = { country_event = { days = 1 id = lux_crisis.23 } }
+				PRS = { country_event = { days = 1 id = lux_crisis.23 } }
+				PRS = { country_event = { days = 7 id = lux_crisis.24 } }
+			}
+		}
+		remove_effect = {
+			if = {
+				limit = {
+					NOT = { has_country_flag = FRA_lux_crisis_ultimatum_successful }
+				}
+				country_event = { id = lux_crisis.27 }
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Enforce Demands in Luxembourg
+	FRA_mission_luxembourg_crisis = {
+		icon = generic_ignite_civil_war
+		allowed = { always = no }
+		available = {
+			if = {
+				limit = {
+					tag = FRA
+				}
+				984 = {
+					is_fully_controlled_by = FRA
+				}
+				51 = {
+					is_controlled_by = FRA
+				}
+				if = {
+					limit = {
+						FRA = { has_war_with = BAV }
+					}
+					42 = {
+						is_controlled_by = FRA
+					}
+				}
+				NOT = {
+					28 = {
+						NOT = { is_controlled_by = FRA }
+					}
+				}
+				#Add condition on Italian border?
+			}
+			if = {
+				limit = {
+					tag = PRS
+				}
+				28 = {
+					NOT = { is_controlled_by = FRA }
+				}
+				972 = {
+					NOT = { is_fully_controlled_by = FRA }
+				}
+				#Add condition on Italian border?
+			}
 		}
 		activation = {
 			always = no
 		}
-		is_good = yes
-		days_mission_timeout = 200
-		available = {
-			OR = {
-				custom_trigger_tooltip = {
-					tooltip = FRA_KBY_victory_conditions_FRA_tt
-					# Victory Condition for Sardinia
+		priority = 100
+		selectable_mission = no
+		is_good = no
+		days_mission_timeout = 180
+		timeout_effect = {
+			if = {
+				limit = {
 					tag = FRA
-					OR = {
-						1382 = {
-							is_controlled_by = FRA
-						}
-						KBY = {
-							surrender_progress > 0.7
-						}
-					}
 				}
-				custom_trigger_tooltip = {
-					tooltip = FRA_KBY_victory_conditions_KBY_tt
-					# Victory Condition for Papal States
-					tag = KBY
-					OR = {
-						date > 1857.10.1
-						KBY = {
-							AND = {
-								controls_state = 1384
-								controls_state = 1382
-								controls_province = 7132
-							}
-						}
+				FRA = {
+					country_event = {
+						id = lux_crisis.67
 					}
 				}
 			}
@@ -193,234 +290,128 @@ FRA_decision_category_colonial_actions = {
 			if = {
 				limit = {
 					tag = FRA
-					OR = {
-						1382 = {
-							is_controlled_by = FRA
-						}
-						KBY = {
-							surrender_progress > 0.7
-						}
-					}
 				}
-				# Peace Treaty Event for French victory
-				FRA = {
-					annex_country = {
-						target = KBY
-					}
-					country_event = {
-						id = nap_france.14
+				custom_effect_tooltip = FRA_mission_luxembourg_crisis_effect_tt
+				hidden_effect = {
+					PRS = {
+						country_event = {
+							id = lux_crisis.31
+						}
 					}
 				}
 			}
 			if = {
 				limit = {
-					tag = KBY
-					OR = {
-						date > 1857.10.1
-						KBY = {
-							AND = {
-								controls_state = 1384
-								controls_state = 1382
-								controls_province = 7132
-							}
-						}
-					}
+					tag = PRS
 				}
-				KBY = {
-					white_peace = FRA
-					country_event = {
-						id = nap_france.13
-					}
+				custom_effect_tooltip = FRA_mission_luxembourg_crisis_effect_tt
+				hidden_effect = {
 					FRA = {
 						country_event = {
-							id = nap_france.13
+							id = lux_crisis.36
 						}
 					}
 				}
 			}
 		}
-		#timeout_effect = {  I don't think this should be necessary, since there will be a time requirement for France to conquer the land
-		#	if = {
-		#		limit = {
-		#			OR = {
-		#				AND = {
-		#					tag = FRA
-		#					has_war_with = KBY
-		#				}
-		#				AND = {
-		#					tag = KBY
-		#					has_war_with = FRA
-		#				}
-		#			}
-		#			date < 1861.1.1
-		#		}
-		#		activate_mission = FRA_war_mission_KBY
-		#	}
-		#	else_if = {
-		#		limit = {
-		#			date > 1860.12.31
-		#		}
-		#		KBY = {
-		#			#transfer_state = 161
-		#			#transfer_state = 157
-		#			white_peace = FRA
-		#		}
-		#	}
-		#}
 	}
-
-	FRA_decision_develop_algeria = {
-
-		icon = generic_construction
-
-		allowed = {
-
-		}
-
+	
+	#Push for a Decisive Victory
+	FRA_mission_luxembourg_crisis_continued = {
+		icon = generic_ignite_civil_war
+		allowed = { always = no }
 		available = {
-			NOT = {
-				has_idea = bankruptcy
+			if = {
+				limit = {
+					tag = FRA
+				}
+				if = {
+					limit = {
+						FRA = { has_war_with = LUX }
+					}
+					8 = {
+						is_fully_controlled_by = FRA
+					}
+				}
+				if = {
+					limit = {
+						FRA = { has_war_with = BEL }
+					}
+					34 = {
+						is_fully_controlled_by = FRA
+					}
+				}
+				984 = {
+					is_fully_controlled_by = FRA
+				}
+				51 = {
+					is_fully_controlled_by = FRA
+				}
+				978 = {
+					is_fully_controlled_by = FRA
+				}
+				if = {
+					limit = {
+						FRA = { has_war_with = BAV }
+					}
+					42 = {
+						is_fully_controlled_by = FRA
+					}
+				}
+				if = {
+					limit = {
+						FRA = { has_war_with = HSD }
+					}
+					581 = {
+						is_fully_controlled_by = FRA
+					}
+				}
+				#if = {
+				#	limit = {
+				#		FRA = { has_war_with = BAD }
+				#	}
+				#	744 = {
+				#		is_fully_controlled_by = FRA
+				#	}
+				#}
+				NOT = {
+					28 = {
+						NOT = { is_fully_controlled_by = FRA }
+					}
+				}
+				#Add condition on Italian border?
 			}
-			num_of_civilian_factories_available_for_projects > 1
-			controls_state = 1384
-		}
-
-		visible = {
-			check_variable = {
-				money > 0
+			if = {
+				limit = {
+					tag = PRS
+				}
+				28 = {
+					NOT = { is_controlled_by = FRA }
+				}
+				972 = {
+					NOT = { is_controlled_by = FRA }
+				}
+				17 = {
+					NOT = { is_controlled_by = FRA }
+				}
+				#Add condition on Italian border?
 			}
-			has_completed_focus = FRA_focus_Development_of_Algeria
-		}
-
-		fire_only_once = yes
-
-		days_remove = 195
-
-		highlight_states = {
-			state = 1384
-		}
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -3 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			1384 = { add_extra_state_shared_building_slots = 1 }
-			1384 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
-			1384 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
-			set_temp_variable = {
-				unemployment_value = -0.005
-			}
-		}
-
-		modifier = {
-			civilian_factory_use = 1
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
-
-	FRA_decision_algeria_agriculture = {
-
-        icon = generic_construction
-
-        allowed = {
-			
-        }
-
-        available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			num_of_civilian_factories_available_for_projects > 1
-			controls_state = 1384
-        }
-
-		visible = {
-			check_variable = {
-				money > 0
-			}
-			has_completed_focus = FRA_focus_The_Agricultural_Projects
-		}
-
-		fire_only_once = yes
-
-		days_remove = 170
-
-        highlight_states = {
-			state = 1384
-		}
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			459 = { add_extra_state_shared_building_slots = 1 }
-			459 = { add_building_construction = { type = farm level = 1 instant_build = yes } }
-			513 = { add_extra_state_shared_building_slots = 1 }
-			513 = { add_building_construction = { type = farm level = 1 instant_build = yes } }
-			set_temp_variable = {
-				unemployment_value = -0.005
-			}
-		}
-
-		modifier = {
-			civilian_factory_use = 1
-		}
-
-		ai_will_do = {
-			base = 1000
-		}
-	}
-
-	FRA_war_mission_gabon = {
-		allowed = {
-			always = no
 		}
 		activation = {
 			always = no
 		}
-		is_good = yes
-		days_mission_timeout = 150
-		available = {
-			OR = {
-				custom_trigger_tooltip = {
-					tooltip = FRA_gabon_victroy_for_FRA
-					tag = FRA 
-					OR = {
-						FRA = {
-							controls_state = 876
-							controls_state = 539
-						}
-						BKW = {
-							surrender_progress > 0.2
-						}
-					}
+		priority = 100
+		selectable_mission = no
+		is_good = no
+		days_mission_timeout = 180
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = FRA
 				}
-				custom_trigger_tooltip = {
-					tooltip = FRA_gabon_victroy_for_BKW
-					tag = BKW
-					BKW = {
-						controls_state = 886
+				FRA = {
+					country_event = {
+						id = lux_crisis.67
 					}
 				}
 			}
@@ -429,3209 +420,482 @@ FRA_decision_category_colonial_actions = {
 			if = {
 				limit = {
 					tag = FRA
-					OR = {
-						1382 = {
-							is_controlled_by = FRA
-						}
-						BKW = {
-							surrender_progress > 0.2
-						}
-					}
 				}
-				# Peace Treaty Event for French victory
-				FRA = {
-					white_peace = BKW
-					transfer_state = 876
-					transfer_state = 539
-					country_event = {
-						id = nap_france.405
+				custom_effect_tooltip = FRA_mission_luxembourg_crisis_FRA_effect_tt
+				hidden_effect = {
+					PRS = {
+						country_event = {
+							id = lux_crisis.42
+						}
 					}
 				}
 			}
 			if = {
 				limit = {
-					tag = BKW
-					BKW = {
-						controls_state = 886
-					}
+					tag = PRS
 				}
-				BKW = {
-					white_peace = FRA
-					transfer_state = 886
-					add_war_support = 0.1
-					country_event = {
-						id = nap_france.406
-					}
-				}
-				FRA = {
-					country_event = {
-						id = nap_france.406
+				custom_effect_tooltip = FRA_mission_luxembourg_crisis_PRS_effect_tt
+				hidden_effect = {
+					FRA = {
+						country_event = {
+							id = lux_crisis.49
+						}
 					}
 				}
 			}
-		}
-	}
-
-
-	FRA_decision_integrate_outer_gabon = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			876 = {
-				compliance > 50
-			}
-			539 = {
-				compliance > 50
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_supress_the_natives
-		}
-
-		fire_only_once = yes
-
-		cost = 150
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 150
-
-		complete_effect = {
-		
-		}
-
-		remove_effect = {
-			GAB = {
-				transfer_state = 876
-				transfer_state = 539
-				add_state_core = 876
-				add_state_core = 539
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_decision_gambia_trade = {
-
-		icon = naval_base
-
-		#allowed = { tag = FRA }
-
-		available = {
-			ENG = {
-				owns_state = 701
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_gambia_trade
-			ENG = {
-				owns_state = 701
-			}
-			date > 1874.1.30
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-
-		days_remove = 7
-
-		complete_effect = {
-		
-		}
-
-		remove_effect = {
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	#Civ for Franceville
-	FRA_decision_expand_industry_in_franceville = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_found_the_franceville_settlement
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-			civilian_factory_use = 2
-		}
-
-		priority = 1
-
-		days_remove = 360
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 3 }
-			eoanb_change_prestige_score = yes
-			886 = {
-				add_building_construction = {
-					type = industrial_complex
-					level = 1
-					instant_build = yes
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	#Buildingslot for Franceville
-	FRA_decision_expand_buildingslots_in_franceville = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_found_the_franceville_settlement
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 50
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 1 }
-			eoanb_change_prestige_score = yes
-			886 = {
-				add_extra_state_shared_building_slots = 1
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_decision_gabon_road_system = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			539 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-			876 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-			886 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_gabon_road_system
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 150
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 3 }
-			eoanb_change_prestige_score = yes
-			886 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 2
-					instant_build = yes
-				}
-			}
-
-			876 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 2
-					instant_build = yes
-				}
-			}
-
-			539 = {
-				add_building_construction = {
-					type = infrastructure
-					level = 2
-					instant_build = yes
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_decision_connect_the_roads_to_the_ports = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_connect_the_road_system_with_port_gentil
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-			civilian_factory_use = 1
-		}
-
-		priority = 1
-
-		days_remove = 360
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2.5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 2 }
-			eoanb_change_prestige_score = yes
-			886 = {
-				add_building_construction = {
-					type = dockyard
-					level = 1
-					instant_build = yes
-				}
-			}
-
-			
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-
-	FRA_decision_extract_ivory = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			539 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_extract_ivory
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 150
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 5 }
-			eoanb_change_prestige_score = yes
-			add_resource = {
-				type = iron
-				amount = 2
-				state = 539
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_decision_gabon_logging_industry = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			539 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-			876 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_gabon_wood_companies
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-			civilian_factory_use = 2
-		}
-
-		priority = 1
-
-		days_remove = 360
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -3 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 1 }
-			eoanb_change_prestige_score = yes
-			876 = {
-				add_building_construction = {
-					type = logging_camp
-					level = 1
-					instant_build = yes
-				}
-			}
-			539 = {
-				add_building_construction = {
-					type = logging_camp
-					level = 1
-					instant_build = yes
-				}
-			}
-			
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_colonial_decision_extract_gabonese_rubber = {
-
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			876 = {
-				OR = {
-					is_controlled_by = FRA
-					is_controlled_by = GAB
-				}
-			}
-		}
-
-		visible = {
-			has_completed_focus = FRA_colonial_extract_gabonese_rubber
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 150
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -1 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 1 }
-			eoanb_change_prestige_score = yes
-			add_resource = {
-				type = rubber
-				amount = 6
-				state = 876
-			}
-		}
-
-		ai_will_do = {
-			base = 100
 		}
 	}
 }
 
-FRA_decision_category_industrialization = {
+FRA_decision_category_health_of_his_majesty = {
 
-	#Crédit lyonnais
-	FRA_decision_credit_lyonnais = {
+	#His Majesty's Condition Worsens
+	FRA_mission_napoleon_health_decrease = {
+		icon = medicine
 
-		icon = money
-
-		#allowed = { tag = FRA }
-
-		available = {
-			has_completed_focus = FRA_embolden_monsieur_schneider
-			set_temp_variable = {
-				amount_of_money_to_check = 1
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = FRA_embolden_monsieur_schneider
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-		priority = 1
-
-		days_remove = 150
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -1 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			set_temp_variable = { eoanb_prestige_change = 5 }
-			eoanb_change_prestige_score = yes
-			if = {
-				limit = {
-					has_idea = FRA_idea_new_banks
-				}
-				modify_timed_idea = {
-					idea = FRA_idea_new_banks
-					days = 60
-				}
-			}
-			EOANBSYS_institutions_innovative_add_two = yes
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = economics_tech
-				category = humanities_tech
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	#Support French Steel Industry
-
-	FRA_mission_economic_growth = {
-		icon = generic_factory
-		allowed = { always = no }
-		activation = { always = no }
-
-		available = { has_completed_focus = FRA_une_victorie_sur_lindustrie }
-
-		priority = 100
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 5000
-
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -100
-				add_stability = -0.1
-			}
-		}
-		complete_effect = {
-			add_political_power = 150
-			add_stability = 0.05
-			set_temp_variable = {
-				eoanb_prestige_change = 10
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes			
-		}
-	}
-
-	FRA_decision_support_french_steel_industry = {
-		icon = steel
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 10
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-			has_completed_focus = FRA_first_batches_of_coal_and_steel
-		}
-		visible = {
-			has_completed_focus = FRA_ignis_et_fumus
-			owns_state = 28
-			owns_state = 976
-			controls_state = 28
-			controls_state = 976
-			controls_state = 971
-		}
-		highlight_states = {
-			highlight_state_targets = {
-				state = 28
-				state = 976
-				state = 971
-			}
-		}
-		fire_only_once = yes
-		priority = 99
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 10
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 300
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -10 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			28 = {
-				add_resource = {
-					type = coal
-					amount = 2
-				}
-			}
-			976 = {
-				add_resource = {
-					type = iron
-					amount = 2
-				}
-				add_resource = {
-					type = coal
-					amount = 2
-				}
-				add_building_construction = {
-					type = steel_mill
-					level = 1
-					instant_build = yes
-				}
-			}
-			971 = {
-				add_resource = {
-					type = iron
-					amount = 2
-				}
-				add_resource = {
-					type = coal
-					amount = 2
-				}
-				add_building_construction = {
-					type = steel_mill
-					level = 1
-					instant_build = yes
-				}
-			}
-			set_temp_variable = {
-				eoanb_prestige_change = 1
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_mission_narbonne_perpignan_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Narbonne-Perpignan
-				tooltip = FRA_mission_narbonne_perpignan_rail_trigger_tt_1
-				hidden_trigger = {
-					has_railway_level = {
-						state = 22
-						level = 2
-					}
-					has_railway_connection = {
-						start_province = 6960
-						target_province = 9853
-					}
-				}
-			}
-		}
 		activation = {
+			has_country_flag = FRA_napoleon_health_activated
+			has_country_leader = { character = FRA_napoleon_iii	ruling_only = yes }
+		}
+		available = {
 			always = no
 		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 22
-			}
-		}
-		priority = 98
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
 		cancel_trigger = {
-			NOT = { owns_state = 22 }
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			22 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_mission_tolouse_cette_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Tolouse-Cette
-				tooltip = FRA_mission_tolouse_cette_rail_trigger_tt_1
-				hidden_trigger = {
-					has_railway_level = {
-						state = 22
-						level = 2
-					}
-					if = { 
-						limit = {
-							has_railway_level = {
-							state = 971
-							level = 2
-							}
-						}
-						has_railway_level = {
-							state = 971
-							level = 2
-						}
-					}
-					has_railway_connection = {
-						start_province = 6766
-						target_province = 6960
-					}
-				}
-			}
-		}
-		activation = {
-			always = no
-		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 22
-			state = 971
-			}
-		}
-		priority = 96
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		cancel_trigger = {
-			OR = {
-				NOT = { owns_state = 22 }
-				NOT = { owns_state = 971 }
-			}
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			22 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			971 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	FRA_mission_saint_dizier_belfort_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Saint Dizier-Belfort
-				tooltip = FRA_mission_saint_dizier_belfort_rail_tt_1
-				hidden_trigger = {
-					has_railway_level = {
-						state = 17
-						level = 2
-					}
-					has_railway_level = {
-						state = 972
-						level = 2
-					}
-					has_railway_connection = {
-						start_province = 11488
-						target_province = 698
-					}
-				}
-			}
-		}
-		activation = {
-			always = no
-		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 17
-			state = 972
-			}
-		}
-		priority = 94
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		cancel_trigger = {
-			OR = {
-				NOT = { owns_state = 17 }
-				NOT = { owns_state = 972 }
-			}
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			17 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			972 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	FRA_mission_carmaux_albi_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Carmaux - Albi
-				tooltip = FRA_mission_carmaux_albi_rail_tt_1
-				hidden_trigger = {
-					if = { 
-						limit = {
-							has_railway_level = {
-							state = 971
-							level = 2
-							}
-						}
-						has_railway_level = {
-							state = 971
-							level = 2
-						}
-					}
-					has_railway_connection = {
-						start_province = 6773
-						target_province = 752
-					}
-				}
-			}
-		}
-		activation = {
-			always = no
-		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 971
-			}
-		}
-		priority = 92
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		cancel_trigger = {
-			OR = {
-				NOT = { owns_state = 971 }
-			}
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			971 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	FRA_mission_caen_cherbourg_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Caen-Cherbourg
-				tooltip = FRA_mission_caen_cherbourg_rail_trigger_tt
-				hidden_trigger = {
-					if = { 
-						limit = {
-							has_railway_level = {
-							state = 15
-							level = 2
-							}
-						}
-						has_railway_level = {
-							state = 15
-							level = 2
-						}
-					}
-					has_railway_connection = {
-						start_province = 11535
-						target_province = 6449
-					}
-				}
-			}
-		}
-		activation = {
-			always = no
-		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 15
-			}
-		}
-		priority = 90
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		cancel_trigger = {
-			OR = {
-				NOT = { owns_state = 15 }
-			}
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			15 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	FRA_mission_caen_argentan_rail = {
-		icon = railway
-		allowed = {
-			always = no
-		}
-		available = {
-			custom_trigger_tooltip = { #Caen-Argentan
-				tooltip = FRA_mission_caen_argentan_rail_trigger_tt
-				hidden_trigger = {
-					has_railway_level = {
-						state = 30
-						level = 2
-					}
-					if = { 
-						limit = {
-							has_railway_level = {
-							state = 15
-							level = 2
-							}
-						}
-						has_railway_level = {
-							state = 15
-							level = 2
-						}
-					}
-					has_railway_connection = {
-						start_province = 11535
-						target_province = 3523
-					}
-				}
-			}
-		}
-		activation = {
-			always = no
-		}
-		highlight_states = {
-			highlight_state_targets = {
-			state = 15
-			state = 30
-			}
-		}
-		priority = 88
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		cancel_trigger = {
-			OR = {
-				NOT = { owns_state = 15 }
-				NOT = { owns_state = 30 }
-			}
-		}
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			15 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			30 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			add_tech_bonus = {
-				bonus = 0.25
-				uses = 1
-				category = transport_tech
-			}
-			set_temp_variable = {
-                eoanb_prestige_change = 2
-            }
-            eoanb_change_prestige_score = yes
-            EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	FRA_decision_narbonne_perpignan_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 97
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # Narbonne Perpignan
-			level = 2
-			path = { 6960 3946 9853 }
-			start_province = 6960
-			target_province = 9853
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	FRA_decision_tolouse_cette_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 95
-	
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # Touloose Cette
-			level = 2
-			path = { 6766 943 9723 6960 }
-			start_province = 6766
-			target_province = 6960
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	FRA_decision_saint_dizier_belfort_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 93
-	
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # St Dizier Belfort
-			level = 2
-			path = { 11488 6698 698 }
-			start_province = 11488
-			target_province = 698
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	FRA_decision_carmaux_albi_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 91
-	
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # Carmaux Albi
-			level = 1
-			path = { 752 6773 }
-			start_province = 752
-			target_province = 6773
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	FRA_decision_caen_cherbourg_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 89
-	
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # Caen Cherbourg
-			level = 1
-			path = { 11535 3579 6449 }
-			start_province = 11535
-			target_province = 6449
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	FRA_decision_caen_argentan_rail = {
-		icon = railway
-		#allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		fire_only_once = yes
-		priority = 87 
-	
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 7
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			build_railway = { # Caen Argentan
-			level = 2
-			path = { 11535 11521 3523 }
-			start_province = 11535
-			target_province = 3523
-			}
-		}
-
-		ai_will_do = {
-			base = 100
-			}
-	}
-
-	#Acquire Locomotives
-	FRA_decision_acquire_locomotives = {
-		icon = train
-		allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_grant_mange_the_blank_check
-		}
-		priority = 1
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 120
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			add_equipment_to_stockpile = {
-				type = train_equipment_1
-				amount = 20
-				producer = FRA
-			}
-		}
-	}
-
-	FRA_mission_new_mines = { 
-
-		icon = coal
-
-		highlight_states = {
-			state = 22
-		}
-		
-		available = {
-			has_completed_focus = FRA_ignis_et_fumus
 			NOT = {
-				has_idea = bankruptcy
-			}
-			has_tech = machine_tools_1
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-
-		visible = {
-			has_completed_focus = FRA_first_batches_of_coal_and_steel
-			FRA = {
-				has_full_control_of_state = 22
-				has_full_control_of_state = 16
-				has_full_control_of_state = 15
-				has_full_control_of_state = 29
-			}
-			num_of_civilian_factories_available_for_projects > 3
-		}
-
-		fire_only_once = yes
-		is_good = yes
-		priority = 86
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.25
+				has_country_leader = { character = FRA_napoleon_iii	ruling_only = yes }				
 			}
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 180
-
-		modifier = {
-			civilian_factory_use = 4
-		}
-		
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.25 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = { 
-			22 = {
-				add_resource = {
-					type = iron
-					amount = 8
-				}
-			}
-			16 = {
-				add_resource = {
-					type = iron
-					amount = 8
-				}
-			}
-			15 = {
-				add_resource = {
-					type = coal
-					amount = 10
-				}
-			}
-			29 = {
-				add_resource = {
-					type = coal
-					amount = 15
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 0
-			modifier = {
-				add = 100
-				check_variable = {
-					money > 50
-				}
-			}
-		}
-	}
-	
-	FRA_mission_northern_lines = {
-	
-		allowed = {
-			always = no
-		}
-
-		icon = generic_construction
-
-		available = {
-			29 = { infrastructure > 7 }
-			15 = { infrastructure > 6 }
-			18 = { infrastructure > 6 }
-			owns_state = 29
-			owns_state = 15
-			owns_state = 18
-		}
-
-		activation = {
-			always = no 	# via effect
-		}
-
-		highlight_states = {
-			state = 29
-		}
-
-		fire_only_once = yes
-
-		priority = 85
 		is_good = no
-		days_mission_timeout = 1600
+		days_mission_timeout = 275
 		timeout_effect = {
-			add_political_power = -80
-			add_stability = -0.02
-		}
-		complete_effect = {
-			29 = { add_extra_state_shared_building_slots = 1 }
-			15 = { add_extra_state_shared_building_slots = 1 }
-			18 = { add_extra_state_shared_building_slots = 1 }
 			random_list = {
 				50 = {
-					add_stability = 0.02 
+					subtract_from_variable = {
+						var = FRA.napoleon_health
+						value = 10
+						tooltip = FRA_napoleon_worsened_10_health_tt
+					}
+					add_to_variable = {
+						var = FRA.napoleon_unhealthy
+						value = 10
+					}
+      				FRA_napoleon_health_trait_lowered_swap = yes
 				}
 				50 = {
-					add_manpower = 1000
+					subtract_from_variable = {
+						var = FRA.napoleon_health
+						value = 5
+						tooltip = FRA_napoleon_worsened_5_health_tt
+					}
+					add_to_variable = {
+						var = FRA.napoleon_unhealthy
+						value = 5
+					}
+      				FRA_napoleon_health_trait_lowered_swap = yes
 				}
 			}
 		}
-
-		ai_will_do = {
-			base = 1
-		}
 	}
 	
-	FRA_mission_southern_lines = {
+	#Imperial Visit to Vichy Baths
+	FRA_decision_imperial_visit_to_vichy_baths = {
+		icon = generic_cavalry
 
-		icon = generic_construction
-
-		allowed = {
-			always = no		# via effect
-		}
-
-		available = {
-			22 = { infrastructure > 5 }
-			20 = { infrastructure > 7 }
-			27 = { infrastructure > 7 }
-			19 = { infrastructure > 7 }
-			owns_state = 22
-			owns_state = 20
-			owns_state = 27
-			owns_state = 19
-		}
-
-		activation = {
-			always = no		# via effect
-		}
-
-		highlight_states = {
-			state = 22
-		}
-
-		fire_only_once = yes
-
-		priority = 84
-		is_good = no
-		days_mission_timeout = 1600
-		timeout_effect = {
-			add_political_power = -80
-			add_stability = -0.02
-		}
-		complete_effect = {
-			22 = { add_extra_state_shared_building_slots = 1 }
-			20 = { add_extra_state_shared_building_slots = 1 }
-			27 = { add_extra_state_shared_building_slots = 1 }
-			19 = { add_extra_state_shared_building_slots = 1 }
-			random_list = {
-				50 = {
-					add_stability = 0.02 
-				}
-				50 = {
-					add_manpower = 1000
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 1
-		}
-	}
-	
-	FRA_mission_connect_the_country = {
-
-		icon = generic_construction
-
-		allowed = {
-			always = no
-		}
-
-		available = {
-			16 = { infrastructure > 5 }
-			23 = { infrastructure > 7 }
-			24 = { infrastructure > 7 }
-			owns_state = 16
-			owns_state = 23
-			owns_state = 24
-		}
-
-		activation = {
-			always = no		# Activated via effect
-		}
-
-		highlight_states = {
-			state = 16
-		}
-
-		fire_only_once = yes
-
-		priority = 83
-		is_good = no
-		days_mission_timeout = 1600
-		timeout_effect = {
-			add_political_power = -80
-			add_stability = -0.02
-		}
-		complete_effect = {
-			16 = { add_extra_state_shared_building_slots = 1 }
-			23 = { add_extra_state_shared_building_slots = 1 }
-			24 = { add_extra_state_shared_building_slots = 1 }
-			random_list = {
-				50 = {
-					add_stability = 0.02 
-				}
-				50 = {
-					add_manpower = 1000
-				}
-			}
-		}
-
-		ai_will_do = {
-			base = 1
-		}
-	}
-	
-	#Invest into Bordeaux Port Infrastructure
-	FRA_decision_strengthen_the_ports_of_bordeaux = {
-		icon = naval_base
-		#allowed = { tag = FRA }
 		available = {
 			NOT = {
-				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+				has_country_flag = FRA_napoleon_health_decision_taken
 			}
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_strengthen_the_ports_of_bordeaux
-			owns_state = 19
-			19 = {
-				naval_base < 2
-			}
-		}
-		fire_only_once = no
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_navy_experience > 24.9
-		}
-		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
-		days_remove = 365
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
-			navy_experience = -25
-			hidden_effect = {
-				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		remove_effect = {
-			19 = {
-				add_building_construction = {
-					type = naval_base
-					level = 1
-					instant_build = yes
-					province = 9737
-				}
-			}
-			set_temp_variable = {
-				unemployment_value = -0.0005
-			}
-			add_unemployment_effect = yes
-			hidden_effect = {
-				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Invest into Bordeaux Dockyard Infrastructure
-	FRA_decision_invest_into_bordeaux_dockyard = {
-		icon = generic_construction
-		#allowed = { tag = FRA }
-		available = {
-			NOT = {
-				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_strengthen_the_ports_of_bordeaux
-			owns_state = 19
-			19 = {
-				dockyard < 2
-			}
-		}
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-			has_navy_experience > 49.9
-		}
-		custom_cost_text = eoanb_money_and_navy_experience_50
-		priority = 81		
-		days_remove = 730
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2.5 }
-			add_money_with_tooltip_effect = yes
-			navy_experience = -50
-			hidden_effect = {
-				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		remove_effect = {
-			19 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			19 = {
-				add_building_construction = {
-					type = dockyard
-					level = 1
-					instant_build = yes
-				}
-			}
-			set_temp_variable = {
-				unemployment_value = -0.0005
-			}
-			add_unemployment_effect = yes
-			hidden_effect = {
-				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Invest into Marseille Port Infrastructure
-	FRA_decision_strengthen_the_ports_of_marseille = {
-		icon = naval_base
-		#allowed = { tag = FRA }
-		available = {
-			NOT = {
-				has_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_expand_the_port_of_marsailles
-			owns_state = 21
-			21 = {
-				naval_base < 3
-			}
-		}
-		fire_only_once = no
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.5
-			}
-			has_navy_experience > 24.9
-		}
-		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 80
-		days_remove = 365
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
-			navy_experience = -25
-			hidden_effect = {
-				set_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-		}
-		remove_effect = {
-			21 = {
-				add_building_construction = {
-					type = naval_base
-					level = 1
-					instant_build = yes
-					province = 11834
-				}
-			}
-			set_temp_variable = {
-				unemployment_value = -0.0005
-			}
-			add_unemployment_effect = yes
-			hidden_effect = {
-				clr_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Invest into Marseille Dockyard Infrastructure
-	FRA_decision_invest_into_marseille_dockyard = {
-		icon = generic_construction
-		#allowed = { tag = FRA }
-		available = {
-			NOT = {
-				has_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_expand_the_port_of_marsailles
-			owns_state = 21
-			21 = {
-				dockyard < 2
-			}
-		}
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-			has_navy_experience > 49.9
-		}
-		custom_cost_text = eoanb_money_and_navy_experience_50
-		priority = 79
-		days_remove = 730
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2.5 }
-			add_money_with_tooltip_effect = yes
-			navy_experience = -50
-			hidden_effect = {
-				set_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-		}
-		remove_effect = {
-			21 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			21 = {
-				add_building_construction = {
-					type = dockyard
-					level = 1
-					instant_build = yes
-				}
-			}
-			set_temp_variable = {
-				unemployment_value = -0.0005
-			}
-			add_unemployment_effect = yes
-			hidden_effect = {
-				clr_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Invest into Lyon Silk
-	FRA_decision_invest_lyon_silk = {
-		allowed = {
-			#tag = FRA
-		}
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.8
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_embolden_the_silk_of_lyon
-			owns_state = 20
-		}
-		icon = fabric
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.8
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		ai_will_do = {
-			base = 25
-		}
-		days_remove = 150
-		priority = 78
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.8 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			20 = {
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = fabric_weavery
-					level = 1
-					instant_build = yes
-				}
-			}
-		}
-	}
-	
-	#Redistribution of Orleans Properties
-	FRA_decision_redistribution_of_orleans_properties = {
-		allowed = {
-			#tag = FRA
-		}
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.4
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_redistribution_of_orleans_properties
-		}
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.4
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 50
-		priority = 77		
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.4 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			add_stability = -0.075
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-		}
-		ai_will_do = {
-			base = 25
-		}
-	}
-	
-	#Limited Land Redistribution
-	FRA_decision_limited_land_redistribution = {
-		allowed = {
-			#tag = FRA
-		}
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.75
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_limited_land_redistribution
-		}
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 0.75
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 50
-		priority = 76		
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -0.75 }
-			add_money_with_tooltip_effect = yes
-		}
-		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}
-		}
-		ai_will_do = {
-			base = 25
-		}
-	}
-	
-	#French Farmlands
-	FRA_decision_french_farmlands = {
-
-		icon = POL_looming_peasants_strike
-		
-		#allowed = { tag = FRA }
-
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1.25
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
 
 		visible = {
-			has_completed_focus = FRA_spur_agricultural_ambition
+			has_completed_focus = FRA_invest_in_the_vichy_baths
+			has_country_flag = FRA_napoleon_health_activated
+			has_country_flag = FRA_vichy_baths_invested_in
 		}
 
 		fire_only_once = yes
-		
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 1.25
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		
-		days_remove = 240
-		priority = 75
 
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -1.25 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = farm
-					level = 1
-					instant_build = yes
-				}
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = farm
-					level = 1
-					instant_build = yes
-				}
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-				add_building_construction = {
-					type = farm
-					level = 1
-					instant_build = yes
-				}
-			}
-			add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
-			EOANBSYS_institutions_innovative_add_one = yes
-		}
-
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#Rebuilding Vendée
-	FRA_mission_rebuilding_vendee = {
-		icon = POL_looming_peasants_strike
-		allowed = { always = no }
-		available = {
-			owns_state = 30
-			owns_state = 23
-			30 = {
-				industrial_complex > 1
-			}
-			30 = {
-				farm > 0
-			}
-			23 = {
-				industrial_complex > 0
-			}
-			23 = {
-				farm > 0
-			}
-		}
-		activation = { always = no }
-		priority = 74
-		highlight_states = {
-			highlight_state_targets = {
-				state = 23
-				state = 30
-			}
-		}
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 1600
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			23 = {
-				add_extra_state_shared_building_slots = 3
-			}
-			30 = {
-				add_extra_state_shared_building_slots = 3
-			}
-			add_stability = 0.02
-			add_tech_bonus = {
-				bonus = 0.5
-				uses = 1
-				category = biochemistry_tech
-			}
-			set_temp_variable = {
-				unemployment_value = -0.0005
-			}
-			add_unemployment_effect = yes
-			set_temp_variable = {
-				eoanb_prestige_change = 5
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_two = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#Foulds Begrudging Subsidies
-	FRA_mission_foulds_begrudging_subsidies = {
-		icon = generic_factory
-		allowed = { always = no }
-		available = {
-			owns_state = 971
-			owns_state = 22
-			owns_state = 20
-			owns_state = 21
-			owns_state = 32
-			971 = {
-				industrial_complex > 2
-			}
-			22 = {
-				industrial_complex > 1
-			}
-			20 = {
-				industrial_complex > 2
-			}
-			20 = {
-				arms_factory > 1
-			}
-			21 = {
-				industrial_complex > 1
-			}
-			21 = {
-				arms_factory > 1
-			}
-			32 = {
-				industrial_complex > 1
-			}
-		}
-		activation = { always = no }
-		priority = 73
-		highlight_states = {
-			highlight_state_targets = {
-				state = 971
-				state = 22
-				state = 20
-				state = 21
-				state = 32
-			}
-		}
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 2600
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			971 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			22 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			21 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			20 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			23 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			add_stability = 0.05
-			add_tech_bonus = {
-				bonus = 0.5
-				uses = 1
-				category = infantry_weapons
-				category = mechanical_engineering_tech
-				category = biochemistry_tech
-			}
-			set_temp_variable = {
-				unemployment_value = -0.005
-			}
-			add_unemployment_effect = yes
-			set_temp_variable = {
-				eoanb_prestige_change = 8
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#A New Manufactural Line
-	FRA_mission_a_new_manufactural_line = {
-		icon = generic_factory
-		allowed = { always = no }
-		available = {
-			owns_state = 975
-			owns_state = 29
-			owns_state = 976
-			971 = {
-				industrial_complex > 1
-			}
-			971 = {
-				arms_factory > 0
-			}
-			29 = {
-				industrial_complex > 3
-			}
-			29 = {
-				arms_factory > 0
-			}
-			21 = {
-				industrial_complex > 0
-			}
-			21 = {
-				arms_factory > 0
-			}
-		}
-		activation = { always = no }
-		priority = 72
-		highlight_states = {
-			highlight_state_targets = {
-				state = 975
-				state = 976
-				state = 29
-			}
-		}
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 2600
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			975 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			976 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			29 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			add_stability = 0.05
-			add_tech_bonus = {
-				bonus = 0.5
-				uses = 1
-				category = infantry_weapons
-				category = mechanical_engineering_tech
-				category = biochemistry_tech
-			}
-			set_temp_variable = {
-				unemployment_value = -0.005
-			}
-			add_unemployment_effect = yes
-			set_temp_variable = {
-				eoanb_prestige_change = 8
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#Continued Industrial Advancement
-	FRA_mission_continued_industrial_advancement = {
-		icon = generic_factory
-		allowed = { always = no }
-		available = {
-			owns_state = 814
-			814 = {
-				industrial_complex > 4
-			}
-		}
-		activation = { always = no }
-		priority = 71
-		highlight_states = {
-			highlight_state_targets = {
-				state = 814
-			}
-		}
-		fire_only_once = yes
-		is_good = no
-		days_mission_timeout = 2600
-		timeout_effect = {
-			if = {
-				limit = {
-					is_ai = no
-				}
-				add_political_power = -50
-				add_stability = -0.02
-			}
-		}
-		complete_effect = {
-			814 = {
-				add_extra_state_shared_building_slots = 2
-			}
-			add_stability = 0.05
-			add_tech_bonus = {
-				bonus = 0.5
-				uses = 1
-				category = mechanical_engineering_tech
-				category = biochemistry_tech
-			}
-			set_temp_variable = {
-				unemployment_value = -0.002
-			}
-			add_unemployment_effect = yes
-			set_temp_variable = {
-				eoanb_prestige_change = 4
-			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
-		}
-		ai_will_do = {
-			base = 100
-		}
-	}
-	
-	#Reaffirming Imperial Ports and Docks
-	FRA_decision_reaffirming_imperial_ports_and_docks = {
-		icon = generic_construction
-		#allowed = { tag = FRA }
-		available = {
-			NOT = {
-				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-			set_temp_variable = {
-				amount_of_money_to_check = 4.5
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_reaffirming_imperial_ports_and_docks
-			owns_state = 976
-			976 = {
-				dockyard < 0
-			}
-			owns_state = 14
-			14 = {
-				dockyard < 3
-			}
-		}
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 4.5
-			}
-			has_navy_experience > 49.9
-		}
-		custom_cost_text = eoanb_money_and_navy_experience_50
-		days_remove = 730
-		priority = 70
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -4.5 }
-			add_money_with_tooltip_effect = yes
-			navy_experience = -50
-			hidden_effect = {
-				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		remove_effect = {
-			14 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			14 = {
-				add_building_construction = {
-					type = dockyard
-					level = 1
-					instant_build = yes
-				}
-			}
-			976 = {
-				add_extra_state_shared_building_slots = 1
-			}
-			976 = {
-				add_building_construction = {
-					type = dockyard
-					level = 1
-					instant_build = yes
-				}
-			}
-			set_temp_variable = {
-				unemployment_value = -0.001
-			}
-			add_unemployment_effect = yes
-			hidden_effect = {
-				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	FRA_decision_break_the_hold_of_artisans = {
-		icon = generic_construction
-		#allowed = { tag = FRA }
-		available = {
-			has_completed_focus = FRA_break_the_hold_of_artisans
-			set_temp_variable = {
-				amount_of_money_to_check = 15
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			has_completed_focus = FRA_break_the_hold_of_artisans
-		}
-
-		priority = 69
-		fire_only_once = yes
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 15
-			}
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 300
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -15 }
-			add_money_with_tooltip_effect = yes
-		}
-		
-		remove_effect = {
-			16 = {
-				add_building_construction = {
-					type = industrial_complex
-					level = 1
-					instant_build = yes
-				}
-				add_manpower = 3000
-			}
-			24 = {
-				add_manpower = -1500
-			}
-			26 = {
-				add_manpower = -1500
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-
-	FRA_decisions_vichy_baths = {
-		icon = generic_factory
-		allowed = { tag = FRA }
-		available = {
-			owns_state = 26
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}
-		}
-		visible = { has_completed_focus = FRA_invest_in_the_vichy_baths }
-		priority = 68
-		highlight_states = {
-			highlight_state_targets = {
-				state = 26
-			}
-		}
-		fire_only_once = yes
-		is_good = no
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}	
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 180
-
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -3 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			26 = { add_extra_state_shared_building_slots = 1 }
-			add_manpower = 1500
-			set_country_flag = FRA_vichy_baths_invested_in
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	FRA_decision_expand_tourism = {
-		icon = generic_construction
-		allowed = { tag = FRA }
-		available = {
-			owns_state = 26
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}
-		}
-		visible = { has_completed_focus = FRA_expand_the_tourism_industry }
-		priority = 67
-		fire_only_once = yes
-		is_good = no
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2.5
-			}	
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 150
-
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2.5 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_manpower = 1000
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_manpower = 1000
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_manpower = 1000
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_manpower = 1000
-			}
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_manpower = 1000
-			}						
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	FRA_decision_enlarged_festivities_of_empire = {
-		icon = generic_construction
-		allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2
-			}
-		}
-		visible = { has_completed_focus = FRA_enlarged_festivities_of_empire }
-		priority = 66
-		fire_only_once = yes
-		is_good = no
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2
-			}	
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 		days_remove = 200
 
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+		}
 
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -2 }
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
+			}
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+
+			set_temp_variable = { money_to_gain = -0.05 }
 			add_money_with_tooltip_effect = yes
 		}
-		remove_effect = {
-			random_owned_controlled_state = {
-				limit = {
-					is_in_mainland_france = yes
-				}
-				add_extra_state_shared_building_slots = 1
-			}	
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
 
-	FRA_decision_expand_the_louvre = {
-		icon = generic_construction
-		allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
 			}
 		}
-		visible = { has_completed_focus = FRA_further_expansion_of_the_louvre }
-		priority = 65
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Hold Imperial Balls in Paris
+	FRA_decision_hold_imperial_balls_in_paris = {
+		icon = generic_monarchy
+
+		available = {
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
+			}
+		}
+
+		visible = {
+			has_country_flag = FRA_napoleon_health_activated
+		}
+
 		fire_only_once = yes
-		is_good = no
+
+		days_remove = 200
 
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 2
-			}	
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		days_remove = 365
-
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -2 }
-			add_money_with_tooltip_effect = yes		
-		}	
-
-		remove_effect = {
-			increase_legitimacy_by_five = yes
-			set_temp_variable = {
-				eoanb_prestige_change = 4
+				amount_of_money_to_check = 0.05
 			}
-			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
-			add_timed_idea = {
-				idea = FRA_french_cities_renovations
-				days = 365
-			}	
-		}
-		ai_will_do = {
-			base = 40
-		}					
-	}
-	FRA_decision_help_pereire_brothers = {
-		icon = money
-		allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 4
-			}
-		}
-		visible = {
-			FRA_pereire_brothers = {
-				is_hired_as_advisor = yes 
-			}
-		}
-		priority = 64
-		fire_only_once = yes
-		days_remove = 150
-
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 4
-			}	
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
-		complete_effect = {
-			set_temp_variable = { money_to_gain = -4 }
-			add_money_with_tooltip_effect = yes		
+		modifier = {
 		}
-
-		remove_effect = { 
-			remove_trait = { character = FRA_pereire_brothers trait = FRA_trait_pereire_brothers_1 }
-			add_trait = { character = FRA_pereire_brothers trait = FRA_trait_pereire_brothers_2 }
-		}
-		ai_will_do = {
-			base = 100
-		}		
-	}
-
-	FRA_decision_support_banking = {
-		icon = money 
-		allowed = { tag = FRA }
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}
-		}
-
-		visible = {
-			FRA_pereire_brothers = {
-				is_hired_as_advisor = yes 
-			}
-		}
-		priority = 63
-		fire_only_once = yes
-		days_remove = 365		
-		
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = 3
-			}	
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -3 }
-			add_money_with_tooltip_effect = yes		
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
+			}
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_tooltip_effect = yes
 		}
 
 		remove_effect = {
-			add_political_power = 50
-			add_stability = 0.1
-			set_temp_variable = { money_to_gain = -7 }
-			add_money_with_tooltip_effect = yes		
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
+			}
 		}
 		ai_will_do = {
-			base = 50
+			base = 1000
 		}
 	}
-}	
-	
-FRA_decision_category_latin_monetary_union = {
-	FRA_latin_monetary_union_establishment = {
- 
-		#allowed = { tag = FRA }
-	 
+
+	#Inquire into Medical Condition
+	FRA_decision_inquire_into_medical_condition = {
+		icon = eng_trade_unions_demand
+
 		available = {
-			OR = {
-				country_exists = ITA
-				country_exists = PIE
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
 			}
-			country_exists = BEL
-			country_exists = SWI
-			date > 1863.12.23
+		}
+
+		visible = {
+			has_country_flag = FRA_napoleon_health_activated
 		}
 
 		fire_only_once = yes
 
-		cost = 50
+		days_remove = 200
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+		}
 
 		complete_effect = {
-			country_event = { id = france.951 days = 5 }
-			BEL = {
-				country_event = { id = france.951 days = 5 }
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
 			}
-			if = {
-				limit = { country_exists = ITA }
-				ITA = {
-					country_event = { id = france.951 days = 5 }
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Attempt a Liver Operation
+	FRA_decision_attempt_a_liver_operation = {
+		icon = medicine
+
+		available = {
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
+			}
+		}
+
+		visible = {
+			has_country_flag = FRA_napoleon_health_activated
+			has_country_flag = FRA_napoleon_liver_operation
+		}
+
+		fire_only_once = yes
+
+		days_remove = 50
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+		}
+
+		complete_effect = {
+			custom_effect_tooltip = FRA_napoleon_liver_operation_warning_tt
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+
+			random_list = {
+				FRA.napoleon_health = {
+					country_event = nap_france_flavor.40
+				}
+				FRA.napoleon_unhealthy = {
+					country_event = nap_france_flavor.39
 				}
 			}
-			else = {
-				PIE = {
-					country_event = { id = france.951 days = 5 }
-				}
+
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
 			}
-			SWI= {
-				country_event = { id = france.951 days = 5 }
-			}
-			set_country_flag = latin_monetary_union_established
 		}
 		ai_will_do = {
-			base = 60
-		}		
+			base = 1000
+		}
 	}
-	FRA_latin_monetary_union_greece = {
- 
-		#allowed = { tag = FRA }
-	 
+
+	#Relaxation and Rehabilitation Therapy
+	FRA_decision_relaxation_and_rehabilitation_therapy = {
+		icon = generic_brainwash
+
 		available = {
-			country_exists = GRE
-			date > 1868.5.23
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
+			}
 		}
 
 		visible = {
-			has_country_flag = latin_monetary_union_established
+			has_country_flag = FRA_napoleon_health_activated
 		}
 
 		fire_only_once = yes
 
-		cost = 50
+		days_remove = 200
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+		}
 
 		complete_effect = {
-			GRE = {
-				country_event = { id = france.952 days = 5 }
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
+			}
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
 			}
 		}
 		ai_will_do = {
-			base = 35
-		}		
+			base = 1000
+		}
 	}
-	FRA_latin_monetary_union_romania = {
- 
-		#allowed = { tag = FRA }
-	 
+
+	#Convene Assembly of Doctors
+	FRA_decision_convene_assembly_of_doctors = {
+		icon = generic_political_discourse
+
 		available = {
-			country_exists = ROM
-			date > 1867.6.30
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
+			}
 		}
 
 		visible = {
-			has_country_flag = latin_monetary_union_established
+			has_country_flag = FRA_napoleon_health_activated
 		}
 
 		fire_only_once = yes
 
+		days_remove = 200
+
 		cost = 50
 
+		modifier = {
+		}
+
 		complete_effect = {
-			ROM = {
-				country_event = { id = france.953 days = 5 }
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
+			}
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+		}
+
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
 			}
 		}
 		ai_will_do = {
-			base = 35
-		}		
+			base = 1000
+		}
 	}
-		
-	FRA_latin_monetary_union_spain = {
- 
-		#allowed = { tag = FRA }
- 
+
+	#His Majesty's Condition Report
+	FRA_decision_his_majestys_condition_report = {
+		icon = eng_trade_unions_support
+
 		available = {
-			date > 1868.3.30
-			country_exists = SPR
+			NOT = {
+				has_country_flag = FRA_napoleon_health_decision_taken
+			}
 		}
 
 		visible = {
-			has_country_flag = latin_monetary_union_established
+			has_country_flag = FRA_napoleon_health_activated
 		}
 
 		fire_only_once = yes
 
-		cost = 50
-
-		complete_effect = {
-			SPR = {
-				country_event = { id = france.953 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
-		
-	FRA_latin_monetary_union_austria_hungary = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = AUS
-			date > 1870.4.30
-		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
+		days_remove = 200
 
 		cost = 50
 
-		complete_effect = {
-			AUS = {
-				country_event = { id = france.953 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
-		
-	FRA_latin_monetary_union_monaco = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = MNC
-			date > 1878.8.30
-		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-
-		complete_effect = {
-			MNC = {
-				country_event = { id = france.953 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
-		
-	FRA_latin_monetary_union_russia = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = RUS
-			date > 1878.8.30
-		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-
-		complete_effect = {
-			RUS = {
-				country_event = { id = france.953 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
-	FRA_latin_monetary_union_serbia = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = SER
-			date > 1873.8.30
-		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-		
-		cancel_trigger = {
-			SER = {
-				has_completed_focus = SER_join_latin_monetary_union
-			}
+		modifier = {
 		}
 
 		complete_effect = {
-			SER = {
-				country_event = { id = france.954 days = 5 }
+			add_to_variable = {
+    			var = FRA.napoleon_health
+    			value = 10
+    			tooltip = FRA_napoleon_improved_10_health_tt
+			}
+
+			subtract_from_variable = {
+				var = FRA.napoleon_unhealthy
+				value = 10
+			}
+
+			hidden_effect = {
+				set_country_flag = FRA_napoleon_health_decision_taken
+				FRA_napoleon_health_trait_raised_swap = yes
+			}
+		}
+
+		remove_effect = {
+			hidden_effect = {
+				clr_country_flag = FRA_napoleon_health_decision_taken
 			}
 		}
 		ai_will_do = {
-			base = 35
-		}		
-	}
-	FRA_latin_monetary_union_bulgaria = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = BUL
-			date > 1880.11.30
+			base = 1000
 		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-
-		complete_effect = {
-			BUL = {
-				country_event = { id = france.954 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
-	}
-	FRA_latin_monetary_union_finland = {
- 
-		#allowed = { tag = FRA }
-	 
-		available = {
-			country_exists = FIN
-			date > 1877.7.31
-		}
-
-		visible = {
-			has_country_flag = latin_monetary_union_established
-		}
-
-		fire_only_once = yes
-
-		cost = 50
-
-		complete_effect = {
-			FIN = {
-				country_event = { id = france.954 days = 5 }
-			}
-		}
-		ai_will_do = {
-			base = 35
-		}		
 	}
 }
 
@@ -4532,433 +1796,92 @@ FRA_decision_category_republican_army_reorganization = {
 	}
 }
 
-FRA_decision_category_luxembourg_crisis = {
-	
-	#Attempt to Buy Luxembourg
-	FRA_decision_attempt_to_buy_luxembourg = {
-		icon = border_war
-		available = {
-			has_stability > 0.25
-			has_war_support > 0.25
-			set_temp_variable = {
-				amount_of_money_to_check = 25
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		visible = {
-			OR = {
-				8 = { is_controlled_by = HOL }
-				AND = {
-					country_exists = LUX
-					LUX = { is_subject_of = HOL }
-				}
-			}
-		}
-		fire_only_once = yes
-		cost = 25
-		days_remove = 21
-		modifier = {
-			political_power_gain = -0.1
-		}
-		complete_effect = {
-			hidden_effect = {
-				LUX = { country_event = { id = lux_crisis.1 days = 7 } }
-			}
-		}
-		remove_effect = {
-			HOL = { country_event = { id = lux_crisis.2 } }
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Escalate the Luxembourg Crisis
-	FRA_decision_escalate_luxembourg_crisis = {
-		icon = generic_prepare_civil_war
-		available = {
-			has_war_support > 0.3
-		}
-		visible = {
-			has_country_flag = lux_crisis_london_conference_not_ratified_flag
-		}
-		fire_only_once = yes
-		cost = 0
-		days_remove = 14
-		war_with_on_remove = ENG
-		war_with_on_remove = PRS
-		complete_effect = {
-			add_war_support = 0.15
-			custom_effect_tooltip = FRA_lux_crisis_ultimatum_effect_tt
-			hidden_effect = {
-				ENG = { country_event = { days = 1 id = lux_crisis.23 } }
-				PRS = { country_event = { days = 1 id = lux_crisis.23 } }
-				PRS = { country_event = { days = 7 id = lux_crisis.24 } }
-			}
-		}
-		remove_effect = {
-			if = {
-				limit = {
-					NOT = { has_country_flag = FRA_lux_crisis_ultimatum_successful }
-				}
-				country_event = { id = lux_crisis.27 }
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-	
-	#Enforce Demands in Luxembourg
-	FRA_mission_luxembourg_crisis = {
-		icon = generic_ignite_civil_war
-		allowed = { always = no }
-		available = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				984 = {
-					is_fully_controlled_by = FRA
-				}
-				51 = {
-					is_controlled_by = FRA
-				}
-				if = {
-					limit = {
-						FRA = { has_war_with = BAV }
-					}
-					42 = {
-						is_controlled_by = FRA
-					}
-				}
-				NOT = {
-					28 = {
-						NOT = { is_controlled_by = FRA }
-					}
-				}
-				#Add condition on Italian border?
-			}
-			if = {
-				limit = {
-					tag = PRS
-				}
-				28 = {
-					NOT = { is_controlled_by = FRA }
-				}
-				972 = {
-					NOT = { is_fully_controlled_by = FRA }
-				}
-				#Add condition on Italian border?
-			}
-		}
-		activation = {
-			always = no
-		}
-		priority = 100
-		selectable_mission = no
-		is_good = no
-		days_mission_timeout = 180
-		timeout_effect = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				FRA = {
-					country_event = {
-						id = lux_crisis.67
-					}
-				}
-			}
-		}
-		complete_effect = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				custom_effect_tooltip = FRA_mission_luxembourg_crisis_effect_tt
-				hidden_effect = {
-					PRS = {
-						country_event = {
-							id = lux_crisis.31
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					tag = PRS
-				}
-				custom_effect_tooltip = FRA_mission_luxembourg_crisis_effect_tt
-				hidden_effect = {
-					FRA = {
-						country_event = {
-							id = lux_crisis.36
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	#Push for a Decisive Victory
-	FRA_mission_luxembourg_crisis_continued = {
-		icon = generic_ignite_civil_war
-		allowed = { always = no }
-		available = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				if = {
-					limit = {
-						FRA = { has_war_with = LUX }
-					}
-					8 = {
-						is_fully_controlled_by = FRA
-					}
-				}
-				if = {
-					limit = {
-						FRA = { has_war_with = BEL }
-					}
-					34 = {
-						is_fully_controlled_by = FRA
-					}
-				}
-				984 = {
-					is_fully_controlled_by = FRA
-				}
-				51 = {
-					is_fully_controlled_by = FRA
-				}
-				978 = {
-					is_fully_controlled_by = FRA
-				}
-				if = {
-					limit = {
-						FRA = { has_war_with = BAV }
-					}
-					42 = {
-						is_fully_controlled_by = FRA
-					}
-				}
-				if = {
-					limit = {
-						FRA = { has_war_with = HSD }
-					}
-					581 = {
-						is_fully_controlled_by = FRA
-					}
-				}
-				#if = {
-				#	limit = {
-				#		FRA = { has_war_with = BAD }
-				#	}
-				#	744 = {
-				#		is_fully_controlled_by = FRA
-				#	}
-				#}
-				NOT = {
-					28 = {
-						NOT = { is_fully_controlled_by = FRA }
-					}
-				}
-				#Add condition on Italian border?
-			}
-			if = {
-				limit = {
-					tag = PRS
-				}
-				28 = {
-					NOT = { is_controlled_by = FRA }
-				}
-				972 = {
-					NOT = { is_controlled_by = FRA }
-				}
-				17 = {
-					NOT = { is_controlled_by = FRA }
-				}
-				#Add condition on Italian border?
-			}
-		}
-		activation = {
-			always = no
-		}
-		priority = 100
-		selectable_mission = no
-		is_good = no
-		days_mission_timeout = 180
-		timeout_effect = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				FRA = {
-					country_event = {
-						id = lux_crisis.67
-					}
-				}
-			}
-		}
-		complete_effect = {
-			if = {
-				limit = {
-					tag = FRA
-				}
-				custom_effect_tooltip = FRA_mission_luxembourg_crisis_FRA_effect_tt
-				hidden_effect = {
-					PRS = {
-						country_event = {
-							id = lux_crisis.42
-						}
-					}
-				}
-			}
-			if = {
-				limit = {
-					tag = PRS
-				}
-				custom_effect_tooltip = FRA_mission_luxembourg_crisis_PRS_effect_tt
-				hidden_effect = {
-					FRA = {
-						country_event = {
-							id = lux_crisis.49
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-FRA_BOP_category_decisions = {
-	### LEFT ###
-	FRA_BOP_appease_the_left = {
-		icon = constitution
-		allowed = { tag = FRA }
-		available = { }
-
-		fire_only_once = yes
-		cost = 50
-		days_remove = 50
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = -0.05
-				tooltip_side = FRA_BOP_Proggresive_Emporer
-			}
-		}
-	}
-	FRA_BOP_progressive_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		available = { }
-
-		fire_only_once = yes
-		cost = 100
-		days_remove = 75
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = -0.1
-				tooltip_side = FRA_BOP_Proggresive_Emporer
-			}
-		}
-	}
-	### Right ###
-	FRA_BOP_appease_the_right = {
-		icon = constitution
-		allowed = { tag = FRA }
-		available = { }
-
-		fire_only_once = yes
-		cost = 50
-		days_remove = 50
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = 0.05
-				tooltip_side = FRA_BOP_Authoritarian_Emporer
-			}
-		}
-	}	
-	FRA_BOP_conservative_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		available = { }
-
-		fire_only_once = yes
-		cost = 100
-		days_remove = 75
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = 0.1
-				tooltip_side = FRA_BOP_Authoritarian_Emporer
-			}
-		}
-	}	
-}
-
 FRA_decision_category_french_navy = {
 
 	FRA_decision_seek_council_support = {
-		priority = 310
-
-		#icon = 
-
+		priority = 100
+		icon = generic_decision
+		#allowed = { tag = FRA }
+		available = {
+			#
+		}
+		visible = {
+			check_variable = { FRA_navy_council = 100 compare = less_than }
+		}
+		cost = 25
+		days_re_enable = 90
+		days_remove = 60
+		modifier = { political_power_gain = -0.05 }
+		remove_effect = {
+			FRA_navy_council_increase_effect = yes
+			custom_effect_tooltip = FRA_decision_seek_council_support_tt
+		}
 		ai_will_do = {
 			factor = 0.9
 			modifier = { add = var:FRA_navy_council }
 			modifier = {
 				factor = 0
-				check_variable = { FRA_navy_council < 25}
+				check_variable = { FRA_navy_council < 25 }
 			}
-		}
-		cost = 25
-		days_re_enable = 90
-		days_remove = 20
-		modifier = { political_power_gain = -0.05 }
-		complete_effect = {
-			FRA_navy_council_increase_effect = yes
-			custom_effect_tooltip = FRA_decision_seek_council_support_tt
 		}
 	}
 
 	#Raise 3 Ironcladships Gloire Class
 	FRA_decision_raise_ironclad_ships = {
+		priority = 90
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
-			NOT = {  has_country_flag = FRA_raise_ironclad_ships_in_progress }
+			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
 			has_tech = tech_naval_mtg_prototype_ironclad
 			check_variable = { FRA_navy_council = 60 compare = greater_than_or_equals tooltip = FRA_ironclad_support }
-			set_temp_variable = {  amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		visible = { has_completed_focus = FRA_focus_gloire_class }
+		visible = {
+			has_completed_focus = FRA_focus_gloire_class
+		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 9
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 24.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
 		days_remove = 180
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -9 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
-			FRA = { country_event = { id = nap_france.16 days = 3 } }
+			hidden_effect = {
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					create_equipment_variant = {
+						name = "Gloire Class"
+						type = ship_hull_ironclad_0
+						name_group = GER_IC_HISTORICAL
+						parent_version = 0
+						modules = {
+							fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
+							fixed_ship_battery_slot = ship_cannon_battery_0
+							fixed_ship_fire_control_system_slot = fire_control_system_0
+							fixed_ship_armor_slot = ship_armor_capital_hardwood_0
+							mid_1_custom_slot = ship_cannon_battery_0
+							mid_2_custom_slot = empty
+							front_1_custom_slot = ship_cannon_battery_0
+							rear_1_custom_slot = ship_cannon_battery_0
+						}
+						#obsolete = no
+					}
+				}
+			}
+			country_event = {
+				id = nap_france.16
+			}
 			set_temp_variable = { unemployment_value = -0.0005 }
 			add_unemployment_effect = yes
 			hidden_effect = { clr_country_flag = FRA_raise_ironclad_ships_in_progress }
@@ -4970,49 +1893,57 @@ FRA_decision_category_french_navy = {
 
 	#Raise 2 Ironcladships Fregate Cuirassee
 	FRA_decision_raise_ironclad_ships_2 = {
+		priority = 89
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
 			has_tech = tech_naval_mtg_prototype_ironclad
 			check_variable = { FRA_navy_council = 60 compare = greater_than_or_equals tooltip = FRA_ironclad_support }
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		visible = {
 			has_completed_focus = FRA_focus_fregate_cuirassee
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 6
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 24.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
 		days_remove = 180
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -6 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
-			country_event = { id = nap_france.17 }
-			create_equipment_variant = {
-				name = "Couronne-class"
-				type = ship_hull_ironclad_0
-				modules = {
-					fixed_ship_engine_slot = ship_engine_paddle_capital
-					fixed_ship_battery_slot = ship_cannon_battery_1
-					fixed_ship_fire_control_system_slot = fire_control_system_0
-					fixed_ship_armor_slot = ship_armor_capital_hardwood_1
-					mid_1_custom_slot = ship_cannon_battery_1
-					mid_2_custom_slot = ship_cannon_battery_1
-					front_1_custom_slot = ship_cannon_battery_1
-					rear_1_custom_slot = ship_cannon_battery_1
+			hidden_effect = {
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					create_equipment_variant = {
+						name = "Couronne Class"
+						type = ship_hull_ironclad_0
+						modules = {
+							fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
+							fixed_ship_battery_slot = ship_RBL_battery_1
+							fixed_ship_fire_control_system_slot = fire_control_system_0
+							fixed_ship_armor_slot = ship_armor_capital_hardwood_0
+							mid_1_custom_slot = empty
+							mid_2_custom_slot = empty
+							front_1_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						#obsolete = no
+					}
 				}
-				#obsolete = no
+			}
+			country_event = {
+				id = nap_france.17
 			}
 			set_temp_variable = { unemployment_value = -0.0005 }
 			add_unemployment_effect = yes
@@ -5023,54 +1954,60 @@ FRA_decision_category_french_navy = {
 
 	#Raise 2 Ironcladships Magenta Class
 	FRA_decision_raise_ironclad_ships_3 = {
+		priority = 88
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
 			has_tech = tech_naval_mtg_ironclad
 			check_variable = { FRA_navy_council = 60 compare = greater_than_or_equals tooltip = FRA_ironclad_support }
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		visible = { has_completed_focus = FRA_focus_fregate_cuirassee }
+		visible = {
+			has_completed_focus = FRA_focus_fregate_cuirassee
+		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 6
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 24.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
 		days_remove = 180
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -6 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = {
 				set_country_flag = FRA_raise_ironclad_ships_in_progress
 			}
-			set_technology = {
-				tech_naval_mtg_prototype_ironclad = 1
-			}
 		}
 		remove_effect = {
-			country_event = { id = nap_france.18 }
-			create_equipment_variant = {
-				name = "Magenta-class"
-				type = ship_hull_ironclad_1
-				modules = {
-					fixed_ship_battery_slot = ship_cannon_battery_1
-					fixed_ship_fire_control_system_slot = fire_control_system_0
-					fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
-					fixed_ship_armor_slot = ship_armor_capital_hardwood_1
-					mid_1_custom_slot = ship_cannon_battery_1
-					mid_2_custom_slot = ship_cannon_battery_1
-					front_1_custom_slot = ship_cannon_battery_1
-					rear_1_custom_slot = ship_cannon_battery_1
+			hidden_effect = {
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					create_equipment_variant = {
+						name = "Magenta Class"
+						type = ship_hull_ironclad_1
+						modules = {
+							fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
+							fixed_ship_battery_slot = ship_cannon_battery_2
+							fixed_ship_fire_control_system_slot = fire_control_system_0
+							fixed_ship_armor_slot = ship_armor_capital_hardwood_0
+							mid_1_custom_slot = ship_cannon_battery_2
+							mid_2_custom_slot = ship_cannon_battery_2
+							front_1_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						#obsolete = no
+					}
 				}
-				#obsolete = no
 			}
-
+			country_event = {
+				id = nap_france.18
+			}
 			set_temp_variable = { unemployment_value = -0.0005 }
 			add_unemployment_effect = yes
 			hidden_effect = { clr_country_flag = FRA_raise_ironclad_ships_in_progress }
@@ -5080,49 +2017,58 @@ FRA_decision_category_french_navy = {
 
 	#Raise 9 Ironcladships Provence Class
 	FRA_decision_raise_ironclad_ships_4 = {
+		priority = 87
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
 			has_tech = tech_naval_mtg_ironclad
 			check_variable = { FRA_navy_council = 60 compare = greater_than_or_equals tooltip = FRA_ironclad_support }
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		visible = { has_completed_focus = FRA_focus_fregate_cuirassee }
+		visible = {
+			has_completed_focus = FRA_focus_fregate_cuirassee
+		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 27
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 24.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
 		days_remove = 180
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -27 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
-			country_event = { id = nap_france.19 }
-			create_equipment_variant = {
-				name = "Provence-class"
-				type = ship_hull_ironclad_1
-				modules = {
-					fixed_ship_battery_slot = ship_cannon_battery_1
-					fixed_ship_fire_control_system_slot = fire_control_system_0
-					fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
-					fixed_ship_armor_slot = ship_armor_capital_hardwood_1
-					mid_1_custom_slot = ship_cannon_battery_1
-					mid_2_custom_slot = ship_cannon_battery_1
-					front_1_custom_slot = ship_cannon_battery_1
-					rear_1_custom_slot = ship_cannon_battery_1
+			hidden_effect = {	
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					create_equipment_variant = {
+						name = "Provence Class"
+						type = ship_hull_ironclad_1
+						modules = {
+							fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
+							fixed_ship_battery_slot = ship_cannon_battery_0
+							fixed_ship_fire_control_system_slot = fire_control_system_0
+							fixed_ship_armor_slot = ship_armor_capital_hardwood_1
+							mid_1_custom_slot = empty
+							mid_2_custom_slot = empty
+							front_1_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						#obsolete = no
+					}
 				}
-				#obsolete = no
 			}
-
+			country_event = {
+				id = nap_france.19
+			}
 			set_temp_variable = { unemployment_value = -0.0005 }
 			add_unemployment_effect = yes
 			hidden_effect = { clr_country_flag = FRA_raise_ironclad_ships_in_progress }
@@ -5132,51 +2078,58 @@ FRA_decision_category_french_navy = {
 
 	#Raise 3 Ironcladships Ocean Class
 	FRA_decision_raise_ironclad_ships_5 = {
+		priority = 86
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
 			has_tech = tech_naval_mtg_ironclad
 			check_variable = { FRA_navy_council = 60 compare = greater_than_or_equals tooltip = FRA_ironclad_support }
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		visible = { has_completed_focus = FRA_focus_fregate_cuirassee_de_1_rang }
+		visible = {
+			has_completed_focus = FRA_focus_fregate_cuirassee_de_1_rang
+		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 9
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 24.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_25
-		priority = 82
 		days_remove = 180
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
-			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -9 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
+			hidden_effect = {	
+				if = {
+					limit = { has_dlc = "Man the Guns" }
+					create_equipment_variant = {
+						name = "Océan Class"
+						type = ship_hull_ironclad_1
+						modules = {
+							fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
+							fixed_ship_battery_slot = ship_cannon_battery_0
+							fixed_ship_fire_control_system_slot = fire_control_system_0
+							fixed_ship_armor_slot = ship_armor_capital_hardwood_1
+							mid_1_custom_slot = ship_cannon_battery_0
+							mid_2_custom_slot = empty
+							front_1_custom_slot = empty
+							rear_1_custom_slot = empty
+						}
+						#obsolete = no
+					}
+				}
+			}
 			country_event = {
 				id = nap_france.20
 			}
-			create_equipment_variant = {
-				name = "Océan-class"
-				type = ship_hull_ironclad_1
-				modules = {
-					fixed_ship_battery_slot = ship_cannon_battery_1
-					fixed_ship_fire_control_system_slot = fire_control_system_0
-					fixed_ship_engine_slot = ship_engine_steam_screw_cruiser
-					fixed_ship_armor_slot = ship_armor_capital_hardwood_1
-					mid_1_custom_slot = ship_cannon_battery_1
-					mid_2_custom_slot = ship_cannon_battery_1
-					front_1_custom_slot = ship_cannon_battery_1
-					rear_1_custom_slot = ship_cannon_battery_1
-				}
-				#obsolete = no
-			}
-
 			set_temp_variable = { unemployment_value = -0.0005 }
 			add_unemployment_effect = yes
 			hidden_effect = { clr_country_flag = FRA_raise_ironclad_ships_in_progress }
@@ -5207,12 +2160,14 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
-			country_event = { id = nap_france.21 }
+			country_event = {
+				id = nap_france.21
+			}
 			create_equipment_variant = {
 				name = "Colbert-class"
 				type = ship_hull_ironclad_1
@@ -5259,12 +2214,15 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
 		remove_effect = {
-			country_event = { id = nap_france.26 }
+			custom_effect_tooltip = FRA_decision_raise_ironclad_ships_7_effect_tt
+			country_event = {
+				id = nap_france.26
+			}
 			create_equipment_variant = {
 				name = "Palestro-class"
 				type = ship_hull_ironclad_0
@@ -5293,7 +2251,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5310,7 +2268,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = {
 				set_country_flag = FRA_raise_ironclad_ships_in_progress
@@ -5375,7 +2333,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5392,7 +2350,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5489,7 +2447,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5553,7 +2511,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5601,7 +2559,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5618,7 +2576,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5651,7 +2609,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5668,7 +2626,7 @@ FRA_decision_category_french_navy = {
 		complete_effect = {
 			FRA_navy_council_decrease_effect = yes
 			set_temp_variable = { money_to_gain = -0.5 }
-			add_money_with_tooltip_effect = yes
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -25
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5746,7 +2704,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5781,7 +2739,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -5890,25 +2848,25 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			set_temp_variable = { amount_of_money_to_check = 2.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
+			has_completed_focus = FRA_focus_expand_lorient_drydocks
 		}
 		visible = {
-			has_completed_focus = FRA_focus_expand_lorient_drydocks
 			owns_state = 19
-			19 = { dockyard < 4 }
 		}
 		fire_only_once = yes
 		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 2.5 }
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 49.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_50
 		priority = 81		
 		days_remove = 730
 		complete_effect = {
-			set_temp_variable = { money_to_gain = -2.5 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			navy_experience = -50
 			hidden_effect = { set_country_flag = FRA_raise_ironclad_ships_in_progress }
 		}
@@ -5933,7 +2891,7 @@ FRA_decision_category_french_navy = {
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
@@ -5989,7 +2947,7 @@ FRA_decision_category_french_navy = {
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			set_temp_variable = { amount_of_money_to_check = 1.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
@@ -6015,7 +2973,7 @@ FRA_decision_category_french_navy = {
 		icon = naval_base
 		#allowed = { tag = FRA }
 		available = {
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			set_temp_variable = { amount_of_money_to_check = 1 }
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
@@ -6161,7 +3119,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6210,7 +3168,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6259,7 +3217,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6308,7 +3266,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6357,7 +3315,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6406,7 +3364,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6470,7 +3428,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6519,7 +3477,7 @@ FRA_decision_category_french_navy = {
 		#allowed = { tag = FRA }
 		available = {
 			NOT = { has_country_flag = FRA_raise_ironclad_ships_in_progress }
-			has_completed_focus = FRA_focus_1857_programm
+			has_completed_focus = FRA_focus_navy_1857
 			check_variable = { FRA_navy_council = 40 compare = greater_than_or_equals tooltip = FRA_gunboat_support }
 			set_temp_variable = { amount_of_money_to_check = 0.5 }
 			has_specific_amount_of_money_with_inflation_included = yes
@@ -6608,112 +3566,2007 @@ FRA_decision_category_french_navy = {
 		ai_will_do = { base = 1000 }
 	}
 }
-		
 
-FRA_decision_category_health_of_his_majesty = {
+FRA_decision_category_industrialization = {
 
-	#His Majesty's Condition Worsens
-	FRA_mission_napoleon_health_decrease = {
-		icon = medicine
+	#Crédit lyonnais
+	FRA_decision_credit_lyonnais = {
 
-		activation = {
-			has_country_flag = FRA_napoleon_health_activated
-			has_country_leader = { character = FRA_napoleon_iii	ruling_only = yes }
-		}
+		icon = money
+
+		#allowed = { tag = FRA }
+
 		available = {
-			always = no
+			has_completed_focus = FRA_embolden_monsieur_schneider
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		cancel_trigger = {
-			NOT = {
-				has_country_leader = { character = FRA_napoleon_iii	ruling_only = yes }				
+
+		visible = {
+			has_completed_focus = FRA_embolden_monsieur_schneider
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
 			}
 		}
-		is_good = no
-		days_mission_timeout = 275
-		timeout_effect = {
-			random_list = {
-				50 = {
-					subtract_from_variable = {
-						var = FRA.napoleon_health
-						value = 10
-						tooltip = FRA_napoleon_worsened_10_health_tt
-					}
-					add_to_variable = {
-						var = FRA.napoleon_unhealthy
-						value = 10
-					}
-      				FRA_napoleon_health_trait_lowered_swap = yes
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+		}
+		priority = 1
+
+		days_remove = 150
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			set_temp_variable = { eoanb_prestige_change = 5 }
+			eoanb_change_prestige_score = yes
+			if = {
+				limit = {
+					has_idea = FRA_idea_new_banks
 				}
-				50 = {
-					subtract_from_variable = {
-						var = FRA.napoleon_health
-						value = 5
-						tooltip = FRA_napoleon_worsened_5_health_tt
+				modify_timed_idea = {
+					idea = FRA_idea_new_banks
+					days = 60
+				}
+			}
+			EOANBSYS_institutions_innovative_add_two = yes
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = economics_tech
+				category = humanities_tech
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Support French Steel Industry
+
+	FRA_mission_economic_growth = {
+		icon = generic_factory
+		allowed = { always = no }
+		activation = { always = no }
+
+		available = { has_completed_focus = FRA_une_victorie_sur_lindustrie }
+
+		priority = 100
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 5000
+
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -100
+				add_stability = -0.1
+			}
+		}
+		complete_effect = {
+			add_political_power = 150
+			add_stability = 0.05
+			set_temp_variable = {
+				eoanb_prestige_change = 10
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_five = yes			
+		}
+	}
+
+	#Support French Steel Industry in the North
+	FRA_decision_support_french_steel_industry_north = {
+		icon = steel
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_first_batches_of_coal_and_steel
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 28
+			owns_state = 976
+			controls_state = 28
+			controls_state = 976
+		}
+		highlight_states = {
+			highlight_state_targets = {
+				state = 28
+				state = 976
+			}
+		}
+		fire_only_once = yes
+		priority = 99
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 300
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			28 = {
+				add_resource = {
+					type = coal
+					amount = 2
+				}
+			}
+			976 = {
+				add_resource = {
+					type = iron
+					amount = 2
+				}
+				add_resource = {
+					type = coal
+					amount = 2
+				}
+				add_building_construction = {
+					type = steel_mill
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 1
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#
+	FRA_decision_support_french_steel_industry_south = {
+		icon = steel
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_first_batches_of_coal_and_steel
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 28
+			owns_state = 971
+			controls_state = 28
+			controls_state = 971
+		}
+		highlight_states = {
+			highlight_state_targets = {
+				state = 28
+				state = 971
+			}
+		}
+		fire_only_once = yes
+		priority = 98
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 300
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			28 = {
+				add_resource = {
+					type = coal
+					amount = 2
+				}
+			}
+			971 = {
+				add_resource = {
+					type = iron
+					amount = 2
+				}
+				add_resource = {
+					type = coal
+					amount = 2
+				}
+				add_building_construction = {
+					type = steel_mill
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 1
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	FRA_mission_narbonne_perpignan_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Narbonne-Perpignan
+				tooltip = FRA_mission_narbonne_perpignan_rail_trigger_tt_1
+				hidden_trigger = {
+					has_railway_level = {
+						state = 22
+						level = 2
 					}
-					add_to_variable = {
-						var = FRA.napoleon_unhealthy
-						value = 5
+					has_railway_connection = {
+						start_province = 6960
+						target_province = 9853
 					}
-      				FRA_napoleon_health_trait_lowered_swap = yes
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 22
+			}
+		}
+		priority = 98
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			NOT = { owns_state = 22 }
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			22 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	FRA_mission_tolouse_cette_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Tolouse-Cette
+				tooltip = FRA_mission_tolouse_cette_rail_trigger_tt_1
+				hidden_trigger = {
+					has_railway_level = {
+						state = 22
+						level = 2
+					}
+					if = { 
+						limit = {
+							has_railway_level = {
+							state = 971
+							level = 2
+							}
+						}
+						has_railway_level = {
+							state = 971
+							level = 2
+						}
+					}
+					has_railway_connection = {
+						start_province = 6766
+						target_province = 6960
+					}
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 22
+			state = 971
+			}
+		}
+		priority = 96
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 22 }
+				NOT = { owns_state = 971 }
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			22 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			971 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	FRA_mission_saint_dizier_belfort_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Saint Dizier-Belfort
+				tooltip = FRA_mission_saint_dizier_belfort_rail_tt_1
+				hidden_trigger = {
+					has_railway_level = {
+						state = 17
+						level = 2
+					}
+					has_railway_level = {
+						state = 972
+						level = 2
+					}
+					has_railway_connection = {
+						start_province = 11488
+						target_province = 698
+					}
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 17
+			state = 972
+			}
+		}
+		priority = 94
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 17 }
+				NOT = { owns_state = 972 }
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			17 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			972 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	FRA_mission_carmaux_albi_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Carmaux - Albi
+				tooltip = FRA_mission_carmaux_albi_rail_tt_1
+				hidden_trigger = {
+					if = { 
+						limit = {
+							has_railway_level = {
+							state = 971
+							level = 2
+							}
+						}
+						has_railway_level = {
+							state = 971
+							level = 2
+						}
+					}
+					has_railway_connection = {
+						start_province = 6773
+						target_province = 752
+					}
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 971
+			}
+		}
+		priority = 92
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 971 }
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			971 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	FRA_mission_caen_cherbourg_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Caen-Cherbourg
+				tooltip = FRA_mission_caen_cherbourg_rail_trigger_tt
+				hidden_trigger = {
+					if = { 
+						limit = {
+							has_railway_level = {
+							state = 15
+							level = 2
+							}
+						}
+						has_railway_level = {
+							state = 15
+							level = 2
+						}
+					}
+					has_railway_connection = {
+						start_province = 11535
+						target_province = 6449
+					}
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 15
+			}
+		}
+		priority = 90
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 15 }
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			15 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	FRA_mission_caen_argentan_rail = {
+		icon = railway
+		allowed = {
+			always = no
+		}
+		available = {
+			custom_trigger_tooltip = { #Caen-Argentan
+				tooltip = FRA_mission_caen_argentan_rail_trigger_tt
+				hidden_trigger = {
+					has_railway_level = {
+						state = 30
+						level = 2
+					}
+					if = { 
+						limit = {
+							has_railway_level = {
+							state = 15
+							level = 2
+							}
+						}
+						has_railway_level = {
+							state = 15
+							level = 2
+						}
+					}
+					has_railway_connection = {
+						start_province = 11535
+						target_province = 3523
+					}
+				}
+			}
+		}
+		activation = {
+			always = no
+		}
+		highlight_states = {
+			highlight_state_targets = {
+			state = 15
+			state = 30
+			}
+		}
+		priority = 88
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		cancel_trigger = {
+			OR = {
+				NOT = { owns_state = 15 }
+				NOT = { owns_state = 30 }
+			}
+		}
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			15 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			30 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_tech_bonus = {
+				bonus = 0.25
+				uses = 1
+				category = transport_tech
+			}
+			set_temp_variable = {
+                eoanb_prestige_change = 2
+            }
+            eoanb_change_prestige_score = yes
+            EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	FRA_decision_narbonne_perpignan_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 97
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # Narbonne Perpignan
+			level = 2
+			path = { 6960 3946 9853 }
+			start_province = 6960
+			target_province = 9853
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	FRA_decision_tolouse_cette_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 96
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # Touloose Cette
+			level = 2
+			path = { 6766 943 9723 6960 }
+			start_province = 6766
+			target_province = 6960
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	FRA_decision_saint_dizier_belfort_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 95
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # St Dizier Belfort
+			level = 2
+			path = { 11488 6698 698 }
+			start_province = 11488
+			target_province = 698
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	FRA_decision_carmaux_albi_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 94
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # Carmaux Albi
+			level = 1
+			path = { 752 6773 }
+			start_province = 752
+			target_province = 6773
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	FRA_decision_caen_cherbourg_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 93
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # Caen Cherbourg
+			level = 1
+			path = { 11535 3579 6449 }
+			start_province = 11535
+			target_province = 6449
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	FRA_decision_caen_argentan_rail = {
+		icon = railway
+		#allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		priority = 92 
+	
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 7
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			build_railway = { # Caen Argentan
+			level = 2
+			path = { 11535 11521 3523 }
+			start_province = 11535
+			target_province = 3523
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+			}
+	}
+
+	#Acquire Locomotives
+	FRA_decision_acquire_locomotives = {
+		icon = train
+		allowed = { tag = FRA }
+		available = {
+			has_completed_focus = FRA_grant_mange_the_blank_check
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		priority = 1
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 120
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			add_equipment_to_stockpile = {
+				type = train_equipment_1
+				amount = 20
+				producer = FRA
+			}
+		}
+	}
+
+	#Open New Mines
+	FRA_decision_open_new_mines = { 
+
+		icon = coal
+
+		highlight_states = {
+			state = 22
+		}
+		
+		available = {
+			has_completed_focus = FRA_the_art_of_refining
+			NOT = {
+				has_idea = bankruptcy
+			}
+			has_tech = machine_tools_1
+		}
+
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			has_full_control_of_state = 22
+			has_full_control_of_state = 16
+			has_full_control_of_state = 15
+			has_full_control_of_state = 29
+			num_of_civilian_factories_available_for_projects > 1
+		}
+
+		fire_only_once = no
+		is_good = yes
+		priority = 86
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 180
+		days_re_enable = 360
+
+		modifier = {
+			civilian_factory_use = 2
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+
+		remove_effect = { 
+			22 = {
+				add_resource = {
+					type = iron
+					amount = 1
+				}
+			}
+			16 = {
+				add_resource = {
+					type = iron
+					amount = 1
+				}
+			}
+			15 = {
+				add_resource = {
+					type = coal
+					amount = 1
+				}
+			}
+			29 = {
+				add_resource = {
+					type = coal
+					amount = 1
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 100
+				check_variable = {
+					money > 50
 				}
 			}
 		}
 	}
 	
-	#Imperial Visit to Vichy Baths
-	FRA_decision_imperial_visit_to_vichy_baths = {
-		icon = generic_cavalry
-
-		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
-			}
+	FRA_mission_northern_lines = {
+	
+		allowed = {
+			always = no
 		}
 
-		visible = {
-			has_completed_focus = FRA_invest_in_the_vichy_baths
-			has_country_flag = FRA_napoleon_health_activated
-			has_country_flag = FRA_vichy_baths_invested_in
+		icon = generic_construction
+
+		available = {
+			29 = { infrastructure > 7 }
+			15 = { infrastructure > 6 }
+			18 = { infrastructure > 6 }
+			owns_state = 29
+			owns_state = 15
+			owns_state = 18
+		}
+
+		activation = {
+			always = no 	# via effect
+		}
+
+		highlight_states = {
+			state = 29
 		}
 
 		fire_only_once = yes
 
-		days_remove = 200
+		priority = 85
+		is_good = no
+		days_mission_timeout = 1600
+		timeout_effect = {
+			add_political_power = -80
+			add_stability = -0.02
+		}
+		complete_effect = {
+			29 = { add_extra_state_shared_building_slots = 1 }
+			15 = { add_extra_state_shared_building_slots = 1 }
+			18 = { add_extra_state_shared_building_slots = 1 }
+			random_list = {
+				50 = {
+					add_stability = 0.02 
+				}
+				50 = {
+					add_manpower = 1000
+				}
+			}
+		}
 
+		ai_will_do = {
+			base = 1
+		}
+	}
+	
+	FRA_mission_southern_lines = {
+
+		icon = generic_construction
+
+		allowed = {
+			always = no		# via effect
+		}
+
+		available = {
+			22 = { infrastructure > 5 }
+			20 = { infrastructure > 7 }
+			27 = { infrastructure > 7 }
+			19 = { infrastructure > 7 }
+			owns_state = 22
+			owns_state = 20
+			owns_state = 27
+			owns_state = 19
+		}
+
+		activation = {
+			always = no		# via effect
+		}
+
+		highlight_states = {
+			state = 22
+		}
+
+		fire_only_once = yes
+
+		priority = 84
+		is_good = no
+		days_mission_timeout = 1600
+		timeout_effect = {
+			add_political_power = -80
+			add_stability = -0.02
+		}
+		complete_effect = {
+			22 = { add_extra_state_shared_building_slots = 1 }
+			20 = { add_extra_state_shared_building_slots = 1 }
+			27 = { add_extra_state_shared_building_slots = 1 }
+			19 = { add_extra_state_shared_building_slots = 1 }
+			random_list = {
+				50 = {
+					add_stability = 0.02 
+				}
+				50 = {
+					add_manpower = 1000
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+		}
+	}
+	
+	FRA_mission_connect_the_country = {
+
+		icon = generic_construction
+
+		allowed = {
+			always = no
+		}
+
+		available = {
+			16 = { infrastructure > 5 }
+			23 = { infrastructure > 7 }
+			24 = { infrastructure > 7 }
+			owns_state = 16
+			owns_state = 23
+			owns_state = 24
+		}
+
+		activation = {
+			always = no		# Activated via effect
+		}
+
+		highlight_states = {
+			state = 16
+		}
+
+		fire_only_once = yes
+
+		priority = 83
+		is_good = no
+		days_mission_timeout = 1600
+		timeout_effect = {
+			add_political_power = -80
+			add_stability = -0.02
+		}
+		complete_effect = {
+			16 = { add_extra_state_shared_building_slots = 1 }
+			23 = { add_extra_state_shared_building_slots = 1 }
+			24 = { add_extra_state_shared_building_slots = 1 }
+			random_list = {
+				50 = {
+					add_stability = 0.02 
+				}
+				50 = {
+					add_manpower = 1000
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 1
+		}
+	}
+	
+	#Invest into Bordeaux Port Infrastructure
+	FRA_decision_strengthen_the_ports_of_bordeaux = {
+		icon = naval_base
+		#allowed = { tag = FRA }
+		available = {
+			NOT = {
+				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+			has_completed_focus = FRA_strengthen_the_ports_of_bordeaux
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 19
+		}
+		fire_only_once = no
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.05
+				amount_of_money_to_check = 1
 			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_navy_experience > 24.9
+		}
+		custom_cost_text = eoanb_money_and_navy_experience_25
+		priority = 82
+		days_remove = 365
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			navy_experience = -25
+			hidden_effect = {
+				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		remove_effect = {
+			19 = {
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					instant_build = yes
+					province = 9737
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0005
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Invest into Bordeaux Dockyard Infrastructure
+	FRA_decision_invest_into_bordeaux_dockyard = {
+		icon = generic_construction
+		#allowed = { tag = FRA }
+		available = {
+			NOT = {
+				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+			has_completed_focus = FRA_strengthen_the_ports_of_bordeaux
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 19
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_navy_experience > 49.9
+		}
+		custom_cost_text = eoanb_money_and_navy_experience_50
+		priority = 81		
+		days_remove = 730
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			navy_experience = -50
+			hidden_effect = {
+				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		remove_effect = {
+			19 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			19 = {
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0005
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Invest into Marseille Port Infrastructure
+	FRA_decision_strengthen_the_ports_of_marseille = {
+		icon = naval_base
+		#allowed = { tag = FRA }
+		available = {
+			NOT = {
+				has_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+			has_completed_focus = FRA_expand_the_port_of_marseille
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 21
+		}
+		fire_only_once = no
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_navy_experience > 24.9
+		}
+		custom_cost_text = eoanb_money_and_navy_experience_25
+		priority = 80
+		days_remove = 365
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			navy_experience = -25
+			hidden_effect = {
+				set_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+		}
+		remove_effect = {
+			21 = {
+				add_building_construction = {
+					type = naval_base
+					level = 1
+					instant_build = yes
+					province = 11834
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0005
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Invest into Marseille Dockyard Infrastructure
+	FRA_decision_invest_into_marseille_dockyard = {
+		icon = generic_construction
+		#allowed = { tag = FRA }
+		available = {
+			NOT = {
+				has_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+			has_completed_focus = FRA_expand_the_port_of_marseille
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 21
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 10
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_navy_experience > 49.9
+		}
+		custom_cost_text = eoanb_money_and_navy_experience_50
+		priority = 79
+		days_remove = 730
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -10 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			navy_experience = -50
+			hidden_effect = {
+				set_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+		}
+		remove_effect = {
+			21 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			21 = {
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0005
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = FRA_strengthen_the_ports_of_marsailles_in_progress
+			}
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	
+	#Invest into Lyon Silk
+	FRA_decision_invest_lyon_silk = {
+		allowed = {
+			#tag = FRA
+		}
+		available = {
+			has_completed_focus = FRA_embolden_the_silk_of_lyon
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+			owns_state = 20
+		}
+		icon = fabric
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		ai_will_do = {
+			base = 25
+		}
+		days_remove = 150
+		priority = 78
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			20 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = fabric_weavery
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+	}
+	
+	#Redistribution of Orleans Properties
+	FRA_decision_redistribution_of_orleans_properties = {
+		allowed = {
+			#tag = FRA
+		}
+		available = {
+			has_completed_focus = FRA_redistribution_of_orleans_properties
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 50
+		priority = 77
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			add_stability = -0.075
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+		}
+		ai_will_do = {
+			base = 25
+		}
+	}
+	
+	#Limited Land Redistribution
+	FRA_decision_limited_land_redistribution = {
+		allowed = {
+			#tag = FRA
+		}
+		available = {
+			has_completed_focus = FRA_limited_land_redistribution
+		}
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 50
+		priority = 76
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}
+		}
+		ai_will_do = {
+			base = 25
+		}
+	}
+	
+	#French Farmlands
+	FRA_decision_french_farmlands = {
 
-		modifier = {
+		icon = POL_looming_peasants_strike
+		
+		#allowed = { tag = FRA }
+
+		available = {
+			has_completed_focus = FRA_spur_agricultural_ambition
 		}
 
+		visible = {
+			has_completed_focus = FRA_ignis_et_fumus
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
+		days_remove = 240
+		priority = 75
+
 		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
-
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
-			}
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
-
-			set_temp_variable = { money_to_gain = -0.05 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -2.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
 
 		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			add_tech_bonus = { bonus = 0.25 uses = 1 category = biochemistry_tech }
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Rebuilding Vendée
+	FRA_mission_rebuilding_vendee = {
+		icon = POL_looming_peasants_strike
+		allowed = { always = no }
+		available = {
+			owns_state = 30
+			owns_state = 23
+			30 = {
+				industrial_complex > 1
+			}
+			30 = {
+				farm > 0
+			}
+			23 = {
+				industrial_complex > 0
+			}
+			23 = {
+				farm > 0
+			}
+		}
+		activation = { always = no }
+		priority = 74
+		highlight_states = {
+			highlight_state_targets = {
+				state = 23
+				state = 30
+			}
+		}
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 1600
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			23 = {
+				add_extra_state_shared_building_slots = 3
+			}
+			30 = {
+				add_extra_state_shared_building_slots = 3
+			}
+			add_stability = 0.02
+			add_tech_bonus = {
+				bonus = 0.5
+				uses = 1
+				category = biochemistry_tech
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0005
+			}
+			add_unemployment_effect = yes
+			set_temp_variable = {
+				eoanb_prestige_change = 5
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_two = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Foulds Begrudging Subsidies
+	FRA_mission_foulds_begrudging_subsidies = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			owns_state = 971
+			owns_state = 22
+			owns_state = 20
+			owns_state = 21
+			owns_state = 32
+			971 = {
+				industrial_complex > 2
+			}
+			22 = {
+				industrial_complex > 1
+			}
+			20 = {
+				industrial_complex > 2
+			}
+			20 = {
+				arms_factory > 1
+			}
+			21 = {
+				industrial_complex > 1
+			}
+			21 = {
+				arms_factory > 1
+			}
+			32 = {
+				industrial_complex > 1
+			}
+		}
+		activation = { always = no }
+		priority = 73
+		highlight_states = {
+			highlight_state_targets = {
+				state = 971
+				state = 22
+				state = 20
+				state = 21
+				state = 32
+			}
+		}
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 2600
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			971 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			22 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			21 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			20 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			23 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			add_stability = 0.05
+			add_tech_bonus = {
+				bonus = 0.5
+				uses = 1
+				category = infantry_weapons
+				category = mechanical_engineering_tech
+				category = biochemistry_tech
+			}
+			set_temp_variable = {
+				unemployment_value = -0.005
+			}
+			add_unemployment_effect = yes
+			set_temp_variable = {
+				eoanb_prestige_change = 8
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_one = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#A New Manufacturing Line
+	FRA_mission_a_new_manufacturing_line = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			owns_state = 975
+			owns_state = 29
+			owns_state = 976
+			971 = {
+				industrial_complex > 0
+			}
+			971 = {
+				arms_factory > 0
+			}
+			29 = {
+				industrial_complex > 2
+			}
+			29 = {
+				arms_factory > 0
+			}
+			21 = {
+				industrial_complex > 2
+			}
+			21 = {
+				arms_factory > 0
+			}
+		}
+		activation = { always = no }
+		priority = 72
+		highlight_states = {
+			highlight_state_targets = {
+				state = 975
+				state = 976
+				state = 29
+			}
+		}
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 3000
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			975 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			976 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			29 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			add_stability = 0.05
+			add_tech_bonus = {
+				bonus = 0.5
+				uses = 1
+				category = infantry_weapons
+				category = mechanical_engineering_tech
+				category = biochemistry_tech
+			}
+			set_temp_variable = {
+				unemployment_value = -0.004
+			}
+			add_unemployment_effect = yes
+			set_temp_variable = {
+				eoanb_prestige_change = 8
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_two = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Continued Industrial Advancement
+	FRA_mission_continued_industrial_advancement = {
+		icon = generic_factory
+		allowed = { always = no }
+		available = {
+			owns_state = 814
+			814 = {
+				industrial_complex > 4
+			}
+		}
+		activation = { always = no }
+		priority = 71
+		highlight_states = {
+			highlight_state_targets = {
+				state = 814
+			}
+		}
+		fire_only_once = yes
+		is_good = no
+		days_mission_timeout = 3000
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		complete_effect = {
+			814 = {
+				add_extra_state_shared_building_slots = 2
+			}
+			add_stability = 0.05
+			add_tech_bonus = {
+				bonus = 0.5
+				uses = 1
+				category = mechanical_engineering_tech
+				category = biochemistry_tech
+			}
+			set_temp_variable = {
+				unemployment_value = -0.002
+			}
+			add_unemployment_effect = yes
+			set_temp_variable = {
+				eoanb_prestige_change = 5
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_two = yes
+		}
+		ai_will_do = {
+			base = 100
+		}
+	}
+	
+	#Reaffirming Imperial Ports and Docks
+	FRA_decision_reaffirming_imperial_ports_and_docks = {
+		icon = generic_construction
+		#allowed = { tag = FRA }
+		available = {
+			NOT = {
+				has_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		visible = {
+			has_completed_focus = FRA_reaffirming_imperial_ports_and_docks
+			owns_state = 976
+			owns_state = 14
+		}
+		fire_only_once = yes
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 20
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_navy_experience > 49.9
+		}
+		custom_cost_text = eoanb_money_and_navy_experience_50
+		days_remove = 730
+		priority = 70
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -20 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			navy_experience = -50
 			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+				set_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
+			}
+		}
+		remove_effect = {
+			14 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			14 = {
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+			}
+			976 = {
+				add_extra_state_shared_building_slots = 1
+			}
+			976 = {
+				add_building_construction = {
+					type = dockyard
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.001
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = FRA_strengthen_the_ports_of_bordeaux_in_progress
 			}
 		}
 		ai_will_do = {
@@ -6721,58 +5574,46 @@ FRA_decision_category_health_of_his_majesty = {
 		}
 	}
 
-	#Hold Imperial Balls in Paris
-	FRA_decision_hold_imperial_balls_in_paris = {
-		icon = generic_monarchy
-
+	#Break the Hold of the Artisans
+	FRA_decision_break_the_hold_of_artisans = {
+		icon = generic_construction
+		#allowed = { tag = FRA }
 		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
-			}
+			has_completed_focus = FRA_break_the_hold_of_artisans
 		}
-
 		visible = {
-			has_country_flag = FRA_napoleon_health_activated
+			has_completed_focus = FRA_ignis_et_fumus
 		}
 
+		priority = 69
 		fire_only_once = yes
-
-		days_remove = 200
-
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.05
+				amount_of_money_to_check = 15
 			}
+			has_specific_amount_of_money_with_inflation_included = yes
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-
-		modifier = {
-		}
-
+		days_remove = 300
 		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
-
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
-			}
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
-
-			set_temp_variable = { money_to_gain = -0.05 }
-			add_money_with_tooltip_effect = yes
+			set_temp_variable = { money_to_gain = -15 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
-
+		
 		remove_effect = {
-			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+			16 = {
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+				add_manpower = 3000
+			}
+			24 = {
+				add_manpower = -1500
+			}
+			26 = {
+				add_manpower = -1500
 			}
 		}
 		ai_will_do = {
@@ -6780,284 +5621,1559 @@ FRA_decision_category_health_of_his_majesty = {
 		}
 	}
 
-	#Inquire into Medical Condition
-	FRA_decision_inquire_into_medical_condition = {
-		icon = eng_trade_unions_demand
-
+	FRA_decisions_vichy_baths = {
+		icon = generic_factory
+		allowed = { tag = FRA }
 		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
+			owns_state = 26
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		visible = { has_completed_focus = FRA_invest_in_the_vichy_baths }
+		priority = 68
+		highlight_states = {
+			highlight_state_targets = {
+				state = 26
+			}
+		}
+		fire_only_once = yes
+		is_good = no
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 180
+
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			26 = { add_extra_state_shared_building_slots = 1 }
+			add_manpower = 1500
+			set_country_flag = FRA_vichy_baths_invested_in
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	FRA_decision_expand_tourism = {
+		icon = generic_construction
+		allowed = { tag = FRA }
+		available = {
+			owns_state = 26
+			set_temp_variable = {
+				amount_of_money_to_check = 2.5
+			}
+		}
+		visible = { has_completed_focus = FRA_expand_the_tourism_industry }
+		priority = 67
+		fire_only_once = yes
+		is_good = no
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2.5
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 150
+
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2.5 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_manpower = 1000
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_manpower = 1000
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_manpower = 1000
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_manpower = 1000
+			}
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_manpower = 1000
+			}						
+		}
+		ai_will_do = {
+			base = 1000
+		}
+	}
+	FRA_decision_enlarged_festivities_of_empire = {
+		icon = generic_construction
+		allowed = { tag = FRA }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+		}
+		visible = { has_completed_focus = FRA_enlarged_festivities_of_empire }
+		priority = 66
+		fire_only_once = yes
+		is_good = no
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 200
+
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes
+		}
+		remove_effect = {
+			random_owned_controlled_state = {
+				limit = {
+					is_in_mainland_france = yes
+				}
+				add_extra_state_shared_building_slots = 1
+			}	
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+
+	FRA_decision_expand_the_louvre = {
+		icon = generic_construction
+		allowed = { tag = FRA }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+		}
+		visible = { has_completed_focus = FRA_further_expansion_of_the_louvre }
+		priority = 65
+		fire_only_once = yes
+		is_good = no
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		days_remove = 365
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes		
+		}	
+
+		remove_effect = {
+			increase_legitimacy_by_five = yes
+			set_temp_variable = {
+				eoanb_prestige_change = 4
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_innovative_add_one = yes
+			add_timed_idea = {
+				idea = FRA_french_cities_renovations
+				days = 365
+			}	
+		}
+		ai_will_do = {
+			base = 40
+		}					
+	}
+	FRA_decision_help_pereire_brothers = {
+		icon = money
+		allowed = { tag = FRA }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 4
+			}
+		}
+		visible = {
+			FRA_pereire_brothers = {
+				is_hired_as_advisor = yes 
+			}
+		}
+		priority = 64
+		fire_only_once = yes
+		days_remove = 150
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 4
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -4 }
+			add_money_with_tooltip_effect = yes		
+		}
+
+		remove_effect = { 
+			remove_trait = { character = FRA_pereire_brothers trait = FRA_trait_pereire_brothers_1 }
+			add_trait = { character = FRA_pereire_brothers trait = FRA_trait_pereire_brothers_2 }
+		}
+		ai_will_do = {
+			base = 100
+		}		
+	}
+
+	FRA_decision_support_banking = {
+		icon = money 
+		allowed = { tag = FRA }
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
 			}
 		}
 
 		visible = {
-			has_country_flag = FRA_napoleon_health_activated
+			FRA_pereire_brothers = {
+				is_hired_as_advisor = yes 
+			}
+		}
+		priority = 63
+		fire_only_once = yes
+		days_remove = 365		
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}	
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_tooltip_effect = yes		
+		}
+
+		remove_effect = {
+			add_political_power = 50
+			add_stability = 0.1
+			set_temp_variable = { money_to_gain = -7 }
+			add_money_with_tooltip_effect = yes		
+		}
+		ai_will_do = {
+			base = 50
+		}
+	}
+}
+
+FRA_decision_category_latin_monetary_union = {
+	FRA_latin_monetary_union_establishment = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			OR = {
+				country_exists = ITA
+				country_exists = PIE
+			}
+			country_exists = BEL
+			country_exists = SWI
+			date > 1863.12.23
 		}
 
 		fire_only_once = yes
 
-		days_remove = 200
+		cost = 50
+
+		complete_effect = {
+			country_event = { id = france.951 days = 5 }
+			BEL = {
+				country_event = { id = france.951 days = 5 }
+			}
+			if = {
+				limit = { country_exists = ITA }
+				ITA = {
+					country_event = { id = france.951 days = 5 }
+				}
+			}
+			else = {
+				PIE = {
+					country_event = { id = france.951 days = 5 }
+				}
+			}
+			SWI= {
+				country_event = { id = france.951 days = 5 }
+			}
+			set_country_flag = latin_monetary_union_established
+		}
+		ai_will_do = {
+			base = 60
+		}		
+	}
+	FRA_latin_monetary_union_greece = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = GRE
+			date > 1868.5.23
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			GRE = {
+				country_event = { id = france.952 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+	FRA_latin_monetary_union_romania = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = ROM
+			date > 1867.6.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			ROM = {
+				country_event = { id = france.953 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+		
+	FRA_latin_monetary_union_spain = {
+ 
+		#allowed = { tag = FRA }
+ 
+		available = {
+			date > 1868.3.30
+			country_exists = SPR
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			SPR = {
+				country_event = { id = france.953 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+		
+	FRA_latin_monetary_union_austria_hungary = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = AUS
+			date > 1870.4.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			AUS = {
+				country_event = { id = france.953 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+		
+	FRA_latin_monetary_union_monaco = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = MNC
+			date > 1878.8.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			MNC = {
+				country_event = { id = france.953 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+		
+	FRA_latin_monetary_union_russia = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = RUS
+			date > 1878.8.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			RUS = {
+				country_event = { id = france.953 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+	FRA_latin_monetary_union_serbia = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = SER
+			date > 1873.8.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+		
+		cancel_trigger = {
+			SER = {
+				has_completed_focus = SER_join_latin_monetary_union
+			}
+		}
+
+		complete_effect = {
+			SER = {
+				country_event = { id = france.954 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+	FRA_latin_monetary_union_bulgaria = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = BUL
+			date > 1880.11.30
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			BUL = {
+				country_event = { id = france.954 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+	FRA_latin_monetary_union_finland = {
+ 
+		#allowed = { tag = FRA }
+	 
+		available = {
+			country_exists = FIN
+			date > 1877.7.31
+		}
+
+		visible = {
+			has_country_flag = latin_monetary_union_established
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		complete_effect = {
+			FIN = {
+				country_event = { id = france.954 days = 5 }
+			}
+		}
+		ai_will_do = {
+			base = 35
+		}		
+	}
+}
+
+FRA_decision_category_colonial_actions = {
+	FRA_war_mission_KBY = {
+		allowed = {
+			always = no
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 200
+		available = {
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = FRA_KBY_victory_conditions_FRA_tt
+					# Victory Condition for Sardinia
+					tag = FRA
+					OR = {
+						1382 = {
+							is_controlled_by = FRA
+						}
+						KBY = {
+							surrender_progress > 0.7
+						}
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = FRA_KBY_victory_conditions_KBY_tt
+					# Victory Condition for Papal States
+					tag = KBY
+					OR = {
+						date > 1857.10.1
+						KBY = {
+							AND = {
+								controls_state = 1384
+								controls_state = 1382
+								controls_province = 7132
+							}
+						}
+					}
+				}
+			}
+		}
+		complete_effect = {
+			if = {
+				limit = {
+					tag = FRA
+					OR = {
+						1382 = {
+							is_controlled_by = FRA
+						}
+						KBY = {
+							surrender_progress > 0.7
+						}
+					}
+				}
+				# Peace Treaty Event for French victory
+				FRA = {
+					annex_country = {
+						target = KBY
+					}
+					country_event = {
+						id = nap_france.14
+					}
+				}
+			}
+			if = {
+				limit = {
+					tag = KBY
+					OR = {
+						date > 1857.10.1
+						KBY = {
+							AND = {
+								controls_state = 1384
+								controls_state = 1382
+								controls_province = 7132
+							}
+						}
+					}
+				}
+				KBY = {
+					white_peace = FRA
+					country_event = {
+						id = nap_france.13
+					}
+					FRA = {
+						country_event = {
+							id = nap_france.13
+						}
+					}
+				}
+			}
+		}
+		#timeout_effect = {  I don't think this should be necessary, since there will be a time requirement for France to conquer the land
+		#	if = {
+		#		limit = {
+		#			OR = {
+		#				AND = {
+		#					tag = FRA
+		#					has_war_with = KBY
+		#				}
+		#				AND = {
+		#					tag = KBY
+		#					has_war_with = FRA
+		#				}
+		#			}
+		#			date < 1861.1.1
+		#		}
+		#		activate_mission = FRA_war_mission_KBY
+		#	}
+		#	else_if = {
+		#		limit = {
+		#			date > 1860.12.31
+		#		}
+		#		KBY = {
+		#			#transfer_state = 161
+		#			#transfer_state = 157
+		#			white_peace = FRA
+		#		}
+		#	}
+		#}
+	}
+
+	FRA_decision_develop_algeria = {
+
+		icon = generic_construction
+
+		allowed = {
+
+		}
+
+		available = {
+			NOT = {
+				has_idea = bankruptcy
+			}
+			num_of_civilian_factories_available_for_projects > 1
+			controls_state = 1384
+		}
+
+		visible = {
+			check_variable = {
+				money > 0
+			}
+			has_completed_focus = FRA_focus_Development_of_Algeria
+		}
+
+		fire_only_once = yes
+
+		days_remove = 195
+
+		highlight_states = {
+			state = 1384
+		}
 
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.05
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			1384 = { add_extra_state_shared_building_slots = 1 }
+			1384 = { add_building_construction = { type = infrastructure level = 1 instant_build = yes } }
+			1384 = { add_building_construction = { type = industrial_complex level = 1 instant_build = yes } }
+			set_temp_variable = {
+				unemployment_value = -0.005
+			}
+		}
+
+		modifier = {
+			civilian_factory_use = 1
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	FRA_decision_algeria_agriculture = {
+
+        icon = generic_construction
+
+        allowed = {
+			
+        }
+
+        available = {
+			NOT = {
+				has_idea = bankruptcy
+			}
+			num_of_civilian_factories_available_for_projects > 1
+			controls_state = 1384
+        }
+
+		visible = {
+			check_variable = {
+				money > 0
+			}
+			has_completed_focus = FRA_focus_The_Agricultural_Projects
+		}
+
+		fire_only_once = yes
+
+		days_remove = 170
+
+        highlight_states = {
+			state = 1384
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			459 = { add_extra_state_shared_building_slots = 1 }
+			459 = { add_building_construction = { type = farm level = 1 instant_build = yes } }
+			513 = { add_extra_state_shared_building_slots = 1 }
+			513 = { add_building_construction = { type = farm level = 1 instant_build = yes } }
+			set_temp_variable = {
+				unemployment_value = -0.005
+			}
+		}
+
+		modifier = {
+			civilian_factory_use = 1
+		}
+
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	FRA_war_mission_gabon = {
+		allowed = {
+			always = no
+		}
+		activation = {
+			always = no
+		}
+		is_good = yes
+		days_mission_timeout = 150
+		available = {
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = FRA_gabon_victroy_for_FRA
+					tag = FRA 
+					OR = {
+						FRA = {
+							controls_state = 876
+							controls_state = 539
+						}
+						BKW = {
+							surrender_progress > 0.2
+						}
+					}
+				}
+				custom_trigger_tooltip = {
+					tooltip = FRA_gabon_victroy_for_BKW
+					tag = BKW
+					BKW = {
+						controls_state = 886
+					}
+				}
+			}
+		}
+		complete_effect = {
+			if = {
+				limit = {
+					tag = FRA
+					OR = {
+						1382 = {
+							is_controlled_by = FRA
+						}
+						BKW = {
+							surrender_progress > 0.2
+						}
+					}
+				}
+				# Peace Treaty Event for French victory
+				FRA = {
+					white_peace = BKW
+					transfer_state = 876
+					transfer_state = 539
+					country_event = {
+						id = nap_france.405
+					}
+				}
+			}
+			if = {
+				limit = {
+					tag = BKW
+					BKW = {
+						controls_state = 886
+					}
+				}
+				BKW = {
+					white_peace = FRA
+					transfer_state = 886
+					add_war_support = 0.1
+					country_event = {
+						id = nap_france.406
+					}
+				}
+				FRA = {
+					country_event = {
+						id = nap_france.406
+					}
+				}
+			}
+		}
+	}
+
+
+	FRA_decision_integrate_outer_gabon = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
+
+		available = {
+			876 = {
+				compliance > 50
+			}
+			539 = {
+				compliance > 50
+			}
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_supress_the_natives
+		}
+
+		fire_only_once = yes
+
+		cost = 150
+
+		modifier = {
+		}
+		priority = 1
+
+		days_remove = 150
+
+		complete_effect = {
+		
+		}
+
+		remove_effect = {
+			GAB = {
+				transfer_state = 876
+				transfer_state = 539
+				add_state_core = 876
+				add_state_core = 539
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	FRA_decision_gambia_trade = {
+
+		icon = naval_base
+
+		#allowed = { tag = FRA }
+
+		available = {
+			ENG = {
+				owns_state = 701
+			}
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_gambia_trade
+			ENG = {
+				owns_state = 701
+			}
+			date > 1874.1.30
+		}
+
+		fire_only_once = yes
+
+		cost = 50
+
+		days_remove = 7
+
+		complete_effect = {
+		
+		}
+
+		remove_effect = {
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Civ for Franceville
+	FRA_decision_expand_industry_in_franceville = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
+
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_found_the_franceville_settlement
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+			civilian_factory_use = 2
+		}
+
+		priority = 1
+
+		days_remove = 360
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -5 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			set_temp_variable = { eoanb_prestige_change = 3 }
+			eoanb_change_prestige_score = yes
+			886 = {
+				add_building_construction = {
+					type = industrial_complex
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Buildingslot for Franceville
+	FRA_decision_expand_buildingslots_in_franceville = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
+
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_found_the_franceville_settlement
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		modifier = {
 		}
-
-		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
-
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
-			}
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
-
-			set_temp_variable = { money_to_gain = -0.05 }
-			add_money_with_tooltip_effect = yes
-		}
-
-		remove_effect = {
-			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
-			}
-		}
-		ai_will_do = {
-			base = 1000
-		}
-	}
-
-	#Attempt a Liver Operation
-	FRA_decision_attempt_a_liver_operation = {
-		icon = medicine
-
-		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
-			}
-		}
-
-		visible = {
-			has_country_flag = FRA_napoleon_health_activated
-			has_country_flag = FRA_napoleon_liver_operation
-		}
-
-		fire_only_once = yes
+		priority = 1
 
 		days_remove = 50
 
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			886 = {
+				add_extra_state_shared_building_slots = 1
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	FRA_decision_gabon_road_system = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
+
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			539 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
+			}
+			876 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
+			}
+			886 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
+			}
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_gabon_road_system
+		}
+
+		fire_only_once = yes
+
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.05
+				amount_of_money_to_check = 5
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		modifier = {
 		}
+		priority = 1
+
+		days_remove = 150
 
 		complete_effect = {
-			custom_effect_tooltip = FRA_napoleon_liver_operation_warning_tt
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
-
-			set_temp_variable = { money_to_gain = -0.05 }
+			set_temp_variable = { money_to_gain = -5 }
 			add_money_with_tooltip_effect = yes
 		}
 
 		remove_effect = {
-
-			random_list = {
-				FRA.napoleon_health = {
-					country_event = nap_france_flavor.40
-				}
-				FRA.napoleon_unhealthy = {
-					country_event = nap_france_flavor.39
+			set_temp_variable = { eoanb_prestige_change = 3 }
+			eoanb_change_prestige_score = yes
+			886 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
 				}
 			}
 
-			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+			876 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
+			}
+
+			539 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 2
+					instant_build = yes
+				}
 			}
 		}
+
 		ai_will_do = {
-			base = 1000
+			base = 100
 		}
 	}
 
-	#Relaxation and Rehabilitation Therapy
-	FRA_decision_relaxation_and_rehabilitation_therapy = {
-		icon = generic_brainwash
+	FRA_decision_connect_the_roads_to_the_ports = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
 
 		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
-			}
+			has_completed_focus = FRA_colonial_connect_the_road_system_with_port_gentil
 		}
 
 		visible = {
-			has_country_flag = FRA_napoleon_health_activated
+			has_completed_focus = FRA_colonial_connect_the_road_system_with_port_gentil
 		}
 
 		fire_only_once = yes
 
-		days_remove = 200
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+
+		modifier = {
+			civilian_factory_use = 1
+		}
+
+		priority = 1
+
+		days_remove = 360
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+
+		remove_effect = {
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+			886 = {
+				add_building_construction = {
+					type = infrastructure
+					level = 1
+					instant_build = yes
+				}
+				add_building_construction = {
+					type = naval_base
+					level = 2
+					instant_build = yes
+					province = 13418
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+
+	FRA_decision_extract_ivory = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
+
+		available = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			539 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
+			}
+		}
+
+		visible = {
+			has_completed_focus = FRA_colonial_extract_ivory
+		}
+
+		fire_only_once = yes
 
 		custom_cost_trigger = {
 			set_temp_variable = {
-				amount_of_money_to_check = 0.05
+				amount_of_money_to_check = 0.5
 			}
 		}
 		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		modifier = {
 		}
+		priority = 1
+
+		days_remove = 150
 
 		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
-
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
-			}
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
-
-			set_temp_variable = { money_to_gain = -0.05 }
+			set_temp_variable = { money_to_gain = -0.5 }
 			add_money_with_tooltip_effect = yes
 		}
 
 		remove_effect = {
-			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+			set_temp_variable = { eoanb_prestige_change = 5 }
+			eoanb_change_prestige_score = yes
+			add_resource = {
+				type = iron
+				amount = 2
+				state = 539
 			}
 		}
+
 		ai_will_do = {
-			base = 1000
+			base = 100
 		}
 	}
 
-	#Convene Assembly of Doctors
-	FRA_decision_convene_assembly_of_doctors = {
-		icon = generic_political_discourse
+	FRA_decision_gabon_logging_industry = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
 
 		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			539 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
+			}
+			876 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
 			}
 		}
 
 		visible = {
-			has_country_flag = FRA_napoleon_health_activated
+			has_completed_focus = FRA_colonial_gabon_wood_companies
 		}
 
 		fire_only_once = yes
 
-		days_remove = 200
-
-		cost = 50
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 3
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		modifier = {
+			civilian_factory_use = 2
 		}
 
+		priority = 1
+
+		days_remove = 360
+
 		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
-
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
-			}
-
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
-			}
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_tooltip_effect = yes
 		}
 
 		remove_effect = {
-			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			876 = {
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
 			}
+			539 = {
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
+			}
+			
 		}
+
 		ai_will_do = {
-			base = 1000
+			base = 100
 		}
 	}
 
-	#His Majesty's Condition Report
-	FRA_decision_his_majestys_condition_report = {
-		icon = eng_trade_unions_support
+	FRA_colonial_decision_extract_gabonese_rubber = {
+
+		icon = money
+
+		#allowed = { tag = FRA }
 
 		available = {
-			NOT = {
-				has_country_flag = FRA_napoleon_health_decision_taken
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			876 = {
+				OR = {
+					is_controlled_by = FRA
+					is_controlled_by = GAB
+				}
 			}
 		}
 
 		visible = {
-			has_country_flag = FRA_napoleon_health_activated
+			has_completed_focus = FRA_colonial_extract_gabonese_rubber
 		}
 
 		fire_only_once = yes
 
-		days_remove = 200
-
-		cost = 50
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
 
 		modifier = {
 		}
+		priority = 1
+
+		days_remove = 150
 
 		complete_effect = {
-			add_to_variable = {
-    			var = FRA.napoleon_health
-    			value = 10
-    			tooltip = FRA_napoleon_improved_10_health_tt
-			}
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
+		}
 
-			subtract_from_variable = {
-				var = FRA.napoleon_unhealthy
-				value = 10
+		remove_effect = {
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			add_resource = {
+				type = rubber
+				amount = 6
+				state = 876
 			}
+		}
 
-			hidden_effect = {
-				set_country_flag = FRA_napoleon_health_decision_taken
-				FRA_napoleon_health_trait_raised_swap = yes
+		ai_will_do = {
+			base = 100
+		}
+	}
+}
+
+FRA_BOP_category_decisions = {
+	### Liberal ###
+	FRA_BOP_appease_the_left = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+
+		cost = 50
+		days_remove = 30
+		days_re_enable = 180
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = -0.05
+				tooltip_side = FRA_BOP_Progressive_Emporer
+			}
+		}
+	}
+	FRA_BOP_prepare_progressive_laws = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+
+		fire_only_once = yes
+		cost = 100
+		days_remove = 60
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = -0.1
+				tooltip_side = FRA_BOP_Progressive_Emporer
 			}
 		}
 
 		remove_effect = {
+			unlock_decision_tooltip = FRA_BOP_enact_progressive_laws
 			hidden_effect = {
-				clr_country_flag = FRA_napoleon_health_decision_taken
+				set_country_flag = FRA_BOP_progressive_laws_prepared_flag
 			}
 		}
-		ai_will_do = {
-			base = 1000
+	}
+	FRA_BOP_enact_progressive_laws = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+		visible = {
+			has_country_flag = FRA_BOP_progressive_laws_prepared_flag
+		}
+
+		cost = 150
+		days_remove = 90
+		days_re_enable = 360
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = -0.1
+				tooltip_side = FRA_BOP_Progressive_Emporer
+			}
+		}
+	}
+	### Authoritarian ###
+	FRA_BOP_appease_the_right = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+
+		cost = 50
+		days_remove = 30
+		days_re_enable = 180
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = 0.02
+				tooltip_side = FRA_BOP_Authoritarian_Emporer
+			}
+		}
+	}
+	FRA_BOP_prepare_conservative_laws = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+
+		fire_only_once = yes
+		cost = 100
+		days_remove = 60
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = 0.05
+				tooltip_side = FRA_BOP_Authoritarian_Emporer
+			}
+		}
+
+		remove_effect = {
+			unlock_decision_tooltip = FRA_BOP_enact_conservative_laws
+			hidden_effect = {
+				set_country_flag = FRA_BOP_conservative_laws_prepared_flag
+			}
+		}
+	}
+	FRA_BOP_enact_conservative_laws = {
+		icon = constitution
+		allowed = { tag = FRA }
+		available = { }
+		visible = {
+			has_country_flag = FRA_BOP_conservative_laws_prepared_flag
+		}
+
+		cost = 150
+		days_remove = 90
+		days_re_enable = 360
+
+		modifier = { political_power_gain = -0.05 }
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Napoleon
+				value = 0.1
+				tooltip_side = FRA_BOP_Authoritarian_Emporer
+			}
 		}
 	}
 }
