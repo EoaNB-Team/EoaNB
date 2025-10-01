@@ -1,401 +1,34 @@
-#War Measures (these by default only show when at war, so adding an extra line in "visible = {}" is not necessary)
-#Target Neighbor State/Country Category (Optimized Targeted Decision)
-# afr_regional_power_empire_politics_foreign_diplomacy_category = {
-# #####################################
-# #									#
-# ### 	Designed by Coggernaut    ### (Currently only for Tribals, but can be expanded to everyone)
-# #									#
-# ##################################### 
-# ### System Mechanic - Dont Adjust ### 
-# #####################################
-# ### On-Button/Show Decisions ###
-# afr_empire_politics_foreign_diplomacy_on = {
-# available = {
-# hidden_trigger = { always = yes }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# cost = 0
-# fire_only_once = no
-# visible = { 
-# NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag } 
-# NOT = { has_idea = afr_post_tribal} 
-# }
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_foreign_diplomacy_on_effect
-# set_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ### Off-Button/Hide Decisions ###
-# afr_empire_politics_foreign_diplomacy_off = {
-# available = {
-# hidden_trigger = { always = yes }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# cost = 0
-# fire_only_once = no
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag 
-# is_ai = no
-# NOT = { has_idea = afr_post_tribal}
-# }
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_foreign_diplomacy_off_effect
-# clr_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# }
-# }
-# ### Set Neighbor Country Target ###
-# afr_empire_politics_foreign_diplomacy_set_target_decision = {
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# NOT = { has_variable = ROOT.afr_empire_politics_foreign_diplomacy_target }
-# NOT = { has_idea = afr_post_tribal}			
-# }
-# target_trigger = {
-# FROM = { is_neighbor_of = ROOT }
-# }
-# cost = 0
-# fire_only_once = no
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_foreign_diplomacy_set_target_decision_tooltip
-# set_variable = { ROOT.afr_empire_politics_foreign_diplomacy_target = FROM.id }
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ### Clear Neighbor Country Target ###
-# afr_empire_politics_foreign_diplomacy_clear_target_decision = {
-# available = { 
-# hidden_trigger = { NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag } }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# has_variable = ROOT.afr_empire_politics_foreign_diplomacy_target	
-# }
-# cost = 0
-# fire_only_once = no
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_state_autonomy_decision_tooltip
-# clear_variable = ROOT.afr_empire_politics_foreign_diplomacy_target
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ###########################################################
-# ### System Mechanic - Place New Country Decisions Below ###
-# ###########################################################
-# #-----------------------------------------------------------------------------#
-# ### Mechanic Example - Purchasing Equipment	(Macro)							###
-# ### What it does: Purchase from a random neighbor country (aka, a macro) 	###
-# #-----------------------------------------------------------------------------#
-# afr_empire_politics_foreign_diplomacy_purchase_equipment_decision_macro = {
-# available = {
-# any_neighbor_country = {
-# has_opinion = {
-# target = ROOT
-# value > 0
-# }
-# NOT = { has_idea = pre_industrial_era }
-# }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = { 
-# #has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# NOT = { has_variable = ROOT.afr_empire_politics_foreign_diplomacy_target }
-# NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag }
-# }
-# custom_cost_trigger = {
-# if = {
-# limit = { has_variable = has_afr_empire_mechanic_system }
-# check_variable = { afr_prosperity_mechanic_value > 9 }
-# }
-# else_if = {
-# limit = { has_idea = egy_vic_debt }
-# check_variable = { debt_level < 50 }
-# }
-# else = { has_political_power > 100 }
-# }
-# custom_cost_text = afr_empire_politics_foreign_diplomacy_purchase_equipment_decision_cost
-# cost = 0
-# fire_only_once = no
-# days_re_enable = 30
-# complete_effect = {
-# hidden_effect = {
-# if = {
-# limit = { has_variable = has_afr_empire_mechanic_system }
-# add_to_variable = { var = afr_prosperity_mechanic_value value = -10 }
-# }
-# random_other_country = {
-# limit = {
-# is_neighbor_of = ROOT
-# has_opinion = {
-# target = ROOT
-# value > 0
-# }
-# NOT = { has_idea = pre_industrial_era }
-# }
-# ROOT = { set_variable = { ROOT.afr_empire_politics_foreign_diplomacy_target = PREV.id } }
-# }
-# activate_decision = afr_empire_politics_foreign_diplomacy_purchase_equipment_decision
-# clear_variable = ROOT.afr_empire_politics_foreign_diplomacy_target
-# }
-# }
-# ai_will_do = {
-# base = 0
-# modifier = {
-# add = 10
-# has_variable = has_afr_empire_mechanic_system
-# check_variable = { afr_prosperity_mechanic_value > 9 }
-# stockpile_ratio = {
-# archetype = infantry_equipment
-# ratio < 0.5
-# }
-# }
-# }
-# }
-# #-----------------------------------------------------------------------------#
-# ### Mechanic Example - Purchasing Equipment	(Targeted)						###
-# ### What it does: Purchase equipment from a targeted neighbor country	 	###
-# #-----------------------------------------------------------------------------#
-# afr_empire_politics_foreign_diplomacy_purchase_equipment_decision = {
-# available = {
-# var:ROOT.afr_empire_politics_foreign_diplomacy_target = {
-# has_opinion = {
-# target = ROOT
-# value > 0
-# }
-# NOT = { has_idea = pre_industrial_era }
-# }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# has_variable = ROOT.afr_empire_politics_foreign_diplomacy_target	
-# NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag }
-# }
-# custom_cost_trigger = {
-# if = {
-# limit = { has_variable = has_afr_empire_mechanic_system }
-# check_variable = { afr_prosperity_mechanic_value > 9 }
-# }
-# else_if = {
-# limit = { has_idea = egy_vic_debt }
-# check_variable = { debt_level < 50 }
-# }
-# else = { has_political_power > 100 }
-# }
-# custom_cost_text = afr_empire_politics_foreign_diplomacy_purchase_equipment_decision_cost
-# cost = 0
-# fire_only_once = no
-# days_re_enable = 30
-# complete_effect = {
-# hidden_effect = {
-# set_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag 
-# var:ROOT.afr_empire_politics_foreign_diplomacy_target = { 
-# country_event = { id = RCE_afr_regional_power.8 }
-# }
-# }
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# #####################################
-# ### System Mechanic - Dont Adjust ###
-# #####################################
-# ### On-Button/Show Decisions ###
-# afr_empire_politics_state_foreign_diplomacy_on = {
-# available = {
-# hidden_trigger = { always = yes }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# cost = 0
-# fire_only_once = no
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# NOT = { has_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag } 
-# NOT = { has_idea = afr_post_tribal} 
-# }
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_state_foreign_diplomacy_on_effect
-# set_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ### Off-Button/Hide Decisions ###
-# afr_empire_politics_state_foreign_diplomacy_off = {
-# available = {
-# hidden_trigger = { always = yes }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# cost = 0
-# fire_only_once = no
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# has_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag 
-# is_ai = no
-# NOT = { has_idea = afr_post_tribal}
-# }
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_state_foreign_diplomacy_off_effect
-# clr_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag
-# }
-# }
-# ### Set Neighbor State Target ###
-# afr_empire_politics_state_foreign_diplomacy_set_target_decision = {
-# available = { 
-# #hidden_trigger = { NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag } }
-# }
-# state_target = yes
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = {
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# has_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag 
-# NOT = { has_idea = afr_post_tribal}
-# #has_variable = ROOT.afr_empire_politics_foreign_diplomacy_target
-# FROM = { is_owned_and_controlled_by = var:ROOT.afr_empire_politics_foreign_diplomacy_target }
-# NOT = { has_variable = ROOT.afr_empire_politics_state_foreign_diplomacy_target }
-# }
-# target_trigger = {
-# FROM = { any_neighbor_state = { is_owned_and_controlled_by = ROOT } }
-# }
-# cost = 0
-# fire_only_once = no
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_state_foreign_diplomacy_set_target_decision_tooltip
-# set_variable = { ROOT.afr_empire_politics_state_foreign_diplomacy_target = FROM.id }
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ### Clear Neighbor State Target ###
-# afr_empire_politics_state_foreign_diplomacy_clear_target_decision = {
-# available = { 
-# hidden_trigger = { NOT = { has_country_flag = afr_empire_politics_foreign_diplomacy_in_event_flag } }
-# }
-# allowed = { 
-# OR = {
-# 
-# 
-# 
-# }
-# }
-# visible = { 
-# has_country_flag = afr_empire_politics_foreign_diplomacy_on_flag
-# has_country_flag = afr_empire_politics_state_foreign_diplomacy_on_flag 
-# has_variable = ROOT.afr_empire_politics_state_foreign_diplomacy_target	
-# }
-# cost = 0
-# fire_only_once = no
-# complete_effect = {
-# custom_effect_tooltip = afr_empire_politics_state_foreign_diplomacy_clear_target_decision_tooltip
-# clear_variable = ROOT.afr_empire_politics_state_foreign_diplomacy_target
-# }
-# ai_will_do = {
-# base = 0
-# }
-# }
-# ###########################################################
-# ### System Mechanic - Place New Country Decisions Below ###
-# ###########################################################
-# }
+# War Measures Category
 eoanb_category_war_measures = {
-	#Promote Austerity
+	
+	# Promote Austerity
 	eoanb_decision_war_austerity = {
 		icon = generic_civil_support
-		available = {
-			ROOT = {
-				surrender_progress > 0.25
-			}
-		}
+		
 		visible = {
-			NOT = {
-				has_idea = pre_industrial_era
-			}
-			NOT = {
-				has_idea = post_digital_era
-			}
+			NOT = { has_idea = pre_industrial_era }
+			NOT = { has_idea = post_digital_era }
 		}
-		fire_only_once = no
+		
+		available = {
+			surrender_progress > 0.25
+		}
+		
+		cost = 150
 		days_remove = 180
 		days_re_enable = 365
-		cost = 150
+		
 		modifier = {
 			consumer_goods_expected_value = -0.05
 		}
-		ai_will_do = {
-			base = 1
-		}
+		
+		ai_will_do = { base = 1 }
 	}
-	#Inspire Troops
+	
+	# Inspire Troops
 	eoanb_decision_war_troops_inspire = {
 		icon = generic_nationalism
-		available = {
-			num_divisions > 5
-		}
+		
 		visible = {
 			OR = {
 				has_idea = victorian_era
@@ -403,178 +36,131 @@ eoanb_category_war_measures = {
 				has_idea = oil_era
 			}
 		}
-		fire_only_once = no
+		
+		available = {
+			num_divisions > 5
+		}
+		
+		cost = 50
 		days_remove = 14
 		days_re_enable = 150
-		cost = 50
+		
 		modifier = {
 			army_morale_factor = 0.05
 			army_core_attack_factor = 0.05
 			army_core_defence_factor = 0.05
 		}
+		
 		remove_effect = {
 			army_experience = 5
 		}
-		ai_will_do = {
-			base = 1
-		}
+		
+		ai_will_do = { base = 1 }
 	}
-	#Mobilize Men (desperate)
+	
+	# Mobilize Men (Desperate)
 	eoanb_decision_war_mobilize_men = {
 		icon = generic_industry
-		available = {
-			NOT = {
-				has_idea = scraping_the_barrel
-			}
-		}
+		
 		visible = {
-			ROOT = {
-				surrender_progress > 0.5
-			}
+			surrender_progress > 0.5
+			has_manpower < 5000
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
 				has_idea = oil_era
 			}
-			has_manpower < 5000
 		}
-		fire_only_once = no
-		days_re_enable = 365
+		
+		available = {
+			NOT = { has_idea = scraping_the_barrel }
+		}
+		
 		cost = 10
+		days_re_enable = 365
+		
 		complete_effect = {
 			add_manpower = 1000
 			add_war_support = -0.005
 		}
-		ai_will_do = {
-			base = 1
-		}
+		
+		ai_will_do = { base = 1 }
 	}
 }
 
-#Economic Development of the Country
+# Economic Development Category
 eoanb_category_economic = {
-	#Expand Building Area (Victorian to Oil Era)
+	
+	# Expand Building Area
 	eoanb_decision_building_slot_victorian = {
 		icon = generic_construction
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			num_of_civilian_factories_available_for_projects > 0
-		}
+		
 		visible = {
-			check_variable = {
-				money > 0
-			}
+			check_variable = { money > 0 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
 				has_idea = oil_era
 			}
 		}
-		fire_only_once = no
-		days_re_enable = 1000
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			num_of_civilian_factories_available_for_projects > 0
+		}
+		
 		days_remove = 90
+		days_re_enable = 1000
+		
 		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
-			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			amount_of_money_to_check < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		amount_of_money_to_check = 50
-			#	}
-			#}
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.2 }
 			if = {
-				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
-					}
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
-				}
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		custom_cost_text = eoanb_money_cost_text
+		
 		modifier = {
 			civilian_factory_use = 1
 		}
+		
 		complete_effect = {
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 50
-			#	}
-			#}
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.2 }
 			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
 			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
+			multiply_temp_variable = { money_to_gain = -1 }
 			add_money_with_inflation_included_with_tooltip_effect = yes
 		}
+		
 		remove_effect = {
 			random_owned_controlled_state = {
-				limit = {
-					is_in_home_area = yes
-				}
+				limit = { is_in_home_area = yes }
 				add_extra_state_shared_building_slots = 1
 			}
 		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
 				factor = 0
 				tag = PRS
-				NOT = {
-					PRS_trigger_formed_germany = yes
-				}
+				NOT = { PRS_trigger_formed_germany = yes }
 			}
-			#modifier = {
-			#	factor = 0
-			#	tag = OTO
-			#	check_variable = {
-			#		debt_level > 4
-			#	}
-			#}
 		}
 	}
-	#Create Public Works
+	
+	# Create Public Works
 	eoanb_decision_create_public_works = {
 		icon = GFX_decision_GENERIC_Create_Public_Works
-		days_remove = 65
-		days_re_enable = 30
+		
 		visible = {
-			check_variable = {
-				money > 0
-			}
+			check_variable = { money > 0 }
 			any_owned_state = {
 				is_controlled_by = ROOT
 				free_building_slots = {
@@ -584,79 +170,26 @@ eoanb_category_economic = {
 				}
 			}
 		}
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			has_tech = tech_humanities_public_works
+		}
+		
+		days_remove = 65
+		days_re_enable = 30
+		
 		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
-			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.1
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			amount_of_money_to_check < 30
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		amount_of_money_to_check = 30
-			#	}
-			#}
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.1 }
 			if = {
-				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
-					}
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
-				}
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_tech = tech_humanities_public_works
-		}
-		complete_effect = {
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.1
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 30
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 30
-			#	}
-			#}
-			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
-			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
-			add_money_with_inflation_included_with_tooltip_effect = yes
-			set_temp_variable = {
-				unemployment_value = -0.0001
-			}
-			add_unemployment_effect = yes
-		}
-
+		custom_cost_text = eoanb_money_cost_text
+		
 		modifier = {
 			political_power_cost = 0.5
 			inflation_change = -0.001
@@ -666,238 +199,74 @@ eoanb_category_economic = {
 				money_income_factor_from_decisions = -0.05
 			}
 		}
-
-		ai_will_do = {
-			factor = 0
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.1 }
+			if = {
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
+			}
+			multiply_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			set_temp_variable = { unemployment_value = -0.0001 }
+			add_unemployment_effect = yes
 		}
+		
+		ai_will_do = { factor = 0 }
 	}
-	#Improve Public Sanitation
+	
+	# Improve Public Sanitation
 	eoanb_decision_improve_public_sanitation = {
 		icon = generic_construction
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_tech = tech_humanities_sewage_system
-			num_of_civilian_factories_available_for_projects > 0
-		}
+		
 		visible = {
-			check_variable = {
-				money > 0
-			}
+			check_variable = { money > 0 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
 				has_idea = oil_era
 			}
 		}
-		fire_only_once = no
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			has_tech = tech_humanities_sewage_system
+			num_of_civilian_factories_available_for_projects > 0
+		}
+		
 		days_remove = 365
 		days_re_enable = 1800
+		
 		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
-			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			amount_of_money_to_check < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		amount_of_money_to_check = 50
-			#	}
-			#}
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.2 }
 			if = {
-				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
-					}
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
-				}
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		complete_effect = {
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 50
-			#	}
-			#}
-			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
-			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
-			add_money_with_inflation_included_with_tooltip_effect = yes
-			set_temp_variable = {
-				unemployment_value = -0.001
-			}
-			add_unemployment_effect = yes
-		}
-		remove_effect = {
-			if = {
-				limit = {
-					any_owned_state = {
-						is_in_home_area = yes
-						infrastructure < 4
-					}
-				}
-				random_owned_state = {
-					limit = {
-						is_in_home_area = yes
-						infrastructure < 4
-					}
-					add_building_construction = {
-						type = infrastructure
-						level = 1
-						instant_build = yes
-					}
-				}
-			}
-			else = {
-				random_owned_state = {
-					limit = {
-						is_in_home_area = yes
-					}
-					add_building_construction = {
-						type = infrastructure
-						level = 1
-						instant_build = yes
-					}
-				}
-			}
-		}
+		custom_cost_text = eoanb_money_cost_text
+		
 		modifier = {
 			civilian_factory_use = 1
 			MONTHLY_POPULATION = 0.01
 		}
-		ai_will_do = {
-			base = 1
-			modifier = {
-				factor = 0
-				tag = PRS
-				NOT = {
-					PRS = {
-						has_completed_focus = PRS_focus_unlock_germany
-					}
-				}
-			}
-		}
-	}
-	#Expand Canal System
-	eoanb_decision_expand_canal_system = {
-		icon = canal
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			num_of_civilian_factories_available_for_projects > 0
-		}
-		visible = {
-			check_variable = {
-				money > 0
-			}
-			OR = {
-				has_idea = victorian_era
-				has_idea = machine_era
-				has_idea = oil_era
-			}
-		}
-		fire_only_once = no
-		days_remove = 365
-		days_re_enable = 1800
-		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
-			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			amount_of_money_to_check < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		amount_of_money_to_check = 50
-			#	}
-			#}
-			if = {
-				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
-					}
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
-				}
-			}
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		
 		complete_effect = {
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 50
-			#	}
-			#}
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.2 }
 			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
 			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
+			multiply_temp_variable = { money_to_gain = -1 }
 			add_money_with_inflation_included_with_tooltip_effect = yes
-			set_temp_variable = {
-				unemployment_value = -0.001
-			}
+			set_temp_variable = { unemployment_value = -0.001 }
 			add_unemployment_effect = yes
 		}
+		
 		remove_effect = {
 			if = {
 				limit = {
@@ -920,9 +289,7 @@ eoanb_category_economic = {
 			}
 			else = {
 				random_owned_state = {
-					limit = {
-						is_in_home_area = yes
-					}
+					limit = { is_in_home_area = yes }
 					add_building_construction = {
 						type = infrastructure
 						level = 1
@@ -931,144 +298,193 @@ eoanb_category_economic = {
 				}
 			}
 		}
-		modifier = {
-			civilian_factory_use = 1
-		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
 				factor = 0
 				tag = PRS
-				NOT = {
-					PRS = {
-						has_completed_focus = PRS_focus_unlock_germany
-					}
-				}
+				NOT = { has_completed_focus = PRS_focus_unlock_germany }
 			}
 		}
 	}
-	#Promote the Shipbuilding Industry
-	eoanb_decision_promote_shipbuilding = {
-		icon = generic_naval
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_navy_experience > 10
-			num_of_civilian_factories_available_for_projects > 1
-		}
+	
+	# Expand Canal System
+	eoanb_decision_expand_canal_system = {
+		icon = canal
+		
 		visible = {
-			check_variable = {
-				money > 0
-			}
-			AND = {
-				num_of_naval_factories > 3
-				any_owned_state = {
-					is_coastal = yes
-				}
-			}
+			check_variable = { money > 0 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
 				has_idea = oil_era
 			}
 		}
-		fire_only_once = no
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			num_of_civilian_factories_available_for_projects > 0
+		}
+		
 		days_remove = 365
 		days_re_enable = 1800
+		
 		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.2 }
+			if = {
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.25
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		modifier = {
+			civilian_factory_use = 1
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.2 }
+			if = {
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
 			}
+			multiply_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			set_temp_variable = { unemployment_value = -0.001 }
+			add_unemployment_effect = yes
+		}
+		
+		remove_effect = {
 			if = {
 				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
+					any_owned_state = {
+						is_in_home_area = yes
+						infrastructure < 4
 					}
 				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
+				random_owned_state = {
+					limit = {
+						is_in_home_area = yes
+						infrastructure < 4
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
 				}
+			}
+			else = {
+				random_owned_state = {
+					limit = { is_in_home_area = yes }
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+		}
+		
+		ai_will_do = {
+			base = 1
+			modifier = {
+				factor = 0
+				tag = PRS
+				NOT = { has_completed_focus = PRS_focus_unlock_germany }
+			}
+		}
+	}
+	
+	# Promote Shipbuilding Industry
+	eoanb_decision_promote_shipbuilding = {
+		icon = generic_naval
+		
+		visible = {
+			check_variable = { money > 0 }
+			num_of_naval_factories > 3
+			any_owned_state = { is_coastal = yes }
+			OR = {
+				has_idea = victorian_era
+				has_idea = machine_era
+				has_idea = oil_era
+			}
+		}
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			has_navy_experience > 10
+			num_of_civilian_factories_available_for_projects > 1
+		}
+		
+		days_remove = 365
+		days_re_enable = 1800
+		
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.25 }
+			if = {
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
 			has_navy_experience > 9.9
 		}
 		custom_cost_text = eoanb_money_and_navy_experience_10
-		complete_effect = {
-			navy_experience = -10
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.25
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 50
-			#	}
-			#}
-			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
-			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
-			add_money_with_inflation_included_with_tooltip_effect = yes
-		}
+		
 		modifier = {
 			industrial_capacity_dockyard = 0.2
-			#civilian_factory_use = 2
 		}
+		
+		complete_effect = {
+			navy_experience = -10
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.25 }
+			if = {
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
+			}
+			multiply_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
 				factor = 0
 				tag = PRS
-				NOT = {
-					PRS = {
-						has_completed_focus = PRS_focus_unlock_germany
-					}
-				}
+				NOT = { has_completed_focus = PRS_focus_unlock_germany }
 			}
 		}
 	}
-	#Provide Public Education
+	
+	# Provide Public Education
 	eoanb_decision_generic_provide_public_education = {
 		icon = generic_research
-		available = {
-			has_stability > 0.5
-			has_war = no
-		}
+		
 		visible = {
 			date > 1860.1.1
 			has_idea = privileged_education
+			NOT = { has_idea = open_schools }
+			num_of_factories > 10
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
 				has_idea = oil_era
 			}
-			NOT = {
-				has_idea = open_schools
-			}
-			num_of_factories > 10
 		}
-		fire_only_once = no
+		
+		available = {
+			has_stability > 0.5
+			has_war = no
+		}
+		
 		cost = 500
+		
 		complete_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_provide_public_education_effect_tt
 			hidden_effect = {
@@ -1078,6 +494,7 @@ eoanb_category_economic = {
 				}
 			}
 		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
@@ -1086,21 +503,14 @@ eoanb_category_economic = {
 			}
 		}
 	}
-	#Improve Public Education
+	
+	# Improve Public Education
 	eoanb_decision_generic_improve_public_education = {
 		icon = university
-		available = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_stability > 0.5
-			has_war = no
-			num_of_civilian_factories_available_for_projects > 0
-		}
+		
 		visible = {
-			check_variable = {
-				money > 0
-			}
+			check_variable = { money > 0 }
+			num_of_factories > 4
 			OR = {
 				has_idea = privileged_education
 				has_idea = open_schools
@@ -1111,77 +521,45 @@ eoanb_category_economic = {
 				has_idea = machine_era
 				has_idea = oil_era
 			}
-			num_of_factories > 4
 		}
-		fire_only_once = no
+		
+		available = {
+			NOT = { has_idea = bankruptcy }
+			has_stability > 0.5
+			has_war = no
+			num_of_civilian_factories_available_for_projects > 0
+		}
+		
 		days_remove = 730
 		days_re_enable = 730
+		
 		custom_cost_trigger = {
-			set_temp_variable = {
-				amount_of_money_to_check = num_of_factories
-			}
-			multiply_temp_variable = {
-				amount_of_money_to_check = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			amount_of_money_to_check < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		amount_of_money_to_check = 50
-			#	}
-			#}
+			set_temp_variable = { amount_of_money_to_check = num_of_factories }
+			multiply_temp_variable = { amount_of_money_to_check = 0.2 }
 			if = {
-				limit = {
-					check_variable = {
-						amount_of_money_to_check > 10000
-					}
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10000
-				}
+				limit = { check_variable = { amount_of_money_to_check > 10000 } }
+				set_temp_variable = { amount_of_money_to_check = 10000 }
 			}
 			has_specific_amount_of_money_with_inflation_included = yes
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		complete_effect = {
-			set_temp_variable = {
-				money_to_gain = num_of_factories
-			}
-			multiply_temp_variable = {
-				money_to_gain = 0.2
-			}
-			#if = {
-			#	limit = {
-			#		check_variable = {
-			#			money_to_gain < 50
-			#		}
-			#	}
-			#	set_temp_variable = {
-			#		money_to_gain = 50
-			#	}
-			#}
-			if = {
-				limit = {
-					check_variable = {
-						money_to_gain > 10000
-					}
-				}
-				set_temp_variable = {
-					money_to_gain = 10000
-				}
-			}
-			multiply_temp_variable = {
-				money_to_gain = -1
-			}
-			add_money_with_inflation_included_with_tooltip_effect = yes
-		}
+		custom_cost_text = eoanb_money_cost_text
+		
 		modifier = {
 			research_speed_factor = 0.05
 			civilian_factory_use = 1
 		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = num_of_factories }
+			multiply_temp_variable = { money_to_gain = 0.2 }
+			if = {
+				limit = { check_variable = { money_to_gain > 10000 } }
+				set_temp_variable = { money_to_gain = 10000 }
+			}
+			multiply_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
@@ -1190,9 +568,11 @@ eoanb_category_economic = {
 			}
 		}
 	}
-	#Start Industrializing
+	
+	# Start Industrializing
 	eoanb_decision_generic_start_industrializing = {
 		icon = generic_industry
+		
 		allowed = {
 			NOT = {
 				OR = {
@@ -1212,34 +592,30 @@ eoanb_category_economic = {
 				}
 			}
 		}
+		
 		visible = {
 			has_idea = agrarian
-			OR = {
-				has_idea = victorian_era
-				has_idea = machine_era
-				has_idea = oil_era
-			}
-			NOT = {
-				has_idea = industrializing
-			}
+			NOT = { has_idea = industrializing }
 			NOT = {
 				has_country_flag = Oceania_industrializing
 				has_country_flag = afr_colony_industrializing
 				has_country_flag = afr_an_african_industrializing
 			}
+			OR = {
+				has_idea = victorian_era
+				has_idea = machine_era
+				has_idea = oil_era
+			}
 			if = {
-				limit = {
-					tag = SPR
-				}
+				limit = { tag = SPR }
 				date > 1920.1.1
 			}
 			if = {
-				limit = {
-					tag = NOR
-				}
+				limit = { tag = NOR }
 				has_completed_focus = NOR_focus_industrialize
 			}
 		}
+		
 		available = {
 			has_stability > 0.5
 			has_tech = interchange_parts
@@ -1247,16 +623,24 @@ eoanb_category_economic = {
 			set_temp_variable = { loan_size_to_check = 50 }
 			has_less_than_specific_loan_size = yes
 		}
+		
 		fire_only_once = yes
 		days_remove = 700
+		
 		custom_cost_trigger = {
 			set_temp_variable = { amount_of_money_to_check = 1 }
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		custom_cost_text = eoanb_money_cost_text
+		
+		modifier = {
+			consumer_goods_expected_value = 0.05
+		}
+		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -1 }
 			add_money_with_tooltip_effect = yes
 		}
+		
 		remove_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_start_industrializing_effect_tt
 			swap_ideas = {
@@ -1264,9 +648,7 @@ eoanb_category_economic = {
 				add_idea = industrializing
 			}
 		}
-		modifier = {
-			consumer_goods_expected_value = 0.05
-		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
@@ -1279,9 +661,21 @@ eoanb_category_economic = {
 			}
 		}
 	}
-	#Finish Industrializing
+	
+	# Finish Industrializing
 	eoanb_decision_generic_industrialisation = {
 		icon = generic_industry
+		
+		visible = {
+			has_idea = industrializing
+			NOT = { has_idea = industrialized }
+			OR = {
+				has_idea = machine_era
+				has_idea = oil_era
+				has_idea = aviation_era
+			}
+		}
+		
 		available = {
 			has_stability > 0.5
 			has_tech = machine_tools_2
@@ -1291,33 +685,27 @@ eoanb_category_economic = {
 			set_temp_variable = { loan_size_to_check = 50 }
 			has_less_than_specific_loan_size = yes
 		}
-		visible = {
-			has_idea = industrializing
-			OR = {
-				has_idea = machine_era
-				has_idea = oil_era
-				has_idea = aviation_era
-			}
-			NOT = {
-				has_idea = industrialized
-			}
-		}
+		
 		fire_only_once = yes
+		
 		custom_cost_trigger = {
 			set_temp_variable = { amount_of_money_to_check = 1 }
 		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
+		custom_cost_text = eoanb_money_cost_text
+		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -1 }
 			add_money_with_tooltip_effect = yes
 		}
-		remove_effect =  {
+		
+		remove_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_start_industrializing_effect_tt
 			swap_ideas = {
 				remove_idea = industrializing
 				add_idea = industrialized
 			}
 		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
@@ -1330,54 +718,41 @@ eoanb_category_economic = {
 			}
 		}
 	}
-	###########################
+	
 	# Reduce Inflation
-	###########################
 	reduce_inflation = {
 		icon = GFX_decision_GENERIC_Deflation_Measures
-		cost = 100
-		days_remove = 60
-		days_re_enable = 30
+		
 		visible = {
-			check_variable = {
-				current_inflation > 0
-			}
+			check_variable = { current_inflation > 0 }
 		}
+		
 		available = {
 			if = {
-				limit = {
-					has_idea = pre_industrial_era
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 10
-				}
+				limit = { has_idea = pre_industrial_era }
+				set_temp_variable = { amount_of_money_to_check = 10 }
 				has_specific_amount_of_money_with_inflation_included = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = victorian_era
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 25
-				}
+				limit = { has_idea = victorian_era }
+				set_temp_variable = { amount_of_money_to_check = 25 }
 				has_specific_amount_of_money_with_inflation_included = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = machine_era
-				}
-				set_temp_variable = {
-					amount_of_money_to_check = 50
-				}
+				limit = { has_idea = machine_era }
+				set_temp_variable = { amount_of_money_to_check = 50 }
 				has_specific_amount_of_money_with_inflation_included = yes
 			}
 			else = {
-				set_temp_variable = {
-					amount_of_money_to_check = 100
-				}
+				set_temp_variable = { amount_of_money_to_check = 100 }
 				has_specific_amount_of_money_with_inflation_included = yes
 			}
 		}
+		
+		cost = 100
+		days_remove = 60
+		days_re_enable = 30
+		
 		modifier = {
 			political_power_cost = 1
 			inflation_change = -0.001
@@ -1386,276 +761,182 @@ eoanb_category_economic = {
 				money_income_factor_from_decisions = -0.1
 			}
 		}
+		
 		complete_effect = {
 			if = {
-				limit = {
-					has_idea = pre_industrial_era
-				}
-				set_temp_variable = {
-					money_to_gain = -10
-				}
+				limit = { has_idea = pre_industrial_era }
+				set_temp_variable = { money_to_gain = -10 }
 				add_money_with_inflation_included_with_tooltip_effect = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = victorian_era
-				}
-				set_temp_variable = {
-					money_to_gain = -25
-				}
+				limit = { has_idea = victorian_era }
+				set_temp_variable = { money_to_gain = -25 }
 				add_money_with_inflation_included_with_tooltip_effect = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = machine_era
-				}
-				set_temp_variable = {
-					money_to_gain = -50
-				}
+				limit = { has_idea = machine_era }
+				set_temp_variable = { money_to_gain = -50 }
 				add_money_with_inflation_included_with_tooltip_effect = yes
 			}
 			else = {
-				set_temp_variable = {
-					money_to_gain = -100
-				}
+				set_temp_variable = { money_to_gain = -100 }
 				add_money_with_inflation_included_with_tooltip_effect = yes
 			}
 		}
+		
 		remove_effect = {
-			set_temp_variable = {
-				inflation_to_gain = -0.1
-			}
+			set_temp_variable = { inflation_to_gain = -0.1 }
 			add_inflation_with_tooltip_effect = yes
 		}
-		ai_will_do = {
-			factor = 50
-		}
+		
+		ai_will_do = { factor = 50 }
 	}
-	###########################
+	
 	# Print Money
-	###########################
 	print_money = {
 		icon = GFX_decision_GENERIC_Issue_Currency
+		
+		visible = {
+			set_temp_variable = { amount_of_money_to_check = 2000000 }
+			subtract_from_temp_variable = { amount_of_money_to_check = 50 }
+			has_less_than_specific_amount_of_money = yes
+		}
+		
+		available = {
+			set_temp_variable = { amount_of_money_to_check = 2000000 }
+			subtract_from_temp_variable = { amount_of_money_to_check = 50 }
+			has_less_than_specific_amount_of_money = yes
+		}
+		
 		cost = 50
 		days_remove = 25
 		days_re_enable = 5
-		visible = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2000000
-			}
-			subtract_from_temp_variable = {
-				amount_of_money_to_check = 50
-			}
-			has_less_than_specific_amount_of_money = yes
-		}
-		available = {
-			set_temp_variable = {
-				amount_of_money_to_check = 2000000
-			}
-			subtract_from_temp_variable = {
-				amount_of_money_to_check = 50
-			}
-			has_less_than_specific_amount_of_money = yes
-		}
+		
 		modifier = {
 			political_power_cost = 1
 			inflation_change = 0.002
 		}
-		complete_effect = {
-		}
+		
 		remove_effect = {
 			if = {
-				limit = {
-					has_idea = pre_industrial_era
-				}
-				set_temp_variable = {
-					money_to_gain = 5
-				}
+				limit = { has_idea = pre_industrial_era }
+				set_temp_variable = { money_to_gain = 5 }
 				add_money_with_tooltip_effect = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = victorian_era
-				}
-				set_temp_variable = {
-					money_to_gain = 15
-				}
+				limit = { has_idea = victorian_era }
+				set_temp_variable = { money_to_gain = 15 }
 				add_money_with_tooltip_effect = yes
 			}
 			else_if = {
-				limit = {
-					has_idea = machine_era
-				}
-				set_temp_variable = {
-					money_to_gain = 65
-				}
+				limit = { has_idea = machine_era }
+				set_temp_variable = { money_to_gain = 65 }
 				add_money_with_tooltip_effect = yes
 			}
 			else = {
-				set_temp_variable = {
-					money_to_gain = 195
-				}
+				set_temp_variable = { money_to_gain = 195 }
 				add_money_with_tooltip_effect = yes
 			}
 		}
-		ai_will_do = {
-			factor = 0
-		}
+		
+		ai_will_do = { factor = 0 }
 	}
+	
+	# Can Become Bankrupt Mission
 	can_become_bankrupt_mission = {
 		icon = decision_envelope
-		visible = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_taken_a_loan = yes
-			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
-			NOT = {
-				check_variable = {
-					total_income_temp > required_income
-				}
-			}
-		}
+		
 		activation = {
-			NOT = {
-				has_idea = bankruptcy
-			}
+			NOT = { has_idea = bankruptcy }
 			has_taken_a_loan = yes
 			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
 			NOT = {
-				check_variable = {
-					total_income_temp > required_income
-				}
+				check_variable = { total_income_temp > required_income }
 			}
 		}
+		
 		available = {
 			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
 			OR = {
 				custom_trigger_tooltip = {
 					tooltip = HAS_MORE_INCOME_THAN_LOAN_EXPENSES
-					check_variable = {
-						total_income_temp > required_income
-					}
+					check_variable = { total_income_temp > required_income }
 				}
 				has_war = yes
 			}
 		}
+		
 		days_mission_timeout = 90
 		is_good = no
+		
 		complete_effect = {
 			hidden_effect = {
 				activate_mission = can_become_bankrupt_mission
 				remove_mission = can_become_bankrupt_mission
 			}
 		}
+		
 		timeout_effect = {
 			become_bankrupt_effect = yes
 		}
-		ai_will_do = {
-			factor = 1
-		}
 	}
+	
+	# Can Become Bankrupt At War Mission
 	can_become_bankrupt_at_war_mission = {
 		icon = decision_envelope
-		visible = {
-			NOT = {
-				has_idea = bankruptcy
-			}
-			has_war = yes
-			has_taken_a_loan = yes
-			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
-			NOT = {
-				check_variable = {
-					total_income_temp > required_income
-				}
-			}
-		}
+		
 		activation = {
-			NOT = {
-				has_idea = bankruptcy
-			}
+			NOT = { has_idea = bankruptcy }
 			has_war = yes
 			has_taken_a_loan = yes
 			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
 			NOT = {
-				check_variable = {
-					total_income_temp > required_income
-				}
+				check_variable = { total_income_temp > required_income }
 			}
 		}
+		
 		available = {
 			calculate_money_balance = yes
-			set_temp_variable = {
-				required_income = expenses_from_loans
-			}
-			multiply_temp_variable = {
-				required_income = -1
-			}
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
 			OR = {
 				custom_trigger_tooltip = {
 					tooltip = HAS_MORE_INCOME_THAN_LOAN_EXPENSES
-					check_variable = {
-						total_income_temp > required_income
-					}
+					check_variable = { total_income_temp > required_income }
 				}
 				has_war = no
 			}
 		}
+		
 		days_mission_timeout = 180
 		is_good = no
+		
 		complete_effect = {
 			hidden_effect = {
 				activate_mission = can_become_bankrupt_mission
 				remove_mission = can_become_bankrupt_mission
 			}
 		}
+		
 		timeout_effect = {
 			become_bankrupt_effect = yes
-		}
-		ai_will_do = {
-			factor = 1
 		}
 	}
 }
 
-#Internal Politics
+# Internal Politics Category
 eoanb_category_politics_internal = {
-	#Encourage Centrism
+	
+	# Encourage Centrism
 	eoanb_decision_drift_centrism = {
 		icon = generic_break_treaty
-		available = {
-			has_stability > 0.6
-		}
+		
 		visible = {
 			centrism < 0.7
 			centrism > 0.1
@@ -1664,14 +945,20 @@ eoanb_category_politics_internal = {
 				has_idea = machine_era
 			}
 		}
-		fire_only_once = no
+		
+		available = {
+			has_stability > 0.6
+		}
+		
+		cost = 150
 		days_remove = 180
 		days_re_enable = 7300
-		cost = 150
+		
 		modifier = {
 			centrism_drift = 0.03
 			stability_weekly = -0.001
 		}
+		
 		ai_will_do = {
 			base = 1
 			modifier = {
@@ -1684,94 +971,20 @@ eoanb_category_politics_internal = {
 			}
 		}
 	}
-#	#Look for an heir
-#	eoanb_decision_generic_seek_heir = {
-#		icon = generic_decision
-#		allowed = {
-#			NOT = {
-#				OR = {
-#					TAG = SPR
-#					TAG = BAD
-#					tag = TSH
-#				}
-#			}
-#		}
-#		available = {
-#			OR = {
-#				has_idea = pre_industrial_era
-#				has_idea = victorian_era
-#				has_idea = machine_era
-#				has_idea = oil_era
-#			}
-#			NOT = {
-#				has_country_flag = no_possible_heir
-#			}
-#			#has_idea = no_heir
-#			hidden_trigger = {
-#				# NOT = { has_active_mission = #eoanb_VIN_tuc_duc_heir_crisis_mission }
-#			}
-#		}
-#		visible = {
-#			OR = {
-#				has_idea = pre_industrial_era
-#				has_idea = victorian_era
-#				has_idea = machine_era
-#				has_idea = oil_era
-#			}
-#			NOT = {
-#				has_country_flag = no_possible_heir
-#			}
-#			#has_idea = no_heir
-#			hidden_trigger = {
-#				# NOT = { has_active_mission = #eoanb_VIN_tuc_duc_heir_crisis_mission }
-#			}
-#		}
-#		fire_only_once = no
-#		days_re_enable = 730
-#		cost = 75
-#		complete_effect = {
-#			country_event = {
-#				id = heir.1
-#			}
-#		}
-#		ai_will_do = {
-#			base = 1000
-#		}
-#	}
-#	#Make heir more legitimate
-#	eoanb_decision_generic_strengthen_heir = {
-#		icon = generic_civil_support
-#		allowed = {
-#			NOT = {
-#				TAG = SPR
-#			}
-#		}
-#		available = {
-#			has_stability > 0.5
-#		}
-#		visible = {
-#			OR = {
-#				has_idea = victorian_era
-#				has_idea = machine_era
-#				has_idea = oil_era
-#			}
-#			#has_idea = weak_heir
-#		}
-#		fire_only_once = no
-#		days_re_enable = 365
-#		cost = 200
-#		complete_effect = {
-#			country_event = {
-#				id = heir.5
-#			}
-#		}
-#		ai_will_do = {
-#			base = 1
-#		}
-#	}
-	#Raise Stability (Victorian Era)
+	
+	# Raise Stability (Victorian Era)
 	eoanb_decision_raise_stability_victorian = {
 		icon = generic_form_nation
+		
+		visible = {
+			has_idea = victorian_era
+			has_stability < 0.75
+			if = {
+				limit = { tag = SPR }
+				date > 1920.1.1
+			}
+		}
+		
 		available = {
 			has_war = no
 			OR = {
@@ -1779,215 +992,202 @@ eoanb_category_politics_internal = {
 				has_idea = low_economic_mobilisation
 			}
 		}
-		visible = {
-			has_idea = victorian_era
-			has_stability < 0.75
-			if = {
-				limit = {
-					TAG = SPR
-				}
-				date > 1920.1.1
-			}
-		}
-		fire_only_once = no
+		
+		cost = 50
 		days_remove = 70
 		days_re_enable = 180
-		cost = 50
-		#APPLIED WHEN SELECTED NOT ON REMOVAL
-		complete_effect = {
-			add_stability = 0.01
-		}
+		
 		modifier = {
 			stability_weekly = 0.0025
 			industrial_capacity_factory = -0.05
 			political_power_gain = -0.25
 		}
-		#AI only does this when stability falls below 20%
+		
+		complete_effect = {
+			add_stability = 0.01
+		}
+		
 		ai_will_do = {
 			base = 5
 			modifier = {
 				factor = 0
-				NOT = {
-					has_stability < 0.2
-				}
+				NOT = { has_stability < 0.2 }
 			}
 		}
 	}
-	#Raise War Support in Peacetime (Victorian Era)
+	
+	# Raise War Support in Peacetime
 	eoanb_decision_gather_warsupport_victorian = {
 		icon = generic_prepare_civil_war
-		available = {
-			OR = {
-				NOT = {
-					has_idea = free_elections
-				}
-				has_stability > 0.5
-			}
-		}
+		
 		visible = {
 			has_idea = victorian_era
 			has_war_support < 0.75
 			has_war = no
 			if = {
-				limit = {
-					TAG = SPR
-				}
+				limit = { tag = SPR }
 				date > 1920.1.1
 			}
 		}
-		fire_only_once = no
+		
+		available = {
+			OR = {
+				NOT = { has_idea = free_elections }
+				has_stability > 0.5
+			}
+		}
+		
+		cost = 50
 		days_remove = 70
 		days_re_enable = 365
-		cost = 50
-		#APPLIED WHEN SELECTED NOT ON REMOVAL
+		
+		modifier = {
+			war_support_weekly = 0.005
+			political_power_gain = -0.1
+			experience_gain_army_factor = -0.5
+		}
+		
 		complete_effect = {
 			add_named_threat = {
 				threat = 0.5
 				name = eoanb_threat_gather_warsupport_victorian
 			}
 		}
-		modifier = {
-			war_support_weekly = 0.005
-			political_power_gain = -0.1
-			experience_gain_army_factor = -0.5
-		}
-		#AI will never do this
-		ai_will_do = {
-			base = 0
-		}
+		
+		ai_will_do = { base = 0 }
 	}
+	
+	# Gather Legitimacy (Victorian Era)
 	eoanb_decision_gather_legitimacy_victorian = {
 		icon = generic_form_nation
-		available = {
-			has_idea = victorian_era
-			check_variable = {
-				political_legitimacy < 1
-			}
-		}
+		
 		visible = {
 			has_idea = victorian_era
 			if = {
-				limit = {
-					TAG = SPR
-				}
+				limit = { tag = SPR }
 				date > 1920.1.1
 			}
 		}
+		
+		available = {
+			has_idea = victorian_era
+			check_variable = { political_legitimacy < 1 }
+		}
+		
+		cost = 50
+		days_re_enable = 90
+		
+		complete_effect = {
+			set_temp_variable = { political_legitimacy_change = 0.05 }
+			eoanb_political_legitimacy_change = yes
+		}
+		
 		ai_will_do = {
 			base = 0
 			modifier = {
+				add = 10
 				has_war = yes
 				has_political_power > 250
-				check_variable = {
-					political_legitimacy < 0.6
-				}
-				add = 10
+				check_variable = { political_legitimacy < 0.6 }
 			}
 			modifier = {
+				add = 10
 				has_war = no
 				has_political_power > 200
-				check_variable = {
-					political_legitimacy < 0.45
-				}
-				add = 10
+				check_variable = { political_legitimacy < 0.45 }
 			}
-		}
-		fire_only_once = no
-		cost = 50
-		days_re_enable = 90
-		complete_effect = {
-			set_temp_variable = {
-				political_legitimacy_change = 0.05
-			}
-			eoanb_political_legitimacy_change = yes
 		}
 	}
+	
+	# Legitimize Through Military Austerity
 	eoanb_decision_legitimize_military_austerity_victorian = {
 		icon = generic_form_nation
+		
+		visible = {
+			has_idea = victorian_era
+			OR = {
+				has_government = radical_democracy
+				has_government = chauvinist_populism
+				has_government = ideology_radical_socialism
+				has_government = fundamentalism
+				AND = {
+					has_government = autocracy
+				}
+			}
+		}
+		
 		available = {
 			has_idea = victorian_era
 			command_power > 50
 			has_army_experience > 75
-			check_variable = {
-				political_legitimacy < 1
-			}
+			check_variable = { political_legitimacy < 1 }
 			OR = {
 				has_government = radical_democracy
 				has_government = chauvinist_populism
 				has_government = ideology_radical_socialism
 				has_government = fundamentalism
-				#has_idea = sharia_constitution
 				AND = {
 					has_government = autocracy
-					#has_idea = absolute_monarchy
 				}
 			}
 		}
-		visible = {
-			OR = {
-				has_government = radical_democracy
-				has_government = chauvinist_populism
-				has_government = ideology_radical_socialism
-				has_government = fundamentalism
-				#has_idea = sharia_constitution
-				AND = {
-					has_government = autocracy
-					#has_idea = absolute_monarchy
-				}
-			}
-			has_idea = victorian_era
-		}
-		ai_will_do = {
-			base = 0
-			modifier = {
-				has_army_experience > 250
-				check_variable = {
-					political_legitimacy < 0.6
-				}
-				add = 10
-			}
-			modifier = {
-				has_war = no
-				has_army_experience > 200
-				check_variable = {
-					political_legitimacy < 0.45
-				}
-				add = 10
-			}
-		}
-		fire_only_once = no
+		
 		cost = 75
+		days_re_enable = 90
+		
 		custom_cost_text = command_power_more_than_50_army_experience_more_than_75
 		custom_cost_trigger = {
 			has_army_experience > 74.9
 			command_power > 49.9
 		}
-		days_re_enable = 90
+		
 		complete_effect = {
 			if = {
-				limit = {
-					has_war_support < 0.8
-				}
+				limit = { has_war_support < 0.8 }
 				add_war_support = 0.015
 			}
 			hidden_effect = {
 				add_command_power = -50
 				army_experience = -75
 			}
-			set_temp_variable = {
-				political_legitimacy_change = 0.1
-			}
+			set_temp_variable = { political_legitimacy_change = 0.1 }
 			eoanb_political_legitimacy_change = yes
 		}
-	}
-	eoanb_decision_generic_arrest_opposition_leaders = {
-		icon = GFX_decision_generic_political_discourse
-		available = {
-			NOT = {
-				has_country_flag = parl_political_action_in_progress
+		
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 10
+				has_army_experience > 250
+				check_variable = { political_legitimacy < 0.6 }
+			}
+			modifier = {
+				add = 10
+				has_war = no
+				has_army_experience > 200
+				check_variable = { political_legitimacy < 0.45 }
 			}
 		}
+	}
+	
+	# Arrest Opposition Leaders
+	eoanb_decision_generic_arrest_opposition_leaders = {
+		icon = GFX_decision_generic_political_discourse
+		
+		visible = {
+			NOT = {
+				has_country_flag = eoanb_decision_generic_arrest_opposition_leaders_is_prohibited
+				tag = PIE
+				tag = TUS
+			}
+		}
+		
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+		
 		days_remove = 7
+		
 		custom_cost_trigger = {
 			if = {
 				limit = {
@@ -2004,16 +1204,11 @@ eoanb_category_politics_internal = {
 			}
 		}
 		custom_cost_text = eoanb_decision_generic_arrest_opposition_leaders_cost
-		visible = {
-			NOT = {
-				OR = {
-					has_country_flag = eoanb_decision_generic_arrest_opposition_leaders_is_prohibited
-					
-					tag = PIE
-					tag = TUS
-				}
-			}
+		
+		modifier = {
+			political_power_gain = -0.25
 		}
+		
 		complete_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_arrest_opposition_leaders_tt
 			if = {
@@ -2031,9 +1226,7 @@ eoanb_category_politics_internal = {
 			}
 			set_country_flag = parl_political_action_in_progress
 		}
-		modifier = {
-			political_power_gain = -0.25
-		}
+		
 		remove_effect = {
 			clr_country_flag = parl_political_action_in_progress
 			for_each_loop = {
@@ -2041,29 +1234,15 @@ eoanb_category_politics_internal = {
 				value = parl_v
 				index = parl_i
 				if = {
-					limit = {
-						check_variable = {
-							parl_coalitions^parl_i = 2
-						}
-					}
-					set_temp_variable = {
-						parl_r = random
-					}
-					multiply_temp_variable = {
-						parl_r = -5
-					}
+					limit = { check_variable = { parl_coalitions^parl_i = 2 } }
+					set_temp_variable = { parl_r = random }
+					multiply_temp_variable = { parl_r = -5 }
 					round_variable = parl_r
-					add_to_temp_variable = {
-						parl_r = -1
-					}
-					add_to_variable = {
-						seats_count_array^parl_i = parl_r
-					}
+					add_to_temp_variable = { parl_r = -1 }
+					add_to_variable = { seats_count_array^parl_i = parl_r }
 				}
 			}
-			add_to_variable = {
-				political_legitimacy = -0.15
-			}
+			add_to_variable = { political_legitimacy = -0.15 }
 			clamp_variable = {
 				var = political_legitimacy
 				min = 0
@@ -2073,14 +1252,25 @@ eoanb_category_politics_internal = {
 			compute_number_seats_approve_est = yes
 		}
 	}
+	
+	# Ban Opposition Party
 	eoanb_decision_generic_ban_opposition_party = {
 		icon = GFX_decision_oppression
-		available = {
+		
+		visible = {
 			NOT = {
-				has_country_flag = parl_political_action_in_progress
+				has_country_flag = eoanb_decision_generic_ban_opposition_party_is_prohibited
+				tag = PIE
+				tag = TUS
 			}
 		}
+		
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+		
 		days_remove = 7
+		
 		custom_cost_trigger = {
 			if = {
 				limit = {
@@ -2097,16 +1287,11 @@ eoanb_category_politics_internal = {
 			}
 		}
 		custom_cost_text = eoanb_decision_generic_ban_opposition_party_cost
-		visible = {
-			NOT = {
-				OR = {
-					has_country_flag = eoanb_decision_generic_ban_opposition_party_is_prohibited
-					
-					tag = PIE
-					tag = TUS
-				}
-			}
+		
+		modifier = {
+			political_power_gain = -0.25
 		}
+		
 		complete_effect = {
 			custom_effect_tooltip = eoanb_decision_generic_ban_opposition_party_tt
 			if = {
@@ -2124,9 +1309,7 @@ eoanb_category_politics_internal = {
 			}
 			set_country_flag = parl_political_action_in_progress
 		}
-		modifier = {
-			political_power_gain = -0.25
-		}
+		
 		remove_effect = {
 			clr_country_flag = parl_political_action_in_progress
 			for_each_loop = {
@@ -2134,22 +1317,12 @@ eoanb_category_politics_internal = {
 				value = parl_v
 				index = parl_i
 				if = {
-					limit = {
-						check_variable = {
-							parl_coalitions^parl_i = 2
-						}
-					}
-					set_variable = {
-						seats_count_array^parl_i = 0
-					}
-					set_variable = {
-						parl_coalitions^parl_i = 3
-					}
+					limit = { check_variable = { parl_coalitions^parl_i = 2 } }
+					set_variable = { seats_count_array^parl_i = 0 }
+					set_variable = { parl_coalitions^parl_i = 3 }
 				}
 			}
-			add_to_variable = {
-				political_legitimacy = -0.25
-			}
+			add_to_variable = { political_legitimacy = -0.25 }
 			clamp_variable = {
 				var = political_legitimacy
 				min = 0
@@ -2164,267 +1337,39 @@ eoanb_category_politics_internal = {
 	}
 }
 
-#Religious Matters
-#eoanb_religious_affairs = {
-	#Switch from Catholic to Protestant
-	#eoanb_decision_generic_change_protestant = {
-	#	icon = generic_civil_support
-	#	allowed = {
-	#		NOT = {
-	#			TAG = PAP
-	#			tag = PIE
-	#			tag = TUS
-	#		}
-	#	}
-	#	available = {
-	#		has_stability > 0.5
-	#		NOT = {
-	#			has_government = fundamentalism
-	#		}
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = victorian_era
-	#			has_idea = machine_era
-	#		}
-	#		has_idea = religion_catholic
-	#		NOT = {
-	#			TAG = SPR
-	#		}
-	#	}
-	#	fire_only_once = yes
-	#	#days_re_enable = 365000
-	#	days_remove = 365
-	#	cost = 250
-	#	complete_effect = {
-	#		add_stability = -0.05
-	#	}
-	#	modifier = {
-	#		stability_factor = -0.1
-	#		political_power_factor = -0.1
-	#		drift_defence_factor = -0.25
-	#	}
-	#	remove_effect = {
-	#		custom_effect_tooltip = eoanb_tt_decision_protestant
-	#		hidden_effect = {
-	#			swap_ideas = {
-	#				remove_idea = religion_catholic
-	#				add_idea = religion_protestant
-	#			}
-	#		}
-	#	}
-	#	ai_will_do = {
-	#		base = 0
-	#	}
-	#}
-	#Switch from Protestant to Catholic
-	#eoanb_decision_generic_change_catholic = {
-	#	icon = generic_civil_support
-	#	available = {
-	#		has_stability > 0.5
-	#		NOT = {
-	#			has_government = fundamentalism
-	#		}
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = victorian_era
-	#			has_idea = machine_era
-	#		}
-	#		has_idea = religion_protestant
-	#	}
-	#	fire_only_once = yes
-	#	#days_re_enable = 365000
-	#	days_remove = 365
-	#	cost = 250
-	#	complete_effect = {
-	#		add_stability = -0.05
-	#	}
-	#	modifier = {
-	#		stability_factor = -0.1
-	#		political_power_factor = -0.1
-	#		drift_defence_factor = -0.25
-	#	}
-	#	remove_effect = {
-	#		custom_effect_tooltip = eoanb_tt_decision_catholic
-	#		hidden_effect = {
-	#			swap_ideas = {
-	#				remove_idea = religion_protestant
-	#				add_idea = religion_catholic
-	#			}
-	#		}
-	#	}
-	#	ai_will_do = {
-	#		base = 0
-	#	}
-	#}
-	#Try to Secularize
-	#eoanb_decision_generic_change_secular = {
-	#	icon = generic_nationalism
-	#	available = {
-	#		has_stability > 0.5
-	#		NOT = {
-	#			has_government = fundamentalism
-	#		}
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = victorian_era
-	#			has_idea = machine_era
-	#			has_idea = oil_era
-	#		}
-	#		NOT = {
-	#			has_idea = religion_secular
-	#			OR = {
-	#				tag = PIE
-	#				tag = TUS
-	#				tag = PAP
-	#			}
-	#		}
-	#	}
-	#	fire_only_once = yes
-	#	#days_re_enable = 365000
-	#	days_remove = 3650
-	#	cost = 750
-	#	complete_effect = {
-	#		add_stability = -0.05
-	#	}
-	#	modifier = {
-	#		stability_factor = -0.1
-	#		political_power_factor = -0.1
-	#		drift_defence_factor = -0.25
-	#	}
-	#	remove_effect = {
-	#		custom_effect_tooltip = eoanb_tt_decision_secular
-	#		hidden_effect = {
-	#			add_ideas = religion_secular
-	#		}
-	#	}
-	#	ai_will_do = {
-	#		base = 0
-	#	}
-	#}
-	#eoanb_decision_generic_hold_animist_festival = {
-	#	icon = generic_civil_support
-	#	available = {
-	#		has_stability > 0.05
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = religion_animist
-	#			has_idea = religion_shamanism
-	#		}
-	#		has_idea = pre_industrial_era
-	#	}
-	#	fire_only_once = no
-	#	days_re_enable = 365
-	#	days_remove = 90
-	#	cost = 50
-	#	modifier = {
-	#		stability_factor = 0.05
-	#		army_morale_factor = 0.05
-	#		MONTHLY_POPULATION = 0.05
-	#	}
-	#	ai_will_do = {
-	#		base = 1
-	#	}
-	#}
-#}
-
-#Political Actions
+# Political Actions (Empty Category)
 political_actions = {
 	
 }
 
-#Foreign Politics
+# Diplomatic Actions Category
 eoanb_category_diplomatic_actions = {
-	#Rename Istanbul to Constantinople
-	#eoanb_decision_generic_rename_constantinople = {
-	#	icon = generic_decision
-	#	available = {
-	#		has_war = no
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = religion_catholic
-	#			has_idea = religion_protestant
-	#			has_idea = religion_orthodox
-	#		}
-	#		owns_state = 957
-	#	}
-	#	fire_only_once = yes
-	#	cost = 10
-	#	complete_effect = {
-	#		set_province_name = {
-	#			id = 9833
-	#			name = "Constantinople"
-	#		}
-	#		hidden_effect = {
-	#			set_global_flag = eoanb_flag_istanbul_renamed_constantinople
-	#		}
-	#	}
-	#	ai_will_do = {
-	#		base = 1000
-	#	}
-	#}
-	#Rename Constantinople to Istanbul
-	#eoanb_decision_generic_rename_istanbul = {
-	#	icon = generic_decision
-	#	available = {
-	#		has_war = no
-	#	}
-	#	visible = {
-	#		OR = {
-	#			has_idea = religion_sunni
-	#			has_idea = religion_shiite
-	#			has_idea = religion_ibadi
-	#		}
-	#		owns_state = 957
-	#		has_global_flag = eoanb_flag_istanbul_renamed_constantinople
-	#	}
-	#	fire_only_once = yes
-	#	cost = 10
-	#	complete_effect = {
-	#		set_province_name = {
-	#			id = 9833
-	#			name = "Istanbul"
-	#		}
-	#		hidden_effect = {
-	#			clr_global_flag = eoanb_flag_istanbul_renamed_constantinople
-	#		}
-	#	}
-	#	ai_will_do = {
-	#		base = 1000
-	#	}
-	#}
-	#Rename New York to New Amsterdam
+	
+	# Rename New York to New Amsterdam
 	eoanb_decision_generic_rename_new_amsterdam = {
 		icon = generic_decision
-		allowed = {
-			TAG = HOL
-		}
-		available = {
-			has_war = no
-		}
+		
+		allowed = { tag = HOL }
+		
 		visible = {
 			OR = {
 				AND = {
-					HOL = {
-						owns_state = 360
-					}
+					HOL = { owns_state = 360 }
 				}
 				AND = {
-					USA = {
-						owns_state = 360
-					}
-					USA = {
-						is_subject_of = HOL
-					}
+					USA = { owns_state = 360 }
+					USA = { is_subject_of = HOL }
 				}
 			}
 		}
+		
+		available = {
+			has_war = no
+		}
+		
 		fire_only_once = yes
 		cost = 10
+		
 		complete_effect = {
 			set_province_name = {
 				id = 3878
@@ -2434,30 +1379,29 @@ eoanb_category_diplomatic_actions = {
 				set_global_flag = eoanb_flag_new_york_renamed_new_amsterdam
 			}
 		}
-		ai_will_do = {
-			base = 1000
-		}
+		
+		ai_will_do = { base = 1000 }
 	}
-	#Rename New Amsterdam to New York
+	
+	# Rename New Amsterdam to New York
 	eoanb_decision_generic_rename_new_york = {
 		icon = generic_decision
-		allowed = {
-			TAG = USA
+		
+		allowed = { tag = USA }
+		
+		visible = {
+			USA = { is_subject = no }
+			USA = { owns_state = 360 }
+			has_global_flag = eoanb_flag_new_york_renamed_new_amsterdam
 		}
+		
 		available = {
 			has_war = no
 		}
-		visible = {
-			USA = {
-				is_subject = no
-			}
-			USA = {
-				owns_state = 360
-			}
-			has_global_flag = eoanb_flag_new_york_renamed_new_amsterdam
-		}
+		
 		fire_only_once = yes
 		cost = 10
+		
 		complete_effect = {
 			set_province_name = {
 				id = 3878
@@ -2467,26 +1411,27 @@ eoanb_category_diplomatic_actions = {
 				clr_global_flag = eoanb_flag_new_york_renamed_new_amsterdam
 			}
 		}
-		ai_will_do = {
-			base = 1000
-		}
+		
+		ai_will_do = { base = 1000 }
 	}
-	#Rename Königsberg to Kaliningrad
+	
+	# Rename Königsberg to Kaliningrad
 	eoanb_decision_generic_rename_kaliningrad = {
 		icon = generic_decision
-		allowed = {
-			TAG = RUS
+		
+		allowed = { tag = RUS }
+		
+		visible = {
+			RUS = { owns_state = 1001 }
 		}
+		
 		available = {
 			has_war = no
 		}
-		visible = {
-			RUS = {
-				owns_state = 1001
-			}
-		}
+		
 		fire_only_once = yes
 		cost = 10
+		
 		complete_effect = {
 			set_province_name = {
 				id = 6332
@@ -2499,35 +1444,36 @@ eoanb_category_diplomatic_actions = {
 				set_global_flag = eoanb_flag_konigsberg_renamed_kaliningrad
 			}
 		}
-		ai_will_do = {
-			base = 1000
-		}
+		
+		ai_will_do = { base = 1000 }
 	}
-	#Rename Kaliningrad to Königsberg
+	
+	# Rename Kaliningrad to Königsberg
 	eoanb_decision_generic_rename_konigsberg = {
 		icon = generic_decision
+		
 		allowed = {
 			OR = {
-				TAG = PRS
-				TAG = GER
+				tag = PRS
+				tag = GER
 			}
 		}
-		available = {
-			has_war = no
-		}
+		
 		visible = {
 			has_global_flag = eoanb_flag_konigsberg_renamed_kaliningrad
 			OR = {
-				PRS = {
-					owns_state = 1001
-				}
-				GER = {
-					owns_state = 1001
-				}
+				PRS = { owns_state = 1001 }
+				GER = { owns_state = 1001 }
 			}
 		}
+		
+		available = {
+			has_war = no
+		}
+		
 		fire_only_once = yes
 		cost = 10
+		
 		complete_effect = {
 			set_province_name = {
 				id = 6332
@@ -2540,55 +1486,26 @@ eoanb_category_diplomatic_actions = {
 				clr_global_flag = eoanb_flag_konigsberg_renamed_kaliningrad
 			}
 		}
-		ai_will_do = {
-			base = 1000
-		}
+		
+		ai_will_do = { base = 1000 }
 	}
-	# #Attack the Tribals on North Sentinel Island
-	# eoanb_decision_generic_attack_NSI_tribals = {
-	# icon = generic_prepare_civil_war
-	# available = {
-	# has_full_control_of_state = 1308
-	# }
-	# visible = {
-	# has_full_control_of_state = 1308
-	# }
-	# fire_only_once = yes
-	# cost = 0
-	# complete_effect = {
-	# hidden_effect = {
-	# 1308 = { add_manpower = -60 }
-	# }
-	# }
-	# ai_will_do = {
-	# base = 0
-	# }
-	# }
 }
 
+# Military Category
 eoanb_category_military = {
+	
+	# Recruit Colonial Troops (Algeria)
 	eoanb_decision_generic_recruit_colonial_troops = {
 		icon = generic_prepare_civil_war
-		available = {
-			NOT = {
-				has_idea = disarmed_nation
-			}
-		}
-		#Capital is not in Africa, country owns one state that is not connected to the capital, not on the same continent as the capital, and is uncored
+		
 		visible = {
 			owns_state = 681
 			NOT = {
-				capital_scope = {
-					is_on_continent = africa
-				}
+				capital_scope = { is_on_continent = africa }
 			}
 			has_manpower > 2500
-			has_equipment = {
-				infantry_equipment > 249
-			}
-			has_equipment = {
-				uniform_equipment > 249
-			}
+			has_equipment = { infantry_equipment > 249 }
+			has_equipment = { uniform_equipment > 249 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
@@ -2596,94 +1513,68 @@ eoanb_category_military = {
 			}
 			OR = {
 				AND = {
-					capital_scope = {
-						is_on_continent = europe
-					}
+					capital_scope = { is_on_continent = europe }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = europe
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = europe }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = north_america
-					}
+					capital_scope = { is_on_continent = north_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = north_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = north_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = south_america
-					}
+					capital_scope = { is_on_continent = south_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = south_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = south_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = australia
-					}
+					capital_scope = { is_on_continent = australia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = australia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = australia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = asia
-					}
+					capital_scope = { is_on_continent = asia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = asia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = asia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = middle_east
-					}
+					capital_scope = { is_on_continent = middle_east }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = middle_east
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = middle_east }
 					}
 				}
 			}
 		}
+		
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
+		
 		fire_only_once = yes
 		cost = 50
 		days_remove = 30
+		
+		modifier = {
+			experience_gain_army_factor = -0.25
+		}
+		
 		complete_effect = {
 			add_manpower = -2000
 			add_equipment_to_stockpile = {
@@ -2695,42 +1586,29 @@ eoanb_category_military = {
 				amount = -200
 			}
 		}
-		modifier = {
-			experience_gain_army_factor = -0.25
-		}
+		
 		remove_effect = {
 			custom_effect_tooltip = eoanb_tt_decision_recruit_colonial_infantry_1
 			hidden_effect = {
 				load_oob = "DECISION_recruit_colonials_12589"
 			}
 		}
-		#Might make the AI do this later
-		ai_will_do = {
-			base = 0
-		}
+		
+		ai_will_do = { base = 0 }
 	}
+	
+	# Recruit Colonial Troops (South Africa)
 	eoanb_decision_generic_recruit_colonial_troops_2 = {
 		icon = generic_prepare_civil_war
-		available = {
-			NOT = {
-				has_idea = disarmed_nation
-			}
-		}
-		#Capital is not in Africa, country owns one state that is not connected to the capital, not on the same continent as the capital, and is uncored
+		
 		visible = {
 			owns_state = 824
 			NOT = {
-				capital_scope = {
-					is_on_continent = africa
-				}
+				capital_scope = { is_on_continent = africa }
 			}
 			has_manpower > 2500
-			has_equipment = {
-				infantry_equipment > 249
-			}
-			has_equipment = {
-				uniform_equipment > 249
-			}
+			has_equipment = { infantry_equipment > 249 }
+			has_equipment = { uniform_equipment > 249 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
@@ -2738,94 +1616,68 @@ eoanb_category_military = {
 			}
 			OR = {
 				AND = {
-					capital_scope = {
-						is_on_continent = europe
-					}
+					capital_scope = { is_on_continent = europe }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = europe
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = europe }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = north_america
-					}
+					capital_scope = { is_on_continent = north_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = north_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = north_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = south_america
-					}
+					capital_scope = { is_on_continent = south_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = south_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = south_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = australia
-					}
+					capital_scope = { is_on_continent = australia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = australia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = australia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = asia
-					}
+					capital_scope = { is_on_continent = asia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = asia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = asia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = middle_east
-					}
+					capital_scope = { is_on_continent = middle_east }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = middle_east
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = middle_east }
 					}
 				}
 			}
 		}
+		
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
+		
 		fire_only_once = yes
 		cost = 50
 		days_remove = 30
+		
+		modifier = {
+			experience_gain_army_factor = -0.25
+		}
+		
 		complete_effect = {
 			add_manpower = -2000
 			add_equipment_to_stockpile = {
@@ -2837,42 +1689,29 @@ eoanb_category_military = {
 				amount = -200
 			}
 		}
-		modifier = {
-			experience_gain_army_factor = -0.25
-		}
+		
 		remove_effect = {
 			custom_effect_tooltip = eoanb_tt_decision_recruit_colonial_infantry_2
 			hidden_effect = {
 				load_oob = "DECISION_recruit_colonials_8248"
 			}
 		}
-		#Might make the AI do this later
-		ai_will_do = {
-			base = 0
-		}
+		
+		ai_will_do = { base = 0 }
 	}
+	
+	# Recruit Colonial Troops (India)
 	eoanb_decision_generic_recruit_colonial_troops_3 = {
 		icon = generic_prepare_civil_war
-		available = {
-			NOT = {
-				has_idea = disarmed_nation
-			}
-		}
-		#Capital is not in Africa, country owns one state that is not connected to the capital, not on the same continent as the capital, and is uncored
+		
 		visible = {
 			owns_state = 459
 			NOT = {
-				capital_scope = {
-					is_on_continent = africa
-				}
+				capital_scope = { is_on_continent = africa }
 			}
 			has_manpower > 2500
-			has_equipment = {
-				infantry_equipment > 249
-			}
-			has_equipment = {
-				uniform_equipment > 249
-			}
+			has_equipment = { infantry_equipment > 249 }
+			has_equipment = { uniform_equipment > 249 }
 			OR = {
 				has_idea = victorian_era
 				has_idea = machine_era
@@ -2880,94 +1719,68 @@ eoanb_category_military = {
 			}
 			OR = {
 				AND = {
-					capital_scope = {
-						is_on_continent = europe
-					}
+					capital_scope = { is_on_continent = europe }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = europe
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = europe }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = north_america
-					}
+					capital_scope = { is_on_continent = north_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = north_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = north_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = south_america
-					}
+					capital_scope = { is_on_continent = south_america }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = south_america
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = south_america }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = australia
-					}
+					capital_scope = { is_on_continent = australia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = australia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = australia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = asia
-					}
+					capital_scope = { is_on_continent = asia }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = asia
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = asia }
 					}
 				}
 				AND = {
-					capital_scope = {
-						is_on_continent = middle_east
-					}
+					capital_scope = { is_on_continent = middle_east }
 					any_owned_state = {
 						is_in_home_area = no
-						NOT = {
-							is_core_of = ROOT
-						}
-						NOT = {
-							is_on_continent = middle_east
-						}
+						NOT = { is_core_of = ROOT }
+						NOT = { is_on_continent = middle_east }
 					}
 				}
 			}
 		}
+		
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
+		
 		fire_only_once = yes
 		cost = 50
 		days_remove = 30
+		
+		modifier = {
+			experience_gain_army_factor = -0.25
+		}
+		
 		complete_effect = {
 			add_manpower = -2000
 			add_equipment_to_stockpile = {
@@ -2979,221 +1792,193 @@ eoanb_category_military = {
 				amount = -200
 			}
 		}
-		modifier = {
-			experience_gain_army_factor = -0.25
-		}
+		
 		remove_effect = {
 			custom_effect_tooltip = eoanb_tt_decision_recruit_colonial_infantry_3
 			hidden_effect = {
 				load_oob = "DECISION_recruit_colonials_1145"
 			}
 		}
-		#Might make the AI do this later
-		ai_will_do = {
-			base = 0
-		}
+		
+		ai_will_do = { base = 0 }
 	}
-
-	### Switching from Tradtinional Army to Napoleonic army
+	
+	# Advance to Napoleonic Age
 	eoanb_decision_advance_to_the_napoleonic_age = {
 		icon = naval_base
-		fire_only_once = yes
-		custom_cost_trigger = {
-			has_political_power > 9.9
-			command_power > 74.99
-		}
-		custom_cost_text = eoanb_political_power_10_command_power_75
-
+		
 		visible = {
 			OR = {
 				has_idea = law_pre_industrial_army
 				has_idea = law_pre_industrial_army_chinese
 			}
 		}
-
+		
 		available = {
-			AND = {
-				OR = {
-					has_idea = law_pre_industrial_army
-					has_idea = law_pre_industrial_army_chinese
-				}
-				AND = {
-					has_tech = vic_army_cloth
-					has_tech = improved_cavalry
-					has_tech = rifle_equipment2
-					OR ={
-						has_tech = rbl_field_gun
-						has_tech = rifled_howitzer
-					}
-				}
+			OR = {
+				has_idea = law_pre_industrial_army
+				has_idea = law_pre_industrial_army_chinese
+			}
+			has_tech = vic_army_cloth
+			has_tech = improved_cavalry
+			has_tech = rifle_equipment2
+			OR = {
+				has_tech = rbl_field_gun
+				has_tech = rifled_howitzer
 			}
 		}
-
+		
+		fire_only_once = yes
 		days_remove = 180
-
+		
+		custom_cost_trigger = {
+			has_political_power > 9.9
+			command_power > 74.99
+		}
+		custom_cost_text = eoanb_political_power_10_command_power_75
+		
 		modifier = {
 			consumer_goods_expected_value = 0.1
 		}
-
-
+		
 		complete_effect = {
 			add_political_power = -10
 			add_command_power = -75
 		}
-
+		
 		remove_effect = {
 			if = {
-				limit = {
-					has_idea = law_pre_industrial_army
-				}
+				limit = { has_idea = law_pre_industrial_army }
 				swap_ideas = {
 					remove_idea = law_pre_industrial_army
 					add_idea = doctrine_napoleonic_army_1
 				}
 			}
 			else_if = {
-				limit = {
-					has_idea = law_pre_industrial_army_chinese
-				}
+				limit = { has_idea = law_pre_industrial_army_chinese }
 				swap_ideas = {
 					remove_idea = law_pre_industrial_army_chinese
 					add_idea = doctrine_napoleonic_army_1
 				}
 			}
 		}
-
-		ai_will_do = {
-			base = 1000
-		}
+		
+		ai_will_do = { base = 1000 }
 	}
 }
 
+# Navy Category
 eoanb_category_navy = {
+	
+	# Found Naval Command
 	eoanb_found_naval_command = {
 		icon = generic_army_support
-		available = {
-			has_navy_size = {
-				size > 1
-			}
-		}
+		
 		visible = {
-			any_owned_state = {
-				is_coastal = yes
-			}
-			NOT = {
-				has_country_flag = naval_command_founded
-			}
+			any_owned_state = { is_coastal = yes }
+			NOT = { has_country_flag = naval_command_founded }
 		}
+		
+		available = {
+			has_navy_size = { size > 1 }
+		}
+		
 		fire_only_once = yes
 		cost = 0
-		ai_will_do = {
-			base = 1000
-		}
+		
 		complete_effect = {
 			set_country_flag = naval_command_founded
 		}
+		
+		ai_will_do = { base = 1000 }
 	}
 }
 
+# Air Category
 eoanb_category_air = {
+	
+	# Found Air Command
 	eoanb_found_air_command = {
 		icon = generic_army_support
-		available = {
-			OR = {
-				has_equipment = {
-					monoplane_equipment_0 > 0
-				}
-				has_equipment = {
-					scout_plane_equipment_0 > 0
-				}
-			}
-		}
+		
 		visible = {
 			has_tech = monoplane_scout
-			NOT = {
-				has_country_flag = air_command_founded
+			NOT = { has_country_flag = air_command_founded }
+		}
+		
+		available = {
+			OR = {
+				has_equipment = { monoplane_equipment_0 > 0 }
+				has_equipment = { scout_plane_equipment_0 > 0 }
 			}
 		}
+		
 		fire_only_once = yes
 		cost = 75
+		
 		complete_effect = {
 			set_country_flag = air_command_founded
 		}
 	}
 }
 
+# Traditions & Celebrations Category
 eoanb_category_traditions_celebrations = {
-	#Celebrate regional traditions - this started from ITA but was expanded to other tags
+	
+	# Celebrate Regional Traditions
 	eoanb_decision_ITA_regional_celebration_tradition = {
 		icon = generic_nationalism
+		
 		allowed = {
 			OR = {
-				TAG = PIE
-				TAG = TUS
-				TAG = BAV
-				TAG = SPR
-				TAG = NSC
-				TAG = HOL
-				TAG = PRS
-				TAG = SWI
-				TAG = BAD
-				TAG = LVN
-				TAG = PRM
-				TAG = MOD
-				TAG = RUS
+				tag = PIE
+				tag = TUS
+				tag = BAV
+				tag = SPR
+				tag = NSC
+				tag = HOL
+				tag = PRS
+				tag = SWI
+				tag = BAD
+				tag = LVN
+				tag = PRM
+				tag = MOD
+				tag = RUS
 			}
 		}
+		
 		available = {
 			has_stability > 0.1
 		}
-		fire_only_once = no
-		days_re_enable = 365
+		
 		cost = 25
+		days_re_enable = 365
+		
 		complete_effect = {
 			add_stability = 0.005
 		}
-		ai_will_do = {
-			base = 0
-		}
+		
+		ai_will_do = { base = 0 }
 	}
 }
 
+# Options Category
 eoanb_category_options = {
+	
+	# Open Options Menu
 	eoanb_decision_open_options = {
 		icon = generic_decision
+		
 		visible = {
 			is_ai = no
-			NOT = {
-				has_country_flag = eoanb_startup_event_marker
-			}
+			NOT = { has_country_flag = eoanb_startup_event_marker }
 		}
-		fire_only_once = no
+		
 		cost = 0
+		
 		complete_effect = {
 			set_country_flag = eoanb_startup_event_marker
 			set_country_flag = eoanb_startup_event_settings_marker
 		}
 	}
-	# eoanb_decision_disable_options = {
-	# 	icon = generic_decision
-	# 	available = {
-	# 		always = yes
-	# 	}
-	# 	visible = {
-	# 		NOT = {
-	# 			has_country_flag = eoanb_flag_options_disabled
-	# 		}
-	# 	}
-	# 	fire_only_once = no
-	# 	cost = 0
-	# 	complete_effect = {
-	# 		custom_effect_tooltip = eoanb_tt_decision_disable_options
-	# 		hidden_effect = {
-	# 			set_country_flag = eoanb_flag_options_disabled
-	# 		}
-	# 	}
-	# 	ai_will_do = {
-	# 		base = 0
-	# 	}
-	# }
 }
