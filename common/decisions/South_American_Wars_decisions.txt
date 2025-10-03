@@ -1,67 +1,13 @@
 war_planning = {
 	south_america_civil_war_purchase_spanish_support = {
 		icon = power_struggle
-		available = { 
-			set_temp_variable = { loan_size_to_check = 50}
-			has_less_than_specific_loan_size = yes 
-			SPR = { set_temp_variable = { loan_size_to_check = 50}
-			has_less_than_specific_loan_size = yes }
-			custom_trigger_tooltip = {
-				tooltip = SPR_loan_support_limit_tooltip
-				check_variable = { var = SPR_debt_repayments_level value = 15 compare = less_than_or_equals }
-			}
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-			has_specific_amount_of_money_with_inflation_included = yes
-		}
 		
-		custom_cost_trigger = {
-			set_temp_variable = { amount_of_money_to_check = 0.5 }
-		}
-		custom_cost_text = CREATE_PUBLIC_WORKS_CUSTOM_COST_TEXT
-		visible = { 
-			if = { 
-				limit = { TAG = MEC }
-				has_country_flag = SPR_gives_loan_support_flag
-			}
-			else = { has_civil_war = yes }
-			if = {
-				limit = { 
-					OR = {
-						TAG = D01
-						TAG = D02
-						TAG = D03
-						TAG = D04
-					}
-				}
-				OR = {
-					#has_war_with = GUA
-					#has_war_with = ELS
-					#has_war_with = HON
-					#has_war_with = NIC
-					#has_war_with = COS
-					has_war_with = COL
-					has_war_with = VEN
-					has_war_with = ECU
-					has_war_with = PRU
-					has_war_with = CHL
-					has_war_with = BOL
-					has_war_with = URG
-					has_war_with = BUE
-					has_war_with = ARG
-				}
-			}
-		}
 		allowed = {
 			OR = {
 				TAG = D01
 				TAG = D02
 				TAG = D03
 				TAG = D04
-				#TAG = GUA
-				#TAG = ELS
-				#TAG = HON
-				#TAG = NIC
-				#TAG = COS
 				TAG = COL
 				TAG = VEN
 				TAG = ECU
@@ -74,18 +20,69 @@ war_planning = {
 				TAG = MEC
 			}
 		}
+		
+		available = { 
+			set_temp_variable = { loan_size_to_check = 200 }
+			has_less_than_specific_loan_size = yes 
+			SPR = { 
+				set_temp_variable = { loan_size_to_check = 200 }
+				has_less_than_specific_loan_size = yes 
+			}
+			custom_trigger_tooltip = {
+				tooltip = SPR_loan_support_limit_tooltip
+				check_variable = { var = SPR_debt_repayments_level value = 15 compare = less_than_or_equals }
+			}
+			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		
+		visible = { 
+			if = { 
+				limit = { TAG = MEC }
+				has_country_flag = SPR_gives_loan_support_flag
+			}
+			else = { has_civil_war = yes }
+			
+			# Check if at war with relevant South American nations
+			if = {
+				limit = { 
+					OR = { TAG = D01 TAG = D02 TAG = D03 TAG = D04 }
+				}
+				OR = {
+					has_war_with = COL
+					has_war_with = VEN
+					has_war_with = ECU
+					has_war_with = PRU
+					has_war_with = CHL
+					has_war_with = BOL
+					has_war_with = URG
+					has_war_with = BUE
+					has_war_with = ARG
+				}
+			}
+		}
+		
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 0.5 }
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
 		fire_only_once = no
 		days_re_enable = 45
 		days_remove = 7
+		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -0.5 }
 			add_money_with_tooltip_effect = yes
+			
+			# Double cost for non-D0X tags
 			if = {
 				limit = { NOT = { OR = { TAG = D01 TAG = D02 TAG = D03 TAG = D04 } } }
 				set_temp_variable = { money_to_gain = -0.5 }
 				add_money_with_tooltip_effect = yes
 			}
 		}
+		
 		remove_effect = {
 			add_equipment_to_stockpile = {
 				type = infantry_equipment_rifle_1
@@ -104,12 +101,13 @@ war_planning = {
 			}
 			add_war_support = 0.01
 		}
+		
 		ai_will_do = {
 			base = 10
 			modifier = {
 				factor = 0
-				set_temp_variable = { loan_size_to_check = 45}
-    			has_less_than_specific_loan_size = yes
+				set_temp_variable = { loan_size_to_check = 45 }
+				has_less_than_specific_loan_size = yes
 			}
 		}
 	}
@@ -117,14 +115,10 @@ war_planning = {
 
 eoanb_category_war_measures = {
 
+	# Bolivia 1857 Civil War - Win condition mission
 	BOL_1857_civil_war_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
-		available = {
-			controls_province = 8240
-			controls_province = 5230
-		}
-
+		
 		allowed = {
 			OR = {
 				TAG = D01
@@ -134,40 +128,37 @@ eoanb_category_war_measures = {
 				TAG = BOL
 			}
 		}
+		
+		available = {
+			controls_province = 8240
+			controls_province = 5230
+		}
+		
 		activation = { 
 			date < 1858.1.1
 			has_civil_war = yes 
 			if = {
-				limit = { 
-					OR = {
-						TAG = D01
-						TAG = D02
-						TAG = D03
-						TAG = D04
-					}
-				}
+				limit = { OR = { TAG = D01 TAG = D02 TAG = D03 TAG = D04 } }
 				has_war_with = BOL
 			}
 		}
+		
 		selectable_mission = no
 		is_good = no
-
 		fire_only_once = yes
-
-		#cost = 0
-
 		days_mission_timeout = 7200
-
+		
 		highlight_states = {
 			highlight_state_targets = {
 				STATE = 1325
 				STATE = 302
 			}
 		}
-
+		
 		complete_effect = {
 			custom_effect_tooltip = BOL_1857_civil_war_decision_win_war_tooltip
 			hidden_effect = {
+				# Transfer all Bolivian states to ROOT
 				ROOT = {
 					set_state_controller = 1304
 					set_state_controller = 753
@@ -184,265 +175,222 @@ eoanb_category_war_measures = {
 				}
 			}
 		}
+		
+		ai_will_do = { factor = 1 }
 	}
 
+	# Paraguayan War - Triggers intervention event
 	PAR_Paraguayan_War_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 100 }
+		
+		allowed = { TAG = PAR }
+		
 		available = {
 			URG = { surrender_progress > 0.2 }
 			has_war = no
-			hidden_trigger = {
-				has_government = chauvinist_populism
-				OR = {
-					BRA = { has_completed_focus	= BRA_direct_intervention }
-					BRA = { has_completed_focus	= BRA_the_second_cisplatine_war }
-				}
-			}
 		}
-
-		highlight_states = {
-			state = 301
-			state = 1064
-			state = 1072
-		}
-
-		allowed = {
-			TAG = PAR
-		}
+		
 		activation = {
-			hidden_trigger = {
-				has_government = chauvinist_populism
-				OR = {
-					BRA = { has_completed_focus	= BRA_direct_intervention }
-					BRA = { has_completed_focus	= BRA_the_second_cisplatine_war }
-				}
-				has_war = no
-				URG = { surrender_progress > 0.2 }
-				NOT = { has_country_flag = Paraguayan_War }
+			has_government = chauvinist_populism
+			OR = {
+				BRA = { has_completed_focus = BRA_direct_intervention }
+				BRA = { has_completed_focus = BRA_the_second_cisplatine_war }
 			}
+			has_war = no
+			URG = { surrender_progress > 0.2 }
+			NOT = { has_country_flag = Paraguayan_War }
 		}
-		selectable_mission = no
-		is_good = yes
-
-		fire_only_once = no
-
-		#cost = 0
-
-		days_mission_timeout = 100
-
+		
 		cancel_trigger = {
 			URG = { has_war = no }
 		}
-
+		
+		selectable_mission = no
+		is_good = yes
+		fire_only_once = no
+		days_mission_timeout = 100
+		
 		complete_effect = {
-			hidden_effect = {
-				if = {
-					limit = { BRA = { has_completed_focus = BRA_direct_intervention } }
-					PAR = { country_event = { id = par.6 } }
-				}
-				if = {
-					limit = { BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
-					PAR = { country_event = { id = par.18 } }
-				}
+			if = {
+				limit = { BRA = { has_completed_focus = BRA_direct_intervention } }
+				country_event = { id = par.6 }
+			}
+			else_if = {
+				limit = { BRA = { has_completed_focus = BRA_the_second_cisplatine_war } }
+				country_event = { id = par.18 }
 			}
 		}
+		
 		timeout_effect = {
-			hidden_effect = { activate_mission = PAR_Paraguayan_War_decision }
+			activate_mission = PAR_Paraguayan_War_decision
 		}
+		
+		ai_will_do = { factor = 100 }
 	}
 
+	# Triple Alliance Formation (Brazil initiates)
 	BRA_triple_alliance_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 100 }
+		
+		allowed = { original_tag = BRA }
+		
 		available = {
 			BRA = { is_in_faction_with = URC }
 			ARG = { is_in_faction = no }
-			hidden_trigger = {
-				BRA = { has_war_with = PAR }
-				URC = { has_war_with = PAR }
-				ARG = { has_war_with = PAR }
-				NOT = { ARG = { has_war_with = BRA } }
-			}
 		}
-
-		highlight_states = {
-			highlight_state_targets = {
-				state = capital_scope
-			}
-		}
-
-		allowed = {
-			original_tag = BRA
-		}
+		
 		activation = {
-				BRA = { is_in_faction_with = URC }
-				ARG = { is_in_faction = no }
-				NOT = { ARG = { has_war_with = BRA } }
-				BRA = { has_war_with = PAR }
-				ARG = { has_war_with = PAR }
-				URC = { has_war_with = PAR }
+			BRA = { 
+				is_in_faction_with = URC 
+				has_war_with = PAR
+			}
+			URC = { has_war_with = PAR }
+			ARG = { 
+				is_in_faction = no
+				has_war_with = PAR
+				NOT = { has_war_with = BRA }
+			}
 		}
-		selectable_mission = no
-		is_good = yes
-
-		fire_only_once = no
-
-		#cost = 0
-
-		days_mission_timeout = 100
-
+		
 		cancel_trigger = {
 			PAR = { has_war = no }
 		}
-
+		
+		highlight_states = {
+			highlight_state_targets = { state = capital_scope }
+		}
+		
+		selectable_mission = no
+		is_good = yes
+		fire_only_once = no
+		days_mission_timeout = 100
+		
 		complete_effect = {
 			BRA = { country_event = { id = par.12 } }
 		}
+		
 		timeout_effect = {
-			hidden_effect = { activate_mission = BRA_triple_alliance_decision }
+			activate_mission = BRA_triple_alliance_decision
 		}
+		
+		ai_will_do = { factor = 100 }
 	}
 
+	# Triple Alliance Formation (Paraguay counter-alliance)
 	PAR_triple_alliance_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 100 }
+		
+		allowed = { TAG = PAR }
+		
 		available = {
 			BRA = { is_in_faction = no }
-			#URG = { is_in_faction = no }
 			ARG = { is_in_faction = no }
-			hidden_trigger = {
-				PAR = { has_war_with = BRA }
-				ARG = { has_war_with = BRA }
-				NOT = { ARG = { has_war_with = PAR } }
-				URG = { has_war_with = URC }
-			}
 		}
-
-		highlight_states = {
-			highlight_state_targets = {
-				state = capital_scope
-			}
-		}
-
-		allowed = {
-			TAG = PAR
-		}
+		
 		activation = {
-			hidden_trigger = {
-				PAR = { has_war_with = BRA }
-				ARG = { has_war_with = BRA }
-				URG = { has_war_with = URC }
-				BRA = { is_in_faction = no }
-				#URG = { is_in_faction = no }
-				ARG = { is_in_faction = no }
-				NOT = { ARG = { has_war_with = PAR } }
+			PAR = { has_war_with = BRA }
+			ARG = { 
+				has_war_with = BRA
+				NOT = { has_war_with = PAR }
 			}
+			URG = { has_war_with = URC }
+			BRA = { is_in_faction = no }
+			ARG = { is_in_faction = no }
 		}
-		selectable_mission = no
-		is_good = yes
-
-		fire_only_once = no
-
-		#cost = 0
-
-		days_mission_timeout = 100
-
+		
 		cancel_trigger = {
 			BRA = { has_war = no }
 		}
-
+		
+		highlight_states = {
+			highlight_state_targets = { state = capital_scope }
+		}
+		
+		selectable_mission = no
+		is_good = yes
+		fire_only_once = no
+		days_mission_timeout = 100
+		
 		complete_effect = {
-			PAR = { country_event = { id = par.13 } }
+			country_event = { id = par.13 }
 		}
+		
 		timeout_effect = {
-			hidden_effect = { activate_mission = PAR_triple_alliance_decision }
+			activate_mission = PAR_triple_alliance_decision
 		}
+		
+		ai_will_do = { factor = 100 }
 	}
 
-
-
+	# Haiti-Spain War Mission
 	HAI_spain_war_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
+		
+		allowed = {
+			OR = { TAG = HAI TAG = DOM TAG = SPR TAG = USA TAG = FRA }
+		}
+		
 		available = {
-			if = {
-				limit = { TAG = HAI }
-				OR = {
-					1318 = { is_fully_controlled_by = HAI }
-					DOM = { has_country_flag = HAI_spain_war_decision_lost_flag }
-				}
-			}
-			if = {
-				limit = {
+			OR = {
+				# Haiti victory condition
+				AND = {
+					TAG = HAI
 					OR = {
-						TAG = DOM
-						TAG = SPR
-						TAG = USA
-						TAG = FRA
+						1318 = { is_fully_controlled_by = HAI }
+						DOM = { has_country_flag = HAI_spain_war_decision_lost_flag }
 					}
 				}
-				OR = {
-					any_country = {
-						NOT = { TAG = HAI }
-						318 = { is_fully_controlled_by = PREV }
-					}
-					HAI = {
-						OR = {
-							has_capitulated = yes
-							exists = no
-							surrender_progress > 0.9
-							has_country_flag = HAI_spain_war_decision_lost_flag
+				# Spain/Allies victory condition
+				AND = {
+					OR = { TAG = DOM TAG = SPR TAG = USA TAG = FRA }
+					OR = {
+						any_country = {
+							NOT = { TAG = HAI }
+							318 = { is_fully_controlled_by = PREV }
+						}
+						HAI = {
+							OR = {
+								has_capitulated = yes
+								exists = no
+								surrender_progress > 0.9
+								has_country_flag = HAI_spain_war_decision_lost_flag
+							}
 						}
 					}
 				}
 			}
 		}
-
-		allowed = {
-			OR = {
-				TAG = HAI
-				TAG = DOM
-				TAG = SPR
-				TAG = USA
-				TAG = FRA
-			}
-		}
+		
 		activation = { has_country_flag = HAI_spain_war }
 		cancel_trigger = { NOT = { has_country_flag = HAI_spain_war } }
-		selectable_mission = no
-		is_good = no
-
-		fire_only_once = yes
-
-		#cost = 0
-
-		days_mission_timeout = 720
-
+		
 		highlight_states = {
 			highlight_state_targets = {
-				#if = {
-				#	limit = { ROOT = { TAG = HAI } }
-					STATE = 1318
-				#}
-				#else = {
-					STATE = 318
-				#}
+				STATE = 1318
+				STATE = 318
 			}
 		}
-
+		
+		selectable_mission = no
+		is_good = no
+		fire_only_once = yes
+		days_mission_timeout = 720
+		
 		complete_effect = {
+			# Haiti wins
 			if = {
 				limit = {
 					TAG = HAI
 					country_exists = HAI
 					OR = {
-						HAI = { 1318  = { is_fully_controlled_by = PREV } }
+						1318 = { is_fully_controlled_by = HAI }
 						DOM = { has_country_flag = HAI_spain_war_decision_lost_flag }
 					}
 				}
-				HAI = { country_event = { id = dom.41 } }
+				country_event = { id = dom.41 }
+				custom_effect_tooltip = HAI_spain_war_decision_HAI_WIN
 			}
+			# Spain/Allies win
 			else_if = {
 				limit = {
 					OR = {
@@ -452,8 +400,12 @@ eoanb_category_war_measures = {
 						}
 						HAI = { has_country_flag = HAI_spain_war_decision_lost_flag }
 						NOT = { country_exists = HAI }
-						HAI = { has_capitulated = yes }
-						HAI = { surrender_progress > 0.9 }
+						HAI = { 
+							OR = {
+								has_capitulated = yes
+								surrender_progress > 0.9
+							}
+						}
 					}
 				}
 				if = {
@@ -468,25 +420,15 @@ eoanb_category_war_measures = {
 					}
 					DOM = { OVERLORD = { country_event = { id = dom.42 } } }
 				}
-				else = { 1318 = { OWNER = { country_event = { id = dom.42 } } } }
-			}
-			if = {
-				limit = {
-					OR = {
-						TAG = DOM
-						TAG = SPR
-						TAG = USA
-						TAG = FRA
-					}
+				else = {
+					1318 = { OWNER = { country_event = { id = dom.42 } } }
 				}
 				custom_effect_tooltip = HAI_spain_war_decision_SPR_WIN
 			}
-			if = {
-				limit = { TAG = HAI }
-				custom_effect_tooltip = HAI_spain_war_decision_HAI_WIN
-			}
 		}
+		
 		timeout_effect = {
+			# Spain wins on timeout
 			if = {
 				limit = {
 					OR = {
@@ -510,8 +452,11 @@ eoanb_category_war_measures = {
 					}
 					DOM = { OVERLORD = { country_event = { id = dom.42 } } }
 				}
-				else = { 1318 = { OWNER = { country_event = { id = dom.42 } } } }
+				else = {
+					1318 = { OWNER = { country_event = { id = dom.42 } } }
+				}
 			}
+			# White peace if Haiti survives
 			else = {
 				every_country = {
 					limit = {
@@ -520,39 +465,40 @@ eoanb_category_war_measures = {
 					}
 					white_peace = HAI
 				}
-				hidden_effect = {
-					HAI = {
-						remove_ideas = HAI_liberation_of_hispaniola
-						clr_country_flag = HAI_spain_war
+				HAI = {
+					remove_ideas = HAI_liberation_of_hispaniola
+					clr_country_flag = HAI_spain_war
+				}
+			}
+		}
+		
+		ai_will_do = { factor = 1 }
+	}
+
+	# Dominican Restoration War
+	DOM_spain_war_decision = {
+		icon = generic_prepare_civil_war
+		
+		allowed = {
+			OR = { TAG = DOM TAG = SPR }
+		}
+		
+		available = {
+			OR = {
+				AND = {
+					TAG = DOM
+					1318 = { is_fully_controlled_by = DOM }
+				}
+				AND = {
+					TAG = SPR
+					OR = {
+						1318 = { is_fully_controlled_by = DOM }
+						NOT = { country_exists = DOM }
 					}
 				}
 			}
 		}
-	}
-
-	DOM_spain_war_decision = {
-		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
-		available = {
-			if = {
-				limit = { TAG = DOM }
-				1318 = { is_fully_controlled_by = DOM }
-			}
-			if = {
-				limit = { TAG = SPR }
-				OR = {
-					1318 = { is_fully_controlled_by = DOM }
-					NOT = { country_exists = DOM }
-				}
-			}
-		}
-
-		allowed = {
-			OR = {
-				TAG = DOM
-				TAG = SPR
-			}
-		}
+		
 		activation = {
 			DOM = {
 				OR = {
@@ -561,259 +507,225 @@ eoanb_category_war_measures = {
 				}
 			}
 		}
-		selectable_mission = no
-		is_good = no
-
-		fire_only_once = no
-
-		#cost = 0
-
-		days_mission_timeout = 720
-
+		
 		highlight_states = {
 			highlight_state_targets = {
-				#if = {
-				#	limit = { ROOT = { TAG = DOM } }
-					STATE = 1318
-				#}
-				#else_if = {
-				#	limit = { ROOT = { TAG = SPR } }
-					STATE = 319
-				#}
+				STATE = 1318
+				STATE = 319
 			}
 		}
-
+		
+		selectable_mission = no
+		is_good = no
+		fire_only_once = no
+		days_mission_timeout = 720
+		
 		complete_effect = {
+			# Dominican victory
 			if = {
 				limit = {
 					TAG = DOM
 					country_exists = DOM
 					1318 = { is_fully_controlled_by = DOM }
 				}
-				DOM = { country_event = { id = dom.46 } }
+				country_event = { id = dom.46 }
+				custom_effect_tooltip = DOM_spain_war_decision_DOM_WIN
 			}
+			# Spanish victory
 			else_if = {
 				limit = {
 					TAG = SPR
 					319 = { is_fully_controlled_by = SPR }
 				}
-				#SPR = { country_event = { id = hispaniola.12 } }  #Not a real event?
-				hidden_effect = {
-					remove_ideas = DOM_restoration_war
-					remove_ideas = DOM_restoration_war2
-				}
-			}
-			if = {
-				limit = { TAG = SPR }
+				remove_ideas = DOM_restoration_war
+				remove_ideas = DOM_restoration_war2
 				custom_effect_tooltip = DOM_spain_war_decision_SPR_WIN
 			}
-			if = {
-				limit = { TAG = DOM }
-				custom_effect_tooltip = DOM_spain_war_decision_DOM_WIN
-			}
 		}
+		
 		timeout_effect = {
 			activate_mission = DOM_spain_war_decision
 		}
+		
+		ai_will_do = { factor = 1 }
 	}
 
+	# Jamaica Independence War
 	JAM_english_war_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
+		
+		allowed = {
+			OR = { TAG = JAM TAG = ENG }
+		}
+		
 		available = {
-			if = {
-				limit = { TAG = JAM }
-				689 = { is_fully_controlled_by = JAM }
-				#hidden_trigger = { NOT = {	has_idea = JAM_placeholder } }
-			}
-			if = {
-				limit = { TAG = ENG }
-				OR = {
-					689 = { is_fully_controlled_by = ENG }
-					NOT = { country_exists = JAM }
+			OR = {
+				AND = {
+					TAG = JAM
+					689 = { is_fully_controlled_by = JAM }
+				}
+				AND = {
+					TAG = ENG
+					OR = {
+						689 = { is_fully_controlled_by = ENG }
+						NOT = { country_exists = JAM }
+					}
 				}
 			}
 		}
-
-		allowed = {
-			OR = {
-				TAG = JAM
-				TAG = ENG
-			}
-		}
+		
 		activation = {
 			JAM = {
 				has_war_with = ENG
 				has_country_flag = JAM_KINGSTON_1
 			}
 		}
+		
+		highlight_states = {
+			highlight_state_targets = { STATE = 689 }
+		}
+		
 		selectable_mission = no
 		is_good = no
-
 		fire_only_once = no
-
-		#cost = 0
-
 		days_mission_timeout = 720
-
-		highlight_states = {
-			highlight_state_targets = {
-				STATE = 689
-			}
-		}
-
+		
 		complete_effect = {
+			# Jamaican victory
 			if = {
 				limit = {
 					TAG = JAM
 					country_exists = JAM
 					689 = { is_fully_controlled_by = JAM }
 					has_country_flag = JAM_KINGSTON_1
-					#NOT = {	has_idea = JAM_placeholder }
 				}
-				hidden_effect = { JAM = { country_event = { id = britishcaribbean.13 } } }
+				country_event = { id = britishcaribbean.13 }
+				custom_effect_tooltip = JAM_english_war_decision_JAM_WIN
 			}
-			if = {
+			# English victory
+			else_if = {
 				limit = {
 					TAG = ENG
 					689 = { is_fully_controlled_by = ENG }
 				}
-				hidden_effect = { ENG = { country_event = { id = britishcaribbean.12 } } }
-			}
-			if = {
-				limit = { TAG = ENG }
+				country_event = { id = britishcaribbean.12 }
 				custom_effect_tooltip = JAM_english_war_decision_ENG_WIN
 			}
-			if = {
-				limit = { TAG = JAM }
-				custom_effect_tooltip = JAM_english_war_decision_JAM_WIN
-			}
 		}
+		
 		timeout_effect = {
-			hidden_effect = { activate_mission = JAM_english_war_decision }
+			activate_mission = JAM_english_war_decision
 		}
+		
+		ai_will_do = { factor = 1 }
 	}
 
+	# Puerto Rico - Lares Revolt
 	PRT_spain_war_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
+		
+		allowed = { TAG = SPR }
+		
 		available = {
 			OR = {
 				686 = { is_fully_controlled_by = JAM }
 				NOT = { country_exists = PRT }
 			}
 		}
-
-		allowed = { TAG = SPR }
+		
 		activation = {
 			SPR = { has_war_with = PRT }
 			PRT = { has_country_flag = PRT_Lares }
 		}
+		
+		highlight_states = {
+			highlight_state_targets = { STATE = 686 }
+		}
+		
 		selectable_mission = no
 		is_good = no
-
 		fire_only_once = no
-
-		#cost = 0
-
 		days_mission_timeout = 900
-
-		highlight_states = {
-			highlight_state_targets = {
-				STATE = 686
-			}
-		}
-
+		
 		complete_effect = {
-			hidden_effect = {
-				SPR = { transfer_state = 686 }
-				SPR = { set_country_flag = SPR_Lares_end }
-				PRT = { clr_country_flag = PRT_Lares }
-				country_event = { id = spain_caribbean.6 days = 3 }
-			}
+			SPR = { transfer_state = 686 }
+			SPR = { set_country_flag = SPR_Lares_end }
+			PRT = { clr_country_flag = PRT_Lares }
 			custom_effect_tooltip = PRT_spain_war_decision_SPR_WIN
+			country_event = { id = spain_caribbean.6 days = 3 }
 		}
+		
 		timeout_effect = {
 			activate_mission = PRT_spain_war_decision
 		}
+		
+		ai_will_do = { factor = 1 }
 	}
 
+	# Brazil-France Guyana War 1857
 	BRA_guyana_war_1857_decision = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 1 }
+		
+		allowed = {
+			OR = { TAG = BRA TAG = FRA }
+		}
+		
 		available = {
-			if = {
-				limit = { TAG = BRA }
-				has_full_control_of_state = 310
-			}
-			if = {
-				limit = { TAG = FRA }
-				OR = {
-					FRA = { has_full_control_of_state = 1323 }
-					NOT = { country_exists = BRA }
+			OR = {
+				AND = {
+					TAG = BRA
+					has_full_control_of_state = 310
+				}
+				AND = {
+					TAG = FRA
+					OR = {
+						has_full_control_of_state = 1323
+						NOT = { country_exists = BRA }
+					}
 				}
 			}
 		}
-
-		highlight_states = {
-			highlight_state_targets = {
-				#if = {
-				#	limit = { ROOT = { TAG = BRA } }
-					STATE = 310
-				#}
-				#else_if = {
-					# limit = { ROOT = { TAG = FRA } }
-				#	STATE = 1323
-				#}
-			}
-		}
-
-		allowed = {
-			OR = {
-				TAG = BRA
-				TAG = FRA
-			}
-		}
+		
 		activation = {
 			BRA = { has_country_flag = BRA_guyana_war_1857 }
 			FRA = { has_country_flag = BRA_guyana_war_1857 }
 		}
+		
+		highlight_states = {
+			highlight_state_targets = { STATE = 310 }
+		}
+		
 		selectable_mission = no
 		is_good = no
-
 		fire_only_once = no
-
-		#cost = 0
-
 		days_mission_timeout = 300
-
+		
 		complete_effect = {
+			# Brazilian victory
 			if = {
 				limit = {
 					TAG = BRA
 					country_exists = BRA
 					310 = { is_fully_controlled_by = BRA }
 				}
-				BRA = { country_event = { id = brazil.21 } }
+				country_event = { id = brazil.21 }
+				custom_effect_tooltip = BRA_guyana_war_decision_BRA_WIN
 			}
+			# French victory
 			else_if = {
 				limit = {
 					TAG = FRA
 					1323 = { is_fully_controlled_by = FRA }
 				}
-				FRA = { country_event = { id = brazil.22 } }
-			}
-			if = {
-				limit = { TAG = FRA }
+				country_event = { id = brazil.22 }
 				custom_effect_tooltip = BRA_guyana_war_decision_FRA_WIN
 			}
-			if = {
-				limit = { TAG = BRA }
-				custom_effect_tooltip = BRA_guyana_war_decision_BRA_WIN
-			}
 		}
+		
 		timeout_effect = {
-			hidden_effect = { activate_mission = BRA_guyana_war_1857_decision }
+			activate_mission = BRA_guyana_war_1857_decision
 		}
+		
+		ai_will_do = { factor = 1 }
 	}
 }
