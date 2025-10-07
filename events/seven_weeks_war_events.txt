@@ -44,7 +44,7 @@ country_event = {
 		hidden_effect = {
 			PRS = { country_event = { days = 150 id = sevenweekswar.2 } }
 			PRS = { clr_country_flag = PRS_gastein_convetion }
-			FRA = { country_event = { id = nap_france.1234 } }
+			FRA = { country_event = { id = france.20234 } }
 		}
 	}
 }
@@ -185,7 +185,7 @@ country_event = {
 		add_dynamic_modifier = { modifier = dynmod_PRS_war_preparations }
 		custom_effect_tooltip = PRS_war_preparations_effect_tt
 		set_variable = { PRS_war_preparations_cgf = 0.15 tooltip = consumer_goods_expected_value_tooltip }
-		set_variable = { PRS_war_preparations_icf = 0.05 tooltip = industrial_capacity_factor_tooltip }
+		set_variable = { PRS_war_preparations_icf = 0.05 tooltip = industrial_capacity_factory_tooltip }
 		set_variable = { PRS_war_preparations_pfmef = 0.05 tooltip = production_factory_max_efficiency_factor_tooltip }
 		hidden_effect = {
 			PRS = { country_event = { days = 7 id = sevenweekswar.7 } }
@@ -299,7 +299,7 @@ country_event = {
 		ai_chance = { base = 100 }
 		custom_effect_tooltip = PRS_war_preparations_effect_tt
 		add_to_variable = { PRS_war_preparations_cgf = 0.05 tooltip = consumer_goods_expected_value_tooltip }
-		add_to_variable = { PRS_war_preparations_icf = 0.05 tooltip = industrial_capacity_factor_tooltip }
+		add_to_variable = { PRS_war_preparations_icf = 0.05 tooltip = industrial_capacity_factory_tooltip }
 		add_to_variable = { PRS_war_preparations_pfmef = 0.05 tooltip = production_factory_max_efficiency_factor_tooltip }
 		set_variable = { PRS_war_preparations_pfegf = 0.05 tooltip = production_factory_efficiency_gain_factor_tooltip }
 	}
@@ -324,12 +324,28 @@ country_event = {
 		add_war_support = 0.02
 		if = {
 			limit = {
-				has_idea = PRS_dreyse_rifle_1
+				is_ai = no
 			}
-			swap_ideas = { remove_idea = PRS_dreyse_rifle_1 add_idea = PRS_dreyse_rifle_2 }
+			if = {
+				limit = {
+					has_idea = PRS_dreyse_rifle_1
+				}
+				swap_ideas = { remove_idea = PRS_dreyse_rifle_1 add_idea = PRS_dreyse_rifle_2 }
+			}
+			else = {
+				add_ideas = PRS_dreyse_rifle_1
+			}
 		}
 		else = {
-			add_ideas = PRS_dreyse_rifle_1
+			if = {
+				limit = {
+					has_idea = PRS_dreyse_rifle_ai_1
+				}
+				swap_ideas = { remove_idea = PRS_dreyse_rifle_ai_1 add_idea = PRS_dreyse_rifle_ai_2 }
+			}
+			else = {
+				add_ideas = PRS_dreyse_rifle_ai_1
+			}
 		}
 	}
 }
@@ -1882,6 +1898,7 @@ country_event = {
 			PRS = { dismantle_faction = yes }
 			AUS = { dismantle_faction = yes }
 			remove_mission = PRS_mission_german_war
+			set_global_flag = eoanb_flag_seven_weeks_war_end
 			clr_global_flag = eoanb_flag_seven_weeks_war_ongoing
 			AUS = {
 				remove_ideas = PRS_idea_weakened_sww
@@ -2029,6 +2046,7 @@ country_event = {
 			PRS = { dismantle_faction = yes }
 			AUS = { dismantle_faction = yes }
 			remove_mission = PRS_mission_german_war
+			set_global_flag = eoanb_flag_seven_weeks_war_end
 			clr_global_flag = eoanb_flag_seven_weeks_war_ongoing
 			clr_country_flag = PRS_signs_of_war_GC_flag
 			AUS = { remove_ideas = PRS_idea_weakened_sww }
@@ -2209,8 +2227,24 @@ country_event = {
 		add_political_power = 25
 		add_stability = 0.02
 		add_ideas = GC_idea_schutz_und_trutz
-		ROOT = { give_guarantee = PRS }
-		PRS = { give_guarantee = ROOT }
+		ROOT = {
+			give_guarantee = PRS
+			give_military_access = PRS
+			diplomatic_relation = {
+				country = PRS
+				relation = non_aggression_pact
+				active = no
+			}
+		}
+		PRS = {
+			give_guarantee = ROOT
+			give_military_access = ROOT
+			diplomatic_relation = {
+				country = ROOT
+				relation = non_aggression_pact
+				active = no
+			}
+		}
 	}
 	
 	option = {
@@ -2608,6 +2642,8 @@ country_event = {
 			PRS = { transfer_state = 1061 }
 			PRS = { remove_ideas = PRS_dreyse_rifle_1 }
 			PRS = { remove_ideas = PRS_dreyse_rifle_2 }
+			PRS = { remove_ideas = PRS_dreyse_rifle_ai_1 }
+			PRS = { remove_ideas = PRS_dreyse_rifle_ai_2 }
 		}
 	}
 }
@@ -3221,6 +3257,8 @@ country_event = {
 			add_ideas = PRS_idea_rapid_expansion
 			remove_ideas = PRS_dreyse_rifle_1
 			remove_ideas = PRS_dreyse_rifle_2
+			remove_ideas = PRS_dreyse_rifle_ai_1
+			remove_ideas = PRS_dreyse_rifle_ai_2
 			PRS = { set_variable = { rival_country = FRA.id } }
 		}
 		complete_national_focus = PRS_focus_north_german_confederation

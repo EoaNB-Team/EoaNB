@@ -1,4 +1,4 @@
-version="0.5.9"
+version="0.6.0"
 tags={
 	"Alternative History"
 	"Events"
@@ -10,7 +10,7 @@ tags={
 	"National Focuses"
 	"Technologies"
 }
-name="End of a New Beginning - Official GitHub Version"
+name="End of a New Beginning - Official Github Version"
 picture="thumbnail.png"
 replace_path="common/abilities"
 replace_path="common/ai_areas"
@@ -62,6 +62,7 @@ replace_path="scenario_tests"
 replace_path="scenario_tests/effects"
 replace_path="scenario_tests/tests"
 replace_path="scenario_tests/triggers"
+replace_path="music"
 supported_version="1.16.*"
 path="mod/EOANB/EoaNB"
 remote_file_id="2856963714"
