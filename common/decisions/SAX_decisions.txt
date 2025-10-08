@@ -121,6 +121,304 @@ SAX_decision_category_foreign_policy = {
 	}
 }
 
+eoanb_decision_category_schleswig_holstein_question = {
+
+	#File for Federal Intervention Against Denmark
+	SAX_decision_file_for_federal_intervention = {
+
+		icon = politics
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.4
+			has_war_support > 0.4
+			power_balance_value = {
+				id = SAX_Balance_of_Power_Trias
+				value > 0.5
+			}
+		}
+
+		visible = {
+			has_country_flag = SAX_event_federal_execution_granted_flag
+			has_country_flag = SAX_unanimous_support_for_augustenburger_flag
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_second_schleswig_war
+					has_global_flag = eoanb_flag_second_schleswig_war_gc
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+		complete_effect = {
+			country_event = { days = 1 id = secschwar.501 }
+		}
+		
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	#Issue an Ultimatum to Denmark
+	SAX_decision_issue_ultimatum_to_denmark = {
+
+		icon = politics
+		
+		allowed = { tag = SAX }
+
+		available = {
+			has_war_support > 0.5
+		}
+
+		visible = {
+			has_country_flag = SAX_gc_federal_intervention_passed_flag
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_second_schleswig_war
+					has_global_flag = eoanb_flag_second_schleswig_war_gc
+				}
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 25
+		
+		complete_effect = {
+			DEN = {
+				country_event = { id = secschwar.511 }
+			}
+			hidden_effect = {
+				clear_variable = GC_federal_intervention
+			}
+		}
+		
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	#Invade Schleswig
+	SAX_decision_invade_schleswig = {
+
+		icon = generic_prepare_civil_war
+
+		allowed = { tag = SAX }
+
+		available = {
+			has_war_support > 0.5
+		}
+
+		visible = {
+			has_country_flag = SAX_denmark_ultimatum_expired_flag
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_second_schleswig_war
+					has_global_flag = eoanb_flag_second_schleswig_war_gc
+				}
+			}
+		}
+
+		cancel_trigger = {
+			OR = {
+				has_global_flag = eoanb_flag_second_schleswig_war
+				has_global_flag = eoanb_flag_second_schleswig_war_gc
+			}
+		}
+
+		fire_only_once = yes
+
+		cost = 0
+
+		days_remove = 10
+
+		war_with_on_remove = DEN
+
+		complete_effect = {
+			add_war_support = 0.05
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							has_global_flag = eoanb_flag_second_schleswig_war
+							has_global_flag = eoanb_flag_second_schleswig_war_gc
+						}
+					}
+					OR = {
+						DEN = { owns_state = 949 }
+						HAN = { owns_state = 949 }
+						PRS = { owns_state = 949 }
+					}
+				}
+				transfer_state = 949
+			}
+		}
+
+		remove_effect = {
+			country_event = { id = secschwar.517 }
+			if = {
+				limit = {
+					NOT = {
+						OR = {
+							has_global_flag = eoanb_flag_second_schleswig_war
+							has_global_flag = eoanb_flag_second_schleswig_war_gc
+						}
+					}
+					OR = {
+						DEN = { owns_state = 949 }
+						HAN = { owns_state = 949 }
+						PRS = { owns_state = 949 }
+					}
+				}
+				transfer_state = 949
+			}
+			hidden_effect = {
+				clr_country_flag = SAX_denmark_ultimatum_expired_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 10000
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
+		}
+	}
+
+	#The Second Schleswig War
+	SAX_mission_second_schleswig_war = {
+		
+		icon = generic_ignite_civil_war
+		
+		allowed = { always = no }
+		
+		available = {
+			if = {
+				limit = {
+					tag = SAX
+				}
+				OR = {
+					AND = {
+						949 = {
+							NOT = { is_controlled_by = DEN }
+						}
+						58 = {
+							NOT = { is_controlled_by = DEN }
+						}
+						1032 = {
+							NOT = { is_controlled_by = DEN }
+						}
+						99 = {
+							NOT = { is_controlled_by = DEN }
+						}
+						37 = {
+							NOT = { is_fully_controlled_by = DEN }
+						}
+					}
+					DEN = { casualties > 6000 }
+				}
+			}
+			if = {
+				limit = {
+					tag = DEN
+				}
+				date > 1864.4.1
+				949 = {
+					is_fully_controlled_by = DEN
+				}
+				58 = {
+					is_fully_controlled_by = DEN
+				}
+				1032 = {
+					is_fully_controlled_by = DEN
+				}
+				99 = {
+					is_fully_controlled_by = DEN
+				}
+				37 = {
+					is_fully_controlled_by = DEN
+				}
+				NOT = {
+					DEN = { casualties > 6000 }
+				}
+			}
+		}
+
+		activation = { always = no }
+
+		priority = 100
+
+		selectable_mission = no
+
+		is_good = no
+
+		days_mission_timeout = 240
+
+		timeout_effect = {
+			if = {
+				limit = {
+					tag = SAX
+				}
+				every_country = {
+					limit = {
+						has_war_with = DEN
+						OR = {
+							is_part_of_the_german_confederation = yes
+							overlord = { is_part_of_the_german_confederation = yes }
+						}
+					}
+					white_peace = DEN
+				}
+				country_event = {
+					id = secschwar.541
+				}
+			}
+		}
+
+		complete_effect = {
+			if = {
+				limit = {
+					tag = SAX
+				}
+				custom_effect_tooltip = SAX_mission_second_schleswig_war_SAX_effect_tt
+				hidden_effect = {
+					DEN = {
+						country_event = {
+							id = secschwar.521
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					tag = DEN
+				}
+				custom_effect_tooltip = SAX_mission_second_schleswig_war_DEN_effect_tt
+				hidden_effect = {
+					SAX = {
+						country_event = {
+							id = secschwar.531
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 SAX_decision_category_trias_policy = {
 	
 	#The Trias Policy
@@ -174,7 +472,10 @@ SAX_decision_category_trias_policy = {
 		}
 		
 		complete_effect = {
-			#
+			add_power_balance_value = {
+				id = SAX_Balance_of_Power_Trias
+				value = 0.03
+			}
 		}
 
 		ai_will_do = {
@@ -794,7 +1095,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -861,7 +1162,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -928,7 +1229,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -995,7 +1296,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1062,7 +1363,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1129,7 +1430,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_POSITIVE_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.02
+				value = 0.01
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1198,7 +1499,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = BAD modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1265,7 +1566,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = BAV modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1332,7 +1633,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HAN modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1399,7 +1700,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HES modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1466,7 +1767,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = HSD modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1533,7 +1834,7 @@ SAX_decision_category_trias_policy = {
 			reverse_add_opinion_modifier = { target = WUR modifier = SAX_GC_BUNDESREFORM_SUPPORT_REL }
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value = 0.03
+				value = 0.02
 			}
 			hidden_effect = {
 				clr_country_flag = SAX_decision_trias_diplomatic_mission_flag
@@ -1802,7 +2103,7 @@ SAX_decision_category_trias_policy = {
 			PS_pol_positive = yes
 			power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value > 0.1
+				value > 0.4
 			}
 		}
 
@@ -1852,7 +2153,7 @@ SAX_decision_category_trias_policy = {
 			PS_pol_positive = yes
 			power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
-				value > 0.2
+				value > 0.5
 			}
 		}
 
@@ -2100,14 +2401,141 @@ SAX_decision_category_trias_policy = {
 		}
 		
 		remove_effect = {
-			unlock_decision_tooltip = SAX_decision_prepare_a_trias_conference_in_dresden
+			if = {
+				limit = {
+					has_completed_focus = SAX_focus_support_augustenburger
+				}
+				unlock_decision_tooltip = SAX_decision_gather_support_for_the_augustenburger
+			}
 			add_power_balance_value = {
 				id = SAX_Balance_of_Power_Trias
 				value = 0.02
 			}
+			set_country_flag = SAX_decision_trias_idea_ready_flag
 			hidden_effect = {
 				clr_country_flag = SAX_decision_refine_trias_idea_flag
-				set_country_flag = SAX_decision_trias_idea_ready_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Gather Support for the Augustenburger
+	SAX_decision_gather_support_for_the_augustenburger = {
+
+		icon = politics
+		
+		#allowed = { tag = SAX }
+
+		available = {
+			has_country_flag = SAX_decision_trias_idea_ready_flag
+			has_country_flag = SAX_decision_support_augustenburger_ready_flag
+			has_completed_focus = SAX_focus_support_augustenburger
+			has_stability > 0.5
+			PS_pol_positive = yes
+			has_war = no
+			power_balance_value = {
+				id = SAX_Balance_of_Power_Trias
+				value > 0.5
+			}
+		}
+
+		visible = {
+			OR = {
+				has_country_flag = SAX_decision_trias_idea_ready_flag
+				has_completed_focus = SAX_focus_support_augustenburger
+			}
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_second_schleswig_war
+					has_global_flag = eoanb_flag_second_schleswig_war_gc
+				}
+			}
+		}
+
+		cancel_trigger = {
+			OR = {
+				has_global_flag = eoanb_flag_second_schleswig_war
+				has_global_flag = eoanb_flag_second_schleswig_war_gc
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 7
+		 
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = SAX_decision_gather_support_for_the_augustenburger_effect_tt
+			country_event = { id = saxony.352 }
+		}
+		
+		ai_will_do = {
+			base = 1000
+		}
+	}
+
+	#Try to Persuade the Sceptics
+	SAX_decision_persuade_sceptics_for_the_augustenburger = {
+
+		icon = politics
+		
+		#allowed = { tag = SAX }
+
+		available = {
+			has_stability > 0.5
+			PS_pol_positive = yes
+			has_war = no
+			power_balance_value = {
+				id = SAX_Balance_of_Power_Trias
+				value > 0.5
+			}
+		}
+
+		visible = {
+			has_country_flag = SAX_persuade_sceptics_augustenburger_flag
+			NOT = {
+				OR = {
+					has_global_flag = eoanb_flag_second_schleswig_war
+					has_global_flag = eoanb_flag_second_schleswig_war_gc
+				}
+			}
+		}
+
+		cancel_trigger = {
+			OR = {
+				has_global_flag = eoanb_flag_second_schleswig_war
+				has_global_flag = eoanb_flag_second_schleswig_war_gc
+			}
+		}
+
+		fire_only_once = yes
+		
+		cost = 100
+		
+		days_remove = 7
+		 
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = SAX_decision_persuade_sceptics_for_the_augustenburger_effect_tt
+			every_other_country = {
+				limit = {
+					has_country_flag = SAX_trias_augustenburger_support_undecided_flag
+				}
+				country_event = { id = saxony.358 days = 1 }
+			}
+			hidden_effect = {
+				country_event = { id = saxony.361 days = 14 }
 			}
 		}
 		
@@ -2135,6 +2563,7 @@ SAX_decision_category_trias_policy = {
 
 		visible = {
 			has_country_flag = SAX_decision_trias_idea_ready_flag
+			has_completed_focus = SAX_focus_trias_succeeds
 		}
 
 		fire_only_once = yes
@@ -3096,6 +3525,7 @@ SAX_decision_category_economy = {
 				amount = 1
 				state = 65
 			}
+			EOANBSYS_institutions_innovative_add_one = yes
 			set_temp_variable = {
 				unemployment_value = -0.0002
 			}
@@ -3992,9 +4422,9 @@ SAX_decision_category_economy = {
 		
 		complete_effect = {
 			custom_effect_tooltip = eoanb_financial_investment_ongoing_effect_tt
+			add_political_power = -150
 			set_temp_variable = { money_to_gain = -2 }
 			add_money_with_inflation_included_with_tooltip_effect = yes
-			add_political_power = -150
 			hidden_effect = { 
 				set_country_flag = eoanb_financial_investment_ongoing_flag 
 			}
@@ -4002,16 +4432,55 @@ SAX_decision_category_economy = {
 		
 		remove_effect = {
 			add_stability = 0.05
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = humanities_tech }
 			set_temp_variable = { eoanb_prestige_change = 2 }
 			eoanb_change_prestige_score = yes
 			EOANBSYS_institutions_innovative_add_two = yes
+			unlock_decision_tooltip = SAX_decision_take_cheap_loan
 			hidden_effect = {
 				clr_country_flag = eoanb_financial_investment_ongoing_flag
+				set_country_flag = SAX_saxon_bank_dresden_founded_flag
 			}
 		}
 
 		ai_will_do = {
 			base = 1000
+		}
+	}
+
+	#Take a Cheap Loan with the Sächsische Bank
+	SAX_decision_take_cheap_loan = {
+
+		icon = money
+
+		#allowed = { tag = SAX }
+		
+		available = {
+			has_stability > 0.3
+			set_temp_variable = { loan_size_to_check = 50 }
+			has_less_than_specific_loan_size = yes
+		}
+
+		visible = {
+			has_country_flag = SAX_saxon_bank_dresden_founded_flag
+		}
+
+		cost = 50
+		
+		days_re_enable = 1825
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 5 }
+			take_loan_without_inflation_effect = yes
+		}
+
+		ai_will_do = {
+			base = 1000
+			modifier = {
+				factor = 0
+				set_temp_variable = { loan_size_to_check = 20 }
+				has_more_than_specific_loan_size = yes
+			}
 		}
 	}
 }
