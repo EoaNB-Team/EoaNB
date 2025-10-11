@@ -82,7 +82,7 @@ country_event = {
 	option = {
 		name = secschwar.4.a
 		ai_chance = { base = 100 }
-		add_war_support = 0.05
+		add_war_support = 0.03
 		add_political_power = 10
 		if = {
 			limit = {
@@ -200,17 +200,8 @@ country_event = {
 					is_part_of_the_german_confederation = yes
 				}
 				country_event = { days = 1 id = secschwar.9 }
+				country_event = { days = 10 id = secschwar.53 }
 			}
-			BAD = { country_event = { days = 15 id = secschwar.53 } }
-			BAV = { country_event = { days = 15 id = secschwar.53 } }
-			HAN = { country_event = { days = 15 id = secschwar.53 } }
-			HES = { country_event = { days = 15 id = secschwar.53 } }
-			HSD = { country_event = { days = 15 id = secschwar.53 } }
-			NAS = { country_event = { days = 15 id = secschwar.53 } }
-			MCK = { country_event = { days = 15 id = secschwar.53 } }
-			SAX = { country_event = { days = 15 id = secschwar.53 } }
-			THU = { country_event = { days = 15 id = secschwar.53 } }
-			WUR = { country_event = { days = 15 id = secschwar.53 } }
 			DEN = { country_event = { days = 3 id = secschwar.10 } }
 		}
 	}
@@ -228,7 +219,7 @@ country_event = {
 	option = {
 		name = secschwar.9.a
 		ai_chance = { base = 100 }
-		add_war_support = 0.05
+		add_war_support = 0.03
 	}
 }
 
@@ -242,6 +233,7 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Sign the constitution.
 	option = {
 		name = secschwar.10.a
 		ai_chance = { base = 100 }
@@ -262,6 +254,7 @@ country_event = {
 		}
 	}
 	
+	#Refuse to sign the constitution.
 	option = {
 		name = secschwar.10.b
 		ai_chance = { base = 0 }
@@ -293,7 +286,7 @@ country_event = {
 	option = {
 		name = secschwar.11.a
 		ai_chance = { base = 100 }
-		add_war_support = 0.05
+		add_war_support = 0.03
 		add_opinion_modifier = { target = DEN modifier = PRS_SCHLESWIG_SCANDAL_2_REL }
 		reverse_add_opinion_modifier = { target = DEN modifier = PRS_SCHLESWIG_SCANDAL_2_REL }
 	}
@@ -346,7 +339,7 @@ country_event = {
 	option = {
 		name = secschwar.14.a
 		ai_chance = { 
-			base = 60
+			base = 70
 			modifier = {
 				factor = 5
 				OR = {
@@ -369,7 +362,7 @@ country_event = {
 	option = {
 		name = secschwar.14.b
 		ai_chance = { 
-			base = 40
+			base = 30
 			modifier = {
 				factor = 5
 				OR = {
@@ -441,8 +434,25 @@ country_event = {
 			}
 			custom_effect_tooltip = PRS_event_federal_execution_granted_tt
 			hidden_effect = {
-				PRS = { set_country_flag = PRS_event_federal_execution_granted_flag }
+				set_country_flag = PRS_event_federal_execution_granted_flag
 				clear_variable = GC_federal_execution
+			}
+		}
+		if = {
+			limit = {
+				tag = SAX
+			}
+			if = {
+				limit = {
+					has_country_flag = SAX_unanimous_support_for_augustenburger_flag
+				}
+				unlock_decision_tooltip = SAX_decision_file_for_federal_intervention
+			}
+			else = {
+				custom_effect_tooltip = SAX_decision_file_for_federal_intervention_trigger_tt
+			}
+			hidden_effect = {
+				set_country_flag = SAX_event_federal_execution_granted_flag
 			}
 		}
 		add_political_power = 10
@@ -453,7 +463,7 @@ country_event = {
 	}
 }
 
-#GC - Activate Federal Execution Against Denmark – Motion Denied  
+#GC - Activate Federal Execution Against Denmark – Motion Denied
 country_event = {
 	id = secschwar.17
 	title = secschwar.17.t
@@ -469,14 +479,14 @@ country_event = {
 			limit = {
 				tag = PRS
 			}
-			unlock_decision_tooltip = PRS_decision_PRS_ITA_alliance
+			unlock_decision_tooltip = PRS_decision_cooperate_with_austria
 			hidden_effect = {
 				PRS = { set_country_flag = PRS_event_federal_execution_denied_flag }
 				clear_variable = GC_federal_execution
 			}
 		}
 		add_political_power = -10
-		add_war_support = -0.15
+		add_war_support = -0.25
 		hidden_effect = {
 			DEN = { country_event = { days = 1 id = secschwar.19 } }
 		}
@@ -521,7 +531,7 @@ country_event = {
 	option = {
 		name = secschwar.19.a
 		ai_chance = { base = 100 }
-		add_war_support = -0.1
+		add_war_support = -0.15
 		add_political_power = 25
 	}
 }
@@ -690,6 +700,15 @@ country_event = {
 	picture = GFX_event_danish_retreat
 	
 	is_triggered_only = yes
+
+	trigger = {
+		NOT = {
+			OR = {
+				has_global_flag = eoanb_flag_second_schleswig_war_trias
+				SAX = { has_decision = SAX_decision_invade_schleswig }
+			}
+		}
+	}
 	
 	option = {
 		name = secschwar.22.a
@@ -849,13 +868,27 @@ country_event = {
 		remove_ideas = DEN_idea_november_constitution
 		custom_effect_tooltip = eoanb_tt_event_secschwar_27
 		hidden_effect = {
-			SCH = { transfer_state = 58 }
-			SCH = { transfer_state = 949 }
-			SCH = { transfer_state = 1032 }
-			DEN = { end_puppet = SCH }
-			SCH = { set_politics = { ruling_party = autocracy } }
-			SCH = { set_party_name = { ideology = autocracy name = SCH_autocracy_party_provisional } }
-			SCH = { 
+			SCH = {
+				transfer_state = 58
+				transfer_state = 949
+				transfer_state = 1032
+				add_state_core = 58
+				add_state_core = 949
+				add_state_core = 1032
+			}
+			DEN = {
+				end_puppet = HLS
+				remove_state_core = 58
+				remove_state_core = 949
+				remove_state_core = 1032
+			}
+			SCH = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = SCH_autocracy_party_provisional }
 				SCH_provisional_administration = {
 					add_country_leader_role = {
 						promote_leader = yes
@@ -869,12 +902,15 @@ country_event = {
 						}
 					}
 				}
-				#retire_character = SCH_frederick_vii
+				retire_character = SCH_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = SCH_Frederick_of_Augustenburg 
+				}
+				give_military_access = PRS
+				give_military_access = AUS
+				inherit_technology = DEN
 			}
-			SCH = { give_military_access = PRS }
-			SCH = { give_military_access = AUS }
-			SCH = { inherit_technology = DEN }
-			#SCH = { load_oob = "PRS_SCH_garrisons" }
 			PRS = { country_event = { id = secschwar.29 } }
 			if = {
 				limit = {
@@ -927,7 +963,7 @@ country_event = {
 		name = secschwar.29.a
 		ai_chance = { base = 100 }
 		add_political_power = 25
-		add_war_support = -0.25
+		add_war_support = -0.3
 		hidden_effect = {
 			PRS = { set_country_flag = eoanb_flag_avoided_2_schleswig_war }
 			every_country = {
@@ -961,10 +997,18 @@ country_event = {
 				threat = 3
 				name = eoanb_threat_ssw_war
 			}
-			add_ideas = hidden_idea_historical_PRS_victory
+			if = {
+				limit = {
+					is_ai = yes
+				}
+				add_ideas = hidden_idea_historical_PRS_victory
+			}
 			set_global_flag = eoanb_flag_second_schleswig_war
-			DEN = { add_ideas = hidden_idea_never_surrender }
-			DEN = { add_ideas = DEN_idea_spirit_of_1848 }
+			DEN = {
+				add_ideas = hidden_idea_never_surrender
+				add_ideas = DEN_idea_spirit_of_1848
+				country_event = { days = 7 id = denmark.451 }
+			}
 			AUS = { country_event = { id = secschwar.31 } }
 			activate_mission = PRS_mission_london_conference
 			DEN = { activate_mission = PRS_mission_london_conference }
@@ -1259,13 +1303,26 @@ country_event = {
 		ai_chance = { base = 100 }
 		custom_effect_tooltip = eoanb_tt_event_secschwar_russell_proposal
 		hidden_effect = {
-			DEN = { white_peace = PRS }
-			DEN = { white_peace = AUS }
-			DEN = { transfer_state = 58 }
-			DEN = { transfer_state = 1032 }
-			HLS = { transfer_state = 949 }
-			DEN = { white_peace = HLS }
-			PRS = { puppet = HLS }
+			DEN = {
+				white_peace = PRS
+				white_peace = AUS
+			}
+			DEN = {
+				transfer_state = 58
+				transfer_state = 1032
+				add_state_core = 58
+				add_state_core = 1032
+			}
+			HLS = {
+				transfer_state = 949
+				add_state_core = 949
+			}
+			DEN = {
+				white_peace = HLS
+			}
+			PRS = {
+				puppet = HLS
+			}
 			HLS = {
 				HLS_provisional_administration = {
 					add_country_leader_role = {
@@ -1280,19 +1337,33 @@ country_event = {
 						}
 					}
 				}
-				#retire_character = HLS_friedrich_von_augustenburg
+				retire_character = HLS_christian_ix
+				retire_character = HLS_friedrich_von_augustenburg
+				add_popularity = {
+					ideology = autocracy
+					popularity = 0.5
+				}
+				inherit_technology = PRS
 			}
 			set_global_flag = eoanb_flag_second_schleswig_war_end
 			clr_global_flag = eoanb_flag_second_schleswig_war
-			PRS = { set_country_flag = eoanb_flag_won_2_schleswig_war }
 			PRS = {
+				set_country_flag = eoanb_flag_won_2_schleswig_war
 				remove_ideas = DEN_idea_pomerania_blockade
 				remove_ideas = hidden_idea_historical_PRS_victory
 			}
 			DEN = {
 			    add_ideas = DEN_idea_lost_second_schleswig_war
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -1300,10 +1371,9 @@ country_event = {
 				}
 				949 = { remove_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
 			}
-			949 = { add_compliance = 80 }
 			DEN = { add_war_support = -0.35 }
 			PRS = { add_war_support = -0.35 }
-			AUS = { add_war_support = -0.25 }
+			AUS = { add_war_support = -0.35 }
 		}
 	}
 }
@@ -1323,15 +1393,29 @@ country_event = {
 		ai_chance = { base = 100 }
 		custom_effect_tooltip = eoanb_tt_event_secschwar_bismarck_proposal
 		hidden_effect = {
-			DEN = { white_peace = PRS }
-			DEN = { white_peace = AUS }
-			DEN = { transfer_state = 1032 }
-			SCH = { transfer_state = 58 }
-			SCH = { transfer_state = 949 }
-			PRS = { puppet = SCH }
-			SCH = { set_politics = { ruling_party = autocracy } }
-			SCH = { set_party_name = { ideology = autocracy name = SCH_autocracy_party_prussia } }
-			SCH = { 
+			DEN = {
+				white_peace = PRS
+				white_peace = AUS
+			}
+			DEN = {
+				transfer_state = 1032
+				add_state_core = 1032
+			}
+			SCH = {
+				transfer_state = 58
+				transfer_state = 949
+				add_state_core = 58
+				add_state_core = 949
+			}
+			DEN = {
+				white_peace = SCH
+			}
+			PRS = {
+				puppet = SCH
+			}
+			SCH = {
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = SCH_autocracy_party_prussia }
 				SCH_wilhelm_i = {
 					add_country_leader_role = {
 						promote_leader = yes
@@ -1345,27 +1429,34 @@ country_event = {
 						}
 					}
 				}
-				#retire_character = SCH_frederick_vii
-			}
-			SCH = {
+				retire_character = SCH_friedrich_von_augustenburg
+				retire_character = SCH_christian_ix
 				add_popularity = {
 					ideology = autocracy
 					popularity = 0.5
 				}
+				inherit_technology = PRS
 			}
 			set_global_flag = eoanb_flag_second_schleswig_war_end
 			clr_global_flag = eoanb_flag_second_schleswig_war
-			PRS = { set_country_flag = eoanb_flag_won_2_schleswig_war }
-			PRS = { country_event = { days = 5 id = prussia.89 } }
 			PRS = {
+				set_country_flag = eoanb_flag_won_2_schleswig_war
+				country_event = { days = 5 id = prussia.89 }
 				remove_ideas = DEN_idea_pomerania_blockade
 				remove_ideas = hidden_idea_historical_PRS_victory
 			}
-			DEN = { white_peace = SCH }
 			DEN = {
 			    add_ideas = DEN_idea_lost_second_schleswig_war
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -1375,7 +1466,7 @@ country_event = {
 			}
 			DEN = { add_war_support = -0.55 }
 			PRS = { add_war_support = -0.35 }
-			AUS = { add_war_support = -0.25 }
+			AUS = { add_war_support = -0.35 }
 		}
 	}
 }
@@ -1395,16 +1486,25 @@ country_event = {
 		ai_chance = { base = 100 }
 		custom_effect_tooltip = eoanb_tt_event_secschwar_beust_proposal
 		hidden_effect = {
-			DEN = { white_peace = PRS }
-			DEN = { white_peace = AUS }
-			DEN = { end_puppet = SCH }
-			DEN = { white_peace = SCH }
-			SCH = { transfer_state = 58 }
-			SCH = { transfer_state = 949 }
-			SCH = { transfer_state = 1032 }
-			SCH = { set_politics = { ruling_party = autocracy } }
-			SCH = { set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg } }
-			SCH = { 
+			DEN = {
+				white_peace = PRS
+				white_peace = AUS
+				end_puppet = SCH
+				white_peace = SCH
+			}
+			SCH = {
+				transfer_state = 58
+				transfer_state = 949
+				transfer_state = 1032
+				add_state_core = 58
+				add_state_core = 949
+				add_state_core = 1032
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg }
 				SCH_friedrich_von_augustenburg = {
 					add_country_leader_role = {
 						promote_leader = yes
@@ -1418,25 +1518,33 @@ country_event = {
 						}
 					}
 				}
-				#retire_character = SCH_frederick_vii
+				retire_character = SCH_christian_ix
+				give_military_access = PRS
+				give_military_access = AUS
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+				country_event = { id = secschwar.54 }
 			}
-			SCH = { give_military_access = PRS }
-			SCH = { give_military_access = AUS }
-			SCH = { inherit_technology = DEN }
-			SCH = { load_oob = "SCH_free_GC_member" }
-			SCH = { country_event = { id = secschwar.54 } }
 			set_global_flag = eoanb_flag_second_schleswig_war_end
 			clr_global_flag = eoanb_flag_second_schleswig_war
-			PRS = { set_country_flag = eoanb_flag_won_2_schleswig_war_gc }
-			PRS = { country_event = { days = 5 id = prussia.89 } }
 			PRS = {
+				set_country_flag = eoanb_flag_won_2_schleswig_war_gc
+				country_event = { days = 5 id = prussia.89 }
 				remove_ideas = DEN_idea_pomerania_blockade
 				remove_ideas = hidden_idea_historical_PRS_victory
 			}
 			DEN = {
 			    add_ideas = DEN_idea_lost_second_schleswig_war
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -1446,7 +1554,7 @@ country_event = {
 			}
 			DEN = { add_war_support = -0.35 }
 			PRS = { add_war_support = -0.35 }
-			AUS = { add_war_support = -0.25 }
+			AUS = { add_war_support = -0.35 }
 		}
 	}
 }
@@ -1558,6 +1666,14 @@ country_event = {
 				}
 				DEN = { white_peace = LUX }
 			}
+			if = {
+				limit = {
+					has_template = "Danish Militia"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Danish Militia"
+				}
+			}
 			mark_focus_tree_layout_dirty = yes
 		}
 	}
@@ -1617,7 +1733,7 @@ country_event = {
 			DEN = {
 			    add_ideas = DEN_idea_lost_second_schleswig_war
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
 			}
 			SCH = {
 				remove_ideas = SCH_idea_ethnic_conflicts
@@ -1639,7 +1755,7 @@ country_event = {
 	}
 }
 
-#Prussia - PRS Supports Federal Execution   
+#Prussia - PRS Supports Federal Execution
 country_event = {
 	id = secschwar.43
 	title = secschwar.43.t
@@ -1739,6 +1855,12 @@ country_event = {
 			SCH = { transfer_state = 949 }
 			SCH = { transfer_state = 1032 }
 			DEN = { end_puppet = SCH }
+			SCH = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+			}
 			SCH = { set_politics = { ruling_party = autocracy } }
 			SCH = { set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg } }
 			SCH = { 
@@ -1791,12 +1913,12 @@ country_event = {
 		name = secschwar.47.a
 		ai_chance = { base = 100 }
 		add_political_power = -25
-		add_war_support = 0.05
+		add_war_support = 0.03
 		if = {
 			limit = {
 				tag = PRS
 			}
-			unlock_decision_tooltip = PRS_decision_support_bundesexekution
+			unlock_decision_tooltip = PRS_decision_support_bundesintervention
 			hidden_effect = {
 				PRS = { set_country_flag = PRS_denmark_gc_ultimatum_expired_flag }
 			}
@@ -1818,7 +1940,7 @@ country_event = {
 		ai_chance = { base = 100 }
 		add_political_power = 50
 		add_stability = 0.03
-		add_war_support = -0.2
+		add_war_support = -0.35
 		hidden_effect = {
 			if = {
 				limit = {
@@ -1858,11 +1980,19 @@ country_event = {
 				threat = 3
 				name = eoanb_threat_ssw_war
 			}
-			add_ideas = hidden_idea_historical_PRS_victory
+			if = {
+				limit = {
+					is_ai = yes
+				}
+				add_ideas = hidden_idea_historical_PRS_victory
+			}
 			MCK = { give_military_access = PRS }
 			set_global_flag = eoanb_flag_second_schleswig_war_gc
-			DEN = { add_ideas = hidden_idea_never_surrender }
-			DEN = { add_ideas = DEN_idea_spirit_of_1848 }
+			DEN = {
+				add_ideas = hidden_idea_never_surrender
+				add_ideas = DEN_idea_spirit_of_1848
+				country_event = { days = 7 id = denmark.451 }
+			}
 			every_other_country = {
 				limit = {
 					is_part_of_the_german_confederation = yes
@@ -1940,6 +2070,14 @@ country_event = {
 				}
 				DEN = { white_peace = LUX }
 			}
+			if = {
+				limit = {
+					has_template = "Danish Militia"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Danish Militia"
+				}
+			}
 			mark_focus_tree_layout_dirty = yes
 		}
 	}
@@ -1970,6 +2108,12 @@ country_event = {
 			SCH = { transfer_state = 58 }
 			SCH = { transfer_state = 949 }
 			SCH = { transfer_state = 1032 }
+			SCH = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+			}
 			SCH = { set_politics = { ruling_party = autocracy } }
 			SCH = { set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg } }
 			SCH = { 
@@ -2000,7 +2144,7 @@ country_event = {
 			DEN = {
 			    add_ideas = DEN_idea_lost_second_schleswig_war
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
 				add_war_support = -0.65
 			}
 			news_event = news.26
@@ -2026,8 +2170,31 @@ country_event = {
 	option = {
 		name = secschwar.53.a
 		ai_chance = { base = 100 }
-		add_war_support = 0.1
+		add_war_support = 0.05
 		add_political_power = 10
+		if = {
+			limit = {
+				tag = SAX
+			}
+			if = {
+				limit = {
+					OR = {
+						has_country_flag = SAX_decision_trias_idea_ready_flag
+						has_completed_focus = SAX_focus_support_augustenburger
+					}
+					NOT = {
+						OR = {
+							has_global_flag = eoanb_flag_second_schleswig_war
+							has_global_flag = eoanb_flag_second_schleswig_war_gc
+						}
+					}
+				}
+				unlock_decision_tooltip = SAX_decision_gather_support_for_the_augustenburger
+			}
+			hidden_effect = {
+				set_country_flag = SAX_decision_support_augustenburger_ready_flag
+			}
+		}
 	}
 }
 
@@ -2060,8 +2227,11 @@ country_event = {
 		}
 		if = {
 			limit = {
-				NOT = { is_part_of_the_german_confederation = yes }
+				has_idea = GEC_idea_german_confederation_minor_power
 			}
+			swap_ideas = { remove_idea = GEC_idea_german_confederation_minor_power add_idea = GEC_idea_german_confederation_middle_power }
+		}
+		else = {
 			add_ideas = GEC_idea_german_confederation_middle_power
 		}
 		if = {
@@ -2070,21 +2240,18 @@ country_event = {
 			}
 			add_ideas = SCH_idea_ethnic_conflicts_DEN
 		}
-		SCH = {
-			if = {
-				limit = {
-					has_idea = state_controlled_press
-				}
-				swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		if = {
+			limit = {
+				has_idea = state_controlled_press
 			}
-			else_if = {
-				limit = {
-					has_idea = censored_press
-				}
-				swap_ideas = { remove_idea = censored_press add_idea = free_press }
-			}
+			swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
 		}
-		#SCH = {
+		else_if = {
+			limit = {
+				has_idea = censored_press
+			}
+			swap_ideas = { remove_idea = censored_press add_idea = free_press }
+		}
 		#	if = {
 		#		limit = {
 		#			has_idea = no_constitution
@@ -2103,32 +2270,24 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
 		#	}
-		#}
-		SCH = {
-			if = {
-				limit = {
-					has_idea = no_elections
-				}
-				swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
+		if = {
+			limit = {
+				has_idea = no_elections
 			}
+			swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
 		}
-		#SCH = {
 		#	if = {
 		#		limit = {
 		#			has_idea = no_heir
 		#		}
 		#		swap_ideas = { remove_idea = no_heir add_idea = has_heir }
 		#	}
-		#}
-		SCH = {
-			if = {
-				limit = {
-					has_idea = agrarian
-				}
-				swap_ideas = { remove_idea = agrarian add_idea = industrializing }
+		if = {
+			limit = {
+				has_idea = agrarian
 			}
+			swap_ideas = { remove_idea = agrarian add_idea = industrializing }
 		}
-		#SCH = {
 		##	if = {
 		#		limit = {
 		#			has_idea = absolute_monarchy
@@ -2141,14 +2300,11 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = constitutional_monarchy add_idea = parliamentary_monarchy }
 		#	}
-		#}
-		SCH = {
-			if = {
-				limit = {
-					has_idea = absolutism
-				}
-				swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
+		if = {
+			limit = {
+				has_idea = absolutism
 			}
+			swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
 		}
 		add_popularity = {
 			ideology = centrism
@@ -2179,27 +2335,25 @@ country_event = {
 				limit = {
 					SAX = { has_variable = SAX_bundesreform_positive_votes }
 				}
-				SCH = { country_event = { id = saxony.303 } }
+				country_event = { id = saxony.303 }
 			}
-			SCH = {
-				if = {
-					limit = {
-						owns_state = 58
-					}
-					58 = { add_core_of = SCH }
+			if = {
+				limit = {
+					owns_state = 58
 				}
-				if = {
-					limit = {
-						owns_state = 949
-					}
-					949 = { add_core_of = SCH }
+				58 = { add_core_of = SCH }
+			}
+			if = {
+				limit = {
+					owns_state = 949
 				}
-				if = {
-					limit = {
-						owns_state = 1032
-					}
-					1032 = { add_core_of = SCH }
+				949 = { add_core_of = SCH }
+			}
+			if = {
+				limit = {
+					owns_state = 1032
 				}
+				1032 = { add_core_of = SCH }
 			}
 		}
 	}
@@ -2244,7 +2398,7 @@ country_event = {
 	option = {
 		name = secschwar.56.a
 		ai_chance = { base = 100 }
-		add_war_support = -0.3
+		add_war_support = -0.35
 		add_political_power = -10
 	}
 }
@@ -2586,7 +2740,7 @@ country_event = {
 	}
 }
 
-#Denmark - Attempt to Extend November Constitution to Holstein 
+#Denmark - Attempt to Extend November Constitution to Holstein?
 country_event = {
 	id = secschwar.67
 	title = secschwar.67.t
@@ -2598,6 +2752,7 @@ country_event = {
 	fire_only_once = yes
 	is_triggered_only = yes
 	
+	#Try to take Holstein
 	option = {
 		name = secschwar.67.a
 		ai_chance = { base = 100 }
@@ -2611,6 +2766,16 @@ country_event = {
 				} 
 				country_event = { days = 2 id = secschwar.68 } 
 			}
+		}
+	}
+
+	#Settle for Schleswig and let Holstein be free
+	option = {
+		name = secschwar.67.b
+		ai_chance = { base = 0 }
+		add_political_power = -10
+		hidden_effect = {
+			country_event = { days = 14 id = secschwar.71 } 
 		}
 	}
 }
@@ -2700,14 +2865,38 @@ country_event = {
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
 			set_country_flag = DEN_glorious_victory_flag
-			HLS = { transfer_state = 949 }
-			DEN = { end_puppet = HLS }
-			DEN = { remove_state_core = 949 }
-			HLS = { add_state_core = 949 }
-			HLS = { set_politics = { ruling_party = autocracy } }
-			HLS = { set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg } }
-			HLS = { inherit_technology = DEN }
-			HLS = { load_oob = "SCH_free_GC_member" }
+			HLS = {
+				transfer_state = 949
+				add_state_core = 949
+			}
+			DEN = {
+				end_puppet = HLS
+				remove_state_core = 949
+			}
+			HLS = {
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg }
+				HLS_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = HLS_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = HLS_Frederick_of_Augustenburg 
+				}
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+			}
 			set_global_flag = eoanb_flag_second_schleswig_war_end
 			clr_global_flag = eoanb_flag_second_schleswig_war
 			PRS = {
@@ -2716,7 +2905,15 @@ country_event = {
 			}
 			DEN = {
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -2726,7 +2923,7 @@ country_event = {
 			}
 			DEN = { add_war_support = -0.4 }
 			PRS = { add_war_support = -0.5 }
-			AUS = { add_war_support = -0.3 }
+			AUS = { add_war_support = -0.4 }
 			PRS = { country_event = { id = secschwar.72 } }
 			every_country = {
 				limit = {
@@ -2762,7 +2959,7 @@ country_event = {
 		}
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
-			PRS = { set_country_flag = eoanb_flag_stopgap_2_schleswig_war }
+			set_country_flag = eoanb_flag_stopgap_2_schleswig_war
 		}
 	}
 }
@@ -2818,22 +3015,27 @@ country_event = {
 			}
 			remove_ideas = DEN_idea_london_protocol
 		}
-		add_ideas = GEC_idea_german_confederation_middle_power
-		HLS = {
-			if = {
-				limit = {
-					has_idea = state_controlled_press
-				}
-				swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		if = {
+			limit = {
+				has_idea = GEC_idea_german_confederation_minor_power
 			}
-			else_if = {
-				limit = {
-					has_idea = censored_press
-				}
-				swap_ideas = { remove_idea = censored_press add_idea = free_press }
-			}
+			swap_ideas = { remove_idea = GEC_idea_german_confederation_minor_power add_idea = GEC_idea_german_confederation_middle_power }
 		}
-		#HLS = {
+		else = {
+			add_ideas = GEC_idea_german_confederation_middle_power
+		}
+		if = {
+			limit = {
+				has_idea = state_controlled_press
+			}
+			swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		}
+		else_if = {
+			limit = {
+				has_idea = censored_press
+			}
+			swap_ideas = { remove_idea = censored_press add_idea = free_press }
+		}
 		#	if = {
 		#		limit = {
 		#			has_idea = no_constitution
@@ -2852,24 +3054,18 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
 		#	}
-		#}
-		HLS = {
-			if = {
-				limit = {
-					has_idea = no_elections
-				}
-				swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
+		if = {
+			limit = {
+				has_idea = no_elections
 			}
+			swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
 		}
-		#HLS = {
 		#	if = {
 		#		limit = {
 		#			has_idea = no_heir
 		#		}
 		#		swap_ideas = { remove_idea = no_heir add_idea = has_heir }
 		#	}
-		#}
-		#HLS = {
 		#	if = {
 		#		limit = {
 		#			has_idea = absolute_monarchy
@@ -2882,14 +3078,11 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = constitutional_monarchy add_idea = parliamentary_monarchy }
 		#	}
-		#}
-		HLS = {
-			if = {
-				limit = {
-					has_idea = absolutism
-				}
-				swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
+		if = {
+			limit = {
+				has_idea = absolutism
 			}
+			swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
 		}
 		add_popularity = {
 			ideology = centrism
@@ -2920,21 +3113,19 @@ country_event = {
 				limit = {
 					SAX = { has_variable = SAX_bundesreform_positive_votes }
 				}
-				HLS = { country_event = { id = saxony.303 } }
+				country_event = { id = saxony.303 }
 			}
-			HLS = {
-				if = {
-					limit = {
-						owns_state = 58
-					}
-					58 = { add_core_of = HLS }
+			if = {
+				limit = {
+					owns_state = 58
 				}
-				if = {
-					limit = {
-						owns_state = 949
-					}
-					949 = { add_core_of = HLS }
+				58 = { add_core_of = HLS }
+			}
+			if = {
+				limit = {
+					owns_state = 949
 				}
+				949 = { add_core_of = HLS }
 			}
 		}
 	}
@@ -3254,7 +3445,15 @@ country_event = {
 			}
 			DEN = {
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -3341,6 +3540,10 @@ country_event = {
 			}
 			add_political_power = -10
 			add_war_support = -0.5
+			hidden_effect = {
+				set_global_flag = eoanb_flag_second_schleswig_war_end
+				clr_global_flag = eoanb_flag_second_schleswig_war
+			}
 		}
 		else_if = {
 			limit = {
@@ -3349,11 +3552,10 @@ country_event = {
 			}
 			add_political_power = -10
 			add_war_support = -0.25
-		}
-		hidden_effect = {
-			set_global_flag = eoanb_flag_second_schleswig_war_end
-			clr_global_flag = eoanb_flag_second_schleswig_war
-			clr_global_flag = eoanb_flag_second_schleswig_war_gc
+			hidden_effect = {
+				set_global_flag = eoanb_flag_second_schleswig_war_end
+				clr_global_flag = eoanb_flag_second_schleswig_war_gc
+			}
 		}
 	}
 }
@@ -3378,22 +3580,27 @@ country_event = {
 			}
 			remove_ideas = DEN_idea_london_protocol
 		}
-		add_ideas = GEC_idea_german_confederation_middle_power
-		HLS = {
-			if = {
-				limit = {
-					has_idea = state_controlled_press
-				}
-				swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		if = {
+			limit = {
+				has_idea = GEC_idea_german_confederation_minor_power
 			}
-			else_if = {
-				limit = {
-					has_idea = censored_press
-				}
-				swap_ideas = { remove_idea = censored_press add_idea = free_press }
-			}
+			swap_ideas = { remove_idea = GEC_idea_german_confederation_minor_power add_idea = GEC_idea_german_confederation_middle_power }
 		}
-		#HLS = {
+		else = {
+			add_ideas = GEC_idea_german_confederation_middle_power
+		}
+		if = {
+			limit = {
+				has_idea = state_controlled_press
+			}
+			swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		}
+		else_if = {
+			limit = {
+				has_idea = censored_press
+			}
+			swap_ideas = { remove_idea = censored_press add_idea = free_press }
+		}
 		#	if = {
 		#		limit = {
 		#			has_idea = no_constitution
@@ -3412,24 +3619,18 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
 		#	}
-		#}
-		HLS = {
-			if = {
-				limit = {
-					has_idea = no_elections
-				}
-				swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
+		if = {
+			limit = {
+				has_idea = no_elections
 			}
+			swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
 		}
-		#HLS = {
 		#	if = {
 		#		limit = {
 		#			has_idea = no_heir
 		#		}
 		#		swap_ideas = { remove_idea = no_heir add_idea = has_heir }
 		#	}
-		#}
-		#HLS = {
 		#	if = {
 		#		limit = {
 		#			has_idea = absolute_monarchy
@@ -3442,14 +3643,11 @@ country_event = {
 		#		}
 		#		swap_ideas = { remove_idea = constitutional_monarchy add_idea = parliamentary_monarchy }
 		#	}
-		#}
-		HLS = {
-			if = {
-				limit = {
-					has_idea = absolutism
-				}
-				swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
+		if = {
+			limit = {
+				has_idea = absolutism
 			}
+			swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
 		}
 		add_popularity = {
 			ideology = centrism
@@ -3480,21 +3678,19 @@ country_event = {
 				limit = {
 					SAX = { has_variable = SAX_bundesreform_positive_votes }
 				}
-				HLS = { country_event = { id = saxony.303 } }
+				country_event = { id = saxony.303 }
 			}
-			HLS = {
-				if = {
-					limit = {
-						owns_state = 58
-					}
-					58 = { add_core_of = HLS }
+			if = {
+				limit = {
+					owns_state = 58
 				}
-				if = {
-					limit = {
-						owns_state = 949
-					}
-					949 = { add_core_of = HLS }
+				58 = { add_core_of = HLS }
+			}
+			if = {
+				limit = {
+					owns_state = 949
 				}
+				949 = { add_core_of = HLS }
 			}
 		}
 	}
@@ -3618,24 +3814,60 @@ country_event = {
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
 			set_country_flag = DEN_a_region_divided_flag
-			HLS = { transfer_state = 949 }
-			HLS = { transfer_state = 58 }
-			DEN = { end_puppet = HLS }
-			DEN = { remove_state_core = 949 }
-			DEN = { remove_state_core = 58 }
-			HLS = { add_state_core = 949 }
-			HLS = { add_state_core = 58 }
-			HLS = { set_politics = { ruling_party = autocracy } }
-			HLS = { set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg } }
-			HLS = { inherit_technology = DEN }
-			HLS = { load_oob = "SCH_free_GC_member" }
+			HLS = {
+				transfer_state = 949
+				transfer_state = 58
+				add_state_core = 949
+				add_state_core = 58
+			}
+			DEN = {
+				end_puppet = HLS
+				remove_state_core = 949
+				remove_state_core = 58
+			}
+			HLS = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg }
+				HLS_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = HLS_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = HLS_Frederick_of_Augustenburg
+				}
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+			}
 			PRS = {
 				remove_ideas = DEN_idea_pomerania_blockade
 				remove_ideas = hidden_idea_historical_PRS_victory
 			}
 			DEN = {
 				remove_ideas = hidden_idea_never_surrender
-				remove_ideas = HLS_idea_profits_from_altona_1
+				#remove_ideas = HLS_idea_profits_from_altona_1
+				if = {
+					limit = {
+						has_template = "Danish Militia"
+					}
+					delete_unit_template_and_units = {
+						division_template = "Danish Militia"
+					}
+				}
 			}
 			if = {
 				limit = {
@@ -3729,6 +3961,10 @@ country_event = {
 				eoanb_prestige_change = -10
 			}
 			eoanb_change_prestige_score = yes
+			hidden_effect = {
+				set_global_flag = eoanb_flag_second_schleswig_war_end
+				clr_global_flag = eoanb_flag_second_schleswig_war
+			}
 		}
 		else_if = {
 			limit = {
@@ -3741,11 +3977,10 @@ country_event = {
 				eoanb_prestige_change = -5
 			}
 			eoanb_change_prestige_score = yes
-		}
-		hidden_effect = {
-			set_global_flag = eoanb_flag_second_schleswig_war_end
-			clr_global_flag = eoanb_flag_second_schleswig_war
-			clr_global_flag = eoanb_flag_second_schleswig_war_gc
+			hidden_effect = {
+				set_global_flag = eoanb_flag_second_schleswig_war_end
+				clr_global_flag = eoanb_flag_second_schleswig_war_gc
+			}
 		}
 	}
 }
@@ -3906,5 +4141,1683 @@ country_event = {
 		name = secschwar.101.a
 		ai_chance = { base = 100 }
 		
+	}
+}
+
+################################################################################################################
+#                          			GERMAN TRIAS ALT HISTORICAL SCENARIO									   #
+################################################################################################################
+
+#Saxony - Vote on Activation of Federal Intervention against Denmark
+country_event = {
+	id = secschwar.501
+	title = secschwar.501.t
+	desc = secschwar.501.d
+	picture = GFX_event_german_confederation_building
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.501.a
+		ai_chance = { base = 100 }
+		every_other_country = {
+			limit = {
+				is_part_of_the_german_confederation = yes
+				NOT = { tag = HLS }
+			}
+			country_event = { days = 1 id = secschwar.502 }
+		}
+		hidden_effect = {
+			set_variable = { var = GC_federal_intervention value = 4 }
+			country_event = { id = secschwar.503 days = 7 }
+		}
+	}
+}
+
+#GC - Vote on Activation of Federal Intervention against Denmark
+country_event = {
+	id = secschwar.502
+	title = secschwar.502.t
+	desc = secschwar.502.d
+	picture = GFX_event_german_confederation_building
+	
+	is_triggered_only = yes
+	
+	timeout_days = 5
+
+	#Vote in favour of the motion.
+	option = {
+		name = secschwar.502.a
+		ai_chance = { 
+			base = 60
+			modifier = {
+				add = -30
+				tag = PRS
+			}
+			modifier = {
+				add = -20
+				tag = AUS
+			}
+			modifier = {
+				add = 20
+				tag = THU
+			}
+			modifier = {
+				add = -10
+				has_government = traditional_conservatism
+			}
+			modifier = {
+				add = -20
+				has_government = autocracy
+			}
+			modifier = {
+				factor = 0
+				tag = PRS
+				has_country_leader = {
+					character = PRS_otto_von_bismarck
+					ruling_only = yes
+				}
+			}
+		}
+		add_political_power = 10
+		add_war_support = 0.03
+		if = {
+			limit = {
+				OR = {
+					tag = BAD
+					tag = HAN
+				}
+			}
+			custom_effect_tooltip = historical_option
+		}
+		hidden_effect = {
+			### 	VOTING IN THE GC's FEDERAL CONVENTION:
+			###		5 VOTES EACH: PRUSSIA (+ 1 for Hohenzollern-Sigmaringen) = 5 votes
+			###		4 VOTES EACH: AUSTRIA, BAVARIA, HANOVER, SAXONY, WURTTEMBERG, THURINGIA (normally one each but we only have that) = 24 votes
+			###		3 VOTES EACH: BADEN, HESSE, HESSE-DARMSTADT, LUXEMBOURG, MECKLENBURG (2 + 1 for Strelitz) = 15 votes
+			###		normally HOLSTEIN too but they are not allowed to vote here
+			###		2 VOTES EACH: NASSAU (normally BRAUNSCHWEIG too, but we don't have them) = 2 votes
+			###		1 VOTE EACH: BREMEN, FRANKFURT, HAMBURG, LÜBECK, OLDENBURG = 5 votes
+			###		= total of 51 votes -- 2/3 majority needs to reach 34 votes in that case
+			if = {
+				limit = {
+					OR = {
+						tag = AUS
+						tag = BAV
+						tag = HAN
+						tag = PRS
+						tag = WUR
+					}
+				}
+				SAX = { add_to_variable = { var = GC_federal_intervention value = 4 } }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						tag = BAD
+						tag = HES
+						tag = HSD
+						tag = LUX
+						tag = MCK
+						tag = THU
+					}
+				}
+				SAX = { add_to_variable = { var = GC_federal_intervention value = 3 } }
+			}
+			else_if = {
+				limit = {
+					tag = NAS
+				}
+				SAX = { add_to_variable = { var = GC_federal_intervention value = 2 } }
+			}
+			else = {
+				SAX = { add_to_variable = { var = GC_federal_intervention value = 1 } }
+			}
+		}
+	}
+	
+	#Vote against the motion.
+	option = {
+		name = secschwar.502.b
+		ai_chance = { 
+			base = 40
+			modifier = {
+				add = 30
+				tag = PRS
+			}
+			modifier = {
+				add = 20
+				tag = AUS
+			}
+			modifier = {
+				add = -20
+				tag = THU
+			}
+			modifier = {
+				add = 10
+				has_government = traditional_conservatism
+			}
+			modifier = {
+				add = 20
+				has_government = autocracy
+			}
+			modifier = {
+				factor = 0
+				NOT = {
+					OR = {
+						tag = AUS
+						tag = PRS
+					}
+				}
+				has_government = centrism
+			}
+			modifier = {
+				factor = 0
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HAN
+					tag = HES
+					tag = HSD
+					tag = WUR
+				}
+			}
+		}
+		add_political_power = -10
+		add_stability = -0.03
+		if = {
+			limit = {
+				OR = {
+					tag = AUS
+					tag = PRS
+				}
+			}
+			custom_effect_tooltip = historical_option
+		}
+	}
+}
+
+#Saxony - Enough Support for the Motion?
+country_event = {
+	id = secschwar.503
+	title = {
+		trigger = { check_variable = { var = GC_federal_intervention value = 34 compare = greater_than_or_equals } }
+		text = secschwar.503.t_enough_support
+	}
+	title = {
+		trigger = { check_variable = { var = GC_federal_intervention value = 34 compare = less_than } }
+		text = secschwar.503.t_not_enough_support
+	}
+	desc = {
+		trigger = { check_variable = { var = GC_federal_intervention value = 34 compare = greater_than_or_equals } }
+		text = secschwar.503.d_enough_support
+	}
+	desc = {
+		trigger = { check_variable = { var = GC_federal_intervention value = 34 compare = less_than } }
+		text = secschwar.503.d_not_enough_support
+	}
+	picture = GFX_event_german_confederation_building
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			set_temp_variable = { var = no_votes_var value = 51 }
+			subtract_from_temp_variable = { var = no_votes_var value = SAX.GC_federal_intervention }
+		}
+	}
+	
+	#Prepare for War!
+	option = {
+		name = secschwar.503.a
+		ai_chance = { base = 100 }
+		trigger = {
+			check_variable = { var = GC_federal_intervention value = 34 compare = greater_than_or_equals }
+		}
+		add_power_balance_value = {
+			id = SAX_Balance_of_Power_Trias
+			value = 0.03
+		}
+		unlock_decision_tooltip = SAX_decision_issue_ultimatum_to_denmark
+		hidden_effect = {
+			set_country_flag = SAX_gc_federal_intervention_passed_flag
+			every_other_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = { tag = HLS }
+				}
+				country_event = { id = secschwar.504 }
+			}
+		}
+	}
+
+	#That is so very disappointing...
+	option = {
+		name = secschwar.503.b
+		ai_chance = { base = 100 }
+		trigger = {
+			check_variable = { var = GC_federal_intervention value = 34 compare = less_than }
+		}
+		add_political_power = -50
+		add_stability = -0.02
+		add_war_support = -0.25
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = { tag = HLS }
+				}
+				country_event = { id = secschwar.505 }
+			}
+		}
+	}
+}
+
+#GC - Motion for Federal Intervention Against Denmark Granted
+country_event = {
+	id = secschwar.504
+	title = secschwar.504.t
+	desc = secschwar.504.d
+	picture = GFX_event_german_confederation_building
+	
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			set_temp_variable = { var = no_votes_var value = 51 }
+			subtract_from_temp_variable = { var = no_votes_var value = SAX.GC_federal_intervention }
+		}
+	}
+	
+	option = {
+		name = secschwar.504.a
+		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HAN
+					tag = HES
+					tag = HSD
+					tag = WUR
+				}
+			}
+			add_political_power = 50
+			add_war_support = 0.05
+		}
+	}
+}
+
+#GC - Motion for Federal Intervention Against Denmark Denied
+country_event = {
+	id = secschwar.505
+	title = secschwar.505.t
+	desc = secschwar.505.d
+	picture = GFX_event_german_confederation_building
+	
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			set_temp_variable = { var = no_votes_var value = 51 }
+			subtract_from_temp_variable = { var = no_votes_var value = SAX.GC_federal_intervention }
+		}
+	}
+	
+	option = {
+		name = secschwar.505.a
+		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HAN
+					tag = HES
+					tag = HSD
+					tag = WUR
+				}
+			}
+			add_political_power = -50
+			add_war_support = -0.25
+		}
+	}
+}
+
+#Denmark - Denmark Responds to Saxony's Ultimatum
+country_event = {
+	id = secschwar.511
+	title = secschwar.511.t
+	desc = secschwar.511.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	#Go to war
+	option = {
+		name = secschwar.511.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = historical_option
+		add_stability = 0.1
+		add_war_support = 0.15
+		add_political_power = 100
+		hidden_effect = {
+			SAX = { country_event = { id = secschwar.512 days = 2 } }
+		}
+	}
+	
+	#Back down
+	option = {
+		name = secschwar.511.b
+		ai_chance = { base = 0 }
+		add_stability = -0.2
+		add_political_power = -200
+		remove_ideas = DEN_idea_november_constitution
+		custom_effect_tooltip = eoanb_event_DEN_trias_ultimatum_accepted_effect_tt
+		hidden_effect = {
+			SCH = {
+				transfer_state = 58
+				transfer_state = 949
+				transfer_state = 1032
+			}
+			DEN = { end_puppet = SCH }
+			SCH = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg }
+				SCH_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = SCH_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = SCH_Frederick_of_Augustenburg 
+				}
+				give_military_access = HAN
+				give_military_access = SAX
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+				country_event = { id = secschwar.551 }
+			}
+			if = {
+				limit = {
+					949 = { has_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+				}
+				949 = { remove_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+			}
+			SAX = { country_event = { id = secschwar.513 days = 1 } }
+		}
+	}
+}
+
+#Saxony - Denmark's Ultimatum Has Expired
+country_event = {
+	id = secschwar.512
+	title = secschwar.512.t
+	desc = secschwar.512.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.512.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		add_war_support = 0.02
+		unlock_decision_tooltip = SAX_decision_invade_schleswig
+		hidden_effect = {
+			set_country_flag = SAX_denmark_ultimatum_expired_flag
+		}
+	}
+}
+
+#Saxony - Denmark Has Accepted the Ultimatum
+country_event = {
+	id = secschwar.513
+	title = secschwar.513.t
+	desc = secschwar.513.d
+	picture = GFX_event_danish_retreat
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.513.a
+		ai_chance = { base = 100 }
+		set_temp_variable = {
+			eoanb_prestige_change = 4
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = 10
+		add_war_support = -0.35
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = {
+						OR = {
+							tag = AUS
+							tag = PRS
+						}
+					}
+				}
+				country_event = { days = 1 id = secschwar.514 }
+			}
+			AUS = { country_event = { id = secschwar.515 days = 1 } }
+			PRS = { country_event = { id = secschwar.515 days = 1 } }
+			news_event = { id = secschwar.516 days = 3 }
+		}
+	}
+}
+
+#GC - Denmark Has Accepted the Ultimatum
+country_event = {
+	id = secschwar.514
+	title = secschwar.514.t
+	desc = secschwar.514.d
+	picture = GFX_event_danish_retreat
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.514.a
+		ai_chance = { base = 100 }
+		if = {
+			limit = {
+				OR = {
+					tag = BAD
+					tag = BAV
+					tag = HAN
+					tag = HES
+					tag = HSD
+					tag = WUR
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 3
+			}
+			eoanb_change_prestige_score = yes
+		}
+		add_political_power = 10
+		add_war_support = -0.35
+	}
+}
+
+#Austria/Prussia - Denmark Has Accepted the Ultimatum
+country_event = {
+	id = secschwar.515
+	title = secschwar.515.t
+	desc = secschwar.515.d
+	picture = GFX_event_danish_retreat
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.515.a
+		ai_chance = { base = 100 }
+		add_war_support = -0.35
+		set_temp_variable = {
+			eoanb_prestige_change = -1
+		}
+		eoanb_change_prestige_score = yes
+	}
+}
+
+#Denmark Accepts German Ultimatum
+news_event = {
+	id = secschwar.516
+	title = secschwar.516.t
+	desc = secschwar.516.d
+	picture = GFX_news_event_military_planning
+	
+	major = yes
+
+	show_major = {
+		NOT = {
+			OR = {
+				tag = AUS
+				tag = BAD
+				tag = BAV
+				tag = DEN
+				tag = HES
+				tag = HLS
+				tag = HSD
+				tag = PRS
+				tag = SCH
+				tag = WUR
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		name = secschwar.516.a
+		ai_chance = { base = 100 }
+	}
+}
+
+
+#Saxony - Declare War on Denmark
+country_event = {
+	id = secschwar.517
+	title = secschwar.517.t
+	desc = secschwar.517.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.517.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = eoanb_event_trias_sax_against_denmark_effect_tt
+		create_faction = faction_trias_allies_ssw
+		BAD = { country_event = { id = secschwar.518 } }
+		BAV = { country_event = { id = secschwar.518 } }
+		HAN = { country_event = { id = secschwar.518 } }
+		HES = { country_event = { id = secschwar.518 } }
+		HSD = { country_event = { id = secschwar.518 } }
+		WUR = { country_event = { id = secschwar.518 } }
+		if = {
+			limit = {
+				PRS = { has_country_flag = PRS_supports_bundesintervention_flag }
+			}
+			PRS = { country_event = { id = secschwar.518 } }
+		}
+		if = {
+			limit = {
+				NOT = {
+					OR = {
+						has_global_flag = eoanb_flag_second_schleswig_war
+						has_global_flag = eoanb_flag_second_schleswig_war_gc
+					}
+				}
+				OR = {
+					DEN = { owns_state = 949 }
+					HAN = { owns_state = 949 }
+					PRS = { owns_state = 949 }
+				}
+			}
+			transfer_state = 949
+		}
+		hidden_effect = {
+			declare_war_on = { target = DEN type = wargoal_second_schleswig_war }
+			add_named_threat = { 
+				threat = 3
+				name = eoanb_threat_ssw_war
+			}
+			if = {
+				limit = {
+					is_ai = yes
+				}
+				add_ideas = hidden_idea_historical_PRS_victory
+				949 = {
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+					add_building_construction = {
+						type = supply_node
+						province = 6389
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			set_global_flag = eoanb_flag_second_schleswig_war_trias
+			DEN = {
+				add_ideas = hidden_idea_never_surrender
+				add_ideas = DEN_idea_spirit_of_1848
+				country_event = { days = 7 id = denmark.451 }
+			}
+			activate_mission = SAX_mission_second_schleswig_war
+			DEN = { activate_mission = SAX_mission_second_schleswig_war }
+		}
+	}
+}
+
+#German Middle States + potentially alt-history Prussia - Join the War against Denmark
+country_event = {
+	id = secschwar.518
+	title = secschwar.518.t
+	desc = secschwar.518.d
+	picture = GFX_event_saxony_coat_of_arms
+	
+	is_triggered_only = yes
+	
+	timeout_days = 3
+	
+	option = {
+		name = secschwar.518.a
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = eoanb_event_trias_war_against_denmark_effect_tt
+		hidden_effect = {
+			SAX = { add_to_faction = ROOT }
+			ROOT = { add_to_war = { targeted_alliance = SAX enemy = DEN } }
+			if = {
+				limit = {
+					tag = PRS
+				}
+				clr_country_flag = PRS_supports_bundesintervention_flag
+			}
+		}
+	}
+}
+
+#Denmark - We have to Sue for Peace
+country_event = {
+	id = secschwar.521
+	title = secschwar.521.t
+	desc = secschwar.521.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			remove_mission = SAX_mission_second_schleswig_war
+			SAX = { remove_mission = SAX_mission_second_schleswig_war }
+			every_country = {
+				limit = {
+					has_war_with = DEN
+					OR = {
+						is_part_of_the_german_confederation = yes
+						overlord = { is_part_of_the_german_confederation = yes }
+					}
+				}
+				white_peace = DEN
+			}
+		}
+	}
+
+	option = {
+		name = secschwar.521.a
+		ai_chance = { base = 100 }
+		complete_national_focus = DEN_focus_humiliating_defeat
+		set_temp_variable = {
+			eoanb_prestige_change = -10
+		}
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			set_country_flag = DEN_humiliating_defeat_flag
+			mark_focus_tree_layout_dirty = yes
+			SCH = {
+				transfer_state = 58
+				transfer_state = 949
+				transfer_state = 1032
+			}
+			DEN = { end_puppet = SCH }
+			SCH = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg }
+				SCH_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = SCH_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = SCH_Frederick_of_Augustenburg 
+				}
+				give_military_access = HAN
+				give_military_access = SAX
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+				country_event = { id = secschwar.551 }
+			}
+			if = {
+				limit = {
+					949 = { has_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+				}
+				949 = { remove_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+			}
+			SAX = {
+				remove_ideas = hidden_idea_historical_PRS_victory
+				country_event = { id = secschwar.522 }
+			}
+		}
+	}
+}
+
+#Saxony - Denmark Sues for Peace
+country_event = {
+	id = secschwar.522
+	title = secschwar.522.t
+	desc = secschwar.522.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.522.a
+		ai_chance = { base = 100 }
+		dismantle_faction = yes
+		complete_national_focus = SAX_focus_trias_succeeds
+		hidden_effect = {
+			set_global_flag = eoanb_flag_second_schleswig_war_end
+			clr_global_flag = eoanb_flag_second_schleswig_war_trias
+			BAD = { country_event = { id = secschwar.523 days = 1 } }
+			BAV = { country_event = { id = secschwar.523 days = 1 } }
+			HAN = { country_event = { id = secschwar.523 days = 1 } }
+			HES = { country_event = { id = secschwar.523 days = 1 } }
+			HSD = { country_event = { id = secschwar.523 days = 1 } }
+			WUR = { country_event = { id = secschwar.523 days = 1 } }
+			country_event = { id = secschwar.523 days = 1 }
+			news_event = { id = secschwar.524 days = 3 }
+		}
+	}
+}
+
+#Trias - Peace of Flensburg
+country_event = {
+	id = secschwar.523
+	title = secschwar.523.t
+	desc = secschwar.523.d
+	picture = GFX_event_duppeler_schanzen
+	
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.523.a
+		ai_chance = { base = 100 }
+		set_temp_variable = {
+			eoanb_prestige_change = 5
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = 50
+		add_war_support = -0.5
+		add_stability = 0.05
+		increase_ps_by_one = yes
+		hidden_effect = {
+			#clr_country_flag
+			#clear some flags and variables?
+		}
+	}
+}
+
+#End of the Second Schleswig War - Victory for the Germans
+news_event = {
+	id = secschwar.524
+	title = secschwar.524.t
+	desc = secschwar.524.d
+	picture = GFX_news_event_military_planning
+	
+	major = yes
+
+	show_major = {
+		NOT = {
+			OR = {
+				tag = BAD
+				tag = BAV
+				tag = DEN
+				tag = HES
+				tag = HLS
+				tag = HSD
+				tag = SCH
+				tag = WUR
+			}
+		}
+	}
+
+	is_triggered_only = yes
+
+	fire_for_sender = no
+
+	option = {
+		name = secschwar.524.a
+		ai_chance = { base = 100 }
+	}
+}
+
+#Saxony - We have to Sue for Peace
+country_event = {
+	id = secschwar.531
+	title = secschwar.531.t
+	desc = secschwar.531.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			remove_mission = SAX_mission_second_schleswig_war
+			DEN = { remove_mission = SAX_mission_second_schleswig_war }
+			every_country = {
+				limit = {
+					has_war_with = DEN
+					OR = {
+						is_part_of_the_german_confederation = yes
+						overlord = { is_part_of_the_german_confederation = yes }
+					}
+				}
+				white_peace = DEN
+			}
+		}
+	}
+
+	option = {
+		name = secschwar.531.a
+		ai_chance = { base = 100 }
+		dismantle_faction = yes
+		set_temp_variable = {
+			eoanb_prestige_change = -5
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = -75
+		add_war_support = -0.5
+		add_stability = -0.1
+		decrease_ps_by_one = yes
+		complete_national_focus = SAX_focus_trias_fails
+		hidden_effect = {
+			remove_ideas = hidden_idea_historical_PRS_victory
+			BAD = { country_event = { id = secschwar.532 } }
+			BAV = { country_event = { id = secschwar.532 } }
+			HAN = { country_event = { id = secschwar.532 } }
+			HES = { country_event = { id = secschwar.532 } }
+			HSD = { country_event = { id = secschwar.532 } }
+			WUR = { country_event = { id = secschwar.532 } }
+			DEN = { country_event = { id = secschwar.533 } }
+		}
+	}
+}
+
+#Trias - Forced to Sign Armistice
+country_event = {
+	id = secschwar.532
+	title = secschwar.532.t
+	desc = secschwar.532.d
+	picture = GFX_event_duppeler_schanzen
+	
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.532.a
+		ai_chance = { base = 100 }
+		set_temp_variable = {
+			eoanb_prestige_change = -5
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = -50
+		add_war_support = -0.5
+		add_stability = -0.05
+		decrease_ps_by_one = yes
+	}
+}
+
+#Denmark - Victory over the Germans
+country_event = {
+	id = secschwar.533
+	title = secschwar.533.t
+	desc = secschwar.533.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.533.a
+		ai_chance = { base = 100 }
+		complete_national_focus = DEN_focus_glorious_victory
+		HLS = { transfer_state = 949 }
+		puppet = HLS
+		set_autonomy = {
+			target = HLS
+			autonomous_state = autonomy_personal_union_3
+			freedom_level = 0.4
+		}
+		set_temp_variable = {
+			eoanb_prestige_change = 20
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = 100
+		add_war_support = -0.4
+		add_stability = 0.1
+		increase_ps_by_one = yes
+		hidden_effect = {
+			set_country_flag = DEN_glorious_victory_flag
+			remove_ideas = hidden_idea_never_surrender
+			#remove_ideas = HLS_idea_profits_from_altona_1
+			if = {
+				limit = {
+					has_template = "Danish Militia"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Danish Militia"
+				}
+			}
+			if = {
+				limit = {
+					949 = { has_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+				}
+				949 = { remove_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+			}
+			mark_focus_tree_layout_dirty = yes
+			country_event = { id = secschwar.534 days = 14 }
+		}
+	}
+}
+
+#Denmark - Attempt to Extend November Constitution to Holstein?
+country_event = {
+	id = secschwar.534
+	title = secschwar.534.t
+	desc = secschwar.534.d
+	picture = GFX_report_event_generic_parliament
+
+	timeout_days = 7
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Try to take Holstein
+	option = {
+		name = secschwar.534.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		hidden_effect = {
+			every_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = { tag = HLS }
+				}
+				country_event = { id = secschwar.535 days = 2 } 
+			}
+		}
+	}
+
+	#Settle for Schleswig and let Holstein be free
+	option = {
+		name = secschwar.534.b
+		ai_chance = { base = 0 }
+		add_political_power = -10
+		hidden_effect = {
+			country_event = { id = secschwar.537 days = 7 }
+			every_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = { tag = HLS }
+				}
+				country_event = { id = secschwar.537 days = 7 }
+			}
+		}
+	}
+}
+
+#GC - Threaten War over Duchy of Holstein
+country_event = {
+	id = secschwar.535
+	title = secschwar.535.t
+	desc = secschwar.535.d
+	picture = GFX_event_german_confederation_building
+	
+	timeout_days = 7
+
+	is_triggered_only = yes
+	
+	#Prussia
+	option = {
+		name = secschwar.535.a
+		ai_chance = { base = 100 }
+		trigger = {
+			OR = {
+				tag = AUS
+				tag = PRS
+			}
+		}
+		add_war_support = 0.05
+		hidden_effect = {
+			DEN = { country_event = { id = secschwar.536 } }
+		}
+	}
+
+	#The Rest
+	option = {
+		name = secschwar.535.b
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = {
+				OR = {
+					tag = AUS
+					tag = PRS
+				}
+			}
+		}
+		add_war_support = 0.05
+	}
+}
+
+#Denmark - Austria and Prussia Threaten War over Duchy of Holstein
+country_event = {
+	id = secschwar.536
+	title = secschwar.536.t
+	desc = secschwar.536.d
+	picture = GFX_event_german_confederation_building
+	
+	timeout_days = 7
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	#End the bloodshed
+	option = {
+		name = secschwar.536.a
+		ai_chance = { base = 100 }
+		add_political_power = -25
+		add_stability = -0.025
+		hidden_effect = {
+			country_event = { id = secschwar.537 days = 7 }
+			every_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+					NOT = { tag = HLS }
+				}
+				country_event = { id = secschwar.537 days = 7 }
+			}
+		}
+	}
+}
+
+#London Peace Treaty of 1864
+country_event = {
+	id = secschwar.537
+	title = secschwar.537.t
+	desc = secschwar.537.d
+	picture = GFX_report_event_generic_parliament
+	
+	is_triggered_only = yes
+	
+	#Denmark
+	option = {
+		name = secschwar.537.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = DEN
+		}
+		custom_effect_tooltip = eoanb_tt_event_secschwar_71
+		hidden_effect = {
+			HLS = {
+				transfer_state = 949
+				add_state_core = 949
+			}
+			DEN = {
+				end_puppet = HLS
+				remove_state_core = 949
+			}
+			HLS = {
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg }
+				HLS_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = HLS_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = HLS_Frederick_of_Augustenburg 
+				}
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+				country_event = { id = secschwar.551 }
+			}
+			set_global_flag = eoanb_flag_second_schleswig_war_end
+			clr_global_flag = eoanb_flag_second_schleswig_war_trias
+			news_event = { days = 3 id = secschwar.538 }
+			mark_focus_tree_layout_dirty = yes
+		}
+	}
+
+	#The Others
+	option = {
+		name = secschwar.537.b
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = { tag = DEN }
+		}
+		custom_effect_tooltip = eoanb_tt_event_secschwar_71
+		add_political_power = 10
+		add_war_support = -0.05
+	}
+}
+
+#End of the Second Schleswig War - Victory for the Danes
+news_event = {
+	id = secschwar.538
+	title = secschwar.538.t
+	desc = secschwar.538.d
+	picture = GFX_news_event_military_planning
+	
+	major = yes
+
+	is_triggered_only = yes
+
+	show_major = {
+		NOT = {
+			OR = {
+				tag = BAD
+				tag = BAV
+				tag = SAX
+				tag = HES
+				tag = HLS
+				tag = HSD
+				tag = SCH
+				tag = WUR
+			}
+		}
+	}
+
+	fire_for_sender = no
+
+	option = {
+		name = secschwar.538.a
+		ai_chance = { base = 100 }
+	}
+}
+
+#Saxony - Stalemate in Schleswig-Holstein
+country_event = {
+	id = secschwar.541
+	title = secschwar.541.t
+	desc = secschwar.541.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	immediate = {
+		hidden_effect = {
+			remove_mission = SAX_mission_second_schleswig_war
+			DEN = { remove_mission = SAX_mission_second_schleswig_war }
+			every_country = {
+				limit = {
+					has_war_with = DEN
+					OR = {
+						is_part_of_the_german_confederation = yes
+						overlord = { is_part_of_the_german_confederation = yes }
+					}
+				}
+				white_peace = DEN
+			}
+		}
+	}
+
+	option = {
+		name = secschwar.541.a
+		ai_chance = { base = 100 }
+		dismantle_faction = yes
+		hidden_effect = {
+			remove_ideas = hidden_idea_historical_PRS_victory
+			BAD = { country_event = { id = secschwar.542 } }
+			BAV = { country_event = { id = secschwar.542 } }
+			HAN = { country_event = { id = secschwar.542 } }
+			HES = { country_event = { id = secschwar.542 } }
+			HSD = { country_event = { id = secschwar.542 } }
+			WUR = { country_event = { id = secschwar.542 } }
+			DEN = { country_event = { id = secschwar.543 } }
+		}
+	}
+}
+
+#Trias - Stalemate in Schleswig-Holstein
+country_event = {
+	id = secschwar.542
+	title = secschwar.542.t
+	desc = secschwar.542.d
+	picture = GFX_event_duppeler_schanzen
+	
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.542.a
+		ai_chance = { base = 100 }
+	}
+}
+
+#Denmark - Stalemate in Schleswig-Holstein
+country_event = {
+	id = secschwar.543
+	title = secschwar.543.t
+	desc = secschwar.543.d
+	picture = GFX_event_duppeler_schanzen
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = secschwar.543.a
+		ai_chance = { base = 100 }
+		hidden_effect = {
+			BAD = { country_event = { id = secschwar.544 days = 14 } }
+			BAV = { country_event = { id = secschwar.544 days = 14 } }
+			HAN = { country_event = { id = secschwar.544 days = 14 } }
+			HES = { country_event = { id = secschwar.544 days = 14 } }
+			HSD = { country_event = { id = secschwar.544 days = 14 } }
+			WUR = { country_event = { id = secschwar.544 days = 14 } }
+			SAX = { country_event = { id = secschwar.544 days = 14 } }
+			country_event = { id = secschwar.544 days = 14 }
+		}
+	}
+}
+
+#Lyksborg Peace Treaty of 1864 
+country_event = {
+	id = secschwar.544
+	title = {
+		trigger = { tag = DEN }
+		text = secschwar.544.t_den
+	}
+	title = {
+		trigger = { NOT = { tag = DEN } }
+		text = secschwar.544.t_ger
+	}
+	desc = {
+		trigger = { tag = DEN }
+		text = secschwar.544.d_den
+	}
+	desc = {
+		trigger = { NOT = { tag = DEN } }
+		text = secschwar.544.d_ger
+	}
+	picture = GFX_report_event_generic_parliament
+	
+	is_triggered_only = yes
+	
+	#Denmark
+	option = {
+		name = secschwar.544.a
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = DEN
+		}
+		custom_effect_tooltip = eoanb_tt_event_secschwar_92
+		complete_national_focus = DEN_focus_a_region_divided
+		set_temp_variable = {
+			eoanb_prestige_change = 5
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = 50
+		add_war_support = -0.4
+		add_stability = 0.05
+		hidden_effect = {
+			set_global_flag = eoanb_flag_second_schleswig_war_end
+			clr_global_flag = eoanb_flag_second_schleswig_war_trias
+			set_country_flag = DEN_a_region_divided_flag
+			remove_ideas = hidden_idea_never_surrender
+			#remove_ideas = HLS_idea_profits_from_altona_1
+			if = {
+				limit = {
+					has_template = "Danish Militia"
+				}
+				delete_unit_template_and_units = {
+					division_template = "Danish Militia"
+				}
+			}
+			HLS = {
+				transfer_state = 949
+				transfer_state = 58
+				add_state_core = 949
+				add_state_core = 58
+			}
+			DEN = {
+				end_puppet = HLS
+				remove_state_core = 949
+				remove_state_core = 58
+			}
+			HLS = {
+				set_capital = {
+					state = 949
+					remember_old_capital = no
+				}
+				set_politics = { ruling_party = autocracy }
+				set_party_name = { ideology = autocracy name = HLS_autocracy_party_augustenburg }
+				HLS_friedrich_von_augustenburg = {
+					add_country_leader_role = {
+						promote_leader = yes
+						country_leader = {
+							expire = "1950.1.1"
+							desc = "POLITICS_GENERIC_EOANB_DESC"
+							ideology = constit_monarch
+							traits = {
+								#
+							}
+						}
+					}
+				}
+				retire_character = HLS_christian_ix
+				swap_ideas = {
+					remove_idea = DEN_Christian_IX 
+					add_idea = HLS_Frederick_of_Augustenburg
+				}
+				give_military_access = HAN
+				give_military_access = SAX
+				inherit_technology = DEN
+				load_oob = "SCH_free_GC_member"
+				country_event = { id = secschwar.551 }
+			}
+			if = {
+				limit = {
+					949 = { has_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+				}
+				949 = { remove_dynamic_modifier = { modifier = dynmod_PRS_SSW_holstein_supply } }
+			}
+			mark_focus_tree_layout_dirty = yes
+			news_event = { days = 7 id = secschwar.545 }
+		}
+	}
+
+	#Saxony
+	option = {
+		name = secschwar.544.b
+		ai_chance = { base = 100 }
+		trigger = {
+			tag = SAX
+		}
+		complete_national_focus = SAX_focus_trias_fails
+		set_temp_variable = {
+			eoanb_prestige_change = -3
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = -50
+		add_war_support = -0.35
+		add_stability = -0.05
+		decrease_ps_by_one = yes
+	}
+
+	#Others
+	option = {
+		name = secschwar.544.c
+		ai_chance = { base = 100 }
+		trigger = {
+			NOT = {
+				OR = {
+					tag = DEN
+					tag = SAX
+				}
+			}
+		}
+		set_temp_variable = {
+			eoanb_prestige_change = -3
+		}
+		eoanb_change_prestige_score = yes
+		add_political_power = -25
+		add_war_support = -0.35
+		add_stability = -0.03
+		decrease_ps_by_one = yes
+	}
+}
+
+#End of the Second Schleswig War - Stalemate
+news_event = {
+	id = secschwar.545
+	title = secschwar.545.t
+	desc = secschwar.545.d
+	picture = GFX_news_event_military_planning
+	
+	major = yes
+
+	is_triggered_only = yes
+
+	show_major = {
+		NOT = {
+			OR = {
+				tag = BAD
+				tag = BAV
+				tag = DEN
+				tag = HES
+				tag = HLS
+				tag = HSD
+				tag = SCH
+				tag = WUR
+			}
+		}
+	}
+
+	fire_for_sender = no
+
+	option = {
+		name = secschwar.545.a
+		ai_chance = { base = 100 }
+	}
+}
+
+#SCH/HLS - New German Middle State
+country_event = {
+	id = secschwar.551
+	title = secschwar.551.t
+	desc = secschwar.551.d
+	picture = GFX_event_augustenburg_reception
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.551.a
+		ai_chance = { base = 100 }
+		add_political_power = 100
+		eoanb_danish_unrecognised = yes
+		if = {
+			limit = {
+				has_idea = DEN_idea_london_protocol
+			}
+			remove_ideas = DEN_idea_london_protocol
+		}
+		if = {
+			limit = {
+				has_idea = SCH_idea_ethnic_conflicts
+			}
+			remove_ideas = SCH_idea_ethnic_conflicts
+		}
+		if = {
+			limit = {
+				has_idea = GEC_idea_german_confederation_minor_power
+			}
+			swap_ideas = { remove_idea = GEC_idea_german_confederation_minor_power add_idea = GEC_idea_german_confederation_middle_power }
+		}
+		else = {
+			add_ideas = GEC_idea_german_confederation_middle_power
+		}
+		if = {
+			limit = {
+				owns_state = 58
+				NOT = { has_idea = SCH_idea_ethnic_conflicts_DEN }
+			}
+			add_ideas = SCH_idea_ethnic_conflicts_DEN
+		}
+		if = {
+			limit = {
+				has_idea = state_controlled_press
+			}
+			swap_ideas = { remove_idea = state_controlled_press add_idea = free_press }
+		}
+		else_if = {
+			limit = {
+				has_idea = censored_press
+			}
+			swap_ideas = { remove_idea = censored_press add_idea = free_press }
+		}
+		#	if = {
+		#		limit = {
+		#			has_idea = no_constitution
+		#		}
+		#		swap_ideas = { remove_idea = no_constitution add_idea = constitution_adopted }
+		#	}
+		#	else_if = {
+		#		limit = {
+		#			has_idea = human_rights
+		#		}
+		#		swap_ideas = { remove_idea = human_rights add_idea = constitution_adopted }
+		#	}
+		#	else_if = {
+		#		limit = {
+		#			has_idea = limited_constitution
+		#		}
+		#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
+		#	}
+		if = {
+			limit = {
+				has_idea = no_elections
+			}
+			swap_ideas = { remove_idea = no_elections add_idea = limited_elections }
+		}
+		#	if = {
+		#		limit = {
+		#			has_idea = no_heir
+		#		}
+		#		swap_ideas = { remove_idea = no_heir add_idea = has_heir }
+		#	}
+		if = {
+			limit = {
+				has_idea = agrarian
+			}
+			swap_ideas = { remove_idea = agrarian add_idea = industrializing }
+		}
+		##	if = {
+		#		limit = {
+		#			has_idea = absolute_monarchy
+		#		}
+		#		swap_ideas = { remove_idea = absolute_monarchy add_idea = parliamentary_monarchy }
+		#	}
+		#	else_if = {
+		#		limit = {
+		#			has_idea = constitutional_monarchy
+		#		}
+		#		swap_ideas = { remove_idea = constitutional_monarchy add_idea = parliamentary_monarchy }
+		#	}
+		if = {
+			limit = {
+				has_idea = absolutism
+			}
+			swap_ideas = { remove_idea = absolutism add_idea = universal_male_suffrage }
+		}
+		add_popularity = {
+			ideology = centrism
+			popularity = 0.45
+		}
+		hidden_effect = {
+			every_other_country = {
+				limit = {
+					is_part_of_the_german_confederation = yes
+				}
+				country_event = { days = 7 id = secschwar.552 }
+			}
+			if = {
+				limit = {
+					SAX = { 
+						OR = {
+							has_country_flag = SAX_decision_notify_the_middle_states_failure_flag
+							has_country_flag = SAX_decision_notify_the_middle_states_small_majority_flag
+							has_country_flag = SAX_decision_notify_the_middle_states_large_majority_flag
+							has_country_flag = SAX_decision_notify_the_middle_states_unanimity_flag
+						}
+					}
+				}
+				add_opinion_modifier = { target = SAX modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+				reverse_add_opinion_modifier = { target = SAX modifier = SAX_GC_BUNDESREFORM_CAUTIOUS_REL }
+			}
+			else_if = {
+				limit = {
+					SAX = { has_variable = SAX_bundesreform_positive_votes }
+				}
+				country_event = { id = saxony.303 }
+			}
+			if = {
+				limit = {
+					owns_state = 58
+				}
+				58 = { add_core_of = ROOT }
+			}
+			if = {
+				limit = {
+					owns_state = 949
+				}
+				949 = { add_core_of = ROOT }
+			}
+			if = {
+				limit = {
+					owns_state = 1032
+				}
+				1032 = { add_core_of = ROOT }
+			}
+		}
+	}
+}
+
+#GC - SCH/HLS New Member of the German Confederation
+country_event = {
+	id = secschwar.552
+	title = secschwar.552.t
+	desc = secschwar.552.d
+	picture = GFX_report_event_generic_peaceful_annexation
+	
+	is_triggered_only = yes
+	
+	option = {
+		name = secschwar.552.a
+		ai_chance = { base = 100 }
+		add_political_power = -10
+		FROM = { add_political_power = 10 }
+		if = {
+			limit = {
+				FROM = { tag = SCH }
+			}
+			ROOT = {
+				add_opinion_modifier = { target = FROM modifier = eoanb_SCHLESWIG_GC_MEMBER_REL }
+				reverse_add_opinion_modifier = { target = FROM modifier = eoanb_SCHLESWIG_GC_MEMBER_REL }
+			}
+		}
+		else = {
+			ROOT = {
+				add_opinion_modifier = { target = FROM modifier = eoanb_HOLSTEIN_GC_MEMBER_REL }
+				reverse_add_opinion_modifier = { target = FROM modifier = eoanb_HOLSTEIN_GC_MEMBER_REL }
+			}
+		}
 	}
 }
