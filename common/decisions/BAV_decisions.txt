@@ -1,6 +1,6 @@
 BAV_decision_category_economy = {
 
-	#Industrializing
+	#Industrialising the Kingdom of Bavaria
 	BAV_mission_industrializing = {
 		
 		icon = generic_factory
@@ -8,26 +8,52 @@ BAV_decision_category_economy = {
 		allowed = { always = no }
 		
 		available = { 
-			has_stability > 0.5
+			num_of_civilian_factories > 4
+			logging_camp > 1
+			steel_mill > 0
+			machine_parts_factory > 0
+			has_railway_connection = {
+				start_province = 707
+				target_province = 11417
+			}
 			has_tech = interchange_parts
 			has_idea = NA_B_medium_scale_railways
 			OR = {
 				has_idea = GEC_idea_gewerbefreiheit
 				has_idea = GEC_idea_gewerbeordnung
 			}
-			num_of_factories > 5
 		}
 		
 		activation = { always = no }
+
+		priority = 95
+
+		fire_only_once = yes
+
+		is_good = no
 		
-		days_mission_timeout = 3000
+		days_mission_timeout = 5000
 		
 		timeout_effect = {
-		    add_political_power = -100
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
+			}
 		}
 		
 		complete_effect = {
-		    swap_ideas = { remove_idea = agrarian add_idea = industrializing }	
+			swap_ideas = { remove_idea = agrarian add_idea = industrializing }
+			52 = { add_extra_state_shared_building_slots = 1 }
+			set_temp_variable = { eoanb_prestige_change = 5 }
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_five = yes
+		}
+
+		ai_will_do = {
+			base = 100
 		}
 	}
 
@@ -39,12 +65,9 @@ BAV_decision_category_economy = {
 		#allowed = { tag = BAV }
 
 		available = {
-			OR = {
-				has_completed_focus = BAV_focusoncivilianindustry
-				has_completed_focus = BAV_focusonmilitaryindustry
-				has_completed_focus = BAV_reformthecountry
-			}
+			has_completed_focus = BAV_focus_trade_and_commerce
 			has_tech = tech_humanities_saint_simonianism
+			num_of_civilian_factories > 4
 		}
 
 		visible = {
@@ -87,17 +110,7 @@ BAV_decision_category_economy = {
 		#allowed = { tag = BAV }
 
 		available = {
-			OR = {
-				AND = {
-					has_completed_focus = BAV_uselocalresources
-					has_completed_focus = BAV_newcropsandfields
-				}
-				AND = {
-					has_completed_focus = BAV_investinthearmy
-					has_completed_focus = BAV_newfactorylayout
-				}
-				has_completed_focus = BAV_industrialreforms
-			}
+			has_completed_focus = BAV_focus_try_to_improve_the_workers_situation
 			has_tech = tech_humanities_workers_rights
 		}
 
@@ -129,16 +142,1045 @@ BAV_decision_category_economy = {
 			base = 100
 		}
 	}
+
+	#Enact Grundentlastung
+	BAV_decision_enact_grundentlastung = {
+
+		icon = constitution
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_agrarian_reform
+			has_tech = cottage_industry_1
+		}
+
+		visible = {
+			#has_idea = #add idea for serfdom / servitude
+		}
+
+		fire_only_once = yes
+		
+		cost = 100
+		
+		days_remove = 365
+			
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			decrease_ps_by_one = yes
+		}
+		
+		remove_effect = {
+			#swap_ideas = { remove_idea = NA_B_small_scale_railways add_idea = NA_B_medium_scale_railways }
+			set_temp_variable = {
+				eoanb_prestige_change = 3
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Expand Bavarian Farmland
+	BAV_decision_expand_bavarian_farmland = {
+
+		icon = cow
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_farms
+			has_tech = mechanized_farming
+		}
+
+		visible = {
+			# NOT = { has_idea = #add idea for serfdom / servitude }
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			53 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+			54 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = farm
+					level = 1
+					instant_build = yes
+				}
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Support Palatinate Lumber Industry
+	BAV_decision_support_palatinate_lumber_industry = {
+
+		icon = wood
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_lumber
+			has_tech = industrial_era_tools_1
+		}
+
+		visible = {
+			owns_state = 42
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.75
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.75 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -50
+		}
+		
+		remove_effect = {
+			42 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Support Upper Franconian Lumber Industry
+	BAV_decision_support_upper_franconian_lumber_industry = {
+
+		icon = wood
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_lumber
+			has_tech = industrial_era_tools_1
+		}
+
+		visible = {
+			owns_state = 54
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.75
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.75 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -50
+		}
+		
+		remove_effect = {
+			54 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = logging_camp
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Invest into New Technologies
+	BAV_decision_invest_into_new_technologies = {
+
+		icon = generic_research
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_mining_and_metalurgy
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+
+		modifier = {
+			research_speed_factor = -0.025
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					NOT = { has_tech = mechanized_farming }
+				}
+				set_technology = { mechanized_farming = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = high_phosphate_fertilizer }
+				}
+				set_technology = { high_phosphate_fertilizer = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = agricultural_engineering }
+				}
+				set_technology = { agricultural_engineering = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = threshing_machine }
+				}
+				set_technology = { threshing_machine = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = copper_salts_pesticides }
+				}
+				set_technology = { copper_salts_pesticides = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = cottage_industry_1 }
+				}
+				set_technology = { cottage_industry_1 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = manufactured_seed_drill }
+				}
+				set_technology = { manufactured_seed_drill = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = fungicides }
+				}
+				set_technology = { fungicides = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = industrial_fertilizers }
+				}
+				set_technology = { industrial_fertilizers = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = biochemistry_tech }
+			}
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Expand Iron Mining Districs
+	BAV_decision_expand_iron_mining_districts = {
+
+		icon = iron
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_iron_mining
+			NOT = { has_country_flag = eoanb_resource_extraction_ongoing_flag }
+		}
+
+		visible = {
+			owns_state = 52
+			owns_state = 54
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 365
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = { 
+				set_country_flag = eoanb_resource_extraction_ongoing_flag 
+			}
+		}
+		
+		remove_effect = {
+			54 = {
+				add_resource = {
+					type = iron
+					amount = 3
+				}
+			}
+			52 = {
+				add_resource = {
+					type = iron
+					amount = 2
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_resource_extraction_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Expand Coal Mining Districs
+	BAV_decision_expand_coal_mining_districts = {
+
+		icon = coal
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_coal_mining
+			NOT = { has_country_flag = eoanb_resource_extraction_ongoing_flag }
+		}
+
+		visible = {
+			owns_state = 42
+			owns_state = 53
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.75
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 365
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.75 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = { 
+				set_country_flag = eoanb_resource_extraction_ongoing_flag 
+			}
+		}
+		
+		remove_effect = {
+			42 = {
+				add_resource = {
+					type = coal
+					amount = 3
+				}
+			}
+			53 = {
+				add_resource = {
+					type = coal
+					amount = 2
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_resource_extraction_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Open a New Mine
+	BAV_decision_open_a_new_mine = {
+
+		icon = generic_construction
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_resource_boom
+			NOT = { has_country_flag = eoanb_resource_extraction_ongoing_flag }
+			has_tech = mechanized_mining
+		}
+
+		visible = {
+			owns_state = 42
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 365
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = { 
+				set_country_flag = eoanb_resource_extraction_ongoing_flag 
+			}
+		}
+		
+		remove_effect = {
+			42 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = coal_mine
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_resource_extraction_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Invest into Modern Technologies
+	BAV_decision_invest_into_modern_technologies = {
+
+		icon = steel
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_steel_mills
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+
+		modifier = {
+			research_speed_factor = -0.025
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					NOT = { has_tech = wrought_iron_industrialization }
+				}
+				set_technology = { wrought_iron_industrialization = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = dry_puddling_process }
+				}
+				set_technology = { dry_puddling_process = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = bessemer_process }
+				}
+				set_technology = { bessemer_process = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = siemens_martin_process }
+				}
+				set_technology = { siemens_martin_process = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = process_engineering_tech }
+			}
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Support the Textile Industry in Franconia
+	BAV_decision_support_textile_industry_franconia = {
+
+		icon = fabric
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_civilian_economy
+			NOT = { has_country_flag = eoanb_industry_development_ongoing_flag }
+		}
+
+		visible = {
+			owns_state = 54
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 2
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 365
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = { 
+				set_country_flag = eoanb_industry_development_ongoing_flag 
+			}
+		}
+		
+		remove_effect = {
+			54 = {
+				add_building_construction = {
+					type = fabric_weavery
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_industry_development_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Extend Powers of the Bayerische Hypothekenbank
+	BAV_decision_extend_powers_bayerische_bank = {
+
+		icon = money
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_banking
+			has_stability > 0.3
+		}
+
+		visible = {
+			owns_state = 52
+		}
+
+		fire_only_once = yes
+		
+		cost = 75
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+		
+		complete_effect = {
+			add_stability = -0.03
+		}
+		
+		remove_effect = {
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = humanities_tech }
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+			unlock_decision_tooltip = BAV_decision_take_cheap_loan
+			hidden_effect = {
+				set_country_flag = BAV_bayerische_bank_empowered_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Industrie- und Kultur-Verein zu Nürnberg
+	BAV_decision_nurnberg_industrie_und_kulturverein = {
+
+		icon = capitalism
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_business_subsidies
+			has_stability > 0.3
+		}
+
+		visible = {
+			owns_state = 54
+		}
+
+		fire_only_once = yes
+		
+		cost = 50
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			#
+		}
+		
+		remove_effect = {
+			#add_ideas
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = humanities_tech }
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Approve Further Grants for Engineers
+	BAV_decision_approve_further_grants_for_engineers = {
+
+		icon = university
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_grants_for_engineers
+			has_tech = dry_puddling_process
+			has_tech = machine_tools_1
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -50
+		}
+		
+		remove_effect = {
+			#unlock_characters
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = humanities_tech }
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Invest into Engineering Technologies
+	BAV_decision_invest_into_engineering_technologies = {
+
+		icon = generic_wreckers
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_machine_parts_industry
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+
+		modifier = {
+			research_speed_factor = -0.025
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					NOT = { has_tech = interchange_parts }
+				}
+				set_technology = { interchange_parts = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = corliss_steam_engine }
+				}
+				set_technology = { corliss_steam_engine = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = mechanical_production_1 }
+				}
+				set_technology = { mechanical_production_1 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = machine_tools_1 }
+				}
+				set_technology = { machine_tools_1 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = traction_engine }
+				}
+				set_technology = { traction_engine = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = mechanical_engineering_tech }
+			}
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Improve the Canal Network
+	BAV_decision_improve_the_canal_network = {
+
+		icon = canal
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_canals
+			NOT = { has_country_flag = eoanb_infrastructure_expansion_ongoing_flag }
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 49.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_50
+		
+		days_remove = 730
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = eoanb_infrastructure_expansion_ongoing_effect_tt
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -50
+			hidden_effect = {
+				set_country_flag = eoanb_infrastructure_expansion_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					any_owned_state = {
+						is_in_home_area = yes
+						infrastructure < 4
+					}
+				}
+				random_owned_state = {
+					limit = {
+						is_in_home_area = yes
+						infrastructure < 4
+					}
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			else = {
+				random_owned_state = {
+					limit = { is_in_home_area = yes }
+					add_building_construction = {
+						type = infrastructure
+						level = 1
+						instant_build = yes
+					}
+				}
+			}
+			set_temp_variable = { eoanb_prestige_change = 1 }
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_one = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_infrastructure_expansion_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Invest into Transport Technologies
+	BAV_decision_invest_into_transport_technologies = {
+
+		icon = train_2
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_railways
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+
+		modifier = {
+			research_speed_factor = -0.025
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			if = {
+				limit = {
+					NOT = { has_tech = train_1855 }
+				}
+				set_technology = { train_1855 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = steam_locomotive_2 }
+				}
+				set_technology = { steam_locomotive_2 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = steel_railways }
+				}
+				set_technology = { steel_railways = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = armor_tech_velocipede }
+				}
+				set_technology = { armor_tech_velocipede = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = train_1865 }
+				}
+				set_technology = { train_1865 = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = transport_tech }
+			}
+			EOANBSYS_institutions_mechanization_add_one = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
 	
-	#Railway Upgrade
-	BAV_decision_railway_upgrade = {
+	#Expand the Railway Network
+	BAV_decision_expand_railway_network = {
 
 		icon = railway
 		
 		#allowed = { tag = BAV }
 
 		available = {
-			has_completed_focus = BAV_extendludwigsdnordbahn
+			has_completed_focus = BAV_focus_improved_mobility
 			52 = { infrastructure > 6 }
 			53 = { infrastructure > 5 }
 			54 = { infrastructure > 6 }
@@ -155,7 +1197,7 @@ BAV_decision_category_economy = {
 				level = 2
 			}
 			custom_trigger_tooltip = {
-				tooltip = BAV_decision_railway_upgrade_trigger_tt
+				tooltip = BAV_decision_expand_railway_network_trigger_tt
 				hidden_trigger = {
 					has_railway_connection = {
 						start_province = 532
@@ -167,9 +1209,10 @@ BAV_decision_category_economy = {
 					}
 				}
 			}
-			has_tech = steam_locomotive_3
-			has_tech = standardized_gauge
+			#has_tech = steam_locomotive_3
+			#has_tech = standardized_gauge
 			has_tech = train_1855
+			NOT = { has_country_flag = eoanb_infrastructure_expansion_ongoing_flag }
 		}
 
 		visible = {
@@ -213,6 +1256,9 @@ BAV_decision_category_economy = {
 			}
 			set_temp_variable = { money_to_gain = -1 }
 			add_money_with_inflation_included_with_tooltip_effect = yes
+			hidden_effect = {
+				set_country_flag = eoanb_infrastructure_expansion_ongoing_flag
+			}
 		}
 		
 		remove_effect = {
@@ -221,15 +1267,545 @@ BAV_decision_category_economy = {
 				eoanb_prestige_change = 1
 			}
 			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_innovative_add_one = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
 			set_temp_variable = {
 				unemployment_value = -0.0002
 			}
 			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_infrastructure_expansion_ongoing_flag
+			}
 		}
 		
 		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Invest into Weapons Technologies
+	BAV_decision_invest_into_weapons_technologies = {
+
+		icon = generic_industry
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_rifling_and_artillery
+			has_stability > 0.4
+			PS_pol_positive = yes
+			has_war = no
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1.5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		
+		days_remove = 180
+
+		modifier = {
+			research_speed_factor = -0.025
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -1.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			#custom_effect
+			if = {
+				limit = {
+					NOT = { has_tech = rifle_equipment1 }
+				}
+				set_technology = { rifle_equipment1 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = rifle_equipment2 }
+				}
+				set_technology = { rifle_equipment2 = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = rifle_equipment3 }
+				}
+				set_technology = { rifle_equipment3 = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = infantry_weapons }
+			}
+			if = {
+				limit = {
+					NOT = { has_tech = rml_field_gun }
+				}
+				set_technology = { rml_field_gun = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = rifled_howitzer }
+				}
+				set_technology = { rifled_howitzer = 1 }
+			}
+			else_if = {
+				limit = {
+					NOT = { has_tech = rml_field_gun }
+				}
+				set_technology = { rml_field_gun = 1 }
+			}
+			else = {
+				add_tech_bonus = { bonus = 1 uses = 1 category = artillery }
+			}
+			EOANBSYS_institutions_mechanization_add_two = yes
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Eisenwerk-Gesellschaft Maximilians-Hütte
+	BAV_mission_maxhutte = {
+		
+		icon = generic_factory
+		
+		allowed = { always = no }
+		
+		available = {
+			owns_state = 53
+			53 = {
+				steel_mill > 0
+			}
+			has_tech = bessemer_process
+			has_idea = siemens_martin_process
+		}
+		
+		activation = { always = no }
+
+		priority = 80
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 53
+			}
+		}
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1095
+
+		#add a temporary idea
+		#modifier = {
+		#	production_speed_steel_mill_factory_factor = 0.25
+		#}
+
+		cancel_trigger = {
+			NOT = { owns_state = 53 }
+		}
+		
+		timeout_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_failed_economic_expansion
+				days = 180
+			}
+			if = {
+				limit = {
+					is_ai = no
+				}
+				EOANBSYS_institutions_mechanization_sub_two = yes
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		
+		complete_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_successful_economic_expansion
+				days = 180
+			}
+			add_victory_points = {
+				province = 3571
+				value = 1
+			}
+			set_province_name = {
+				id = 3571
+				name = "Burglengenfeld"
+			}
+			53 = {
+				add_extra_state_shared_building_slots = 1
+				add_resource = {
+					type = iron
+					amount = 1
+				}
+				add_resource = {
+					type = coal
+					amount = 1
+				}
+			}
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Maschinenfabrik Augsburg AG
+	BAV_mission_maschinenfabrik_augsburg = {
+		
+		icon = machine_gear_cogwheel
+		
+		allowed = { always = no }
+		
+		available = {
+			owns_state = 52
+			52 = {
+				machine_parts_factory > 0
+			}
+			has_tech = high_speed_steam_engine
+			has_idea = porter_allen_engine
+		}
+		
+		activation = { always = no }
+
+		priority = 70
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 52
+			}
+		}
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1095
+
+		#add a temporary idea
+		#modifier = {
+		#	production_speed_machine_parts_factory_factor = 0.25
+		#}
+
+		cancel_trigger = {
+			NOT = { owns_state = 52 }
+		}
+		
+		timeout_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_failed_economic_expansion
+				days = 180
+			}
+			if = {
+				limit = {
+					is_ai = no
+				}
+				EOANBSYS_institutions_mechanization_sub_two = yes
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		
+		complete_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_successful_economic_expansion
+				days = 180
+			}
+			add_victory_points = {
+				province = 3705
+				value = 1
+			}
+			52 = { add_extra_state_shared_building_slots = 1 }
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Lokomotivfabrik Krauss & Comp.
+	BAV_mission_lokomotivfabrik_krauss = {
+		
+		icon = train_2
+		
+		allowed = { always = no }
+		
+		available = {
+			owns_state = 52
+			52 = {
+				machine_parts_factory > 0
+			}
+			has_tech = steel_railways
+			has_idea = standardized_gauge
+		}
+		
+		activation = { always = no }
+
+		priority = 60
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 52
+			}
+		}
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1095
+
+		#add a temporary idea
+		#modifier = {
+		#	production_speed_machine_parts_factory_factor = 0.25
+		#}
+
+		cancel_trigger = {
+			NOT = { owns_state = 52 }
+		}
+		
+		timeout_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_failed_economic_expansion
+				days = 180
+			}
+			if = {
+				limit = {
+					is_ai = no
+				}
+				EOANBSYS_institutions_mechanization_sub_two = yes
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		
+		complete_effect = {
+			#change once MIOs are a thing in our mod
+			add_timed_idea = {
+				idea = BAV_idea_successful_economic_expansion
+				days = 180
+			}
+			add_equipment_to_stockpile = { type = train_equipment amount = 10 producer = BAV }
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = transport_tech }
+			52 = { add_extra_state_shared_building_slots = 1 }
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Maschinenbau-Gesellschaft Klett & Co.
+	BAV_mission_maschinenbau_gesellschaft_klett = {
+		
+		icon = generic_assassination
+		
+		allowed = { always = no }
+		
+		available = {
+			owns_state = 54
+			54 = {
+				arms_factory > 1
+			}
+			has_tech = tech_infantry_breech_loading
+		}
+		
+		activation = { always = no }
+
+		priority = 50
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 54
+			}
+		}
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1095
+
+		#add a temporary idea
+		#modifier = {
+		#	production_speed_arms_factory_factor = 0.25
+		#}
+
+		cancel_trigger = {
+			NOT = { owns_state = 54 }
+		}
+		
+		timeout_effect = {
+			add_timed_idea = {
+				idea = BAV_idea_failed_economic_expansion
+				days = 180
+			}
+			if = {
+				limit = {
+					is_ai = no
+				}
+				EOANBSYS_institutions_mechanization_sub_two = yes
+				add_political_power = -50
+				add_stability = -0.02
+			}
+		}
+		
+		complete_effect = {
+			#change once MIOs are a thing in our mod
+			add_timed_idea = {
+				idea = BAV_idea_successful_economic_expansion
+				days = 180
+			}
+			add_tech_bonus = { bonus = 0.75 uses = 1 category = infantry_weapons }
+			54 = { add_extra_state_shared_building_slots = 1 }
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Expand Königlich Bayerische Gewehrfabrik
+	BAV_decision_expand_bayerische_gewehrfabrik = {
+
+		icon = generic_industry
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_expand_koniglich_bayerische_gewehrfabrik
+			NOT = { has_country_flag = eoanb_industry_development_ongoing_flag }
+		}
+
+		visible = {
+			owns_state = 53
+		}
+
+		fire_only_once = yes
+		
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 5
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 99.9
+		}
+		custom_cost_text = eoanb_money_and_political_power_100
+		
+		days_remove = 730
+
+		modifier = {
+			political_power_gain = -0.05
+		}
+		
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -100
+			hidden_effect = {
+				set_country_flag = eoanb_industry_development_ongoing_flag
+			}
+		}
+		
+		remove_effect = {
+			53 = {
+				add_extra_state_shared_building_slots = 1
+				add_building_construction = {
+					type = arms_factory
+					level = 1
+					instant_build = yes
+				}
+			}
+			set_temp_variable = {
+				eoanb_prestige_change = 3
+			}
+			eoanb_change_prestige_score = yes
+			EOANBSYS_institutions_mechanization_add_two = yes
+			set_temp_variable = {
+				unemployment_value = -0.0002
+			}
+			add_unemployment_effect = yes
+			hidden_effect = {
+				clr_country_flag = eoanb_industry_development_ongoing_flag
+			}
+		}
+		
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Take a Cheap Loan with the Bayerische Hypothekenbank
+	BAV_decision_take_cheap_loan = {
+
+		icon = money
+
+		#allowed = { tag = BAV }
+		
+		available = {
+			has_stability > 0.3
+			set_temp_variable = { loan_size_to_check = 50 }
+			has_less_than_specific_loan_size = yes
+		}
+
+		visible = {
+			has_country_flag = BAV_bayerische_bank_empowered_flag
+		}
+
+		cost = 50
+		
+		days_re_enable = 1825
+		
+		complete_effect = {
+			set_temp_variable = { loans_amount = 5 }
+			take_loan_without_inflation_effect = yes
+		}
+
+		ai_will_do = {
 			base = 1000
+			modifier = {
+				factor = 0
+				set_temp_variable = { loan_size_to_check = 20 }
+				has_more_than_specific_loan_size = yes
+			}
 		}
 	}
 }
