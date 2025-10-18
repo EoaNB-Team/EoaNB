@@ -1897,21 +1897,9 @@ BAV_decision_category_military = {
 		
 		allowed = { always = no }
 		
-		available = { 
-			num_of_civilian_factories > 4
-			logging_camp > 1
-			steel_mill > 0
-			machine_parts_factory > 0
-			has_railway_connection = {
-				start_province = 707
-				target_province = 11417
-			}
-			has_tech = interchange_parts
-			has_idea = NA_B_medium_scale_railways
-			OR = {
-				has_idea = GEC_idea_gewerbefreiheit
-				has_idea = GEC_idea_gewerbeordnung
-			}
+		available = {
+			NOT = { has_idea = BAV_unexperiencedgen }
+			NOT = { has_idea = BAV_landtaghindrance }
 		}
 		
 		activation = { always = no }
@@ -1922,7 +1910,7 @@ BAV_decision_category_military = {
 
 		is_good = no
 		
-		days_mission_timeout = 5000
+		days_mission_timeout = 1085
 		
 		timeout_effect = {
 			if = {
@@ -1935,11 +1923,12 @@ BAV_decision_category_military = {
 		}
 		
 		complete_effect = {
-			swap_ideas = { remove_idea = agrarian add_idea = industrializing }
-			52 = { add_extra_state_shared_building_slots = 1 }
-			set_temp_variable = { eoanb_prestige_change = 5 }
+			#army modifier
+			army_experience = 50
+			add_war_support = 0.03
+			add_doctrine_cost_reduction = { cost_reduction = 0.5 uses = 2 category = land_doctrine }
+			set_temp_variable = { eoanb_prestige_change = 2 }
 			eoanb_change_prestige_score = yes
-			EOANBSYS_institutions_mechanization_add_five = yes
 		}
 
 		ai_will_do = {
@@ -2392,7 +2381,7 @@ BAV_decision_category_military = {
 		}
 		custom_cost_text = eoanb_money_and_political_power_50_and_command_power_50
 		
-		days_remove = 1
+		days_remove = 180
 		
 		complete_effect = {
 			set_temp_variable = { money_to_gain = -1 }
@@ -2408,10 +2397,107 @@ BAV_decision_category_military = {
 		
 		ai_will_do = {
 			base = 500
-			modifier = {
-				factor = 0
-				has_equipment = { infantry_equipment > 1999 }
+		}
+	}
+
+	#Bavarian Army Reform
+	BAV_mission_bavarian_army_reform = {
+		
+		icon = generic_military
+		
+		allowed = { always = no }
+		
+		available = {
+			#
+		}
+		
+		activation = { always = no }
+
+		priority = 90
+
+		fire_only_once = yes
+
+		is_good = no
+		
+		days_mission_timeout = 1085
+		
+		timeout_effect = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				add_political_power = -50
+				add_stability = -0.02
 			}
+		}
+		
+		complete_effect = {
+			#army modifier
+			army_experience = 50
+			add_war_support = 0.03
+			add_doctrine_cost_reduction = { cost_reduction = 0.5 uses = 2 category = land_doctrine }
+			set_temp_variable = { eoanb_prestige_change = 2 }
+			eoanb_change_prestige_score = yes
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+}
+
+BAV_decision_category_politics = {
+
+	#Abandon the Landgerichte
+	BAV_decision_abandon_the_landgerichte = {
+
+		icon = justice
+		
+		#allowed = { tag = BAV }
+
+		available = {
+			has_completed_focus = BAV_focus_separation_of_powers
+		}
+
+		visible = {
+			#
+		}
+
+		fire_only_once = yes
+		
+		cost = 100
+		
+		days_remove = 180
+
+		modifier = {
+			political_power_gain = -0.1
+		}
+		
+		complete_effect = {
+			add_stability = -0.02
+			decrease_legitimacy_by_three = yes
+			if = {
+				limit = {
+					NOT = { has_variable = political_legitimacy_equilibrium_custom }
+				}
+				set_variable = { political_legitimacy_equilibrium_custom = -0.03 }
+			}
+			else = {
+				add_to_variable = {
+					political_legitimacy_equilibrium_custom = -0.03
+				}
+			}
+		}
+		
+		remove_effect = {
+			increase_ps_by_one = yes
+			add_stability = 0.05
+			add_popularity = { ideology = centrism popularity = 0.03 }
+			add_popularity = { ideology = ideology_social_liberalism popularity = 0.02 }
+		}
+		
+		ai_will_do = {
+			base = 100
 		}
 	}
 }
