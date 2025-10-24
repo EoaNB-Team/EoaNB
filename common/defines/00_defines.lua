@@ -859,7 +859,7 @@ NDefines = {
 		CHANCE_TO_AVOID_HIT_AT_NO_DEF = 60,	           -- chance to avoid hit if no defences left.
 		COMBAT_MOVEMENT_SPEED = 0.33,	               -- speed reduction base modifier in combat
 		TACTIC_SWAP_FREQUENCEY = 24,                   -- hours between tactic swaps
-		PREFERRED_TACTIC_CHARACTER_SKILL_LEVEL_REQUIRED = 5, -- Which level a field marhal or general has to be before they can pick their preferred tactic
+		PREFERRED_TACTIC_CHARACTER_SKILL_LEVEL_REQUIRED = 3, -- Which level a field marhal or general has to be before they can pick their preferred tactic
 		COUNTRY_PREFERRED_TACTIC_WEIGHT_FACTOR = 0.25,  -- extra weight multiplier for the country preferred tactic when doing weighted random
 		ARMY_GENERAL_PREFERRED_TACTIC_WEIGHT_FACTOR = 0.5,   -- extra weight multiplier for the army general preferred tactic when doing weighted random
 		FIELD_MARSHAL_PREFERRED_TACTIC_WEIGHT_FACTOR = 0.25, -- extra weight multiplier for the field marhsal preferred tactic when doing weighted random
@@ -3911,9 +3911,9 @@ NDefines = {
 		COUNTRY_LEADER_BASE_EXPIRE_YEAR_LENGTH = 5, -- When creating a dynamic country leader if an expire date is not set it will have 5 years as a base expiration date
 		COUNTRY_LEADER_BASE_RANDOM_MAX_YEAR_LENGTH = 15, -- Max random value added to COUNTRY_LEADER_BASE_EXPIRE_YEAR_LENGTH
 
-		SPECIALIST_ADVISOR_MIN_RANK = 4,
-		EXPERT_ADVISOR_MIN_RANK = 6,
-		GENIUS_ADVISOR_MIN_RANK = 8,
+		SPECIALIST_ADVISOR_MIN_RANK = 3,
+		EXPERT_ADVISOR_MIN_RANK = 4,
+		GENIUS_ADVISOR_MIN_RANK = 5,
 	},
 
 	NSupply = {
