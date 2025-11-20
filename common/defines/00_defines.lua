@@ -621,6 +621,7 @@ NDefines = {
 		EFFICIENCY_LOSS_PER_UNUSED_DAY = 1,		-- Daily loss of efficiency for unused factory slots ( efficiency is tracked per factory slot in the production line )
 		RESOURCE_PENALTY_WARNING_CRITICAL_RATIO =  0.8, -- Switch to red progress bar if penalty is over threshold
 		RESOURCE_TO_ENERGY_COEFFICIENT = 10.0,		-- How much energy per coal produces
+		BASE_COUNTRY_ENERGY_PRODUCTION = 10.0, 			-- The base energy production of a country
 		ENERGY_SCALING_COST_BY_FACTORY_COUNT = 0.02, -- Scales energy cost based on the total number of factories
 		BASE_ENERGY_COST = 1.0,						-- How much energy per factory consumes
 		BASE_FACTORY_SPEED = 5, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
