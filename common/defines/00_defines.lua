@@ -624,6 +624,8 @@ NDefines = {
 		BASE_COUNTRY_ENERGY_PRODUCTION = 10.0, 			-- The base energy production of a country
 		ENERGY_SCALING_COST_BY_FACTORY_COUNT = 0.02, -- Scales energy cost based on the total number of factories
 		BASE_ENERGY_COST = 1.0,						-- How much energy per factory consumes
+		ENERGY_COST_CAP = 6,						-- Maximum energy cost per factory
+		ENERGY_SCALE_PER_TRADE_FACTORY_EXPORT = 0.25, -- Factor of how many of the factories gained from trade is affects the energy cost scaling		
 		BASE_FACTORY_SPEED = 5, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
 		BASE_FACTORY_SPEED_MIL = 5, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
 		BASE_FACTORY_SPEED_NAV = 2.0, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
@@ -1577,6 +1579,7 @@ NDefines = {
 		REPAIR_AND_RETURN_AMOUNT_SHIPS_MEDIUM = 0.4,					-- % of total damaged ships, that will be sent for repair-and-return in one call.
 		REPAIR_AND_RETURN_AMOUNT_SHIPS_HIGH = 0.8,						-- % of total damaged ships, that will be sent for repair-and-return in one call.
 		REPAIR_AND_RETURN_UNIT_DYING_STR = 0.2,							-- Str below this point is considering a single ship "dying", and a high priority to send to repair.
+		AI_MAX_TASKFORCES_PER_TRAINING_OBJECTIVE = 5,					-- Max number of taskforces we desire for AI to put in each fleet that is training.
 		EXPERIENCE_LOSS_FACTOR = 1.00,                 					-- percentage of experienced solders who die when manpower is removed
 		NAVY_EXPENSIVE_IC = 5500,										-- How much IC is considering the fleet to be expensive. Those expensive will triger the alert, when are on low STR.
 		MISSION_MAX_REGIONS = 0,										-- Limit of the regions that can be assigned to naval mission. Set to 0 for unlimited.
@@ -1658,7 +1661,8 @@ NDefines = {
 		NAVY_REPAIR_BASE_SEARCH_SCORE_PER_SHIP_WAITING_EXTRA_SHIP = 5,  -- if a naval base has more ships than it can repair, it will get penalties
 		NAVY_REPAIR_BASE_SEARCH_SCORE_PER_SLOT = 1.0,					-- while searching for a naval base for repairs, the bases gets a bonus to their scores per empty slot they have
 		NAVY_REPAIR_BASE_SEARCH_BOOST_FOR_SAME_COUNTRY = 5,				-- while searching for a naval base for repairs, your own bases gets a bonus
-		
+		NAVY_REPAIR_BASE_PRIORITY_THRESHOLD_LOW = 2,					-- bases with a level above this value will be set to low prio	(bases between these levels will get medium prio)
+		NAVY_REPAIR_BASE_PRIORITY_THRESHOLD_HIGH = 7,					-- bases with a level above this value will be set to high prio (bases between these levels will get medium prio)	
 
 		CONVOY_SPOTTING_COOLDOWN = 0.3,  -- % of travel time 
 		CONVOY_SPOTTING_COOLDOWN_MIN = 36, -- minimum cooldown time
@@ -2340,6 +2344,10 @@ NDefines = {
 		EQUIPMENT_MARKET_SCORE_FACTOR_AI_STRAT_WEIGHT = 50.0,           -- Score coefficient for AiStratWeight (high is prio)
 		EQUIPMENT_MARKET_SCORE_FACTOR_DIPLO_OPINION = 1.0,              -- Score coefficient for DiploOpinion, mainly used as tie breaker (high is good)
 
+		INFRASTRUCTURE_PERCENTAGE_AT_WHICH_TO_BUILD_INFRA_CAP_BUILDING = 0.75,		-- When should we build a cap building on a state
+		NUM_FACTORIES_IN_STATE_TO_WANT_ENERGY_REDUCTION = 6,			-- How many mils should we want in a state before we think about building energy reduction cap building
+		TOTAL_STATE_EXTRACTED_RESOURCES_FOR_BUILDING_RESOURCE_CAP_BUILDING = 30.0,	--How many resources required for building a resource inproving infra cap building		
+		
 		DIPLOMACY_ACCEPT_CONDITIONAL_SURRENDER_MANPOWER_IN_FIELD = -20,	-- Scale multiplied by difference in manpower in field
 		DIPLOMACY_ACCEPT_CONDITIONAL_SURRENDER_GLOBAL_TENSION = -10,	-- Multiplied by WT
 		DIPLOMACY_ACCEPT_CONDITIONAL_SURRENDER_WAR_SUPPORT = -10,		-- Multiplied by recipient WS
