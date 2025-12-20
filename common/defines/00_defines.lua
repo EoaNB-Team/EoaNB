@@ -2830,6 +2830,8 @@ NDefines = {
 		NAVAL_PATROL_PLANES_PER_SHIP_RAIDING = 10.0,		-- Amount of naval patrol planes per ship on a convoy raid mission
 		NAVAL_PATROL_PLANES_PER_SHIP_ESCORTING = 10.0,		-- Amount of naval patrol planes per ship on a convoy escort mission
 
+		NAVAL_COAST_DEFENSE_TENSION_THRESHOLD = 0.5,		-- The world tension threshold where countries start pre-emptively protecting their home coast
+		
 		NAVAL_FIGHTERS_PER_PLANE = 1.0,						-- Amounts of air superiority planes requested per enemy plane
 		NAVAL_STRIKE_PLANES_PER_ARMY = 0,					-- Amount of planes requested per enemy army
 		NAVAL_STRIKE_PLANES_PER_SHIP = 20,					-- Amount of bombers requested per enemy ship
