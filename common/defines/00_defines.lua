@@ -2465,7 +2465,7 @@ NDefines = {
 		MINIMUM_FUEL_DAYS_TO_ASK_LEND_LEASE = 2,	-- AI will accept to lend lease fuel only if the player have less fuel than this number multiply by his max daily consumption.
 		MINIMUM_FUEL_DAYS_TO_ACCEPT_LEND_LEASE = 10, -- AI will accept to lend lease fuel only if they have more fuel than this number multiply by their max daily consumption. Note that for a GiE asking to its host, we divide this number by 2.
 
-		DEFAULT_SUPPLY_TRUCK_BUFFER_RATIO = 1.5,	-- ai will set to truck buffer ratio to this. can be modified by wanted_supply_trucks min_wanted_supply_trucks ai strats
+		DEFAULT_SUPPLY_TRUCK_BUFFER_RATIO = 0,	-- ai will set to truck buffer ratio to this. can be modified by wanted_supply_trucks min_wanted_supply_trucks ai strats
 		DEFAULT_SUPPLY_TRAIN_NEED_FACTOR = 1.5,     -- AI multiplies current train usage by this to determine desired nr of wanted trains. Can be modified by wanted_supply_train min_wanted_supply_trains ai strats.
 
 		POLITICAL_IDEA_MIN_SCORE = 0.1,				-- Only replace or add an idea if score is above this score.
@@ -3281,7 +3281,7 @@ NDefines = {
 		UPDATE_SUPPLY_BOTTLENECKS_FREQUENCY_HOURS = 168;     -- Check for and try to fix supply bottlenecks this often. (168 hours = 1 week)
 		FIX_SUPPLY_BOTTLENECK_SATURATION_THRESHOLD = 0.75;  -- Try to fix supply bottlenecks if supply node saturation exceeds this value.
 
-		UPDATE_SUPPLY_MOTORIZATION_FREQUENCY_HOURS = 52;     -- Check if activating motorization would improve supply situation this often.
+		UPDATE_SUPPLY_MOTORIZATION_FREQUENCY_HOURS = 999;     -- Check if activating motorization would improve supply situation this often.
 
 		AI_PREFERRED_TACTIC_WEEKLY_CHANGE_CHANCE = 0.05, 	-- Chance for AI to select a new preferred tactic if they don't have one selected
 
@@ -3365,7 +3365,7 @@ NDefines = {
 		PEACE_AI_EVALUATE_OTHER_IF_CLAIM = true,                    -- Whether AI should evaluate giving states to other winners if they have a claim on the state (may affect performance on new conference turn)
 		PEACE_AI_EVALUATE_OTHER_ALWAYS = false,                     -- Whether AI should always evaluate giving states to other winners (!!! may heavily affect performance on new conference turn for large peace conferences !!!)
 
-		DIVISION_SUPPLY_RATIO_TO_MOTORIZE = 0.80,						-- If supply ratio is less than this, consider motorizing any applicable nearby supply hub
+		DIVISION_SUPPLY_RATIO_TO_MOTORIZE = 0.0,						-- If supply ratio is less than this, consider motorizing any applicable nearby supply hub
 
 		INDUSTRIAL_ORG_TRAIT_UNLOCK_RANDOMNESS = 3,		-- AI will pick a random from N top traits when choosing a trait to unlock
 		INDUSTRIAL_ORG_POLICY_CHANGE_RANDOMNESS = 3,	-- AI will pick a random from N top policies when choosing a policy to attach to an MIO
@@ -4156,23 +4156,23 @@ NDefines = {
 		NODE_FLOW_BONUS_PER_RAIL_LEVEL = 0.34,
 
 		-- rivers will transfer in between nodes as if they were this level
-		RIVER_RAILWAY_LEVEL = 1,
+		RIVER_RAILWAY_LEVEL = 2,
 
 		-- defines that are used for supply reach for floating harbors
-		FLOATING_HARBOR_INITIAL_SUPPLY_FLOW = 2.6,
-		FLOATING_HARBOR_STARTING_PENALTY_PER_PROVINCE = 0.8,
-		FLOATING_HARBOR_ADDED_PENALTY_PER_PROVINCE = 0.8,
+		FLOATING_HARBOR_INITIAL_SUPPLY_FLOW = 0.0,
+		FLOATING_HARBOR_STARTING_PENALTY_PER_PROVINCE = 0.0,
+		FLOATING_HARBOR_ADDED_PENALTY_PER_PROVINCE = 0.0,
 
-		FLOATING_HARBOR_BASE_SUPPLY = 15.0, -- supply given by a floating harbor
-		FLOATING_HARBOR_BASE_DURATION = 21, -- duration of a full hp floating harbor
+		FLOATING_HARBOR_BASE_SUPPLY = 0, -- supply given by a floating harbor
+		FLOATING_HARBOR_BASE_DURATION = 0, -- duration of a full hp floating harbor
 		FLOATING_HARBOR_DURATION_RATIO_AT_MIN_HP = 0.0,  -- duration mult for a harbor that was reduced to 0 hp
 
-		FLOATING_HARBOR_MIN_DECAY = 0.2, -- Always reduce Floating Harbor longevity by this many "hours" per hour
-		FLOATING_HARBOR_DECAY_MAX_AIR_BONUS = -0.1, -- At 100% Friendly Air superiourity, change decay rate by this many "hours" per hour
-		FLOATING_HARBOR_DECAY_MAX_AIR_PENALTY = 0.4, -- At 100% Enemy Air superiourity, change decay rate by this many "hours" per hour
-		FLOATING_HARBOR_DECAY_MAX_NAVAL_BONUS = -0.2, -- At 100% Friendly naval superiourity, change decay rate by this many "hours" per hour
-		FLOATING_HARBOR_DECAY_MAX_NAVAL_PENALTY = 0.5, -- At 100% Enemy Naval superiourity, change decay rate by this many "hours" per hour
-		FLOATING_HARBOR_DECAY_NO_CONTROL_PENALTY = 1.0, -- If adjacent land province is not held, change decay rate by this many "hours" per hour
+		FLOATING_HARBOR_MIN_DECAY = 1.0, -- Always reduce Floating Harbor longevity by this many "hours" per hour
+		FLOATING_HARBOR_DECAY_MAX_AIR_BONUS = 0.0, -- At 100% Friendly Air superiourity, change decay rate by this many "hours" per hour
+		FLOATING_HARBOR_DECAY_MAX_AIR_PENALTY = 0.0, -- At 100% Enemy Air superiourity, change decay rate by this many "hours" per hour
+		FLOATING_HARBOR_DECAY_MAX_NAVAL_BONUS = 0.0, -- At 100% Friendly naval superiourity, change decay rate by this many "hours" per hour
+		FLOATING_HARBOR_DECAY_MAX_NAVAL_PENALTY = 0.0, -- At 100% Enemy Naval superiourity, change decay rate by this many "hours" per hour
+		FLOATING_HARBOR_DECAY_NO_CONTROL_PENALTY = 0.0, -- If adjacent land province is not held, change decay rate by this many "hours" per hour
 
 		SUPPLY_FLOW_DROP_REDUCTION_AT_MAX_INFRA = 0.30, -- max infrastructure level will reduce the supply flow drop off by this ratio
 		SUPPLY_FLOW_PENALTY_CROSSING_RIVERS = 0.20, -- crossing rivers introduces additional penalty
@@ -4184,11 +4184,11 @@ NDefines = {
 		SUPPLY_FLOW_DIST_LOGISTICS_FALLOFF_MIN_PENALTY_SCALE = 0.25, -- Logistics curve never reduces penalty facor below this limit
 
 		-- The range bonus added to a fully motorized hub. This supply is added on top of the XXX_INITIAL_SUPPLY_FLOW defined above.
-		SUPPLY_HUB_FULL_MOTORIZATION_BONUS = 2.2,
+		SUPPLY_HUB_FULL_MOTORIZATION_BONUS = 0.0,
 		-- How many trucks does it cost to fully motorize a hub
-		SUPPLY_HUB_FULL_MOTORIZATION_TRUCK_COST = 50.0,
+		SUPPLY_HUB_FULL_MOTORIZATION_TRUCK_COST = 0.0,
 		-- For each additional level of motorization on a hub (i.e. contry with set motoriazation) reduce max bonus for next level by this amount
-		SUPPLY_HUB_MOTORIZATION_MARGINAL_EFFECT_DECAY = 1.6,
+		SUPPLY_HUB_MOTORIZATION_MARGINAL_EFFECT_DECAY = 0.0,
 
 
 		-- used for calculating "flow" for railways.
@@ -4215,21 +4215,21 @@ NDefines = {
 		RAILWAY_CONVERSION_COOLDOWN_CORE = 5,
 		RAILWAY_CONVERSION_COOLDOWN_CIVILWAR = 0,
 
-		DEFAULT_STARTING_TRUCK_RATIO = 1.5, -- countries get this ratio of starting truck in their buffers compared to their need
+		DEFAULT_STARTING_TRUCK_RATIO = 0, -- countries get this ratio of starting truck in their buffers compared to their need
 		DEFAULT_STARTING_TRAIN_RATIO = 1, -- countries get this ratio of starting trains in their buffers compared to their need
 
 		SUPPLY_POINTS_PER_TRAIN = 1.0,  -- old default 1.25 -- Amount of supply that can fit in a train. (Trains distribute supply from capital to a supply node.)
 		NUM_RAILWAYS_TRAIN_FACTOR = 0.03, -- the train usage is scaled by railway distance between the supply node and the capital multiplied by this factor
 
-		BASE_SUPPLY_MULT_FOR_TRUCK_DEFAULT_BUFFER = 1.0,  -- initial value for wanted buffers over potential truck usage
+		BASE_SUPPLY_MULT_FOR_TRUCK_DEFAULT_BUFFER = 0,  -- initial value for wanted buffers over potential truck usage
 		BASE_SUPPLY_MULT_FOR_TRUCK_MIN_BUFFER = 0.0, -- min and max values for buffer ratio
 		BASE_SUPPLY_MULT_FOR_TRUCK_MAX_BUFFER = 100.0,
 
-		TRUCK_ATTRITION = 0.003, -- base truck attrition
-		TRUCK_ATTRITION_FACTOR = 0.65, --a scale on total truck attrition
+		TRUCK_ATTRITION = 0.0, -- base truck attrition
+		TRUCK_ATTRITION_FACTOR = 0.0, --a scale on total truck attrition
 
-		BASE_TRUCK_HP = 100.0,
-		TRUCK_HP_PER_ARMOR = 2,
+		BASE_TRUCK_HP = 0,
+		TRUCK_HP_PER_ARMOR = 0,
 
 		BASE_TRAIN_HP = 100.0,
 		TRAIN_ARMOR_TARGETING_WEIGHT = 0.01, -- For each health point gained by armor_value, enemy bombers are this much more likely to target
