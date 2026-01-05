@@ -198,22 +198,22 @@ static const float GB_CAM_MAX_FILLING_CLAMP = 0.85f; // 0 to 1 value for clampin
 static const float GB_THRESHOLD = 0.05f; // interpolation time
 static const float GB_THRESHOLD2 = 0.25f; // interpolation time
 //static const float3 GB_OUTLINE_COLOR = float3( 0.0f, 0.0f, 0.0f );
-static const float GB_OUTLINE_CUTOFF_SEA = 0.990f; // Magic number to balance cutoff on edges without neighbor (over Sea)
+static const float GB_OUTLINE_CUTOFF_SEA = 1.0f; // Magic number to balance cutoff on edges without neighbor (over Sea)
 static const float GB_OPACITY_NEAR = 1.0f; // Transparency when camera is near
 static const float GB_OPACITY_FAR = 0.9f;  // Transparency when camera is far
-static const float BORDER_NIGHT_DESATURATION_MAX = .0f; // how much border colors can get desaturated at night. 1.0f is full grey
+static const float BORDER_NIGHT_DESATURATION_MAX = 0.0f; // how much border colors can get desaturated at night. 1.0f is full grey
 static const float BORDER_FOW_REMOVAL_FACTOR = 1.0f; // How much of the FOW that is removed from the borders. 1.0f is no FOW
 static const float BORDER_LIGHT_REMOVAL_FACTOR = 1.0f; // How much of the light calculations that are removed from the borders. 1.0f is no light
-static const float GB_STRENGTH_CH1 = 1.0; // Opacity of bottom layer
-static const float GB_STRENGTH_CH2 = 1.0; // Opacity of top layer
+static const float GB_STRENGTH_CH1 = 0.0; // Opacity of bottom layer
+static const float GB_STRENGTH_CH2 = 0.0; // Opacity of top layer
 static const float GB_FIRST_LAYER_PRIORITY = 0.9; // Priority for first/second layer when both are active at the same pixel
-static const float BORDER_MAP_TILE = 18000.0f;
+static const float BORDER_MAP_TILE = 0.0f;
 
 // --------------------------------------------------------------
 // ------------------    SECONDARY COLOR MAP   ------------------
 // --------------------------------------------------------------
 
-static const float SEC_MAP_TILE = 6000.0f;
+static const float SEC_MAP_TILE = 0.0f;
 
 
 // --------------------------------------------------------------
