@@ -1,3 +1,4 @@
+
 NDefines = {
 
 	NGame = {
@@ -886,10 +887,10 @@ NDefines = {
 		LAND_COMBAT_COLLATERAL_FORT_FACTOR = 0.005,		-- Factor to scale collateral damage to forts with.
 		LAND_COMBAT_COLLATERAL_INFRA_FACTOR = 0.0022,	-- Factor to scale collateral damage to infra with.
 		LAND_COMBAT_FORT_DAMAGE_CHANCE = 5,		-- chance to get a hit to damage on forts. (out of 100)
-		ATTRITION_DAMAGE_ORG = 0.1,					   -- damage from attrition to Organisation
-		ATTRITION_EQUIPMENT_LOSS_CHANCE = 0.1,		   -- Chance for loosing equipment when suffer attrition. Scaled up the stronger attrition is. Then scaled down by equipment reliability.
+		ATTRITION_DAMAGE_ORG = 0.08,					   -- damage from attrition to Organisation
+		ATTRITION_EQUIPMENT_LOSS_CHANCE = 0.005,		   -- Chance for loosing equipment when suffer attrition. Scaled up the stronger attrition is. Then scaled down by equipment reliability.
 		ATTRITION_EQUIPMENT_PER_TYPE_LOSS_CHANCE = 0.1, -- Chance for loosing equipment when suffer attrition. Scaled up the stronger attrition is. Then scaled down by equipment reliability.
-		ATTRITION_WHILE_MOVING_FACTOR = 1,
+		ATTRITION_WHILE_MOVING_FACTOR = 1.1,
 		RELIABILITY_ORG_REGAIN = -0.3,                 -- how much reliability affects org regain
 		RELIABILITY_ORG_MOVING = -1.0,                 -- how much reliability affects org loss on moving
 		RELIABILITY_WEATHER = 3.0,                     -- how much reliability is afffecting weather impact
@@ -973,12 +974,12 @@ NDefines = {
 		SUPPLY_GRACE_MAX_REDUCE_PER_HOUR = 2,          -- supply grace is not decreased instantly when it is buffed temporarily and buff is removed
 		SUPPLY_ORG_MAX_CAP = 0.30,                     -- Max organization is factored by this if completely out of supply
 		MAX_OUT_OF_SUPPLY_DAYS = 30, 				   -- how many days of shitty supply until max penalty achieved
-		OUT_OF_SUPPLY_ATTRITION = 0.3,                 -- max attrition when out of supply
+		OUT_OF_SUPPLY_ATTRITION = 0.20,                 -- max attrition when out of supply
 		OUT_OF_SUPPLY_SPEED = -0.8,                    -- max speed reduction from supply
 		NON_CORE_SUPPLY_SPEED = -0.5,				   -- we are not running on our own VP supply so need to steal stuff along the way
 		NON_CORE_SUPPLY_AIR_SPEED = -0.25,			   -- we are not running on our own VP supply so need to steal stuff along the way, a bit less due to air supply
 		OUT_OF_SUPPLY_MORALE = -0.3,                   -- max org regain reduction from supply
-		TRAINING_ATTRITION = 0.06,		  			   -- amount of extra attrition from being in training
+		TRAINING_ATTRITION = 0.05,		  			   -- amount of extra attrition from being in training
 		TRAINING_MIN_STRENGTH = 0.1,					-- if strength is less than this, the unit will pause training until it's been reinforced
 		TRAINING_MAX_DAILY_COUNTRY_EXP = 0.06,			-- Maximum army XP gained per day from training
 		AIR_SUPPORT_BASE = 0.3,                        -- base ground bonus to troops when active planes helping them
@@ -1855,10 +1856,6 @@ NDefines = {
 		NAVAL_MINES_ACCIDENT_STRENGTH_LOSS = 50.0,						-- Amount of strength loss when hit by naval mine
 		NAVAL_MINES_ACCIDENT_ORG_LOSS_FACTOR = 0.5,						-- Amount of strength loss when hit by naval mine
 		
-		ATTRITION_WHILE_MOVING_FACTOR = 1.5,							-- attrition multiplier while moving & doing missions
-		ATTRITION_DAMAGE_ORG = 0.01,					   				-- damage from attrition to Organisation (relative to max org)
-		ATTRITION_DAMAGE_STR = 0.03,					   				-- damage from attrition to str (relative to max str)
-		ATTRITION_STR_DAMAGE_CHANCE = 0.2,								-- chance to get damaged at highest attrition
 			
 		NAVAL_ACCIDENT_CHANCE_REDUCTION_ON_POTF = 0.01,					-- Scale of the current chance for an accident to happen, applied for the pride of the fleet.
 		NAVAL_ACCIDENT_CRITICAL_HIT_CHANCE_REDUCTION_POTF = 0.01,		-- Scale of the current chance for a critical hit when an accident happens, applied for the pride of the fleet.
