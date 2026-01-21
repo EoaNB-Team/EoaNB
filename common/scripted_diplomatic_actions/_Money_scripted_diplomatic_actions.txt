@@ -1,688 +1,505 @@
-# MONEY SYSTEM #
 scripted_diplomatic_actions = {
-	bankroll = {
-		allowed = {}
-		selectable = {
-			NOT = {
-				ROOT={ has_country_flag = eoanb_is_bankrolling }
-			}
-			ROOT = {
-				set_temp_variable = { amount_of_money_to_check = PREV.money }
-				has_specific_amount_of_money = yes
-			}
-			ROOT = {
-				NOT = {
-					has_balance_in_negative = yes
-				}
-			}
-			NOT = { has_war_with = THIS }
-			NOT = { is_embargoed_by = THIS }
-		}
-		visible = {
-			NOT = {
-				check_variable = {
-					ROOT.bankrolled = THIS.id
-				}
-			}
-			NOT = {
-				tag = UCT
-				tag = BKW
-			}
-		}
+    bankroll = {
+        allowed = {}
+        
+        selectable = {
+            NOT = { ROOT = { has_country_flag = eoanb_is_bankrolling } }
+            ROOT = {
+                set_temp_variable = { amount_of_money_to_check = PREV.money }
+                has_specific_amount_of_money = yes
+                NOT = { has_balance_in_negative = yes }
+            }
+            NOT = { 
+                has_war_with = ROOT 
+                is_embargoed_by = ROOT
+            }
+        }
+        
+        visible = {
+            NOT = {
+                check_variable = { ROOT.bankrolled = THIS.id }
+                tag = UCT
+                tag = BKW
+            }
+        }
 
-		#cost = 5
+        icon = 1
+        requires_acceptance = yes
+        show_acceptance_on_action_button = yes
 
-		icon = 1
+        complete_effect = {
+            set_temp_variable = { money_send_temp = THIS.money }
+            multiply_temp_variable = { money_send_temp = 0.3 }
+            
+            THIS = {
+                set_variable = { bankrolled_recieving = money_send_temp }
+                add_dynamic_modifier = { modifier = bankrolling_recieving_money }
+                ROOT = {
+                    set_variable = { bankrolled = PREV.id }
+                }
+            }
+            ROOT = {
+                set_country_flag = eoanb_is_bankrolling
+                multiply_temp_variable = { money_send_temp = -1 }
+                set_variable = { bankrolled_giving = money_send_temp }
+                add_dynamic_modifier = { modifier = bankrolling_giving_money }
+            }
+        }
 
-		requires_acceptance = yes
-		show_acceptance_on_action_button = yes   
+        send_scripted_gui = bankroll_gui
+        accept_title = BANKROLLING_ACCEPT_TITLE
+        accept_description = BANKROLLING_ACCEPT_DESC
 
-		complete_effect = {
-			THIS = {
-				#calculate_money_balance = yes
-				set_temp_variable = { money_send_temp = THIS.money }
-				multiply_temp_variable = { money_send_temp = 0.3 }
-				set_variable = { bankrolled_recieving = money_send_temp }
-				add_dynamic_modifier = {
-					modifier = bankrolling_recieving_money
-				}
-				ROOT = {
-					set_variable = {
-						var = bankrolled
-						value = PREV.id
-					}
-				}
-			}
-			ROOT = {
-				set_country_flag = eoanb_is_bankrolling
-				set_temp_variable = { money_send_temp = PREV.money }
-				multiply_temp_variable = { money_send_temp = 0.3 }
-				multiply_temp_variable = { money_send_temp = -1 }
-				set_variable = { bankrolled_giving = money_send_temp }
-				add_dynamic_modifier = {
-					modifier = bankrolling_giving_money
-				}
-			}
-		}
-
-		send_scripted_gui = bankroll_gui
-
-		accept_title = BANKROLLING_ACCEPT_TITLE
-		accept_description = BANKROLLING_ACCEPT_DESC
-
-		#reject_effect = {} # runs when the action is properly sent and rejected
-		#can_be_sent = {} # send button will be disabled if no
-		# send_description = eoanb_bankrolling_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# #reset_receive_effect = {}
-		# #can_be_accepted = { always = no } # accept button will be disabled if no
-		# receive_description = eoanb_bankrolling_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# ai_will_do to decide if AI should send this action or not
-		ai_acceptance = {
-			Base = { # name is used for loc
-				base = -20  
-				modifier = {
-					add = -40
-				}
-			}
-			Puppet = {
-			       base = 0 
-				   modifier = {
-				    add = -1000 
-					
-					OR = {
-					    is_puppet = yes 
-						is_subject = yes 
-					}
-				}
-				 
-			}
+        ai_acceptance = {
+            Base = {
+                base = -60
+            }
+            
+            Puppet = {
+                base = 0
+                modifier = {
+                    add = -1000
+                    OR = {
+                        is_puppet = yes
+                        is_subject = yes
+                    }
+                }
+            }
+            
             Relations = {
-                base = 0 
-				modifier = {
-				    add = THIS.opinion@ROOT 
-				} 
+                base = 0
+                modifier = {
+                    add = THIS.opinion@ROOT
+                }
             }
+            
             "Strategic Considerations" = {
-                base = 0 
-				    modifier = {
-				        add = 15   
-                        check_variable = { ROOT.score_array_position_var >  8 }		
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 16 		
-			                compare = less_than_or_equals 
-			            }	
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 16 		
-			                compare = greater_than   
-			            }
+                base = 0
+                
+                modifier = {
+                    add = 15
+                    check_variable = { ROOT.score_array_position_var > 8 }
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 16
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = 25  
-						AND = {
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 8		
-			                compare = less_than_or_equals 
-			            }
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 8		
-			                compare = greater_than   
-			            }
-						} 
-                    }	
-				    modifier = {
-				        add = -15    	
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 16 		
-			                compare = greater_than 
-			            }	
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 16 		
-			                compare = less_than_or_equals  
-			            }
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 16
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = 20     	
-                        check_variable = { ROOT.overall_score > This.overall_score }	
+                }
+                
+                modifier = {
+                    add = 25
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 8
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = -20      	
-                        check_variable = { ROOT.overall_score < This.overall_score }	
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = pre_industrial_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = pre_industrial_era
-					    	}	
-						}
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 8
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = 20       	
-                        check_variable = { this.rival_nation = root.rival_country }
+                }
+                
+                modifier = {
+                    add = -15
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 16
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = victorian_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = victorian_era
-					    	}	
-						}
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 16
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = machine_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = machine_era
-					    	}	
-						}
-                    }		
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = oil_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = oil_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = aviation_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = aviation_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = modern_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = modern_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = atomic_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = atomic_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = information_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = information_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = digital_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = digital_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = post_digital_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = post_digital_era
-					    	}	
-						}
+                }
+                
+                modifier = {
+                    add = 20
+                    check_variable = { ROOT.overall_score > THIS.overall_score }
+                }
+                modifier = {
+                    add = -20
+                    check_variable = { ROOT.overall_score < THIS.overall_score }
+                }
+                
+                modifier = {
+                    add = -15
+                    OR = {
+                        AND = {
+                            THIS = { has_idea = pre_industrial_era }
+                            NOT = { ROOT = { has_idea = pre_industrial_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = victorian_era }
+                            NOT = { ROOT = { has_idea = victorian_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = machine_era }
+                            NOT = { ROOT = { has_idea = machine_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = oil_era }
+                            NOT = { ROOT = { has_idea = oil_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = aviation_era }
+                            NOT = { ROOT = { has_idea = aviation_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = modern_era }
+                            NOT = { ROOT = { has_idea = modern_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = atomic_era }
+                            NOT = { ROOT = { has_idea = atomic_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = information_era }
+                            NOT = { ROOT = { has_idea = information_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = digital_era }
+                            NOT = { ROOT = { has_idea = digital_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = post_digital_era }
+                            NOT = { ROOT = { has_idea = post_digital_era } }
+                        }
                     }
-				    modifier = {
-				        add = 15        	
-                        THIS = {
-						    is_neighbor_of = ROOT 
-						}
+                }
+                
+                modifier = {
+                    add = 20
+                    check_variable = { THIS.rival_nation = ROOT.rival_country }
+                }
+                
+                modifier = {
+                    add = 15
+                    THIS = { is_neighbor_of = ROOT }
+                }
+                
+                modifier = {
+                    add = 55
+                    THIS = { has_war_together_with = ROOT }
+                }
+                
+                modifier = {
+                    factor = 0
+                    THIS = {
+                        OR = {
+                            is_puppet = yes
+                            is_subject = yes
+                        }
                     }
-			        modifier = { 
-					    factor = 0     
-			            THIS = {
-				            OR = {
-				          	    is_puppet = yes
-				        		is_subject = yes 
-					        }
-				        }
-			        }
-				modifier = {
-			   	 	add = 55 
-					THIS = {
-				    	has_war_together_with = ROOT 
-					} 
-				}					
+                }
             }
-		}
-	}
-	bankroll_remove = {
-		allowed = {}
-		visible = {
-			check_variable = {
-				ROOT.bankrolled = THIS.id
-			}
-		}
+        }
+    }
+    
+    bankroll_remove = {
+        allowed = {}
+        
+        visible = {
+            check_variable = { ROOT.bankrolled = THIS.id }
+        }
 
-		cost = 5
+        cost = 5
+        icon = 5
+        requires_acceptance = no
+        show_acceptance_on_action_button = no
 
-		icon = 5
+        complete_effect = {
+            THIS = {
+                remove_dynamic_modifier = { modifier = bankrolling_recieving_money }
+            }
+            ROOT = {
+                hidden_effect = {
+                    clr_country_flag = eoanb_is_bankrolling
+                }
+                remove_dynamic_modifier = { modifier = bankrolling_giving_money }
+                clear_variable = ROOT.bankrolled
+            }
+        }
 
-		requires_acceptance = no
-		show_acceptance_on_action_button = no
+        send_scripted_gui = stop_bankroll_gui
+        
+        ai_desire = {
+            base = 10
+        }
+    }
+    
+    take_on_loan = {
+        allowed = { always = yes }
+        visible = { always = yes }
+        
+        selectable = {
+            THIS = { has_taken_a_loan = yes }
+            NOT = { is_embargoed_by = THIS }
+            NOT = { has_war_with = THIS }
+            check_variable = {
+                var = ROOT.money
+                value = THIS.current_loans_sum
+                compare = greater_than_or_equals
+                tooltip = check_money_to_loan_size_tt
+            }
+        }
 
-		complete_effect = {
-			THIS = {
-				remove_dynamic_modifier = {
-					modifier = bankrolling_recieving_money
-				}
-			}
-			ROOT = {
-				hidden_effect = {
-					clr_country_flag = eoanb_is_bankrolling
-				}
-				remove_dynamic_modifier = {
-					modifier = bankrolling_giving_money
-				}
-				clear_variable = ROOT.bankrolled
-			}
-		}
+        requires_acceptance = yes
+        show_acceptance_on_action_button = yes
+        icon = 1
 
-		send_scripted_gui = stop_bankroll_gui
+        on_sent_effect = {
+        }
 
-		#reject_effect = {} # runs when the action is properly sent and rejected
-		#can_be_sent = {} # send button will be disabled if no
-		# send_description = eoanb_clear_bankrolling_target_sent # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# #reset_receive_effect = {}
-		# #can_be_accepted = { always = no } # accept button will be disabled if no
-		# receive_description = eoanb_clear_bankrolling_target_recieved # if there is no scripted gui, this desc will be used in send yes/no pop up
-		# ai_will_do to decide if AI should send this action or not
-		ai_desire = {
-			base = 10
-		}
-	}
-	take_on_loan = {
-		allowed = {
-			always = yes
-		}
-		visible = {
-			always = yes
-		}
-		selectable = {
-			THIS = {
-				has_taken_a_loan = yes
-			}
-			NOT = { is_embargoed_by = THIS }
-			NOT = { has_war_with = THIS }
-			check_variable = {
-				var = ROOT.money
-				value = THIS.current_loans_sum
-				compare = greater_than_or_equals
-				tooltip = check_money_to_loan_size_tt
-			}
-		}
+        complete_effect = {
+            THIS = {
+                set_temp_variable = { loan_size = current_loans_sum }
+                if = {
+                    limit = {
+                        check_variable = { money < loan_size }
+                    }
+                    set_temp_variable = { loan_size_test = money }
+                    divide_temp_variable = { loan_size_test = 100 }
+                    subtract_from_temp_variable = { loan_size_test = 0.5 }
+                    round_temp_variable = loan_size
+                    multiply_temp_variable = { loan_size_test = 100 }
+                }
+                multiply_temp_variable = { loan_size = -1 }
+                add_to_variable = { current_loans_sum = loan_size }
+            }
+            ROOT = {
+                set_temp_variable = { money_to_gain = loan_size }
+                add_money_with_tooltip_effect = yes
+            }
+            add_opinion_modifier = {
+                target = ROOT
+                modifier = paid_our_debts
+            }
+        }
 
-		requires_acceptance = yes
-		show_acceptance_on_action_button = yes
+        send_scripted_gui = take_on_loan_gui
+        accept_title = TAKE_ON_LOAN_ACCEPT_TITLE
+        accept_description = TAKE_ON_LOAN_ACCEPT_DESC
 
-		icon = 1
-
-		on_sent_effect = {
-		}
-
-		complete_effect = {
-			THIS = {
-				set_temp_variable = { loan_size = current_loans_sum }
-				if = {
-					limit = {
-						check_variable = { money < loan_size }
-					}
-					set_temp_variable = { loan_size_test = money }
-					divide_temp_variable = { loan_size_test = 100 }
-					subtract_from_temp_variable = { loan_size_test = 0.5 }
-					round_temp_variable = loan_size
-					multiply_temp_variable = { loan_size_test = 100 }
-				}
-				multiply_temp_variable = { loan_size = -1 }
-				add_to_variable = { current_loans_sum = loan_size }
-			}
-			ROOT = {
-				set_temp_variable = { money_to_gain = loan_size }
-				add_money_with_tooltip_effect = yes
-			}
-			add_opinion_modifier = {
-				target = ROOT
-				modifier = paid_our_debts
-			}
-		}
-
-		send_scripted_gui = take_on_loan_gui
-
-		accept_title = TAKE_ON_LOAN_ACCEPT_TITLE
-		accept_description = TAKE_ON_LOAN_ACCEPT_DESC
-
-		ai_acceptance = {
-			Base = { # name is used for loc
-				base = -20  
-				modifier = {
-					add = -40
-				}
-			}
-			Puppet = {
-			       base = 0 
-				   modifier = {
-				    add = -1000 
-					
-					OR = {
-					    is_puppet = yes 
-						is_subject = yes 
-					}
-				}
-				 
-			}
+        ai_acceptance = {
+            Base = {
+                base = -60
+            }
+            
+            Puppet = {
+                base = 0
+                modifier = {
+                    add = -1000
+                    OR = {
+                        is_puppet = yes
+                        is_subject = yes
+                    }
+                }
+            }
+            
             Relations = {
-                base = 0 
-				modifier = {
-				    add = THIS.opinion@ROOT 
-				} 
+                base = 0
+                modifier = {
+                    add = THIS.opinion@ROOT
+                }
             }
-			Debt = {
-				base = 0
-				modifier = {
-					add = THIS.current_loans_sum
-				}
-			}
+            
+            Debt = {
+                base = 0
+                modifier = {
+                    add = THIS.current_loans_sum
+                }
+            }
+            
             "Strategic Considerations" = {
-                base = 0 
-				    modifier = {
-				        add = 15   
-                        check_variable = { ROOT.score_array_position_var >  8 }		
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 16 		
-			                compare = less_than_or_equals 
-			            }	
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 16 		
-			                compare = greater_than   
-			            }
+                base = 0
+                
+                modifier = {
+                    add = 15
+                    check_variable = { ROOT.score_array_position_var > 8 }
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 16
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = 25  
-						AND = {
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 8		
-			                compare = less_than_or_equals 
-			            }
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 8		
-			                compare = greater_than   
-			            }
-						} 
-                    }	
-				    modifier = {
-				        add = -15    	
-                        check_variable = { 
-			                var = ROOT.score_array_position_var
-                            value = 16 		
-			                compare = greater_than 
-			            }	
-                        check_variable = { 
-			                var = this.score_array_position_var
-                            value = 16 		
-			                compare = less_than_or_equals  
-			            }
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 16
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = 20     	
-                        check_variable = { ROOT.overall_score > This.overall_score }	
+                }
+                
+                modifier = {
+                    add = 25
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 8
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = -20      	
-                        check_variable = { ROOT.overall_score < This.overall_score }	
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = pre_industrial_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = pre_industrial_era
-					    	}	
-						}
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 8
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = 20       	
-                        check_variable = { this.rival_nation = root.rival_country }
+                }
+                
+                modifier = {
+                    add = -15
+                    check_variable = {
+                        var = ROOT.score_array_position_var
+                        value = 16
+                        compare = greater_than
                     }
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = victorian_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = victorian_era
-					    	}	
-						}
+                    check_variable = {
+                        var = THIS.score_array_position_var
+                        value = 16
+                        compare = less_than_or_equals
                     }
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = machine_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = machine_era
-					    	}	
-						}
-                    }		
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = oil_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = oil_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = aviation_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = aviation_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = modern_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = modern_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = atomic_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = atomic_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = information_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = information_era
-					    	}	
-						}
-                    }			
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = digital_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = digital_era
-					    	}	
-						}
-                    }	
-				    modifier = {
-				        add = -15      	
-                        THIS = {
-						    has_idea = post_digital_era
-						}
-                        NOT = {						
-                            ROOT = {
-			     			    has_idea = post_digital_era
-					    	}	
-						}
+                }
+                
+                modifier = {
+                    add = 20
+                    check_variable = { ROOT.overall_score > THIS.overall_score }
+                }
+                modifier = {
+                    add = -20
+                    check_variable = { ROOT.overall_score < THIS.overall_score }
+                }
+                
+                modifier = {
+                    add = -15
+                    OR = {
+                        AND = {
+                            THIS = { has_idea = pre_industrial_era }
+                            NOT = { ROOT = { has_idea = pre_industrial_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = victorian_era }
+                            NOT = { ROOT = { has_idea = victorian_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = machine_era }
+                            NOT = { ROOT = { has_idea = machine_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = oil_era }
+                            NOT = { ROOT = { has_idea = oil_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = aviation_era }
+                            NOT = { ROOT = { has_idea = aviation_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = modern_era }
+                            NOT = { ROOT = { has_idea = modern_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = atomic_era }
+                            NOT = { ROOT = { has_idea = atomic_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = information_era }
+                            NOT = { ROOT = { has_idea = information_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = digital_era }
+                            NOT = { ROOT = { has_idea = digital_era } }
+                        }
+                        AND = {
+                            THIS = { has_idea = post_digital_era }
+                            NOT = { ROOT = { has_idea = post_digital_era } }
+                        }
                     }
-				    modifier = {
-				        add = 15        	
-                        THIS = {
-						    is_neighbor_of = ROOT 
-						}
+                }
+                
+                modifier = {
+                    add = 20
+                    check_variable = { THIS.rival_nation = ROOT.rival_country }
+                }
+                
+                modifier = {
+                    add = 15
+                    THIS = { is_neighbor_of = ROOT }
+                }
+                
+                modifier = {
+                    factor = 0
+                    THIS = {
+                        OR = {
+                            is_puppet = yes
+                            is_subject = yes
+                        }
                     }
-			        modifier = { 
-					    factor = 0     
-			            THIS = {
-				            OR = {
-				          	    is_puppet = yes
-				        		is_subject = yes 
-					        }
-				        }
-			        }
-				modifier = {
-			   	 	add = 55 
-					THIS = {
-				    	has_war_together_with = ROOT 
-					} 
-				}					
+                }
+                
+                modifier = {
+                    add = 55
+                    THIS = { has_war_together_with = ROOT }
+                }
             }
-		}
-	}
-	customs_union = {
-		allowed = {
-			always = yes
-		}
-		visible = {
-			always = yes
-			is_not_great_power = yes
-			ROOT = {
-				is_great_power = yes
-			}
-		}
-		selectable = {
-			THIS = {
-				has_opinion = {
-					target = ROOT
-					value > 80
-				}
-			}
-			NOT = { is_embargoed_by = THIS }
-			THIS = {
-				is_not_great_power = yes
-			}
-			NOT = { is_not_sphere_member = yes }
-			is_neighbor_of = ROOT
-			NOT = { has_war_with = THIS }
-		}
+        }
+    }
+    
+    customs_union = {
+        allowed = { always = yes }
+        
+        visible = {
+            always = yes
+            is_not_great_power = yes
+            ROOT = { is_great_power = yes }
+        }
+        
+        selectable = {
+            THIS = {
+                has_opinion = { target = ROOT value > 80 }
+            }
+            NOT = { is_embargoed_by = THIS }
+            THIS = { is_not_great_power = yes }
+            NOT = { is_not_sphere_member = yes }
+            is_neighbor_of = ROOT
+            NOT = { has_war_with = THIS }
+        }
 
-		requires_acceptance = yes
-		show_acceptance_on_action_button = yes
+        requires_acceptance = yes
+        show_acceptance_on_action_button = yes
+        cost = 25
+        icon = 1
 
-		cost = 25
+        on_sent_effect = {
+        }
 
-		icon = 1
-
-		on_sent_effect = {
-		}
-
-		complete_effect = {
-			THIS = {
-				#add_modifiers_to_sphere_any_countries = yes
-				set_country_flag = is_sphereling
-				add_ideas = sphere_market_2_modifier
-				add_ideas = { sphere_member_level_2 }
-				set_variable = { sphere_overlord = ROOT.id }
-				add_relation_modifier = {
-					target = ROOT
-					modifier = custom_union_accepted_leader
-				}
-			}
-			ROOT = {
-				#add_modifiers_to_sphere_any_countries = yes
-				add_ideas = sphere_market_leader_modifier
-				add_nation_to_sphere = yes
-				add_relation_modifier = {
+        complete_effect = {
+            THIS = {
+                set_country_flag = is_sphereling
+                add_ideas = sphere_market_2_modifier
+                add_ideas = sphere_member_level_2
+                set_variable = { sphere_overlord = ROOT.id }
+                add_relation_modifier = {
+                    target = ROOT
+                    modifier = custom_union_accepted_leader
+                }
+            }
+            ROOT = {
+                add_ideas = sphere_market_leader_modifier
+                add_nation_to_sphere = yes
+                add_relation_modifier = {
                     target = PREV
                     modifier = custom_union_accepted_member
                 }
-			}
-		}
+            }
+        }
 
-		accept_title = CUSTOMS_UNION_ACCEPT_TITLE
-		accept_description = CUSTOMS_UNION_ACCEPT_DESC
+        accept_title = CUSTOMS_UNION_ACCEPT_TITLE
+        accept_description = CUSTOMS_UNION_ACCEPT_DESC
 
-		ai_desire = {
-			base = 10
-		}
-	}
+        ai_desire = {
+            base = 10
+        }
+    }
 }
