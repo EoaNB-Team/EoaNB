@@ -3846,11 +3846,26 @@ news_event = {
 	title = acw_generic.9.t
 	desc = {
 		text = acw_generic.9.d
-		trigger = { country_exists = CSA }
+		trigger = { 
+			OR = {
+				tag = USA
+				tag = CSA
+			}
+		}
 	}
 	desc = {
 		text = acw_generic.9.d_northrebels
-		trigger = { country_exists = NEG }
+		trigger = { tag = NEG }
+	}
+	desc = {
+		text = acw_generic.9.d_other
+		trigger = {
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = NEG
+			}
+		}
 	}
 	picture = GFX_news_event_fort_sumter
 
@@ -3860,87 +3875,45 @@ news_event = {
 	immediate = {
 		hidden_effect = {
 			set_global_flag = ACW_Confederate_States_Rebelled
-			
-			# Apply player nerf to all ACW participants
-			if = {
-				limit = { OR = { tag = USA tag = CAL tag = NEG tag = CSA } }
-				add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
-			}
-			
-			# USA setup
-			if = {
-				limit = { tag = USA }
-				add_stability = 0.15
-				add_war_support = 0.10
-				
-				country_event = { id = acw_first_nations.7 days = 10 }
-				if = {
-					limit = { has_completed_focus = USA_Focus_PACW_The_Abolitionists }
-					country_event = { id = acw_generic.15 days = 30 random_days = 45 }
-				}
-				country_event = { id = acw_generic.135 days = 17 }
-				country_event = { id = usa.312 days = 1 }
-				
-				clr_global_flag = ACW_American_Civil_War_Start
-				set_global_flag = ACW_American_Civil_War
-				add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
-				
-				set_temp_variable = { acw_weapons_count_change = 30 }
-				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 22 }
-				ACW_Draft_Count_Get = yes
-				USA_Slavery_Debate_Remove = yes
-				
-				load_oob = USA_Standard_ACW
-				activate_mission = eoanb_decision_acw_csa_surrender_to_usa_union
-				activate_mission = eoanb_decision_acw_usa_surrender_to_csa_union
-				activate_decision = eoanb_decision_acw_reform_west_point1
-				
-				CSA = { 
-					load_oob = CSA_Standard_ACW
-					activate_mission = eoanb_decision_acw_csa_surrender_to_usa_dixie
-					activate_mission = eoanb_decision_acw_usa_surrender_to_csa_dixie
-				}
-			}
-			
-			# Handle other factions with consolidated logic
-			if = {
-				limit = { OR = { tag = CSA tag = NEG tag = CAL } }
-				add_stability = 0.10
-				add_war_support = 0.10
-				
-				# Set faction-specific values
-				if = {
-					limit = { tag = CSA }
-					set_temp_variable = { acw_weapons_count_change = 15 }
-					set_temp_variable = { acw_draft_count_change = 10 }
-				}
-				else_if = {
-					limit = { tag = NEG }
-					set_temp_variable = { acw_weapons_count_change = 25 }
-					set_temp_variable = { acw_draft_count_change = 15 }
-				}
-				else_if = {
-					limit = { tag = CAL }
-					set_temp_variable = { acw_weapons_count_change = 20 }
-					set_temp_variable = { acw_draft_count_change = 8 }
-				}
-				
-				ACW_Weapons_Count_Get = yes
-				ACW_Draft_Count_Get = yes
-			}
+			clr_global_flag = ACW_American_Civil_War_Start
+			set_global_flag = ACW_American_Civil_War
 		}
 	}
 
+	# USA Option
 	option = {
 		trigger = { tag = USA }
 		name = acw_generic.9.a
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
 		
+		add_stability = 0.15
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
+		
 		add_popularity = {
 			ideology = traditional_conservatism
 			popularity = -0.15
 		}
+		
+		set_temp_variable = { acw_weapons_count_change = 30 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 22 }
+		ACW_Draft_Count_Get = yes
+		USA_Slavery_Debate_Remove = yes
+		
+		load_oob = USA_Standard_ACW
+		activate_mission = eoanb_decision_acw_csa_surrender_to_usa_union
+		activate_mission = eoanb_decision_acw_usa_surrender_to_csa_union
+		activate_decision = eoanb_decision_acw_reform_west_point1
+		
+		country_event = { id = acw_first_nations.7 days = 10 }
+		if = {
+			limit = { has_completed_focus = USA_Focus_PACW_The_Abolitionists }
+			country_event = { id = acw_generic.15 days = 30 random_days = 45 }
+		}
+		country_event = { id = acw_generic.135 days = 17 }
+		country_event = { id = usa.312 days = 1 }
 		
 		if = {
 			limit = { is_ai = no }
@@ -3949,7 +3922,7 @@ news_event = {
 		
 		custom_effect_tooltip = ACW_Union_Generals_Join_tt
 		hidden_effect = {
-			# Union Generals - optimized assignment
+			# Union Generals
 			USA_character_george_b_mcclellan = {
 				add_corps_commander_role = {
 					traits = { expert_administrator aversion_to_offense inflexible_strategist career_officer trait_cautious organizer }
@@ -4113,13 +4086,29 @@ news_event = {
 					logistics_skill = 4
 				}
 			}
+			
+			CSA = { 
+				load_oob = CSA_Standard_ACW
+				activate_mission = eoanb_decision_acw_csa_surrender_to_usa_dixie
+				activate_mission = eoanb_decision_acw_usa_surrender_to_csa_dixie
+			}
 		}
 	}
 	
+	# CSA Option
 	option = {
-		trigger = { OR = { tag = CSA tag = NEG } }
+		trigger = { tag = CSA }
 		name = acw_generic.9.b
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 15 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 10 }
+		ACW_Draft_Count_Get = yes
 		
 		declare_war_on = {
 			target = USA
@@ -4139,103 +4128,161 @@ news_event = {
 			set_variable = { super_event_displayed = 9 }
 		}
 		
-		if = {
-			limit = { tag = CSA }
-			custom_effect_tooltip = ACW_CSA_Generals_Join_tt
-			hidden_effect = {
-				# Confederate Generals - cleaned up and optimized
-				CSA_character_robert_e_lee = {
-					add_corps_commander_role = {
-						traits = { brilliant_strategist unyielding_defender guerilla_fighter }
-						skill = 4
-						attack_skill = 5
-						defense_skill = 5
-						planning_skill = 1
-						logistics_skill = 1
-					}
+		custom_effect_tooltip = ACW_CSA_Generals_Join_tt
+		hidden_effect = {
+			CSA_character_robert_e_lee = {
+				add_corps_commander_role = {
+					traits = { brilliant_strategist unyielding_defender guerilla_fighter }
+					skill = 4
+					attack_skill = 5
+					defense_skill = 5
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_stonewall_jackson = {
-					add_corps_commander_role = {
-						traits = { brilliant_strategist infantry_leader }
-						skill = 3
-						attack_skill = 6
-						defense_skill = 1
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_stonewall_jackson = {
+				add_corps_commander_role = {
+					traits = { brilliant_strategist infantry_leader }
+					skill = 3
+					attack_skill = 6
+					defense_skill = 1
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_edmund_kirby_smith = {
-					add_corps_commander_role = {
-						skill = 3
-						attack_skill = 3
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_edmund_kirby_smith = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 3
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_leonidas_polk = {
-					add_corps_commander_role = {
-						traits = { politically_connected }
-						skill = 1
-						attack_skill = 3
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_leonidas_polk = {
+				add_corps_commander_role = {
+					traits = { politically_connected }
+					skill = 1
+					attack_skill = 3
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_william_j_hardee = {
-					add_corps_commander_role = {
-						skill = 3
-						attack_skill = 4
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_william_j_hardee = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_john_bell_hood = {
-					add_corps_commander_role = {
-						skill = 2
-						attack_skill = 3
-						defense_skill = 2
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_john_bell_hood = {
+				add_corps_commander_role = {
+					skill = 2
+					attack_skill = 3
+					defense_skill = 2
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_albert_sidney_johnson = {
-					add_corps_commander_role = {
-						traits = { desert_fox }
-						skill = 3
-						attack_skill = 4
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_albert_sidney_johnson = {
+				add_corps_commander_role = {
+					traits = { desert_fox }
+					skill = 3
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_braxton_bragg = {
-					add_corps_commander_role = {
-						traits = { old_guard hill_fighter }
-						skill = 2
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_braxton_bragg = {
+				add_corps_commander_role = {
+					traits = { old_guard hill_fighter }
+					skill = 2
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_joseph_e_jonston = {
-					add_corps_commander_role = {
-						traits = { urban_assault_specialist old_guard }
-						skill = 3
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 3
-					}
+			}
+			CSA_character_joseph_e_jonston = {
+				add_corps_commander_role = {
+					traits = { urban_assault_specialist old_guard }
+					skill = 3
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 3
 				}
 			}
 		}
 	}
 	
 	option = {
+		trigger = { tag = NEG }
+		name = acw_generic.9.b
+		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 25 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 15 }
+		ACW_Draft_Count_Get = yes
+		
+		declare_war_on = {
+			target = USA
+			type = acw_civil_war_wargoal
+		}
+		
+		add_named_threat = {
+			threat = 5
+			name = "The American Civil War"
+		}
+		
+		country_event = { id = acw_generic.10 days = 7 }
+		USA = { country_event = { id = acw_generic.10 days = 7 } }
+		
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
+	}
+	
+	# CAL Option
+	option = {
+		trigger = { tag = CAL }
+		name = acw_generic.9.b
+		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 20 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 8 }
+		ACW_Draft_Count_Get = yes
+		
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
+	}
+	
+	option = {
+		trigger = {
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = NEG
+				tag = CAL
+			}
+		}		
 		name = acw_generic.9.c
 		
 		if = {
