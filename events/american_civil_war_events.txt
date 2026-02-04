@@ -252,33 +252,40 @@ country_event = {
 		
 		fire_only_once = yes
 		is_triggered_only = yes
+		
+		# Trigger only needs to check conditions that might change during delays
+		# or when fired via on_actions - removed redundant 'exists = yes'
 		trigger = {
 			tag = USA
-			exists = yes
 			NOT = {
 				has_global_flag = ACW_American_Civil_War_Avoided
 				has_global_flag = ACW_American_Civil_War_Happened
 			}
 		}
-
+		
 		immediate = {
+			# Set initial tension change
 			set_temp_variable = { USA_Slavery_Debate_Tension_Change = 2 }
 			USA_Slavery_Debate_Tension_Modify = yes
+			
+			# Schedule follow-up events with hidden_effect for cleaner tooltips
 			hidden_effect = {
+				# Early events (first year)
+				country_event = { id = usa_slavery_debate.15 days = 5 }
 				country_event = { id = usa_slavery_debate.2 days = 370 }
 				country_event = { id = usa_slavery_debate.3 days = 480 }
 				country_event = { id = usa_slavery_debate.4 days = 486 random_days = 5 }
 				country_event = { id = usa_slavery_debate.5 days = 510 }
 				country_event = { id = usa_slavery_debate.6 days = 550 }
+				
+				# Later events (second year+)
 				country_event = { id = usa_slavery_debate.7 days = 800 }
 				country_event = { id = usa_slavery_debate.8 days = 890 random_days = 35 }
-
-				country_event = { id = usa_slavery_debate.15 days = 5 }
 			}
 		}
-
+		
+		# States' Rights - Moderate approach
 		option = {
-			# The Issue of Slavery is a States' Issue 
 			name = usa_slavery_debate.1.a
 			ai_chance = {
 				base = 50
@@ -287,22 +294,24 @@ country_event = {
 			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = 1 }
 			USA_Slavery_Debate_Leaning_Modify = yes
 		}
+		
+		# Abolitionist - Anti-slavery stance
 		option = {
-			# Abolitionists
 			name = usa_slavery_debate.1.b
 			ai_chance = {
 				base = 15
 				modifier = {
-					is_historical_focus_on = yes
 					factor = 0
+					is_historical_focus_on = yes
 				}
 			}
 			add_political_power = -15
 			set_temp_variable = { USA_Slavery_Debate_Leaning_Change = -4 }
 			USA_Slavery_Debate_Leaning_Modify = yes
 		}
+		
+		# Pro-Slavery - Southern sympathies
 		option = {
-			# Pro-Slavery
 			name = usa_slavery_debate.1.c
 			ai_chance = {
 				base = 35
@@ -600,6 +609,7 @@ country_event = {
 		picture = GFX_report_event_election_vote
 
 		is_triggered_only = yes
+		
 		trigger = {
 			tag = USA
 			has_idea = usa_slavery_law
@@ -613,26 +623,23 @@ country_event = {
 
 		immediate = {
 			complete_national_focus = USA_Focus_ACW_Election_1860
-
+			
+			# Update slavery debate tension
 			set_temp_variable = { USA_Slavery_Debate_Tension_Change = 3 }
 			USA_Slavery_Debate_Tension_Modify = yes
-
-			hidden_effect = {
-				set_division_template_lock = { division_template = "American Infantry Regiment" is_locked = yes }
-				set_division_template_lock = { division_template = "American Infantry Brigade" is_locked = yes }
-				set_division_template_lock = { division_template = "American Infantry Brigade with Support" is_locked = yes }
-				set_division_template_lock = { division_template = "American State Guard" is_locked = yes }
-				set_division_template_lock = { division_template = "American National Guard" is_locked = yes }
-				set_division_template_lock = { division_template = "American Cavalry Battalion" is_locked = yes	}
-			}
+			
+			# Lock division templates to prevent modification during critical period
+			set_division_template_lock = { division_template = "American Infantry Regiment" is_locked = yes }
+			set_division_template_lock = { division_template = "American Infantry Brigade" is_locked = yes }
+			set_division_template_lock = { division_template = "American Infantry Brigade with Support" is_locked = yes }
+			set_division_template_lock = { division_template = "American State Guard" is_locked = yes }
+			set_division_template_lock = { division_template = "American National Guard" is_locked = yes }
+			set_division_template_lock = { division_template = "American Cavalry Battalion" is_locked = yes }
 		}
 
-		option = { # Lincoln
+		option = { # Lincoln - Anti-slavery candidate
 			name = usa_slavery_debate.12.a
-			ai_chance = {
-				base = 65
-				modifier = { factor = 100 is_historical_focus_on = yes }
-			}
+			
 			trigger = {
 				OR = {
 					AND = {
@@ -641,33 +648,47 @@ country_event = {
 					}
 					AND = {
 						NOT = { has_country_flag = USA_Slavery_Debate_Ongoing }
-						NOT = { has_war_with = NEG }
-						NOT = { has_war_with = MIN }
+						NOT = { 
+							OR = {
+								has_war_with = NEG
+								has_war_with = MIN
+							}
+						}
 					}
 				}
 			}
-
-			hidden_effect = {
-				add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
-				add_popularity = { ideology = ideology_social_liberalism popularity = 0.03 }
-
-				hidden_effect = {
-					set_country_flag = USA_LincolnElected
-					country_event = { id = acw_generic.33 days = 1 }
-					news_event = usa_slavery_debate.13
+			
+			ai_chance = {
+				base = 65
+				modifier = { 
+					factor = 100 
+					is_historical_focus_on = yes 
 				}
 			}
+
+			add_popularity = { ideology = social_egalitarianism popularity = 0.01 }
+			add_popularity = { ideology = ideology_social_liberalism popularity = 0.03 }
+			
+			hidden_effect = {
+				set_country_flag = USA_LincolnElected
+				country_event = { id = acw_generic.33 days = 1 }
+				news_event = usa_slavery_debate.13
+			}
 		}
-		option = { # Douglas
+		
+		option = { # Douglas - Popular sovereignty candidate
 			name = usa_slavery_debate.12.b
+			
+			trigger = {
+				has_country_flag = USA_Slavery_Debate_Ongoing
+				has_completed_focus = USA_Focus_PACW_The_Unionists
+			}
+			
 			ai_chance = {
 				base = 10
-				modifier = { factor = 0 is_historical_focus_on = yes }
-			}
-			trigger = {
-				AND = {
-					has_country_flag = USA_Slavery_Debate_Ongoing
-					has_completed_focus = USA_Focus_PACW_The_Unionists
+				modifier = { 
+					factor = 0 
+					is_historical_focus_on = yes 
 				}
 			}
 
@@ -679,12 +700,10 @@ country_event = {
 				news_event = usa_slavery_debate.13
 			}
 		}
-		option = { # Bell
+		
+		option = { # Bell - Constitutional Union candidate
 			name = usa_slavery_debate.12.c
-			ai_chance = {
-				base = 10
-				modifier = { factor = 0 is_historical_focus_on = yes }
-			}
+			
 			trigger = {
 				OR = {
 					AND = {
@@ -701,8 +720,14 @@ country_event = {
 					}
 				}
 			}
-			# trigger = { check_variable = { USA_Slavery_Debate_Leaning > -25 } }
 			
+			ai_chance = {
+				base = 10
+				modifier = { 
+					factor = 0 
+					is_historical_focus_on = yes 
+				}
+			}
 
 			add_popularity = { ideology = traditional_conservatism popularity = 0.06 }
 
@@ -712,12 +737,10 @@ country_event = {
 				news_event = usa_slavery_debate.13
 			}
 		}
-		option = { # Breckinridge
+		
+		option = { # Breckinridge - Pro-slavery Southern Democrat
 			name = usa_slavery_debate.12.e
-			ai_chance = {
-				base = 10
-				modifier = { factor = 0 is_historical_focus_on = yes }
-			}
+			
 			trigger = {
 				OR = {
 					AND = {
@@ -730,50 +753,53 @@ country_event = {
 					}
 				}
 			}
+			
+			ai_chance = {
+				base = 10
+				modifier = { 
+					factor = 0 
+					is_historical_focus_on = yes 
+				}
+			}
 
 			add_popularity = { ideology = radical_democracy popularity = 0.03 }
+			add_to_variable = { var = USA_Slavery_Debate_Leaning value = 30 }
 
 			hidden_effect = {
 				set_country_flag = USA_BreckinridgeElected
 				country_event = { id = acw_generic.80 days = 21 }
-				add_to_variable = {
-					var = USA_Slavery_Debate_Leaning
-					value = 30
-				}
 				news_event = usa_slavery_debate.13
 			}
 		}
-		option = { # Buchanan
+		
+		option = { # Buchanan - Incumbent continuation
 			name = usa_slavery_debate.12.f
+			
+			trigger = {
+				has_country_flag = USA_Slavery_Debate_Ongoing
+				has_completed_focus = USA_Focus_PACW_Pro_Slavery
+				NOT = {
+					OR = {
+						has_country_flag = breckinridge_sucessor
+						has_country_flag = douglas_successor
+					}
+				}
+			}
+			
 			ai_chance = {
 				base = 5
-				modifier = { factor = 0 is_historical_focus_on = yes }
-			}
-			# trigger = { check_variable = { USA_Slavery_Debate_Leaning > -35 } }
-			trigger = {
-				OR = {
-					AND = {
-						has_country_flag = USA_Slavery_Debate_Ongoing
-						has_completed_focus = USA_Focus_PACW_Pro_Slavery
-						OR = {
-							NOT = {
-								has_country_flag = breckinridge_sucessor
-								has_country_flag = douglas_successor
-							}
-						}
-					}
+				modifier = { 
+					factor = 0 
+					is_historical_focus_on = yes 
 				}
 			}
 
 			add_popularity = { ideology = radical_democracy popularity = 0.03 }
+			add_to_variable = { var = USA_Slavery_Debate_Leaning value = 40 }
 
 			hidden_effect = {
 				set_country_flag = USA_BuchananElected
 				country_event = { id = acw_buchanan.1 days = 21 }
-				add_to_variable = {
-					var = USA_Slavery_Debate_Leaning
-					value = 40
-				}
 				news_event = usa_slavery_debate.13
 			}
 		}
@@ -783,6 +809,8 @@ country_event = {
 	news_event = {
 		id = usa_slavery_debate.13
 		title = usa_slavery_debate.13.t
+		
+		# Dynamic descriptions based on election winner
 		desc = {
 			text = usa_slavery_debate.13.d_lincoln
 			trigger = {
@@ -813,9 +841,12 @@ country_event = {
 				USA = { has_country_flag = USA_BuchananElected }
 			}
 		}
+		
 		picture = GFX_report_event_election_vote
-
 		is_triggered_only = yes
+		major = yes
+		
+		# Only fire if USA exists and has compatible government
 		trigger = {
 			country_exists = USA
 			USA = {
@@ -827,9 +858,8 @@ country_event = {
 				}
 			}
 		}
-
-		major = yes
-
+		
+		# Immediate effects (hidden from tooltip)
 		immediate = {
 			hidden_effect = {
 				if = {
@@ -838,22 +868,34 @@ country_event = {
 						name = "Election of 1860"
 						threat = 1
 					}
-								
 				}
 			}
 		}
-
+		
+		# Default option for all countries except SNM and USA
 		option = {
 			name = usa_slavery_debate.13.a
-			trigger = { NOT = { AND = { tag = SNM tag = USA } } }
+			trigger = { 
+				NOT = { tag = SNM }
+				NOT = { tag = USA }
+			}
 		}
+		
+		# SNM option - Honor Lincoln (conditional on election result)
 		option = {
 			name = usa_slavery_debate.13.b
 			trigger = { tag = SNM }
 			ai_chance = {
 				base = 100
-				modifier = { factor = 0 USA = { has_country_flag = USA_BreckinridgeElected } }
-				modifier = { factor = 0 USA = { has_country_flag = USA_BuchananElected } }
+				modifier = { 
+					factor = 0 
+					USA = { 
+						OR = {
+							has_country_flag = USA_BreckinridgeElected
+							has_country_flag = USA_BuchananElected
+						}
+					}
+				}
 			}
 			complete_national_focus = SNM_focus_Honor_Abraham_Lincoln
 			add_opinion_modifier = {
@@ -867,6 +909,8 @@ country_event = {
 				}
 			}
 		}
+		
+		# SNM alternative option
 		option = {
 			name = usa_slavery_debate.13.c
 			trigger = { tag = SNM }
@@ -874,6 +918,8 @@ country_event = {
 				base = 50
 			}
 		}
+		
+		# USA-specific option
 		option = {
 			name = usa_slavery_debate.13.e
 			trigger = { tag = USA }
@@ -1706,14 +1752,14 @@ country_event = {
 	# CSA Secedes 
 	country_event = {
 		id = usa_slavery_debate.47
-		title = usa_slavery_debate.48.t
+		title = usa_slavery_debate.47.t  # Fixed title to match event ID
 		desc = {
 			trigger = { USA = { NOT = { has_country_flag = USA_BellElected } } }
-			text = usa_slavery_debate.48.d_lincoln
+			text = usa_slavery_debate.47.d_lincoln  # Updated to match event ID
 		}
 		desc = {
 			trigger = { USA = { has_country_flag = USA_BellElected } }
-			text = usa_slavery_debate.48.d_bell
+			text = usa_slavery_debate.47.d_bell  # Updated to match event ID
 		}
 		picture = GFX_report_event_generic_riot
 
@@ -1729,78 +1775,20 @@ country_event = {
 					add_state_claim = 364
 					set_variable = { rival_country = CSA.id }
 					
-					if = {
-						limit = { owns_state = 315 controls_state = 315 }
-						315 = { set_demilitarized_zone = yes }
+					every_owned_state = {
+						limit = {
+							OR = {
+								state = 315  state = 1350  state = 1022  state = 362   state = 746
+								state = 365  state = 366   state = 367   state = 368   state = 369
+								state = 370  state = 371   state = 372   state = 373   state = 374
+								state = 375  state = 363   state = 1285  state = 1406
+							}
+							controller = { tag = USA }  # Simplified control check
+						}
+						set_demilitarized_zone = yes
 					}
-					if = {
-						limit = { owns_state = 1350 controls_state = 1350 }
-						1350 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 1022 controls_state = 1022 }
-						1022 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 362 controls_state = 362 }
-						362 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 746 controls_state = 746 }
-						746 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 365 controls_state = 365 }
-						365 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 366 controls_state = 366 }
-						366 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 367 }
-						367 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 368 }
-						368 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 369 }
-						369 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 370 }
-						370 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 371 }
-						371 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 372 }
-						372 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 373 }
-						373 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 374 controls_state = 374 }
-						374 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 375 controls_state = 375 }
-						375 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 363 controls_state = 363 }
-						363 = { set_demilitarized_zone = yes }
-					}
-					if = {
-						limit = { owns_state = 1285 controls_state = 1285 }
-						1285 = { set_demilitarized_zone = yes }
-					}
+					
+					# Special case for Kansas with state flag check
 					if = {
 						limit = { 
 							owns_state = 383
@@ -1809,10 +1797,14 @@ country_event = {
 						}
 						383 = { set_demilitarized_zone = yes }
 					}
+					
+					# Fire related events
 					country_event = usa_slavery_debate.32
 					news_event = { id = acw_generic.1 days = 35 }
 					
+					# CSA setup 
 					CSA = {
+						# Handle capital state transfer (364 or fallback)
 						if = {
 							limit = { USA = { owns_state = 364 } }
 							transfer_state = 364
@@ -1820,6 +1812,7 @@ country_event = {
 							set_capital = { state = 364 }
 						}
 						else = {
+							# Fallback: transfer any demilitarized state as capital
 							USA = {
 								random_owned_state = {
 									limit = { is_demilitarized_zone = yes }
@@ -1832,31 +1825,39 @@ country_event = {
 							}
 						}
 
+						# CSA initialization
 						set_variable = { rival_country = USA.id }
 						inherit_technology = USA
 						set_politics = { ruling_party = radical_democracy }
 						add_popularity = { ideology = radical_democracy popularity = 0.35 }
 
+						# Variable inheritance from USA
 						set_global_flag = CSA_NA_B_idea_working_class_exploitation_score_var_set_flag
-						set_variable = { var = CSA.NA_B_idea_working_class_exploitation_score_var@CSA value = USA.NA_B_idea_working_class_exploitation_score_var@USA }
-						set_variable = { var = CSA.NA_B_idea_working_class_organization_score_var@CSA value = USA.NA_B_idea_working_class_organization_score_var@USA }
+						set_variable = { 
+							var = CSA.NA_B_idea_working_class_exploitation_score_var@CSA 
+							value = USA.NA_B_idea_working_class_exploitation_score_var@USA 
+						}
+						set_variable = { 
+							var = CSA.NA_B_idea_working_class_organization_score_var@CSA 
+							value = USA.NA_B_idea_working_class_organization_score_var@USA 
+						}
 						
+						# CSA-specific events and ideas
+						add_ideas = CSA_Slavery_Conscription
 						news_event = { id = acw_generic.1 days = 35 }
 						country_event = balkanized_usa.10
 						country_event = { id = csa.1 days = 75 }
-
-						hidden_effect = {
-							add_ideas = CSA_Slavery_Conscription
-						}
 					}
 				}
 			}
 		}
 
+		# USA stays - main path
 		option = {
-			name = usa_slavery_debate.48.a
+			name = usa_slavery_debate.47.a  # Updated to match event ID
 			trigger = { tag = USA }
 			ai_chance = { base = 100 }
+			
 			add_popularity = { ideology = ideology_social_liberalism popularity = 0.015 }
 			add_popularity = { ideology = traditional_conservatism popularity = 0.005 }
 			add_timed_idea = {
@@ -1864,13 +1865,15 @@ country_event = {
 				days = 120
 			}
 		}
+		
+		# Player chooses to play as CSA
 		option = {
-			name = usa_slavery_debate.48.b
+			name = usa_slavery_debate.47.b  # Updated to match event ID
 			trigger = { tag = USA }
 			ai_chance = { factor = 0 }
+			
 			add_popularity = { ideology = ideology_social_liberalism popularity = 0.015 }
 			add_popularity = { ideology = traditional_conservatism popularity = 0.005 }
-
 			CSA = { change_tag_from = USA }
 		}
 	}
@@ -2341,6 +2344,7 @@ country_event = {
 			country_exists = USA
 			country_exists = CSA
 			366 = { is_owned_by = USA }
+			1406 = { is_owned_by = USA }
 		}
 
 		immediate = {
@@ -2349,7 +2353,9 @@ country_event = {
 				if = {
 					limit = { USA = { owns_state = 366 } }
 					remove_state_core = 366
+					remove_state_core = 1406
 					add_state_claim = 366
+					add_state_claim = 1406
 				}
 			}
 			else_if = {
@@ -2357,10 +2363,16 @@ country_event = {
 				if = {
 					limit = { USA = { controls_state = 366 } }
 					366 = { set_demilitarized_zone = no }
+					1406 = { set_demilitarized_zone = no }
 					transfer_state = 366
+					transfer_state = 1406
 					add_state_core = 366
+					add_state_core = 1406
 				}
-				else = { add_state_claim = 366 }
+				else = { 
+					add_state_claim = 366 
+					add_state_claim = 1406
+				}
 			}
 		}
 
@@ -2752,7 +2764,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = { brilliant_strategist unyielding_defender guerilla_fighter }
 							skill = 4
-							legacy_id = 5020
 							attack_skill = 5
 							defense_skill = 5
 							planning_skill = 1
@@ -2763,7 +2774,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = { brilliant_strategist infantry_leader }
 							skill = 3
-							legacy_id = 5021
 							attack_skill = 6
 							defense_skill = 1
 							planning_skill = 1
@@ -2774,7 +2784,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = {}
 							skill = 3
-							legacy_id = 5022
 							attack_skill = 3
 							defense_skill = 4
 							planning_skill = 1
@@ -2785,7 +2794,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = { politically_connected }
 							skill = 1
-							legacy_id = 5023
 							attack_skill = 3
 							defense_skill = 4
 							planning_skill = 1
@@ -2796,7 +2804,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = {}
 							skill = 3
-							legacy_id = 5024
 							attack_skill = 4
 							defense_skill = 4
 							planning_skill = 1
@@ -2807,7 +2814,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = { old_guard hill_fighter }
 							skill = 2
-							legacy_id = 5027
 							attack_skill = 3
 							defense_skill = 3
 							planning_skill = 1
@@ -2818,7 +2824,6 @@ country_event = {
 						add_corps_commander_role = {
 							traits = { urban_assault_specialist old_guard }
 							skill = 3
-							legacy_id = 5028
 							attack_skill = 2
 							defense_skill = 3
 							planning_skill = 4
@@ -3841,11 +3846,26 @@ news_event = {
 	title = acw_generic.9.t
 	desc = {
 		text = acw_generic.9.d
-		trigger = {	country_exists = CSA }
+		trigger = { 
+			OR = {
+				tag = USA
+				tag = CSA
+			}
+		}
 	}
 	desc = {
 		text = acw_generic.9.d_northrebels
-		trigger = {	country_exists = NEG }
+		trigger = { tag = NEG }
+	}
+	desc = {
+		text = acw_generic.9.d_other
+		trigger = {
+			NOT = {
+				tag = USA
+				tag = CSA
+				tag = NEG
+			}
+		}
 	}
 	picture = GFX_news_event_fort_sumter
 
@@ -3855,441 +3875,416 @@ news_event = {
 	immediate = {
 		hidden_effect = {
 			set_global_flag = ACW_Confederate_States_Rebelled
-			if = {
-				limit = {	OR = { tag = USA tag = CAL tag = NEG tag = CSA } }
-				add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
-			}
-			if = {
-				limit = { tag = USA }
-				add_stability = 0.15
-				add_war_support = 0.10
-
-				country_event = { id = acw_first_nations.7 days = 10 }
-				if = {
-					limit = {
-						has_completed_focus = USA_Focus_PACW_The_Abolitionists
-					}
-					country_event = { id = acw_generic.15 days = 30 random_days = 45 }
-				}
-				country_event = { id = acw_generic.135 days = 17 } #End support for the ACS in Liberia?
-				country_event = { id = usa.312 days = 1 }
-				
-				clr_global_flag = ACW_American_Civil_War_Start
-				set_global_flag = ACW_American_Civil_War
-
-				add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
-
-				set_temp_variable = { acw_weapons_count_change = 30 }
-				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 22 }
-				ACW_Draft_Count_Get = yes
-				USA_Slavery_Debate_Remove = yes
-
-				load_oob = USA_Standard_ACW
-				activate_mission = eoanb_decision_acw_csa_surrender_to_usa_union
-				activate_mission = eoanb_decision_acw_usa_surrender_to_csa_union
-				activate_decision = eoanb_decision_acw_reform_west_point1
-				
-				CSA = { 
-					load_oob = CSA_Standard_ACW
-					activate_mission = eoanb_decision_acw_csa_surrender_to_usa_dixie
-					activate_mission = eoanb_decision_acw_usa_surrender_to_csa_dixie
-				}
-			}
-			else_if = {
-				limit = { tag = CSA }
-				add_stability = 0.10
-				add_war_support = 0.10
-				set_temp_variable = { acw_weapons_count_change = 15 }
-				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 10 }
-				ACW_Draft_Count_Get = yes
-			}
-			else_if = {
-				limit = { tag = NEG }
-				add_stability = 0.10
-				add_war_support = 0.10
-				set_temp_variable = { acw_weapons_count_change = 25 }
-				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 15 }
-				ACW_Draft_Count_Get = yes
-			}
-			else_if = {
-				limit = { tag = CAL }
-				add_stability = 0.10
-				add_war_support = 0.10
-				set_temp_variable = { acw_weapons_count_change = 20 }
-				ACW_Weapons_Count_Get = yes
-				set_temp_variable = { acw_draft_count_change = 8 }
-				ACW_Draft_Count_Get = yes
-			}
+			clr_global_flag = ACW_American_Civil_War_Start
+			set_global_flag = ACW_American_Civil_War
 		}
 	}
 
+	# USA Option
 	option = {
 		trigger = { tag = USA }
 		name = acw_generic.9.a
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.15
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		add_ideas = USA_Spirit_American_Civil_War_Historical_Buff
+		
 		add_popularity = {
 			ideology = traditional_conservatism
 			popularity = -0.15
 		}
+		
+		set_temp_variable = { acw_weapons_count_change = 30 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 22 }
+		ACW_Draft_Count_Get = yes
+		USA_Slavery_Debate_Remove = yes
+		
+		load_oob = USA_Standard_ACW
+		activate_mission = eoanb_decision_acw_csa_surrender_to_usa_union
+		activate_mission = eoanb_decision_acw_usa_surrender_to_csa_union
+		activate_decision = eoanb_decision_acw_reform_west_point1
+		
+		country_event = { id = acw_first_nations.7 days = 10 }
+		if = {
+			limit = { has_completed_focus = USA_Focus_PACW_The_Abolitionists }
+			country_event = { id = acw_generic.15 days = 30 random_days = 45 }
+		}
+		country_event = { id = acw_generic.135 days = 17 }
+		country_event = { id = usa.312 days = 1 }
+		
 		if = {
 			limit = { is_ai = no }
 			set_variable = { super_event_displayed = 9 }
 		}
+		
 		custom_effect_tooltip = ACW_Union_Generals_Join_tt
 		hidden_effect = {
-			USA = {
-				USA_character_george_b_mcclellan = {
-					add_corps_commander_role = {
-						traits = { expert_administrator aversion_to_offense inflexible_strategist career_officer trait_cautious organizer }
-						skill = 4
-						legacy_id = 5003
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 4
-					}
+			# Union Generals
+			USA_character_george_b_mcclellan = {
+				add_corps_commander_role = {
+					traits = { expert_administrator aversion_to_offense inflexible_strategist career_officer trait_cautious organizer }
+					skill = 4
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 4
 				}
-				USA_character_george_meade = {
-					add_corps_commander_role = {
-						traits = { urban_assault_specialist hill_fighter }
-						skill = 3
-						legacy_id = 5004
-						attack_skill = 2
-						defense_skill = 4
-						planning_skill = 3
-						logistics_skill = 3
-					}
+			}
+			USA_character_george_meade = {
+				add_corps_commander_role = {
+					traits = { urban_assault_specialist hill_fighter }
+					skill = 3
+					attack_skill = 2
+					defense_skill = 4
+					planning_skill = 3
+					logistics_skill = 3
 				}
-				USA_character_henry_halleck = {
-					add_corps_commander_role = {
-						traits = { old_guard trait_cautious career_officer }
-						skill = 1
-						legacy_id = 5005
-						attack_skill = 1
-						defense_skill = 2
-						planning_skill = 4
-						logistics_skill = 4
-					}
+			}
+			USA_character_henry_halleck = {
+				add_corps_commander_role = {
+					traits = { old_guard trait_cautious career_officer }
+					skill = 1
+					attack_skill = 1
+					defense_skill = 2
+					planning_skill = 4
+					logistics_skill = 4
 				}
-				USA_character_irvin_mcdowell = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 2
-						legacy_id = 5006
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 2
-						logistics_skill = 3
-					}
+			}
+			USA_character_irvin_mcdowell = {
+				add_corps_commander_role = {
+					skill = 2
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 2
+					logistics_skill = 3
 				}
-				USA_character_ambrose_e_burnside = {
-					add_corps_commander_role = {
-						traits = { aversion_to_offense }
-						skill = 1
-						legacy_id = 5007
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 2
-						logistics_skill = 4
-					}
+			}
+			USA_character_ambrose_e_burnside = {
+				add_corps_commander_role = {
+					traits = { aversion_to_offense }
+					skill = 1
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 2
+					logistics_skill = 4
 				}
-				USA_character_joseph_hooker = {
-					add_corps_commander_role = {
-						traits = { aversion_to_offense }
-						skill = 2
-						legacy_id = 5008
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 3
-						logistics_skill = 3
-					}
+			}
+			USA_character_joseph_hooker = {
+				add_corps_commander_role = {
+					traits = { aversion_to_offense }
+					skill = 2
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 3
+					logistics_skill = 3
 				}
-				USA_character_james_birdeye_mcpherson = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 3
-						legacy_id = 5009
-						attack_skill = 4
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 3
-					}
+			}
+			USA_character_james_birdeye_mcpherson = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 4
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 3
 				}
-				USA_character_john_a_logan = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 2
-						legacy_id = 5010
-						attack_skill = 2
-						defense_skill = 2
-						planning_skill = 2
-						logistics_skill = 3
-					}
+			}
+			USA_character_john_a_logan = {
+				add_corps_commander_role = {
+					skill = 2
+					attack_skill = 2
+					defense_skill = 2
+					planning_skill = 2
+					logistics_skill = 3
 				}
-				USA_character_oliver_o_howard = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 3
-						legacy_id = 5011
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 3
-					}
+			}
+			USA_character_oliver_o_howard = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 3
 				}
-				USA_character_benjamin_f_butler = {
-					add_corps_commander_role = {
-						traits = { naval_invader }
-						skill = 2
-						legacy_id = 5012
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 3
-						logistics_skill = 4
-					}
+			}
+			USA_character_benjamin_f_butler = {
+				add_corps_commander_role = {
+					traits = { naval_invader }
+					skill = 2
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 3
+					logistics_skill = 4
 				}
-				USA_character_nathaniel_p_banks = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 1
-						legacy_id = 5013
-						attack_skill = 2
-						defense_skill = 1
-						planning_skill = 2
-						logistics_skill = 2
-					}
+			}
+			USA_character_nathaniel_p_banks = {
+				add_corps_commander_role = {
+					skill = 1
+					attack_skill = 2
+					defense_skill = 1
+					planning_skill = 2
+					logistics_skill = 2
 				}
-				USA_character_john_pope = {
-					add_corps_commander_role = {
-						traits = { aversion_to_offense }
-						skill = 2
-						legacy_id = 5014
-						attack_skill = 3
-						defense_skill = 2
-						planning_skill = 2
-						logistics_skill = 3
-					}
+			}
+			USA_character_john_pope = {
+				add_corps_commander_role = {
+					traits = { aversion_to_offense }
+					skill = 2
+					attack_skill = 3
+					defense_skill = 2
+					planning_skill = 2
+					logistics_skill = 3
 				}
-				USA_character_william_s_rosecrans = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 2
-						legacy_id = 5015
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 2
-						logistics_skill = 4
-					}
+			}
+			USA_character_william_s_rosecrans = {
+				add_corps_commander_role = {
+					skill = 2
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 2
+					logistics_skill = 4
 				}
-				USA_character_philip_sheridan = {
-					add_corps_commander_role = {
-						traits = { cavalry_officer career_officer }
-						skill = 3
-						legacy_id = 5016
-						attack_skill = 4
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 3
-					}
+			}
+			USA_character_philip_sheridan = {
+				add_corps_commander_role = {
+					traits = { cavalry_officer career_officer }
+					skill = 3
+					attack_skill = 4
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 3
 				}
-				USA_character_george_h_thomas = {
-					add_corps_commander_role = {
-						traits = { brilliant_strategist infantry_officer }
-						skill = 3
-						legacy_id = 5017
-						attack_skill = 4
-						defense_skill = 4
-						planning_skill = 3
-						logistics_skill = 2
-					}
+			}
+			USA_character_george_h_thomas = {
+				add_corps_commander_role = {
+					traits = { brilliant_strategist infantry_officer }
+					skill = 3
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 3
+					logistics_skill = 2
 				}
-				USA_character_edward_ord = {
-					add_corps_commander_role = {
-						traits = { bearer_of_artillery artillery_officer artillery_leader }
-						skill = 3
-						legacy_id = 5018
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 2
-						logistics_skill = 3
-					}
+			}
+			USA_character_edward_ord = {
+				add_corps_commander_role = {
+					traits = { bearer_of_artillery artillery_officer artillery_leader }
+					skill = 3
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 2
+					logistics_skill = 3
 				}
-				USA_character_john_g_parke = {
-					add_corps_commander_role = {
-						traits = {	}
-						skill = 3
-						legacy_id = 5019
-						attack_skill = 3
-						defense_skill = 4
-						planning_skill = 3
-						logistics_skill = 4
-					}
+			}
+			USA_character_john_g_parke = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 3
+					defense_skill = 4
+					planning_skill = 3
+					logistics_skill = 4
 				}
+			}
+			
+			CSA = { 
+				load_oob = CSA_Standard_ACW
+				activate_mission = eoanb_decision_acw_csa_surrender_to_usa_dixie
+				activate_mission = eoanb_decision_acw_usa_surrender_to_csa_dixie
 			}
 		}
 	}
+	
+	# CSA Option
 	option = {
-		trigger = { OR = { tag = CSA tag = NEG } }
+		trigger = { tag = CSA }
 		name = acw_generic.9.b
 		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 15 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 10 }
+		ACW_Draft_Count_Get = yes
+		
 		declare_war_on = {
 			target = USA
 			type = acw_civil_war_wargoal
 		}
+		
 		add_named_threat = {
 			threat = 5
 			name = "The American Civil War"
 		}
+		
 		country_event = { id = acw_generic.10 days = 7 }
-		USA = {
-			country_event = { id = acw_generic.10 days = 7 }
-		}
+		USA = { country_event = { id = acw_generic.10 days = 7 } }
+		
 		if = {
 			limit = { is_ai = no }
 			set_variable = { super_event_displayed = 9 }
 		}
-		if = {
-			limit = {
-				tag = CSA
+		
+		custom_effect_tooltip = ACW_CSA_Generals_Join_tt
+		hidden_effect = {
+			CSA_character_robert_e_lee = {
+				add_corps_commander_role = {
+					traits = { brilliant_strategist unyielding_defender guerilla_fighter }
+					skill = 4
+					attack_skill = 5
+					defense_skill = 5
+					planning_skill = 1
+					logistics_skill = 1
+				}
 			}
-			custom_effect_tooltip = ACW_CSA_Generals_Join_tt
-			hidden_effect = {
-				# USA_character_george_b_mcclellan = {
-				# 	add_corps_commander_role = {
-				# 		traits = { expert_administrator aversion_to_offense inflexible_strategist career_officer trait_cautious organizer }
-				# 		skill = 4
-				# 		legacy_id = 5003
-				# 		attack_skill = 2
-				# 		defense_skill = 3
-				# 		planning_skill = 4
-				# 		logistics_skill = 4
-				# 	}
-				# }
-				CSA_character_robert_e_lee = {
-					add_corps_commander_role = {
-						traits = { brilliant_strategist unyielding_defender guerilla_fighter }
-						skill = 4
-						legacy_id = 5020
-						attack_skill = 5
-						defense_skill = 5
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			CSA_character_stonewall_jackson = {
+				add_corps_commander_role = {
+					traits = { brilliant_strategist infantry_leader }
+					skill = 3
+					attack_skill = 6
+					defense_skill = 1
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_stonewall_jackson = {
-					add_corps_commander_role = {
-						traits = { brilliant_strategist infantry_leader }
-						skill = 3
-						legacy_id = 5021
-						attack_skill = 6
-						defense_skill = 1
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_edmund_kirby_smith = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 3
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_edmund_kirby_smith = {
-					add_corps_commander_role = {
-						traits = {}
-						skill = 3
-						legacy_id = 5022
-						attack_skill = 3
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_leonidas_polk = {
+				add_corps_commander_role = {
+					traits = { politically_connected }
+					skill = 1
+					attack_skill = 3
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_leonidas_polk = {
-					add_corps_commander_role = {
-						traits = { politically_connected }
-						skill = 1
-						legacy_id = 5023
-						attack_skill = 3
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_william_j_hardee = {
+				add_corps_commander_role = {
+					skill = 3
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_william_j_hardee = {
-					add_corps_commander_role = {
-						traits = {}
-						skill = 3
-						legacy_id = 5024
-						attack_skill = 4
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_john_bell_hood = {
+				add_corps_commander_role = {
+					skill = 2
+					attack_skill = 3
+					defense_skill = 2
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_john_bell_hood = {
-					add_corps_commander_role = {
-						traits = {}
-						skill = 2
-						legacy_id = 5025
-						attack_skill = 3
-						defense_skill = 2
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_albert_sidney_johnson = {
+				add_corps_commander_role = {
+					traits = { desert_fox }
+					skill = 3
+					attack_skill = 4
+					defense_skill = 4
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_albert_sidney_johnson = {
-					add_corps_commander_role = {
-						traits = { desert_fox }
-						skill = 3
-						legacy_id = 5026
-						attack_skill = 4
-						defense_skill = 4
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_braxton_bragg = {
+				add_corps_commander_role = {
+					traits = { old_guard hill_fighter }
+					skill = 2
+					attack_skill = 3
+					defense_skill = 3
+					planning_skill = 1
+					logistics_skill = 1
 				}
-				CSA_character_braxton_bragg = {
-					add_corps_commander_role = {
-						traits = { old_guard hill_fighter }
-						skill = 2
-						legacy_id = 5027
-						attack_skill = 3
-						defense_skill = 3
-						planning_skill = 1
-						logistics_skill = 1
-					}
+			}
+			CSA_character_joseph_e_jonston = {
+				add_corps_commander_role = {
+					traits = { urban_assault_specialist old_guard }
+					skill = 3
+					attack_skill = 2
+					defense_skill = 3
+					planning_skill = 4
+					logistics_skill = 3
 				}
-				CSA_character_joseph_e_jonston = {
-					add_corps_commander_role = {
-						traits = { urban_assault_specialist old_guard }
-						skill = 3
-						legacy_id = 5028
-						attack_skill = 2
-						defense_skill = 3
-						planning_skill = 4
-						logistics_skill = 3
-					}
-				}
-				# USA_character_john_breckinridge = {
-				# 	add_corps_commander_role = {
-				# 		traits = {  }
-				# 		skill = 1
-				# 		attack_skill = 1
-				# 		defense_skill = 2
-				# 		planning_skill = 1
-				# 		logistics_skill = 1
-				# 	}
-				# 	set_nationality = CSA
-				# }
 			}
 		}
 	}
+	
+	option = {
+		trigger = { tag = NEG }
+		name = acw_generic.9.b
+		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 25 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 15 }
+		ACW_Draft_Count_Get = yes
+		
+		declare_war_on = {
+			target = USA
+			type = acw_civil_war_wargoal
+		}
+		
+		add_named_threat = {
+			threat = 5
+			name = "The American Civil War"
+		}
+		
+		country_event = { id = acw_generic.10 days = 7 }
+		USA = { country_event = { id = acw_generic.10 days = 7 } }
+		
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
+	}
+	
+	# CAL Option
+	option = {
+		trigger = { tag = CAL }
+		name = acw_generic.9.b
+		custom_effect_tooltip = 07_ACW_GENERIC_tt
+		
+		add_stability = 0.10
+		add_war_support = 0.10
+		add_ideas = USA_Spirit_American_Civil_War_Player_Nerf
+		
+		set_temp_variable = { acw_weapons_count_change = 20 }
+		ACW_Weapons_Count_Get = yes
+		set_temp_variable = { acw_draft_count_change = 8 }
+		ACW_Draft_Count_Get = yes
+		
+		if = {
+			limit = { is_ai = no }
+			set_variable = { super_event_displayed = 9 }
+		}
+	}
+	
 	option = {
 		trigger = {
 			NOT = {
 				tag = USA
 				tag = CSA
 				tag = NEG
+				tag = CAL
 			}
-		}
+		}		
 		name = acw_generic.9.c
+		
 		if = {
 			limit = { is_ai = no }
 			set_variable = { super_event_displayed = 9 }
@@ -4597,7 +4592,6 @@ country_event = {
 					character = USA_character_ulysses_s_grant
 					traits = { old_guard ranger butcher brilliant_strategist }
 					skill = 6
-					legacy_id = 5029
 					attack_skill = 6
 					defense_skill = 4
 					planning_skill = 5
@@ -4618,7 +4612,6 @@ country_event = {
 					character = USA_character_william_t_sherman
 					traits = { trickster swamp_fox commando brilliant_strategist }
 					skill = 5
-					legacy_id = 5030
 					attack_skill = 6
 					defense_skill = 4
 					planning_skill = 4
@@ -4787,7 +4780,7 @@ country_event = {
 	option = {
 		name = acw_generic.21.a
 		custom_effect_tooltip = 08_ACW_tt
-		hidden_effect = { news_event = { id = acw_generic.133 } }
+		#hidden_effect = { news_event = { id = acw_generic.133 } }
 		hidden_effect = {
 			ENG = {
 				country_event = { days = 10 id = acw_generic.22 }
@@ -4844,7 +4837,7 @@ country_event = {
 		}
 		ai_chance = { factor = 60 }
 		name = acw_generic.23.a
-		hidden_effect = { news_event = { id = acw_generic.134 } }
+		#hidden_effect = { news_event = { id = acw_generic.134 } }
 		custom_effect_tooltip = 11_ACW_tt
 	}
 	option = {
@@ -4870,7 +4863,7 @@ country_event = {
 		name = acw_generic.23.c
 		clr_global_flag = Trent_Affair_ENG_Yes
 		hidden_effect = { ENG = { country_event = { days = 10 id = acw_generic.24 } } }
-		hidden_effect = { news_event = { id = acw_generic.134 } }
+		#hidden_effect = { news_event = { id = acw_generic.134 } }
 		custom_effect_tooltip = 11_ACW_tt
 	}
 }
@@ -4901,7 +4894,7 @@ country_event = {
 		}
 		name = acw_generic.24.a
 		custom_effect_tooltip = 11_ACW_tt
-		hidden_effect = { news_event = { id = acw_generic.134 } }
+		#hidden_effect = { news_event = { id = acw_generic.134 } }
 	}
 	option = {
 		trigger = {
@@ -4917,7 +4910,7 @@ country_event = {
 		}
 		name = acw_generic.24.c
 		custom_effect_tooltip = 11_ACW_tt
-		hidden_effect = { news_event = { id = acw_generic.134 } }
+		#hidden_effect = { news_event = { id = acw_generic.134 } }
 	}
 }
 
@@ -4990,7 +4983,7 @@ country_event = {
 			}
 		}
 		name = acw_generic.26.b
-		hidden_effect = { news_event = { id = acw_generic.134 } }
+		#hidden_effect = { news_event = { id = acw_generic.134 } }
 		custom_effect_tooltip = 11_ACW_tt
 	}
 	option = {
@@ -5321,7 +5314,7 @@ country_event = {
 	id = acw_generic.33
 	title = acw_generic.33.t
 	desc = acw_generic.33.d
-	picture = GFX_news_event_lincoln_elected
+	picture = GFX_news_event_lincoln_elected_1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -5461,7 +5454,7 @@ country_event = {
 	id = acw_generic.37
 	title = acw_generic.37.t
 	desc = acw_generic.37.d
-	picture = GFX_news_event_lincoln_elected
+	picture = GFX_news_event_lincoln_elected_1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -5470,9 +5463,7 @@ country_event = {
 		set_temp_variable = { USA_Slavery_Debate_Tension_Change = 15 }
 		USA_Slavery_Debate_Tension_Modify = yes
 		if = {
-			limit = {
-				has_country_flag = USA_Houston_TX_Gov
-			}
+			limit = { has_country_flag = USA_Houston_TX_Gov }
 			country_event = {
 				id = usa.110
 				days = 14
@@ -5480,137 +5471,54 @@ country_event = {
 			}
 		}
 	}
+
 	option = {
 		name = acw_generic.37.a
 		hidden_effect = {
+			# Retire current leadership and set new politics
 			retire_country_leader = yes
 			set_politics = {
 				ruling_party = ideology_social_liberalism
 				elections_allowed = no
 			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_1_lvl1
-				}
-				remove_ideas =	USA_doughface_1_lvl1
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_1_lvl2
-				}
-				remove_ideas =	USA_doughface_1_lvl2
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_1_lvl3
-				}
-				remove_ideas =	USA_doughface_1_lvl3
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_1_lvl4
-				}
-				remove_ideas =	USA_doughface_1_lvl4
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_1_lvl5
-				}
-				remove_ideas =	USA_doughface_1_lvl5
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_2_lvl1
-				}
-				remove_ideas =	USA_doughface_2_lvl1
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_2_lvl2
-				}
-				remove_ideas =	USA_doughface_2_lvl2
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_2_lvl3
-				}
-				remove_ideas =	USA_doughface_2_lvl3
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_2_lvl4
-				}
-				remove_ideas =	USA_doughface_2_lvl4
-			}
-			if = {
-				limit = {
-					has_idea = USA_doughface_2_lvl5
-				}
-				remove_ideas =	USA_doughface_2_lvl5
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_1_lvl1
-				}
-				remove_ideas =	USA_inclusive_1_lvl1
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_1_lvl2
-				}
-				remove_ideas =	USA_inclusive_1_lvl2
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_1_lvl3
-				}
-				remove_ideas =	USA_inclusive_1_lvl3
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_1_lvl4
-				}
-				remove_ideas =	USA_inclusive_1_lvl4
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_1_lvl5
-				}
-				remove_ideas =	USA_inclusive_1_lvl5
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_2_lvl1
-				}
-				remove_ideas =	USA_inclusive_2_lvl1
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_2_lvl2
-				}
-				remove_ideas =	USA_inclusive_2_lvl2
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_2_lvl3
-				}
-				remove_ideas =	USA_inclusive_2_lvl3
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_2_lvl4
-				}
-				remove_ideas =	USA_inclusive_2_lvl4
-			}
-			if = {
-				limit = {
-					has_idea = USA_inclusive_2_lvl5
-				}
-				remove_ideas =	USA_inclusive_2_lvl5
-			}
+
+			# Remove all doughface and inclusive ideas efficiently
+			# Level 1 ideas
+			remove_ideas = USA_doughface_1_lvl1
+			remove_ideas = USA_doughface_2_lvl1
+			remove_ideas = USA_inclusive_1_lvl1
+			remove_ideas = USA_inclusive_2_lvl1
+			
+			# Level 2 ideas
+			remove_ideas = USA_doughface_1_lvl2
+			remove_ideas = USA_doughface_2_lvl2
+			remove_ideas = USA_inclusive_1_lvl2
+			remove_ideas = USA_inclusive_2_lvl2
+			
+			# Level 3 ideas
+			remove_ideas = USA_doughface_1_lvl3
+			remove_ideas = USA_doughface_2_lvl3
+			remove_ideas = USA_inclusive_1_lvl3
+			remove_ideas = USA_inclusive_2_lvl3
+			
+			# Level 4 ideas
+			remove_ideas = USA_doughface_1_lvl4
+			remove_ideas = USA_doughface_2_lvl4
+			remove_ideas = USA_inclusive_1_lvl4
+			remove_ideas = USA_inclusive_2_lvl4
+			
+			# Level 5 ideas
+			remove_ideas = USA_doughface_1_lvl5
+			remove_ideas = USA_doughface_2_lvl5
+			remove_ideas = USA_inclusive_1_lvl5
+			remove_ideas = USA_inclusive_2_lvl5
+
+			# Reset political power and leadership
 			set_political_power = 0
 			retire_character = USA_character_james_buchanan
 			retire_ideology_leader = ideology_social_liberalism
+
+			# Install Lincoln as new leader
 			USA_character_abraham_lincoln = {
 				add_country_leader_role = {
 					promote_leader = yes
@@ -5622,15 +5530,17 @@ country_event = {
 					}
 				}
 			}
+
+			# Remove all existing cabinet members
 			every_character = {
 				limit = {
 					is_character_slot = political_advisor
 					has_character_flag = usa_cabinet_member_flag
 				}
-				remove_advisor_role = {
-					slot = political_advisor
-				}
+				remove_advisor_role = { slot = political_advisor }
 			}
+
+			# Install new cabinet - Secretary of State
 			USA_character_william_seward = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5643,6 +5553,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Secretary of Treasury
 			USA_character_salmon_p_chase = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5655,6 +5567,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Secretary of War (Cameron)
 			USA_character_simon_cameron = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5667,6 +5581,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Attorney General
 			USA_character_edward_bates = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5679,6 +5595,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Secretary of Navy
 			USA_character_gideon_welles = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5691,6 +5609,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Vice President
 			USA_character_hannibal_hamlin = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5703,6 +5623,8 @@ country_event = {
 					activate = yes
 				}
 			}
+
+			# Future Secretary of War (Stanton) - not activated initially
 			USA_character_edwin_m_stanton = {
 				set_character_flag = usa_cabinet_member_flag
 				add_advisor_role = {
@@ -5722,7 +5644,7 @@ country_event = {
 	id = acw_generic.38
 	title = acw_generic.38.t
 	desc = acw_generic.38.d
-	picture = GFX_news_event_lincoln_elected
+	picture = GFX_news_event_lincoln_elected_1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -5744,39 +5666,45 @@ country_event = {
 	title = acw_generic.39.t
 	desc = acw_generic.39.d
 	picture = GFX_report_event_worker_protests
-
+	
 	is_triggered_only = yes
+	fire_only_once = yes
+	
 	trigger = {
 		has_country_leader = {
 			character = USA_character_abraham_lincoln
 			ruling_only = yes
 		}
 	}
-	fire_only_once = yes
-
+	
 	option = {
 		name = acw_generic.39.a
 		ai_chance = {
-			factor = 80
+			base = 80
 			modifier = {
-				factor = 100
+				factor = 1.25
 				is_historical_focus_on = yes
 			}
 		}
+		
 		custom_effect_tooltip = 01_lincoln_tt
 		add_stability = -0.2
 		add_timed_idea = {
 			idea = Generic_Shocked_Nation_2
 			days = 93
 		}
+		
 		hidden_effect = {
+			# Set flags
 			set_global_flag = Lincoln_Assassinated
 			set_country_flag = Lincoln_Assassinated
-		}
-		hidden_effect = { news_event = { id = usa_news.18 } }
-		if = {
-			limit = { date > 1864.11.5 }
-			hidden_effect = {
+			
+			# Fire news event
+			news_event = { id = usa_news.18 }
+			
+			# Handle succession based on date
+			if = {
+				limit = { date > 1864.11.5 }
 				USA_character_andrew_johnson = {
 					add_country_leader_role = {
 						country_leader = {
@@ -5793,9 +5721,7 @@ country_event = {
 					elections_allowed = no
 				}
 			}
-		}
-		else = {
-			hidden_effect = {
+			else = {
 				USA_character_hannibal_hamlin = {
 					add_country_leader_role = {
 						country_leader = {
@@ -5812,22 +5738,29 @@ country_event = {
 					elections_allowed = no
 				}
 			}
+			
+			# Retire Lincoln last to avoid scope issues
+			retire_character = USA_character_abraham_lincoln
 		}
-		retire_character = USA_character_abraham_lincoln
 	}
+	
 	option = {
 		name = acw_generic.39.b
 		ai_chance = {
-			factor = 20
+			base = 20
 			modifier = {
 				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
+		
 		custom_effect_tooltip = 02_lincoln_tt
-		hidden_effect = { news_event = { id = usa_news.19 } }
-		set_global_flag = Lincoln_Survived
-		set_country_flag = Lincoln_Survived
+		
+		hidden_effect = {
+			set_global_flag = Lincoln_Survived
+			set_country_flag = Lincoln_Survived
+			news_event = { id = usa_news.19 }
+		}
 	}
 }
 
@@ -6651,20 +6584,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = ORE
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = ORE
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -6988,20 +6911,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = UTA
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = UTA
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -7194,20 +7107,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = NMX
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = NMX
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -7497,7 +7400,6 @@ country_event = {
 # 					character = CSA_character_albert_sidney_johnson
 # 					traits = { desert_fox }
 # 					skill = 3
-# 					legacy_id = 5026
 # 					attack_skill = 4
 # 					defense_skill = 4
 # 					planning_skill = 1
@@ -7642,20 +7544,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = OKL
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = OKL
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -7830,20 +7722,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = KNS
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = KNS
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -8062,20 +7944,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = DAK
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = DAK
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -8277,20 +8149,10 @@ country_event = {
 # 						}
 # 					}
 # 					OVERLORD = {
-# 						if = {
-# 							limit = { OR = {
-# 								has_dlc = "Together for Victory"
-# 								has_dlc = "Death or Dishonor"
-# 								has_dlc = "Waking the Tiger"
-# 							} }
 # 							set_autonomy = {
 # 								target = MIN
 # 								autonomy_state = autonomy_free
 # 							}
-# 						}
-# 						else = {
-# 							end_puppet = MIN
-# 						}
 # 					}
 # 					white_peace = CAL
 # 				}
@@ -8636,7 +8498,6 @@ country_event = {
 # 					character = CSA_character_john_bell_hood
 # 					traits = {}
 # 					skill = 2
-# 					legacy_id = 5025
 # 					attack_skill = 3
 # 					defense_skill = 2
 # 					planning_skill = 1
@@ -9174,7 +9035,6 @@ country_event = {
 # 				add_field_marshal_role = {
 # 					traits = { expert_administrator aversion_to_offense inflexible_strategist career_officer trait_cautious organizer logistics_wizard }
 # 					skill = 4
-# 					legacy_id = 5003
 # 					attack_skill = 2
 # 					defense_skill = 3
 # 					planning_skill = 4
@@ -9197,7 +9057,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = { urban_assault_specialist hill_fighter }
 # 					skill = 3
-# 					legacy_id = 5004
 # 					attack_skill = 2
 # 					defense_skill = 4
 # 					planning_skill = 3
@@ -9209,7 +9068,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = { urban_assault_specialist hill_fighter }
 # 					skill = 3
-# 					legacy_id = 5004
 # 					attack_skill = 2
 # 					defense_skill = 4
 # 					planning_skill = 3
@@ -9221,7 +9079,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = {  }
 # 					skill = 2
-# 					legacy_id = 5006
 # 					attack_skill = 3
 # 					defense_skill = 3
 # 					planning_skill = 2
@@ -9233,7 +9090,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = { cavalry_officer career_officer }
 # 					skill = 3
-# 					legacy_id = 5016
 # 					attack_skill = 4
 # 					defense_skill = 3
 # 					planning_skill = 4
@@ -9245,7 +9101,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = { bearer_of_artillery artillery_officer artillery_leader }
 # 					skill = 3
-# 					legacy_id = 5018
 # 					attack_skill = 3
 # 					defense_skill = 3
 # 					planning_skill = 2
@@ -9257,7 +9112,6 @@ country_event = {
 # 				add_corps_commander_role = {
 # 					traits = {  }
 # 					skill = 3
-# 					legacy_id = 5019
 # 					attack_skill = 3
 # 					defense_skill = 4
 # 					planning_skill = 3
@@ -9522,7 +9376,7 @@ country_event = {
 	id = acw_generic.84
 	title = acw_generic.84.t
 	desc = acw_generic.84.d
-	picture = GFX_news_event_lincoln_elected
+	picture = GFX_news_event_lincoln_elected_1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -9643,7 +9497,7 @@ country_event = {
 	id = acw_generic.85
 	title = acw_generic.85.t
 	desc = acw_generic.85.d
-	picture = GFX_news_event_lincoln_elected
+	picture = GFX_news_event_lincoln_elected_1
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -9779,7 +9633,6 @@ country_event = {
 				add_field_marshal_role = {
 					traits = { brilliant_strategist unyielding_defender guerilla_fighter }
 					skill = 4
-					legacy_id = 5020
 					attack_skill = 5
 					defense_skill = 5
 					planning_skill = 1
@@ -9827,7 +9680,6 @@ country_event = {
 				add_corps_commander_role = {
 					traits = {}
 					skill = 3
-					legacy_id = 5024
 					attack_skill = 4
 					defense_skill = 4
 					planning_skill = 1
@@ -9839,7 +9691,6 @@ country_event = {
 				add_corps_commander_role = {
 					traits = {}
 					skill = 2
-					legacy_id = 5025
 					attack_skill = 3
 					defense_skill = 2
 					planning_skill = 1
@@ -9851,7 +9702,6 @@ country_event = {
 				add_corps_commander_role = {
 					traits = { desert_fox }
 					skill = 3
-					legacy_id = 5026
 					attack_skill = 4
 					defense_skill = 4
 					planning_skill = 1
@@ -9863,7 +9713,6 @@ country_event = {
 				add_corps_commander_role = {
 					traits = { old_guard hill_fighter }
 					skill = 2
-					legacy_id = 5027
 					attack_skill = 3
 					defense_skill = 3
 					planning_skill = 1
@@ -9875,7 +9724,6 @@ country_event = {
 				add_corps_commander_role = {
 					traits = { urban_assault_specialist old_guard }
 					skill = 3
-					legacy_id = 5028
 					attack_skill = 2
 					defense_skill = 3
 					planning_skill = 4
@@ -11736,52 +11584,6 @@ country_event = {
 	}
 }
 
-# Norton declares war
-country_event = {
-	id = acw_generic.123
-	title = acw_generic.123.t
-	desc = acw_generic.123.d
-	picture = GFX_report_event_chinese_army_training
-
-	is_triggered_only = yes
-
-	option = {
-		name = acw_generic.123.a
-		trigger = { tag = CAL }
-		#set_cosmetic_tag = USA_imperial_states_of_america
-		set_global_flag = ACW_Norton_War
-		add_war_support = 0.10
-		declare_war_on = {
-			target = USA
-			type = annex_everything
-		}
-		set_temp_variable = { acw_weapons_count_change = 5 }
-		ACW_Weapons_Count_Get = yes
-		USA = { country_event = acw_generic.123 }
-		if = {
-			limit = { has_country_flag = USA_DouglasElected }
-			custom_effect_tooltip = 05_ACW_NORTON_tt
-		}
-		activate_mission = eoanb_decision_acw_usa_surrender_to_cal
-		activate_mission = eoanb_decision_acw_cal_surrender_to_usa
-		hidden_effect = {
-			add_timed_idea = {
-				idea = EOANBSYS_spirit_war_total_war
-				days = 1000
-			}
-		}
-	}
-	option = {
-		name = acw_generic.123.b
-		trigger = { tag = USA }
-		add_war_support = 0.025
-		set_temp_variable = { USA_Slavery_Debate_Tension_Change = 5 }
-		USA_Slavery_Debate_Tension_Modify = yes
-		activate_mission = eoanb_decision_acw_usa_surrender_to_cal
-		activate_mission = eoanb_decision_acw_cal_surrender_to_usa
-	}
-}
-
 ############################ PEACE TREATIES ###########################
 
 # USA > CSA
@@ -11795,180 +11597,89 @@ news_event = {
 	major = yes
 
 	immediate = {
-		if = {
-			limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
-			clr_global_flag = ACW_American_Civil_War
-			set_global_flag = ACW_American_Civil_War_Happened
-			PRS = {
-				clr_country_flag = PRS_weapons_deal_successful
-				clr_country_flag = PRS_USA_sell_guns_rejected_flag
-				clr_country_flag = PRS_CSA_sell_guns_rejected_flag
+		hidden_effect = {
+			# Clean up ACW flags if not a radical coup
+			if = {
+				limit = { NOT = { has_global_flag = ACW_Radical_Coup } }
+				clr_global_flag = ACW_American_Civil_War
+				set_global_flag = ACW_American_Civil_War_Happened
+				
+				# Clear PRS weapon deal flags
+				PRS = {
+					clr_country_flag = PRS_weapons_deal_successful
+					clr_country_flag = PRS_USA_sell_guns_rejected_flag
+					clr_country_flag = PRS_CSA_sell_guns_rejected_flag
+				}
 			}
-		}
-		set_global_flag = ACW_CSA_Lost
-		if = {
-			limit = { tag = USA }
-			# UCT = {
-			# 	# Anarchists
-			# 	if = {
-			# 		limit = {
-			# 			USA = { NOT = { has_government = anarchism } }
-			# 		}
-			# 		set_variable = {
-			# 			var = forming_usaanarchy_progress
-			# 			value = 3
-			# 		}
-			# 		clamp_variable = {
-			# 			var = forming_usaanarchy_progress
-			# 			min = 0
-			# 			max = 100
-			# 		}
-			# 	}
-			# 	# Ku Klux
-			# 	set_variable = {
-			# 		var = forming_kuklux_progress
-			# 		value = 2
-			# 	}
-			# 	clamp_variable = {
-			# 		var = forming_kuklux_progress
-			# 		min = 0
-			# 		max = 100
-			# 	}
-			# 	if = {
-			# 		limit = {
-			# 			NOT = { has_country_flag = USA_LincolnorDouglas_Moderate_Appeal }
-			# 		}
-			# 		add_to_variable = {
-			# 			var = forming_kuklux_progress
-			# 			value = 8
-			# 		}
-			# 	}
-			# 	# Free America
-			# 	if = {
-			# 		limit = {
-			# 			OR = {
-			# 				has_global_flag = USA_Radical_Coup
-			# 			}
-			# 		}
-			# 		set_variable = {
-			# 			var = forming_radabolition_progress
-			# 			value = 2
-			# 		}
-			# 		clamp_variable = {
-			# 			var = forming_radabolition_progress
-			# 			min = 0
-			# 			max = 100
-			# 		}
-			# 	}
-			# 	# Norton
-			# 	if = {
-			# 		limit = {
-			# 			NOT = {	country_exists = CAL }
-			# 			USA = { has_global_flag = ACW_Norton_Imprisoned }
-			# 		}
-			# 		set_variable = {
-			# 			var = forming_nortonrevival_progress
-			# 			value = 11
-			# 		}
-			# 		clamp_variable = {
-			# 			var = forming_nortonrevival_progress
-			# 			min = 0
-			# 			max = 100
-			# 		}
-			# 		if = {
-			# 			limit = {
-			# 				USA = { NOT = { has_country_flag = USA_Norton_Empowered } }
-			# 			}
-			# 			add_to_variable = {
-			# 				var = forming_nortonrevival_progress
-			# 				value = 15
-			# 			}
-			# 		}
-			# 	}
-			# 	# National Labor
-			# 	if = {
-			# 		limit = {
-			# 			NOT = {
-			# 				any_country = {
-			# 					OR = {
-			# 						has_government = ideology_radical_socialism
-			# 						has_government = social_egalitarianism
-			# 					}
-			# 				}
-			# 			}
-			# 		}
-			# 		set_variable = {
-			# 			var = forming_usasyndicate_progress
-			# 			value = 4
-			# 		}
-			# 		clamp_variable = {
-			# 			var = forming_usasyndicate_progress
-			# 			min = 0
-			# 			max = 100
-			# 		}
-			# 		if = {
-			# 			limit = { country_exists = MHC }
-			# 			add_to_variable = {
-			# 				var = forming_usasyndicate_progress
-			# 				value = 20
-			# 			}
-			# 		}
-			# 	}
-			# }
-			hidden_effect = {
+			
+			# Set CSA defeat flag
+			set_global_flag = ACW_CSA_Lost
+			
+			# USA-specific immediate effects
+			if = {
+				limit = { tag = USA }
 				country_event = { id = acw_generic.39 days = 4 random_days = 5 }
 				country_event = { id = usa.310 days = 100 random_days = 200 }
 				country_event = { id = usa.68 days = 1 }
 			}
 		}
 	}
+
+	# USA Victory Option
 	option = {
 		name = acw_peace_deal.1.a
 		trigger = { tag = USA }
+		
 		custom_effect_tooltip = 04_ACW_PEACEDEAL_tt
+		
 		hidden_effect = {
+			# Only execute if civil war actually happened
 			if = {
 				limit = { has_global_flag = ACW_American_Civil_War_Happened }
-				USA = {
-					delete_unit_template_and_units = { division_template = "Union Militia Battalion" }
-					delete_unit_template_and_units = { division_template = "Union Infantry Regiment" }
-					delete_unit_template_and_units = { division_template = "Union Cavalry" }
-					delete_unit_template_and_units = { division_template = "Union Army" }
-					delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
-					set_division_template_lock = {
-						division_template = "American Infantry Regiment"
-						is_locked = no
-					}
-					set_division_template_lock = {
-						division_template = "American Infantry Brigade"
-						is_locked = no
-					}
-					set_division_template_lock = {
-						division_template = "American Infantry Brigade with Support"
-						is_locked = no
-					}
-					set_division_template_lock = {
-						division_template = "American National Guard"
-						is_locked = no
-					}
+				
+				# Clean up USA military templates
+				delete_unit_template_and_units = { division_template = "Union Militia Battalion" }
+				delete_unit_template_and_units = { division_template = "Union Infantry Regiment" }
+				delete_unit_template_and_units = { division_template = "Union Cavalry" }
+				delete_unit_template_and_units = { division_template = "Union Army" }
+				delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
+				delete_unit_template_and_units = { division_template = "Union Regimental" }
+				
+				# Unlock peacetime templates
+				set_division_template_lock = {
+					division_template = "American Infantry Regiment"
+					is_locked = no
 				}
+				set_division_template_lock = {
+					division_template = "American Infantry Brigade"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "American Infantry Brigade with Support"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "American National Guard"
+					is_locked = no
+				}
+				set_division_template_lock = {
+					division_template = "National Guard"
+					is_locked = no
+				}
+				
+				# Handle CSA occupation
 				CSA = {
+					# Clean up CSA military templates
 					delete_unit_template_and_units = { division_template = "Confederate Militia Battalion" }
 					delete_unit_template_and_units = { division_template = "Confederate Infantry Regiment" }
 					delete_unit_template_and_units = { division_template = "Confederate Cavalry" }
 					delete_unit_template_and_units = { division_template = "Confederate Army" }
 					delete_unit_template_and_units = { division_template = "South American Confederate Volunteers" }
-					USA = {
-						if = {
-							limit = { eoanb_enable_autonomy = yes }
-							set_autonomy = {
-								target = CSA
-								autonomous_state = autonomy_unintegrated_seceded_state
-							}
-						}
-						else = {
-							puppet = CSA
-						}
+					
+					# Set up occupation government
+					set_autonomy = {
+						target = CSA
+						autonomous_state = autonomy_unintegrated_seceded_state
 					}
 					set_politics = {
 						ruling_party = radical_democracy
@@ -11984,7 +11695,8 @@ news_event = {
 					}
 					set_cosmetic_tag = USA_Occupied_CSA_Cosmetic
 				}
-				### CSA
+				
+				# Assign military governor based on focus choice
 				if = {
 					limit = { has_completed_focus = USA_Focus_ACW_Grant_Commands }
 					USA_character_ulysses_s_grant = {
@@ -12027,87 +11739,71 @@ news_event = {
 						}
 					}
 				}
-				# else = {
-				# 	USA_character_george_b_mcclellan = {
-				# 		set_nationality = CSA
-				# 		add_country_leader_role = {
-				# 			country_leader = {
-				# 				desc = ""
-				# 				expire = "1900.7.1"
-				# 				ideology = military_goverment
-				# 				traits = { }
-				# 			}
-				# 		}
-				# 	}
-				# }
 			}
-		}
-
-		ENG = {
-			if = {
-				limit ={ has_war_with = USA has_war_together_with = CSA }
-				custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
+			
+			# Handle foreign intervention cleanup
+			every_country = {
+				limit = { 
+					has_war_together_with = CSA 
+					has_war_with = USA 
+				}
+				
+				# Handle specific territorial returns
+				if = {
+					limit = {
+						OR = { tag = ENG tag = CAN }
+						USA = {
+							OR = {
+								owns_state = 426
+								owns_state = 740
+							}
+						}
+					}
+					USA = {
+						transfer_state = 426
+						transfer_state = 740
+					}
+				}
+				else_if = {
+					limit = {
+						tag = FRA
+						USA = { owns_state = 730 }
+					}
+					USA = { transfer_state = 730 }
+				}
+				
+				# Make peace with subjects first, then main country
 				for_each_scope_loop = {
 					array = subjects
 					white_peace = USA
 				}
 				white_peace = USA
-				hidden_effect = {
-					transfer_state = 426
-					transfer_state = 740
-				}
 			}
-		}
-		FRA = {
-			if = {
-				limit ={ has_war_with = USA has_war_together_with = CSA }
-				custom_effect_tooltip = 01_ACW_PEACEDEAL_VAL_tt
-				for_each_scope_loop = {
-					array = subjects
-					white_peace = USA
-				}
-				white_peace = USA
-				hidden_effect = {
-					transfer_state = 730
-				}
+			
+			# Replace civil war spirit with recovery spirit
+			swap_ideas = {
+				remove_idea = USA_Spirit_American_Civil_War
+				add_idea = USA_recovery
 			}
-		}
-		every_country = {
-			limit = { has_war_together_with = CSA has_war_with = USA }
-			white_peace = USA
-		}
-		swap_ideas = {
-			remove_idea = USA_Spirit_American_Civil_War
-			add_idea = USA_recovery
-		}
-
-		hidden_effect = {
+			
+			# Make peace with CSA
+			white_peace = CSA
+			
+			# Fire follow-up events
 			news_event = { id = acw_generic.131 days = 1 }
 			country_event = { id = usa.314 days = 30 }
-			USA = {
-				delete_unit_template_and_units = { division_template = "Union Regimental" }
-				delete_unit_template_and_units = { division_template = "South American Union Volunteers" }
-				set_division_template_lock = {
-					division_template = "National Guard"
-					is_locked = no
-				}
-				white_peace = CSA
-			}
 		}
 	}
-	option = { # Reaction
+
+	# International Reaction Option
+	option = {
 		name = acw_peace_deal.1.b
-		trigger = {
-			NOT = {
-				tag = USA
-			}
-		}
+		trigger = { NOT = { tag = USA } }
+		
+		# Conditional tooltips based on territorial situation
 		if = {
 			limit = {
-				OR ={
-					tag = ENG
-					tag = CAN
-				}
+				OR = { tag = ENG tag = CAN }
 				USA = {
 					OR = {
 						owns_state = 426
@@ -13515,8 +13211,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		add_war_support = 0.07
 		ROOT = { country_event = { id = acw_first_nations.3 months = 1 } }
@@ -13532,8 +13226,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		add_war_support = 0.07
 		ROOT = { country_event = { id = acw_first_nations.4 months = 2 } }
@@ -13575,8 +13267,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		custom_effect_tooltip = acw_first_nations_choose_CSA_tooltip
 		hidden_effect = { 
@@ -13595,8 +13285,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		ROOT = { country_event = { id = acw_first_nations.3 months = 1 } }
 		custom_effect_tooltip = acw_first_nations_choose_later_tooltip
@@ -13637,8 +13325,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		custom_effect_tooltip = acw_first_nations_choose_CSA_tooltip
 		hidden_effect = { 
@@ -13657,8 +13343,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		ROOT = { country_event = { id = acw_first_nations.4 months = 1 } }
 		custom_effect_tooltip = acw_first_nations_choose_latest_tooltip
@@ -13686,8 +13370,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		custom_effect_tooltip = acw_first_nations_choose_USA_tooltip
 		hidden_effect = { 
@@ -13706,8 +13388,6 @@ country_event = {
 			NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 			NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 			NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-			NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-			NOT = { has_autonomy_state = autonomy_freely_associated_state }
 		}
 		custom_effect_tooltip = acw_first_nations_choose_CSA_tooltip
 		hidden_effect = { 
@@ -13740,8 +13420,6 @@ country_event = {
 				NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 				NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 				NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-				NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-				NOT = { has_autonomy_state = autonomy_freely_associated_state }
 			}
 			diplomatic_relation = {
 				country = FROM
@@ -13771,8 +13449,6 @@ country_event = {
 				NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 				NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 				NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-				NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-				NOT = { has_autonomy_state = autonomy_freely_associated_state }
 			}
 			diplomatic_relation = {
 				country = FROM
@@ -13802,8 +13478,6 @@ country_event = {
 				NOT = { has_autonomy_state = autonomy_organized_incorporated_territory }
 				NOT = { has_autonomy_state = autonomy_first_nations_reservation }
 				NOT = { has_autonomy_state = autonomy_organized_unincorporated_territory }
-				NOT = { has_autonomy_state = autonomy_organized_unincorporated_commonwealth }
-				NOT = { has_autonomy_state = autonomy_freely_associated_state }
 			}
 			diplomatic_relation = {
 				country = FROM
