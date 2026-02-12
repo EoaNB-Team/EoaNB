@@ -1,4 +1,37 @@
-# MONEY SYSTEM #
+###########################
+# Core helpers (internal) #
+###########################
+
+# Internal: adds money_to_gain to money with overflow protection. No tooltip.
+# Prereq: set money_to_gain before calling.
+_add_money_core = {
+	set_temp_variable = { money_temp = money }
+	add_to_variable = { money = money_to_gain }
+	clamp_variable = {
+		var = money
+		min = -2000000
+		max = 2000000
+	}
+	if = {
+		limit = {
+			check_variable = { money_to_gain > 0 }
+			check_variable = { money < money_temp }
+		}
+		set_variable = { money = 2000000 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { money_to_gain < 0 }
+			check_variable = { money > money_temp }
+		}
+		set_variable = { money = -2000000 }
+	}
+}
+
+#################
+# Money effects #
+#################
+
 # example usage:
 ## set_temp_variable = { money_to_gain = 100 }
 ## add_money_with_tooltip_effect = yes
@@ -13,27 +46,7 @@ add_money_with_tooltip_effect = {
 		custom_effect_tooltip = GAIN_MONEY_TT
 	}
 	hidden_effect = {
-		set_temp_variable = { money_temp = money }
-		add_to_variable = { money = money_to_gain }
-		clamp_variable = {
-			var = money
-			min = -2000000
-			max = 2000000
-		}
-		if = {
-			limit = {
-				check_variable = { money_to_gain > 0 }
-				check_variable = { money < money_temp }
-			}
-			set_variable = { money = 2000000 }
-		}
-		else_if = {
-			limit = {
-				check_variable = { money_to_gain < 0 }
-				check_variable = { money > money_temp }
-			}
-			set_variable = { money = -2000000 }
-		}
+		_add_money_core = yes
 	}
 }
 
@@ -41,6 +54,7 @@ add_money_with_tooltip_effect = {
 ## set_temp_variable = { money_to_gain = 100 }
 ## add_money_with_inflation_included_with_tooltip_effect = yes
 add_money_with_inflation_included_with_tooltip_effect = {
+	# Scale money_to_gain by (1 + current_inflation)
 	set_temp_variable = { inflation_calc_temp = 1 }
 	add_to_temp_variable = { inflation_calc_temp = current_inflation }
 	multiply_temp_variable = { money_to_gain = inflation_calc_temp }
@@ -54,29 +68,13 @@ add_money_with_inflation_included_with_tooltip_effect = {
 		custom_effect_tooltip = GAIN_MONEY_TT
 	}
 	hidden_effect = {
-		set_temp_variable = { money_temp = money }
-		add_to_variable = { money = money_to_gain }
-		clamp_variable = {
-			var = money
-			min = -2000000
-			max = 2000000
-		}
-		if = {
-			limit = {
-				check_variable = { money_to_gain > 0 }
-				check_variable = { money < money_temp }
-			}
-			set_variable = { money = 2000000 }
-		}
-		else_if = {
-			limit = {
-				check_variable = { money_to_gain < 0 }
-				check_variable = { money > money_temp }
-			}
-			set_variable = { money = -2000000 }
-		}
+		_add_money_core = yes
 	}
 }
+
+#####################
+# Inflation effects #
+#####################
 
 # example usage:
 ## set_temp_variable = { inflation_to_gain = 100 }
@@ -93,23 +91,20 @@ add_inflation_with_tooltip_effect = {
 	}
 	add_to_variable = { current_inflation = inflation_to_gain }
 	hidden_effect = {
-		if = {
-			limit = {
-				check_variable = { current_inflation < 0 }
-			}
-			set_variable = { current_inflation = 0 }
-		}
-		else_if = {
-			limit = {
-				check_variable = { current_inflation > 20000 }
-			}
-			set_variable = { current_inflation = 20000 }
+		clamp_variable = {
+			var = current_inflation
+			min = 0
+			max = 20000
 		}
 		set_variable = { inflation_effect_var = current_inflation }
 		divide_variable = { inflation_effect_var = -2 }
 		force_update_dynamic_modifier = yes
 	}
 }
+
+########################
+# Unemployment effects #
+########################
 
 # example usage:
 ## set_temp_variable = { unemployment_value = 0.5 }
@@ -227,85 +222,49 @@ change_unemployment_value_modifier = {
 	}
 }
 
+################
+# Loan effects #
+################
+
+# Internal: core loan logic used by both variants.
+# Prereq: set loans_amount. Set _loan_add_inflation = 1 temp var if inflation should be added.
+_take_loan_core = {
+	add_to_variable = { current_loans_sum = loans_amount }
+	set_temp_variable = { money_to_gain = loans_amount }
+	_add_money_core = yes
+	if = {
+		limit = {
+			check_variable = { _loan_add_inflation > 0 }
+		}
+		set_temp_variable = { inflation_to_gain = 0.001 }
+		multiply_temp_variable = { inflation_to_gain = loans_amount }
+		add_to_variable = { current_inflation = inflation_to_gain }
+		clamp_variable = {
+			var = current_inflation
+			min = 0
+			max = 20000
+		}
+		set_variable = { inflation_effect_var = current_inflation }
+		divide_variable = { inflation_effect_var = -2 }
+		force_update_dynamic_modifier = yes
+	}
+	# Overflow check on loans — if loans wrapped negative, go bankrupt
+	if = {
+		limit = {
+			check_variable = { current_loans_sum < 0 }
+		}
+		become_bankrupt_effect = yes
+	}
+}
+
 # example usage:
 ## set_temp_variable = { loans_amount = 1 }
 ## take_loan_effect = yes
 take_loan_effect = {
 	custom_effect_tooltip = TAKE_LOAN_EFFECT_TT
 	hidden_effect = {
-		if = {
-			limit = {
-				check_variable = { loans_amount < 1000 }
-			}
-			for_loop_effect = {
-				start = 0
-				end = loans_amount
-				set_temp_variable = { loan_size = 1 }
-				add_to_variable = { current_loans_sum = loan_size }
-				set_temp_variable = { money_to_gain = loan_size }
-				add_money_with_tooltip_effect = yes
-				set_temp_variable = { inflation_to_gain = 0.001 }
-				add_inflation_with_tooltip_effect = yes
-			}
-		}
-		else = {
-			set_temp_variable = { first_loop = loans_amount }
-			divide_temp_variable = { first_loop = 1000 }
-			if = {
-				limit = {
-					check_variable = { first_loop < 1000 }
-				}
-				divide_temp_variable = { loans_amount = first_loop }
-				for_loop_effect = {
-					start = 0
-					end = first_loop
-					for_loop_effect = {
-						start = 0
-						end = loans_amount
-						set_temp_variable = { loan_size = 1 }
-						add_to_variable = { current_loans_sum = loan_size }
-						set_temp_variable = { money_to_gain = loan_size }
-						add_money_with_tooltip_effect = yes
-						set_temp_variable = { inflation_to_gain = 0.001 }
-						add_inflation_with_tooltip_effect = yes
-					}
-				}
-				multiply_temp_variable = { loans_amount = first_loop }
-			}
-			else = {
-				set_temp_variable = { second_loop = first_loop }
-				divide_temp_variable = { second_loop = 1000 }
-				divide_temp_variable = { loans_amount = first_loop }
-				divide_temp_variable = { loans_amount = second_loop }
-				for_loop_effect = {
-					start = 0
-					end = second_loop
-					for_loop_effect = {
-						start = 0
-						end = first_loop
-						for_loop_effect = {
-							start = 0
-							end = loans_amount
-							set_temp_variable = { loan_size = 1 }
-							add_to_variable = { current_loans_sum = loan_size }
-							set_temp_variable = { money_to_gain = loan_size }
-							add_money_with_tooltip_effect = yes
-							set_temp_variable = { inflation_to_gain = 0.001 }
-							add_inflation_with_tooltip_effect = yes
-						}
-					}
-				}
-				multiply_temp_variable = { loans_amount = first_loop }
-				multiply_temp_variable = { loans_amount = second_loop }
-			}
-		}
-		if = {
-			limit = {
-				check_variable = { current_loans_sum < 0 }
-			}
-			# if you overflow loans, you automatically become bankrupt
-			become_bankrupt_effect = yes
-		}
+		set_temp_variable = { _loan_add_inflation = 1 }
+		_take_loan_core = yes
 	}
 	effect_tooltip = {
 		set_temp_variable = { loan_size = 1 }
@@ -316,79 +275,15 @@ take_loan_effect = {
 		add_inflation_with_tooltip_effect = yes
 	}
 }
+
 # example usage:
 ## set_temp_variable = { loans_amount = 1 }
 ## take_loan_without_inflation_effect = yes
 take_loan_without_inflation_effect = {
 	custom_effect_tooltip = TAKE_LOAN_EFFECT_TT
 	hidden_effect = {
-		if = {
-			limit = {
-				check_variable = { loans_amount < 1000 }
-			}
-			for_loop_effect = {
-				start = 0
-				end = loans_amount
-				set_temp_variable = { loan_size = 1 }
-				add_to_variable = { current_loans_sum = loan_size }
-				set_temp_variable = { money_to_gain = loan_size }
-				add_money_with_tooltip_effect = yes
-			}
-		}
-		else = {
-			set_temp_variable = { first_loop = loans_amount }
-			divide_temp_variable = { first_loop = 1000 }
-			if = {
-				limit = {
-					check_variable = { first_loop < 1000 }
-				}
-				divide_temp_variable = { loans_amount = first_loop }
-				for_loop_effect = {
-					start = 0
-					end = first_loop
-					for_loop_effect = {
-						start = 0
-						end = loans_amount
-						set_temp_variable = { loan_size = 1 }
-						add_to_variable = { current_loans_sum = loan_size }
-						set_temp_variable = { money_to_gain = loan_size }
-						add_money_with_tooltip_effect = yes
-					}
-				}
-				multiply_temp_variable = { loans_amount = first_loop }
-			}
-			else = {
-				set_temp_variable = { second_loop = first_loop }
-				divide_temp_variable = { second_loop = 1000 }
-				divide_temp_variable = { loans_amount = first_loop }
-				divide_temp_variable = { loans_amount = second_loop }
-				for_loop_effect = {
-					start = 0
-					end = second_loop
-					for_loop_effect = {
-						start = 0
-						end = first_loop
-						for_loop_effect = {
-							start = 0
-							end = loans_amount
-							set_temp_variable = { loan_size = 1 }
-							add_to_variable = { current_loans_sum = loan_size }
-							set_temp_variable = { money_to_gain = loan_size }
-							add_money_with_tooltip_effect = yes
-						}
-					}
-				}
-				multiply_temp_variable = { loans_amount = first_loop }
-				multiply_temp_variable = { loans_amount = second_loop }
-			}
-		}
-		if = {
-			limit = {
-				check_variable = { current_loans_sum < 0 }
-			}
-			# if you overflow loans, you automatically become bankrupt
-			become_bankrupt_effect = yes
-		}
+		set_temp_variable = { _loan_add_inflation = 0 }
+		_take_loan_core = yes
 	}
 	effect_tooltip = {
 		set_temp_variable = { loan_size = 1 }
@@ -422,8 +317,10 @@ become_bankrupt_effect = {
 	hidden_effect = {
 		set_variable = { current_loans_sum = 0 }
 		set_variable = { money = 0 }
-		set_temp_variable = { inflation_to_gain = -20000 } # set to 0
-		add_inflation_with_tooltip_effect = yes
+		# Reset inflation directly to 0
+		set_variable = { current_inflation = 0 }
+		set_variable = { inflation_effect_var = 0 }
+		force_update_dynamic_modifier = yes
 	}
 	add_political_power = -300
 	add_timed_idea = {
@@ -442,860 +339,486 @@ become_bankrupt_effect = {
 	}
 }
 
-# example usage:
-## decrease_slider_taxes = yes
+############################
+# Budget slider effects    #
+############################
+# --- TAXES ---
+# example usage: decrease_slider_taxes = yes
 decrease_slider_taxes = {
 	if = {
 		limit = {
 			NOT = { has_idea = taxation_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = taxation_level_2
-			}
-			swap_ideas = {
-				add_idea = taxation_level_1
-				remove_idea = taxation_level_2
-			}
+			limit = { has_idea = taxation_level_2 }
+			swap_ideas = { add_idea = taxation_level_1 remove_idea = taxation_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_3
-			}
-			swap_ideas = {
-				add_idea = taxation_level_2
-				remove_idea = taxation_level_3
-			}
+			limit = { has_idea = taxation_level_3 }
+			swap_ideas = { add_idea = taxation_level_2 remove_idea = taxation_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_4
-			}
-			swap_ideas = {
-				add_idea = taxation_level_3
-				remove_idea = taxation_level_4
-			}
+			limit = { has_idea = taxation_level_4 }
+			swap_ideas = { add_idea = taxation_level_3 remove_idea = taxation_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_5
-			}
-			swap_ideas = {
-				add_idea = taxation_level_4
-				remove_idea = taxation_level_5
-			}
+			limit = { has_idea = taxation_level_5 }
+			swap_ideas = { add_idea = taxation_level_4 remove_idea = taxation_level_5 }
 		}
-		set_country_flag = {
-			flag = taxes_changed_recently
-			days = 180
-			value = 1
-		}
+		set_country_flag = { flag = taxes_changed_recently days = 180 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_TAXATION_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_taxes = yes
+# example usage: increase_slider_taxes = yes
 increase_slider_taxes = {
 	if = {
 		limit = {
 			NOT = { has_idea = taxation_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = taxation_level_1
-			}
-			swap_ideas = {
-				add_idea = taxation_level_2
-				remove_idea = taxation_level_1
-			}
+			limit = { has_idea = taxation_level_1 }
+			swap_ideas = { add_idea = taxation_level_2 remove_idea = taxation_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_2
-			}
-			swap_ideas = {
-				add_idea = taxation_level_3
-				remove_idea = taxation_level_2
-			}
+			limit = { has_idea = taxation_level_2 }
+			swap_ideas = { add_idea = taxation_level_3 remove_idea = taxation_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_3
-			}
-			swap_ideas = {
-				add_idea = taxation_level_4
-				remove_idea = taxation_level_3
-			}
+			limit = { has_idea = taxation_level_3 }
+			swap_ideas = { add_idea = taxation_level_4 remove_idea = taxation_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = taxation_level_4
-			}
-			swap_ideas = {
-				add_idea = taxation_level_5
-				remove_idea = taxation_level_4
-			}
+			limit = { has_idea = taxation_level_4 }
+			swap_ideas = { add_idea = taxation_level_5 remove_idea = taxation_level_4 }
 		}
-		set_country_flag = {
-			flag = taxes_changed_recently
-			days = 180
-			value = 1
-		}
+		set_country_flag = { flag = taxes_changed_recently days = 180 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_TAXATION_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_social_spending = yes
+# --- SOCIAL SPENDING ---
+# example usage: decrease_slider_social_spending = yes
 decrease_slider_social_spending = {
 	if = {
 		limit = {
 			NOT = { has_idea = social_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = social_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_1
-				remove_idea = social_spending_level_2
-			}
+			limit = { has_idea = social_spending_level_2 }
+			swap_ideas = { add_idea = social_spending_level_1 remove_idea = social_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_2
-				remove_idea = social_spending_level_3
-			}
+			limit = { has_idea = social_spending_level_3 }
+			swap_ideas = { add_idea = social_spending_level_2 remove_idea = social_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_3
-				remove_idea = social_spending_level_4
-			}
+			limit = { has_idea = social_spending_level_4 }
+			swap_ideas = { add_idea = social_spending_level_3 remove_idea = social_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_4
-				remove_idea = social_spending_level_5
-			}
+			limit = { has_idea = social_spending_level_5 }
+			swap_ideas = { add_idea = social_spending_level_4 remove_idea = social_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = social_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = social_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_SOCIAL_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_social_spending = yes
+# example usage: increase_slider_social_spending = yes
 increase_slider_social_spending = {
 	if = {
 		limit = {
 			NOT = { has_idea = social_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = social_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_2
-				remove_idea = social_spending_level_1
-			}
+			limit = { has_idea = social_spending_level_1 }
+			swap_ideas = { add_idea = social_spending_level_2 remove_idea = social_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_3
-				remove_idea = social_spending_level_2
-			}
+			limit = { has_idea = social_spending_level_2 }
+			swap_ideas = { add_idea = social_spending_level_3 remove_idea = social_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_4
-				remove_idea = social_spending_level_3
-			}
+			limit = { has_idea = social_spending_level_3 }
+			swap_ideas = { add_idea = social_spending_level_4 remove_idea = social_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = social_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = social_spending_level_5
-				remove_idea = social_spending_level_4
-			}
+			limit = { has_idea = social_spending_level_4 }
+			swap_ideas = { add_idea = social_spending_level_5 remove_idea = social_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = social_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = social_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_SOCIAL_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_research_spending = yes
+# --- RESEARCH SPENDING ---
+# example usage: decrease_slider_research_spending = yes
 decrease_slider_research_spending = {
 	if = {
 		limit = {
 			NOT = { has_idea = research_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = research_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_1
-				remove_idea = research_spending_level_2
-			}
+			limit = { has_idea = research_spending_level_2 }
+			swap_ideas = { add_idea = research_spending_level_1 remove_idea = research_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_2
-				remove_idea = research_spending_level_3
-			}
+			limit = { has_idea = research_spending_level_3 }
+			swap_ideas = { add_idea = research_spending_level_2 remove_idea = research_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_3
-				remove_idea = research_spending_level_4
-			}
+			limit = { has_idea = research_spending_level_4 }
+			swap_ideas = { add_idea = research_spending_level_3 remove_idea = research_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_4
-				remove_idea = research_spending_level_5
-			}
+			limit = { has_idea = research_spending_level_5 }
+			swap_ideas = { add_idea = research_spending_level_4 remove_idea = research_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = research_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = research_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_RESEARCH_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_research_spending = yes
+# example usage: increase_slider_research_spending = yes
 increase_slider_research_spending = {
 	if = {
 		limit = {
 			NOT = { has_idea = research_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = research_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_2
-				remove_idea = research_spending_level_1
-			}
+			limit = { has_idea = research_spending_level_1 }
+			swap_ideas = { add_idea = research_spending_level_2 remove_idea = research_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_3
-				remove_idea = research_spending_level_2
-			}
+			limit = { has_idea = research_spending_level_2 }
+			swap_ideas = { add_idea = research_spending_level_3 remove_idea = research_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_4
-				remove_idea = research_spending_level_3
-			}
+			limit = { has_idea = research_spending_level_3 }
+			swap_ideas = { add_idea = research_spending_level_4 remove_idea = research_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = research_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = research_spending_level_5
-				remove_idea = research_spending_level_4
-			}
+			limit = { has_idea = research_spending_level_4 }
+			swap_ideas = { add_idea = research_spending_level_5 remove_idea = research_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = research_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = research_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_RESEARCH_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_army = yes
+# --- ARMY SPENDING ---
+# example usage: decrease_slider_army = yes
 decrease_slider_army = {
 	if = {
 		limit = {
 			NOT = { has_idea = army_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = army_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_1
-				remove_idea = army_spending_level_2
-			}
+			limit = { has_idea = army_spending_level_2 }
+			swap_ideas = { add_idea = army_spending_level_1 remove_idea = army_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_2
-				remove_idea = army_spending_level_3
-			}
+			limit = { has_idea = army_spending_level_3 }
+			swap_ideas = { add_idea = army_spending_level_2 remove_idea = army_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_3
-				remove_idea = army_spending_level_4
-			}
+			limit = { has_idea = army_spending_level_4 }
+			swap_ideas = { add_idea = army_spending_level_3 remove_idea = army_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_4
-				remove_idea = army_spending_level_5
-			}
+			limit = { has_idea = army_spending_level_5 }
+			swap_ideas = { add_idea = army_spending_level_4 remove_idea = army_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = army_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = army_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_ARMY_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_army = yes
+# example usage: increase_slider_army = yes
 increase_slider_army = {
 	if = {
 		limit = {
 			NOT = { has_idea = army_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = army_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_2
-				remove_idea = army_spending_level_1
-			}
+			limit = { has_idea = army_spending_level_1 }
+			swap_ideas = { add_idea = army_spending_level_2 remove_idea = army_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_3
-				remove_idea = army_spending_level_2
-			}
+			limit = { has_idea = army_spending_level_2 }
+			swap_ideas = { add_idea = army_spending_level_3 remove_idea = army_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_4
-				remove_idea = army_spending_level_3
-			}
+			limit = { has_idea = army_spending_level_3 }
+			swap_ideas = { add_idea = army_spending_level_4 remove_idea = army_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = army_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = army_spending_level_5
-				remove_idea = army_spending_level_4
-			}
+			limit = { has_idea = army_spending_level_4 }
+			swap_ideas = { add_idea = army_spending_level_5 remove_idea = army_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = army_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = army_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_ARMY_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_navy = yes
+# --- NAVY SPENDING ---
+# example usage: decrease_slider_navy = yes
 decrease_slider_navy = {
 	if = {
 		limit = {
 			NOT = { has_idea = navy_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = navy_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_1
-				remove_idea = navy_spending_level_2
-			}
+			limit = { has_idea = navy_spending_level_2 }
+			swap_ideas = { add_idea = navy_spending_level_1 remove_idea = navy_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_2
-				remove_idea = navy_spending_level_3
-			}
+			limit = { has_idea = navy_spending_level_3 }
+			swap_ideas = { add_idea = navy_spending_level_2 remove_idea = navy_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_3
-				remove_idea = navy_spending_level_4
-			}
+			limit = { has_idea = navy_spending_level_4 }
+			swap_ideas = { add_idea = navy_spending_level_3 remove_idea = navy_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_4
-				remove_idea = navy_spending_level_5
-			}
+			limit = { has_idea = navy_spending_level_5 }
+			swap_ideas = { add_idea = navy_spending_level_4 remove_idea = navy_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = navy_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = navy_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_NAVY_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_navy = yes
+# example usage: increase_slider_navy = yes
 increase_slider_navy = {
 	if = {
 		limit = {
 			NOT = { has_idea = navy_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = navy_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_2
-				remove_idea = navy_spending_level_1
-			}
+			limit = { has_idea = navy_spending_level_1 }
+			swap_ideas = { add_idea = navy_spending_level_2 remove_idea = navy_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_3
-				remove_idea = navy_spending_level_2
-			}
+			limit = { has_idea = navy_spending_level_2 }
+			swap_ideas = { add_idea = navy_spending_level_3 remove_idea = navy_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_4
-				remove_idea = navy_spending_level_3
-			}
+			limit = { has_idea = navy_spending_level_3 }
+			swap_ideas = { add_idea = navy_spending_level_4 remove_idea = navy_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = navy_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = navy_spending_level_5
-				remove_idea = navy_spending_level_4
-			}
+			limit = { has_idea = navy_spending_level_4 }
+			swap_ideas = { add_idea = navy_spending_level_5 remove_idea = navy_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = navy_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = navy_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_NAVY_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_road = yes
+# --- ROAD SPENDING ---
+# example usage: decrease_slider_road = yes
 decrease_slider_road = {
 	if = {
 		limit = {
 			NOT = { has_idea = road_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = road_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_1
-				remove_idea = road_spending_level_2
-			}
+			limit = { has_idea = road_spending_level_2 }
+			swap_ideas = { add_idea = road_spending_level_1 remove_idea = road_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_2
-				remove_idea = road_spending_level_3
-			}
+			limit = { has_idea = road_spending_level_3 }
+			swap_ideas = { add_idea = road_spending_level_2 remove_idea = road_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_3
-				remove_idea = road_spending_level_4
-			}
+			limit = { has_idea = road_spending_level_4 }
+			swap_ideas = { add_idea = road_spending_level_3 remove_idea = road_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_4
-				remove_idea = road_spending_level_5
-			}
+			limit = { has_idea = road_spending_level_5 }
+			swap_ideas = { add_idea = road_spending_level_4 remove_idea = road_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = road_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = road_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_ROAD_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_road = yes
+# example usage: increase_slider_road = yes
 increase_slider_road = {
 	if = {
 		limit = {
 			NOT = { has_idea = road_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = road_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_2
-				remove_idea = road_spending_level_1
-			}
+			limit = { has_idea = road_spending_level_1 }
+			swap_ideas = { add_idea = road_spending_level_2 remove_idea = road_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_3
-				remove_idea = road_spending_level_2
-			}
+			limit = { has_idea = road_spending_level_2 }
+			swap_ideas = { add_idea = road_spending_level_3 remove_idea = road_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_4
-				remove_idea = road_spending_level_3
-			}
+			limit = { has_idea = road_spending_level_3 }
+			swap_ideas = { add_idea = road_spending_level_4 remove_idea = road_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = road_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = road_spending_level_5
-				remove_idea = road_spending_level_4
-			}
+			limit = { has_idea = road_spending_level_4 }
+			swap_ideas = { add_idea = road_spending_level_5 remove_idea = road_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = road_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = road_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_ROAD_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## decrease_slider_law = yes
+# --- LAW SPENDING ---
+# example usage: decrease_slider_law = yes
 decrease_slider_law = {
 	if = {
 		limit = {
 			NOT = { has_idea = law_spending_level_1 }
 		}
 		if = {
-			limit = {
-				has_idea = law_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_1
-				remove_idea = law_spending_level_2
-			}
+			limit = { has_idea = law_spending_level_2 }
+			swap_ideas = { add_idea = law_spending_level_1 remove_idea = law_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_2
-				remove_idea = law_spending_level_3
-			}
+			limit = { has_idea = law_spending_level_3 }
+			swap_ideas = { add_idea = law_spending_level_2 remove_idea = law_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_3
-				remove_idea = law_spending_level_4
-			}
+			limit = { has_idea = law_spending_level_4 }
+			swap_ideas = { add_idea = law_spending_level_3 remove_idea = law_spending_level_4 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_5
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_4
-				remove_idea = law_spending_level_5
-			}
+			limit = { has_idea = law_spending_level_5 }
+			swap_ideas = { add_idea = law_spending_level_4 remove_idea = law_spending_level_5 }
 		}
-		set_country_flag = {
-			flag = law_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = law_spending_changed_recently days = 90 value = 1 }
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_LOWER_LAW_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## increase_slider_law = yes
+# example usage: increase_slider_law = yes
+# BUG FIX: was setting road_spending_changed_recently, now correctly sets law_spending_changed_recently
 increase_slider_law = {
 	if = {
 		limit = {
 			NOT = { has_idea = law_spending_level_5 }
 		}
 		if = {
-			limit = {
-				has_idea = law_spending_level_1
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_2
-				remove_idea = law_spending_level_1
-			}
+			limit = { has_idea = law_spending_level_1 }
+			swap_ideas = { add_idea = law_spending_level_2 remove_idea = law_spending_level_1 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_2
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_3
-				remove_idea = law_spending_level_2
-			}
+			limit = { has_idea = law_spending_level_2 }
+			swap_ideas = { add_idea = law_spending_level_3 remove_idea = law_spending_level_2 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_3
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_4
-				remove_idea = law_spending_level_3
-			}
+			limit = { has_idea = law_spending_level_3 }
+			swap_ideas = { add_idea = law_spending_level_4 remove_idea = law_spending_level_3 }
 		}
 		else_if = {
-			limit = {
-				has_idea = law_spending_level_4
-			}
-			swap_ideas = {
-				add_idea = law_spending_level_5
-				remove_idea = law_spending_level_4
-			}
+			limit = { has_idea = law_spending_level_4 }
+			swap_ideas = { add_idea = law_spending_level_5 remove_idea = law_spending_level_4 }
 		}
-		set_country_flag = {
-			flag = road_spending_changed_recently
-			days = 90
-			value = 1
-		}
+		set_country_flag = { flag = law_spending_changed_recently days = 90 value = 1 } # FIXED: was road_spending_changed_recently
 	}
 	else = {
 		custom_effect_tooltip = CANNOT_INCREASE_LAW_SPENDING_LEVEL_TT
 	}
 }
 
-# example usage:
-## lock_slider_army_spending = yes
+#################################
+# Slider lock/unlock effects    #
+#################################
+
 lock_slider_army_spending = {
 	set_country_flag = army_spending_slider_increase_blocked
 	set_country_flag = army_spending_slider_decrease_blocked
 }
-
-# example usage:
-## lock_slider_army_spending = yes
 lock_slider_navy_spending = {
 	set_country_flag = navy_spending_slider_increase_blocked
 	set_country_flag = navy_spending_slider_decrease_blocked
 }
-
-# example usage:
-## lock_slider_road_spending = yes
 lock_slider_road_spending = {
 	set_country_flag = road_spending_slider_increase_blocked
 	set_country_flag = road_spending_slider_decrease_blocked
 }
-
-# example usage:
-## lock_slider_law_spending = yes
 lock_slider_law_spending = {
 	set_country_flag = law_spending_slider_increase_blocked
 	set_country_flag = law_spending_slider_decrease_blocked
 }
-
-# example usage:
-## lock_slider_research_spending = yes
 lock_slider_research_spending = {
 	set_country_flag = research_spending_slider_increase_blocked
 	set_country_flag = research_spending_slider_decrease_blocked
 }
-
-# example usage:
-## lock_slider_social_spending = yes
 lock_slider_social_spending = {
 	set_country_flag = social_spending_slider_increase_blocked
 	set_country_flag = social_spending_slider_decrease_blocked
 }
-# example usage:
-## lock_slider_taxes_spending = yes
 lock_slider_taxes_spending = {
 	set_country_flag = taxes_slider_increase_blocked
 	set_country_flag = taxes_slider_decrease_blocked
 }
 
-
-
-# example usage:
-## unlock_slider_army_spending = yes
 unlock_slider_army_spending = {
 	clr_country_flag = army_spending_slider_increase_blocked
 	clr_country_flag = army_spending_slider_decrease_blocked
 	custom_effect_tooltip = army_spending_slider_unlocked
 }
-# example usage:
-## unlock_slider_navy_spending = yes
 unlock_slider_navy_spending = {
 	clr_country_flag = navy_spending_slider_increase_blocked
 	clr_country_flag = navy_spending_slider_decrease_blocked
 	custom_effect_tooltip = navy_spending_slider_unlocked
 }
-
-# example usage:
-## unlock_slider_road_spending = yes
 unlock_slider_road_spending = {
 	clr_country_flag = road_spending_slider_increase_blocked
 	clr_country_flag = road_spending_slider_decrease_blocked
 	custom_effect_tooltip = road_spending_slider_unlocked
 }
-
-# example usage:
-## unlock_slider_law_spending = yes
 unlock_slider_law_spending = {
 	clr_country_flag = law_spending_slider_increase_blocked
 	clr_country_flag = law_spending_slider_decrease_blocked
 	custom_effect_tooltip = law_spending_slider_unlocked
 }
-
-# example usage:
-## unlock_slider_research_spending = yes
 unlock_slider_research_spending = {
 	clr_country_flag = research_spending_slider_increase_blocked
 	clr_country_flag = research_spending_slider_decrease_blocked
 	custom_effect_tooltip = research_spending_slider_unlocked
 }
-
-# example usage:
-## unlock_slider_social_spending = yes
 unlock_slider_social_spending = {
 	clr_country_flag = social_spending_slider_increase_blocked
 	clr_country_flag = social_spending_slider_decrease_blocked
 	custom_effect_tooltip = social_spending_slider_unlocked
 }
-# example usage:
-## unlock_slider_taxes_spending = yes
 unlock_slider_taxes_spending = {
 	clr_country_flag = taxes_slider_increase_blocked
 	clr_country_flag = taxes_slider_decrease_blocked
