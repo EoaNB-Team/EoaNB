@@ -1523,6 +1523,8 @@ NFrontend = {
 
 	SOCIALVIEW_CONTEXT_MENU_BUTTON_OFFSET = 10,
 	SOCIALVIEW_CONTEXT_MENU_MARGIN = 2,
+	TIME_TO_SWAP_BACKGROUNDS = 20, -- Amount of seconds before swapping to another background
+	NEW_BACKGROUND_DURATION = 4 --How often you get to see the new background first before it is inside of the regular rotation, 1 means it will be automatically selcted, 0 means not selected at all, anything higher is the amount of start ups it will be prioritized
 },
 
 NSound = {
