@@ -876,8 +876,6 @@ NMilitary = {
 
 	LAND_COMBAT_ORG_DICE_SIZE = 4,                 -- nr of damage dice
 	LAND_COMBAT_STR_DICE_SIZE = 2,                 -- nr of damage dice
-	LAND_COMBAT_STR_ARMOR_ON_SOFT_DICE_SIZE = 2,   -- extra damage dice if our armor outclasses enemy
-	LAND_COMBAT_ORG_ARMOR_ON_SOFT_DICE_SIZE = 6,   -- extra damage dice if our armor outclasses enemy
 	LAND_AIR_COMBAT_STR_DICE_SIZE = 2,                 -- nr of damage dice (used by air to ground)
 	LAND_AIR_COMBAT_ORG_DICE_SIZE = 5,                 -- nr of damage dice (used by air to ground)
 	LAND_COMBAT_STR_DAMAGE_MODIFIER = 0.03,        -- global damage modifier... but some equipment is returned at end of battles see : EQUIPMENT_COMBAT_LOSS_FACTOR
@@ -2041,6 +2039,7 @@ NNavy = {
 		17,	-- Mine sweepers
 		29,	-- Patrol task force
 		1,	-- Convoy escort
+		5,    -- Dominance patrol force
 	},
 
 	-- NOTE: you can see the effect of changing the values down below by running the command tfria with a task force selected
