@@ -1,0 +1,56 @@
+calculate_balance_indicator_frame = {
+	if = {
+		limit = {
+			is_ai = no
+		}
+		calculate_money_balance = yes
+		calculate_inflation_change = yes
+	}
+	set_temp_variable = { balance_indicator_icon_frame = 1 }
+	if = {
+		limit = {
+			check_variable = { total_balance_temp < 0 }
+		}
+		set_temp_variable = { balance_indicator_icon_frame = 2 }
+	}
+	else_if = {
+		limit = {
+			check_variable = { total_balance_temp = 0 }
+		}
+		set_temp_variable = { balance_indicator_icon_frame = 3 }
+	}
+}
+
+# Loan taking enabled check - expects temp var: loan_size (1, 10, or 50)
+check_take_loan_enabled = {
+	set_temp_variable = { amount_of_money_to_check = 2000000 }
+	subtract_from_temp_variable = { amount_of_money_to_check = loan_size }
+	set_temp_variable = { loan_size_to_check = amount_of_money_to_check }
+	if = {
+		limit = {
+			has_specific_loan_size = yes
+		}
+		has_less_than_specific_loan_size = yes
+	}
+	else = {
+		if = {
+			limit = {
+				has_specific_amount_of_money = yes
+			}
+			has_less_than_specific_amount_of_money = yes
+		}
+		else = {
+			NOT = { has_idea = bankruptcy }
+		}
+	}
+}
+
+# Slider button enabled check - common pattern for all sliders
+# Expects temp vars: slider_at_boundary = yes/no (is at min/max already)
+# Uses country flags via the specific per-slider trigger wrapping this
+slider_button_can_be_clicked = {
+	OR = {
+		is_ai = yes
+		has_political_power > 49.9
+	}
+}
