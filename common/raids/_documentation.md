@@ -98,7 +98,7 @@ raid_type_id = {
 
     # Conditions on the starting point:
     starting_point = {
-        types = { air_base, naval_base, rocket_site, carrier, submarine }
+        types = { air_base, naval_base, carrier, submarine }
     }
 
 	show_target = {  }
