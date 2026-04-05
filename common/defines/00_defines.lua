@@ -4486,6 +4486,7 @@ NFactions = {
 	FACTION_INFLUENCE_EXPEDITIONARY_FORCE_RECIEVER_FACTOR = -0.02 , --how much the country's provided expeditionary forces affects its influence
 	FACTION_MANPOWER_GIVE_CONTRIBUTION_SCALAR=0.1,			-- a scalar of how much contribution you get for giving a singular recruitable population to your faction
 	FACTION_MANPOWER_RECIEVE_CONTRIBUTION_SCALAR=0.1,		-- a scalar for how much contribution it takes to get a singular recruitable population
+	FACTION_INFLUENCE_SCIENTIST_CONTRIBUTION_VALUE = 0.5,				-- how much contribution one scientists gives to you if it is working for somebody else.
 	FACTION_SCIENTIST_CONTRIBUTION_VALUE = 5,				--how much contribution one scientists gives to you if it is working for somebody else.
 	ASSIGN_FACILITY_TO_FACTION_INITIATIVE_COST = 1,		--The initiative cost of assigning a facility to a faction
 	FACTION_ASSIGN_SCIENTIST_COST = 25,						--how much political power it costs to assign a supportive scientist
