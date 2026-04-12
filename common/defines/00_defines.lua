@@ -2101,6 +2101,11 @@ NNavy = {
 	SUBMARINE_REVEAL_POW 											= 3.0,		-- A scaling factor that is applied to the reveal chance in order to make large differences in detection vs visibility more pronounced
 	SUBMARINE_BASE_TORPEDO_REVEAL_CHANCE 							= 0.04,		-- Chance of a submarine being revealed when it fires. 1.0 is 100%. this chance is then multiplied with modifier created by comparing firer's visibiility and target's detection
 
+	-- reworked submarine detection formula, new formula is (avg. sub detection * SUBMARINE_REVEAL_DETECTION_MULTIPLIER) / MAX{( SUBMARINE_BASE_STEALTH_VALUE - sub visibility), 0.1_fixed }, for formula (with one 'hack' on the graph to avoid undefined) - https://www.desmos.com/calculator/zhbwchjblc
+	SUBMARINE_BASE_STEALTH_VALUE									= 100,		-- Used in the reworked formula, sub_visiblity is subtracted from SUBMARINE_BASE_STEALTH_VALUE for the divider. The higher the define, the lower the chance for detection to happen
+	SUBMARINE_REVEAL_DETECTION_MULTIPLIER							= 0.075,		-- Used in the reworked formula, multiplies the average submarine detection. The higher the define, the higher chance for detection to happen
+	SUBMARINE_REVEAL_TORPEDO_FIRING_DETECTION_MULTIPLIER			= 1.1,		-- used in the reworked formula when firing the torpedos to see whether it has been detected. This define is applied as multiplier to the numerator (avg. sub detection * SUBMARINE_REVEAL_DETECTION_MULTIPLIER * SUBMARINE_REVEAL_TORPEDO_FIRING_DETECTION_MULTIPLIER). define = 1, no difference, define < 0, no chance of detecting, 0 < define < 1, lowers chance of detecting comparing to passive reveal, 1 < define, increases chance to be revealed.
+
 	MAX_NUM_HOURS_TO_WAIT_AT_ALLY_DOCKYARDS_FOR_REPAIRS 			= 48,		-- taskforces will wait at most this amount of hours in ally bases for repairs before switching to another base for repairs
 
 	COMBAT_RESULT_PRIORITY_THRESHOLDS = { 										-- the game will use this thresholds to define importance of a naval combat result. it will use the highest level that has higher threshold than the amount of production lost in combat
