@@ -33,7 +33,7 @@ This site is the official respository (cloud) for sharing and cooperating in the
 
 <hr>
 
-## Installing the Mod (currently being reworked)
+## Installing the Mod
 
 Get easy access to our open-source development, with just a few quick steps!
 Here's a useful installation video by one of our former lead developers: 
@@ -63,9 +63,6 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 
 `Railgun Crash`: There is a railgun tech in our mod that crashes the user when they hover over the tech icon. We are still unsure what is causing this crash and are looking for a fix.
 
-### Other notable issues
-`Save Game Load Times`: It is a notable issue of how long save games take to load. Our average developer notices it takes them 5-10 minutes to load a save; longer as the game progresses past 1880. This issue is to be addressed with Ars Bellica.
-
 <hr>
 
 ## Meet the Team; Join the Discussion
@@ -79,14 +76,6 @@ Have more questions, comments or feedback? You can contact us by joining our dis
 ## Join the Team
 
 If you wish to contribute to the development of the mod, support us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
-
-### Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `(0.5)-Sanguis in Harenis` branch.
-- All code should be error-checked before pushed onto the Github
-- Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
-- If procedural pushing (including incomplete content) is crucial to development, request a new branch.
-- Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
-- Additional rules in the **Developer Bible**
 
 ### Meet the Lead-Developers
 <table>
