@@ -93,7 +93,7 @@ If you wish to contribute to the development of the mod, support us on Patreon o
   <img src="https://avatars.githubusercontent.com/u/81909388?v=4" width="80px;" alt="Kaiser Franz23"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/gsbr20"><strong>gsbr</strong></a>
+  <a href = "https://github.com/gsbr20"><strong>Isa / gsbr</strong></a>
   <img src="https://avatars.githubusercontent.com/u/93613957?v=4" width="80px;" alt="Isa / gsbr"/>
 </td>
 </tr>
