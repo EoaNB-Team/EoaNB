@@ -89,7 +89,6 @@ If you wish to contribute to the development of the mod, support us on Patreon o
 - Additional rules in the **Developer Bible**
 
 ### Meet the Lead-Developers
-*aka Centurions*
 <table>
 <tr>
 <td align="center">
@@ -101,8 +100,8 @@ If you wish to contribute to the development of the mod, support us on Patreon o
   <img src="https://avatars.githubusercontent.com/u/138278445?v=4" width="80px;" alt="Syrexx"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/34871134?v=4" width="80px;" alt="Kuba"/>
+  <a href = "https://github.com/joachymCZ"><strong>Jáchym_CZ</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/99016186?v=4" width="80px;" alt="Jáchym_CZ"/>
 </td>
   <td align="center">
   <a href = "https://github.com/aquamarinespitfire"><strong>Aquamarine</strong></a>
