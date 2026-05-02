@@ -92,10 +92,6 @@ If you wish to contribute to the development of the mod, support us on Patreon o
 <table>
 <tr>
 <td align="center">
-  <a href = "https://github.com/Sir-DEM0"><strong>DEM0</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="DEM0"/>
-</td>
-<td align="center">
   <a href = "https://github.com/Syrexx-x"><strong>Syrexx</strong></a>
   <img src="https://avatars.githubusercontent.com/u/138278445?v=4" width="80px;" alt="Syrexx"/>
 </td>
@@ -104,8 +100,8 @@ If you wish to contribute to the development of the mod, support us on Patreon o
   <img src="https://avatars.githubusercontent.com/u/99016186?v=4" width="80px;" alt="Jáchym_CZ"/>
 </td>
   <td align="center">
-  <a href = "https://github.com/aquamarinespitfire"><strong>Aquamarine</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/135063414?v=4" width="80px;" alt="Aquamarine"/>
+  <a href = "https://github.com/hurera-123"><strong>Kaiser Franz23</strong></a>
+  <img src="https://avatars.githubusercontent.com/u/81909388?v=4" width="80px;" alt="Kaiser Franz23"/>
 </td>
 <td align="center">
   <a href = "https://github.com/gsbr20"><strong>gsbr</strong></a>
