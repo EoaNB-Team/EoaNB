@@ -329,11 +329,11 @@ PixelShader =
 		
 		float4 main( VS_OUTPUT In ) : PDX_COLOR
 		{
+			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
+
 			float4 vDiffuseColor = tex2D( DiffuseMap, In.vTexCoord0_TintUV.xy );
 			if( vCamPos.y < 80.0f )
 				clip( vDiffuseColor.a - 0.5f );
-			
-			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
 			
 			float2 uv = float2( ( ( In.vPos.x+0.5f ) / MAP_SIZE_X ), ( ( In.vPos.z+0.5f-MAP_SIZE_Y ) / -MAP_SIZE_Y )); 
 			
@@ -426,11 +426,11 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT In ) : PDX_COLOR
 		{
+			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
+
 			float4 vDiffuseColor = tex2D( DiffuseMap, In.vTexCoord0_TintUV.xy );
 			if( vCamPos.y < 80.0f )
 				clip( vDiffuseColor.a - 0.5f );
-			
-			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
 		
 			// Grab the shadow term
 			float fShadowTerm = CalculateShadow( In.vShadowProj, ShadowMap);

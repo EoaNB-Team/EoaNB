@@ -535,7 +535,7 @@ PixelShader =
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 		
 		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 vEyeDir = normalize( vPos - vCamPos.xyz );
+			float3 vEyeDir = -lightingProperties._ToCameraDir;
 			float3 reflection = reflect( vEyeDir, vNormal );
 			float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
 			
@@ -580,9 +580,11 @@ PixelShader =
 			alpha = TrainColor.a;
 			vColor *= TrainColor.rgb;
 			float2 toPos = vPos.xz - TrainAlphaStart;
-			float cosPos2d = dot( normalize( toPos ), TrainAlphaDir );
+			float toPosLenSq = dot( toPos, toPos );
+			float toPosInvLen = rsqrt( max( toPosLenSq, 1e-6f ) );
+			float cosPos2d = dot( toPos * toPosInvLen, TrainAlphaDir );
 			float clipalpha = step( 0.0f, cosPos2d );
-			float smoothalpha = smoothstep( 0.0f, 2.5f, length( toPos ) );
+			float smoothalpha = smoothstep( 0.0f, 2.5f, toPosLenSq * toPosInvLen );
 
 			alpha *= clipalpha * smoothalpha;
 

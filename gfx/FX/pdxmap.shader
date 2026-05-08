@@ -242,7 +242,7 @@ PixelShader =
 			vTileRepeat.x *= MAP_SIZE_X/MAP_SIZE_Y;
 			
 			float lod = clamp( mipmapLevel( vTileRepeat ) - 0.5f, 0.0f, 6.0f );
-			float vMipTexels = pow( 2.0f, ATLAS_TEXEL_POW2_EXPONENT - lod );
+			float vMipTexels = exp2( ATLAS_TEXEL_POW2_EXPONENT - lod );
 					
 		#ifdef LOW_END_GFX
 			float3 normal = float3( 0, 1, 0 );
@@ -344,14 +344,13 @@ PixelShader =
 			lightingProperties._Diffuse = MetalnessToDiffuse(MetalnessRemapped, diffuse.rgb);
 			lightingProperties._Glossiness = vGlossiness;
 			lightingProperties._SpecularColor = MetalnessToSpec(MetalnessRemapped, diffuse.rgb, SpecRemapped);
-			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vGlossiness);
 		#else
 			lightingProperties._Diffuse = diffuse.rgb;
 			lightingProperties._Glossiness = vGlossiness;
 			lightingProperties._SpecularColor = vec3(vSpec);
-			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vGlossiness);
 
 		#endif //PDX_IMPROVED_BLINN_PHONG
+			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vGlossiness);
 
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
@@ -365,7 +364,7 @@ PixelShader =
 		#endif
 			
 		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 vEyeDir = normalize( Input.prepos - vCamPos.xyz );
+			float3 vEyeDir = -lightingProperties._ToCameraDir;
 			//float3 reflection = reflect( vEyeDir, lightingProperties._Normal );
 			//float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
 			

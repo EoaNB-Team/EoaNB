@@ -258,6 +258,15 @@ PixelShader =
 		// Calculate heightmap normal
 		float3 normal = normalize( tex2D( HeightNormal, vUvTerrain ).rbg - 0.5f );
 
+		// Fast path for far camera distances: keep only topology/water blending and
+		// skip expensive terrain-tile normal reconstruction.
+		float vUseFarFastPath = step( 0.7f, cam_distance( 600.0f, 1400.0f ) );
+		if ( vUseFarFastPath > 0.5f )
+		{
+			vWaterValue = calculate_water_or_land( vUvTerrain );
+			return lerp( normal, float3( 0, 1, 0 ), vWaterValue );
+		}
+
 	#ifdef NO_SHADER_TEXTURE_LOD
 		return normal;
 	#else

@@ -507,17 +507,12 @@ PixelShader =
 	//------------------------------
 	// Phong -----------------------
 	//------------------------------
-	float3 CalculatePBRSpecularPower( float3 vPos, float3 vNormal, float3 vMaterialSpecularColor, float vSpecularPower, float3 vLightColor, float3 vLightDirIn )
+	float3 CalculatePBRSpecularPower( float3 vToCameraDir, float3 vNormal, float3 vMaterialSpecularColor, float vSpecularPower, float3 vLightColor, float3 vLightDirIn )
 	{
-		// OPT: removed dead first assignment to vSpecularColor — it was
-		// immediately overwritten by the second line, so its pow() and mul
-		// chain were entirely wasted work each call.
-		float3 H = normalize( normalize( vCamPos - vPos ) - vLightDirIn );
+		float3 H = normalize( vToCameraDir - vLightDirIn );
 		float NdotH = saturate( dot( H, vNormal ) );
 		float NdotL = saturate( dot( -vLightDirIn, vNormal ) );
 
-		// NdotH is in [0,1] and vSpecularPower is positive → pow result already
-		// in [0,1], so the original saturate around pow is redundant.
 		float specPow = pow( NdotH, vSpecularPower );
 		float3 fresnel = FresnelSchlick( vMaterialSpecularColor * SPECULAR_MULTIPLIER, -vLightDirIn, H );
 
@@ -544,7 +539,7 @@ PixelShader =
 		{
 			lightdir *= invDist;
 			aDiffuseLightOut += CalculateLight(aProperties._Normal, lightdir, aPointlight._Color * vLightIntensity);
-			aSpecularLightOut += CalculatePBRSpecularPower(aProperties._WorldSpacePos, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, aPointlight._Color * vLightIntensity, lightdir);
+			aSpecularLightOut += CalculatePBRSpecularPower(aProperties._ToCameraDir, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, aPointlight._Color * vLightIntensity, lightdir);
 		}
 	}
 
@@ -651,7 +646,7 @@ PixelShader =
 		ImprovedBlinnPhong(sunIntensity, -vLightSourceDirection, aProperties, aDiffuseLightOut, aSpecularLightOut);
 	#else
 		aDiffuseLightOut = CalculateLight(aProperties._Normal, vLightSourceDirection, sunIntensity);
-		aSpecularLightOut = CalculatePBRSpecularPower(aProperties._WorldSpacePos, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
+		aSpecularLightOut = CalculatePBRSpecularPower(aProperties._ToCameraDir, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
 	#endif
 		aSpecularLightOut *= SunSpecularIntensity;
 	}
@@ -833,12 +828,13 @@ PixelShader =
 		return stripeVal;
 	}	
 	
-	float gradient_border_process_channel( out float3 vCh, float3 vInit, float vCamDist, float3 vNormal, float2 uv, in sampler2D gbTex, in sampler2D gbTex2, float vOutlineMult, float vOutlineCutoff, float vStrength )
+	float gradient_border_process_channel( out float3 vCh, out float vChannelAlpha, float3 vInit, float vCamDist, float3 vNormal, float2 uv, in sampler2D gbTex, in sampler2D gbTex2, float vOutlineMult, float vOutlineCutoff, float vStrength )
 	{
 		vCh = vInit;
 
 		const float PulseSpeedMult = 3.5f;
 		float2 FX_Alpha = tex2D( gbTex2, uv ).bg;
+		vChannelAlpha = FX_Alpha.g;
 		// OPT: (sin(x)+1)*0.5 == sin(x)*0.5 + 0.5 — same instruction count but
 		// more obvious to the compiler as a simple MAD.
 		float vPulse = sin( vGlobalTime * PulseSpeedMult ) * 0.5f + 0.5f;
@@ -913,15 +909,15 @@ PixelShader =
 		// Calculate color and transparency of both channels
 		float3 vGradMix;
 		
-		float vAlpha1 = gradient_border_process_channel( vGradMix, vColor, vGBCamDistCh1, vNormal, vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.x, GB_STRENGTH_CH1 );
+		float vTranspA;
+		float vAlpha1 = gradient_border_process_channel( vGradMix, vTranspA, vColor, vGBCamDistCh1, vNormal, vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.x, GB_STRENGTH_CH1 );
 		// Now mix the result with background
-		float TranspA = tex2D( TexCh2, vUV ).g;		
-		vColor = lerp( vColor, vGradMix, vCamOpacity * TranspA );
+		vColor = lerp( vColor, vGradMix, vCamOpacity * vTranspA );
 		
 		
-		float vAlpha2 = gradient_border_process_channel( vGradMix, vColor, vGBCamDistCh2, vNormal, vUV2, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.y, (1.0 - vAlpha1 * GB_STRENGTH_CH1 * GB_FIRST_LAYER_PRIORITY) * GB_STRENGTH_CH2 );
-		float TranspB = tex2D( TexCh2, vUV2 ).g;
-		vColor = lerp( vColor, vGradMix, vCamOpacity * TranspB );
+		float vTranspB;
+		float vAlpha2 = gradient_border_process_channel( vGradMix, vTranspB, vColor, vGBCamDistCh2, vNormal, vUV2, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.y, (1.0 - vAlpha1 * GB_STRENGTH_CH1 * GB_FIRST_LAYER_PRIORITY) * GB_STRENGTH_CH2 );
+		vColor = lerp( vColor, vGradMix, vCamOpacity * vTranspB );
 
 		// Return some alpha, so the postprocess will ignore gradient borders
 		// when applying season coloring overlay 

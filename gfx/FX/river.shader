@@ -333,11 +333,9 @@ PixelShader =
 			float4 diffuseColor   = tex2D( Diffuse,   float2( vNewUV.x, 1.0f - vNewUV.y ) );
 			float2 waterSideAlpha = tex2D( RiverData, vNewUV ).br;
 
-			// Force pure water in the central strip of the river.
-			if ( abs( Input.vUV.y - 0.5f ) <= 0.25f )
-			{
-				waterSideAlpha = float2( 0.0f, 1.0f );
-			}
+			// Force pure water in the central strip of the river (branchless).
+			float vCenterStrip = 1.0f - step( 0.25f, abs( Input.vUV.y - 0.5f ) );
+			waterSideAlpha = lerp( waterSideAlpha, float2( 0.0f, 1.0f ), vCenterStrip );
 		#endif
 
 			// ----------------------------------------------------------------
