@@ -1,53 +1,138 @@
 setup_initial_coalitions = {
-	# 0 is Neutral
-    # 1 is in Ruling Coalition
-    # 2 is in Opposition Coalition
-    # 3 is Banned Party
-    # 4 Is an Ununorganized Party
+	# Coalition mechanic arrays:
+	# parl_neu_coalitions
+	# parl_gov_coalitions
+	# parl_opp_coalitions
+	# parl_ban_coalitions
+	# parl_uno_coalitions
 
-	resize_array = {
-	    array = parl_coalitions
-	    value = 0
-	    size = 9
+	# List of Party "ids":
+	# 1 - RadSoc
+	# 2 - SocLib
+	# 3 - SocEga
+	# 4 - Cen
+	# 5 - TraCon
+	# 6 - RadDem
+	# 7 - CauvPop
+	# 8 - Aut
+	# 9 - Fun
+
+	# Needed for the colours
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 1
 	}
-}
-
-reverse_coalitions = {
-	for_each_loop = {
-	    array = parl_coalitions
-	    value = parl_v
-	    index = parl_i
-	    
-	    if = {
-	    	limit = {
-	    		check_variable = { parl_coalitions^parl_i = 1 }
-	    	}
-	    	set_variable = { parl_coalitions^parl_i = 2 }
-	    }
-
-	    else = {
-	    	if = {
-		    	limit = {
-		    		check_variable = { parl_coalitions^parl_i = 2 }
-		    	}
-		    	set_variable = { parl_coalitions^parl_i = 1 }
-		    }
-	    }
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 2
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 3
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 4
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 5
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 6
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 7
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 8
+	}
+	add_to_array = { 
+		array = internal_politics_parties_ideology
+		value = 9
 	}
 }
 
 set_all_opposition_to_neutral = {
 	for_each_loop = {
-	    array = parl_coalitions
+	    array = parl_opp_coalitions
 	    value = parl_v
 	    index = parl_i
 	    
-	    if = {
-	    	limit = {
-	    		check_variable = { parl_coalitions^parl_i = 2 }
-	    	}
-	    	set_variable = { parl_coalitions^parl_i = 0 }
-	    }
+		if = {
+			limit = { NOT = { is_in_array = { parl_neu_coalitions = parl_v } } }
+			add_to_array = { parl_neu_coalitions = parl_v }
+		}
+		remove_from_array = {
+			array = parl_opp_coalitions
+			index = parl_i
+		}
+	}
+}
+
+reverse_coalitions = {
+	# Extracts the two arrays into temp_arrays
+	for_each_loop = {
+	    array = parl_gov_coalitions
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_temp_array = { parl_gov_temp = parl_v }
+		remove_from_array = {
+			array = parl_gov_coalitions
+			index = parl_i
+		}
+	}
+	for_each_loop = {
+	    array = parl_opp_coalitions
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_temp_array = { parl_opp_temp = parl_v }
+		remove_from_array = {
+			array = parl_opp_coalitions
+			index = parl_i
+		}
+	}
+
+	# Clears the original arrays
+	clear_array = parl_gov_coalitions
+	clear_array = parl_opp_coalitions
+
+	# Adds the temp_arrays into the original arrays
+	for_each_loop = {
+		array = parl_gov_temp
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_array = { parl_gov_coalitions = parl_v }
+	}
+	for_each_loop = {
+		array = parl_opp_temp
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_array = { parl_opp_coalitions = parl_v }
+	}
+}
+
+set_all_government_members_to_opposition = { # Used if you only want one opposition member to add to the coalition (in place of reverse_coalitions)
+	for_each_loop = {
+	    array = parl_gov_coalitions
+	    value = parl_v
+	    index = parl_i
+	    
+		if = {
+			limit = { NOT = { is_in_array = { parl_opp_coalitions = parl_v } } }
+			add_to_array = { parl_opp_coalitions = parl_v }
+		}
+		remove_from_array = {
+			array = parl_gov_coalitions
+			index = parl_i
+		}
 	}
 }
 
@@ -62,39 +147,218 @@ set_all_opposition_to_neutral = {
 ####################################################################################################
 
 set_rad_soc_to_neutral = {
-	set_variable = { parl_coalitions^0 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 1 } }
+		add_to_array = { parl_neu_coalitions = 1 }
+		remove_from_array = { parl_gov_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 1 } }
+		add_to_array = { parl_neu_coalitions = 1 }
+		remove_from_array = { parl_opp_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 1 } }
+		add_to_array = { parl_neu_coalitions = 1 }
+		remove_from_array = { parl_ban_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 1 } }
+		add_to_array = { parl_neu_coalitions = 1 }
+		remove_from_array = { parl_uno_coalitions = 1 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  1 } }
 }
 
 set_soc_lib_to_neutral = {
-	set_variable = { parl_coalitions^1 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 2 } }
+		add_to_array = { parl_neu_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 2 } }
+		add_to_array = { parl_neu_coalitions = 2 }
+		remove_from_array = { parl_opp_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 2 } }
+		add_to_array = { parl_neu_coalitions = 2 }
+		remove_from_array = { parl_ban_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 2 } }
+		add_to_array = { parl_neu_coalitions = 2 }
+		remove_from_array = { parl_uno_coalitions = 2 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  2 } }
 }
 
 set_soc_ega_to_neutral = {
-	set_variable = { parl_coalitions^2 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 3 } }
+		add_to_array = { parl_neu_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 3 } }
+		add_to_array = { parl_neu_coalitions = 3 }
+		remove_from_array = { parl_opp_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 3 } }
+		add_to_array = { parl_neu_coalitions = 3 }
+		remove_from_array = { parl_ban_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 3 } }
+		add_to_array = { parl_neu_coalitions = 3 }
+		remove_from_array = { parl_uno_coalitions = 3 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  3 } }
 }
 
 set_cen_to_neutral = {
-	set_variable = { parl_coalitions^3 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 4 } }
+		add_to_array = { parl_neu_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 4 } }
+		add_to_array = { parl_neu_coalitions = 4 }
+		remove_from_array = { parl_opp_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 4 } }
+		add_to_array = { parl_neu_coalitions = 4 }
+		remove_from_array = { parl_ban_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 4 } }
+		add_to_array = { parl_neu_coalitions = 4 }
+		remove_from_array = { parl_uno_coalitions = 4 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  4 } }
 }
 
 set_tra_con_to_neutral = {
-	set_variable = { parl_coalitions^4 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 5 } }
+		add_to_array = { parl_neu_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 5 } }
+		add_to_array = { parl_neu_coalitions = 5 }
+		remove_from_array = { parl_opp_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 5 } }
+		add_to_array = { parl_neu_coalitions = 5 }
+		remove_from_array = { parl_ban_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 5 } }
+		add_to_array = { parl_neu_coalitions = 5 }
+		remove_from_array = { parl_uno_coalitions = 5 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  5 } }
 }
 
 set_rad_dem_to_neutral = {
-	set_variable = { parl_coalitions^5 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 6 } }
+		add_to_array = { parl_neu_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 6 } }
+		add_to_array = { parl_neu_coalitions = 6 }
+		remove_from_array = { parl_opp_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 6 } }
+		add_to_array = { parl_neu_coalitions = 6 }
+		remove_from_array = { parl_ban_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 6 } }
+		add_to_array = { parl_neu_coalitions = 6 }
+		remove_from_array = { parl_uno_coalitions = 6 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  6 } }
 }
 
 set_chauv_pop_to_neutral = {
-	set_variable = { parl_coalitions^6 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 7 } }
+		add_to_array = { parl_neu_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 7 } }
+		add_to_array = { parl_neu_coalitions = 7 }
+		remove_from_array = { parl_opp_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 7 } }
+		add_to_array = { parl_neu_coalitions = 7 }
+		remove_from_array = { parl_ban_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 7 } }
+		add_to_array = { parl_neu_coalitions = 7 }
+		remove_from_array = { parl_uno_coalitions = 7 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  7 } }
 }
-
 set_aut_to_neutral = {
-	set_variable = { parl_coalitions^7 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 8 } }
+		add_to_array = { parl_neu_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 8 } }
+		add_to_array = { parl_neu_coalitions = 8 }
+		remove_from_array = { parl_opp_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 8 } }
+		add_to_array = { parl_neu_coalitions = 8 }
+		remove_from_array = { parl_ban_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 8 } }
+		add_to_array = { parl_neu_coalitions = 8 }
+		remove_from_array = { parl_uno_coalitions = 8 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  8 } }
 }
 
 set_fun_to_neutral = {
-	set_variable = { parl_coalitions^8 = 0 }
+	if = {
+		limit = { is_in_array = { parl_gov_coalitions = 9 } }
+		add_to_array = { parl_neu_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 9 } }
+		add_to_array = { parl_neu_coalitions = 9 }
+		remove_from_array = { parl_opp_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 9 } }
+		add_to_array = { parl_neu_coalitions = 9 }
+		remove_from_array = { parl_ban_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 9 } }
+		add_to_array = { parl_neu_coalitions = 9 }
+		remove_from_array = { parl_uno_coalitions = 9 }
+	}
+	else = { add_to_array = { parl_neu_coalitions =  9 } }
 }
 
 ####################################################################################################
@@ -107,40 +371,219 @@ set_fun_to_neutral = {
 
 ####################################################################################################
 
-add_rad_soc_to_coalition = {
-	set_variable = { parl_coalitions^0 = 1 }
+set_rad_soc_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 1 } }
+		add_to_array = { parl_gov_coalitions = 1 }
+		remove_from_array = { parl_neu_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 1 } }
+		add_to_array = { parl_gov_coalitions = 1 }
+		remove_from_array = { parl_opp_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 1 } }
+		add_to_array = { parl_gov_coalitions = 1 }
+		remove_from_array = { parl_ban_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 1 } }
+		add_to_array = { parl_gov_coalitions = 1 }
+		remove_from_array = { parl_uno_coalitions = 1 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  1 } }
 }
 
-add_soc_lib_to_coalition = {
-	set_variable = { parl_coalitions^1 = 1 }
+set_soc_lib_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 2 } }
+		add_to_array = { parl_gov_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 2 } }
+		add_to_array = { parl_gov_coalitions = 2 }
+		remove_from_array = { parl_opp_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 2 } }
+		add_to_array = { parl_gov_coalitions = 2 }
+		remove_from_array = { parl_ban_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 2 } }
+		add_to_array = { parl_gov_coalitions =  2 }
+		remove_from_array = { parl_uno_coalitions = 2 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  2 } }
 }
 
-add_soc_ega_to_coalition = {
-	set_variable = { parl_coalitions^2 = 1 }
+set_soc_ega_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 3 } }
+		add_to_array = { parl_gov_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 3 } }
+		add_to_array = { parl_gov_coalitions = 3 }
+		remove_from_array = { parl_opp_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 3 } }
+		add_to_array = { parl_gov_coalitions = 3 }
+		remove_from_array = { parl_ban_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 3 } }
+		add_to_array = { parl_gov_coalitions =  3 }
+		remove_from_array = { parl_uno_coalitions = 3 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  3 } }
 }
 
-add_cen_to_coalition = {
-	set_variable = { parl_coalitions^3 = 1 }
+set_cen_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 4 } }
+		add_to_array = { parl_gov_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 4 } }
+		add_to_array = { parl_gov_coalitions = 4 }
+		remove_from_array = { parl_opp_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 4 } }
+		add_to_array = { parl_gov_coalitions = 4 }
+		remove_from_array = { parl_ban_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 4 } }
+		add_to_array = { parl_gov_coalitions =  4 }
+		remove_from_array = { parl_uno_coalitions = 4 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  4 } }
 }
 
-add_tra_con_to_coalition = {
-	set_variable = { parl_coalitions^4 = 1 }
+set_tra_con_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 5 } }
+		add_to_array = { parl_gov_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 5 } }
+		add_to_array = { parl_gov_coalitions = 5 }
+		remove_from_array = { parl_opp_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 5 } }
+		add_to_array = { parl_gov_coalitions = 5 }
+		remove_from_array = { parl_ban_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 5 } }
+		add_to_array = { parl_gov_coalitions =  5 }
+		remove_from_array = { parl_uno_coalitions = 5 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  5 } }
 }
 
-add_rad_dem_to_coalition = {
-	set_variable = { parl_coalitions^5 = 1 }
+set_rad_dem_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 6 } }
+		add_to_array = { parl_gov_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 6 } }
+		add_to_array = { parl_gov_coalitions = 6 }
+		remove_from_array = { parl_opp_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 6 } }
+		add_to_array = { parl_gov_coalitions = 6 }
+		remove_from_array = { parl_ban_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 6 } }
+		add_to_array = { parl_gov_coalitions =  6 }
+		remove_from_array = { parl_uno_coalitions = 6 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  6 } }
 }
 
-add_chauv_pop_to_coalition = {
-	set_variable = { parl_coalitions^6 = 1 }
+set_chauv_pop_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 7 } }
+		add_to_array = { parl_gov_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 7 } }
+		add_to_array = { parl_gov_coalitions = 7 }
+		remove_from_array = { parl_opp_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 7 } }
+		add_to_array = { parl_gov_coalitions = 7 }
+		remove_from_array = { parl_ban_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 7 } }
+		add_to_array = { parl_gov_coalitions =  7 }
+		remove_from_array = { parl_uno_coalitions = 7 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  7 } }
+}
+set_aut_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 8 } }
+		add_to_array = { parl_gov_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 8 } }
+		add_to_array = { parl_gov_coalitions = 8 }
+		remove_from_array = { parl_opp_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 8 } }
+		add_to_array = { parl_gov_coalitions = 8 }
+		remove_from_array = { parl_ban_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 8 } }
+		add_to_array = { parl_gov_coalitions =  8 }
+		remove_from_array = { parl_uno_coalitions = 8 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  8 } }
 }
 
-add_aut_to_coalition = {
-	set_variable = { parl_coalitions^7 = 1 }
-}
-
-add_fun_to_coalition = {
-	set_variable = { parl_coalitions^8 = 1 }
+set_fun_to_coalition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 9 } }
+		add_to_array = { parl_gov_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 9 } }
+		add_to_array = { parl_gov_coalitions = 9 }
+		remove_from_array = { parl_opp_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 9 } }
+		add_to_array = { parl_gov_coalitions = 9 }
+		remove_from_array = { parl_ban_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 9 } }
+		add_to_array = { parl_gov_coalitions =  9 }
+		remove_from_array = { parl_uno_coalitions = 9 }
+	}
+	else = { add_to_array = { parl_gov_coalitions =  9 } }
 }
 
 ####################################################################################################
@@ -153,40 +596,219 @@ add_fun_to_coalition = {
 
 ####################################################################################################
 
-add_rad_soc_to_opposition = {
-	set_variable = { parl_coalitions^0 = 2 }
+set_rad_soc_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 1 } }
+		add_to_array = { parl_opp_coalitions = 1 }
+		remove_from_array = { parl_neu_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 1 } }
+		add_to_array = { parl_opp_coalitions = 1 }
+		remove_from_array = { parl_gov_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 1 } }
+		add_to_array = { parl_opp_coalitions = 1 }
+		remove_from_array = { parl_ban_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 1 } }
+		add_to_array = { parl_opp_coalitions = 1 }
+		remove_from_array = { parl_uno_coalitions = 1 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  1 } }
 }
 
-add_soc_lib_to_opposition = {
-	set_variable = { parl_coalitions^1 = 2 }
+set_soc_lib_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 2 } }
+		add_to_array = { parl_opp_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 2 } }
+		add_to_array = { parl_opp_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 2 } }
+		add_to_array = { parl_opp_coalitions = 2 }
+		remove_from_array = { parl_ban_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 2 } }
+		add_to_array = { parl_opp_coalitions =  2 }
+		remove_from_array = { parl_uno_coalitions = 2 }
+	}
+	else = { add_to_array = { parl_opp_coalitions = 2 } }
 }
 
-add_soc_ega_to_opposition = {
-	set_variable = { parl_coalitions^2 = 2 }
+set_soc_ega_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 3 } }
+		add_to_array = { parl_opp_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 3 } }
+		add_to_array = { parl_opp_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 3 } }
+		add_to_array = { parl_opp_coalitions = 3 }
+		remove_from_array = { parl_ban_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 3 } }
+		add_to_array = { parl_opp_coalitions =  3 }
+		remove_from_array = { parl_uno_coalitions = 3 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  3 } }
 }
 
-add_cen_to_opposition = {
-	set_variable = { parl_coalitions^3 = 2 }
+set_cen_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 4 } }
+		add_to_array = { parl_opp_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 4 } }
+		add_to_array = { parl_opp_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 4 } }
+		add_to_array = { parl_opp_coalitions = 4 }
+		remove_from_array = { parl_ban_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 4 } }
+		add_to_array = { parl_opp_coalitions =  4 }
+		remove_from_array = { parl_uno_coalitions = 4 }
+	}
+	else = { add_to_array = { parl_opp_coalitions = 4 } }
 }
 
-add_tra_con_to_opposition = {
-	set_variable = { parl_coalitions^4 = 2 }
+set_tra_con_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 5 } }
+		add_to_array = { parl_opp_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 5 } }
+		add_to_array = { parl_opp_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 5 } }
+		add_to_array = { parl_opp_coalitions = 5 }
+		remove_from_array = { parl_ban_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 5 } }
+		add_to_array = { parl_opp_coalitions =  5 }
+		remove_from_array = { parl_uno_coalitions = 5 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  5 } }
 }
 
-add_rad_dem_to_opposition = {
-	set_variable = { parl_coalitions^5 = 2 }
+set_rad_dem_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 6 } }
+		add_to_array = { parl_opp_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 6 } }
+		add_to_array = { parl_opp_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 6 } }
+		add_to_array = { parl_opp_coalitions = 6 }
+		remove_from_array = { parl_ban_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 6 } }
+		add_to_array = { parl_opp_coalitions =  6 }
+		remove_from_array = { parl_uno_coalitions = 6 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  6 } }
 }
 
-add_chauv_pop_to_opposition = {
-	set_variable = { parl_coalitions^6 = 2 }
+set_chauv_pop_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 7 } }
+		add_to_array = { parl_opp_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 7 } }
+		add_to_array = { parl_opp_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 7 } }
+		add_to_array = { parl_opp_coalitions = 7 }
+		remove_from_array = { parl_ban_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 7 } }
+		add_to_array = { parl_opp_coalitions =  7 }
+		remove_from_array = { parl_uno_coalitions = 7 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  7 } }
+}
+set_aut_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 8 } }
+		add_to_array = { parl_opp_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 8 } }
+		add_to_array = { parl_opp_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 8 } }
+		add_to_array = { parl_opp_coalitions = 8 }
+		remove_from_array = { parl_ban_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 8 } }
+		add_to_array = { parl_opp_coalitions =  8 }
+		remove_from_array = { parl_uno_coalitions = 8 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  8 } }
 }
 
-add_aut_to_opposition = {
-	set_variable = { parl_coalitions^7 = 2 }
-}
-
-add_fun_to_opposition = {
-	set_variable = { parl_coalitions^8 = 2 }
+set_fun_to_opposition = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 9 } }
+		add_to_array = { parl_opp_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 9 } }
+		add_to_array = { parl_opp_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 9 } }
+		add_to_array = { parl_opp_coalitions = 9 }
+		remove_from_array = { parl_ban_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 9 } }
+		add_to_array = { parl_opp_coalitions =  9 }
+		remove_from_array = { parl_uno_coalitions = 9 }
+	}
+	else = { add_to_array = { parl_opp_coalitions =  9 } }
 }
 
 ####################################################################################################
@@ -199,40 +821,219 @@ add_fun_to_opposition = {
 
 ####################################################################################################
 
-ban_rad_soc_party = {
-	set_variable = { parl_coalitions^0 = 3 }
+set_rad_soc_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 1 } }
+		add_to_array = { parl_ban_coalitions = 1 }
+		remove_from_array = { parl_neu_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 1 } }
+		add_to_array = { parl_ban_coalitions = 1 }
+		remove_from_array = { parl_gov_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 1 } }
+		add_to_array = { parl_ban_coalitions = 1 }
+		remove_from_array = { parl_opp_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 1 } }
+		add_to_array = { parl_ban_coalitions = 1 }
+		remove_from_array = { parl_uno_coalitions = 1 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 1 } }
 }
 
-ban_soc_lib_party = {
-	set_variable = { parl_coalitions^1 = 3 }
+set_soc_lib_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 2 } }
+		add_to_array = { parl_ban_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 2 } }
+		add_to_array = { parl_ban_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 2 } }
+		add_to_array = { parl_ban_coalitions = 2 }
+		remove_from_array = { parl_opp_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 2 } }
+		add_to_array = { parl_ban_coalitions =  2 }
+		remove_from_array = { parl_uno_coalitions = 2 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 2 } }
 }
 
-ban_soc_ega_party = {
-	set_variable = { parl_coalitions^2 = 3 }
+set_soc_ega_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 3 } }
+		add_to_array = { parl_ban_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 3 } }
+		add_to_array = { parl_ban_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 3 } }
+		add_to_array = { parl_ban_coalitions = 3 }
+		remove_from_array = { parl_opp_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 3 } }
+		add_to_array = { parl_ban_coalitions =  3 }
+		remove_from_array = { parl_uno_coalitions = 3 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 3 } }
 }
 
-ban_cen_party = {
-	set_variable = { parl_coalitions^3 = 3 }
+set_cen_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 4 } }
+		add_to_array = { parl_ban_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 4 } }
+		add_to_array = { parl_ban_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 4 } }
+		add_to_array = { parl_ban_coalitions = 4 }
+		remove_from_array = { parl_opp_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 4 } }
+		add_to_array = { parl_ban_coalitions =  4 }
+		remove_from_array = { parl_uno_coalitions = 4 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 4 } }
 }
 
-ban_tra_con_party = {
-	set_variable = { parl_coalitions^4 = 3 }
+set_tra_con_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 5 } }
+		add_to_array = { parl_ban_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 5 } }
+		add_to_array = { parl_ban_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 5 } }
+		add_to_array = { parl_ban_coalitions = 5 }
+		remove_from_array = { parl_opp_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 5 } }
+		add_to_array = { parl_ban_coalitions =  5 }
+		remove_from_array = { parl_uno_coalitions = 5 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 5 } }
 }
 
-ban_rad_dem_party = {
-	set_variable = { parl_coalitions^5 = 3 }
+set_rad_dem_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 6 } }
+		add_to_array = { parl_ban_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 6 } }
+		add_to_array = { parl_ban_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 6 } }
+		add_to_array = { parl_ban_coalitions = 6 }
+		remove_from_array = { parl_opp_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 6 } }
+		add_to_array = { parl_ban_coalitions =  6 }
+		remove_from_array = { parl_uno_coalitions = 6 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 6 } }
 }
 
-ban_chauv_pop_party = {
-	set_variable = { parl_coalitions^6 = 3 }
+set_chauv_pop_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 7 } }
+		add_to_array = { parl_ban_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 7 } }
+		add_to_array = { parl_ban_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 7 } }
+		add_to_array = { parl_ban_coalitions = 7 }
+		remove_from_array = { parl_opp_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 7 } }
+		add_to_array = { parl_ban_coalitions =  7 }
+		remove_from_array = { parl_uno_coalitions = 7 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 7 } }
+}
+set_aut_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 8 } }
+		add_to_array = { parl_ban_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 8 } }
+		add_to_array = { parl_ban_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 8 } }
+		add_to_array = { parl_ban_coalitions = 8 }
+		remove_from_array = { parl_opp_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 8 } }
+		add_to_array = { parl_ban_coalitions =  8 }
+		remove_from_array = { parl_uno_coalitions = 8 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 8 } }
 }
 
-ban_aut_party = {
-	set_variable = { parl_coalitions^7 = 3 }
-}
-
-ban_fun_party = {
-	set_variable = { parl_coalitions^8 = 3 }
+set_fun_to_banned = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 9 } }
+		add_to_array = { parl_ban_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 9 } }
+		add_to_array = { parl_ban_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 9 } }
+		add_to_array = { parl_ban_coalitions = 9 }
+		remove_from_array = { parl_opp_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_uno_coalitions = 9 } }
+		add_to_array = { parl_ban_coalitions =  9 }
+		remove_from_array = { parl_uno_coalitions = 9 }
+	}
+	else = { add_to_array = { parl_ban_coalitions = 9 } }
 }
 
 ####################################################################################################
@@ -245,38 +1046,217 @@ ban_fun_party = {
 
 ####################################################################################################
 
-unorganize_rad_soc_party = {
-	set_variable = { parl_coalitions^0 = 4 }
+set_rad_soc_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 1 } }
+		add_to_array = { parl_uno_coalitions = 1 }
+		remove_from_array = { parl_neu_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 1 } }
+		add_to_array = { parl_uno_coalitions = 1 }
+		remove_from_array = { parl_gov_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 1 } }
+		add_to_array = { parl_uno_coalitions = 1 }
+		remove_from_array = { parl_opp_coalitions = 1 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 1 } }
+		add_to_array = { parl_uno_coalitions = 1 }
+		remove_from_array = { parl_ban_coalitions = 1 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 1 } }
 }
 
-unorganize_soc_lib_party = {
-	set_variable = { parl_coalitions^1 = 4 }
+set_soc_lib_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 2 } }
+		add_to_array = { parl_uno_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 2 } }
+		add_to_array = { parl_uno_coalitions = 2 }
+		remove_from_array = { parl_gov_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 2 } }
+		add_to_array = { parl_uno_coalitions = 2 }
+		remove_from_array = { parl_opp_coalitions = 2 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 2 } }
+		add_to_array = { parl_uno_coalitions =  2 }
+		remove_from_array = { parl_ban_coalitions = 2 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 2 } }
 }
 
-unorganize_soc_ega_party = {
-	set_variable = { parl_coalitions^2 = 4 }
+set_soc_ega_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 3 } }
+		add_to_array = { parl_uno_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 3 } }
+		add_to_array = { parl_uno_coalitions = 3 }
+		remove_from_array = { parl_gov_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 3 } }
+		add_to_array = { parl_uno_coalitions = 3 }
+		remove_from_array = { parl_opp_coalitions = 3 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 3 } }
+		add_to_array = { parl_uno_coalitions =  3 }
+		remove_from_array = { parl_ban_coalitions = 3 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 3 } }
 }
 
-unorganize_cen_party = {
-	set_variable = { parl_coalitions^3= 4 }
+set_cen_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 4 } }
+		add_to_array = { parl_uno_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 4 } }
+		add_to_array = { parl_uno_coalitions = 4 }
+		remove_from_array = { parl_gov_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 4 } }
+		add_to_array = { parl_uno_coalitions = 4 }
+		remove_from_array = { parl_opp_coalitions = 4 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 4 } }
+		add_to_array = { parl_uno_coalitions =  4 }
+		remove_from_array = { parl_ban_coalitions = 4 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 4 } }
 }
 
-unorganize_tra_con_party = {
-	set_variable = { parl_coalitions^4 = 4 }
+set_tra_con_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 5 } }
+		add_to_array = { parl_uno_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 5 } }
+		add_to_array = { parl_uno_coalitions = 5 }
+		remove_from_array = { parl_gov_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 5 } }
+		add_to_array = { parl_uno_coalitions = 5 }
+		remove_from_array = { parl_opp_coalitions = 5 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 5 } }
+		add_to_array = { parl_uno_coalitions =  5 }
+		remove_from_array = { parl_ban_coalitions = 5 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 5 } }
 }
 
-unorganize_rad_dem_party = {
-	set_variable = { parl_coalitions^5 = 4 }
+set_rad_dem_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 6 } }
+		add_to_array = { parl_uno_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 6 } }
+		add_to_array = { parl_uno_coalitions = 6 }
+		remove_from_array = { parl_gov_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 6 } }
+		add_to_array = { parl_uno_coalitions = 6 }
+		remove_from_array = { parl_opp_coalitions = 6 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 6 } }
+		add_to_array = { parl_uno_coalitions =  6 }
+		remove_from_array = { parl_ban_coalitions = 6 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 6 } }
 }
 
-unorganize_chauv_pop_party = {
-	set_variable = { parl_coalitions^6 = 4 }
+set_chauv_pop_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 7 } }
+		add_to_array = { parl_uno_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 7 } }
+		add_to_array = { parl_uno_coalitions = 7 }
+		remove_from_array = { parl_gov_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 7 } }
+		add_to_array = { parl_uno_coalitions = 7 }
+		remove_from_array = { parl_opp_coalitions = 7 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 7 } }
+		add_to_array = { parl_uno_coalitions =  7 }
+		remove_from_array = { parl_ban_coalitions = 7 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 7 } }
+}
+set_aut_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 8 } }
+		add_to_array = { parl_uno_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 8 } }
+		add_to_array = { parl_uno_coalitions = 8 }
+		remove_from_array = { parl_gov_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 8 } }
+		add_to_array = { parl_uno_coalitions = 8 }
+		remove_from_array = { parl_opp_coalitions = 8 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 8 } }
+		add_to_array = { parl_uno_coalitions =  8 }
+		remove_from_array = { parl_ban_coalitions = 8 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 8 } }
 }
 
-unorganize_aut_party = {
-	set_variable = { parl_coalitions^7 = 4 }
-}
-
-unorganize_fun_party = {
-	set_variable = { parl_coalitions^8 = 4 }
+set_fun_to_unorganized = {
+	if = {
+		limit = { is_in_array = { parl_neu_coalitions = 9 } }
+		add_to_array = { parl_uno_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_gov_coalitions = 9 } }
+		add_to_array = { parl_uno_coalitions = 9 }
+		remove_from_array = { parl_gov_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_opp_coalitions = 9 } }
+		add_to_array = { parl_uno_coalitions = 9 }
+		remove_from_array = { parl_opp_coalitions = 9 }
+	}
+	else_if = {
+		limit = { is_in_array = { parl_ban_coalitions = 9 } }
+		add_to_array = { parl_uno_coalitions =  9 }
+		remove_from_array = { parl_ban_coalitions = 9 }
+	}
+	else = { add_to_array = { parl_uno_coalitions = 8 } }
 }
