@@ -11779,3 +11779,191 @@ country_event = {
 		}
 	}
 }
+
+############################################################
+### RUSSIAN-CHINESE BORDER COMMISSION ###
+############################################################
+
+# Russian-Chinese Border Commission (13.05.1861) 
+country_event = {
+	id = rossiya.2000
+	title = rossiya.2000.t
+	desc = rossiya.2000.d
+	picture = GFX_report_event_generic_diplomatic_treaty
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2000.a
+		set_country_flag = RUS_QNG_border_commission_active
+		set_variable = { rus_qng_border_points = 0 }
+		hidden_effect = {
+			QNG = { country_event = { id = qing.800 days = 0 } }
+			country_event = { id = rossiya.2010 days = 1242 } # 07.10.1864
+		}
+	}
+}
+
+# Chuguchak Protocol (Russia wins) 
+country_event = {
+	id = rossiya.2001
+	title = rossiya.2001.t
+	desc = rossiya.2001.d
+	picture = GFX_report_event_generic_diplomatic_treaty
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2001.a
+		add_political_power = 50
+		add_stability = 0.03
+		set_country_flag = RUS_QNG_border_commission_concluded
+		clr_country_flag = RUS_QNG_border_commission_active
+		1443 = { remove_claim_by = QNG }
+		1444 = { remove_claim_by = QNG }
+		654 = { remove_claim_by = QNG }
+	}
+}
+
+# Negotiations Fail 
+country_event = {
+	id = rossiya.2003
+	title = rossiya.2003.t
+	desc = rossiya.2003.d
+	picture = GFX_report_event_generic_diplomatic_treaty
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2003.a
+		add_political_power = -25
+		set_country_flag = RUS_QNG_negotiations_failed
+		clr_country_flag = RUS_QNG_border_commission_active
+		set_country_flag = RUS_QNG_border_commission_concluded
+		hidden_effect = {
+			# Allow AI to focus on holding the disputed regions (943, 1443, 1444) against China
+			add_ai_strategy = {
+				type = front_unit_request
+				tag = QNG
+				value = 200
+			}
+		}
+	}
+}
+
+# Hidden decider 
+country_event = {
+	id = rossiya.2010
+	title = rossiya.2010.t
+	desc = rossiya.2010.d
+	hidden = yes
+
+	is_triggered_only = yes
+
+	trigger = {
+		has_country_flag = RUS_QNG_border_commission_active
+		QNG = { exists = yes }
+	}
+
+	immediate = {
+		if = {
+			limit = { check_variable = { rus_qng_border_points > QNG.rus_qng_border_points } }
+			country_event = { id = rossiya.2001 days = 0 }
+			QNG = { country_event = { id = qing.801 days = 0 } }
+		}
+		else = {
+			country_event = { id = rossiya.2003 days = 0 }
+			QNG = { country_event = { id = qing.802 days = 0 } }
+		}
+	}
+
+	option = { name = rossiya.2010.a }
+}
+
+# Border battle (north) won by Russia - notification
+country_event = {
+	id = rossiya.2011
+	title = rossiya.2011.t
+	desc = rossiya.2011.d
+	picture = GFX_report_event_generic_victory
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2011.a
+		add_political_power = 25
+		add_war_support = 0.03
+	}
+}
+
+# Border battle (north) lost by Russia - notification 
+country_event = {
+	id = rossiya.2012
+	title = rossiya.2012.t
+	desc = rossiya.2012.d
+	picture = GFX_report_event_generic_defeat
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2012.a
+		add_political_power = -25
+		add_war_support = -0.05
+	}
+}
+
+# Border battle (south) won by Russia - notification
+country_event = {
+	id = rossiya.2013
+	title = rossiya.2013.t
+	desc = rossiya.2013.d
+	picture = GFX_report_event_generic_victory
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2013.a
+		add_political_power = 25
+		add_war_support = 0.03
+	}
+}
+
+# Border battle (south) lost by Russia 
+country_event = {
+	id = rossiya.2014
+	title = rossiya.2014.t
+	desc = rossiya.2014.d
+	picture = GFX_report_event_generic_defeat
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2014.a
+		add_political_power = -50
+		add_war_support = -0.05
+	}
+}
+
+# Russian counter-offensive failed to materialise: the Qing consolidate their northern gains.
+country_event = {
+	id = rossiya.2015
+	title = rossiya.2015.t
+	desc = rossiya.2015.d
+	picture = GFX_report_event_generic_defeat
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.2015.a
+		add_political_power = -100
+		add_war_support = -0.15
+		hidden_effect = {
+			QNG = { country_event = { id = qing.803 days = 1 } }
+			clr_country_flag = RUS_QNG_first_battle_won
+			clr_country_flag = RUS_QNG_second_battle_pending
+		}
+	}
+}

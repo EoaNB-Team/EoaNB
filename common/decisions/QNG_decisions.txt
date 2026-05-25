@@ -2680,3 +2680,133 @@ QNG_BOP_category = {
 		}
 	}		
 }
+
+# China-side decisions: gain influence points + border conflict decisions
+QNG_QNG_border_commission_category = {
+
+	### Send garrisons (QNG) ###
+	QNG_QNG_border_send_garrisons = {
+
+		icon = generic_army_support
+
+		allowed = { tag = QNG }
+
+		visible = {
+			has_country_flag = RUS_QNG_border_commission_active
+			# Garrisons can be dispatched even while the Dungan Revolt rages in Xinjiang;
+			# the Court draws on banner forces from Mongolia and Manchuria instead.
+		}
+
+		available = { has_manpower > 4999 }
+
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 0.1 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+
+		days_remove = 30
+
+		ai_will_do = { base = 50 }
+
+		complete_effect = {
+			add_manpower = -5000
+			set_temp_variable = { money_to_gain = -0.1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+
+		remove_effect = { add_to_variable = { rus_qng_border_points = 2 } }
+	}
+
+	### Bribe tribes (QNG) - higher money cost than RUS, +1 point ###
+	QNG_QNG_border_bribe_tribes = {
+
+		icon = generic_political_actions
+
+		allowed = { tag = QNG }
+
+		visible = { has_country_flag = RUS_QNG_border_commission_active }
+
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 0.4 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+
+		days_re_enable = 180
+		days_remove = 30
+
+		ai_will_do = { base = 50 }
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.4 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+
+		remove_effect = { add_to_variable = { rus_qng_border_points = 1 } }
+	}
+
+	### Convince tribes (QNG) - higher PP cost than RUS, +1 point ###
+	QNG_QNG_border_convince_tribes = {
+
+		icon = generic_political_actions
+
+		allowed = { tag = QNG }
+
+		visible = { has_country_flag = RUS_QNG_border_commission_active }
+
+		available = { has_political_power > 34 }
+
+		days_re_enable = 90
+		days_remove = 30
+
+		ai_will_do = { base = 50 }
+
+		complete_effect = { add_political_power = -35 }
+
+		remove_effect = { add_to_variable = { rus_qng_border_points = 1 } }
+	}
+
+	### Establish control in the north (QNG) - starts north border war ###
+	QNG_QNG_border_establish_control_north = {
+
+		icon = border_war
+
+		allowed = { tag = QNG }
+
+		visible = {
+			has_country_flag = RUS_QNG_negotiations_failed
+			NOT = { has_country_flag = RUS_QNG_first_battle_won }
+		}
+
+		available = { has_war = no }
+
+		highlight_states = {
+			state = 1443
+			state = 1444
+		}
+
+		fire_only_once = yes
+		days_remove = 10
+
+		ai_will_do = { base = 60 }
+
+		remove_effect = {
+			start_border_war = {
+				change_state_after_war = no
+				attacker = {
+					state = 944
+					num_provinces = 3
+					on_win = qing.804
+					on_lose = qing.805
+				}
+				defender = {
+					state = 1444
+					num_provinces = 3
+					on_win = rossiya.2011
+					on_lose = rossiya.2012
+				}
+			}
+		}
+	}
+}
