@@ -320,9 +320,7 @@ PixelShader =
 
 			float vSpecularIntensity = 0.010f;
 			float vGlossiness = (spec/9.0f) * (1-vSpecMap); 
-			//float CubeMipmapIndex = GetEnvmapMipLevel(saturate(1.0f-vSpecMap)); 
 			
-			//float3 reflectiveColor = texCUBElod( ReflectionCubeMap, float4(reflection, CubeMipmapIndex) ).rgb;// * CubemapIntensity;
 			float3 reflectiveColor = texCUBE( ReflectionCubeMap, reflection ).rgb;
 		
 		#ifdef NO_REFRACTIONS
@@ -353,7 +351,7 @@ PixelShader =
 				GradientBorderChannel1, GradientBorderChannel2, 0.0f, 
 				vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,
 				vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
-			
+				
 			
 			secondary_color_mask( refractiveColor, normal, 
 				Input.uv - vRefractionDistortion * 0.001, 
@@ -396,10 +394,10 @@ PixelShader =
 
 			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.pos.xz ), lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
 			
-			//dominance_fx_apply(vOut, normal, 
-			//	Input.uv, 
-			//	GradientBorderChannel1,GradientBorderChannel2,GradientBorderChannel3,
-			//	vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f);
+			dominance_fx_apply(vOut, normal, 
+				Input.uv, 
+				GradientBorderChannel1,GradientBorderChannel2,GradientBorderChannel3,
+				vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f);
 				
 		#ifdef LOW_END_GFX
 			DebugReturn(vOut, lightingProperties, 0.0f);

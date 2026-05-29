@@ -1524,7 +1524,9 @@ NNavy = {
 	NAVAL_HOMEBASE_CALCULATION_DISTANCE_CUTOFF = 1000,				-- Tuning parameter for homebase calculation. Distance to normalize against. Everything above said value will be treated as score = 0.
 	NAVAL_HOMEBASE_BUILDING_SCORE_FACTOR = 0.02,					-- Tuning parameter for homebase calculation. Multiplier for how much the level of the naval base impacts its total score.
 	NAVAL_HOMEBASE_OWNERSHIP_BONUS = 0.04,							-- Tuning parameter for homebase calculation. Adds to total score based on if the base is owned by the country doing the calculation.
-
+	NAVAL_MISSION_AI_RANGE_THRESHOLD_EPSILON = 0.25,				-- Epsilon tolerance for AI naval range threshold checks.
+	NAVAL_MISSION_AI_CONVOY_NORMALIZATION_TARGET = 150,			-- Number of convoys to normalize against when scoring convoy raiding missions.
+	
 	ADMIRAL_TASKFORCE_CAP = 10,										-- admirals will start getting penalties after this amount of taskforces
 
 	DETECTION_CHANCE_MULT_BASE = 0.1,								-- base multiplier value for detection chance. Later the chance is an average between our detection and enemy visibility, mult by surface/sub detection chance in the following defines.
@@ -2101,6 +2103,11 @@ NNavy = {
 	SUBMARINE_REVEAL_POW 											= 3.0,		-- A scaling factor that is applied to the reveal chance in order to make large differences in detection vs visibility more pronounced
 	SUBMARINE_BASE_TORPEDO_REVEAL_CHANCE 							= 0.04,		-- Chance of a submarine being revealed when it fires. 1.0 is 100%. this chance is then multiplied with modifier created by comparing firer's visibiility and target's detection
 
+	-- reworked submarine detection formula, new formula is (avg. sub detection * SUBMARINE_REVEAL_DETECTION_MULTIPLIER) / MAX{( SUBMARINE_BASE_STEALTH_VALUE - sub visibility), 0.1_fixed }, for formula (with one 'hack' on the graph to avoid undefined) - https://www.desmos.com/calculator/zhbwchjblc
+	SUBMARINE_BASE_STEALTH_VALUE									= 100,		-- Used in the reworked formula, sub_visiblity is subtracted from SUBMARINE_BASE_STEALTH_VALUE for the divider. The higher the define, the lower the chance for detection to happen
+	SUBMARINE_REVEAL_DETECTION_MULTIPLIER							= 0.075,		-- Used in the reworked formula, multiplies the average submarine detection. The higher the define, the higher chance for detection to happen
+	SUBMARINE_REVEAL_TORPEDO_FIRING_DETECTION_MULTIPLIER			= 1.1,		-- used in the reworked formula when firing the torpedos to see whether it has been detected. This define is applied as multiplier to the numerator (avg. sub detection * SUBMARINE_REVEAL_DETECTION_MULTIPLIER * SUBMARINE_REVEAL_TORPEDO_FIRING_DETECTION_MULTIPLIER). define = 1, no difference, define < 0, no chance of detecting, 0 < define < 1, lowers chance of detecting comparing to passive reveal, 1 < define, increases chance to be revealed.
+	
 	MAX_NUM_HOURS_TO_WAIT_AT_ALLY_DOCKYARDS_FOR_REPAIRS 			= 48,		-- taskforces will wait at most this amount of hours in ally bases for repairs before switching to another base for repairs
 
 	COMBAT_RESULT_PRIORITY_THRESHOLDS = { 										-- the game will use this thresholds to define importance of a naval combat result. it will use the highest level that has higher threshold than the amount of production lost in combat
@@ -2477,6 +2484,7 @@ NAI = {
 	JOIN_FACTION_BOTH_LOSING = -300,			-- Desire to be in a faction when both we and htey are in losing wars
 	LENDLEASE_FRACTION_OF_PRODUCTION = 0.5,		-- Base fraction AI would send as lendlease
 	LENDLEASE_FRACTION_OF_STOCKPILE = 0.25,		-- Base fraction AI would send as lendlease
+	MINIMUM_MONTHLY_LEND_LEASE_EQUIPMENT = 10,	-- AI will not offer lend-lease if the monthly amount would be less than this
 	MINIMUM_EQUIPMENT_TO_ASK_LEND_LEASE = -100,	-- AI will accept to lend lease this equipment only if our stockpile is less than that.
 	MINIMUM_CONVOY_TO_ASK_LEND_LEASE = 30,		-- AI will accept to lend lease convoys only if our stockpile is less than that (special case because convoy stockpile can't be negative).
 	MINIMUM_FUEL_DAYS_TO_ASK_LEND_LEASE = 2,	-- AI will accept to lend lease fuel only if the player have less fuel than this number multiply by his max daily consumption.
