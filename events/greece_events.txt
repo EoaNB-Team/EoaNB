@@ -1129,7 +1129,7 @@ country_event = {
 		}
 		country_event = {
 			id = greece.89
-			random_days = 150
+			days = 28
 		}
 		custom_effect_tooltip = historical_option
 		complete_national_focus = GRE_nafplion_revolution
@@ -1156,7 +1156,7 @@ country_event = {
 		}
 		country_event = {
 			id = greece.89
-			random_days = 150
+			days = 28
 		}
 		complete_national_focus = GRE_nafplion_revolution
 	}
@@ -1220,7 +1220,7 @@ country_event = {
 			var = GRE_otto_support_var
 			value = 4
 		}
-		add_stability = 0.5
+		add_stability = 0.05
 		custom_effect_tooltip = GRE_amalia_assasination_atempt_tt
 	}
 	#Let the shooter live freely
@@ -2792,6 +2792,10 @@ country_event = {
 		ai_chance = {factor = 50}
 		 
 		add_stability = -0.05
+		add_command_power = -15
+		set_temp_variable = { money_to_gain = -0.02 }
+		add_money_with_tooltip_effect = yes		
+		navy_experience = 5
 		subtract_from_variable = {
 			var = GRE_otto_support_var
 			value = 2
@@ -3015,11 +3019,12 @@ country_event = {
 				is_historical_focus_on = yes
 			}
 		}
-		country_event = {
-			id = greece.95
-			days = 10 
+		ENG = {
+			country_event = {
+				id = greece.95
+				days = 10 
+			}
 		}	
-	
 	}
 	#We are not yet lost
 	option = { 
@@ -3045,7 +3050,7 @@ country_event = {
 	option = { 
 		name = greece.95.a
 
-		ENG = {
+		GRE = {
 			country_event = { id = greece.96 days = 3 }
 		}
 		custom_effect_tooltip = historical_option
@@ -3083,6 +3088,13 @@ country_event = {
 			country_event = { id = greece.3 days = 1 }
 		}
 		custom_effect_tooltip = historical_option
+		ai_chance = { 
+			factor = 50
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}
 	}
 	#We should listen to Amalia
 	option = { 
@@ -3383,44 +3395,58 @@ country_event = {
 	is_triggered_only = yes 	
 
 	option = { #Replace the Phalanx with the Royal Guard
-		name = greece.400.a  
-		add_political_power = -25
-		division_template = {
-			name = "Royal Guard"
-			priority = 0
-			template_counter = 0
-			regiments = {
-				guard_infantry = { x = 0 y = 0}
-				guard_infantry = { x = 0 y = 1}
-				guard_infantry = { x = 1 y = 0}
-				guard_infantry = { x = 1 y = 1}
-				guard_infantry = { x = 2 y = 0}
-				guard_infantry = { x = 2 y = 1}
+		name = greece.400.a 
+		add_political_power = 25
+
+		if = {
+			limit = { has_idea = GRE_idea_outdated_army }
+			swap_ideas = {
+				remove_idea = GRE_idea_outdated_army
+				add_idea = GRE_idea_outdated_army_royal_guard
 			}
 		}
 
 		delete_unit_template_and_units = {
 			division_template = "Royal Phalanx Division"
-			disband = yes #will refund equipment and manpower
+			disband = yes
 		}
-		
+
 		GRE = {
-			var:capital = {
-				create_unit = {
-					division = "name = \"Royal Guard Division\" division_template = \"Royal Guard\" start_experience_factor = 0.5"
-					owner = GRE
+			if = {
+				limit = { has_country_flag = GRE_flag_Republic }
+				var:capital = {
+					create_unit = {
+						division = "name = \"Agema\" division_template = \"National Guard\" start_experience_factor = 0.5"
+						owner = GRE
+					}
 				}
-	
-				create_unit = {
-					division = "name = \"Royal Guard Division\" division_template = \"Royal Guard\" start_experience_factor = 0.5"
-					owner = GRE
+			}
+			else = {
+				var:capital = {
+					create_unit = {
+						division = "name = \"Agema\" division_template = \"Royal Guard\" start_experience_factor = 0.5"
+						owner = GRE
+					}
 				}
 			}
 		}
+		set_division_template_lock = {
+			division_template = "Royal Guard"
+			is_locked = no
+		}		
+		custom_effect_tooltip = historical_option
+		ai_chance = { 
+			factor = 50
+			modifier = {
+				factor = 100
+				is_historical_focus_on = yes
+			}
+		}	
 	}
 
 	option = { #Hold the Phalanx and expand it
 		name = greece.400.b
+		ai_chance = { factor = 0 }
 
 		GRE = {
 			var:capital = {
@@ -3435,10 +3461,20 @@ country_event = {
 
 	option = { #Remove the Phalanx and give manpower and pp
 		name = greece.400.c 
-		add_political_power = 50
+		ai_chance = { factor = 0 }
+		add_political_power = -25
 		army_experience = 25
+
+		if = {
+			limit = { has_idea = GRE_idea_outdated_army }
+			swap_ideas = {
+				remove_idea = GRE_idea_outdated_army
+				add_idea = GRE_idea_outdated_army_reformed
+			}
+		}
+
 		delete_unit_template_and_units = {
-			division_template = "Royal Phalanx"
+			division_template = "Royal Phalanx Division"
 			disband = yes #will refund equipment and manpower
 		}
 	}
