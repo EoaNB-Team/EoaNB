@@ -745,7 +745,6 @@ decrease_slider_law = {
 }
 
 # example usage: increase_slider_law = yes
-# BUG FIX: was setting road_spending_changed_recently, now correctly sets law_spending_changed_recently
 increase_slider_law = {
 	if = {
 		limit = {
@@ -773,6 +772,58 @@ increase_slider_law = {
 		custom_effect_tooltip = CANNOT_INCREASE_LAW_SPENDING_LEVEL_TT
 	}
 }
+
+# --- TARIFFS ---
+# example usage: decrease_slider_tariffs = yes
+decrease_slider_tariffs = {
+	if = {
+		limit = {
+			NOT = { has_idea = eoanb_tariff_free_trade }
+		}
+		if = {
+			limit = { has_idea = eoanb_tariff_mercantilism }
+			swap_ideas = { add_idea = eoanb_tariff_free_trade remove_idea = eoanb_tariff_mercantilism }
+		}
+		else_if = {
+			limit = { has_idea = eoanb_tariff_protectionism }
+			swap_ideas = { add_idea = eoanb_tariff_mercantilism remove_idea = eoanb_tariff_protectionism }
+		}
+		else_if = {
+			limit = { has_idea = eoanb_tariff_autarky }
+			swap_ideas = { add_idea = eoanb_tariff_protectionism remove_idea = eoanb_tariff_autarky }
+		}
+		set_country_flag = { flag = tariffs_changed_recently days = 180 value = 1 }
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_LOWER_TARIFF_POLICY_TT
+	}
+}
+ 
+# example usage: increase_slider_tariffs = yes
+increase_slider_tariffs = {
+	if = {
+		limit = {
+			NOT = { has_idea = eoanb_tariff_autarky }
+		}
+		if = {
+			limit = { has_idea = eoanb_tariff_free_trade }
+			swap_ideas = { add_idea = eoanb_tariff_mercantilism remove_idea = eoanb_tariff_free_trade }
+		}
+		else_if = {
+			limit = { has_idea = eoanb_tariff_mercantilism }
+			swap_ideas = { add_idea = eoanb_tariff_protectionism remove_idea = eoanb_tariff_mercantilism }
+		}
+		else_if = {
+			limit = { has_idea = eoanb_tariff_protectionism }
+			swap_ideas = { add_idea = eoanb_tariff_autarky remove_idea = eoanb_tariff_protectionism }
+		}
+		set_country_flag = { flag = tariffs_changed_recently days = 180 value = 1 }
+	}
+	else = {
+		custom_effect_tooltip = CANNOT_INCREASE_TARIFF_POLICY_TT
+	}
+}
+
 
 #################################
 # Slider lock/unlock effects    #
@@ -805,6 +856,11 @@ lock_slider_social_spending = {
 lock_slider_taxes_spending = {
 	set_country_flag = taxes_slider_increase_blocked
 	set_country_flag = taxes_slider_decrease_blocked
+}
+
+lock_slider_tariffs = {
+	set_country_flag = tariffs_slider_increase_blocked
+	set_country_flag = tariffs_slider_decrease_blocked
 }
 
 unlock_slider_army_spending = {
@@ -841,4 +897,9 @@ unlock_slider_taxes_spending = {
 	clr_country_flag = taxes_slider_increase_blocked
 	clr_country_flag = taxes_slider_decrease_blocked
 	custom_effect_tooltip = tax_spending_slider_unlocked
+}
+unlock_slider_tariffs = {
+	clr_country_flag = tariffs_slider_increase_blocked
+	clr_country_flag = tariffs_slider_decrease_blocked
+	custom_effect_tooltip = tariffs_slider_unlocked
 }
