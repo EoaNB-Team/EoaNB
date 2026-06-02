@@ -3095,6 +3095,73 @@ RAJ_category_famine_balance = {
 			add_to_variable = { var = RAJ_var_amount_of_farms value = -50 }
 		}
 	}
+	RAJ_mission_avoid_famine_phase_one = {
+		icon = generic_decision
+		activation = {
+			NOT = {
+				has_war_with = SRS	# Instead has special war time famine
+				has_country_flag = RAJ_flag_famine
+			}
+			check_variable = { RAJ_var_food_production < RAJ_var_food_needed }
+		}
+		available = { check_variable = { RAJ_var_food_production > RAJ_var_food_needed } }
+		days_mission_timeout = 25
+		timeout_effect = {
+			country_event = { id = britishindia.39 }
+			set_country_flag = RAJ_flag_famine
+			activate_mission = RAJ_mission_famine
+		}
+	}
+	RAJ_mission_famine = {
+		icon = generic_decision
+		available = { check_variable = { RAJ_var_food_production > RAJ_var_food_needed } }
+		days_mission_timeout = 15
+		activation = { always = no }
+		complete_effect = {
+			clr_country_flag = RAJ_flag_famine
+		}
+		timeout_effect = {
+			activate_mission = RAJ_mission_famine
+
+			# for later to effect specific states with famine
+			#if = {
+			#	limit = { has_country_flag = RAJ_flag_X_drought }
+			#	Y = {
+			#		add_manpower = -N
+			#	}
+			#}
+			#if_else = {
+			#	limit = { has_country_flag = RAJ_flag_Z_drought }
+			#	Y = {
+			#		add_manpower = -N
+			#	}
+			#}
+			#else = {
+				### For Generic Player caused famine
+				random_owned_controlled_state = {
+					add_manpower = -1000000
+				}
+			#}
+		}
+	}
+	RAJ_decision_import_food = {
+		icon = generic_decision
+		available = { has_country_flag = RAJ_flag_famine }
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 1
+			}
+		}
+		custom_cost_text = eoanb_money_cost_text
+		remove_effect = {
+			set_temp_variable = { money_to_gain = -1 }
+			add_money_with_tooltip_effect = yes
+			add_days_mission_timeout = {
+				mission = RAJ_mission_famine
+				days = 14
+			}
+		}
+	}
 }
 
 
