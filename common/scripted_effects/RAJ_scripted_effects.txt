@@ -51,9 +51,7 @@ RAJ_decrease_revolt_risk_one = {
 		}
 		custom_effect_tooltip = RAJ_revolt_risk_decrease_by_one
 	}
-	else = {
-		add_stability = 0.05
-	}
+	else = { add_stability = 0.05 }
 }
 RAJ_increase_revolt_risk_one = {
 	add_to_variable = {
@@ -62,24 +60,44 @@ RAJ_increase_revolt_risk_one = {
 	}
 	custom_effect_tooltip = RAJ_revolt_risk_increase_by_one
 }
+
+
 RAJ_calculate_food = {
 	set_variable = { RAJ_var_food_production = RAJ_var_amount_of_farms }
 	multiply_variable = { RAJ_var_food_production = RAJ_var_food_pro_farm }
+
 	set_variable = { RAJ_food_production_cost = RAJ_var_amount_of_farms }
 	divide_variable = { RAJ_food_production_cost = -2 }
 
 	set_variable = { RAJ_var_food_exported = RAJ_var_food_production }
 	multiply_variable = { RAJ_var_food_exported = RAJ_var_food_exported_value }
 
-	set_variable = { RAJ_var_net_gain = RAJ_var_food_production }
 	set_variable = { RAJ_var_food_needed = RAJ_var_food_consumption }
 	add_to_variable = { RAJ_var_food_needed = RAJ_var_food_exported }
-	subtract_from_variable = { RAJ_var_net_gain = RAJ_var_food_needed }	
+	set_variable = { RAJ_var_net_gain = RAJ_var_food_production }
+	subtract_from_variable = { RAJ_var_net_gain = RAJ_var_food_needed }
 }
-RAJ_calculate_population_consumption = {
-	set_variable = { RAJ_var_indian_population = ROOT.max_manpower }
 
-	### Food consumed pro person equaling around short of half a kg of rice and wheats a day to survive
+RAJ_calculate_population_consumption = {
+	set_variable = { RAJ_var_indian_population = ROOT.max_manpower_k }
+
+	# ~0.5 kg of grain per person per day, scaled into food units.
 	set_variable = { RAJ_var_food_consumption = RAJ_var_indian_population }
-	divide_variable = { RAJ_var_food_consumption = 4900000000 }
+	divide_variable = { RAJ_var_food_consumption = 4900000 }
+}
+
+# Umbrella refresh. Call this single effect from any focus / event / decision
+# that changes the food economy
+#     RAJ_recalculate_food = yes
+RAJ_recalculate_food = {
+	RAJ_calculate_population_consumption = yes
+	RAJ_calculate_food = yes
+}
+
+#     RAJ_init_food_economy = yes
+RAJ_init_food_economy = {
+	set_variable = { RAJ_var_amount_of_farms = 25 }
+	set_variable = { RAJ_var_food_pro_farm = 0.0036 }
+	set_variable = { RAJ_var_food_exported_value = 0.05 }
+	RAJ_recalculate_food = yes
 }
