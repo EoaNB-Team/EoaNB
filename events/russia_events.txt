@@ -6474,87 +6474,533 @@ country_event = {
 	}
 }
 
-#RUS/JPN: Treaty of Saint Petersburg (1875) 
+##### SAKHALIN / KARAFUTO TERRITORIAL DEMARCATION (rossiya.444-462) #####
+
+# Territorial demarcation (RUS) - 1867 opening
 country_event = {
 	id = rossiya.444
 	title = rossiya.444.t
 	desc = rossiya.444.d
-	#picture = 
-	
+
+	picture = GFX_report_event_generic_negotiation
+
 	fire_only_once = yes
-	is_triggered_only = yes
-	
+	is_triggered_only = yes # Fired by KDE (KDE_bi_yearly_event_fire_1866, 1867.3.31)
+
+	trigger = {
+		TSH = { exists = yes }
+		NOT = { owns_state = 537 }
+		NOT = { has_country_flag = RUS_sakhalin_demarcation_started }
+	}
+
+	immediate = {
+		set_country_flag = RUS_sakhalin_demarcation_started
+		set_variable = { RUS_sakhalin_points = 0 }
+	}
+
 	option = {
-        name = rossiya.444.a
-        ai_chance = { base = 100 }
-        RUS = {
-            transfer_state = 537
-			transfer_state = 555
-			transfer_state = 655 # North Sakhalin
-        }
-        RUS = {
-            country_event = rossiya.445
-        }
-    }
-	option = {
-		name = rossiya.444.b
-		ai_chance = { base = 0 }
-		RUS = {
-			country_event = rossiya.446
-		}
+		name = rossiya.444.a
+		ai_chance = { base = 1 }
+		unlock_decision_tooltip = RUS_decision_increase_sakhalin_garrison
+		hidden_effect = { set_country_flag = RUS_sakhalin_garrison_available }
 	}
 }
 
-#RUS/JPN: Treaty of Saint Petersburg (1875) Accepted
+# Arrival of the Japanese Ambassador in St. Petersburg - 1874
 country_event = {
 	id = rossiya.445
 	title = rossiya.445.t
 	desc = rossiya.445.d
-	#picture = 
-	
+
+	picture = GFX_report_event_jap_embassy_to_south_europe
+
 	fire_only_once = yes
-	is_triggered_only = yes
-	
+	is_triggered_only = yes # Fired by KDE (KDE_bi_yearly_event_fire_1874, 1874.3.1)
+
+	trigger = {
+		TSH = { exists = yes }
+		NOT = { owns_state = 537 }
+	}
+
 	option = {
 		name = rossiya.445.a
-		add_opinion_modifier = {
-			target = TSH
-			modifier = om_medium_opinion_boost_decay 
-		}
-		TSH = {
-			add_opinion_modifier = {
-				target = RUS
-				modifier = om_medium_opinion_boost_decay 
-			}
-		}
+		country_event = { id = rossiya.446 days = 90 }
 	}
 }
 
-#RUS/JPN: Treaty of Saint Petersburg (1875) Refused
+# The position of the Japanese Ambassador
 country_event = {
 	id = rossiya.446
 	title = rossiya.446.t
 	desc = rossiya.446.d
-	#picture = 
-	
-	fire_only_once = yes
+
+	picture = GFX_report_event_generic_negotiation
+
 	is_triggered_only = yes
-	
+
+	# Pursue a peaceful resolution (historical)
 	option = {
 		name = rossiya.446.a
-		add_opinion_modifier = {
-			target = TSH
-			modifier = om_small_opinion_drop_decay 
+		ai_chance = { base = 80 }
+		custom_effect_tooltip = historical_option
+		if = {
+			limit = { owns_state = 463 }
+			country_event = { id = rossiya.448 days = 90 }
+		}
+		country_event = { id = rossiya.447 days = 300 }
+	}
+
+	# Demand an immediate settlement in our favour
+	option = {
+		name = rossiya.446.b
+		ai_chance = { base = 20 }
+		country_event = { id = rossiya.449 days = 7 }
+	}
+}
+
+# Resumption of negotiations
+country_event = {
+	id = rossiya.447
+	title = rossiya.447.t
+	desc = rossiya.447.d
+
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+
+	# Sign the exchange (historical)
+	option = {
+		name = rossiya.447.a
+		ai_chance = {
+			base = 80
+			modifier = { has_country_flag = RUS_sakhalin_aggressive factor = 0.25 }
+		}
+		custom_effect_tooltip = historical_option
+		country_event = { id = rossiya.450 days = 30 }
+	}
+
+	# Press our advantage
+	option = {
+		name = rossiya.447.b
+		ai_chance = {
+			base = 20
+			modifier = { has_country_flag = RUS_sakhalin_aggressive factor = 3 }
+		}
+		add_political_power = -30
+		hidden_effect = { set_country_flag = RUS_sakhalin_militia_available }
+		unlock_decision_tooltip = RUS_decision_prepare_militia
+		TSH = { country_event = { id = JAP_tokugawa_shogunate.311 days = 7 } }
+		activate_decision = RUS_decision_negotiating_efforts
+	}
+}
+
+# The report of the Russian American company
+country_event = {
+	id = rossiya.448
+	title = rossiya.448.t
+	desc = rossiya.448.d
+
+	picture = GFX_report_event_rus_general_admiral
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.448.a
+		add_political_power = 15
+		set_country_flag = RUS_sakhalin_aggressive
+	}
+}
+
+# Treaty of St. Petersburg in 1874
+country_event = {
+	id = rossiya.449
+	title = rossiya.449.t
+	desc = rossiya.449.d
+
+	picture = GFX_report_event_generic_sign_treaty1
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.449.a
+		RUS = {
+			set_state_owner = 537
+			set_state_controller = 537
+			add_state_core = 537
 		}
 		TSH = {
-			add_opinion_modifier = {
-				target = RUS
-				modifier = om_small_opinion_drop_decay
+			set_state_owner = 555
+			set_state_controller = 555
+			add_state_core = 555
+			remove_state_claim = 537
+			if = {
+				limit = { NOT = { has_idea = TSH_idea_sakhalin_fishing } }
+				add_ideas = TSH_idea_sakhalin_fishing
 			}
+		}
+		QNG = {
+			remove_state_claim = 537
+			remove_state_claim = 655
+		}
+		537 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		655 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		408 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1375 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		560 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		562 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1374 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1372 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		637 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		country_event = { id = rossiya.462 days = 3650 }
+	}
+}
+
+# Treaty of St. Petersburg in 1875
+country_event = {
+	id = rossiya.450
+	title = rossiya.450.t
+	desc = rossiya.450.d
+
+	picture = GFX_report_event_generic_sign_treaty1
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.450.a
+		RUS = {
+			set_state_owner = 537
+			set_state_controller = 537
+			add_state_core = 537
+		}
+		TSH = {
+			set_state_owner = 555
+			set_state_controller = 555
+			add_state_core = 555
+			remove_state_claim = 537
+			if = {
+				limit = { NOT = { has_idea = TSH_idea_sakhalin_fishing } }
+				add_ideas = TSH_idea_sakhalin_fishing
+			}
+		}
+		QNG = {
+			remove_state_claim = 537
+			remove_state_claim = 655
+		}
+		537 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		655 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		408 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1375 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		560 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		562 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1374 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1372 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		637 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		country_event = { id = rossiya.462 days = 3650 }
+	}
+}
+
+# The Japanese insist on an exchange
+country_event = {
+	id = rossiya.451
+	title = rossiya.451.t
+	desc = rossiya.451.d
+
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.451.a
+		unlock_decision_tooltip = RUS_decision_occupy_south_sakhalin
+		hidden_effect = { set_country_flag = RUS_sakhalin_occupation_available }
+	}
+}
+
+# The Japanese response
+country_event = {
+	id = rossiya.452
+	title = rossiya.452.t
+	desc = rossiya.452.d
+
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.452.a
+		country_event = { id = rossiya.459 days = 7 }
+	}
+}
+
+# Japanese persist
+country_event = {
+	id = rossiya.453
+	title = rossiya.453.t
+	desc = rossiya.453.d
+
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.453.a
+		add_days_mission_timeout = {
+			mission = RUS_mission_sea_of_japan_demonstration
+			days = 1825
 		}
 	}
 }
 
+# The intervention failed
+country_event = {
+	id = rossiya.454
+	title = rossiya.454.t
+	desc = rossiya.454.d
+
+	picture = GFX_report_event_rus_general_admiral
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.454.a
+		add_days_mission_timeout = {
+			mission = RUS_mission_sea_of_japan_demonstration
+			days = 1825
+		}
+	}
+}
+
+# Japanese retaliatory demonstration
+country_event = {
+	id = rossiya.455
+	title = rossiya.455.t
+	desc = rossiya.455.d
+
+	picture = GFX_report_event_jap_black_ships
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.455.a
+		add_political_power = -50
+		add_war_support = -0.05
+		country_event = { id = rossiya.461 days = 7 }
+	}
+}
+
+# The demonstration failed
+country_event = {
+	id = rossiya.456
+	title = rossiya.456.t
+	desc = rossiya.456.d
+
+	picture = GFX_report_event_rus_general_admiral
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.456.a
+		country_event = { id = rossiya.461 days = 7 }
+	}
+}
+
+# A new side of the negotiations?
+country_event = {
+	id = rossiya.457
+	title = rossiya.457.t
+	desc = rossiya.457.d
+
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+
+	# Reject American involvement
+	option = {
+		name = rossiya.457.a
+		ai_chance = {
+			base = 20
+			modifier = { has_country_flag = RUS_sakhalin_aggressive factor = 3 }
+		}
+		USA = { country_event = { id = usa.401 days = 7 } }
+	}
+
+	# Offer the status quo and economic compensation
+	option = {
+		name = rossiya.457.b
+		ai_chance = { base = 50 }
+		trigger = { controls_state = 537 }
+		USA = { country_event = { id = usa.402 days = 7 } }
+	}
+
+	# Offer further concessions
+	option = {
+		name = rossiya.457.c
+		ai_chance = { base = 50 }
+		trigger = { NOT = { controls_state = 537 } }
+		TSH = { country_event = { id = JAP_tokugawa_shogunate.318 days = 7 } }
+	}
+}
+
+# Response from Washington
+country_event = {
+	id = rossiya.458
+	title = rossiya.458.t
+	desc = rossiya.458.d
+
+	picture = GFX_report_event_usa_capitol
+
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.458.a
+		USA = { country_event = { id = usa.403 days = 7 } }
+	}
+}
+
+# Vladivostok Treaty (Russian victory)
+country_event = {
+	id = rossiya.459
+	title = rossiya.459.t
+	desc = rossiya.459.d
+
+	picture = GFX_report_event_generic_sign_treaty2
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.459.a
+		RUS = {
+			set_state_owner = 537
+			set_state_controller = 537
+			add_state_core = 537
+		}
+		TSH = {
+			remove_state_claim = 537
+			remove_state_claim = 555
+		}
+		QNG = {
+			remove_state_claim = 537
+			remove_state_claim = 655
+		}
+		set_temp_variable = { money_to_gain = -2 }
+		add_money_with_tooltip_effect = yes
+		TSH = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes
+			add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_unfair_treaty }
+		}
+	}
+}
+
+# Vladivostok Treaty (Japanese and American victory)
+country_event = {
+	id = rossiya.460
+	title = rossiya.460.t
+	desc = rossiya.460.d
+
+	picture = GFX_report_event_generic_sign_treaty2
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.460.a
+		RUS = {
+			set_state_owner = 537
+			set_state_controller = 537
+			add_state_core = 537
+		}
+		TSH = {
+			remove_state_claim = 537
+			remove_state_claim = 555
+		}
+		QNG = {
+			remove_state_claim = 537
+			remove_state_claim = 655
+		}
+		set_temp_variable = { money_to_gain = -7 }
+		add_money_with_tooltip_effect = yes
+		TSH = {
+			set_temp_variable = { money_to_gain = 7 }
+			add_money_with_tooltip_effect = yes
+			add_opinion_modifier = { target = RUS modifier = eoanb_om_RUS_unfair_treaty }
+			add_opinion_modifier = { target = USA modifier = eoanb_om_USA_unfair_treaty }
+		}
+	}
+}
+
+# Vladivostok Treaty (territorial exchange)
+country_event = {
+	id = rossiya.461
+	title = rossiya.461.t
+	desc = rossiya.461.d
+
+	picture = GFX_report_event_generic_sign_treaty3
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.461.a
+		RUS = {
+			set_state_owner = 537
+			set_state_controller = 537
+			add_state_core = 537
+		}
+		TSH = {
+			set_state_owner = 555
+			set_state_controller = 555
+			add_state_core = 555
+			remove_state_claim = 537
+			if = {
+				limit = { NOT = { has_idea = TSH_idea_sakhalin_fishing } }
+				add_ideas = TSH_idea_sakhalin_fishing
+			}
+		}
+		QNG = {
+			remove_state_claim = 537
+			remove_state_claim = 655
+		}
+		537 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		655 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		408 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1375 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		560 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		562 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1374 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1372 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		637 = { add_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		country_event = { id = rossiya.462 days = 3650 }
+		set_temp_variable = { money_to_gain = -2 }
+		add_money_with_tooltip_effect = yes
+		TSH = {
+			set_temp_variable = { money_to_gain = -2 }
+			add_money_with_tooltip_effect = yes
+		}
+	}
+}
+
+# Hidden cleanup - removes the Japanese fishing rights after ten years
+country_event = {
+	id = rossiya.462
+	hidden = yes
+	is_triggered_only = yes
+
+	immediate = {
+		537 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		655 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		408 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1375 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		560 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		562 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1374 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		1372 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+		637 = { remove_dynamic_modifier = { modifier = dynmod_RUS_japanese_fishing } }
+	}
+}
 
 ##### ECONOMY AND TRADE EVENTS (rossiya.501-700) #####
 
