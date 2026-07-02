@@ -1,285 +1,258 @@
 eoanb_category_parliament = {
-	parliament_small_lobby_effort = {
-		icon = generic_political_discourse
-		available = {
-			OR = {
-				check_variable = { senators_support < senators_total }
-				check_variable = { representatives_support < representatives_total }
+	############################
+	##### Normal Decisions #####
+	############################
+
+	#Give Tax Cuts
+	parliament_give_tax_cuts = {
+
+		icon = GFX_decision_dynamite
+
+		available = { has_thirty_percent_government_support = yes }
+		fire_only_once = no
+		days_remove = 0
+		cost = 35
+
+		complete_effect = {
+			add_timed_idea = {
+				idea = parliament_idea_tax_cuts
+				days = 90
 			}
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
-			}
-			OR = {
-				political_power_daily > 0.3
-				has_political_power > 10
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_give_tax_cuts }
+				parliament_hide_decision = yes
+				country_event = { id = parliament_event.900 days = 180 }
 			}
 		}
 
 		ai_will_do = {
-			factor = 10
-			modifier = {
-				congress_medium_support_trigger = yes
-				factor = 0.5
+			base = 200
+		}
+	}
+
+	#Minor Research Grant
+	parliament_minor_research_grant = {
+
+		icon = GFX_decision_dynamite
+
+		available = { has_twenty_five_percent_government_support = yes }
+		fire_only_once = no
+		days_remove = 0
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 3.5 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+
+		complete_effect = {
+			#set_temp_variable = { money_to_gain = -3.5 }
+			#add_money_with_tooltip_effect = yes
+			add_timed_idea = {
+				idea = parliament_idea_minor_research_grant
+				days = 120
 			}
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0.5
-			}
-			modifier = {
-				congress_high_support_trigger = yes
-				factor = 0
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_minor_research_grant }
+				parliament_hide_decision = yes
+				country_event = { id = parliament_event.901 days = 150 }
 			}
 		}
+		
+		ai_will_do = {
+			base = 200
+		}
+	}
 
+	#Major Research Grant
+	parliament_major_research_grant = {
+
+		icon = GFX_decision_dynamite
+
+		available = { 
+			has_thirty_five_percent_government_support = yes
+			has_stability > 0.50
+		} 
+		fire_only_once = no
+		days_remove = 0
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 5 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+
+		complete_effect = {
+			#set_temp_variable = { money_to_gain = -5 }
+			#add_money_with_tooltip_effect = yes
+			add_timed_idea = {
+				idea = parliament_idea_major_research_grant
+				days = 90
+			}
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_major_research_grant }
+				parliament_hide_decision = yes
+				country_event = { id = parliament_event.902 days = 150 }
+			}
+		}
+		
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Enact a Stricter Budget
+	parliament_enact_a_stricter_budget = {
+
+		icon = GFX_decision_dynamite
+
+		available = { 
+			has_fourty_percent_government_support = yes
+			has_stability > 0.40
+			set_temp_variable = { amount_of_money_to_check = 10 }
+			has_less_than_specific_amount_of_money = yes
+			NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+			NOT = { has_idea = parliament_idea_a_strict_budget }
+		} 
+
+		fire_only_once = no
+		days_remove = 50
+		#cost = 50
+
+		complete_effect = { set_country_flag = { flag = parliament_decision_category_1_ongoing days = 50 value = 1 } }
+
+		remove_effect = {
+			add_timed_idea = {
+				idea = parliament_idea_a_strict_budget
+				days = 180
+			}
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_enact_a_stricter_budget }
+				parliament_hide_decision = yes
+				country_event = { id = parliament_event.903 days = 180 }
+			}
+		}
+		
+		ai_will_do = {
+			base = 200
+		}
+	}
+
+	#Increase Government Legitimacy
+	parliament_increase_government_legitimacy = {
+
+		icon = GFX_decision_dynamite
+
+		available = { 
+			has_thirty_percent_government_support = yes
+			check_variable = { political_legitimacy < 0.60 }
+			NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+		} 
+		
+		fire_only_once = no
 		days_remove = 30
-		days_re_enable = 20
-		cost = 0
+		#cost = 35
 
-		modifier = {
-			political_power_gain = -0.3
-		}
+		modifier = { political_power_factor = -0.03 }
 
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
+		complete_effect = { set_country_flag = { flag = parliament_decision_category_1_ongoing days = 30 value = 1 } }
+
 		remove_effect = {
-			#parliament_congress_small_support = yes
-			clr_country_flag = Parliament_decision_active_flag
-
+			increase_legitimacy_by_five = yes
 			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_small_lobby_effort }
+				set_temp_variable = { parliament_decision_token = token:parliament_increase_government_legitimacy }
 				parliament_hide_decision = yes
-				country_event = { id = parliament_event.1 days = 20}
-			}
-		}
-	}
-	parliament_medium_lobby_effort = {
-		icon = generic_political_discourse
-		available = {
-			OR = {
-				check_variable = { senators_support < senators_total }
-				check_variable = { representatives_support < representatives_total }
-			}
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
-			}
-			OR = {
-				political_power_daily > 0.75
-				has_political_power > 35
+				country_event = { id = parliament_event.904 days = 65 }
 			}
 		}
 		
 		ai_will_do = {
-			factor = 10
-			modifier = {
-				congress_medium_support_trigger = yes
-				factor = 0.5
-			}
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0.5
-			}
-			modifier = {
-				congress_high_support_trigger = yes
-				factor = 0
-			}
-		}
-
-		cost = 0
-		days_remove = 45
-		days_re_enable = 20
-
-		modifier = {
-			political_power_gain = -0.75
-		}
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
-		remove_effect = {
-			#parliament_congress_medium_support = yes
-			clr_country_flag = Parliament_decision_active_flag
-
-			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_medium_lobby_effort }
-				parliament_hide_decision = yes
-				country_event = { id = parliament_event.2 days = 20}
-			}
+			base = 200
 		}
 	}
-	parliament_special_measures = {
-		icon = ger_mefo_bills
-		available = {
-			OR = {
-				check_variable = { senators_support < senators_total }
-				check_variable = { representatives_support < representatives_total }
-			}
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
-			}
-		}
+
+	#Make a Speech in Parliament
+	parliament_make_a_speech_in_parliament = {
+
+		icon = GFX_decision_dynamite
+
+		available = { 
+			PS_pol_positive = yes
+			check_variable = { political_legitimacy > 0.59 }
+			NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+		} 
 		
-		ai_will_do = {
-			factor = 100
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0
-			}
-		}
+		fire_only_once = no
+		days_remove = 10
+		#cost = 15
 
-		days_re_enable = 90
-		cost = 0
+		complete_effect = { set_country_flag = { flag = parliament_decision_category_1_ongoing days = 10 value = 1 } }
 
-		complete_effect = {
+		remove_effect = {
 			set_temp_variable = { sog_to_gain = 0.05 }
-			add_tra_con_sog_with_tooltip_effect = yes
-		}
-	}
-	parliament_pay_farm_subsidies = {
-		icon = ger_mefo_bills
-		available = {
-			OR = {
-				check_variable = { senators_support < senators_total }
-				check_variable = { representatives_support < representatives_total }
-			}
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
+			add_sog_to_all_with_tooltip_effect = yes
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_make_a_speech_in_parliament }
+				parliament_hide_decision = yes
+				country_event = { id = parliament_event.905 days = 15 }
 			}
 		}
 		
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0
-			}
-		}
-		cost = 0
-		days_remove = 90
-		days_re_enable = 20
-
-		modifier = { consumer_goods_factor = 0.05 }
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
-		remove_effect = {
-			#parliament_congress_small_support = yes
-			clr_country_flag = Parliament_decision_active_flag
-
-			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_pay_farm_subsidies }
-				parliament_hide_decision = yes
-				country_event = { id = parliament_event.4 days = 20}
-			}
+			base = 200
 		}
 	}
-	parliament_give_tax_break = {
-		icon = ger_mefo_bills
-		available = {
-			OR = {
-				check_variable = { senators_support < senators_total }
-				check_variable = { representatives_support < representatives_total }
-			}
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
+
+	#Negotiate with the Breakaway Party
+	parliament_negotiate_with_the_breakaway_party = {
+
+		icon = GFX_decision_dynamite
+
+		visible = {
+			has_active_mission = parliament_coalition_breakaway_mission
+			NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+		}
+		
+		fire_only_once = no
+		days_remove = 20
+		#cost = 30
+
+		complete_effect = { set_country_flag = { flag = parliament_decision_category_1_ongoing days = 20 value = 1 } }
+
+		remove_effect = { 
+			country_event = { id = parliament_event.1 }
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_negotiate_with_the_breakaway_party }
+				parliament_hide_decision = yes
 			}
 		}
 		
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0
-			}
-		}
-		cost = 0
-		days_remove = 90
-		days_re_enable = 20
-
-		modifier = { consumer_goods_factor = 0.05 }
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
-		remove_effect = {
-			#parliament_congress_small_support = yes
-			clr_country_flag = Parliament_decision_active_flag
-			
-			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_give_tax_break }
-				parliament_hide_decision = yes
-				country_event = { id = parliament_event.6 days = 20}
-			}
+			base = 200
 		}
 	}
-	parliament_amend_the_budget = {
-		icon = ger_mefo_bills
-		available = {
-			congress_medium_support_trigger = yes
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
+
+	#Invite <insert_party_name> to our coalition
+	parliament_invite_party_to_our_coalition = {
+
+		icon = GFX_decision_dynamite
+
+		available = { NOT = { has_country_flag = parliament_decision_category_1_ongoing } }
+		visible = { has_opposition_or_neutral_party_over_seventy_support = yes }
+		
+		fire_only_once = no
+		days_remove = 20
+		#cost = 40
+
+		complete_effect = { set_country_flag = { flag = parliament_decision_category_1_ongoing days = 20 value = 1 } }
+
+		remove_effect = {
+			hidden_effect = {
+				set_temp_variable = { parliament_decision_token = token:parliament_invite_party_to_our_coalition }
+				parliament_hide_decision = yes
 			}
 		}
 		
 		ai_will_do = {
-			factor = 1
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0
-			}
-		}
-
-		cost = 0
-		days_remove = 90
-		days_re_enable = 275
-
-		modifier = { consumer_goods_factor = -0.10 }
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
-		remove_effect = {
-			#parliament_congress_medium_opposition = yes
-			clr_country_flag = Parliament_decision_active_flag
-
-			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_amend_the_budget }
-				parliament_hide_decision = yes
-				country_event = { id = parliament_event.5 days = 275}
-			}
-		}
-	}
-	parliament_research_grants = {
-		icon = ger_mefo_bills
-		available = {
-			congress_medium_support_trigger = yes
-			NOT = {
-				has_country_flag = Parliament_decision_active_flag
-			}
-		}
-
-		ai_will_do = {
-			factor = 1
-			modifier = {
-				congress_low_support_trigger = yes
-				factor = 0
-			}
-		}
-
-		cost = 0
-		days_remove = 90
-		days_re_enable = 275
-
-		modifier = { research_speed_factor = 0.08 }
-		complete_effect = {
-			set_country_flag = Parliament_decision_active_flag
-		}
-		remove_effect = {
-			#parliament_congress_medium_opposition = yes
-			clr_country_flag = Parliament_decision_active_flag
-
-			hidden_effect = {
-				set_temp_variable = { parliament_decision_token = token:parliament_research_grants }
-				parliament_hide_decision = yes
-				country_event = { id = parliament_event.7 days = 275}
-			}
+			base = 200
 		}
 	}
 }

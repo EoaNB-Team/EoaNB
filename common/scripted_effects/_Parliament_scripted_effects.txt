@@ -11,6 +11,7 @@
 	parliament_propose_decision = { 
 		custom_effect_tooltip = parliament_propose_decision_tt
 		set_variable = { lp_cost@var:parliament_decision_token = parliament_decision_lp_cost }
+		set_variable = { money_cost@var:parliament_decision_token = parliament_decision_money_cost }
 		set_variable = { icon@var:parliament_decision_token = parliament_decision_icon }
 		if = {
 			limit = { check_variable = { parliament_decision_category = 1 } }
@@ -20,12 +21,30 @@
 			}
 			set_variable = { clicked@var:parliament_decision_token = 0 }
 		}
+		if = {
+			limit = { check_variable = { parliament_decision_category = 2 } } # -> voting decision
+			add_to_array = {
+				array = parliament_decision_array_2
+				value = parliament_decision_token
+			}
+			set_variable = { clicked@var:parliament_decision_token = 0 }
+		}
 	}
 	parliament_hide_decision = { 
 		set_variable = { clicked@var:parliament_decision_token = 0 }
-		remove_from_array = {
-			array = parliament_decision_array_1
-			value = parliament_decision_token
+		if = {
+			limit = { is_in_array = { parliament_decision_array_1 = parliament_decision_token} }
+			remove_from_array = {
+				array = parliament_decision_array_1
+				value = parliament_decision_token
+			}
+		}
+		if = {
+			limit = { is_in_array = { parliament_decision_array_2 = parliament_decision_token} }
+			remove_from_array = {
+				array = parliament_decision_array_2
+				value = parliament_decision_token
+			}
 		}
 	}
 
@@ -33,18 +52,23 @@
 	parliament_enact_decision = {
 		# custom_effect_tooltip = mne_enact_decision_tt
 
-		custom_effect_tooltip = AUS_multinational_empire_enact_decision_lp_cost_tt
-		set_temp_variable = { lp_cost = lp_cost@var:v }
-		multiply_temp_variable = { lp_cost = -1 }
-		log = "[?lp_cost]"
-		add_political_power = var:lp_cost
+		if = {
+			limit = { check_variable = { lp_cost@var:v > 0 } }
+			custom_effect_tooltip = AUS_multinational_empire_enact_decision_lp_cost_tt
+			set_temp_variable = { lp_cost = lp_cost@var:v }
+			multiply_temp_variable = { lp_cost = -1 }
+			log = "[?lp_cost]"
+			add_political_power = var:lp_cost
+		}
 
 		if = {
-			limit = { check_variable = { debt_cost@var:v > 0 } }
+			limit = { check_variable = { money_cost@var:v > 0 } }
 			custom_effect_tooltip = RUS_peasant_reform_enact_decision_debt_cost_tt
-			# add_to_variable = { debt_level = debt_cost@var:v }
-			# debt_level_checks_effect = yes
-			# debt_related_country_content_effects = yes
+			set_temp_variable = { money_cost = mone_costy@var:v }
+			multiply_temp_variable = { money_cost = -1 }
+			log = "[?money_cost]"
+			set_temp_variable = { money_to_gain = var:money_cost }
+			add_money_with_tooltip_effect = yes
 		}
 
 		set_variable = { clicked@var:v = 1 }
@@ -52,32 +76,36 @@
 		#### DECISION EFFECTS
 
 		if = {
-			limit = { check_variable = { v = token:parliament_small_lobby_effort } }
-			activate_decision = parliament_small_lobby_effort
+			limit = { check_variable = { v = token:parliament_give_tax_cuts } }
+			activate_decision = parliament_give_tax_cuts
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_medium_lobby_effort } }
-			activate_decision = parliament_medium_lobby_effort 
+			limit = { check_variable = { v = token:parliament_minor_research_grant } }
+			activate_decision = parliament_minor_research_grant
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_special_measures } }
-			activate_decision = parliament_special_measures
+			limit = { check_variable = { v = token:parliament_major_research_grant } }
+			activate_decision = parliament_major_research_grant
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_pay_farm_subsidies } }
-			activate_decision = parliament_pay_farm_subsidies
+			limit = { check_variable = { v = token:parliament_enact_a_stricter_budget } }
+			activate_decision = parliament_enact_a_stricter_budget
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_give_tax_break } }
-			activate_decision = parliament_give_tax_break
+			limit = { check_variable = { v = token:parliament_increase_government_legitimacy } }
+			activate_decision = parliament_increase_government_legitimacy
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_amend_the_budget } }
-			activate_decision = parliament_amend_the_budget
+			limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament } }
+			activate_decision = parliament_make_a_speech_in_parliament
 		}
 		if = {
-			limit = { check_variable = { v = token:parliament_research_grants } }
-			activate_decision = parliament_research_grants
+			limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
+			activate_decision = parliament_negotiate_with_the_breakaway_party
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_party_to_our_coalition } }
+			activate_decision = parliament_invite_party_to_our_coalition
 		}
 	}
 
