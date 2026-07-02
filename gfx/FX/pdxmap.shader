@@ -125,9 +125,9 @@ PixelShader =
 			MagFilter = "Linear"
 			MinFilter = "Linear"
 			MipFilter = "Linear"
-			AddressU = "Wrap"
-			AddressV = "Wrap"
-			Type = "Shadow"
+			AddressU = "Clamp"
+    		AddressV = "Clamp"
+    		Type = "Shadow"
 		}
 		MudDiffuseGloss =
 		{
@@ -188,20 +188,20 @@ VertexShader =
 			
 			float2 pos = VertexIn.position.xy * QuadOffset_Scale_IsDetail.z + QuadOffset_Scale_IsDetail.xy;
 		
-			float vSatPosZ = saturate( VertexIn.position.z ); // VertexIn.position.z can have a value [0-4], if != 0 then we shall displace vertex
-			float vUseAltHeight = vSatPosZ * vSnap[ int( VertexIn.position.z - 1.0f ) ]; // the snap values are set to either 0 or 1 before each draw call to enable/disable snapping due to LOD
+			int vSnapIndex = int( max( 0.0f, VertexIn.position.z - 1.0f ) );
+			float vSatPosZ      = saturate( VertexIn.position.z );
+			float vUseAltHeight = vSatPosZ * vSnap[ vSnapIndex ];
 		
 			pos += vUseAltHeight 
 				* float2( 1.0f - VertexIn.position.w, VertexIn.position.w ) // VertexIn.position.w determines offset direction
 				* QuadOffset_Scale_IsDetail.z; // and of course we need to scale it to the same LOD
 		
-			VertexOut.uv = float2( ( pos.x + 0.5f ) / MAP_SIZE_X,  ( pos.y + 0.5f ) / MAP_SIZE_Y );
-			VertexOut.uv2.x = ( pos.x + 0.5f ) / MAP_SIZE_X;
-			VertexOut.uv2.y = ( pos.y + 0.5f - MAP_SIZE_Y ) / -MAP_SIZE_Y;	
-			VertexOut.uv2.xy *= float2( MAP_POW2_X, MAP_POW2_Y ); //POW2
-		
-			float vHeight = VertexIn.height.x * ( 1.0f - vUseAltHeight ) + VertexIn.height.y * vUseAltHeight;
-			vHeight *= 0.01f;
+			static const float2 MAP_SIZE_RCP = float2( 1.0f / MAP_SIZE_X, 1.0f / MAP_SIZE_Y );
+			VertexOut.uv  = ( float2( pos.x, pos.y ) + 0.5f ) * MAP_SIZE_RCP;
+			VertexOut.uv2 = float2( VertexOut.uv.x * MAP_POW2_X,
+                        ( 1.0f - VertexOut.uv.y ) * MAP_POW2_Y );
+
+			float vHeight = lerp( float(VertexIn.height.x), float(VertexIn.height.y), vUseAltHeight ) * 0.01f;
 		
 			VertexOut.prepos = float3( pos.x, vHeight, pos.y );
 			VertexOut.position = mul( ViewProjectionMatrix, float4( VertexOut.prepos, 1.0f ) );
@@ -209,13 +209,13 @@ VertexShader =
 			VertexOut.vShadowProj = mul( ShadowMapTextureMatrix, float4( VertexOut.prepos, 1.0f ) );
 			
 			// Output the screen-space texture coordinates
-			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
-			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
+			float fHalfW = VertexOut.position.w * 0.5f;
+			VertexOut.vScreenCoord.x  = VertexOut.position.x * 0.5f + fHalfW;
+			VertexOut.vScreenCoord.y  = fHalfW - VertexOut.position.y * 0.5f;
 		#ifdef PDX_OPENGL
 			VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
 		#endif	
-			VertexOut.vScreenCoord.z = VertexOut.position.w;
-			VertexOut.vScreenCoord.w = VertexOut.position.w;	
+			VertexOut.vScreenCoord.zw = VertexOut.position.ww;
 		
 			return VertexOut;
 		}
@@ -231,12 +231,12 @@ PixelShader =
 			//return float4( 0, 1.0f, 0, 1.0f );
 			//clip( Input.prepos.y + TERRAIN_WATER_CLIP_HEIGHT - WATER_HEIGHT );
 		
-			float2 vOffsets = float2( -0.5f / MAP_SIZE_X, -0.5f / MAP_SIZE_Y );
+			static const float2 vOffsets = float2( -0.5f / MAP_SIZE_X, -0.5f / MAP_SIZE_Y );
 			
 			float vAllSame;
 			float4 IndexU;
 			float4 IndexV;
-			calculate_map_tex_index( tex2D( TerrainIDMap, Input.uv + vOffsets.xy ), IndexU, IndexV, vAllSame );
+			calculate_map_tex_index( tex2D( TerrainIDMap, Input.uv + vOffsets ), IndexU, IndexV, vAllSame );
 						
 			float2 vTileRepeat = Input.uv2 * TERRAIN_TILE_FREQ;
 			vTileRepeat.x *= MAP_SIZE_X/MAP_SIZE_Y;
@@ -338,12 +338,12 @@ PixelShader =
 				float SpecRemapped = 0.1;
 			#else
 				float SpecRemapped = vSpec * vSpec * 0.4;
-			#endif // NO_SHADER_TEXTURE_LOD			
+			#endif // NO_SHADER_TEXTURE_LOD
 
-			float MetalnessRemapped = 0.0;// - (1.0 - vProperties.b) * (1.0 - vProperties.b);
-			lightingProperties._Diffuse = MetalnessToDiffuse(MetalnessRemapped, diffuse.rgb);
-			lightingProperties._Glossiness = vGlossiness;
-			lightingProperties._SpecularColor = MetalnessToSpec(MetalnessRemapped, diffuse.rgb, SpecRemapped);
+			// TODO: wire up MetalnessRemapped
+			lightingProperties._Diffuse       = diffuse.rgb;      // MetalnessToDiffuse(0, x) == x
+			lightingProperties._Glossiness	  = vGlossiness;
+			lightingProperties._SpecularColor = vec3( SpecRemapped ); // MetalnessToSpec(0, x, s) == s
 		#else
 			lightingProperties._Diffuse = diffuse.rgb;
 			lightingProperties._Glossiness = vGlossiness;
@@ -364,12 +364,9 @@ PixelShader =
 		#endif
 			
 		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 vEyeDir = -lightingProperties._ToCameraDir;
-			//float3 reflection = reflect( vEyeDir, lightingProperties._Normal );
-			//float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-			
 			float3 reflectiveColor = FAKE_CUBEMAP_COLOR; //texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
+			specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor,
+    			lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
 		#endif
 			
 			float3 vOut = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
@@ -409,22 +406,15 @@ PixelShader =
 		{
 			clip( WATER_HEIGHT - Input.prepos.y + TERRAIN_WATER_CLIP_HEIGHT );
 		
-			float3 normal = normalize( tex2D( HeightNormal,Input.uv2 ).rbg - 0.5f );
+			float3 normal = normalize( tex2D( HeightNormal, Input.uv2 ).rbg - 0.5f );
 			float3 diffuse = tex2D( TerrainDiffuse, Input.uv2 * float2(( MAP_SIZE_X / 32.0f ), ( MAP_SIZE_Y / 32.0f ) ) ).rgb;
-
-			// TOMASZ: SnowTexture texture slot here was some kind of normalmap that is obsolete 
-			//         and makes no visual effect, so I've removed it.
-			//float3 offset = tex2D( SnowTexture, Input.uv2 * float2(( MAP_SIZE_X / 32.0f ), ( MAP_SIZE_Y / 32.0f ) ) ).rgb;
-			//offset -= vec3(0.5);
 			
 			float3 waterColorTint = tex2D( TerrainColorTint, Input.uv2 /*+ offset.xy * WATER_RIPPLE_EFFECT*/ ).rgb;		
 			waterColorTint *= WATER_COLOR_LIGHTNESS;
 			
-			float vMin = 5.3f; //5.3f; Depthfog ish for bottom
-			float vMax = 13.0f; //30.0f; 
-
-			//float vWaterAlpha = saturate( Input.prepos.y * Input.prepos.y * Input.prepos.y * WATER_HEIGHT_RECP_SQUARED * WATER_HEIGHT_RECP  );
-			float vWaterAlpha = saturate(( Input.prepos.y - vMin ) / ( vMax - vMin ) );
+			static const float WATER_DEPTH_MIN     = 5.3f;
+			static const float INV_WATER_DEPTH_RANGE = 1.0f / ( 13.0f - 5.3f ); // 1/7.7
+			float vWaterAlpha = saturate( ( Input.prepos.y - WATER_DEPTH_MIN ) * INV_WATER_DEPTH_RANGE );
 		
 			float vGlossiness = MAP_SPECULAR_WIDTH;
 		

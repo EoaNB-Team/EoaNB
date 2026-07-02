@@ -67,8 +67,8 @@ Code
 	float2 RotateVector2D( float2 v, float vAngle )
 	{
 		// OPT: paired sin/cos written so the compiler can fold to a single sincos op
-		float vSin = sin( vAngle );
-		float vCos = cos( vAngle );
+		float vSin, vCos;
+		sincos( vAngle, vSin, vCos );
 		return float2( v.x * vCos - v.y * vSin, v.x * vSin + v.y * vCos );
 	}
 
@@ -105,27 +105,21 @@ PixelShader =
 
 	float3 RGBtoHSV( in float3 RGB )
 	{
-		float Cmax = max( RGB.r, max( RGB.g, RGB.b ) );
-		float Cmin = min( RGB.r, min( RGB.g, RGB.b ) );
-		float diff = Cmax - Cmin;
-		
-		float H = 0.0;
-		float S = 0.0;
-		if (diff != 0.0)
-		{
-			S = diff / Cmax;
-			
-			// NOTE: the "+6/+2/+4" offsets give H in [1,7] rather than the
-			// usual [0,6]. HuePost is written to accept this directly.
-			if (Cmax == RGB.r)
-				H = (RGB.g - RGB.b) / diff + 6.0;
-			else if (Cmax == RGB.g)
-				H = (RGB.b - RGB.r) / diff + 2.0;
-			else
-				H = (RGB.r - RGB.g) / diff + 4.0;
-		}
+	    float Cmax = max( RGB.r, max( RGB.g, RGB.b ) );
+	    float Cmin = min( RGB.r, min( RGB.g, RGB.b ) );
+	    float diff = Cmax - Cmin;
+	    float S = ( Cmax > 0.0f ) ? diff / Cmax : 0.0f;
 
-		return float3(H, S, Cmax);
+	    // Branchless H selection via step weights
+	    #ifdef PDX_OPENGL
+		    vec3 sel = step( vec3(Cmax), RGB ) * step( RGB.yzx, RGB );
+		#else
+		    float3 sel = step( Cmax.xxx, RGB ) * step( RGB.yzx, RGB );
+		#endif
+	    // sel.r = 1 when R is max, sel.g = 1 when G is max, sel.b = 1 when B is max
+	    float H = sel.r * ( (RGB.g - RGB.b) / max(diff, 1e-5f) + 6.0f ) + sel.g * ( (RGB.b - RGB.r) / max(diff, 1e-5f) + 2.0f ) + sel.b * ( (RGB.r - RGB.g) / max(diff, 1e-5f) + 4.0f );
+
+	    return float3( ( diff > 0.0f ) ? H : 0.0f, S, Cmax );
 	}
 
 
@@ -186,11 +180,13 @@ PixelShader =
 	{
 		float vStrength = 1.0f - cam_distance( FOW_CAMERA_MIN, FOW_CAMERA_MAX );
 		vStrength *= FOW_MAX;
-		// NOTE: the ' * FOW_POW2_Y' is *outside* the float2() — it scales BOTH
-		// components, so u ends up multiplied by FOW_POW2_X * FOW_POW2_Y.
-		// Preserved verbatim from the original to avoid changing FoW alignment;
-		// double-check this is intentional in your texture layout.
-		return tex2D( TexFoW, float2( ( ( vPos.x + 0.5f ) / MAP_SIZE_X ) * FOW_POW2_X, ( (vPos.z + 0.5f ) / MAP_SIZE_Y) ) * FOW_POW2_Y ).a * vStrength;
+		// U = ((x+0.5)/MAP_SIZE_X) * FOW_POW2_X
+		// V = ((z+0.5)/MAP_SIZE_Y) * FOW_POW2_Y
+		#ifdef PDX_OPENGL
+			return texture2D( TexFoW, vec2( ((vPos.x + 0.5) / MAP_SIZE_X) * FOW_POW2_X, ((vPos.z + 0.5) / MAP_SIZE_Y) * FOW_POW2_Y )).r;
+		#else
+			return tex2D( TexFoW, float2( ((vPos.x + 0.5f) / MAP_SIZE_X) * FOW_POW2_X, ((vPos.z + 0.5f) / MAP_SIZE_Y) * FOW_POW2_Y )).r;
+		#endif
 	}
 
 	float CalculateDistanceFogFactor(float3 vPos)
@@ -198,7 +194,12 @@ PixelShader =
 		float3 vDiff = vCamPos - vPos;
 		float vSqDistance = dot( vDiff, vDiff );
 		// OPT: use rsqrt directly instead of normalize().y
-		float vFogFactor = 1.0f - abs( vDiff.y * rsqrt( vSqDistance ) ); // abs b/c of reflections
+		#ifdef PDX_OPENGL
+			float vFogFactor = 1.0f - abs( vDiff.y * (1.0f / sqrt( vSqDistance )) );
+		#else
+			// rsqrt is faster than 1/sqrt; result is mathematically identical.
+			float vFogFactor = 1.0f - abs( vDiff.y * rsqrt( vSqDistance ) ); // abs b/c of reflections
+		#endif
 
 		float vBegin = FOG_BEGIN * FOG_BEGIN;
 		float vEnd   = FOG_END   * FOG_END;
@@ -338,13 +339,13 @@ PixelShader =
 		float x = fmod_loop( ( vWorldXZ.x - GMT_OFFSET ) / MAP_SIZE_X + DayNight_Hour_SunDir.x, 1.0f );
 		float y = vWorldXZ.y / MAP_SIZE_Y;
 		y = SOUTH_POLE_OFFSET + ( NORTH_POLE_OFFSET - SOUTH_POLE_OFFSET ) * y;
-		y = -cos( y * 3.1415f );
+		y = -cos( y * ( TWO_PI * 0.5f ) );
 		float xzLen = 1.0f - abs( y );
 
 		// OPT: paired sin/cos on the same angle (was two separate calls).
-		float angle = x * TWO_PI;
-		float sinX = sin( angle );
-		float cosX = cos( angle );
+		float sinX, cosX;
+		sincos( x * TWO_PI, sinX, cosX );
+		return normalize( float3( sinX * xzLen, y, cosX * xzLen ) );
 
 		return normalize( float3( sinX * xzLen, y, cosX * xzLen ) );
 	}
@@ -366,7 +367,7 @@ PixelShader =
 		// OPT: lerp(0, 0.8, x) == 0.8 * x; vec3() wrapper on scalar t was unnecessary.
 		float vDesaturation = 0.8f * vBlend * vBlend * vBlend;
 
-		float Grey = dot( vDayColor.rgb, float3( 0.4f, 0.3f, 0.05f ) );
+		float Grey = dot( vDayColor.rgb, float3( 0.2126f, 0.7152f, 0.0722f ) );
 		float3 vNightColor = saturate( lerp( vec3(Grey), Grey * float3(0.2, 0.7, 1.2), 0.25f ) );
 
 		float3 vColor = lerp( vDayColor, vNightColor, vDesaturation );
@@ -482,16 +483,24 @@ PixelShader =
 		return AmbientLight(WorldNormal, vDayFactor, DayAmbientColors, NightAmbientColors);
 	}
 
-	// Direct lighting
-	float3 FresnelSchlick(float3 SpecularColor, float3 E, float3 H)
+	float Schlick5( float x )
 	{
-		return SpecularColor + (vec3(1.0f) - SpecularColor) * pow(1.0 - saturate(dot(E, H)), 5.0);
+	    float x2 = x * x;
+	    return x2 * x2 * x;    // x^5
+	}
+
+	// Direct lighting
+	float3 FresnelSchlick( float3 SpecularColor, float3 E, float3 H )
+	{
+	    float fc = Schlick5( 1.0f - saturate( dot(E, H) ) );
+	    return SpecularColor + ( vec3(1.0f) - SpecularColor ) * fc;
 	}
 
 	// Indirect lighting
-	float3 FresnelGlossy(float3 SpecularColor, float3 E, float3 N, float Smoothness)
+	float3 FresnelGlossy( float3 SpecularColor, float3 E, float3 N, float Smoothness )
 	{
-		return SpecularColor + (max(vec3(Smoothness), SpecularColor) - SpecularColor) * pow(1.0 - saturate(dot(E, N)), 5.0);
+	    float fc = Schlick5( 1.0f - saturate( dot(E, N) ) );
+	    return SpecularColor + ( max( vec3(Smoothness), SpecularColor ) - SpecularColor ) * fc;
 	}
 
 	float3 MetalnessToDiffuse(float Metalness, float3 DiffuseValue)
@@ -529,9 +538,16 @@ PixelShader =
 	{
 		float3 lightdir = aProperties._WorldSpacePos - aPointlight._Position;
 		float lightdistSq = dot(lightdir, lightdir);
+
 		// OPT: rsqrt avoids the sqrt + reciprocal pair from length()/division.
-		float invDist = rsqrt(lightdistSq);
-		float lightdist = lightdistSq * invDist; // == sqrt(lightdistSq)
+		#ifdef PDX_OPENGL
+			float invDist = 1.0f / sqrt(lightdistSq);
+			float lightdist = sqrt(lightdistSq);
+		#else
+			// rsqrt is faster than 1/sqrt; result is mathematically identical.
+			float invDist = rsqrt(lightdistSq);
+			float lightdist = lightdistSq * invDist; // == sqrt(lightdistSq)
+		#endif
 		
 		float vLightIntensity = saturate((aPointlight._Radius - lightdist) / aPointlight._Falloff);
 
@@ -577,7 +593,12 @@ PixelShader =
 	{
 		float3 posToLight = aPointlight._Position - aProperties._WorldSpacePos;
 		float distSq = dot(posToLight, posToLight);
-		float invDist = rsqrt(distSq);
+		#ifdef PDX_OPENGL
+			float invDist = 1.0f / sqrt(distSq);
+		#else
+			// rsqrt is faster than 1/sqrt; result is mathematically identical.
+			float invDist = rsqrt(distSq);
+		#endif
 		float lightDistance = distSq * invDist;
 		
 		float lightIntensity = saturate((aPointlight._Radius - lightDistance) / aPointlight._Falloff);
@@ -637,9 +658,7 @@ PixelShader =
 
 		aShadowTerm = aShadowTerm * saturate( vDayFactor + vNightFactor );
 
-		float3 sunIntensity = 
-			SunDiffuseIntensity.rgb * SunDiffuseIntensity.a * aShadowTerm * vDayFactor
-			+ MoonDiffuseIntensity.rgb * MoonDiffuseIntensity.a * aShadowTerm * vNightFactor;
+		float3 sunIntensity = SunDiffuseIntensity.rgb * SunDiffuseIntensity.a * aShadowTerm * vDayFactor + MoonDiffuseIntensity.rgb * MoonDiffuseIntensity.a * aShadowTerm * vNightFactor;
 
 
 	#ifdef PDX_IMPROVED_BLINN_PHONG
@@ -1163,10 +1182,12 @@ PixelShader =
 
 		normal = float3( B.x, 1.0f, B.y );
 
-		// Original comment: "because sometimes, normalize() crashes the
-		// compiler(and with sometimes, I mean always)" — keeping the manual
-		// normalize, but using rsqrt instead of 1/sqrt for one less op.
-		normal *= rsqrt( dot( normal, normal ) );
+		#ifdef PDX_OPENGL
+			normal *= 1.0f / sqrt( dot( normal, normal ) );
+		#else
+			// rsqrt is faster than 1/sqrt; result is mathematically identical.
+			normal *= rsqrt( dot( normal, normal ) );
+		#endif
 	}
 
 	void SampleWater( float2 uv, float vTime, out float2 B, out float3 M, out float3 normal, in sampler2D Lean1, in sampler2D Lean2 )

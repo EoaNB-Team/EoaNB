@@ -37,8 +37,8 @@ PixelShader =
 			MagFilter = "Linear"
 			MinFilter = "Linear"
 			MipFilter = "Linear"
-			AddressU = "Wrap"
-			AddressV = "Wrap"
+			AddressU = "Clamp"
+			AddressV = "Clamp"
 			Type = "Shadow"
 		}
 		TerrainIDMap =
@@ -191,10 +191,9 @@ VertexShader =
 			VertexOut.uv_isHead_variant.x -= vTime_IsSelected_FadeInOut.x * vOfsX_vOfsTex_vOfsFx.y;
 		#endif
 			VertexOut.uv_isHead_variant.y = fCullingOffset > 0 ? fCullingOffset - VertexOut.uv_isHead_variant.y : VertexOut.uv_isHead_variant.y;
-			VertexOut.uv_terrain_id = float2( ( vPos.x + 0.5f ) / MAP_SIZE_X, ( vPos.z + 0.5f ) / MAP_SIZE_Y );
-			VertexOut.uv_terrain.x = ( vPos.x + 0.5f ) / MAP_SIZE_X;
-			VertexOut.uv_terrain.y = ( vPos.z + 0.5f - MAP_SIZE_Y ) / -MAP_SIZE_Y;	
-			VertexOut.uv_terrain.xy *= float2( MAP_POW2_X, MAP_POW2_Y );
+			static const float2 MAP_SIZE_RCP = float2( 1.0f / MAP_SIZE_X, 1.0f / MAP_SIZE_Y );
+			VertexOut.uv_terrain_id  = ( float2( vPos.x, vPos.z ) + 0.5f ) * MAP_SIZE_RCP;
+			VertexOut.uv_terrain     = float2( VertexOut.uv_terrain_id.x * MAP_POW2_X, ( 1.0f - VertexOut.uv_terrain_id.y ) * MAP_POW2_Y );
 			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
 			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
 		#ifdef PDX_OPENGL
@@ -280,7 +279,7 @@ PixelShader =
 		float2 vTileRepeat = vUvTerrain * TERRAIN_TILE_FREQ;
 		vTileRepeat.x *= MAP_SIZE_X/MAP_SIZE_Y;
 		float lod = clamp( trunc( mipmapLevel( vTileRepeat ) - 0.5f ), 0.0f, 6.0f );
-		float vMipTexels = pow( 2.0f, ATLAS_TEXEL_POW2_EXPONENT - lod );
+		float vMipTexels = exp2( ATLAS_TEXEL_POW2_EXPONENT - lod );
 		float3 terrain_normal = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
 		if( vAllSame < 1.0f )
 		{
@@ -290,11 +289,9 @@ PixelShader =
 			terrain_normal += terrain_normalRD + terrain_normalLU + terrain_normalRU;
 			terrain_normal *= 0.25f;
 		}
-		//return normalize( terrain_normal );
 
 		float3 water_normal;
 		SampleWater( vUvTerrain, vTime, water_normal, LeanTexture1, LeanTexture2 );
-		//return water_normal;
 
 		// Ignore topology normal when over the water
 		normal = lerp( normal, float3( 0, 1, 0 ), vWaterValue );
@@ -316,7 +313,6 @@ PixelShader =
 
 	float3 CalculateLighting( float3 prepos, float4 vScreenCoord, float3 vNormal, float4 vColor )
 	{
-		float3 reflectiveColor = vec3(0.0f); // ArrowColor
 		LightingProperties lightingProperties;
 		lightingProperties._WorldSpacePos = prepos;
 		lightingProperties._ToCameraDir = normalize(vCamPos - prepos);
@@ -330,7 +326,6 @@ PixelShader =
 		float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TERRAIN, vScreenCoord, ShadowMap );
 		CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
 		CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		diffuseLight += reflectiveColor * lightingProperties._Glossiness;
 		return ComposeLight(lightingProperties, diffuseLight, specularLight);
 	}
 
@@ -338,9 +333,11 @@ PixelShader =
 	{
 		float v = vUV.y > 0.5f ? 1.0f - vUV.y: vUV.y;
 		float u = 1.0f - ( vUV.x * 5.0f - vTime_IsSelected_FadeInOut.x * vOfsX_vOfsTex_vOfsFx.y * 5.0f );
-		float t = 3.14159 / 4.0;
-		float w = 25;
-		float stripeVal = cos( ( u * cos( t ) * w ) + ( v * sin( t ) * w ) ); 
+		static const float PI_OVER_4  = 3.14159f * 0.25f;
+		static const float STRIPE_W   = 25.0f;
+		static const float COS_T      = 0.70710678f; // cos(π/4) = 1/√2
+		static const float SIN_T      = 0.70710678f; // sin(π/4) = 1/√2
+		float stripeVal = cos( ( u * COS_T * STRIPE_W ) + ( v * SIN_T * STRIPE_W ) );
 		float camDist = cam_distance( 300.0, 1200.0 );
 		stripeVal += camDist * 1.5;
 		stripeVal = smoothstep(0.0, 1.0, stripeVal*1.7) * lerp(1.0, 0.3, camDist);
@@ -353,9 +350,8 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT_MAPARROW Input ) : PDX_COLOR
 		{
-			//return float4( 1, 0, 1, 1 );
-			float vIsHead = Input.uv_isHead_variant.z < 0.5f ? 0.0f : 1.0f;
-			float vTextureVariant = 1.0f - step( Input.uv_isHead_variant.w, 0.0f );
+			float vIsHead         = step( 0.5f, Input.uv_isHead_variant.z );
+			float vTextureVariant = step( 0.001f, Input.uv_isHead_variant.w ); // or keep 1-step(w,0) if w can be negative
 			
 			float vVariantBodyUvScale = lerp( vBodyUvScale, vSecondaryBodyUvScale, vTextureVariant );
 
@@ -379,26 +375,20 @@ PixelShader =
 			float vMaskValue = saturate( vMask.r + vMask.g + vMask.b );
 			vMaskValue *= vTime_IsSelected_FadeInOut.z > 0 ? saturate( Levels( Input.uv_isHead_variant.x, 0.0f, vTime_IsSelected_FadeInOut.z ) + vIsHead ) : 1;
 			vMaskValue *= vTime_IsSelected_FadeInOut.w > 0 ? saturate( Levels( 1.0f - Input.uv_isHead_variant.x, 0.0f, vTime_IsSelected_FadeInOut.w ) + vIsHead ) : 1;
-			clip( vMaskValue <= 0 ? 0 : 1 );
+			clip( vMaskValue <= 0 ? -1 : 1 );
 			vMaskValue *= FxMask( float2( vUV.x * 2.0f, vUV.y ), vIsHead );
 
 			float4 vPattern = tex2D( TexPattern, vUV );
 
 			float4 vArrowColor = lerp( ArrowColor, ArrowSecondaryColor, vTextureVariant );
-		#if 1
 			vArrowColor.rgb = RGBtoHSV(vArrowColor.rgb);
 			vArrowColor.r = mod( vArrowColor.r, 6.0 ); //H
 			vArrowColor.g *= 1.5; //S bump up the saturation and light
-			vArrowColor.b *= 1.0; //V
 			vArrowColor.rgb = HSVtoRGBPost(vArrowColor.rgb);
 
 			float4 vColor = saturate( vPattern * vArrowColor );
 			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			vColor.rgb = lerp(vColor.rgb, vColor2, 0.5);
-		#else
-			float4 vColor = saturate( vPattern * vArrowColor );
-			vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
-		#endif
 
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
 			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
@@ -411,7 +401,6 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT_MAPARROW Input ) : PDX_COLOR
 		{
-			//return float4( 1, 0, 1, 1 );
 			float vTextureVariant = 1.0f - step( Input.uv_isHead_variant.w, 0.0f );
 			
 			float vVariantBodyUvScale = lerp( vBodyUvScale, vSecondaryBodyUvScale, vTextureVariant );
@@ -427,7 +416,6 @@ PixelShader =
 			float4 vMask = tex2D( TexMask, vUV );
 			vMask -= ( ( sin( vTime_IsSelected_FadeInOut.x * MAP_ARROW_SEL_BLINK_SPEED ) * MAP_ARROW_SEL_BLINK_RANGE + 1.0f - MAP_ARROW_SEL_BLINK_RANGE * 0.5f ) * 0.5f ) * vTime_IsSelected_FadeInOut.y;
 			vMask = saturate( vMask );
-			//clip( vMask.a <= 0 ? -1 : 1 );
 			vMask.rgb = vMask.rgb * ArrowMask.rgb * vMask.a;
 			float vMaskValue = saturate( vMask.r + vMask.g + vMask.b );
 			clip( vMaskValue <= 0 ? -1 : 1 );
@@ -435,22 +423,16 @@ PixelShader =
 			float4 vPattern = tex2D( TexPattern, vUV );
 
 			float4 vArrowColor = lerp( ArrowColor, ArrowSecondaryColor, vTextureVariant );
-			#if 1
-				vArrowColor.rgb = RGBtoHSV(vArrowColor.rgb);
-				vArrowColor.r = mod( vArrowColor.r, 6.0 ); //H
-				vArrowColor.g *= 2.0; //S bump up the saturation and light
-				vArrowColor.b *= 1.5; //V
-				vArrowColor.rgb = HSVtoRGBPost(vArrowColor.rgb);
+			vArrowColor.rgb = RGBtoHSV(vArrowColor.rgb);
+			vArrowColor.r = mod( vArrowColor.r, 6.0 ); //H
+			vArrowColor.g *= 2.0; //S bump up the saturation and light
+			vArrowColor.b *= 1.5; //V
+			vArrowColor.rgb = HSVtoRGBPost(vArrowColor.rgb);
 
-				float4 vColor = saturate( vPattern * vArrowColor );
-				float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
-				vColor.rgb = lerp(vColor.rgb, vColor2, 0.5);
-			#else
-				float4 vColor = saturate( vPattern * vArrowColor );
-				vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
-			#endif
+			float4 vColor = saturate( vPattern * vArrowColor );
+			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
+			vColor.rgb = lerp(vColor.rgb, vColor2, 0.5);
 			
-			vColor.rgb *= GetShadowScaled( vShadowFactor * SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap );
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
 			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			#ifdef SEETHROUGH
@@ -465,7 +447,6 @@ PixelShader =
 	[[
 		float4 main( VS_OUTPUT_MAPSYMBOL Input ) : PDX_COLOR
 		{
-			//return float4( 1, 0, 1, 1 );
 		
 			// Calculate terrain/water normal
 			float2 vUV = Input.uv;
@@ -473,19 +454,14 @@ PixelShader =
 			float3 vNormal = CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_IsIntersect_Rot.x );
 			vUV += vNormal.xz * ( vNormal.y * MAP_ARROW_NORMALS_STR_TERR );
 			vUV -= vNormal.xz * ( vWaterValue * MAP_ARROW_NORMALS_STR_WATER );
-			//float3 vNormal = float3( 0, 1, 0 );
 		
 			// Grab texture color
 			float4 vColor = tex2D( TexPattern, vUV );
 			vColor *= SymbolColor;
 		
-			// Blinking transparency
-			//vColor.a -= ( ( sin( vTime_IsSelected.x * MAP_ARROW_SEL_BLINK_SPEED ) * MAP_ARROW_SEL_BLINK_RANGE + 1.0f - MAP_ARROW_SEL_BLINK_RANGE * 0.5f ) * 0.5f ) * vTime_IsSelected.y;
-			//clip( vColor.a );
-		
 			vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
-			//vColor.rgb = DayNight( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ) );
+			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			return vColor;
 		}
 	]]

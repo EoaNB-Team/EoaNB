@@ -79,9 +79,9 @@ PixelShader =
 			MagFilter = "Linear"
 			MinFilter = "Linear"
 			MipFilter = "Linear"
-			AddressU = "Wrap"
-			AddressV = "Wrap"
-			Type = "Shadow"
+			AddressU = "Clamp"
+    		AddressV = "Clamp"
+    		Type = "Shadow"
 		}
 		EnvironmentMap =
 		{
@@ -186,10 +186,11 @@ VertexStruct VS_OUTPUT_SHADOW
 
 ConstantBuffer( 1, 32 )
 {
-	float4x4 	ShadowMapTextureMatrix;
-	float	 	vSeasonLerp;
-	float		vSeasonColumn;
-	float		vTreeFade;
+    float4x4    ShadowMapTextureMatrix;
+    float       vSeasonLerp;
+    float       vSeasonColumn;
+    float       vTreeFade;
+    float       vSeasonColumnUV;  // precomputed: vSeasonColumn/8.0 + 1.0/16.0
 };
 
 
@@ -200,8 +201,13 @@ VertexShader =
 		VS_OUTPUT main( const VS_INPUT_INSTANCE v )
 		{
 			VS_OUTPUT Out;
+
+			Out.vNormal    = normalize( Out.vNormal );
+			Out.vTangent   = normalize( Out.vTangent );
+			Out.vBitangent = normalize( cross( Out.vTangent, Out.vNormal ) * v.vTangent.w );
 		
-			float vRandom = v.vPos_YRot.w / 6.28318531f;
+			static const float INV_TWO_PI = 0.15915494309f;
+			float vRandom = v.vPos_YRot.w * INV_TWO_PI;
 			float vSummedRandom = v.vUV1.x + vRandom;
 			vSummedRandom = vSummedRandom >= 1.0f ? vSummedRandom - 1.0f : vSummedRandom;
 			
@@ -209,8 +215,8 @@ VertexShader =
 			Out.vPosition = float4( v.vPosition.xyz, 1.0 );
 			Out.vPosition.y *= vHeightScaleFactor;
 		
-			float randSin = sin( v.vPos_YRot.w );
-			float randCos = cos( v.vPos_YRot.w );
+			float randSin, randCos;
+			sincos( v.vPos_YRot.w, randSin, randCos );
 		
 			Out.vPosition.xz = float2( 
 				Out.vPosition.x * randCos - Out.vPosition.z * randSin, 
@@ -251,8 +257,7 @@ VertexShader =
 			Out.vScreenCoord.w = Out.vPosition.w;
 			
 			Out.vPrePos_vSeasonColumn.xyz = v.vPosition.xyz;
-			Out.vPrePos_vSeasonColumn.w = vSeasonColumn / 8.0;
-			Out.vPrePos_vSeasonColumn.w += 1.0 / 16.0;
+			Out.vPrePos_vSeasonColumn.w = vSeasonColumnUV;
 			
 			return Out;
 		}
@@ -265,7 +270,8 @@ VertexShader =
 		{
 			VS_OUTPUT_SHADOW Out;
 		
-			float vRandom = v.vPos_YRot.w / 6.28318531f;
+			static const float INV_TWO_PI = 0.15915494309f;
+			float vRandom = v.vPos_YRot.w * INV_TWO_PI;
 			float vSummedRandom = v.vUV1.x + vRandom;
 			vSummedRandom = vSummedRandom >= 1.0f ? vSummedRandom - 1.0f : vSummedRandom;
 			
@@ -273,8 +279,8 @@ VertexShader =
 			Out.vPosition = float4( v.vPosition.xyz, 1.0f );
 			Out.vPosition.y *= vHeightScaleFactor;
 		
-			float randSin = sin( v.vPos_YRot.w );
-			float randCos = cos( v.vPos_YRot.w );
+			float randSin, randCos;
+			sincos( v.vPos_YRot.w, randSin, randCos );
 		
 			Out.vPosition.xz = float2( 
 				Out.vPosition.x * randCos - Out.vPosition.z * randSin, 
@@ -309,10 +315,9 @@ PixelShader =
 
 	MainCode PixelShader
 	[[	
-		float3 ApplySnowTree( float3 vColor, float3 vPos, inout float3 vNormal, float4 vFoWColor, out float vSnowAlpha )
+		float3 ApplySnowTree( float3 vColor, float3 vPos, inout float3 vNormal, float4 vFoWColor, float vSnowAlpha )
 		{
 			float vIsSnow = GetSnow( vFoWColor );
-			//float vSnowFade = saturate( saturate( vNormal.y - saturate( 1.0f - vIsSnow ) )*vIsSnow*5.5f*saturate( ( vNormal.y - 0.8f ) * 1000.0f ) );
 			float vSnowFade = saturate( vIsSnow * 1.5f );
 			
 			float vOpacity = cam_distance( SNOW_CAM_MIN, SNOW_CAM_MAX );
@@ -320,8 +325,6 @@ PixelShader =
 			
 			vColor = lerp( vColor, SNOW_COLOR, vSnowFade * vOpacity );
 			
-			//vNormal.y += 1.0f * vSnowFade;
-			//vNormal = normalize( vNormal );
 			vSnowAlpha = vSnowFade * vOpacity;
 			
 			return vColor;
@@ -347,14 +350,10 @@ PixelShader =
 			vColor += saturate( tex2D( SeasonMap, float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ) ).rgb-0.5f ) * vSeasonTreeFade;
 		
 			float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
-			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), normalize( In.vNormal ) );
+			float3x3 TBN = Create3x3( In.vTangent, In.vBitangent, In.vNormal );
 			float3 vNormal = mul( vNormalSample, TBN );	
 			
 			float vSnowAlpha = 0;
-		#ifndef LOW_END_GFX
-			float4 vFoWColor = GetMudSnowColor( In.vPos, SnowMudData );
-			vColor = ApplySnowTree( vColor, In.vPos, vNormal, vFoWColor, vSnowAlpha );	
-		#endif
 
 			// Gradient Borders
 			float vBloomAlpha = 0.0f;
@@ -380,17 +379,6 @@ PixelShader =
 		
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TREE, In.vScreenCoord, ShadowMap );	
 			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
-
-		#ifndef LOW_END_GFX
-			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-
-			float3 vEyeVec = vPos - vCamPos.xyz;
-			float3 vEyeDir = normalize( vEyeVec );
-			float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
-			float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
-		
-			diffuseLight += reflectiveColor * vSpecular;
-		#endif
 			
 			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha );
 
@@ -398,13 +386,10 @@ PixelShader =
 		
 			float3 vFOWColor = ApplyFOW( vColor, ShadowMap, In.vScreenCoord );
 			vColor = lerp( vFOWColor, vColor, BORDER_FOW_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
-		#ifndef LOW_END_GFX
-			vColor = ApplyDistanceFog( vColor, vPos );
-		#endif
+
 			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
 
 			DebugReturn(vColor, lightingProperties, fShadowTerm);
-			//return float4( vColor, 1.0 - saturate( (length(vEyeVec) - 100.0) / 200.0 ) );
 			return float4( vColor, vTreeFade );
 		}
 	]]
@@ -413,10 +398,9 @@ PixelShader =
 	[[	
 		float4 main( VS_OUTPUT_SHADOW In ) : PDX_COLOR
 		{
+			clip( 0.1f - GetTreeMask( TreeMaskTexture, In.vPos ) );
 			float4 vDiffuseColor = tex2D( DiffuseMap, In.vTexCoord0_UV.xy );
 			clip( vDiffuseColor.a - 0.5f );
-			
-			clip( 0.1f - GetTreeMask( TreeMaskTexture, In.vPos ) );
 			
 			return float4( In.fDepth.xxx * In.fDepth.y, 1.0f);
 		}

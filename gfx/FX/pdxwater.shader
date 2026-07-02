@@ -153,9 +153,9 @@ PixelShader =
 			MagFilter = "Linear"
 			MinFilter = "Linear"
 			MipFilter = "Linear"
-			AddressU = "Wrap"
-			AddressV = "Wrap"
-			Type = "Shadow"
+			AddressU = "Clamp"
+    		AddressV = "Clamp"
+    		Type = "Shadow"
 		}
 	}
 }
@@ -235,20 +235,24 @@ PixelShader =
 		// 3x3 Gaussian-like kernel for a fraction of the cost (4 samples vs 9).
 		float MultiSampleTexX( in sampler2D TexCh, in float2 vUV )
 		{
-		#ifdef LOW_END_GFX
-			return tex2D( TexCh, vUV ).x;
-		#else
 			const float2 vHalfTexel = float2( 0.5f / MAP_SIZE_X, 0.5f / MAP_SIZE_Y );
 			float vResult  = tex2D( TexCh, vUV + float2( -vHalfTexel.x, -vHalfTexel.y ) ).x;
 			vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x, -vHalfTexel.y ) ).x;
 			vResult       += tex2D( TexCh, vUV + float2( -vHalfTexel.x,  vHalfTexel.y ) ).x;
 			vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x,  vHalfTexel.y ) ).x;
 			return vResult * 0.25f;
-		#endif
 		}
 
-		float3 ApplyIce( float3 vColor, float2 vPos, inout float3 vNormal, float4 vMudSnowColor, float2 vIceUV, out float vIceFade )
+		float3 ApplyIce( float3 vColor, float2 vPos, inout float3 vNormal, float4 vMudSnowColor, float2 vIceUV, float vIceFade )
 		{
+			// Latitude gate — polar region check (> 74% of map height)
+			float vMapLimitFade = saturate( ( vPos.y / MAP_SIZE_Y - 0.74f ) * 800.0f );
+			if ( vMapLimitFade <= 0.0f )
+			{
+				vIceFade = 0.0f;
+				return vColor;  // skip both texture reads entirely
+			}
+
 			float4 vIceDiffuse = tex2D( IceDiffuse, vIceUV );
 			float vIceNoise    = tex2D( IceNoise, ( vPos + 0.5f ) * ICE_NOISE_TILING ).r;
 
@@ -259,12 +263,12 @@ PixelShader =
 			vIceFade = vSnow * 8.0f * vIceNoise * vOpacity;
 
 			// Latitude mask - removes ice from non-polar regions
-			float vMapLimitFade = saturate( saturate( ( vPos.y / MAP_SIZE_Y ) - 0.74f ) * 800.0f );
+			vMapLimitFade = saturate( ( vPos.y / MAP_SIZE_Y - 0.74f ) * 800.0f );
 			vIceFade *= vMapLimitFade;
 
 			vIceFade = saturate( ( vIceFade - 0.3f ) * 10.0f );
 
-			float3 vIceNormal = normalize( vIceDiffuse.rbg - 0.5f );
+			float3 vIceNormal = normalize( vIceDiffuse.rgb - 0.5f );
 			vNormal = normalize( lerp( vNormal, vIceNormal, vIceFade ) );
 
 			float3 vIceColor = ICE_COLOR * vIceDiffuse.a;
@@ -273,11 +277,29 @@ PixelShader =
 
 		float4 main( VS_OUTPUT_WATER Input ) : PDX_COLOR
 		{
+			// screen_pos derivation (pixel shader):
+			//   refractiveUV = (screen_pos.xy / screen_pos.w) * 0.5 + 0.5
+			//   1 - refractiveUV.y
+
+			// vScreenCoord derivation (vertex shader):
+			//   .x = pos.x*0.5 + w*0.5     → /w gives  pos.x/(2w) + 0.5        ✓ same
+			//   .y = w*0.5 - pos.y*0.5     → /w gives  0.5 - pos.y/(2w)         ✓ same as 1-y form
+			//   .z = .w = w
+
+			#ifdef PDX_OPENGL
+				float invW = 1.0 / Input.vScreenCoord.z;
+			#else
+				// Replacement in pixel shader (DX path):
+				float invW = rcp( Input.vScreenCoord.z );
+			#endif
+			float2 refractiveUV = Input.vScreenCoord.xy * invW;
+			refractiveUV    += vTime_HalfPixelOffset.gb;
+
 			// --- Heightmap shore mask ---
 			// 1.0 / (95.7 / 255.0) precomputed as a constant
-			const float WATER_HEIGHT_SCALE = 255.0f / 95.7f;
-			float waterHeight = MultiSampleTexX( HeightTexture, Input.uv ) * WATER_HEIGHT_SCALE;
-			float waterShore  = saturate( ( waterHeight - 0.954f ) * 25.0f );
+			const float SHORE_SCALE = 255.0f / 95.7f * 25.0f;   // ~66.56, compile-time constant
+			const float SHORE_BIAS  = -0.954f * 25.0f;           // -23.85, compile-time constant
+			float waterShore = saturate( MultiSampleTexX( HeightTexture, Input.uv ) * SHORE_SCALE + SHORE_BIAS );
 
 			// --- Wave + LEAN normals ---
 			float2 B;
@@ -295,11 +317,7 @@ PixelShader =
 			M *= vSpecMap * vSpecMap;
 
 			// --- Sun direction ---
-		#ifdef LOW_END_GFX
-			float3 SunDirWater = float3( 0.0f, -1.0f, 0.0f );
-		#else
 			float3 SunDirWater = CalculateSunDirectionWater( Input.pos );
-		#endif
 
 			// Cache view direction once: was being normalize()'d 3 separate times.
 			float3 vToCam  = normalize( vCamPos - Input.pos );
@@ -313,15 +331,25 @@ PixelShader =
 			float  det   = sigma.x * sigma.y - sigma.z * sigma.z;
 			float2 HWave2 = HWave * HWave;
 			float  e     = HWave2.x * sigma.y + HWave2.y * sigma.x - 2.0f * HWave.x * HWave.y * sigma.z;
-			// rsqrt is cheaper than 1/sqrt; condition flipped to match
-			float  spec  = ( det > 0.0f ) ? exp( -0.5f * e / det ) * rsqrt( det ) : 0.0f;
+			#ifdef PDX_OPENGL
+				float spec = (det <= 0) ? 0.0f : exp( -0.5f*e/det ) / sqrt(det);
+			#else
+				// rsqrt is faster than 1/sqrt; result is mathematically identical.
+				float spec  = ( det > 0.0f ) ? exp( -0.5f * e / det ) * rsqrt( det ) : 0.0f;
+			#endif
 
 			// --- Refraction UV setup ---
-			float2 refractiveUV = ( Input.screen_pos.xy / Input.screen_pos.w ) * 0.5f + 0.5f;
-			refractiveUV.y = 1.0f - refractiveUV.y;
-			refractiveUV += vTime_HalfPixelOffset.gb;
+			#ifdef PDX_OPENGL
+				invW = 1.0f / ( Input.screen_pos.w );
+			#else
+				// Replacement in pixel shader (DX path):
+				invW = rcp( Input.screen_pos.w );
+			#endif
+			refractiveUV.x =  Input.screen_pos.x * invW * 0.5f + 0.5f;
+			refractiveUV.y = -Input.screen_pos.y * invW * 0.5f + 0.5f; // folds the 1.0-y flip
+			refractiveUV  += vTime_HalfPixelOffset.yz;
 
-			float vRefractionScale       = saturate( 5.0f - ( Input.screen_pos.z / Input.screen_pos.w ) * 5.0f );
+			float vRefractionScale = saturate( ( 1.0f - Input.screen_pos.z * invW ) * 5.0f );
 			float2 vRefractionDistortion = normal.xz * vRefractionScale * 1.80f;
 
 			float3 reflection = reflect( vEyeDir, normal );
@@ -332,11 +360,7 @@ PixelShader =
 
 			float3 reflectiveColor = texCUBE( ReflectionCubeMap, reflection ).rgb;
 
-		#ifdef NO_REFRACTIONS
-			float3 refractiveColor = float3( 0.0f, 0.1f, 0.2f );
-		#else
 			float3 refractiveColor = tex2D( WaterRefraction, refractiveUV - vRefractionDistortion ).rgb;
-		#endif
 
 			// --- Fresnel: replace pow(x,10) with 3 muls ---
 			const float fresnelBias = 0.5f;
@@ -350,14 +374,6 @@ PixelShader =
 
 			// --- Ice ---
 			float vIceFade = 0.0f;
-		#ifndef LOW_END_GFX
-			float4 vMudSnowColor = GetMudSnowColor( Input.pos, SnowMudTexture );
-			refractiveColor = ApplyIce( refractiveColor, Input.pos.xz, normal, vMudSnowColor, Input.uv_ice, vIceFade );
-
-			vRefractionDistortion *= 1.0f - vIceFade;
-			vSpecularIntensity    += vIceFade * 0.07f;
-			vGlossiness           += vIceFade * 20.0f;
-		#endif
 
 			// --- Borders / province overlays ---
 			float vBloomAlpha = 0.0f;
@@ -382,10 +398,6 @@ PixelShader =
 			lightingProperties._SpecularColor        = vec3( vSpecularIntensity );
 			lightingProperties._NonLinearGlossiness  = GetNonLinearGlossiness( vGlossiness );
 
-		#ifdef LOW_END_GFX
-			float3 diffuseLight  = vec3( 1.0f );
-			float3 specularLight = vec3( 0.002f );
-		#else
 			float3 diffuseLight  = vec3( 0.0f );
 			float3 specularLight = vec3( 0.0f );
 
@@ -395,14 +407,8 @@ PixelShader =
 
 			CalculateSunLight( lightingProperties, fShadowTerm, SunDirWater, diffuseLight, specularLight );
 			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight );
-		#endif
 
 			float3 vOut = ComposeLight( lightingProperties, diffuseLight, specularLight );
-
-		#ifndef LOW_END_GFX
-			vOut = ApplyFOW( vOut, ShadowMap, Input.vScreenCoord );
-			vOut = ApplyDistanceFog( vOut, Input.pos );
-		#endif
 
 			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.pos.xz ),
 				lerp( BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha ) );
@@ -413,11 +419,7 @@ PixelShader =
 				vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,
 				vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f );
 
-		#ifdef LOW_END_GFX
-			DebugReturn( vOut, lightingProperties, 0.0f );
-		#else
 			DebugReturn( vOut, lightingProperties, fShadowTerm );
-		#endif
 			return float4( vOut, 1.0f - waterShore );
 		}
 	]]

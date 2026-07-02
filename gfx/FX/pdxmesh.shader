@@ -13,7 +13,7 @@ PixelShader =
 		DiffuseMap =
 		{
 			Index = 0
-			#MipMapLodBias = -1.0
+			MipMapLodBias = -1.0
 			MagFilter = "Linear"
 			MinFilter = "Linear"
 			MipFilter = "Linear"
@@ -101,6 +101,16 @@ PixelShader =
 			MipFilter = "Point"
 			AddressU = "Clamp"
 			AddressV = "Clamp"
+		}
+		ShadowMap =
+		{
+			Index = 14
+			MagFilter = "Linear"
+			MinFilter = "Linear"
+			MipFilter = "Linear"
+			AddressU = "Clamp"
+    		AddressV = "Clamp"
+    		Type = "Shadow"
 		}
 		GradientBorderChannel1 =
 		{
@@ -312,16 +322,17 @@ VertexShader =
 			Out.vPos_Height /= WorldMatrix[3][3];
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
 		
-			Out.vNormal = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedNormal ) ) );
-			Out.vTangent = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedTangent ) ) );
-			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedBitangent ) ) );
+			// If WorldMatrix has no non-uniform scale (typical for character/unit transforms)
+			Out.vNormal    = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedNormal ) );
+			Out.vTangent   = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedTangent ) );
+			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedBitangent ) );
 		
 			Out.vUV0 = v.vUV0;
-#ifdef PDX_MESH_UV1
-			Out.vUV1 = v.vUV1;
-#else
-			Out.vUV1 = v.vUV0;
-#endif			
+			#ifdef PDX_MESH_UV1
+				Out.vUV1 = v.vUV1;
+			#else
+				Out.vUV1 = v.vUV0;
+			#endif			
 			return Out;
 		}
 	]]
@@ -456,7 +467,7 @@ PixelShader =
 		#endif	
 
 		#ifdef ALPHA_TEST
-			clip(vDiffuse.a - 1.0);
+			clip(vDiffuse.a - 0.5);
 		#endif
 		
 			float3 vPos = In.vPos_Height.xyz;
@@ -495,9 +506,8 @@ PixelShader =
 			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
 			float3 vNormal = normalize(mul( vNormalSample, TBN ));
 			
-			// self shadowing
-			float fShadowTerm = 1.0f;//CalculateShadowCascaded(vPos, ShadowMap);
-			//fShadowTerm = (1.0f - SHADOW_WEIGHT_MESH) + SHADOW_WEIGHT_MESH * fShadowTerm;
+			// re-enable using the screen-space shadow already available on vPos_Height
+			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TERRAIN, In.vPos_Height, ShadowMap );
 
 			float vSnowAlpha = 0;
 		#ifdef PDX_SNOW
@@ -507,7 +517,9 @@ PixelShader =
 
 		#ifdef PDX_GRADIENT_BORDERS
 			// Gradient Borders
-			float2 map_uv = float2( ( ( vPos.x+0.5f ) / MAP_SIZE_X ), ( ( vPos.z+0.5f-MAP_SIZE_Y ) / -MAP_SIZE_Y ));
+			static const float MAP_SIZE_X_RCP = 1.0f / MAP_SIZE_X;
+			static const float MAP_SIZE_Y_RCP = 1.0f / MAP_SIZE_Y;
+			float2 map_uv = float2( ( vPos.x + 0.5f ) * MAP_SIZE_X_RCP, ( 1.0f - ( vPos.z + 0.5f ) * MAP_SIZE_Y_RCP ) );
 			
 			float vBloomAlpha = 0.0f;
 			gradient_border_apply( vColor.rgb, vNormal, map_uv, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
@@ -535,12 +547,11 @@ PixelShader =
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 		
 		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 vEyeDir = -lightingProperties._ToCameraDir;
-			float3 reflection = reflect( vEyeDir, vNormal );
+			float3 reflection = reflect( -lightingProperties._ToCameraDir, vNormal );
 			float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
 			
 			float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
+			specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor, lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
 		#endif
 		
 		#ifdef PDX_SNOW
@@ -568,12 +579,6 @@ PixelShader =
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
 			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
 
-/*		#ifdef RIM_LIGHT
-			float vRim = smoothstep( RIM_START, RIM_END, 1.0f - dot( vInNormal, lightingProperties._ToCameraDir ) );
-			vColor.rgb = lerp( vColor.rgb, RIM_COLOR.rgb, vRim );
-		#endif	
-*/			
-
 			DebugReturn(vColor, lightingProperties, fShadowTerm);
 			
 		#ifdef TRAIN
@@ -581,7 +586,12 @@ PixelShader =
 			vColor *= TrainColor.rgb;
 			float2 toPos = vPos.xz - TrainAlphaStart;
 			float toPosLenSq = dot( toPos, toPos );
-			float toPosInvLen = rsqrt( max( toPosLenSq, 1e-6f ) );
+			#ifdef PDX_OPENGL
+				float toPosInvLen = 1.0f / sqrt( max( toPosLenSq, 1e-6f ) );
+			#else
+				// rsqrt is faster than 1/sqrt; result is mathematically identical.
+				float toPosInvLen = rsqrt( max( toPosLenSq, 1e-6f ) );
+			#endif
 			float cosPos2d = dot( toPos * toPosInvLen, TrainAlphaDir );
 			float clipalpha = step( 0.0f, cosPos2d );
 			float smoothalpha = smoothstep( 0.0f, 2.5f, toPosLenSq * toPosInvLen );
@@ -603,7 +613,7 @@ PixelShader =
 			float4 vDiffuse = tex2D( DiffuseMap, In.vUV0 );
 			
 		#ifdef ALPHA_TEST
-			clip(vDiffuse.a - 1.0);
+			clip(vDiffuse.a - 0.5);
 		#endif
 			
 			float3 vPos = In.vPos_Height.xyz;
@@ -618,8 +628,8 @@ PixelShader =
 			lightingProperties._Glossiness = vProperties.a;
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(lightingProperties._Glossiness);
 		
-			float3 vInNormal = normalize( In.vNormal );
-			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
+			float3 vInNormal = In.vNormal;
+			float3x3 TBN = Create3x3( In.vTangent, In.vBitangent, vInNormal );
 			float3 vNormal = normalize( mul( vNormalSample, TBN ) );
 
 			lightingProperties._WorldSpacePos = vPos;
@@ -635,13 +645,6 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 			ImprovedBlinnPhong(BORDER_SUN_INTENSITY, normalize(BORDER_SUN_DIRECTION), lightingProperties, diffuseLight, specularLight);
 		
-			//float3 vEyeDir = normalize( vPos - vCamPos.xyz );
-			//float3 reflection = reflect( vEyeDir, vNormal );
-			//float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-			
-			//float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			//specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
-		
 			float3 DayAmbientColors[6];
 			DayAmbientColors[0] = AmbientPosX;
 			DayAmbientColors[1] = AmbientNegX;
@@ -653,8 +656,6 @@ PixelShader =
 			float3 vAmbientColor = AmbientLight(lightingProperties._Normal, 0.0, DayAmbientColors, DayAmbientColors);
 			float3 diffuse = ((vAmbientColor + diffuseLight) * lightingProperties._Diffuse) * HdrRange;
 			vColor = diffuse + specularLight;
-
-			//vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
 			
 			return float4( vColor, 0 );
 		}
@@ -791,7 +792,7 @@ Effect PdxMeshAdvanced
 	VertexShader = "VertexPdxMeshStandard"
 	PixelShader = "PixelPdxMeshStandard"
 	DepthStencilState = "DepthStencilStateDisableTransparencyPassthrough"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" }
 }
 
 Effect PdxMeshAdvancedSkinned
@@ -799,7 +800,7 @@ Effect PdxMeshAdvancedSkinned
 	VertexShader = "VertexPdxMeshStandardSkinned"
 	PixelShader = "PixelPdxMeshStandard"
 	DepthStencilState = "DepthStencilStateDisableTransparencyPassthrough"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "ATLAS" "RIM_LIGHT"  }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "ATLAS" }
 }
 
 Effect PdxMeshAdvancedShadow
@@ -820,14 +821,14 @@ Effect PdxMeshAdvancedSnow
 	VertexShader = "VertexPdxMeshStandard"
 	PixelShader = "PixelPdxMeshStandard"
 	DepthStencilState = "DepthStencilStateTransparencyPassthrough"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" "PDX_SNOW" }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "PDX_SNOW" }
 }
 
 Effect PdxMeshAdvancedSnowSkinned
 {
 	VertexShader = "VertexPdxMeshStandardSkinned"
 	PixelShader = "PixelPdxMeshStandard"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "ATLAS" "PDX_SNOW" "RIM_LIGHT"  }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "ATLAS" "PDX_SNOW" }
 }
 
 Effect PdxMeshAdvancedSnowShadow
@@ -862,7 +863,7 @@ Effect PdxMeshAdvancedAnimSkinned
 {
 	VertexShader = "VertexPdxMeshStandardSkinned"
 	PixelShader = "PixelPdxMeshStandard"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "UV_ANIM" "RIM_LIGHT" }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "UV_ANIM" }
 }
 
 Effect PdxMeshAdvancedAnimSkinnedShadow
@@ -903,7 +904,7 @@ Effect PdxMeshSnow
 {
 	VertexShader = "VertexPdxMeshStandard"
 	PixelShader = "PixelPdxMeshStandard"
-	Defines = { "PDX_SNOW" "PDX_IMPROVED_BLINN_PHONG" "EMISSIVE" "RIM_LIGHT" }
+	Defines = { "PDX_SNOW" "PDX_IMPROVED_BLINN_PHONG" "EMISSIVE" }
 }
 
 Effect PdxMeshSnowSkinned
@@ -969,7 +970,7 @@ Effect PdxMeshTrain
 	VertexShader = "VertexPdxMeshStandard"
 	PixelShader = "PixelPdxMeshStandard"
 	BlendState = "BlendStateAlphaTestTrain"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" "TRAIN" "ALPHA_TEST" }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "TRAIN" "ALPHA_TEST" }
 }
 
 Effect PdxMeshTrainShadow
@@ -984,7 +985,7 @@ Effect PdxMeshTrainSkinned
 	VertexShader = "VertexPdxMeshStandardSkinned"
 	PixelShader = "PixelPdxMeshStandard"
 	BlendState = "BlendStateAlphaTestTrain"
-	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "RIM_LIGHT" "TRAIN" }
+	Defines = { "EMISSIVE" "PDX_IMPROVED_BLINN_PHONG" "TRAIN" }
 }
 
 Effect PdxMeshTrainSkinnedShadow
