@@ -151,6 +151,7 @@ scripted_gui = {
 		visible = {
 			check_variable = { show_parliament_window > 0 }
 			check_variable = { show_decisions_window  > 0 }
+			NOT = { has_country_flag = parliament_voting_ongoing_flag }
 		}
 
 		effects = {
@@ -175,6 +176,44 @@ scripted_gui = {
 				}
 				NOT = { has_country_flag = Parliament_decision_active_flag }
 				check_variable = { clicked@var:v = 0 }
+				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+
+				### Checking if the decision is available ###
+				if = {
+					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
+					has_thirty_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_minor_research_grant } }
+					has_twenty_five_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_major_research_grant } }
+					has_thirty_five_percent_government_support = yes
+					has_stability > 0.50
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_enact_a_stricter_budget } }
+					has_fourty_percent_government_support = yes
+					has_stability > 0.40
+					set_temp_variable = { amount_of_money_to_check = 10 }
+					has_less_than_specific_amount_of_money = yes
+					NOT = { has_idea = parliament_idea_a_strict_budget }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_increase_government_legitimacy } }
+					has_thirty_percent_government_support = yes
+					check_variable = { political_legitimacy < 0.60 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament } }
+					PS_pol_positive = yes
+					check_variable = { political_legitimacy > 0.59 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
+					has_active_mission = parliament_coalition_breakaway_mission
+				}
 			}
 			parliament_decision_timeout_visible = {
 				check_variable = { clicked@var:v > 0 }
@@ -183,9 +222,214 @@ scripted_gui = {
 				NOT = { check_variable = { clicked@var:v > 0 } }
 			}
 			parliament_decision_background_available_visible = {
-				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				if = {
+					limit = { check_variable = { lp_cost@var:v > 0 } }
+					set_temp_variable = { lpcost = lp_cost@var:v }
+					has_political_power > var:lpcost
+				}
+				if = {
+					limit = { check_variable = { money_cost@var:v > 0 } }
+					set_temp_variable = { moneycost = money_cost@var:v }
+					set_temp_variable = { amount_of_money_to_check = var:moneycost }
+					has_less_than_specific_amount_of_money = no
+				}
+				NOT = { has_country_flag = Parliament_decision_active_flag }
 				check_variable = { clicked@var:v = 0 }
+				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+
+				### Checking if the decision is available ###
+				if = {
+					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
+					has_thirty_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_minor_research_grant } }
+					has_twenty_five_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_major_research_grant } }
+					has_thirty_five_percent_government_support = yes
+					has_stability > 0.50
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_enact_a_stricter_budget } }
+					has_fourty_percent_government_support = yes
+					has_stability > 0.40
+					set_temp_variable = { amount_of_money_to_check = 10 }
+					has_less_than_specific_amount_of_money = yes
+					NOT = { has_idea = parliament_idea_a_strict_budget }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_increase_government_legitimacy } }
+					has_thirty_percent_government_support = yes
+					check_variable = { political_legitimacy < 0.60 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament } }
+					PS_pol_positive = yes
+					check_variable = { political_legitimacy > 0.59 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
+					has_active_mission = parliament_coalition_breakaway_mission
+				}
+			}
+			parliament_decision_background_in_progress_visible = {
+				check_variable = { clicked@var:v = 1 }
+			}
+			parliament_progress_good_visible = {
+				check_variable = { clicked@var:v = 1 }
+			}
+		}
+
+		properties = {
+			parliament_decision_icon = {
+				image = "[GetParliamentDecisionIcon]"
+			}
+			parliament_progress_good  = { frame = ROOT.parliament_decision_days_left }
+		}
+
+		dynamic_lists = {
+			parliament_decisions_grid = {
+				array = parliament_decision_array_1
+				entry_container = parliament_decision_container
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	parliament_decisions_conatiner_grid_2_gui = {
+		context_type = player_context
+
+		window_name = "parliament_decisions_conatiner_grid_2"
+		#parent_window_name = "parliament_decision_window_instance"
+
+		visible = {
+			check_variable = { show_parliament_window > 0 }
+			check_variable = { show_decisions_window  > 0 }
+			has_country_flag = parliament_voting_ongoing_flag
+		}
+
+		effects = {
+			parliament_decision_select_click = {
+				custom_effect_tooltip = AUS_multinational_empire_enact_decision_tt
+				parliament_enact_decision = yes
+			}
+		}
+
+		triggers = {
+			parliament_decision_select_click_enabled = {
+				if = {
+					limit = { check_variable = { lp_cost@var:v > 0 } }
+					set_temp_variable = { lpcost = lp_cost@var:v }
+					has_political_power > var:lpcost
+				}
+				if = {
+					limit = { check_variable = { money_cost@var:v > 0 } }
+					set_temp_variable = { moneycost = money_cost@var:v }
+					set_temp_variable = { amount_of_money_to_check = var:moneycost }
+					has_less_than_specific_amount_of_money = no
+				}
+				NOT = { has_country_flag = Parliament_decision_active_flag }
+				check_variable = { clicked@var:v = 0 }
+				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+
+				### Checking if the decision is available ###
+				if = {
+					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
+					has_thirty_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_minor_research_grant } }
+					has_twenty_five_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_major_research_grant } }
+					has_thirty_five_percent_government_support = yes
+					has_stability > 0.50
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_enact_a_stricter_budget } }
+					has_fourty_percent_government_support = yes
+					has_stability > 0.40
+					set_temp_variable = { amount_of_money_to_check = 10 }
+					has_less_than_specific_amount_of_money = yes
+					NOT = { has_idea = parliament_idea_a_strict_budget }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_increase_government_legitimacy } }
+					has_thirty_percent_government_support = yes
+					check_variable = { political_legitimacy < 0.60 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament } }
+					PS_pol_positive = yes
+					check_variable = { political_legitimacy > 0.59 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
+					has_active_mission = parliament_coalition_breakaway_mission
+				}
+			}
+			parliament_decision_timeout_visible = {
+				check_variable = { clicked@var:v > 0 }
+			}
+			parliament_decision_cost_visible = {
+				NOT = { check_variable = { clicked@var:v > 0 } }
+			}
+			parliament_decision_background_available_visible = {
+				if = {
+					limit = { check_variable = { lp_cost@var:v > 0 } }
+					set_temp_variable = { lpcost = lp_cost@var:v }
+					has_political_power > var:lpcost
+				}
+				if = {
+					limit = { check_variable = { money_cost@var:v > 0 } }
+					set_temp_variable = { moneycost = money_cost@var:v }
+					set_temp_variable = { amount_of_money_to_check = var:moneycost }
+					has_less_than_specific_amount_of_money = no
+				}
+				NOT = { has_country_flag = Parliament_decision_active_flag }
+				check_variable = { clicked@var:v = 0 }
+				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
+
+				### Checking if the decision is available ###
+				if = {
+					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
+					has_thirty_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_minor_research_grant } }
+					has_twenty_five_percent_government_support = yes
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_major_research_grant } }
+					has_thirty_five_percent_government_support = yes
+					has_stability > 0.50
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_enact_a_stricter_budget } }
+					has_fourty_percent_government_support = yes
+					has_stability > 0.40
+					set_temp_variable = { amount_of_money_to_check = 10 }
+					has_less_than_specific_amount_of_money = yes
+					NOT = { has_idea = parliament_idea_a_strict_budget }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_increase_government_legitimacy } }
+					has_thirty_percent_government_support = yes
+					check_variable = { political_legitimacy < 0.60 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament } }
+					PS_pol_positive = yes
+					check_variable = { political_legitimacy > 0.59 }
+				}
+				if = {
+					limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
+					has_active_mission = parliament_coalition_breakaway_mission
+				}
 			}
 			parliament_decision_background_in_progress_visible = {
 				check_variable = { clicked@var:v = 1 }
@@ -196,11 +440,12 @@ scripted_gui = {
 			parliament_decision_icon = {
 				image = "[GetParliamentDecisionIcon]"
 			}
+			parliament_progress_good  = { frame = ROOT.parliament_decision_category_1_ongoing:days_left }
 		}
 
 		dynamic_lists = {
 			parliament_decisions_grid = {
-				array = parliament_decision_array_1
+				array = parliament_decision_array_2
 				entry_container = parliament_decision_container
 			}
 		}
