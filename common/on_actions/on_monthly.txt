@@ -19,125 +19,114 @@ on_actions = {
 				add_unemployment_effect = yes
 			}
 			eoanb_political_legitimacy_drift = yes
+			set_temp_variable = { gained_money = 0 }
+			if = {
+				limit = {
+					calculate_money_balance = yes
+					OR = {
+						check_variable = { money < 2000000 }
+						NOT = { check_variable = { total_balance_temp > 0 } }
+					}
+					OR = {
+						check_variable = { money > -2000000 }
+						NOT = { check_variable = { total_balance_temp < 0 } }
+					}
+				}
+				set_temp_variable = { gained_money = total_balance_temp }
+				add_to_variable = { money = gained_money }
+			}
+			if = {
+				limit = { check_variable = { money > 2000000 } }
+				set_variable = { money = 2000000 }
+			}
+			else_if = {
+				limit = { check_variable = { money < -2000000 } }
+				set_variable = { money = -2000000 }
+			}
+			if = {
+				limit = { calculate_inflation_change = yes }
+				add_to_variable = { current_inflation = daily_inflation_change }
+				set_variable = { inflation_effect_var = current_inflation }
+				divide_variable = { inflation_effect_var = -10 }
+			}
+			if = {
+				limit = { check_variable = { current_inflation < 0 } }
+				set_variable = { current_inflation = 0 }
+			}
+			else_if = {
+				limit = { check_variable = { current_inflation > 20000 } }
+				set_variable = { current_inflation = 20000 }
+			}
+			
 
-			#if = {
-				#limit = { NOT = has_idea = { traditional_economy } }
-				set_temp_variable = { gained_money = 0 }
+			if = {
+				limit = {
+					is_ai = no
+					check_variable = { money < 0 }
+				}
+				set_temp_variable = { loans_amount = 0 }
+				subtract_from_temp_variable = { loans_amount = money }
+				divide_temp_variable = { loans_amount = 100 }
+				add_to_temp_variable = { loans_amount = 0.5 }
+				round_temp_variable = loans_amount
+				take_loan_effect = yes
+				if = {
+					limit = { check_variable = { current_loans_sum > 0 } }
+					set_variable = { show_automatic_loan_popup = 1 }
+					set_variable = { automatic_loan_amount = loans_amount }
+				}
 				if = {
 					limit = {
-						calculate_money_balance = yes
-						OR = {
-							check_variable = { money < 2000000 }
-							NOT = { check_variable = { total_balance_temp > 0 } }
-						}
-						OR = {
-							check_variable = { money > -2000000 }
-							NOT = { check_variable = { total_balance_temp < 0 } }
-						}
+						tag = GRE
+						has_idea = GRE_idea_national_debt
 					}
-					set_temp_variable = { gained_money = total_balance_temp }
-					add_to_variable = { money = gained_money }
-				}
-				if = {
-					limit = { check_variable = { money > 2000000 } }
-					set_variable = { money = 2000000 }
-				}
-				else_if = {
-					limit = { check_variable = { money < -2000000 } }
-					set_variable = { money = -2000000 }
-				}
-				if = {
-					limit = { calculate_inflation_change = yes }
-					add_to_variable = { current_inflation = daily_inflation_change }
-					set_variable = { inflation_effect_var = current_inflation }
-					divide_variable = { inflation_effect_var = -10 }
-				}
-				if = {
-					limit = { check_variable = { current_inflation < 0 } }
-					set_variable = { current_inflation = 0 }
-				}
-				else_if = {
-					limit = { check_variable = { current_inflation > 20000 } }
-					set_variable = { current_inflation = 20000 }
-				}
-				
 
-				if = {
-					limit = {
-						is_ai = no
-						check_variable = { money < 0 }
-					}
-					set_temp_variable = { loans_amount = 0 }
-					subtract_from_temp_variable = { loans_amount = money }
-					divide_temp_variable = { loans_amount = 100 }
-					add_to_temp_variable = { loans_amount = 0.5 }
-					round_temp_variable = loans_amount
-					take_loan_effect = yes
-					if = {
-						limit = {
-							is_ai = no
-							check_variable = { current_loans_sum > 0 }
-						}
-						set_variable = { show_automatic_loan_popup = 1 }
-						set_variable = { automatic_loan_amount = loans_amount }
-					}
-					if = {
-						limit = {
-							tag = GRE
-							has_idea = GRE_idea_national_debt
-						}
-
-						set_temp_variable = { inflation_to_gain = 0.1 }
-						add_inflation_with_tooltip_effect = yes
-						set_temp_variable = { money_to_gain = 10 }
-						add_money_with_tooltip_effect = yes
-					}
+					set_temp_variable = { inflation_to_gain = 0.1 }
+					add_inflation_with_tooltip_effect = yes
+					set_temp_variable = { money_to_gain = 10 }
+					add_money_with_tooltip_effect = yes
 				}
+			}
 
+			if = {
+				limit = { is_ai = yes }
 				if = {
-					limit = {
-						is_ai = yes
-						check_variable = { money < 0 }
-					}
+					limit = { check_variable = { money < 0 } }
 					add_to_variable = { money = 200 }
 				}
-
 				if = {
-					limit = {
-						is_ai = yes
-						check_variable = { current_inflation > 0 }
-					}
+					limit = { is_ai = yes }
 					set_variable = { current_inflation = 0 }
 				}
+			}
 
-				if = {
-					limit = {
-						has_taken_a_loan = yes
-						has_dynamic_modifier = { modifier = bankrolling_giving_money }
-					}
-					remove_dynamic_modifier = { modifier = bankrolling_giving_money }
-					var:bankrolled = {
-						remove_dynamic_modifier = { modifier = bankrolling_recieving_money }
-						clear_variable = bankrolled_recieving
-					}
-					clear_variable = bankrolled
-					clr_country_flag = eoanb_is_bankrolling
-					clear_variable = bankrolled_giving
+			if = {
+				limit = {
+					has_taken_a_loan = yes
+					has_dynamic_modifier = { modifier = bankrolling_giving_money }
 				}
-			#}  # End Money System block
+				remove_dynamic_modifier = { modifier = bankrolling_giving_money }
+				var:bankrolled = {
+					remove_dynamic_modifier = { modifier = bankrolling_recieving_money }
+					clear_variable = bankrolled_recieving
+				}
+				clear_variable = bankrolled
+				clr_country_flag = eoanb_is_bankrolling
+				clear_variable = bankrolled_giving
+			}
 
 			if = {
 				limit = { has_taken_a_loan = yes }
 				add_ideas = debt_idea
 			}
 			else_if = {
-				limit = { has_idea = bankruptcy }
-				remove_ideas = debt_idea
-			}
-			else_if = {
 				limit = {
-					set_temp_variable = { loan_size_to_check = 0 }
-					has_specific_loan_size = yes
+					OR = {
+						has_idea = bankruptcy 
+						set_temp_variable = { loan_size_to_check = 0 }
+						has_specific_loan_size = yes
+					}
+					has_idea = bankruptcy 
 				}
 				remove_ideas = debt_idea
 			}
@@ -194,6 +183,48 @@ on_actions = {
 					round_variable = GER_elsass_french_pop
 				}
 				add_to_variable = { GER_Elsass_Refresh_Variable = 1 }
+			}
+		}
+	}
+	on_monthly_RUS = {
+		effect = {
+			# Galician underdevelopment: monthly_population is a country-scope modifier and is
+			# ignored in the per-state poverty/backwardness dynamic modifiers. Mirror it onto the
+			# owner via a country-scope dynamic modifier so the population-growth penalty applies.
+			if = {
+				limit = {
+					NOT = { has_dynamic_modifier = { modifier = dynmod_galician_underdevelopment } }
+					OR = {
+						owns_state = 88
+						owns_state = 89
+						owns_state = 91
+						owns_state = 1431
+						owns_state = 1321
+					}
+					any_owned_state = {
+						OR = {
+							has_dynamic_modifier = { modifier = dynmod_AUS_galician_poverty }
+							has_dynamic_modifier = { modifier = dynmod_RUS_galician_poverty }
+							has_dynamic_modifier = { modifier = dynmod_RUS_galician_backwardness }
+						}
+					}
+				}
+				add_dynamic_modifier = { modifier = dynmod_galician_underdevelopment }
+			}
+			else_if = {
+				limit = {
+					has_dynamic_modifier = { modifier = dynmod_galician_underdevelopment }
+					NOT = {
+						any_owned_state = {
+							OR = {
+								has_dynamic_modifier = { modifier = dynmod_AUS_galician_poverty }
+								has_dynamic_modifier = { modifier = dynmod_RUS_galician_poverty }
+								has_dynamic_modifier = { modifier = dynmod_RUS_galician_backwardness }
+							}
+						}
+					}
+				}
+				remove_dynamic_modifier = { modifier = dynmod_galician_underdevelopment }
 			}
 		}
 	}
