@@ -33,9 +33,31 @@ on_actions = {
                 }
             }
 
+            # Capture chance modifier unused as it would just increased or decrease death chance
+            #multiply_temp_variable = {
+            #   var = capture_chance
+            #   value = own_capture_chance_factor # the operative's capture chance modifiers
+            #}
+            #clamp_temp_variable = {
+            #   var = capture_chance
+            #   min = 0
+            #   max = 100
+            #}
+
             random_list = {
-                temp_var:capture_chance = { capture_operative = { captured_by = ROOT } }
-                temp_var:kill_chance = { kill_operative = { killed_by = ROOT } }
+                #log = yes # log picked effect in game.log
+
+                temp_var:capture_chance = {
+                   	capture_operative = {
+                   	    captured_by = ROOT
+                   	}  	
+                }
+                temp_var:kill_chance = {
+                    kill_operative = {
+                        killed_by = ROOT
+                    }
+                }
+
             }
 
         }
@@ -48,11 +70,15 @@ on_actions = {
 			# ROOT   the country the operative was performing its mission in
 			# FROM   the country the operative is operating for
 			if = {
-				limit = { NOT = { has_unit_leader_flag = le_clerc1 } }
+				limit = {
+					NOT = { has_unit_leader_flag = le_clerc1 }
+				}
 				set_unit_leader_flag = le_clerc1
 			}
 			else_if = {
-				limit = { has_unit_leader_flag = le_clerc1 }
+				limit = {
+					has_unit_leader_flag = le_clerc1
+				}
 				set_unit_leader_flag = le_clerc2
 			}
 			random_list = {
@@ -89,13 +115,18 @@ on_actions = {
 			# ROOT   the killer country (optional)
 			# FROM   the country the operative is operating for
 			if = {
-				limit = { country_exists = ROOT }
+				limit = {
+					country_exists = ROOT
+				}
 
 				# operative killed by a country, likelly while on mission
 				operative_leader_event = {
 					id = lar_operative_event.3
 					set_from_from = ROOT
 				}
+			}
+			else = {
+				# other cause of death
 			}
 			
 			if = {
@@ -124,15 +155,23 @@ on_actions = {
 						set_from_from = FROM
 					}
 				}
-				35 = { capture_operative = { captured_by = FROM } }
+				35 = {
+					capture_operative = {
+						captured_by = FROM
+					}
+				}
 				20 = {
 					harm_operative_leader = 90
 					operative_leader_event = {
 						id = lar_operative_event.4
 						set_from_from = FROM
 					}
-				} 
-				5 = { kill_operative = { killed_by = FROM } }
+				}
+				5 = {
+					kill_operative = {
+						killed_by = FROM
+					}
+				}
 			}
 		}
 	}
@@ -143,12 +182,17 @@ on_actions = {
 			# THIS: the operation
 			# ROOT: the initiating country
 			# FROM: the target country
+			#log = "This: [This.GetName] From: [From.GetName] Root: [Root.GetName]"
 			
 			if = {
-				limit = { ROOT = { has_country_flag = just_freed_operative_flag } }
+				limit = {
+					ROOT = { has_country_flag = just_freed_operative_flag }
+				}
 				every_operative = {
 					if = {
-						limit = { NOT = { has_trait = operative_escape_artist } }
+						limit = {
+							NOT = { has_trait = operative_escape_artist }
+						}
 						random_list = {
 							15 = { add_unit_leader_trait = operative_escape_artist }
 							85 = {}
@@ -172,7 +216,9 @@ on_actions = {
 			}
 			every_operative = {
 				if = {
-					limit = { has_nationality = FRA }
+					limit = {
+						has_nationality = FRA
+					}
 					ROOT = {
 						add_to_variable = {
 							var = fra_nat
@@ -181,7 +227,9 @@ on_actions = {
 					}
 				}
 				if = {
-					limit = { has_nationality = ENG }
+					limit = {
+						has_nationality = ENG
+					}
 					ROOT = {
 						add_to_variable = {
 							var = eng_nat
@@ -209,4 +257,26 @@ on_actions = {
 			}
 		}
 	}
+
+	# ROOT is capitulated country, FROM is winner
+	on_capitulation = {
+		effect = {
+		}
+	}
+
+	# called a country fully decrypts cipher of a target country
+	# scope is the target country that its cipher is decrypted
+	# from scope is the decrypter country
+	on_fully_decrypted_cipher = {
+
+	}
+
+	# called when a country activates its active cipher bonuses against a target
+	# scope is the target country
+	# from scope is the country that activates its bonuses
+	on_activated_active_decryption_bonuses = {
+
+	}
+
+	#ROOT is winner #FROM gets annexed - This will also fire on_annex
 }

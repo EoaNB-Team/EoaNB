@@ -820,9 +820,6 @@ NMilitary = {
 	FIELD_EXPERIENCE_ON_DIVISION_MULT = 0.04,	-- Multiply field experience gained by this, when applying to divisional commander
 	MAX_FIELD_EXPERIENCE_ON_DIVISION = 8000,	-- Max experience that can be gained on divisional commanders
 	FIELD_EXPERIENCE_ON_DIVISION_PER_MEDAL_MULT = 0.1,	--Multiply officer field experience gain by this * number of division medals on application
-	CAPTAIN_EXPERIENCE_ON_SHIP_MULT = 1.55,		-- Multiply ship experience gained by this, when applying to ship captain
-	MAX_CAPTAIN_EXPERIENCE_ON_SHIP = 8000,		-- Max experience that can be gained on ship captains
-	CAPTAIN_EXPERIENCE_ON_SHIP_PER_MEDAL_MULT = 0.1,	--Multiply ship captain experience gain by this * number of ship medals on application
 	HISTORY_OPERATION_RANDOM_MAX = 24,			-- max random int to roll when determining whether to grant an awardable entry for operations. 1/N chances.
 	CASUALTY_COUNT_FOR_HISTORY_ENTRY = 40000,	-- number of received casualties to receive a history entry (one only)
 	FIELD_OFFICER_PROMOTION_PENALTY = 0.25,		--Amount of division experience lost when promoting a commander (reduced by modifiers)
@@ -856,32 +853,15 @@ NMilitary = {
 
 	RECON_SKILL_IMPACT = 5, -- how many skillpoints is a recon advantage worth when picking a tactic.
 
-	MAX_DIVISION_BRIGADE_WIDTH = 5,			-- Max width of regiments in division designer (non-HQ templates).
-	MAX_DIVISION_BRIGADE_HEIGHT = 5,		-- Max height of regiments in division designer (non-HQ templates).
+	MAX_DIVISION_BRIGADE_WIDTH = 5,			-- Max width of regiments in division designer.
+	MAX_DIVISION_BRIGADE_HEIGHT = 5,		-- Max height of regiments in division designer.
 	MIN_DIVISION_BRIGADE_HEIGHT = 4,		-- Min height of regiments in division designer.
-	MAX_DIVISION_SUPPORT_WIDTH = 1,			-- Max width of support in division designer (non-HQ templates).
-	MAX_DIVISION_SUPPORT_HEIGHT = 5,		-- Max height of support in division designer (non-HQ templates).
-	MAX_REGIMENTAL_SUPPORT_WIDTH = 5,		-- Max width of regimental supports in division designer.
-	MAX_REGIMENTAL_SUPPORT_HEIGHT = 1,		-- Max height of regimental supports in division designer.
-	MAX_HQ_BATTALION_WIDTH = 1,			-- Max width of regiments in division designer (Army HQ templates).
-	MAX_HQ_BATTALION_HEIGHT = 4,			-- Max height of regiments in division designer (Army HQ templates).
-	MAX_HQ_SUPPORT_WIDTH = 1,			-- Max width of support in division designer (Army HQ templates).
-	MAX_HQ_SUPPORT_HEIGHT = 4,			-- Max height of support in division designer (Army HQ templates).
-	MAX_HQ_REGIMENTAL_SUPPORT_WIDTH = 0,		-- Max width of regimental supports in division designer (Army HQ templates).
-	MAX_HQ_REGIMENTAL_SUPPORT_HEIGHT = 0,		-- Max height of regimental supports in division designer (Army HQ templates).
-	REGIMENTAL_SUPPORT_REQUIRED_BATTALIONS = { 3 }, -- For each regimental support row, how many battalions are required in the regiment to be able to place a support in that row.
-	-- When the AI is deciding where to place battalions, it tries to place it in the position with the lowest number according to this grid.
-	AI_BATTALION_BUILD_ORDER = { 	1,  6,  11, 16, 21,
-				     				2,  7,  12, 17, 22,
-				     				3,  8,  13, 18, 23,
-				     				4,  9,  14, 19, 24,
-				     				5,  10, 15, 20, 25 }, 
+	MAX_DIVISION_SUPPORT_WIDTH = 1,			-- Max width of support in division designer.
+	MAX_DIVISION_SUPPORT_HEIGHT = 5,		-- Max height of support in division designer.
 
 	BASE_DIVISION_BRIGADE_GROUP_COST = 20, 	--Base cost to unlock a regiment slot,
 	BASE_DIVISION_BRIGADE_CHANGE_COST = 5,	--Base cost to change a regiment column.
 	BASE_DIVISION_SUPPORT_SLOT_COST = 10, 	--Base cost to unlock a support slot
-
-	REGIMENTAL_SUPPORT_SLOT_COST_MULTIPLIER = 0.5, -- Regimental support slot costs are scaled by this value compared to normal support slots
 
 	MAX_ARMY_EXPERIENCE = 2500,			--Max army experience a country can store
 	MAX_NAVY_EXPERIENCE = 2500,			--Max navy experience a country can store
@@ -1204,14 +1184,6 @@ NMilitary = {
 	UNIT_LEADER_ASSIGN_TRAIT_COST = 15.0,					-- cost to assign a new trait to a unit leader
 	ATTACHED_WINGS_ORDER_UPDATE_DAYS = 5,					-- Days untill the attached wing will update the order
 
-	UNIT_LEADER_MODIFIER_COOLDOWN_ON_DEPLOY = 3,		-- base time in days for a unit leader to be deployed while not already deployed. Instantaneous if 0. Scaled by HQ template manpower.
-	UNIT_LEADER_MODIFIER_COOLDOWN_ON_DEPLOY_MIN = 1,		-- minimum cooldown in days for deploying a unit leader, even for very small HQ templates
-	UNIT_LEADER_MODIFIER_COOLDOWN_ON_REDEPLOY = 15,		-- time in days for a unit leader to de redeployed to a new unit. Instantaneous if 0
-	UNIT_LEADER_MODIFIER_COOLDOWN_ON_WITHDRAW = 3,		-- base time in days for withdrawing a deployed unit leader. Instantaneous if 0. Scaled by HQ template manpower.
-	UNIT_LEADER_MODIFIER_COOLDOWN_ON_WITHDRAW_MIN = 1,		-- minimum cooldown in days for withdrawing a unit leader, even for very small HQ templates
-	UNIT_LEADER_MODIFIER_COOLDOWN_REFERENCE_MANPOWER = 9600,	-- reference manpower for deploy/withdraw cooldown scaling. At this value, delay equals the base.
-	UNIT_LEADER_MODIFIER_COOLDOWN_MANPOWER_EXPONENT = 1.5,		-- exponent for manpower scaling (>1 = big divisions punished harder)
-
 	BORDER_WAR_WIN_DAYS_AGAINST_EMPTY_OPPONENTS = 15,		-- border wars will be automatically won if no opponent shows up for this duration
 
 
@@ -1257,30 +1229,7 @@ NMilitary = {
 		0.95, -- 95% for level one
 		0.05  -- 5% for level two
 		      -- 0% for level three to ten
-	},
-
-	FIGHTING_STRENGTH_DEATH_THRESHOLD = 0.001,		-- fighting strength below which divisions die from attrition
-	FIGHTING_STRENGTH_HQ_ALERT_THRESHOLD = 0.2,		-- fighting strength below which deployed leader have an alert glow on their portrait
-
-	COMMANDER_ABILITY_BASE_RANGE = 20,                  -- Base radius range of commander abilities
-
-	COMMS_MAX_DISTANCE = 4,											-- If N is >= the size of the below arrays, the last value will be considered repeated
-	PLANNING_CAP_COMMS_SCALING = { 1.0, 0.95, 0.9, 0.85, 0.8 },		-- Value at index J is the scaling applied to planning cap when HQ is J provinces behind the frontline
-	PLANNING_CAP_NO_HQ_SCALING = 0.8,								-- Scaling applied to planning cap when there's no HQ (no leader or leader not deployed or not the same root order)
-	PLANNING_SPEED_COMMS_SCALING = { 1.0, 0.95, 0.9, 0.85, 0.8 },		-- Same as PLANNING_CAP_COMMS_SCALING but for planning speed
-	PLANNING_SPEED_NO_HQ_SCALING = 0.8,								-- Same as PLANNING_CAP_NO_HQ_SCALING but for planning speed
-	LEADER_MOD_COMMS_SCALING = { 1.06, 1.04, 1.02, 1.01, 1.0 },		-- Same as PLANNING_CAP_COMMS_SCALING but for leader modifiers
-	LEADER_MOD_NO_HQ_SCALING = 1.0,									-- Same as PLANNING_CAP_NO_HQ_SCALING but for leader modifiers
-	ABILITY_COMMS_SCALING = { 1.06, 1.04, 1.02, 1.01, 1.0 },			-- Same as PLANNING_CAP_COMMS_SCALING but for active abilities
-	ABILITY_NO_HQ_SCALING = 1.0,									-- Same as PLANNING_CAP_NO_HQ_SCALING but for active abilities
-	GENERAL_PROXIMITY_CLOSE = 1,									-- At the "close" proximity setting, the general should stay this many provinces behind the frontline
-	GENERAL_PROXIMITY_MEDIUM = 2,									-- At the "medium" proximity setting, the general should stay this many provinces behind the frontline
-	GENERAL_PROXIMITY_FAR = 3,										-- At the "far" proximity setting, the general should stay this many provinces behind the frontline
-	GENERAL_PROXIMITY_DEFAULT = 1,									-- The default proximity setting for a deployed general. This number should correspond to one of the values above
-	GENERAL_RANK_TO_ARMY_HQ_EXP_LEVEL_FACTOR = 0.5,				    -- The general's rank is multiplied by this factor (rounded up) to determine the spawned Army HQ division's experience level
-	ARMY_HQ_REQUISITION_MINIMUM_REMAINING_PERCENTAGE = 10,		    -- When deploying an Army HQ, divisions will not have their equipment or manpower requisitioned below this percentage of their target manpower or equipment
-
-	PREFERRED_PRISON_VP = 5,	-- When capturing a general, try to find a province with at least that much VP to imprison them. The effective prison VP can be lower than that, if the capturing country doesn't have any province with at least this amount of VP
+	}
 },
 
 
@@ -1577,7 +1526,6 @@ NNavy = {
 	NAVAL_HOMEBASE_OWNERSHIP_BONUS = 0.04,							-- Tuning parameter for homebase calculation. Adds to total score based on if the base is owned by the country doing the calculation.
 	NAVAL_MISSION_AI_RANGE_THRESHOLD_EPSILON = 0.25,				-- Epsilon tolerance for AI naval range threshold checks.
 	NAVAL_MISSION_AI_CONVOY_NORMALIZATION_TARGET = 150,			-- Number of convoys to normalize against when scoring convoy raiding missions.
-	
 	ADMIRAL_TASKFORCE_CAP = 10,										-- admirals will start getting penalties after this amount of taskforces
 
 	DETECTION_CHANCE_MULT_BASE = 0.1,								-- base multiplier value for detection chance. Later the chance is an average between our detection and enemy visibility, mult by surface/sub detection chance in the following defines.
@@ -1608,7 +1556,7 @@ NNavy = {
 	COMBAT_CHASE_RESIGNATION_HOURS = 8,								-- Before we resign chasing enemy, give them some minimum time so the combat doesn't end instantly.
 
 	COMBAT_MAX_GROUPS = 1,											-- Max amount of "Fire Exchange" groups (FEX).
-	COMBAT_MIN_DURATION = 8,										-- Min combat duration before we can retreat. It's a balancing variable so it's not possible to always run with our weak ships against big flotillas.
+	COMBAT_MIN_DURATION = 8,										-- Min combat duration before we can retreat. It's a balancing variable so it's not possible to always run with our weak ships agains big flotillas.
 	COMBAT_INITIAL_DURATION = 6,									-- Number of hours that is considered the "initial phase" of naval combat, used for modifiers like surprise attack during "initial combat"
 	COMBAT_RETREAT_DECISION_CHANCE = 0.22, 							-- There is also random factor in deciding if we should retreat or not. That causes a delay in taking decision, that sooner or later will be picked. It's needed so damaged fast ships won't troll the combat.
 	COMBAT_DETECTED_CONVOYS_FROM_SURFACE_DETECTION_STAT = 0.1,		-- Each 1.0 of surface_detection that ship has (equipment stat), gives x% of convoys discovered from total travelling along the route.
@@ -2122,11 +2070,6 @@ NNavy = {
 	HIT_PROFILE_MULT 												= 50.0,  	-- multiplies hit profile of every ship
 	HIT_PROFILE_SPEED_FACTOR										= 0.5,		-- factors speed value when determining it profile (Vis * HIT_PROFILE_MULT * Ship Hit Profile Mult)
 	HIT_PROFILE_SPEED_BASE											= 20,		-- Base value added to hitprofile speed calulation
-
-	NAVAL_COMBAT_MEDAL_CHANCE										= 24,		-- 1/N chance that a ship gains a medal after participating in a battle
-	NAVAL_COMBAT_MEDAL_MIN_DURATION									= 48,		-- Minimum hours the battle must have taken to gain a medal
-	NAVAL_COMBAT_MEDAL_LAST_MEDAL_LIMIT								= 30,		-- Minimum days before the ship can gain a new medal
-	NAVAL_COMBAT_MEDAL_ALLOW_CONVOY									= false,	-- Do naval attacks on convoy count for medals
 
 	CONVOY_RAID_MAX_REGION_TO_TASKFORCE_RATIO						= 1.5,		-- each taskforce in convoy raid mission can at most cover this many regions without losing efficiency
 	CONVOY_DEFENSE_MAX_CONVOY_TO_SHIP_RATIO							= 2.0,		-- each ship in convoy defense mission can at most cover this many convoys without losing efficiency
@@ -3237,14 +3180,13 @@ NAI = {
 	NAVAL_BASE_RATIO_ALLOCATED_FOR_REPAIRS = 0.15,				-- ai will allocate at most this ratio of dockyards for repairs in peace time
 	NAVAL_BASE_RATIO_ALLOCATED_FOR_REPAIRS_IN_WAR_TIME = 0.25,	-- ai will allocate at most this ratio of dockyards for repairs in war time
 
-	MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 0.25,			-- ai will use at most this ratio of affordable fuel for air training
-
 	AI_SHIP_SWAP_MIN_DAMAGED_SHIPS = 2,							-- minimum number of damaged ships in a taskforce before AI considers swapping them to reserves
 	AI_SHIP_SWAP_DAMAGE_THRESHOLD = 0.33,						-- per-ship strength threshold below which the AI considers a capital/carrier damaged enough to swap to reserves
 	AI_REPAIR_CANCEL_MIN_STRENGTH = 0.75,						-- AI will pull non-reserve task forces out of repair and back on mission once they reach this strength
 	AI_SURFACE_COMBAT_FUEL_RATIO = 0.70,						-- fraction of navy fuel reserved for surface combat (patrols, strike forces, dominance)
 	AI_CONVOY_DEFENSE_FUEL_RATIO = 0.15,						-- fraction of navy fuel reserved for convoy escorts (remaining goes to convoy raiding)
 
+	MAX_FUEL_CONSUMPTION_RATIO_FOR_AIR_TRAINING = 0.25,			-- ai will use at most this ratio of affordable fuel for air training
 	MAX_FUEL_CONSUMPTION_RATIO_FOR_NAVY_TRAINING = 0.25,		-- ai will use at most this ratio of affordable fuel for naval training
 
 	MAX_FULLY_TRAINED_SHIP_RATIO_FOR_TRAINING = 0.7,			-- ai will not train a taskforce if fully trained ships are above this ratio
@@ -3368,8 +3310,8 @@ NAI = {
 
 	EQUIPMENT_UPGRADE_VARIANT_MATCH_SCORE_FACTOR = 0.2, -- the weight of equipment upgrade level when computing the match score of a variant to an ai equipment design.
 
-	AI_UPDATE_ROLES_FREQUENCY_HOURS = 48;               -- Update the roles for a country AI this often (affects performance)
-	AI_NAVAL_GOALS_UPDATE_FREQUENCY_DAYS = 7;           -- Regenerate naval AI objectives this often in days (affects performance)
+	AI_UPDATE_ROLES_FREQUENCY_HOURS = 168;               -- Update the roles for a country AI this often (affects performance)
+	AI_NAVAL_GOALS_UPDATE_FREQUENCY_DAYS = 28;           -- Regenerate naval AI objectives this often in days (affects performance)
 
 	UPDATE_SUPPLY_BOTTLENECKS_FREQUENCY_HOURS = 168;     -- Check for and try to fix supply bottlenecks this often. (168 hours = 1 week)
 	FIX_SUPPLY_BOTTLENECK_SATURATION_THRESHOLD = 0.75;  -- Try to fix supply bottlenecks if supply node saturation exceeds this value.
@@ -3401,10 +3343,6 @@ NAI = {
 	ARMY_LEADER_ASSIGN_NR_TRAITS = 5,                           -- This times general's nr of active traits is added to score
 	ARMY_LEADER_ASSIGN_EXILED_LEADS_EXILED_TROOPS = 10,         -- If exiled leader, increase chance of leading army with exiled troops
 	ARMY_LEADER_ASSIGN_EXILED_LEADS_OWN_EXILED_TROOPS = 100,    -- If exiled leader, increase chance of leading army with exiled troops from same country as the leader
-	ARMY_LEADER_ASSIGN_WITHDRAW_DAYS = 7,						-- General will withdraw from HQ after that many days without an order HQ can influence (frontline or naval invasion)
-	ARMY_LEADER_MIN_DIVISIONS_FOR_HQ = 15,						-- Army must contain at least this many divisions before the AI will deploy an HQ unit for it
-	MAX_DEPLOYED_ARMY_HQS = 5,									-- AI will not deploy more than this many army HQs at once
-	MAX_CAPTURED_GENERALS_TO_STOP_HQ_DEPLOY = 3,				-- AI stops deploying new army HQs once this many of its army leaders are captured
 
 	-- the following defines concern the general's modifiers
 	ARMY_LEADER_ASSIGN_DEFENSE_MAX_DIG_IN_FACTOR = 1.0,         -- If defensive army, importance of general's MAX_DIG_IN_FACTOR modifier
@@ -3476,7 +3414,7 @@ NAI = {
 	AI_WANTED_CARRIER_BASED_PLANES_FACTOR = 1.0,	-- Factor applied to desire for carrier based planes (total carrier space * define)
 
 	-- AIFC stands for "AI Force Concentration". Using acronym to keep define names shorter.
-	AIFC_UPDATE_FREQUENCY_DAYS = 5,                             -- How often will AI run its AI force concentration logic. Lowering this number may decrease performance.
+	AIFC_UPDATE_FREQUENCY_DAYS = 7,                             -- How often will AI run its AI force concentration logic. Lowering this number may decrease performance.
 	AIFC_FRESHNESS_BASE_VALUE = 45.0,                           -- AIFC fronts have a "freshness value" which decreases if no progress is made. When it reaches zero, it will give up on the current target and try another.
 	AIFC_REFRESH_NEED_PER_DAY = 1.0,                            -- Decrease freshness value with this every day.
 	AIFC_REFRESH_NEED_SUPPLY_FACTOR_PER_DAY = 0.8,              -- Decrease freshness value with this multiplied by average supply ratio every day.

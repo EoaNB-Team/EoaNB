@@ -18,28 +18,28 @@
 increase_trade_law = {
 	if = {
 		limit = {
-			has_idea = isolationism
+			has_idea = closed_economy
 		}
 		swap_ideas = {
-			remove_idea = isolationism
-			add_idea = protectionism
+			remove_idea = closed_economy
+			add_idea = limited_exports
 		}
 	}
 	else_if = {
 		limit = {
-			has_idea = protectionism
+			has_idea = limited_exports
 		}
 		swap_ideas = {
-			remove_idea = protectionism
-			add_idea = mercantilism
+			remove_idea = limited_exports
+			add_idea = export_focus
 		}
 	}
 	else_if = {
 		limit = {
-			has_idea = mercantilism
+			has_idea = export_focus
 		}
 		swap_ideas = {
-			remove_idea = mercantilism
+			remove_idea = export_focus
 			add_idea = free_trade
 		}
 	}
@@ -58,32 +58,136 @@ decrease_trade_law = {
 		}
 		swap_ideas = {
 			remove_idea = free_trade
-			add_idea = mercantilism
+			add_idea = export_focus
 		}
 	}
 	else_if = {
 		limit = {
-			has_idea = mercantilism
+			has_idea = export_focus
 		}
 		swap_ideas = {
-			remove_idea = mercantilism
-			add_idea = protectionism
+			remove_idea = export_focus
+			add_idea = limited_exports
 		}
 	}
 	else_if = {
 		limit = {
-			has_idea = protectionism
+			has_idea = limited_exports
 		}
 		swap_ideas = {
-			remove_idea = protectionism
-			add_idea = isolationism
+			remove_idea = limited_exports
+			add_idea = closed_economy
 		}
 	}
 	else_if = {
 		limit = {
-			has_idea = isolationism
+			has_idea = closed_economy
 		}
 		add_stability = 0.01
+	}
+}
+
+increase_voting_rights = {
+	if = {
+		limit = {
+			has_idea = absolutism
+		}
+		swap_ideas = {
+			remove_idea = absolutism
+			add_idea = oligarchism
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = oligarchism
+		}
+		swap_ideas = {
+			remove_idea = oligarchism
+			add_idea = parliamentary_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = parliamentary_suffrage
+		}
+		swap_ideas = {
+			remove_idea = parliamentary_suffrage
+			add_idea = property_owners_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = property_owners_suffrage
+		}
+		swap_ideas = {
+			remove_idea = property_owners_suffrage
+			add_idea = universal_male_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = universal_male_suffrage
+		}
+		swap_ideas = {
+			remove_idea = universal_male_suffrage
+			add_idea = universal_suffrage
+		}
+	}
+	else = {
+		add_political_power = -50
+		add_stability = 0.01
+	}
+}
+
+decrease_voting_rights = {
+	if = {
+		limit = {
+			has_idea = universal_suffrage
+		}
+		swap_ideas = {
+			remove_idea = universal_suffrage
+			add_idea = universal_male_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = universal_male_suffrage
+		}
+		swap_ideas = {
+			remove_idea = universal_male_suffrage
+			add_idea = property_owners_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = property_owners_suffrage
+		}
+		swap_ideas = {
+			remove_idea = property_owners_suffrage
+			add_idea = parliamentary_suffrage
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = parliamentary_suffrage
+		}
+		swap_ideas = {
+			remove_idea = parliamentary_suffrage
+			add_idea = oligarchism
+		}
+	}
+	else_if = {
+		limit = {
+			has_idea = oligarchism
+		}
+		swap_ideas = {
+			remove_idea = oligarchism
+			add_idea = absolutism
+		}
+	}
+	else = {
+		add_political_power = 50
+		add_stability = -0.01
 	}
 }
 
@@ -608,6 +712,33 @@ RUS_PIE_Galicia_Conference_Pass = {
 	}
 }
 
+#Country scope
+ROOT_inherit_current_scope_wars_effect = {
+	custom_effect_tooltip = ROOT_inherit_current_scope_wars_effect
+	hidden_effect = {
+		every_country = {
+			limit = {
+				has_defensive_war_with = PREV
+			}
+			ROOT = {
+				declare_war_on = {
+					target = PREV
+					type = annex_everything
+				}
+			}
+		}
+		every_country = {
+			limit = {
+				has_offensive_war_with = PREV
+			}
+			declare_war_on = {
+				target = ROOT
+				type = annex_everything
+			}
+		}
+	}
+}
+
 apply_ruling_party_popularity_change = {
 	if = {
 		limit = { has_government = centrism }
@@ -715,7 +846,13 @@ ruling_party_gain_10_popularity = {
 
 clear_sabotaged_resources_if_necesary = {
 	if = {
-		limit = { not = { has_dynamic_modifier = { modifier = sabotaged_resources } } }
+		limit = {
+			not = {
+				has_dynamic_modifier = {
+					modifier = sabotaged_resources
+				}
+			}
+		}
 		clear_variable = sabotaged_oil
 		clear_variable = sabotaged_aluminium
 		clear_variable = sabotaged_rubber

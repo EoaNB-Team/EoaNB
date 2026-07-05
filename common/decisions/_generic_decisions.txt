@@ -5,9 +5,14 @@ eoanb_category_war_measures = {
 	eoanb_decision_war_austerity = {
 		icon = generic_civil_support
 		
-		visible = { NOT = { has_idea = pre_industrial_era } }
+		visible = {
+			NOT = { has_idea = pre_industrial_era }
+			NOT = { has_idea = post_digital_era }
+		}
 		
-		available = { surrender_progress > 0.25 }
+		available = {
+			surrender_progress > 0.25
+		}
 		
 		cost = 150
 		days_remove = 180
@@ -35,7 +40,9 @@ eoanb_category_war_measures = {
 			}
 		}
 		
-		available = { num_divisions > 5 }
+		available = {
+			num_divisions > 5
+		}
 		
 		cost = 50
 		days_remove = 14
@@ -68,7 +75,9 @@ eoanb_category_war_measures = {
 			}
 		}
 		
-		available = { NOT = { has_idea = scraping_the_barrel } }
+		available = {
+			NOT = { has_idea = scraping_the_barrel }
+		}
 		
 		cost = 10
 		days_re_enable = 365
@@ -462,8 +471,8 @@ eoanb_category_economic = {
 		
 		visible = {
 			date > 1860.1.1
-			has_idea = private_education
-			NOT = { has_idea = public_schooling_system }
+			has_idea = privileged_education
+			NOT = { has_idea = open_schools }
 			num_of_factories > 10
 			OR = {
 				has_idea = victorian_era
@@ -483,8 +492,8 @@ eoanb_category_economic = {
 			custom_effect_tooltip = eoanb_decision_generic_provide_public_education_effect_tt
 			hidden_effect = {
 				swap_ideas = {
-					remove_idea = private_education
-					add_idea = public_schooling_system
+					remove_idea = privileged_education
+					add_idea = open_schools
 				}
 			}
 		}
@@ -506,9 +515,9 @@ eoanb_category_economic = {
 			check_variable = { money > 0 }
 			num_of_factories > 4
 			OR = {
-				has_idea = private_education
-				has_idea = public_schooling_system
-
+				has_idea = privileged_education
+				has_idea = open_schools
+				has_idea = compulsory_education
 			}
 			OR = {
 				has_idea = victorian_era
@@ -723,7 +732,9 @@ eoanb_category_economic = {
 	reduce_inflation = {
 		icon = GFX_decision_GENERIC_Deflation_Measures
 		
-		visible = { check_variable = { current_inflation > 0 } }
+		visible = {
+			check_variable = { current_inflation > 0 }
+		}
 		
 		available = {
 			if = {
@@ -850,7 +861,9 @@ eoanb_category_economic = {
 			calculate_money_balance = yes
 			set_temp_variable = { required_income = expenses_from_loans }
 			multiply_temp_variable = { required_income = -1 }
-			NOT = { check_variable = { total_income_temp > required_income } }
+			NOT = {
+				check_variable = { total_income_temp > required_income }
+			}
 		}
 		
 		available = {
@@ -876,7 +889,53 @@ eoanb_category_economic = {
 			}
 		}
 		
-		timeout_effect = { become_bankrupt_effect = yes }
+		timeout_effect = {
+			become_bankrupt_effect = yes
+		}
+	}
+	
+	# Can Become Bankrupt At War Mission
+	can_become_bankrupt_at_war_mission = {
+		icon = decision_envelope
+		
+		activation = {
+			NOT = { has_idea = bankruptcy }
+			has_war = yes
+			has_taken_a_loan = yes
+			calculate_money_balance = yes
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
+			NOT = {
+				check_variable = { total_income_temp > required_income }
+			}
+		}
+		
+		available = {
+			calculate_money_balance = yes
+			set_temp_variable = { required_income = expenses_from_loans }
+			multiply_temp_variable = { required_income = -1 }
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = HAS_MORE_INCOME_THAN_LOAN_EXPENSES
+					check_variable = { total_income_temp > required_income }
+				}
+				has_war = no
+			}
+		}
+		
+		days_mission_timeout = 180
+		is_good = no
+		
+		complete_effect = {
+			hidden_effect = {
+				activate_mission = can_become_bankrupt_mission
+				remove_mission = can_become_bankrupt_mission
+			}
+		}
+		
+		timeout_effect = {
+			become_bankrupt_effect = yes
+		}
 	}
 }
 
@@ -896,7 +955,9 @@ eoanb_category_politics_internal = {
 			}
 		}
 		
-		available = { has_stability > 0.6 }
+		available = {
+			has_stability > 0.6
+		}
 		
 		cost = 150
 		days_remove = 180
@@ -936,8 +997,8 @@ eoanb_category_politics_internal = {
 		available = {
 			has_war = no
 			OR = {
-				has_idea = demobilised_economy
-				has_idea = low_level_mobilisation
+				has_idea = civilian_economy
+				has_idea = low_economic_mobilisation
 			}
 		}
 		
@@ -980,7 +1041,7 @@ eoanb_category_politics_internal = {
 		
 		available = {
 			OR = {
-
+				NOT = { has_idea = free_elections }
 				has_stability > 0.5
 			}
 		}
@@ -1101,189 +1162,188 @@ eoanb_category_politics_internal = {
 			set_temp_variable = { political_legitimacy_change = 0.1 }
 			eoanb_political_legitimacy_change = yes
 		}
+		
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 10
+				has_army_experience > 250
+				check_variable = { political_legitimacy < 0.6 }
+			}
+			modifier = {
+				add = 10
+				has_war = no
+				has_army_experience > 200
+				check_variable = { political_legitimacy < 0.45 }
+			}
+		}
 	}
-	#eoanb_decision_generic_arrest_opposition_leaders = {
-	#	icon = GFX_decision_generic_political_discourse
-	#	available = {
-	#		NOT = {
-	#			has_country_flag = parl_political_action_in_progress
-	#		}
-	#	}
-	#	days_remove = 7
-	#	custom_cost_trigger = {
-	#		if = {
-	#			limit = {
-	#				OR = {
-	#					has_idea = GEC_idea_polizeiverein_leader_1
-	#					has_idea = GEC_idea_polizeiverein_leader_2
-	#					has_idea = GEC_idea_polizeiverein_member
-	#				}
-	#			}
-	#			has_political_power > 50
-	#		}
-	#		else = {
-	#			has_political_power > 75
-	#		}
-	#	}
-	#	custom_cost_text = eoanb_decision_generic_arrest_opposition_leaders_cost
-	#	visible = {
-	#		NOT = {
-	#			OR = {
-	#				has_country_flag = eoanb_decision_generic_arrest_opposition_leaders_is_prohibited
-	#				afr_is_tribal = yes
-	#				tag = PIE
-	#				tag = TUS
-	#			}
-	#		}
-	#	}
-	#	complete_effect = {
-	#		custom_effect_tooltip = eoanb_decision_generic_arrest_opposition_leaders_tt
-	#		if = {
-	#			limit = {
-	#				OR = {
-	#					has_idea = GEC_idea_polizeiverein_leader_1
-	#					has_idea = GEC_idea_polizeiverein_leader_2
-	#					has_idea = GEC_idea_polizeiverein_member
-	#				}
-	#			}
-	#			add_political_power = -50
-	#		}
-	#		else = {
-	#			add_political_power = -75
-	#		}
-	#		set_country_flag = parl_political_action_in_progress
-	#	}
-	#	modifier = {
-	#		political_power_gain = -0.25
-	#	}
-	#	remove_effect = {
-	#		clr_country_flag = parl_political_action_in_progress
-	#		for_each_loop = {
-	#			array = seats_count_array
-	#			value = parl_v
-	#			index = parl_i
-	#			if = {
-	#				limit = {
-	#					check_variable = {
-	#						parl_coalitions^parl_i = 2
-	#					}
-	#				}
-	#				set_temp_variable = {
-	#					parl_r = random
-	#				}
-	#				multiply_temp_variable = {
-	#					parl_r = -5
-	#				}
-	#				round_variable = parl_r
-	#				add_to_temp_variable = {
-	#					parl_r = -1
-	#				}
-	#				add_to_variable = {
-	#					seats_count_array^parl_i = parl_r
-	#				}
-	#			}
-	#		}
-	#		add_to_variable = {
-	#			political_legitimacy = -0.15
-	#		}
-	#		clamp_variable = {
-	#			var = political_legitimacy
-	#			min = 0
-	#			max = 1
-	#		}
-	#		compute_number_seats_tot = yes
-	#		compute_number_seats_approve_est = yes
-	#	}
-	#}
-	#eoanb_decision_generic_ban_opposition_party = {
-	#	icon = GFX_decision_oppression
-	#	available = {
-	#		NOT = {
-	#			has_country_flag = parl_political_action_in_progress
-	#		}
-	#	}
-	#	days_remove = 7
-	#	custom_cost_trigger = {
-	#		if = {
-	#			limit = {
-	#				OR = {
-	#					has_idea = GEC_idea_polizeiverein_leader_1
-	#					has_idea = GEC_idea_polizeiverein_leader_2
-	#					has_idea = GEC_idea_polizeiverein_member
-	#				}
-	#			}
-	#			has_political_power > 75
-	#		}
-	#		else = {
-	#			has_political_power > 100
-	#		}
-	#	}
-	#	custom_cost_text = eoanb_decision_generic_ban_opposition_party_cost
-	#	visible = {
-	#		NOT = {
-	#			OR = {
-	#				has_country_flag = eoanb_decision_generic_ban_opposition_party_is_prohibited
-	#				afr_is_tribal = yes
-	#				tag = PIE
-	#				tag = TUS
-	#			}
-	#		}
-	#	}
-	#	complete_effect = {
-	#		custom_effect_tooltip = eoanb_decision_generic_ban_opposition_party_tt
-	#		if = {
-	#			limit = {
-	#				OR = {
-	#					has_idea = GEC_idea_polizeiverein_leader_1
-	#					has_idea = GEC_idea_polizeiverein_leader_2
-	#					has_idea = GEC_idea_polizeiverein_member
-	#				}
-	#			}
-	#			add_political_power = -75
-	#		}
-	#		else = {
-	#			add_political_power = -100
-	#		}
-	#		set_country_flag = parl_political_action_in_progress
-	#	}
-	#	modifier = {
-	#		political_power_gain = -0.25
-	#	}
-	#	remove_effect = {
-	#		clr_country_flag = parl_political_action_in_progress
-	#		for_each_loop = {
-	#			array = seats_count_array
-	#			value = parl_v
-	#			index = parl_i
-	#			if = {
-	#				limit = {
-	#					check_variable = {
-	#						parl_coalitions^parl_i = 2
-	#					}
-	#				}
-	#				set_variable = {
-	#					seats_count_array^parl_i = 0
-	#				}
-	#				set_variable = {
-	#					parl_coalitions^parl_i = 3
-	#				}
-	#			}
-	#		}
-	#		add_to_variable = {
-	#			political_legitimacy = -0.25
-	#		}
-	#		clamp_variable = {
-	#			var = political_legitimacy
-	#			min = 0
-	#			max = 1
-	#		}
-	#		apply_coalition_modifier = yes
-	#		compute_weights = yes
-	#		draw_seats = yes
-	#		compute_number_seats_tot = yes
-	#		compute_number_seats_approve_est = yes
-	#	}
-	#}
+	
+	# Arrest Opposition Leaders
+	eoanb_decision_generic_arrest_opposition_leaders = {
+		icon = GFX_decision_generic_political_discourse
+		
+		visible = {
+			NOT = {
+				has_country_flag = eoanb_decision_generic_arrest_opposition_leaders_is_prohibited
+				tag = PIE
+				tag = TUS
+			}
+		}
+		
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+		
+		days_remove = 7
+		
+		custom_cost_trigger = {
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				has_political_power > 49.9
+			}
+			else = {
+				has_political_power > 74.9
+			}
+		}
+		custom_cost_text = eoanb_decision_generic_arrest_opposition_leaders_cost
+		
+		modifier = {
+			political_power_gain = -0.25
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = eoanb_decision_generic_arrest_opposition_leaders_tt
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				add_political_power = -50
+			}
+			else = {
+				add_political_power = -75
+			}
+			set_country_flag = parl_political_action_in_progress
+		}
+		
+		remove_effect = {
+			clr_country_flag = parl_political_action_in_progress
+			for_each_loop = {
+				array = seats_count_array
+				value = parl_v
+				index = parl_i
+				if = {
+					limit = { check_variable = { parl_coalitions^parl_i = 2 } }
+					set_temp_variable = { parl_r = random }
+					multiply_temp_variable = { parl_r = -5 }
+					round_variable = parl_r
+					add_to_temp_variable = { parl_r = -1 }
+					add_to_variable = { seats_count_array^parl_i = parl_r }
+				}
+			}
+			add_to_variable = { political_legitimacy = -0.15 }
+			clamp_variable = {
+				var = political_legitimacy
+				min = 0
+				max = 1
+			}
+			compute_number_seats_tot = yes
+			compute_number_seats_approve_est = yes
+		}
+	}
+	
+	# Ban Opposition Party
+	eoanb_decision_generic_ban_opposition_party = {
+		icon = GFX_decision_oppression
+		
+		visible = {
+			NOT = {
+				has_country_flag = eoanb_decision_generic_ban_opposition_party_is_prohibited
+				tag = PIE
+				tag = TUS
+			}
+		}
+		
+		available = {
+			NOT = { has_country_flag = parl_political_action_in_progress }
+		}
+		
+		days_remove = 7
+		
+		custom_cost_trigger = {
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				has_political_power > 75
+			}
+			else = {
+				has_political_power > 100
+			}
+		}
+		custom_cost_text = eoanb_decision_generic_ban_opposition_party_cost
+		
+		modifier = {
+			political_power_gain = -0.25
+		}
+		
+		complete_effect = {
+			custom_effect_tooltip = eoanb_decision_generic_ban_opposition_party_tt
+			if = {
+				limit = {
+					OR = {
+						has_idea = GEC_idea_polizeiverein_leader_1
+						has_idea = GEC_idea_polizeiverein_leader_2
+						has_idea = GEC_idea_polizeiverein_member
+					}
+				}
+				add_political_power = -75
+			}
+			else = {
+				add_political_power = -100
+			}
+			set_country_flag = parl_political_action_in_progress
+		}
+		
+		remove_effect = {
+			clr_country_flag = parl_political_action_in_progress
+			for_each_loop = {
+				array = seats_count_array
+				value = parl_v
+				index = parl_i
+				if = {
+					limit = { check_variable = { parl_coalitions^parl_i = 2 } }
+					set_variable = { seats_count_array^parl_i = 0 }
+					set_variable = { parl_coalitions^parl_i = 3 }
+				}
+			}
+			add_to_variable = { political_legitimacy = -0.25 }
+			clamp_variable = {
+				var = political_legitimacy
+				min = 0
+				max = 1
+			}
+			apply_coalition_modifier = yes
+			compute_weights = yes
+			draw_seats = yes
+			compute_number_seats_tot = yes
+			compute_number_seats_approve_est = yes
+		}
+	}
 }
 
 # Political Actions (Empty Category)
@@ -1312,7 +1372,9 @@ eoanb_category_diplomatic_actions = {
 			}
 		}
 		
-		available = { has_war = no }
+		available = {
+			has_war = no
+		}
 		
 		fire_only_once = yes
 		cost = 10
@@ -1342,7 +1404,9 @@ eoanb_category_diplomatic_actions = {
 			has_global_flag = eoanb_flag_new_york_renamed_new_amsterdam
 		}
 		
-		available = { has_war = no }
+		available = {
+			has_war = no
+		}
 		
 		fire_only_once = yes
 		cost = 10
@@ -1366,9 +1430,13 @@ eoanb_category_diplomatic_actions = {
 		
 		allowed = { tag = RUS }
 		
-		visible = { RUS = { owns_state = 1001 } }
+		visible = {
+			RUS = { owns_state = 1001 }
+		}
 		
-		available = { has_war = no }
+		available = {
+			has_war = no
+		}
 		
 		fire_only_once = yes
 		cost = 10
@@ -1408,7 +1476,9 @@ eoanb_category_diplomatic_actions = {
 			}
 		}
 		
-		available = { has_war = no }
+		available = {
+			has_war = no
+		}
 		
 		fire_only_once = yes
 		cost = 10
@@ -1502,7 +1572,9 @@ eoanb_category_military = {
 			}
 		}
 		
-		available = { NOT = { has_idea = disarmed_nation } }
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
 		
 		fire_only_once = yes
 		cost = 50
@@ -1603,7 +1675,9 @@ eoanb_category_military = {
 			}
 		}
 		
-		available = { NOT = { has_idea = disarmed_nation } }
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
 		
 		fire_only_once = yes
 		cost = 50
@@ -1704,7 +1778,9 @@ eoanb_category_military = {
 			}
 		}
 		
-		available = { NOT = { has_idea = disarmed_nation } }
+		available = {
+			NOT = { has_idea = disarmed_nation }
+		}
 		
 		fire_only_once = yes
 		cost = 50
@@ -1812,7 +1888,9 @@ eoanb_category_navy = {
 			NOT = { has_country_flag = naval_command_founded }
 		}
 		
-		available = { has_navy_size = { size > 1 } }
+		available = {
+			has_navy_size = { size > 1 }
+		}
 		
 		fire_only_once = yes
 		cost = 0
@@ -1878,7 +1956,9 @@ eoanb_category_traditions_celebrations = {
 			}
 		}
 		
-		available = { has_stability > 0.1 }
+		available = {
+			has_stability > 0.1
+		}
 		
 		cost = 25
 		days_re_enable = 365
@@ -1893,21 +1973,6 @@ eoanb_category_traditions_celebrations = {
 
 # Options Category
 eoanb_category_options = {
-
-	eoanb_decision_disable_options = {
-		icon = generic_decision
-		
-		visible = {
-			is_ai = no
-			NOT = { has_country_flag = eoanb_startup_event_marker }
-		}
-		
-		cost = 0
-
-		complete_effect = {
-			set_country_flag = eoanb_flag_options_disabled
-		}
-	}	
 	
 	# Open Options Menu
 	eoanb_decision_open_options = {

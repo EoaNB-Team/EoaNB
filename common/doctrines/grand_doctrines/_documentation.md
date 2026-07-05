@@ -24,9 +24,6 @@ mobile_warfare = {
         armor
         operations
     }
-    
-    max_track_rows = 2 # Optional: unlimited by default
-    max_track_columns = 2 # Optional: unlimited by default
 
     # ACTIVATION EFFECTS - SEE BELOW
 

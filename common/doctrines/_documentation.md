@@ -25,7 +25,6 @@
 * has_completed_track
 * has_subdoctrine_in_track
 * has_mastery
-* has_mastery_level
 
 ## Doctrine Modifiers
 
@@ -39,12 +38,6 @@ land_doctrine_cost_factor = -0.15 # 15% cost reduction to grand doctrines and su
 ### Mastery Gain modifiers
 
 Note: for these mastery gain modifiers, localization is automatically mapped, meaning you do not have to define unique localization keys for each generated modifier.
-
-* *[folder_name]*_track_mastery_gain_factor
-```
-# Example:
-land_track_mastery_gain_factor = 0.15 # +15% mastery gain for all tracks in the land folder
-```
 
 * *[grand_doctrine_name]*_mastery_gain_factor
 ```
