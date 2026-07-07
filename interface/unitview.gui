@@ -471,6 +471,19 @@ guiTypes = {
 		}
 
 		iconType = {
+			name = "pending_leader_icon"
+			position = {x=9 y=32}
+			quadTextureSprite ="GFX_leader_unknown"
+			scale = 0.15
+		}
+		
+		iconType = {
+			name = "leader_coming"
+			spriteType = "GFX_opinion_arrow_right"
+			position = { x=22 y=32 }
+			alwaystransparent = yes
+		}
+		iconType = {
 			name = "leader_portrait_frame"
 			position = { x = 5 y = 27 }
 			quadTextureSprite = "GFX_unit_leader_portrait_frame_badge"
@@ -513,11 +526,18 @@ guiTypes = {
 			frame = 1
 			pdx_tooltip = "TOGGLE_ARMY_GROUP_VIEW_ARMIES_DIVISIONS"
 		}
+
 		iconType = {
 			name = "leader_enroute"
 			position = { x = 37 y = 73 }
 			quadTextureSprite = "GFX_leader_en_route"
 			alwaystransparent = yes
+		}
+
+		# Applied to "leader_enroute" while "pending_leader_icon" is shown so the icons stack vertically
+		positionType = {
+			name = "pending_leader_shown_offset"
+			position = { x=0 y=31 }
 		}
 
 		iconType = {
@@ -758,6 +778,15 @@ guiTypes = {
 		background = {
 			name = "Background"
 			quadTextureSprite = "GFX_tiled_window_1b_thin_border"
+		}
+
+		# Off-screen anchor for the ctrl+g+s shortcut. containerWindowType cannot host shortcut=,
+		# so a hidden buttonType is the only place the engine will dispatch the chord from.
+		buttonType = {
+			name = "select_hq_shortcut_anchor"
+			position = { x=-1000 y=-1000 }
+			quadTextureSprite = "GFX_group_marker3"
+			shortcut = "ctrl+g+s"
 		}
 
 		containerWindowType = {
@@ -1066,6 +1095,138 @@ guiTypes = {
 						spriteType = "GFX_division_list_column_button"
 						alwaystransparent = yes
 					}
+				}
+			}
+			containerWindowType = {
+				name = "hq_window"
+				position = { x=8 y=-37 }
+				size = { width=423 height=45 }
+				clipping = no
+
+				background = {
+					name = "Background"
+					position = { x=-4 y=-5 }
+					quadTextureSprite ="GFX_army_hq_bg"
+					alwaystransparent = yes
+				}
+
+				containerWindowType = {
+					name = "empty_slot"
+
+					# Off-screen ctrl+g+d chord anchor
+					buttonType = {
+						name = "deploy_hq_shortcut_anchor"
+						position = { x=-1000 y=-1000 }
+						quadTextureSprite = "GFX_group_marker3"
+						shortcut = "ctrl+g+d"
+					}
+
+					# Deploy button lives inside the dropdown (so opening-click counts as "inside"); expand_button is parked off-screen and C++ drives toggling.
+					dropDownBoxType = {
+						name = "deploy_dropdown"
+						position = { x = 45 y = 2 }
+
+						containerWindowType = {
+							name = "deploy_button_container_window"
+							position = { x=0 y=0 }
+
+							buttonType = {
+								name = "deploy"
+								quadTextureSprite = "GFX_deploy_hq_button"
+								font = "hoi_16mbs"
+							}
+
+							instantTextboxType = {
+								name = "deploy_button_label"
+								position = { x = 0 y = 7 }
+								font = "hoi_16mbs"
+								maxWidth = 110
+								format = center
+								alwaystransparent = yes
+							}
+
+							iconType = {
+								name = "template_icon"
+								spriteType = "GFX_unit_infantry_icon_medium" # <- Replaced in code
+								position = { x=97 y=-6 }
+								alwaystransparent = yes
+							}
+
+							instantTextboxType = {
+								name = "deploy_button_template_name"
+								position = { x = 168 y = 8 }
+								font = "hoi_16mbs"
+								maxWidth = 85
+								maxHeight = 20
+								format = left
+								truncate = yes
+								fixedsize = yes
+								alwaystransparent = yes
+							}
+
+							instantTextboxType = {
+								name = "deploy_button_cost"
+								position = { x = 226 y = 8 }
+								font = "hoi_16mbs"
+								maxWidth = 60
+								format = right
+								alwaystransparent = yes
+							}
+
+							instantTextboxType = {
+								name = "deploy_button_no_commander_message"
+								position = { x = 92 y = 8 }
+								font = "hoi_16mbs"
+								maxWidth = 220
+								format = center
+								alwaystransparent = yes
+							}
+						}
+
+						expandButton = {
+							name = "expand_button"
+							spriteType = "GFX_hq_template_selector_button"
+							position = { x=-1000 y=-1000 }
+							clicksound = click_default
+						}
+
+						expandedWindow = {
+							name = "expanded_window"
+							position = { x = 96 y = -280 }
+							show_position = { x = 96 y = 20 }
+							show_animation_type = decelerated
+							hide_animation_type = accelerated
+							animation_time = 300
+							size = { width=230 height=250 }
+							verticalScrollbar = "right_vertical_slider"
+							scroll_wheel_factor = 50
+							smooth_scrolling = yes
+							margin = { top = 18 bottom = 2 right = 6 }
+
+							background = {
+								name = "Background"
+								quadTextureSprite ="GFX_tiled_window_1b_thin_border"
+								position = { x = 0 y = 10 }
+							}
+
+							gridBoxType = {
+								name = "templates_grid"
+								position = { x = 8 y = 0 }
+								size = { width = 199 height = 100%% }
+								slotsize = { width = 220 height = 50 }
+								max_slots_horizontal = 1
+								format = "UPPER_LEFT"
+							}
+						}
+					}
+				}
+				
+				buttonType = {
+					name = "undeploy"
+					position = { x=393 y=0 }
+					spriteType = "GFX_NV_btn_delete"
+					clicksound = disband
+					shortcut = "ctrl+g+w"
 				}
 			}
 			containerWindowType = {
@@ -1394,6 +1555,13 @@ guiTypes = {
 			name = "unitinfo_button"
 			spriteType = "GFX_unitlist_unitinfo_button"
 			position = { x = 22 y = 1 }
+		}
+
+		iconType = {
+			name = "hq_template_frame"
+			spriteType = "GFX_hq_template_selector_button"
+			position = { x=18 y=-3 }
+			alwaystransparent = yes
 		}
 
 		buttonType = {
@@ -1789,6 +1957,27 @@ guiTypes = {
 	}
 
 	containerWindowType = {
+		name = "unit_stats_view_support_entry"
+		position = { x=0 y=0}
+		size = { width=64 height=53 }
+		clipping = no
+
+		background = {
+			name = "background"
+			position = { x = 0 y = 21 }
+			spriteType ="GFX_div_subunit_item_bg"
+		}
+
+		iconType = {
+			name = "unit_icon"
+			position = {x=2 y=20}
+			spriteType = "GFX_locked_icon"
+			Orientation = CENTER_LOWER
+			scale = 0.8
+		}
+	}	
+	
+	containerWindowType = {
 		name = "army_division_stats_view"
 		moveable = yes
 		position = { x = -275 y = -235 }
@@ -2011,59 +2200,206 @@ guiTypes = {
 
 		containerWindowType = {
 			name = "template_tab"
-			size = { width = 548 height = 360 }
+			size = { width=548 height=360 }
 			position = { x = 13 y = 70 }
 			clipping = no
 
 			iconType = {
 				name = "unit_template_tab_bg"
-				quadTextureSprite = "GFX_unit_stats_template_tab_bg"
-				position = { x = -9 y = -1 }
+				quadTextureSprite ="GFX_unit_stats_template_tab_bg"
+				position = { x= -9 y = -1 }
+				Orientation = "UPPER_LEFT"
+				alwaystransparent = yes
+			}
+
+			iconType = {
+				name = "unit_template_hq_bg"
+				quadTextureSprite = "GFX_unit_stats_template_hq_bg"
+				position = { x = -1 y = 28 }
 				Orientation = "UPPER_LEFT"
 				alwaystransparent = yes
 			}
 
 			iconType = {
 				name = "niche"
-				position = {  x=474 y=2 }
+				position = {  x=30 y=40 }
 				spriteType = "GFX_niche_icon_strip"
 			}
-			instantTextboxType = {
-				name = "combat_header_label"
-				position = { x = 105 y = 47 }
-				font = "hoi_18mbs"
-				text = "COMBAT_HEADER"
-				maxWidth = 372
-				maxHeight = 20
-				format = right
-				pdx_tooltip = "DESIGNER_MAIN_COLUMN_TITLE"
+
+
+			containerWindowType = {
+				name = "subunits"
+				
+				instantTextboxType = {
+					name = "division_composition_header"
+					position = { x = 18 y = 4 }
+					font = "hoi_18mbs"
+					text = "DESIGNER_DIVISIONAL_COMPOSITION"
+					maxWidth = 372
+					maxHeight = 20
+					format = left
+					pdx_tooltip = "DESIGNER_MAIN_COLUMN_TITLE"
+				}
+
+				instantTextboxType = {
+					position = { x = 221 y = 44 }
+					name = "combat_width_text"
+					font = "hoi_18mbs"
+					maxWidth = 40
+					format = center
+				}
+
+				instantTextboxType = {
+					name = "support_header_label"
+					position = { x = 418 y = 99 }
+					font = "hoi_16mbs"
+					text = "SUPPORT_HEADER"
+					maxWidth = 110
+					maxHeight = 20
+					format = center
+					pdx_tooltip = "DESIGNER_SUPPORT_COLUMN_TITLE"
+				}
+
+				instantTextboxType = {
+					name = "regimental_support_header_label"
+					position = { x = 94 y = 373 }
+					font = "hoi_16mbs"
+					text = "REGIMENTAL_SUPPORT_HEADER"
+					maxWidth = 250
+					maxHeight = 20
+					format = center
+					pdx_tooltip = "DESIGNER_REGIMENTAL_SUPPORT_COLUMN_TITLE"
+				}
+
+				gridboxtype = {
+					name = "support_grid"
+					position = { x = 442 y = 99 }
+					size = { width = 85 height = 100%% }
+					slotsize = { width = 82 height = 34 }
+					format = "UPPER_LEFT"
+				}
+
+				gridboxtype = {
+					name = "regiments_grid"
+					position = { x = 15 y = 81 }
+					size = { width = 445 height = 100%% }
+					slotsize = { width = 85 height = 46 }
+					format = "UPPER_LEFT"
+				}
+
+				gridboxtype = {
+					name = "regiment_support_grid"
+					position = { x = 19 y = 316 }
+					size = { width = 445 height = 100%% }
+					slotsize = { width = 85 height = 36 }
+					format = "UPPER_LEFT"
+				}
 			}
 
-			instantTextboxType = {
-				name = "support_header_label"
-				position = { x = -12 y = 47 }
-				font = "hoi_18mbs"
-				text = "SUPPORT_HEADER"
-				maxWidth = 110
-				maxHeight = 20
-				format = center
-				pdx_tooltip = "DESIGNER_SUPPORT_COLUMN_TITLE"
-			}
+			containerWindowType = {
+				name = "subunits_hq"
+												
+				instantTextboxType = {
+					name = "division_composition_header"
+					position = { x = 18 y = 3 }
+					font = "hoi_18mbs"
+					text = "DESIGNER_HQ_COMPOSITION"		
+					pdx_tooltip = "DESIGNER_HQ_COMPOSITION_DESC"					
+					maxWidth = 372
+					maxHeight = 20
+					format = left
+				}
 
-			gridboxtype = {
-				name = "support_grid"
-				position = { x = 4 y = 78 }
-				size = { width = 85 height = 100%% }
-				slotsize = { width = 82 height = 51 }
-				format = "UPPER_LEFT"
-			}
+				instantTextboxType = {
+					position = { x = 135 y = 84 }
+					name = "combat_width_text"
+					font = "hoi_18mbs"
+					maxWidth = 40
+					format = center
+				}
 
-			gridboxtype = {
-				name = "regiments_grid"
-				position = { x = 110 y = 78 }
-				size = { width = 445 height = 100%% }
-				slotsize = { width = 82 height = 51 }
-				format = "UPPER_LEFT"
+				instantTextboxType = {
+					name = "hq_battalions_label"
+					position = { x = 100 y = 165 }
+					font = "hoi_16mbs"
+					text = "DESIGNER_HQ_BATTALIONS_HEADER"
+					maxWidth = 110
+					maxHeight = 20
+					format = centre
+				}
+
+				instantTextboxType = {
+					name = "hq_support_header"
+					position = { x = 15 y = 273 }
+					font = "hoi_16mbs"
+					text = "DESIGNER_HQ_SUPPORT_HEADER"
+					maxWidth = 280
+					maxHeight = 20
+					format = centre
+				}
+
+				instantTextboxType = {
+					name = "hq_modifiers_header"
+					position = { x = 328 y = 3 }
+					font = "hoi_18mbs"
+					text = "DESIGNER_HQ_MODIFIERS_HEADER"
+					maxWidth = 180
+					maxHeight = 20
+					pdx_tooltip = "DESIGNER_HQ_MODIFIERS_HEADER_DESC"
+				}
+
+				# Dynamically populated from C++.
+				containerWindowType = {
+					name = "hq_modifiers_list"
+					position = { x = 328 y = 40 }
+					size = { width = 216 height = 352 }
+					verticalScrollbar = "right_vertical_slider"
+
+					# An (invisible) background is required so the list reports its content bounds
+					# and the scrollbar gets a non-zero range.
+					background = {
+						name = "Background"  
+						spriteType = "GFX_tiled_window_transparent"
+					}
+
+					# Inner workspace whose height C++ stretches to total content size so the
+					# scrollbar gets a non-zero range.
+					containerWindowType = {
+						name = "content"
+						position = { x = 0 y = 0 }
+						size = { width = 100%% height = 100%% }
+					}
+				}
+
+				gridboxtype = {
+					name = "regiments_grid_lead"
+					position = { x = 117 y = 107 }
+					size = { width = 85 height = 46 }
+					slotsize = { width = 85 height = 46 }
+					max_slots_horizontal = 1
+					max_slots_vertical = 1
+					format = "UPPER_LEFT"
+				}
+
+				gridboxtype = {
+					name = "regiments_grid"
+					position = { x = 18 y = 202 }
+					size = { width = 255 height = 46 }
+					slotsize = { width = 98 height = 46 }
+					max_slots_horizontal = 3
+					max_slots_vertical = 1
+					format = "UPPER_LEFT"
+				}
+
+				gridboxtype = {
+					name = "support_grid"
+					position = { x = 14 y = 300 }
+					size = { width = 328 height = 34 }
+					slotsize = { width = 72 height = 34 }
+					max_slots_horizontal = 4
+					max_slots_vertical = 1
+					format = "UPPER_LEFT"
+				}
 			}
 		}
 
@@ -2203,6 +2539,15 @@ guiTypes = {
 					format = left
 				}
 
+				# listboxes don't accept extended scrollbars such as right_vertical_slider, so code handles the scrollbar background manually to behave as expected
+				buttonType = {
+					name = "scrollbar_background"
+					quadTextureSprite = "GFX_scrollbar_vertical_bg"
+					position = { x = 521 y = 95 }
+					size = { x=18 y=320 }
+					alwaystransparent = yes
+				}				
+				
 				listboxType = {
 					name = "history_entry_grid"
 					position = { x = 0 y = 84 }
@@ -2506,9 +2851,10 @@ guiTypes = {
 		size = { width = 188 height = 50 }
 		clipping = no
 
-		background = {
+		buttonType = {
 			name = "Background"
-			quadTextureSprite = "GFX_mini_tooltip"
+			quadTextureSprite ="GFX_mini_tooltip"
+			size = { x = 198 y = 50 }
 		}
 
 		iconType = {
@@ -2555,13 +2901,30 @@ guiTypes = {
 			quadTextureSprite = "GFX_mapicon_unit_flag_stripe_visible"
 			position = { x = 25 y = 38 }
 		}
+		
+		iconType = {
+			name = "cp_cost_icon"
+			spriteType = "GFX_command_power"
+			position = { x=150 y=18 }
+			alwaystransparent = yes
+		}
+
+		instantTextboxType = {
+			name = "cp_cost_text"
+			position = { x=174 y=20 }
+			font = "hoi_16mbs"
+			maxWidth = 28
+			maxHeight = 20
+			format = left
+			alwaystransparent = yes
+		}	
 	}
 
 	containerWindowType = {
 		name = "ship_stats_window"
 		moveable = yes
 		click_to_front = yes
-		position = { x = -275 y = -235 }
+		position = { x=-275 y=-235 }
 		size = { width = 557 height = 407 }
 		Orientation = center
 		clipping = no
@@ -2577,7 +2940,7 @@ guiTypes = {
 
 		buttonType = {
 			name = "btn_pride"
-			position = { x = 13 y = 280 }
+			position = {x=13 y=280}
 			spriteType = "GFX_NV_btn_pride"
 		}
 
@@ -2586,7 +2949,7 @@ guiTypes = {
 			position = { x = 35 y = 0 }
 			textureFile = ""
 			font = "hoi_36header"
-			borderSize = { x = 0 y = 0 }
+			borderSize = {x = 0 y = 0}
 			text = "SHIP_UNIT_STATS"
 			maxWidth = 300
 			maxHeight = 20
@@ -2612,17 +2975,8 @@ guiTypes = {
 		}
 
 		buttonType = {
-			name = "tab_terrain"
-			position = { x = 230 y = -10 }
-			Orientation = "LOWER_LEFT"
-			quadTextureSprite = "GFX_unit_stats_view_tabs"
-			buttonText = "NAVAL_TERRAIN_LABEL"
-			font = "hoi_18mbs"
-		}
-
-		buttonType = {
 			name = "tab_design"
-			position = { x = 340 y = -10 }
+			position = { x = 227 y = -10 }
 			Orientation = "LOWER_LEFT"
 			quadTextureSprite = "GFX_unit_stats_view_tabs"
 			buttonText = "NAVAL_DESIGN_LABEL"
@@ -2633,16 +2987,16 @@ guiTypes = {
 		iconType = {
 			name = "type_icon"
 			spriteType = "GFX_unit_infantry_icon_medium" # <- Replaced in code
-			position = { x = 17 y = 43 }
+			position = { x=17 y=43 }
 		}
 
 		editBoxType = {
 			name = "ship_name"
 			position = { x = 113 y = 42 }
-			size = { x = 264 y = 20 }
+			size = {x=264 y=20}
 			#textureFile = ""
 			font = "hoi_20b"
-			borderSize = { x = 0 y = 0 }
+			borderSize = {x = 0 y = 0}
 			text = ""
 			#maxWidth = 300
 			#maxHeight = 20
@@ -2658,13 +3012,12 @@ guiTypes = {
 			maxHeight = 20
 		}
 
-		
 		iconType = {
 			name = "unit_level"
 			spriteType = "GFX_unit_level"
 			position = { x = 496 y = 38 }
 		}
-
+		
 		iconType = {
 			name = "dominance_icon"
 			position = {x=20 y=330}
@@ -2700,66 +3053,115 @@ guiTypes = {
 			maxWidth = 300
 			maxHeight = 20
 			format = left
-		}		
-		
+		}
+
 		iconType = {
 			name = "manpower_icon"
 			spriteType = "GFX_manpower_icon"
-			position = { x = 20 y = 364 }
+			position = { x=600 y=3 }
 		}
 
 		instantTextboxType = {
 			name = "current_manpower"
-			position = { x = 50 y = 369 }
+			position = { x = 643 y = 8 }
 			font = "hoi_18mbs"
 			text = "Stuff"
 			maxWidth = 60
 			maxHeight = 20
 			format = center
 		}
+		
+		iconType = {
+			name = "fuel_icon"
+			spriteType = "GFX_fuel"
+			position = { x = 735 y = 8 }
+		}
 
+		instantTextboxType = {
+			name = "fuel_consumption"
+			position = { x = 768 y = 8 }
+			font = "hoi_18mbs"
+			text = "Stuff"
+			maxWidth = 60
+			maxHeight = 20
+			format = left
+		}
+
+		# captain
 		containerWindowType = {
-			name = "history"
-			position = { x = 2 y = 70 }
-			size = { width = 100% height = 210 }
-			margin = { top = 13 left = 13 bottom = 15 right = 25 }
-			verticalScrollbar = "right_vertical_slider"
-			scroll_wheel_factor = 40
-			smooth_scrolling = yes
+			name = "captain_window"
+			containerWindowType = {
+				name = "captain_header_list_entry"
+				position = { x = 562 y = 34 }
+				size = { width = 270 height = 30 }
 
-			background = {
-				name = "Background"
-				quadTextureSprite = "GFX_ship_history_bg"
+				Background = {
+					name = "captain_list_entry_bg"
+					quadTextureSprite = "GFX_unit_stats_list_entry_bg2"
+					alwaystransparent = yes
+				}
 			}
 
-			gridboxtype = {
-				name = "history_grid"
-				position = { x = 0 y = 0 }
-				size = { width = 500 height = 100% }
-				slotsize = { width = 500 height = 29 }
-				max_slots_horizontal = 1
-				format = "UPPER_LEFT"
+			instantTextboxType = {
+				name = "captain_title_text"
+				position = { x = 574 y = 39 }
+				font = "hoi_18mbs"
+				text = "CAPTAIN_TITLE_TEXT"
+				maxWidth = 340
+				maxHeight = 20
+				format = left
+			}
+
+			buttonType = {
+				name = "portraittime"
+				position = { x = 568 y = 60 }
+				quadTextureSprite = "GFX_idea_HOL_wilhelmina"
+				alwaystransparent= yes
+			}
+
+			buttonType = {
+				name = "promote_captain"
+				quadTextureSprite ="GFX_leader_selection_button"
+				position = { x=740 y=34 }
+				buttonText = "PROMOTE"
+				font = "hoi_16mbs"
+				frame = 1
+			}
+
+			iconType = {
+				name = "idea_traits"
+				position = { x = 611 y = 104 }
+				spriteType = "GFX_chevrons"
+				centerposition = yes
+				alwaystransparent = yes
+				frame = 1
+				scale = 0.68
+			}
+
+			instantTextboxType = {
+				name = "captain"
+				position = { x = 632  y = 72 }
+				font = "hoi_18mbs"
+				text = "captain haddock"
+				maxWidth = 190
+				maxHeight = 20
+				format = left
 			}
 		}
 
 		containerWindowType = {
 			name = "terrain"
-			position = { x = 2 y = 70 }
-			size = { width = 100% height = 210 }
-			margin = { top = 13 left = 13 bottom = 15 right = 25 }
+			position = { x=370 y=262}
+			size = { width=200 height=210}
+			margin = { top = 13 left = 13 bottom = 15 right = 25}
 			verticalScrollbar = "right_vertical_slider"
-
-			background = {
-				name = "Background"
-				quadTextureSprite = "GFX_ship_history_bg"
-			}
 
 			gridboxtype = {
 				name = "terrain_grid"
 				position = { x = 0 y = -2 }
 				size = { width = 100%% height = 100%% }
-				slotsize = { width = 110 height = 62 }
-				max_slots_horizontal = 5
+				slotsize = { width = 70 height = 58 }
+				max_slots_horizontal = 2
 				max_slots_vertical = 2
 				format = "UPPER_LEFT"
 			}
@@ -2767,14 +3169,14 @@ guiTypes = {
 
 		containerWindowType = {
 			name = "info"
-			position = { x = 3 y = 47 }
-			size = { width = 100% height = 100%% }
+			position = { x=3 y=47}
+			size = { width=100% height=100%% }
 			verticalScrollbar = "right_vertical_slider"
 
 			containerWindowType = {
 				name = "base_stats"
-				position = { x = 10 y = 15 }
-				size = { width = 165 height = 200 }
+				position = { x=10 y=15 }
+				size = { width=165 height=200 }
 				clipping = no
 
 				instantTextboxType = {
@@ -2799,8 +3201,8 @@ guiTypes = {
 
 			containerWindowType = {
 				name = "combat_stats"
-				position = { x = 179 y = 15 }
-				size = { width = 165 height = 200 }
+				position = { x=179 y=15 }
+				size = { width=165 height=200 }
 				clipping = no
 
 				instantTextboxType = {
@@ -2825,8 +3227,8 @@ guiTypes = {
 
 			containerWindowType = {
 				name = "misc_stats"
-				position = { x = 354 y = 15 }
-				size = { width = 165 height = 200 }
+				position = { x=354 y=15 }
+				size = { width=165 height=200 }
 				Orientation = UPPER_LEFT
 				clipping = no
 
@@ -2853,8 +3255,8 @@ guiTypes = {
 
 		containerWindowType = {
 			name = "equipment"
-			position = { x = 10 y = 290 }
-			size = { width = 250 height = 200 }
+			position = { x=10 y=290 }
+			size = { width=250 height=200 }
 			clipping = no
 
 			gridboxtype = {
@@ -2868,41 +3270,61 @@ guiTypes = {
 			}
 		}
 
+		positionType = {
+			name = "carrier_air_wings_list_position"
+			position = { x=547 y=0 }
+		}
+		positionType = {
+			name = "taog_carrier_air_wings_list_position"
+			position = { x=547 y=90 }
+		}
+
 		containerWindowType = {
 			name = "air_wings"
-			position = { x = 547 y = 0 }
-			size = { width = 300 height = 100%% }
+			position = { x=547 y=90 }
+			size = { width=300 height=-4 }
 			margin = { bottom = 8 }
 			clipping = no
 
+			containerWindowType = {
+				name = "captain_header_list_entry"
+				position = { x = 15 y = 34 }
+				size = { width = 270 height = 30 }
+
+				Background = {
+					name = "captain_list_entry_bg"
+					quadTextureSprite = "GFX_unit_stats_list_entry_bg2"
+					alwaystransparent = yes
+				}
+			}
+
 			background = {
 				name = "Background"
-				quadTextureSprite = "GFX_tiled_window_transparent"
+				quadTextureSprite ="GFX_tiled_window_transparent"
 			}
 
 			instantTextboxType = {
 				name = "title"
-				position = { x = 15 y = 7 }
+				position = { x = 27 y = 39 }
 				textureFile = ""
 				font = "hoi_18mbs"
-				borderSize = { x = 0 y = 0 }
+				borderSize = {x = 0 y = 0}
 				text = "AIR_WINGS"
 				maxWidth = 210
 				maxHeight = 20
 				fixedsize = yes
-				format = center
 			}
 
 			containerWindowType = {
 				name = "list_window"
-				position = { x = 0 y = 40 }
-				size = { width = 310 height = 100%% }
+				position = { x=0 y=65}
+				size = { width=310 height=100%% }
 				clipping = yes
 				verticalScrollbar = "right_vertical_slider"
 
 				background = {
 					name = "Background"
-					spriteType = "GFX_tiled_window_transparent"
+					spriteType ="GFX_tiled_window_transparent"
 				}
 
 				gridboxtype = {
@@ -2912,6 +3334,84 @@ guiTypes = {
 					slotsize = { width = 280 height = 46 }
 					max_slots_horizontal = 1
 					format = "UPPER_LEFT"
+				}
+			}
+		}
+
+		containerWindowType = {
+			name = "history"
+			position = { x=2 y=70}
+			size = { width=100% height=210}
+
+			containerWindowType = {
+				name = "medal_instance_container"
+				position = { x = 4 y = 0 }
+				size = { width = 100% height = 30 }
+
+				background = {
+					name = "Background"
+					quadTextureSprite ="GFX_deployment_binding"
+					alwaysTransparent = yes
+				}
+
+				instantTextboxType = {
+					name = "base_medals_label"
+					position = { x = 19 y = 5 }
+					font = "hoi_18mbs"
+					text = "INSTANCED_MEDALS"
+					maxWidth = 100
+					maxHeight = 20
+					format = left
+				}
+
+				gridboxtype = {
+					name = "medals_grid"
+					position = { x = 105 y = -6 }
+					size = { width = 155 height = 80 }
+					slotsize = { width = 40 height = 60 }
+					max_slots_horizontal = 9
+					format = "UPPER_LEFT"
+				}
+				
+				instantTextboxType = {
+					name = "captain_experience"
+					position = { x = 230 y = 5 }
+					font = "hoi_18mbs"
+					text = "Experience Count"
+					maxWidth = 250
+					maxHeight = 20
+					format = right
+				}
+
+			}
+
+			containerWindowType = {
+				name = "history_grid_container"
+				position = { x=-2 y=28}
+				size = { width=100% height=310 }
+				margin = { top = 13 left = 13 bottom = 0 }
+
+				background = {
+					name = "Background"
+					quadTextureSprite ="GFX_tiled_paper_w_frame_one_border_2"
+					alwaysTransparent = yes
+				}
+
+				# history_grid needs to be a listbox because army history is one too and the entries are shared
+				# listboxes don't accept extended scrollbars such as right_vertical_slider, so code handles the scrollbar background manually to behave as expected
+				buttonType = {
+					name = "scrollbar_background"
+					quadTextureSprite = "GFX_scrollbar_vertical_bg"
+					position = { x = 521 y = 0 }
+					size = { x=18 y=288 }
+					alwaystransparent = yes
+				}
+
+				listboxType = {
+					name = "history_grid"
+					position = { x = 0 y = 2 }
+					size = { x = 522 y = 283 }
+					scrollbartype = "standardlistbox_slider"
 				}
 			}
 		}
@@ -2927,7 +3427,7 @@ guiTypes = {
 		buttonType = {
 			name = "btn_close"
 			position = { x = 265 y = 3 }
-			quadTextureSprite = "GFX_NV_btn_close"
+			quadTextureSprite ="GFX_NV_btn_close"
 			buttonFont = "Main_14_black"
 			shortcut = "ESCAPE"
 			clicksound = click_close
@@ -2935,7 +3435,7 @@ guiTypes = {
 			Orientation = "UPPER_RIGHT"
 		}
 	}
-
+	
 	containerWindowType = {
 		name = "ship_stats_air_wing_entry"
 		position = { x = 0 y = 0 }
