@@ -3,15 +3,12 @@ on_actions = {
 		effect = {
 			# MONEY SYSTEM #
 			every_country = {
+				eoanb_political_legitimacy_drift = yes
 				if = {
-					limit = {
-						NOT = { has_variable = money }
-					}
+					limit = { NOT = { has_variable = money } }
 					set_variable = { money = 100 }
 				}
-				add_dynamic_modifier = {
-					modifier = inflation_dynamic_modifier
-				}
+				add_dynamic_modifier = { modifier = inflation_dynamic_modifier }
 				# Default spending levels (level 3) for any country missing them
 				# Using a helper approach: each block checks that NONE of the 5 levels exist
 				if = {
@@ -84,24 +81,27 @@ on_actions = {
 					}
 					add_ideas = law_spending_level_3
 				}
+				if = {
+					limit = {
+						NOT = { has_idea = eoanb_tariff_free_trade }
+						NOT = { has_idea = eoanb_tariff_mercantilism }
+						NOT = { has_idea = eoanb_tariff_protectionism }
+						NOT = { has_idea = eoanb_tariff_autarky }
+					}
+					add_ideas = eoanb_tariff_free_trade
+				}							
 				# Calculate money balance for non-blacklisted countries
 				if = {
 					limit = {
-						NOT = { has_country_flag = Country_Optimised }
+						calculate_money_balance = yes
+						#NOT = { has_idea = traditional_economy }
 					}
-					if = {
-						limit = {
-							calculate_money_balance = yes
-							always = yes
-						}
-						set_variable = { total_income_temp = total_income_temp }
-						set_variable = { total_expenses_temp = total_expenses_temp }
-						set_variable = { total_balance_temp = total_balance_temp }
-					}
+					set_variable = { total_income_temp = total_income_temp }
+					set_variable = { total_expenses_temp = total_expenses_temp }
+					set_variable = { total_balance_temp = total_balance_temp }
 				}
 			}
 
-			random_state = { state_event = { id = spain.17 days = 5 } }
 			286 = { state_event = { id = cochinchina_expedition.1 days = 390 trigger_for = controller } }
 
 			### START DATE 11.5.1857 ###
@@ -120,8 +120,15 @@ on_actions = {
 				MEX = {
 					483 = { add_to_variable = { var = yaqui_resistance_in_sonora value = 7 } }
 				}
+
+				NEZ = {
+					country_event = { id = usa.301 days = 10 } 
+				}
+
 				USA = {
 					country_event = { id = usa.249 days = 1 }
+					country_event = { id = usa.291 days = 17 }
+					country_event = { id = usa.301 days = 10 }
 					country_event = { id = usa.346 days = 14 }
 					country_event = { id = usa.266 days = 54 }
 					country_event = { id = usa.344 days = 79 }
@@ -171,9 +178,9 @@ on_actions = {
 					country_event = { id = britishindia.17 days = 10 }
 				}
 				FRA = {
-					#country_event = { id = nap_france.4 days = 248 }
+					country_event = { id = france.191 days = 248 }
 					country_event = { id = france.801 days = 1 }
-					country_event = { id = nap_france.1 days = 30 }
+					country_event = { id = france.4 days = 30 }
 					country_event = { id = france.201 days = 43 }
 					country_event = { id = france.231 days = 66 }
 					country_event = { id = rom_wallachia.12 days = 94 }
@@ -252,7 +259,6 @@ on_actions = {
 					country_event = { id = rom_wallachia.1 days = 1 }
 					country_event = { id = wallachian_union.12 days = 90 random_days = 5 }
 					country_event = { id = rom_wallachia.2 days = 91 }
-					country_event = { id = rom_wallachia.45 days = 100 } # 1880.4.10
 				}
 				RUS = {
 					add_named_threat = { threat = 4.5 name = "The Crimean War" }
@@ -260,6 +266,7 @@ on_actions = {
 					country_event = { id = rossiya.501 days = 109 }
 					country_event = { id = rossiya.811 days = 142 }
 					country_event = { id = austria.121 days = 143 }
+					#country_event = { id = rossiya.585 days = 218 } # 1857.12.15
 					country_event = { id = rossiya.510 days = 225 }
 				}
 				SAX = {
@@ -305,6 +312,11 @@ on_actions = {
 					country_event = { id = OTO_events.217 days = 21 random_days = 184 }
 					country_event = { id = OTO_events.231 days = 204 random_days = 30 }
 					country_event = { id = OTO_events.40 days = 505 random_days = 3 }
+					OTO_calculate_hellenization = yes
+					OTO_lock_hellenization = yes
+					OTO_lock_separatism = yes
+					OTO_return_to_separatism = yes
+					OTO_calculate_avg_sep = yes
 				}
 				OUD = { add_to_war = { targeted_alliance = SRS enemy = RAJ } }
 				PER = {
@@ -314,6 +326,7 @@ on_actions = {
 				RAJ = {
 					country_event = { id = britishindia.17 days = 10 }
 					set_global_flag = eoanb_flag_sepoy_rebellion_ongoing
+					set_global_flag = eoanb_flag_sow_ongoing
 				}
 				SRS = { country_event = { id = sepoy.1 days = 5 } }
 
@@ -361,12 +374,8 @@ on_actions = {
 
 			### START DATE 1870 ###
 			else_if = {
-				limit = {
-					has_start_date < 1871.1.1
-				}
-				FRA = {
-					country_event = { id = france.757 days = 527 random_days = 400 }
-				}
+				limit = { has_start_date < 1871.1.1 }
+				FRA = { country_event = { id = france.757 days = 527 random_days = 400 } }
 				JAP = { eoanbsys_demographic_bookmark_adjustment = yes }
 				ROM = { set_cosmetic_tag = ROM_costag_generic_formed }
 				USA = { set_global_flag = USA_gilded_age_ft load_focus_tree = usa_gilded_age }
@@ -385,6 +394,8 @@ on_actions = {
 				NSC_francesco_saverio_de_sanctis = { set_character_flag = NSC_exiled_character_flag }
 				NSC_pasquale_villari = { set_character_flag = NSC_exiled_character_flag }
 			}
+
+			UCT = { EOANBSYS_pandemics_constants_setup = yes }
 
 			# Russian collection dynamic modifiers
 			every_collection_element = {
