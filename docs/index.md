@@ -1,20 +1,24 @@
-<hr>
+# End of a New Beginning Mod Repository ![github-size]  ![github-stars]
 
-# Official End of a New Beginning Website
+### Media      [![Patreon][patreon-badge]][patreon-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]   [![Subreddit][subreddit-badge]][subreddit-link] [![Steam Subscriptions][steam-subscriptions-badge]][steam-link]
 
-### Media      [![Patreon][patreon-badge]][patreon-link]   [![Youtube][youtube-badge]][youtube-link]   [![Steam][steam-badge]][steam-link]   [![Discord][discord-badge]][discord-link]
+[github-size]: https://img.shields.io/github/languages/code-size/EoaNB-Team/EoaNB
+[github-stars]: https://img.shields.io/github/stars/EoaNB-Team/EoaNB?style=social
 
 [patreon-badge]: https://img.shields.io/static/v1?label=Patreon&message=Donate&color=orange&logo=patreon
 [patreon-link]: https://www.patreon.com/mod_eoanb
 
-[steam-badge]: https://img.shields.io/static/v1?label=Steam&message=Download&color=lightgrey&logo=steam	
-[steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2114093692
-
-[youtube-badge]: https://img.shields.io/static/v1?label=Youtube&message=Videos&color=red&logo=youtube
-[youtube-link]: https://www.youtube.com/channel/UCR6n-pjZ4ain9hhUESuhZNw
+[steam-badge]: https://img.shields.io/static/v1?label=Steam&message=Download&color=lightgrey&logo=steam
+[steam-subscriptions-badge]: https://img.shields.io/steam/subscriptions/2856963714
+[steam-link]: https://steamcommunity.com/sharedfiles/filedetails/?id=2856963714
 
 [discord-badge]: https://img.shields.io/static/v1?label=Discord&message=Chat&color=blue&logo=discord
 [discord-link]: https://discord.gg/VgufEME
+
+[subreddit-badge]: https://img.shields.io/reddit/subreddit-subscribers/eoanb
+[subreddit-link]: https://www.reddit.com/r/eoanb/
+
+
 
 <hr>
 
@@ -23,29 +27,27 @@
 * [Installation/Download](#installing-the-mod)
 * [Usage](#usage)
 * [Troubleshooting](#troubleshooting)
-* [Join the Discussion](#meet-the-team;-join-the-discussion)
 
 <hr>
 
 ## What is this?
 
-This is the official website for EoaNB. Here, you can learn how to join our community, install our mod, and join/support the development team.
+This site is the official respository (cloud) for sharing and cooperating in the development of the Hearts of Iron IV mod, **End of a New Beginning**. Here, you can learn how to join our community, install our mod, and join/support the development team.
 
-<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_paxorientalis.jpg?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
+<img src="https://github.com/team-eoanb/EoaNB-Wallpapers/blob/main/banner_vertersus.png?raw=true" width="720px;" align="middle" alt="End of a New Beginning — Pax Orientalis Banner"/>
 
 <hr>
 
 ## Installing the Mod
 
 Get easy access to our open-source development, with just a few quick steps!
-Here's a useful installation video by one of our lead developers: 
+Here's a useful installation video by one of our former lead developers: 
 
-<a href="https://youtu.be/Qr6l2DEneNY">Video Link: https://youtu.be/Qr6l2DEneNY</a>
+<a href="https://www.youtube.com/watch?v=00UqzQT8W68">Video Link: https://www.youtube.com/watch?v=00UqzQT8W68</a>
 
 ### Links from the Video 
-* Video Link: [https://youtu.be/Qr6l2DEneNY]
-* Github Desktop App: [https://desktop.github.com/]
-* Github Repo URL: [https://github.com/team-eoanb/EoaNB]
+* <a href="https://desktop.github.com/">Github Desktop App: https://desktop.github.com/</a>
+* <a href="https://github.com/EoaNB-Team/EoaNB">Github Repo URL: https://github.com/EoaNB-Team/EoaNB</a>
 
 <hr>
 
@@ -53,9 +55,9 @@ Here's a useful installation video by one of our lead developers:
 
 **End of a New Beginning** is a `free to play, open source mod`.
 
-If you would like to work on the mod but do not wish to apply for the team, you are free to fork the repository and modify it, and redistribute it for private use. Content of EoaNB is licensed under the `GNU General Public License 3.0`, which means you have to alert users you are redistributing a modified, unofficial version of EoaNB.
+If you would like to work on the mod but do not wish to apply for the team, you are free to fork the repository and modify it, and redistribute it for private use. Content of EoaNB is licensed under the `CC BY-NC-SA`, which means you have to maintain the same license if you are to redistribute a modified, unofficial version of EoaNB.
 
-We do not tolerate using content developed for EoaNB for other purposes. Any other source doing such things without our explicit permision and/or are claiming ownership/profiting from our work may be liable to legal disputes.
+We do not tolerate using assets developed for EoaNB for other purposes. Any other source doing such things without our explicit permision and/or are claiming ownership/profiting from our work may be liable to legal disputes.
 
 <hr>
 
@@ -64,73 +66,34 @@ We do not tolerate using content developed for EoaNB for other purposes. Any oth
 ### Crashes
 `Recalculating Naval Distances Crash`: The current build of our mod crashes during the game-booting process between the launcher window and the main menu for some users with incompatible graphics cards. A good fix for most users has been to enter the Steam Library and enter the option `-opengl` into Hearts of Iron 4's launch settings. <a href="https://github.com/team-eoanb/EoaNB/wiki/Common-Troubleshooting-Actions"> Instructions Here</a>
 
-`Railgun Crash`: There is a railgun tech in our mod that crashes the user when they hover over the tech icon. We are still unsure what is causing this crash and are looking for a fix.
-
-### Other notable issues
-`Save Game Load Times`: It is a notable issue of how long save games take to load. Our average developer notices it takes them 5-10 minutes to load a save; longer as the game progresses past 1880. After the Pax Orientalis update, we will work to improving on this issue.
-
-<hr>
-
-## Meet the Team; Join the Discussion
-
-Have more questions, comments or feedback? You can contact us by joining our [discord](https://discord.gg/VgufEME). There is almost always a developer active on the server.
-
 <hr>
 
 ## Join the Team
-If you wish to contribute to the development of the mod, supprt us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Curia` Team Member Role and the `Disciplio` Trial Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable.
 
-### Rules for Developers
-- Current General Development for EoaNB shall be pushed onto the `Ver-Tersus-(Optimization-and-Finishing-Pax)` branch.
-- All code should be error-checked before pushed onto the Github
-- Merging should be done carefully and procedurely. Do not override other developers' work without acknowledgment of the team.
-- If procedural pushing (including incomplete content) is crucial to development, request a new branch.
-- Merging any branch into the master branch (the distributed branch) will require a pull request which can only be initialised by a *Centurion*, and requires the approval of at least another Centurion. Errors are to be checked and minimalised by the Centurion who does the request.
-- Additional rules in the **Developer Bible**
+If you wish to contribute to the development of the mod, support us on Patreon or join the team. The links to support/apply can be found in our `#faq` channel on Discord. Donators will be given the special Auxillaires role on Discord which gives backdoor access to most of our development process/work and given special personalized easter eggs in our mod. Applicant Developers will be given the `Team Member` Role and the `Trial Developer` Role. After passing the Trial Period, members will be fully accepted into the team and be given GitHub write access if applicable. All of our links are listed under `Media` at the top of this page.
 
 ### Meet the Lead-Developers
-*aka Centurions*
 <table>
 <tr>
 <td align="center">
-  <a href = "https://github.com/ChrisSGD"><strong>ChrisSGD</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075039432724/chris.png" width="80px;" alt="ChrisSGD"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/Energywelder"><strong>Energywelder</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730076553576498/energy.png" width="80px;" alt="Energywelder"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/Sir-DEM0"><strong>Dem0</strong></a>
+  <a href = "https://github.com/Sir-DEM0"><strong>Dem0 - Lead</strong></a>
   <img src="https://avatars.githubusercontent.com/u/84448163" width="80px;" alt="Dem0"/>
 </td>
-<td align="center">
-  <a href = "https://github.com/Imperialism1"><strong>Imperialism</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/37026198" width="80px;" alt="Imperialism"/>
+  <td align="center">
+  <a href = "https://github.com/AGamer5876"><strong>Kirky - Zone A</strong></a>
+  <img src="https://cdn.discordapp.com/avatars/1328860158968860683/e53b916a35056885ae8378b1bb909b65.webp" width="80px;" alt="AGamer"/>
+</td>
+  <td align="center">
+  <a href = "https://github.com/joachymCZ"><strong>Jáchym_CZ - Zone B</strong></a>
+  <img src="https://cdn.discordapp.com/avatars/765577006401978418/23d1afcdb0bdd1d32081d80f3389f048.webp" width="80px;" alt="Jáchym_CZ"/>
 </td>
 <td align="center">
-  <a href = "https://github.com/Polskastronkkurwa"><strong>Kuba</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075802775562/kuba.png" width="80px;" alt="Kuba"/>
+  <a href = "https://discord.com/users/794235300326146058"><strong>Antkell - Zone C</strong></a>
+  <img src="https://cdn.discordapp.com/avatars/794235300326146058/4afe94300c97ba7b097b4cc3beb2e0cf.webp" width="80px;" alt="Antkell"/>
 </td>
-<td align="center">
-  <a href = "https://github.com/Coggernaut"><strong>Coggernaut</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730075349782628/cogg.png" width="80px;" alt="Coggernaut"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/toadsess"><strong>toadsess</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/469981670141853699/fb3081404173ce844580025574c17751.webp" width="80px;" alt="toadsess"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/FloridaMayhem"><strong>EnzoC9083</strong></a>
-  <img src="https://cdn.discordapp.com/attachments/469238221436354580/960730076272533544/enzo.png" width="80px;" alt="EnzoC9083"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/TheFunkymenStudio"><strong>Funkyman</strong></a>
-  <img src="https://cdn.discordapp.com/avatars/183277104769662977/5d4846e2317051328c8317f03ad4422b.webp" width="80px;" alt="Funkyman"/>
-</td>
-<td align="center">
-  <a href = "https://github.com/Makkkkus"><strong>Makkkkus</strong></a>
-  <img src="https://avatars.githubusercontent.com/u/37084190" width="80px;" alt="Makkkkus"/>
+  <td align="center">
+  <a href = "https://github.com/Shadow0311"><strong>Warleader - Auxiliaries</strong></a>
+  <img src="https://cdn.discordapp.com/avatars/547212306237358130/2b8bf6edcf29b71640d3dd9d1c4b03a7.webp" width="80px;" alt="Shadow0311"/>
 </td>
 </tr>
 </table>
