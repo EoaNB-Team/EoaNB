@@ -581,20 +581,80 @@ on_actions = {
 
 	on_daily = {
 		effect = {
+			# The progress-bar texture uses frames 0 through 100.
 			if = {
-				limit = { 
+				limit = {
 					has_country_flag = parliament_decision_category_1_ongoing
-					NOT = { check_variable = { parliament_decision_days_left = parliament_decision_target_day } }
+					check_variable = { parliament_decision_target_day > 0 }
+					check_variable = { parliament_decision_days_left < 100 }
 				}
 				set_variable = { parliament_decision_progress_to_add = 100 }
-				divide_variable = { var = parliament_decision_progress_to_add value = parliament_decision_target_day }
-				add_to_variable = { parliament_decision_days_left = parliament_decision_progress_to_add }
+				divide_variable = {
+					var = parliament_decision_progress_to_add
+					value = parliament_decision_target_day
+				}
+				add_to_variable = {
+					var = parliament_decision_days_left
+					value = parliament_decision_progress_to_add
+				}
 				clamp_variable = {
 					var = parliament_decision_days_left
 					min = 0
-					max = parliament_decision_target_day
+					max = 100
 				}
-			} 
+			}
+
+			### Parliament vote GUI timer, progress###
+			if = {
+				limit = { has_active_mission = parliament_voting_mission }
+
+				if = {
+					limit = {
+						NOT = {
+							is_in_array = {
+								array = parliament_decision_array_2
+								value = token:parliament_voting_mission
+							}
+						}
+					}
+					parliament_show_voting_decisions = yes
+				}
+
+				set_variable = {
+					var = parliament_vote_days_left
+					value = days_mission_timeout@parliament_voting_mission
+				}
+
+				if = {
+					limit = {
+						NOT = { check_variable = { parliament_vote_total_days > 0 } }
+						check_variable = { parliament_vote_days_left > 0 }
+					}
+					set_variable = {
+						var = parliament_vote_total_days
+						value = parliament_vote_days_left
+					}
+				}
+
+				if = {
+					limit = { check_variable = { parliament_vote_total_days > 0 } }
+					set_variable = {
+						var = parliament_vote_progress
+						value = parliament_vote_days_left
+					}
+					multiply_variable = { parliament_vote_progress = -100 }
+					divide_variable = {
+						var = parliament_vote_progress
+						value = parliament_vote_total_days
+					}
+					add_to_variable = { parliament_vote_progress = 100 }
+					clamp_variable = {
+						var = parliament_vote_progress
+						min = 0
+						max = 100
+					}
+				}
+			}
 		}
 	}
 
