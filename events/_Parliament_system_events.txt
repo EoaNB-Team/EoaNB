@@ -31,6 +31,140 @@ country_event = {
 	}
 }
 
+#############################
+### REFORM VOTING EVENTS ###
+#############################
+
+# A Reform is Proposed to Parliament
+# Fired by parliament_enact_reform - current_reform_token is already set at this point
+country_event = {
+	id = parliament_event.10
+	title = parliament_event.10.t
+	desc = parliament_event.10.d
+	picture = GFX_report_event_constitutional_era_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		parliament_set_reform_vote_type = yes
+		parliament_set_reform_majority = yes
+		parliament_set_reform_approvals = yes
+		compute_voting_approval = yes
+		compute_number_seats_tot = yes
+		compute_number_seats_approve_est = yes
+	}
+
+	option = { #Schedule the vote - resolves through the parliament_voting_mission timeout
+		name = parliament_event.10.a
+		ai_chance = { factor = 90 }
+
+		activate_mission = parliament_voting_mission
+
+		hidden_effect = {
+			# show the voting mission and the vote swaying decisions in the parliament gui
+			# (category 2 = voting decisions)
+			parliament_show_voting_decisions = yes
+		}
+	}
+
+	option = { #Urgent vote - the parliament votes tomorrow
+		name = parliament_event.10.b
+		ai_chance = { factor = 5 }
+
+		trigger = {
+			has_political_power > 49
+		}
+
+		add_political_power = -50
+
+		hidden_effect = {
+			country_event = { id = parliament_event.11 days = 1 }
+		}
+	}
+
+	option = { #Abandon the proposal
+		name = parliament_event.10.c
+		ai_chance = { factor = 5 }
+
+		custom_effect_tooltip = parliament_vote_abandon_tt
+
+		hidden_effect = {
+			# unlock the reform again - the lp cost is not refunded on purpose, otherwise the
+			# initial approval roll could be rerolled for free by abandoning and reproposing
+			set_variable = { clicked@var:current_reform_token = 0 }
+			clear_variable = current_reform_token
+			clr_country_flag = parliament_reform_vote_ongoing
+		}
+	}
+}
+
+# Urgent vote resolution (hidden)
+# The scheduled path resolves through the timeout_effect of parliament_voting_mission instead
+country_event = {
+	id = parliament_event.11
+
+	is_triggered_only = yes
+	hidden = yes
+
+	immediate = {
+		parliament_calculate_vote_result = yes
+	}
+}
+
+# The Parliament has Voted - fired by parliament_calculate_vote_result
+country_event = {
+	id = parliament_event.12
+	title = parliament_event.12.t
+	desc = parliament_event.12.d
+	picture = GFX_report_event_constitutional_era_parliament
+
+	is_triggered_only = yes
+
+	option = { #The vote passed
+		name = parliament_event.12.a
+		trigger = { has_country_flag = eoanb_reform_vote_success }
+		ai_chance = { factor = 100 }
+
+		parliament_enact_voted_reform = yes
+
+		if = {
+			limit = {
+				NOT = { has_country_flag = eoanb_flag_ps_no_vote_increase }
+			}
+			increase_ps_by_one = yes #FIXME-verify: ported from the old result event, effect comes from the political stability system
+		}
+
+		hidden_effect = {
+			clr_country_flag = eoanb_reform_vote_success
+			parliament_reform_vote_cleanup = yes
+		}
+	}
+
+	option = { #The vote failed
+		name = parliament_event.12.b
+		trigger = { has_country_flag = eoanb_reform_vote_failure }
+		ai_chance = { factor = 100 }
+
+		hidden_effect = {
+			clr_country_flag = eoanb_reform_vote_failure
+			# unlock the reform so it can be proposed again
+			set_variable = { clicked@var:current_reform_token = 0 }
+			parliament_reform_vote_cleanup = yes
+		}
+	}
+
+	option = { #The vote is tied - only possible with a simple majority
+		name = parliament_event.12.c
+		trigger = { has_country_flag = eoanb_reform_vote_tie }
+		ai_chance = { factor = 100 }
+
+		hidden_effect = {
+			clr_country_flag = eoanb_reform_vote_tie
+			set_variable = { clicked@var:current_reform_token = 0 }
+			parliament_reform_vote_cleanup = yes
+		}
+	}
+}
 #These events will unlock the Parliament Decisions again
 
 country_event = {
