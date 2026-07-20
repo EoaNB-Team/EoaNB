@@ -1,344 +1,41 @@
-#### Party Issue Effects ####
+##########################################
+### PARLIAMENT VOTING SCRIPTED EFFECTS ###
+##########################################
 
-# Sets the Issues of a party at the gamestart
-set_generic_party_issues = {
-	resize_array = {
-	    array = ideology_rad_soc_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_rad_soc_issues^0 = 4 } # Sets cultural opinion of RadSoc to Progressivist
-	set_variable = { ideology_rad_soc_issues^1 = 4 } # Sets eco opinion of RadSoc to Planned Economy
-	set_variable = { ideology_rad_soc_issues^2 = 4 } # Sets demographic opinion of RadSoc to Egalitarian
-	set_variable = { ideology_rad_soc_issues^3 = 2 } # Sets war opinion of RadSoc to Pro-Militarist
+# This file holds the whole reform voting pipeline of the new parliament system:
+#
+#  1. parliament_enact_reform (in _Parliament_scripted_effects.txt) saves the clicked
+#     reform token into current_reform_token and fires parliament_event.10
+#  2. parliament_event.10 (immediate) calls, in this order:
+#       parliament_set_reform_vote_type    -> sets vote_issue_id from the reform category
+#       parliament_set_reform_majority     -> sets parliament_reform_majority (1 = simple, 2 = super)
+#       parliament_set_reform_approvals    -> sets parl_issue_approval_array for the reform
+#       compute_voting_approval            -> seeds parl_voting_approval_array (party values + SoG)
+#       compute_number_seats_tot           -> parl_tot_num_seats / parl_num_seats_half
+#       compute_number_seats_approve_est   -> parl_est_num_seats (estimate for the event text)
+#  3. The vote resolves either through the parliament_voting_mission timeout or the urgent
+#     option of parliament_event.10; both end in parliament_calculate_vote_result, which
+#     sets the result flags and fires parliament_event.12
+#  4. parliament_event.12 calls parliament_enact_voted_reform on a successful vote and
+#     parliament_reform_vote_cleanup in every outcome
+#  5. parliament_show_voting_decisions / parliament_hide_voting_decisions put the vote
+#     swaying decisions into gui category 2 while a vote is scheduled and clear them after
 
-	resize_array = {
-	    array = ideology_soc_lib_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_soc_lib_issues^0 = 4 } # Sets cultural opinion of SocLib to Progressivist
-	set_variable = { ideology_soc_lib_issues^1 = 4 } # Sets eco opinion of SocLib to Planned Economy
-	set_variable = { ideology_soc_lib_issues^2 = 4 } # Sets demographic opinion of SocLib to Egalitarian
-	set_variable = { ideology_soc_lib_issues^3 = 3 } # Sets war opinion of SocLib to Anti-Militarist
- 
-	resize_array = {
-	    array = ideology_soc_ega_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_soc_ega_issues^0 = 4 } # Sets cultural opinion of SocEga to Progressivist
-	set_variable = { ideology_soc_ega_issues^1 = 2 } # Sets eco opinion of SocEga to Interventionist
-	set_variable = { ideology_soc_ega_issues^2 = 4 } # Sets demographic opinion of SocEga to Egalitarian
-	set_variable = { ideology_soc_ega_issues^3 = 4 } # Sets war opinion of SocEga to pacifist
+####################################################################################################
+### PER REFORM ISSUE APPROVALS ###
+####################################################################################################
 
-	resize_array = {
-	    array = ideology_cen_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_cen_issues^0 = 3 } # Sets cultural opinion of Cen to Liberal
-	set_variable = { ideology_cen_issues^1 = 1 } # Sets eco opinion of Cen to Laissez-Faire
-	set_variable = { ideology_cen_issues^2 = 3 } # Sets demographic opinion of Cen to Favoritist
-	set_variable = { ideology_cen_issues^3 = 3 } # Sets demographic opinion of Cen to Favoritist
-
-	resize_array = {
-	    array = ideology_tra_con_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_tra_con_issues^0 = 2 } # Sets cultural opinion of TraCon to Conservative
-	set_variable = { ideology_tra_con_issues^1 = 2 } # Sets eco opinion of TraCon to Interventionist
-	set_variable = { ideology_tra_con_issues^2 = 2 } # Sets demographic opinion of TraCon to Elitist
-	set_variable = { ideology_tra_con_issues^3 = 2 } # Sets war opinion of TraCon to Pro-Militarist
-
-	resize_array = {
-	    array = ideology_rad_dem_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_rad_dem_issues^0 = 2 } # Sets cultural opinion of RadDem to Conservative
-	set_variable = { ideology_rad_dem_issues^1 = 3 } # Sets eco opinion of RadDem to State-Capitalist
-	set_variable = { ideology_rad_dem_issues^2 = 2 } # Sets demographic opinion of RadDem to Elitist
-	set_variable = { ideology_rad_dem_issues^3 = 1 } # Sets war opinion of RadDem to Jingoist
-
-	resize_array = {
-	    array = ideology_chauv_pop_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_chauv_pop_issues^0 = 1 } # Sets cultural opinion of ChauvPop to Reactionary
-	set_variable = { ideology_chauv_pop_issues^1 = 3 } # Sets eco opinion of ChauvPop to State Capitalist
-	set_variable = { ideology_chauv_pop_issues^2 = 2 } # Sets demographic opinion of ChauvPop to State Elitist
-	set_variable = { ideology_chauv_pop_issues^3 = 1 } # Sets war opinion of ChauvPop to Jingoist
-
-	resize_array = {
-	    array = ideology_aut_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_aut_issues^0 = 1 } # Sets cultural opinion of Aut to Reactionary
-	set_variable = { ideology_aut_issues^1 = 3 } # Sets eco opinion of Aut to State Capitalist
-	set_variable = { ideology_aut_issues^2 = 1 } # Sets demographic opinion of Aut to Paternalist
-	set_variable = { ideology_aut_issues^3 = 2 } # Sets war opinion of Aut to Pro-Militarist
-
-	resize_array = {
-	    array = ideology_fun_issues
-	    value = 0
-	    size = 4
-	}
-	set_variable = { ideology_fun_issues^0 = 1 } # Sets cultural opinion of Fun to Reactionary
-	set_variable = { ideology_fun_issues^1 = 3 } # Sets eco opinion of Fun to State Capitalist
-	set_variable = { ideology_fun_issues^2 = 1 } # Sets demographic opinion of Fun to Paternalist
-	set_variable = { ideology_fun_issues^3 = 3 } # Sets war opinion of Fun to Anti-Militarist
-}
-
-# The following scripted effects change the issues of each party
-# Example:
-# set_temp_variable = { parl_issue_num = <int> } only numbers 1-4 work
-# set_<ideology_name>_<cultural/eco/demographic/war>_issue = yes
-
-# RadSoc
-set_rad_soc_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_rad_soc_issues^0 = parl_issue_num } 
-	}
-}
-set_rad_soc_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_soc_issues^1 = parl_issue_num } 
-	}
-}
-set_rad_soc_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_soc_issues^2 = parl_issue_num } 
-	}
-}
-set_rad_soc_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_soc_issues^3 = parl_issue_num } 
-	}
-}
-
-# SocLib
-set_soc_lib_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_soc_lib_issues^0 = parl_issue_num } 
-	}
-}
-set_soc_lib_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_lib_issues^1 = parl_issue_num } 
-	}
-}
-set_soc_lib_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_lib_issues^2 = parl_issue_num } 
-	}
-}
-set_soc_lib_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_lib_issues^3 = parl_issue_num } 
-	}
-}
-
-# SocEga
-set_soc_ega_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_soc_ega_issues^0 = parl_issue_num } 
-	}
-}
-set_soc_ega_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_ega_issues^1 = parl_issue_num } 
-	}
-}
-set_soc_ega_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_ega_issues^2 = parl_issue_num } 
-	}
-}
-set_soc_ega_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_soc_ega_issues^3 = parl_issue_num } 
-	}
-}
-
-# Cen
-set_cen_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_cen_issues^0 = parl_issue_num } 
-	}
-}
-set_cen_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_cen_issues^1 = parl_issue_num } 
-	}
-}
-set_cen_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_cen_issues^2 = parl_issue_num } 
-	}
-}
-set_cen_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_cen_issues^3 = parl_issue_num } 
-	}
-}
-
-# TraCon
-set_tra_con_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_tra_con_issues^0 = parl_issue_num } 
-	}
-}
-set_tra_con_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_tra_con_issues^1 = parl_issue_num } 
-	}
-}
-set_tra_con_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_tra_con_issues^2 = parl_issue_num } 
-	}
-}
-set_tra_con_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_tra_con_issues^3 = parl_issue_num } 
-	}
-}
-
-# RadDem
-set_rad_dem_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_rad_dem_issues^0 = parl_issue_num } 
-	}
-}
-set_rad_dem_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_dem_issues^1 = parl_issue_num } 
-	}
-}
-set_rad_dem_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_dem_issues^2 = parl_issue_num } 
-	}
-}
-set_rad_dem_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_rad_dem_issues^3 = parl_issue_num } 
-	}
-}
-
-# ChauvPop
-set_chauv_pop_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_chauv_pop_issues^0 = parl_issue_num } 
-	}
-}
-set_chauv_pop_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_chauv_pop_issues^1 = parl_issue_num } 
-	}
-}
-set_chauv_pop_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_chauv_pop_issues^2 = parl_issue_num } 
-	}
-}
-set_chauv_pop_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_chauv_pop_issues^3 = parl_issue_num } 
-	}
-}
-
-# Aut
-set_aut_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_aut_issues^0 = parl_issue_num } 
-	}
-}
-set_aut_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_aut_issues^1 = parl_issue_num } 
-	}
-}
-set_aut_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_aut_issues^2 = parl_issue_num } 
-	}
-}
-set_aut_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_aut_issues^3 = parl_issue_num } 
-	}
-}
-
-# Fun
-set_fun_cultural_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } } # Checks if the temp_variable has the right value
-		set_variable = { ideology_fun_issues^0 = parl_issue_num } 
-	}
-}
-set_fun_eco_issue = {
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_fun_issues^1 = parl_issue_num } 
-	}
-}
-set_fun_demographic_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_fun_issues^2 = parl_issue_num } 
-	}
-}
-set_fun_war_issue = { 
-	if = {
-		limit = { AND = { check_variable = { parl_issue_num > 0 } check_variable = { parl_issue_num < 5 } } }
-		set_variable = { ideology_fun_issues^3 = parl_issue_num } 
-	}
-}
-
-### Party Issue Approval changing
+# Resets the per-reform stance approval array (index 0..3 = stance 1..4)
 reset_approval_arrays = {
 	resize_array = {
 	    array = parl_issue_approval_array
 	    value = 0
 	    size = 4
 	}
+	set_variable = { parl_issue_approval_array^0 = 0 }
+	set_variable = { parl_issue_approval_array^1 = 0 }
+	set_variable = { parl_issue_approval_array^2 = 0 }
+	set_variable = { parl_issue_approval_array^3 = 0 }
 }
 
 # Issue 1:
@@ -425,7 +122,7 @@ set_4_approval_highly_agree = {
 	set_variable = { parl_issue_approval_array^3 = 0.3 }
 }
 
-# These sets the type of the vote, which determine a party's voting percent
+# These set the type of the vote, which determines which issue a party uses to judge it
 set_vote_cul = {
 	set_variable = { vote_issue_id = 0 }
 }
@@ -439,31 +136,830 @@ set_vote_war = {
 	set_variable = { vote_issue_id = 3 }
 }
 
-#### Voting Percent Calculations ####
+# Removes the random component from the next compute_voting_approval call (debug / scripted votes)
+set_deterministic_vote = {
+	set_country_flag = parl_vote_deterministic
+}
+
+####################################################################################################
+### REFORM VOTE SETUP (called from parliament_event.10 immediate) ###
+####################################################################################################
+
+# Sets vote_issue_id based on which reform category array holds current_reform_token
+# Category -> issue mapping ported from the old per-reform events:
+# cul: 3 (church and state), 7 (education)
+# eco: 6 (health), 15 (child labour), 16 (economic structure), 17 (trade policy),
+#      18 (economic mobilisation), 19 (land ownership), 20 (working hours)
+# war: 5 (policing), 8 (conscription)
+# dem: everything else (1, 2, 4, 9, 10, 11, 12, 13, 14)
+parliament_set_reform_vote_type = {
+	if = {
+		limit = {
+			OR = {
+				is_in_array = { array = parliament_reform_array_3 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_7 value = current_reform_token }
+			}
+		}
+		set_vote_cul = yes
+	}
+	else_if = {
+		limit = {
+			OR = {
+				is_in_array = { array = parliament_reform_array_6 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_15 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_16 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_17 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_18 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_19 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_20 value = current_reform_token }
+			}
+		}
+		set_vote_eco = yes
+	}
+	else_if = {
+		limit = {
+			OR = {
+				is_in_array = { array = parliament_reform_array_5 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_8 value = current_reform_token }
+			}
+		}
+		set_vote_war = yes
+	}
+	else = {
+		set_vote_dem = yes
+	}
+}
+
+# Sets the level of majority needed to pass the current reform
+# 1 = simple majority (more than 50 percent of all seats)
+# 2 = super majority (at least 65 percent of all seats)
+#  super majority currently applies to categories 1 (DoP), 2 (discriminatory laws),
+# 3 (church and state), 12 (rights of women) and 14 (slavery) - adjust the list to taste
+parliament_set_reform_majority = {
+	# Simple majority is the default.
+	set_variable = { parliament_reform_majority = 1 }
+
+	# Constitutional and fundamental-rights reforms require a 65% supermajority.
+	if = {
+		limit = {
+			OR = {
+				is_in_array = { array = parliament_reform_array_1 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_2 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_3 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_12 value = current_reform_token }
+				is_in_array = { array = parliament_reform_array_14 value = current_reform_token }
+			}
+		}
+		set_variable = { parliament_reform_majority = 2 }
+	}
+}
+
+# Sets the four per-stance approval values for the reform stored in current_reform_token
+parliament_set_reform_approvals = {
+	reset_approval_arrays = yes
+
+	# Category 1 - Distribution of Power
+	if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_elections compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:landed_voting compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:weighted_wealth_voting compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:wealth_voting compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:universal_male_suffrage compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:universal_suffrage compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 2 - Discriminatory Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:national_supremacy compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:racial_segregation compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:limited_equality compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:full_equality compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 3 - Status of Church and State
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:theocracy compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_religion compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:freedom_of_religion compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:total_seperation compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_atheism compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 4 - Court System
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:politicized_courts compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:corrupt_courthouse compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:aristocratic_courts compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:quasi_jury_court compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:full_jury_court compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 5 - Policing
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_police compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:local_police compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:dedicated_police compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:police_state compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+
+	# Category 6 - Health System
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:apothecaries compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:charitable_healthcare compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:private_healthcare compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:public_healthcare compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 7 - Education
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:oral_tradition compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:traditional_ulama compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:church_sponsored_education compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:private_education compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:public_schooling_system compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 8 - Conscription
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:disarmed_nation compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:early_conscription compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:allotment_system compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:volunteer_only compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:limited_conscription compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:extensive_conscription compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:service_by_requirement compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:all_adults_serve compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:scraping_the_barrel compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+
+	# Category 9 - Press Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_press compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_controlled_press compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:censored_press compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:regulated_press compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_press compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 10 - Freedom of Assembly
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_freedom_of_speech compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:government_only_gatherings compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_assembly compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:protected_speech compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 11 - Trade Union Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:prohibited_trade_unions compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_controlled_unions compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_regulatory_bodies compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:worker_controlled_unions compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 12 - Rights of Women
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legal_guardianship compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:property_rights_for_women compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:women_in_the_workforce compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:womens_suffrage compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 13 - Migration Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:closed_borders compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:strict_border_control compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:loose_borders compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:open_borders compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 14 - Status of Slavery
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legacy_slavery compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:slave_trade compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:debt_slavery compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:freedom_of_the_womb compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:slavery_banned compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 15 - Child Labour
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legal_child_labour compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:restricted_child_labour compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:banned_child_labour compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 16 - Economic Structure
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:all_industry_banned compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:traditional_economy compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:agrarian_economy compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:interventionist_economy compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:laissez_faire_economy compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:planned_economy compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 17 - Trade Policy
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:isolationism compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:protectionism compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_neutral = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:mercantilism compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_trade compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+
+	# Category 19 - Land Ownership
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:serfdom compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:tenant_farmers compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:farmer_owned_land compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:capitalist_agriculture compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_owned_farmland compare = equals } } #FIXME-verify: axis position is a judgment call
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 18 - Economic Mobilisation
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:demobilised_economy compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:low_level_mobilisation compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:partial_mobilisation compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:war_economy compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:total_mobilisation compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+
+	# Category 20 - Working Hours
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_limit compare = equals } }
+		set_1_approval_highly_agree = yes
+		set_2_approval_agree = yes
+		set_3_approval_neutral = yes
+		set_4_approval_highly_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_14 compare = equals } }
+		set_1_approval_agree = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_agree = yes
+		set_4_approval_disagree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_12 compare = equals } }
+		set_1_approval_neutral = yes
+		set_2_approval_highly_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_neutral = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_10 compare = equals } }
+		set_1_approval_disagree = yes
+		set_2_approval_agree = yes
+		set_3_approval_highly_agree = yes
+		set_4_approval_agree = yes
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_8 compare = equals } }
+		set_1_approval_highly_disagree = yes
+		set_2_approval_neutral = yes
+		set_3_approval_agree = yes
+		set_4_approval_highly_agree = yes
+	}
+	else = {
+		log = "parliament_set_reform_approvals: no approval data for token [?current_reform_token]"
+	}
+}
+
+####################################################################################################
+### VOTING PERCENT CALCULATIONS ###
+####################################################################################################
+
+# Seeds parl_voting_approval_array with the initial support of every party for the current reform
+# New formula per party:
+#   0.30 base
+# + 0.40 * <party>_approval_of_government (SoG, 0..1 - see the coalition scripted effects)
+# + issue alignment from parl_issue_approval_array (-0.5 .. +0.3)
+# + random -0.10 .. +0.10 (skipped when parl_vote_deterministic is set)
+# clamped to 0..1
 compute_voting_approval = {
 	resize_array = {
 	    array = parl_voting_approval_array
-	    value = 0.5
+	    value = 0
 	    size = 9
 	}
 
-	for_each_loop = {
-	    array = parl_voting_approval_array
-	    value = parl_v
-	    index = parl_i
-	    
-	    set_variable = { parl_voting_approval_array^parl_i = 0.5 }
-	}
-
-	set_temp_variable = { comp_value = 0 }
-
 	# RAD_SOC CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = rad_soc_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_rad_soc_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-
-	set_temp_variable = { comp_value = parl_voting_approval_array^0 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -472,19 +968,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^0 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^0
+		min = 0
+		max = 1
+	}
 
 	# SOC_LIB CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = soc_lib_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_soc_lib_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^1 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -493,19 +995,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^1 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^1
+		min = 0
+		max = 1
+	}
 
 	# SOC_EGA CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = soc_ega_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_soc_ega_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^2 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -514,19 +1022,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^2 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^2
+		min = 0
+		max = 1
+	}
 
 	# CEN CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = cen_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_cen_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^3 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -535,19 +1049,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^3 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^3
+		min = 0
+		max = 1
+	}
 
 	# TRA_CON CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = tra_con_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_tra_con_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^4 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -556,19 +1076,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^4 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^4
+		min = 0
+		max = 1
+	}
 
 	# RAD_DEM CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = rad_dem_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_rad_dem_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^5 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -577,19 +1103,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^5 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^5
+		min = 0
+		max = 1
+	}
 
 	# CHAUV_POP CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = chauv_pop_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_chauv_pop_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^6 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -598,19 +1130,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^6 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^6
+		min = 0
+		max = 1
+	}
 
 	# AUT CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = aut_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_aut_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^7 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -619,19 +1157,25 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^7 = comp_value }
-
-
+	clamp_variable = {
+		var = parl_voting_approval_array^7
+		min = 0
+		max = 1
+	}
 
 	# FUN CALCULATIONS
+	set_temp_variable = { comp_value = 0.30 }
+	set_temp_variable = { comp_sog = fun_approval_of_government }
+	multiply_temp_variable = { comp_sog = 0.40 }
+	add_to_temp_variable = { comp_value = comp_sog }
 	set_temp_variable = { comp_value_cursor = ideology_fun_issues^vote_issue_id }
 	add_to_temp_variable = { comp_value_cursor = -1 }
-	
-	set_temp_variable = { comp_value = parl_voting_approval_array^8 }
 	add_to_temp_variable = { comp_value = parl_issue_approval_array^comp_value_cursor }
-
 	if = {
 		limit = {
 			NOT = { has_country_flag = parl_vote_deterministic }
@@ -640,58 +1184,24 @@ compute_voting_approval = {
 		multiply_temp_variable = { parl_r = 0.2 }
 		add_to_temp_variable = { parl_r = -0.1 }
 	}
-
+	else = {
+		set_temp_variable = { parl_r = 0 }
+	}
 	add_to_temp_variable = { comp_value = parl_r }
 	set_variable = { parl_voting_approval_array^8 = comp_value }
+	clamp_variable = {
+		var = parl_voting_approval_array^8
+		min = 0
+		max = 1
+	}
 
 	if = {
-		limit = {
-			NOT = { has_country_flag = parl_vote_deterministic }
-		}
+		limit = { has_country_flag = parl_vote_deterministic }
 		clr_country_flag = parl_vote_deterministic
 	}
 }
 
-calculate_vote_result = {
-	set_variable = { yay_votes = 0 }
-	set_variable = { nay_votes = 0 }
-
-	for_each_loop = {
-	    array = seats_array
-	    value = parl_v
-	    index = parl_i
-
-	    set_temp_variable = { parl_r = random }
-
-	    if = {
-	    	limit = {
-	    		check_variable = { parl_r < parl_voting_approval_array^parl_v }
-	    	}
-	    	add_to_variable = { yay_votes = 1 }
-	    }
-	    
-	    else = {
-	    	add_to_variable = { nay_votes = 1 }
-	    }
-	}
-
-	if = {
-		limit = {
-			check_variable = { yay_votes > nay_votes }
-		}
-		set_country_flag = eoanb_reform_vote_success
-	}
-	else = {
-		if = {
-			limit = {
-				check_variable = { yay_votes < nay_votes }
-			}
-			set_country_flag = eoanb_reform_vote_failure
-		}
-		else = { set_country_flag = eoanb_reform_vote_tie }
-	}
-}
-
+# Total number of seats in the parliament (also computes the half point)
 compute_number_seats_tot = {
 	set_variable = { parl_tot_num_seats = 0 }
 
@@ -708,6 +1218,7 @@ compute_number_seats_tot = {
 	round_variable = parl_num_seats_half
 }
 
+# Estimated number of seats that would approve the reform right now (event text / tooltips)
 compute_number_seats_approve_est = {
 	set_variable = { parl_est_num_seats = 0 }
 
@@ -725,329 +1236,1036 @@ compute_number_seats_approve_est = {
 	round_variable = parl_est_num_seats
 }
 
-# Assigns the parliament seats to the parties based on their support
-compute_national_vote={
-	###much better system to transfer popularity to parlement seats
+####################################################################################################
+### VOTE RESOLUTION ###
+####################################################################################################
 
-	set_variable = { n_parl_weights^0 = party_popularity@ideology_radical_socialism }
-	set_variable = { n_parl_weights^1 = party_popularity@ideology_social_liberalism }
-	set_variable = { n_parl_weights^2 = party_popularity@social_egalitarianism }
-	set_variable = { n_parl_weights^3 = party_popularity@centrism }
-	set_variable = { n_parl_weights^4 = party_popularity@traditional_conservatism }
-	set_variable = { n_parl_weights^5 = party_popularity@radical_democracy }
-	set_variable = { n_parl_weights^6 = party_popularity@chauvinist_populism }
-	set_variable = { n_parl_weights^7 = party_popularity@autocracy }
-	set_variable = { n_parl_weights^8 = party_popularity@fundamentalism }
-	
-	set_variable = { parl_fun_seats_count = party_popularity@fundamentalism }
-	multiply_variable = { parl_fun_seats_count = 256 }
-	set_variable = { parl_aut_seats_count = party_popularity@autocracy }
-	multiply_variable = { parl_aut_seats_count = 256 }
-	set_variable = { parl_chauv_pop_seats_count = party_popularity@chauvinist_populism }
-	multiply_variable = { parl_chauv_pop_seats_count = 256 }
-	set_variable = { parl_rad_dem_seats_count = party_popularity@radical_democracy }
-	multiply_variable = { parl_rad_dem_seats_count = 256 }
-	set_variable = { parl_tra_con_seats_count = party_popularity@traditional_conservatism }
-	multiply_variable = { parl_tra_con_seats_count = 256 }
-	set_variable = { parl_cen_seats_count = party_popularity@centrism }
-	multiply_variable = { parl_cen_seats_count = 256 }
-	set_variable = { parl_soc_ega_seats_count = party_popularity@social_egalitarianism }
-	multiply_variable = { parl_soc_ega_seats_count = 256 }
-	set_variable = { parl_soc_lib_seats_count = party_popularity@ideology_social_liberalism }
-	multiply_variable = { parl_soc_lib_seats_count = 256 }
-	set_variable = { parl_rad_soc_seats_count = party_popularity@ideology_radical_socialism }
-	multiply_variable = { parl_rad_soc_seats_count = 256 }
-	# resize_array = {
-	    # array = total_parties
-	    # value = 1
-	    # size = 32
-	# }
-	
-	resize_array = {
-	    array = seats_auto
-	    value = 1
-	    size = parl_aut_seats_count
-	}
-	resize_array = {
-	    array = seats_fund
-	    value = 1
-	    size = parl_fun_seats_count
-	}
-	resize_array = {
-	    array = chav_seats
-	    value = 1
-	    size = parl_chauv_pop_seats_count
-	}
-	resize_array = {
-	    array = rade_seats
-	    value = 1
-	    size = parl_rad_dem_seats_count
-	}
-	resize_array = {
-	    array = trad_seats
-	    value = 1
-	    size = parl_tra_con_seats_count
-	}
-	resize_array = {
-	    array = cent_seats
-	    value = 1
-	    size = parl_cen_seats_count
-	}
-	resize_array = {
-	    array = socegl_seats
-	    value = 1
-	    size = parl_soc_ega_seats_count
-	}
-	resize_array = {
-	    array = soc_lib_seats
-	    value = 1
-	    size = parl_soc_lib_seats_count
-	}
-	resize_array = {
-	    array = radsoc_seats
-	    value = 1
-	    size = parl_rad_soc_seats_count
-	}
-	set_temp_variable = { random_seed = random }
-	set_temp_variable = { current_seat_posistion = 0 }
-	
-	if={
-		limit={
-			NOT={has_country_flag = IP_CUSTOM_PARTIES_SET}
+# Rolls the vote of every seat, checks the result against the required majority and fires the
+# result event. Called by the parliament_voting_mission timeout_effect and by parliament_event.11
+# (the urgent vote path). Requires parliament_reform_majority to be set (see
+# parliament_set_reform_majority); an unset value falls back to a simple majority.
+parliament_calculate_vote_result = {
+	# Prevent result flags from an interrupted or previously unresolved vote
+	# from activating the wrong event option.
+	clr_country_flag = eoanb_reform_vote_success
+	clr_country_flag = eoanb_reform_vote_failure
+	clr_country_flag = eoanb_reform_vote_tie
+
+	set_variable = { yay_votes = 0 }
+	set_variable = { nay_votes = 0 }
+
+	for_each_loop = {
+		array = seats_array
+		value = parl_v
+		index = parl_i
+
+		set_temp_variable = { parl_r = random }
+
+		if = {
+			limit = {
+				check_variable = {
+					var = parl_r
+					value = parl_voting_approval_array^parl_v
+					compare = less_than
+				}
+			}
+			add_to_variable = { yay_votes = 1 }
 		}
-		# for_each_loop = {
-			# array = internal_politics_parties
-			# value = ipp_v
-			# index = ipp_i
-			
-			# set_variable = { parl_voting_approval_array^parl_i = 0.5 }
-		# }
-		
-		
-		for_each_loop = {
-			array = seats_fund
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 8 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-			
+		else = {
+			add_to_variable = { nay_votes = 1 }
 		}
-		for_each_loop = {
-			array = seats_auto
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 7 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = chav_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 6 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = rade_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 5 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = trad_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 4 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = cent_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 3 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = socegl_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 2 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = soc_lib_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 1 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		for_each_loop = {
-			array = radsoc_seats
-			value = ipp_v
-			index = ipp_i
-			
-			set_variable = { seats_array^current_seat_posistion = 0 }
-			add_to_temp_variable = {current_seat_posistion = 1}
-		}
-		
 	}
 
+	compute_number_seats_tot = yes
+
+	if = {
+		limit = { check_variable = { parliament_reform_majority = 2 } }
+
+		# Supermajority: at least 65% of every parliamentary seat.
+		set_variable = { parl_votes_threshold = parl_tot_num_seats }
+		multiply_variable = { parl_votes_threshold = 0.65 }
+
+		# Convert the fractional threshold to the smallest whole number that
+		# reaches it. Example: 65% of 256 is 166.4, so 167 votes are required.
+		set_variable = { parl_votes_required = parl_votes_threshold }
+		round_variable = parl_votes_required
+		if = {
+			limit = {
+				check_variable = {
+					var = parl_votes_required
+					value = parl_votes_threshold
+					compare = less_than
+				}
+			}
+			add_to_variable = { parl_votes_required = 1 }
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					var = yay_votes
+					value = parl_votes_required
+					compare = greater_than_or_equals
+				}
+			}
+			set_country_flag = eoanb_reform_vote_success
+		}
+		else = {
+			# A supermajority proposal can fail even when yays outnumber nays.
+			set_country_flag = eoanb_reform_vote_failure
+		}
+	}
+	else = {
+		# Simple majority: strictly more than half of every parliamentary seat.
+		set_variable = { parl_votes_threshold = parl_tot_num_seats }
+		multiply_variable = { parl_votes_threshold = 0.50 }
+
+		set_variable = { parl_votes_required = parl_votes_threshold }
+		round_variable = parl_votes_required
+
+		# With an even number of seats, half is an integer and one additional
+		# vote is necessary. With an odd number, normal rounding already gives
+		# the first whole number above half.
+		if = {
+			limit = {
+				check_variable = {
+					var = parl_votes_required
+					value = parl_votes_threshold
+					compare = less_than_or_equals
+				}
+			}
+			add_to_variable = { parl_votes_required = 1 }
+		}
+
+		if = {
+			limit = {
+				check_variable = {
+					var = yay_votes
+					value = parl_votes_required
+					compare = greater_than_or_equals
+				}
+			}
+			set_country_flag = eoanb_reform_vote_success
+		}
+		else_if = {
+			limit = {
+				check_variable = {
+					var = yay_votes
+					value = nay_votes
+					compare = equals
+				}
+			}
+			set_country_flag = eoanb_reform_vote_tie
+		}
+		else = {
+			set_country_flag = eoanb_reform_vote_failure
+		}
+	}
+
+	hidden_effect = {
+		country_event = { id = parliament_event.12 }
+	}
 }
 
-### VA Value Change (Based on the add_money_with_tooltip_effect scripted effect)
+####################################################################################################
+### REFORM ENACTMENT AFTER A SUCCESSFUL VOTE ###
+####################################################################################################
+
+# Adds the national spirit of the reform stored in current_reform_token
+# All reform tokens share the name of their idea, so this is a plain token -> add_ideas chain
+# The reform ideas are law-type ideas, so add_ideas replaces the previous law of the same slot
+parliament_enact_voted_reform = {
+
+	# Category 1 - Distribution of Power
+	if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_elections compare = equals } }
+		add_ideas = no_elections
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:landed_voting compare = equals } }
+		add_ideas = landed_voting
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:weighted_wealth_voting compare = equals } }
+		add_ideas = weighted_wealth_voting
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:wealth_voting compare = equals } }
+		add_ideas = wealth_voting
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:universal_male_suffrage compare = equals } }
+		add_ideas = universal_male_suffrage
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:universal_suffrage compare = equals } }
+		add_ideas = universal_suffrage
+	}
+
+	# Category 2 - Discriminatory Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:national_supremacy compare = equals } }
+		add_ideas = national_supremacy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:racial_segregation compare = equals } }
+		add_ideas = racial_segregation
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:limited_equality compare = equals } }
+		add_ideas = limited_equality
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:full_equality compare = equals } }
+		add_ideas = full_equality
+	}
+
+	# Category 3 - Status of Church and State
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:theocracy compare = equals } }
+		add_ideas = theocracy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_religion compare = equals } }
+		add_ideas = state_religion
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:freedom_of_religion compare = equals } }
+		add_ideas = freedom_of_religion
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:total_seperation compare = equals } }
+		add_ideas = total_seperation
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_atheism compare = equals } }
+		add_ideas = state_atheism
+	}
+
+	# Category 4 - Court System
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:politicized_courts compare = equals } }
+		add_ideas = politicized_courts
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:corrupt_courthouse compare = equals } }
+		add_ideas = corrupt_courthouse
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:aristocratic_courts compare = equals } }
+		add_ideas = aristocratic_courts
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:quasi_jury_court compare = equals } }
+		add_ideas = quasi_jury_court
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:full_jury_court compare = equals } }
+		add_ideas = full_jury_court
+	}
+
+	# Category 5 - Policing
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_police compare = equals } }
+		add_ideas = no_police
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:local_police compare = equals } }
+		add_ideas = local_police
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:dedicated_police compare = equals } }
+		add_ideas = dedicated_police
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:police_state compare = equals } }
+		add_ideas = police_state
+	}
+
+	# Category 6 - Health System
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:apothecaries compare = equals } }
+		add_ideas = apothecaries
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:charitable_healthcare compare = equals } }
+		add_ideas = charitable_healthcare
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:private_healthcare compare = equals } }
+		add_ideas = private_healthcare
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:public_healthcare compare = equals } }
+		add_ideas = public_healthcare
+	}
+
+	# Category 7 - Education
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:oral_tradition compare = equals } }
+		add_ideas = oral_tradition
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:traditional_ulama compare = equals } }
+		add_ideas = traditional_ulama
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:church_sponsored_education compare = equals } }
+		add_ideas = church_sponsored_education
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:private_education compare = equals } }
+		add_ideas = private_education
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:public_schooling_system compare = equals } }
+		add_ideas = public_schooling_system
+	}
+
+	# Category 8 - Conscription
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:disarmed_nation compare = equals } }
+		add_ideas = disarmed_nation
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:early_conscription compare = equals } }
+		add_ideas = early_conscription
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:allotment_system compare = equals } }
+		add_ideas = allotment_system
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:volunteer_only compare = equals } }
+		add_ideas = volunteer_only
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:limited_conscription compare = equals } }
+		add_ideas = limited_conscription
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:extensive_conscription compare = equals } }
+		add_ideas = extensive_conscription
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:service_by_requirement compare = equals } }
+		add_ideas = service_by_requirement
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:all_adults_serve compare = equals } }
+		add_ideas = all_adults_serve
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:scraping_the_barrel compare = equals } }
+		add_ideas = scraping_the_barrel
+	}
+
+	# Category 9 - Press Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_press compare = equals } }
+		add_ideas = no_press
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_controlled_press compare = equals } }
+		add_ideas = state_controlled_press
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:censored_press compare = equals } }
+		add_ideas = censored_press
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:regulated_press compare = equals } }
+		add_ideas = regulated_press
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_press compare = equals } }
+		add_ideas = free_press
+	}
+
+	# Category 10 - Freedom of Assembly
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_freedom_of_speech compare = equals } }
+		add_ideas = no_freedom_of_speech
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:government_only_gatherings compare = equals } }
+		add_ideas = government_only_gatherings
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_assembly compare = equals } }
+		add_ideas = free_assembly
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:protected_speech compare = equals } }
+		add_ideas = protected_speech
+	}
+
+	# Category 11 - Trade Union Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:prohibited_trade_unions compare = equals } }
+		add_ideas = prohibited_trade_unions
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_controlled_unions compare = equals } }
+		add_ideas = state_controlled_unions
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_regulatory_bodies compare = equals } }
+		add_ideas = free_regulatory_bodies
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:worker_controlled_unions compare = equals } }
+		add_ideas = worker_controlled_unions
+	}
+
+	# Category 12 - Rights of Women
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legal_guardianship compare = equals } }
+		add_ideas = legal_guardianship
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:property_rights_for_women compare = equals } }
+		add_ideas = property_rights_for_women
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:women_in_the_workforce compare = equals } }
+		add_ideas = women_in_the_workforce
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:womens_suffrage compare = equals } }
+		add_ideas = womens_suffrage
+	}
+
+	# Category 13 - Migration Laws
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:closed_borders compare = equals } }
+		add_ideas = closed_borders
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:strict_border_control compare = equals } }
+		add_ideas = strict_border_control
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:loose_borders compare = equals } }
+		add_ideas = loose_borders
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:open_borders compare = equals } }
+		add_ideas = open_borders
+	}
+
+	# Category 14 - Status of Slavery
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legacy_slavery compare = equals } }
+		add_ideas = legacy_slavery
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:slave_trade compare = equals } }
+		add_ideas = slave_trade
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:debt_slavery compare = equals } }
+		add_ideas = debt_slavery
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:freedom_of_the_womb compare = equals } }
+		add_ideas = freedom_of_the_womb
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:slavery_banned compare = equals } }
+		add_ideas = slavery_banned
+	}
+
+	# Category 15 - Child Labour
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:legal_child_labour compare = equals } }
+		add_ideas = legal_child_labour
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:restricted_child_labour compare = equals } }
+		add_ideas = restricted_child_labour
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:banned_child_labour compare = equals } }
+		add_ideas = banned_child_labour
+	}
+
+	# Category 16 - Economic Structure
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:all_industry_banned compare = equals } }
+		add_ideas = all_industry_banned
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:traditional_economy compare = equals } }
+		add_ideas = traditional_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:agrarian_economy compare = equals } }
+		add_ideas = agrarian_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:interventionist_economy compare = equals } }
+		add_ideas = interventionist_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:laissez_faire_economy compare = equals } }
+		add_ideas = laissez_faire_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:planned_economy compare = equals } }
+		add_ideas = planned_economy
+	}
+
+	# Category 17 - Trade Policy
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:isolationism compare = equals } }
+		add_ideas = isolationism
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:protectionism compare = equals } }
+		add_ideas = protectionism
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:mercantilism compare = equals } }
+		add_ideas = mercantilism
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:free_trade compare = equals } }
+		add_ideas = free_trade
+	}
+
+	# Category 19 - Land Ownership
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:serfdom compare = equals } }
+		add_ideas = serfdom
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:tenant_farmers compare = equals } }
+		add_ideas = tenant_farmers
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:farmer_owned_land compare = equals } }
+		add_ideas = farmer_owned_land
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:capitalist_agriculture compare = equals } }
+		add_ideas = capitalist_agriculture
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:state_owned_farmland compare = equals } }
+		add_ideas = state_owned_farmland
+	}
+
+	# Category 18 - Economic Mobilisation
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:demobilised_economy compare = equals } }
+		add_ideas = demobilised_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:low_level_mobilisation compare = equals } }
+		add_ideas = low_level_mobilisation
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:partial_mobilisation compare = equals } }
+		add_ideas = partial_mobilisation
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:war_economy compare = equals } }
+		add_ideas = war_economy
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:total_mobilisation compare = equals } }
+		add_ideas = total_mobilisation
+	}
+
+	# Category 20 - Working Hours
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:no_limit compare = equals } }
+		add_ideas = no_limit
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_14 compare = equals } }
+		add_ideas = hours_14
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_12 compare = equals } }
+		add_ideas = hours_12
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_10 compare = equals } }
+		add_ideas = hours_10
+	}
+	else_if = {
+		limit = { check_variable = { var = current_reform_token value = token:hours_8 compare = equals } }
+		add_ideas = hours_8
+	}
+	else = {
+		log = "parliament_enact_voted_reform: no idea mapped for token [?current_reform_token]"
+	}
+}
+
+####################################################################################################
+### VA VALUE CHANGE (ported from the old coalition scripted effects) ###
+####################################################################################################
+
 # How to use it:
 # set_temp_variable = { va_to_gain = 0.xx }
 # add_<ideology_name>_voting_approval_with_tooltip_effect = yes
+# Referenced by the meet with representatives decisions in the new decision file
 
 add_rad_soc_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_RAD_SOC_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_RAD_SOC_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { rad_soc_va_temp = parl_voting_approval_array^0 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^0 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^0
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_soc_lib_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_SOC_LIB_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_SOC_LIB_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { soc_lib_va_temp = parl_voting_approval_array^1 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^1 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^1
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_soc_ega_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_SOC_EGA_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_SOC_EGA_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { soc_ega_va_temp = parl_voting_approval_array^2 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^2 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^2
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_cen_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_CEN_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_CEN_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { cen_va_temp = parl_voting_approval_array^3 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^3 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^3
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_tra_con_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_TRA_CON_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_TRA_CON_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { tra_con_va_temp = parl_voting_approval_array^4 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^4 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^4
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_rad_dem_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_RAD_DEM_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_RAD_DEM_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { rad_dem_va_temp = parl_voting_approval_array^5 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^5 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^5
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_chauv_pop_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_CHAUV_POP_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_CHAUV_POP_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { chauv_pop_va_temp = parl_voting_approval_array^6 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^6 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^6
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_aut_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_AUT_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_AUT_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { aut_va_temp = parl_voting_approval_array^7 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^7 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^7
 			min = 0
 			max = 1
 		}
 	}
 }
+
 add_fun_voting_approval_with_tooltip_effect = {
 	if = {
-		limit = { check_variable = { va_to_gain < 0 } } #Checks if the values are positive
+		limit = { check_variable = { va_to_gain < 0 } }
 		custom_effect_tooltip = LOSE_VA_FUN_TT
 	}
 	else = { custom_effect_tooltip = GAIN_VA_FUN_TT }
-	hidden_effect = { #This section will give the values specified on the temp variable to the actual variable
-		set_temp_variable = { fun_va_temp = parl_voting_approval_array^8 } 
+	hidden_effect = {
 		add_to_variable = { parl_voting_approval_array^8 = va_to_gain }
-		clamp_variable = { #Keeps the value of the var between 0 and 1 (0 and 100)
+		clamp_variable = {
 			var = parl_voting_approval_array^8
 			min = 0
 			max = 1
 		}
 	}
+}
+
+# Group variants used by the vote swaying decisions
+
+# All parties - used by parliament_make_a_speech_in_parliament_voting
+# Banned parties hold no seats, so including them is harmless and keeps this simple
+add_all_voting_approval_with_tooltip_effect = {
+	if = {
+		limit = { check_variable = { va_to_gain < 0 } }
+		custom_effect_tooltip = LOSE_VA_ALL_TT
+	}
+	else = { custom_effect_tooltip = GAIN_VA_ALL_TT }
+	hidden_effect = {
+		for_each_loop = {
+			array = parl_voting_approval_array
+			value = parl_v
+			index = parl_i
+
+			add_to_variable = { parl_voting_approval_array^parl_i = va_to_gain }
+			clamp_variable = {
+				var = parl_voting_approval_array^parl_i
+				min = 0
+				max = 1
+			}
+		}
+	}
+}
+
+# All parties currently in the opposition coalition - used by
+# parliament_meet_with_the_leader_of_the_opposition
+# parl_opp_coalitions holds party IDs 1-9; the approval array is indexed 0-8
+add_opposition_voting_approval_with_tooltip_effect = {
+	if = {
+		limit = { check_variable = { va_to_gain < 0 } }
+		custom_effect_tooltip = LOSE_VA_OPPOSITION_TT
+	}
+	else = { custom_effect_tooltip = GAIN_VA_OPPOSITION_TT }
+	hidden_effect = {
+		for_each_loop = {
+			array = parl_opp_coalitions
+			value = parl_opp_v
+			index = parl_opp_i
+
+			set_temp_variable = { parl_opp_index = parl_opp_v }
+			add_to_temp_variable = { parl_opp_index = -1 }
+			add_to_variable = { parl_voting_approval_array^parl_opp_index = va_to_gain }
+			clamp_variable = {
+				var = parl_voting_approval_array^parl_opp_index
+				min = 0
+				max = 1
+			}
+		}
+	}
+}
+
+# The hardliner parties - used by parliament_try_a_deal_with_the_hardliners
+add_hardliners_voting_approval_with_tooltip_effect = {
+	if = {
+		limit = { check_variable = { va_to_gain < 0 } }
+		custom_effect_tooltip = LOSE_VA_HARDLINERS_TT
+	}
+	else = { custom_effect_tooltip = GAIN_VA_HARDLINERS_TT }
+	hidden_effect = {
+		add_to_variable = { parl_voting_approval_array^0 = va_to_gain }
+		clamp_variable = {
+			var = parl_voting_approval_array^0
+			min = 0
+			max = 1
+		}
+		add_to_variable = { parl_voting_approval_array^6 = va_to_gain }
+		clamp_variable = {
+			var = parl_voting_approval_array^6
+			min = 0
+			max = 1
+		}
+		add_to_variable = { parl_voting_approval_array^7 = va_to_gain }
+		clamp_variable = {
+			var = parl_voting_approval_array^7
+			min = 0
+			max = 1
+		}
+		add_to_variable = { parl_voting_approval_array^8 = va_to_gain }
+		clamp_variable = {
+			var = parl_voting_approval_array^8
+			min = 0
+			max = 1
+		}
+	}
+}
+
+####################################################################################################
+### VOTING DECISIONS IN THE PARLIAMENT GUI ###
+####################################################################################################
+
+# Puts the voting mission and the vote swaying decisions into category 2 of the parliament
+# gui (the parliament_decision_array_2 dynamic list) while a vote is scheduled.
+# Called by the schedule option of parliament_event.10.
+#
+# Costs mirror the commented-out cost lines of the decisions - the gui charges what is
+# proposed here, since activate_decision bypasses the cost in the decision definition.
+# Icon indices refer to GetParliamentDecisionIcon.
+parliament_show_voting_decisions = {
+	# the running vote itself
+	set_temp_variable = { parliament_decision_token = token:parliament_voting_mission }
+	set_temp_variable = { parliament_decision_lp_cost = 0 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 1 } 
+	parliament_propose_decision = yes
+	# The mission is a status row rather than a clickable custom decision.
+	set_variable = { clicked@var:parliament_decision_token = 1 }
+
+	set_variable = { parliament_vote_days_left = 60 }
+	set_variable = { parliament_vote_total_days = 60 }
+	set_variable = { parliament_vote_progress = 0 }
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_rad_soc_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_soc_lib_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_soc_ega_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_cen_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_tra_con_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_rad_dem_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_chauv_pop_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_aut_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_fun_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 40 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_the_leader_of_the_opposition }
+	set_temp_variable = { parliament_decision_lp_cost = 20 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_try_a_deal_with_the_hardliners }
+	set_temp_variable = { parliament_decision_lp_cost = 50 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_make_a_speech_in_parliament_voting }
+	set_temp_variable = { parliament_decision_lp_cost = 15 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 9 } # speech
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_find_compromises }
+	set_temp_variable = { parliament_decision_lp_cost = 30 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 11 } # civil support
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_put_pressure_on_the_lobbies }
+	set_temp_variable = { parliament_decision_lp_cost = 20 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 12 } # investment
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_silence_the_oppposition }
+	set_temp_variable = { parliament_decision_lp_cost = 35 } 
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 2 } # wreckers
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_bribe_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 35 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 12 } # investment
+	parliament_propose_decision = yes
+}
+
+# Removes the voting mission and every vote swaying decision from the parliament gui.
+parliament_hide_voting_decisions = {
+	set_temp_variable = { parliament_decision_token = token:parliament_voting_mission }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_rad_soc_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_soc_lib_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_soc_ega_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_cen_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_tra_con_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_rad_dem_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_chauv_pop_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_aut_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_fun_representatives }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_the_leader_of_the_opposition }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_try_a_deal_with_the_hardliners }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_make_a_speech_in_parliament_voting }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_find_compromises }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_put_pressure_on_the_lobbies }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_silence_the_oppposition }
+	parliament_hide_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_bribe_representatives }
+	parliament_hide_decision = yes
+}
+
+####################################################################################################
+### VOTE STATE CLEANUP ###
+####################################################################################################
+
+# Clears the vote state after the result event - called by every option of parliament_event.12
+# NOTE: unlock of the reform (clicked@var:current_reform_token = 0) is handled by the failure and
+# tie options of the event BEFORE this runs, since this effect clears current_reform_token
+parliament_reform_vote_cleanup = {
+	clr_country_flag = eoanb_reform_vote_success
+	clr_country_flag = eoanb_reform_vote_failure
+	clr_country_flag = eoanb_reform_vote_tie
+	clear_variable = parl_votes_threshold
+	clear_variable = parl_votes_required
+	clr_country_flag = parliament_reform_vote_ongoing
+	clear_variable = current_reform_token
+
+	# Reset the mission GUI row and all custom timer values.
+	set_temp_variable = { parliament_decision_token = token:parliament_voting_mission }
+	set_variable = { clicked@var:parliament_decision_token = 0 }
+	clear_variable = parliament_vote_days_left
+	clear_variable = parliament_vote_total_days
+	clear_variable = parliament_vote_progress
+
+	# remove the voting mission and the vote swaying decisions from the parliament gui
+	# both calls are safe no-ops if the urgent path was taken and the mission never started
+	if = {
+		limit = { has_active_mission = parliament_voting_mission }
+		remove_mission = parliament_voting_mission
+	}
+	parliament_hide_voting_decisions = yes
 }

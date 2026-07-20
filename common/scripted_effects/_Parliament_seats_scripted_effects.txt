@@ -197,16 +197,16 @@ compute_seats = {
 	set_variable = { parl_aut_seats_count = 0 }
 	set_variable = { parl_fun_seats_count = 0 }
 
+	resize_array = {
+	    array = seats_count_array
+	    value = 0
+	    size = 9
+	}
+
 	for_each_loop = {
 		array = seats_array
 		value = parl_seats_v
 		index = parl_seats_i
-
-		resize_array = {
-		    array = seats_count_array
-		    value = 0
-		    size = 9
-		}
 
 		if = {
 		    limit = {
@@ -914,4 +914,296 @@ set_global_seats_posistions={
 	add_to_array = { global.internal_politics_house_y = 162 }
 	add_to_array = { global.internal_politics_house_x = 334 }
 	add_to_array = { global.internal_politics_house_y = 162 }
+}
+
+####################################################################################################
+### NATIONAL VOTE -> SEATS ###
+####################################################################################################
+
+# Turns party popularity into parliament seats. This effect is called by compute_seats but was
+# never carried over when the parliament system was split into the new files - without it
+# seats_array stayed at its -1 fill, every per-party seat array stayed empty, and so:
+#   - draw_seats painted all 256 seats with the fallback colour
+#   - seats_count_array stayed at 0, showing 'Government Support: 0/256'
+#   - coalition_seats_num stayed at 0, since the coalition setters read <party>_seats^num
+# Ported from the old system with three fixes: the seat counts are rounded instead of
+# truncated, the writes are bounded to the 256 seats of seats_array, and any seats left over
+# by rounding are handed to the largest party instead of staying at -1.
+compute_national_vote = {
+	parliament_compute_highest_party = yes
+
+	# kept for compatibility - the old weight based path read these
+	set_variable = { n_parl_weights^0 = party_popularity@ideology_radical_socialism }
+	set_variable = { n_parl_weights^1 = party_popularity@ideology_social_liberalism }
+	set_variable = { n_parl_weights^2 = party_popularity@social_egalitarianism }
+	set_variable = { n_parl_weights^3 = party_popularity@centrism }
+	set_variable = { n_parl_weights^4 = party_popularity@traditional_conservatism }
+	set_variable = { n_parl_weights^5 = party_popularity@radical_democracy }
+	set_variable = { n_parl_weights^6 = party_popularity@chauvinist_populism }
+	set_variable = { n_parl_weights^7 = party_popularity@autocracy }
+	set_variable = { n_parl_weights^8 = party_popularity@fundamentalism }
+
+	# popularity -> seat count (256 seats)
+	set_variable = { parl_rad_soc_seats_count = party_popularity@ideology_radical_socialism }
+	multiply_variable = { parl_rad_soc_seats_count = 256 }
+	round_variable = parl_rad_soc_seats_count
+	set_variable = { parl_soc_lib_seats_count = party_popularity@ideology_social_liberalism }
+	multiply_variable = { parl_soc_lib_seats_count = 256 }
+	round_variable = parl_soc_lib_seats_count
+	set_variable = { parl_soc_ega_seats_count = party_popularity@social_egalitarianism }
+	multiply_variable = { parl_soc_ega_seats_count = 256 }
+	round_variable = parl_soc_ega_seats_count
+	set_variable = { parl_cen_seats_count = party_popularity@centrism }
+	multiply_variable = { parl_cen_seats_count = 256 }
+	round_variable = parl_cen_seats_count
+	set_variable = { parl_tra_con_seats_count = party_popularity@traditional_conservatism }
+	multiply_variable = { parl_tra_con_seats_count = 256 }
+	round_variable = parl_tra_con_seats_count
+	set_variable = { parl_rad_dem_seats_count = party_popularity@radical_democracy }
+	multiply_variable = { parl_rad_dem_seats_count = 256 }
+	round_variable = parl_rad_dem_seats_count
+	set_variable = { parl_chauv_pop_seats_count = party_popularity@chauvinist_populism }
+	multiply_variable = { parl_chauv_pop_seats_count = 256 }
+	round_variable = parl_chauv_pop_seats_count
+	set_variable = { parl_aut_seats_count = party_popularity@autocracy }
+	multiply_variable = { parl_aut_seats_count = 256 }
+	round_variable = parl_aut_seats_count
+	set_variable = { parl_fun_seats_count = party_popularity@fundamentalism }
+	multiply_variable = { parl_fun_seats_count = 256 }
+	round_variable = parl_fun_seats_count
+
+	# the coalition setters read <party>_seats^num to maintain coalition_seats_num,
+	# so these arrays have to exist even when a party holds no seats
+	resize_array = {
+	    array = radsoc_seats
+	    value = 1
+	    size = parl_rad_soc_seats_count
+	}
+	resize_array = {
+	    array = soc_lib_seats
+	    value = 1
+	    size = parl_soc_lib_seats_count
+	}
+	resize_array = {
+	    array = socegl_seats
+	    value = 1
+	    size = parl_soc_ega_seats_count
+	}
+	resize_array = {
+	    array = cent_seats
+	    value = 1
+	    size = parl_cen_seats_count
+	}
+	resize_array = {
+	    array = trad_seats
+	    value = 1
+	    size = parl_tra_con_seats_count
+	}
+	resize_array = {
+	    array = rade_seats
+	    value = 1
+	    size = parl_rad_dem_seats_count
+	}
+	resize_array = {
+	    array = chav_seats
+	    value = 1
+	    size = parl_chauv_pop_seats_count
+	}
+	resize_array = {
+	    array = seats_auto
+	    value = 1
+	    size = parl_aut_seats_count
+	}
+	resize_array = {
+	    array = seats_fund
+	    value = 1
+	    size = parl_fun_seats_count
+	}
+
+	set_temp_variable = { current_seat_posistion = 0 }
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = IP_CUSTOM_PARTIES_SET }
+		}
+
+		# seat order is kept identical to the old system so the hemicycle layout does not shift
+		for_each_loop = {
+			array = seats_fund
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 8 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = seats_auto
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 7 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = chav_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 6 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = rade_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 5 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = trad_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 4 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = cent_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 3 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = socegl_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 2 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = soc_lib_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 1 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = radsoc_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 0 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+
+		# rounding can leave a handful of seats unassigned - give them to the largest party
+		# so that no seat is left at -1 (which would draw with the fallback colour)
+		for_each_loop = {
+			array = seats_array
+			value = parl_fill_v
+			index = parl_fill_i
+
+			if = {
+				limit = { check_variable = { seats_array^parl_fill_i < 0 } }
+				set_variable = { seats_array^parl_fill_i = highest_party_index }
+			}
+		}
+	}
+}
+
+# Works out which party is the largest and stores it as both a token and an array index.
+# highest_party_ideology is read by setup_<party>_sog and by add_<party>_sog_with_tooltip_effect
+# in the coalition scripted effects, but nothing ever wrote it - it stayed at 0, so every
+# 'this party is the largest' branch was dead code.
+parliament_compute_highest_party = {
+	set_temp_variable = { highest_party_pop = -1 }
+	set_variable = { highest_party_index = 0 }
+	set_variable = { highest_party_ideology = token:ideology_radical_socialism }
+
+	if = {
+		limit = { check_variable = { party_popularity@ideology_radical_socialism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@ideology_radical_socialism }
+		set_variable = { highest_party_index = 0 }
+		set_variable = { highest_party_ideology = token:ideology_radical_socialism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@ideology_social_liberalism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@ideology_social_liberalism }
+		set_variable = { highest_party_index = 1 }
+		set_variable = { highest_party_ideology = token:ideology_social_liberalism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@social_egalitarianism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@social_egalitarianism }
+		set_variable = { highest_party_index = 2 }
+		set_variable = { highest_party_ideology = token:social_egalitarianism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@centrism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@centrism }
+		set_variable = { highest_party_index = 3 }
+		set_variable = { highest_party_ideology = token:centrism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@traditional_conservatism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@traditional_conservatism }
+		set_variable = { highest_party_index = 4 }
+		set_variable = { highest_party_ideology = token:traditional_conservatism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@radical_democracy > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@radical_democracy }
+		set_variable = { highest_party_index = 5 }
+		set_variable = { highest_party_ideology = token:radical_democracy }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@chauvinist_populism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@chauvinist_populism }
+		set_variable = { highest_party_index = 6 }
+		set_variable = { highest_party_ideology = token:chauvinist_populism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@autocracy > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@autocracy }
+		set_variable = { highest_party_index = 7 }
+		set_variable = { highest_party_ideology = token:autocracy }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@fundamentalism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@fundamentalism }
+		set_variable = { highest_party_index = 8 }
+		set_variable = { highest_party_ideology = token:fundamentalism }
+	}
 }
