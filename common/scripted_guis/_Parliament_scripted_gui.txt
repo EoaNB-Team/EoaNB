@@ -151,7 +151,7 @@ scripted_gui = {
 		visible = {
 			check_variable = { show_parliament_window > 0 }
 			check_variable = { show_decisions_window  > 0 }
-			NOT = { has_country_flag = parliament_voting_ongoing_flag }
+			NOT = { has_active_mission = parliament_voting_mission }
 		}
 
 		effects = {
@@ -166,7 +166,7 @@ scripted_gui = {
 				if = {
 					limit = { check_variable = { lp_cost@var:v > 0 } }
 					set_temp_variable = { lpcost = lp_cost@var:v }
-					has_political_power > var:lpcost
+					NOT = { has_political_power < var:lpcost }
 				}
 				if = {
 					limit = { check_variable = { money_cost@var:v > 0 } }
@@ -225,7 +225,7 @@ scripted_gui = {
 				if = {
 					limit = { check_variable = { lp_cost@var:v > 0 } }
 					set_temp_variable = { lpcost = lp_cost@var:v }
-					has_political_power > var:lpcost
+					NOT = { has_political_power < var:lpcost }
 				}
 				if = {
 					limit = { check_variable = { money_cost@var:v > 0 } }
@@ -286,12 +286,15 @@ scripted_gui = {
 			parliament_decision_icon = {
 				image = "[GetParliamentDecisionIcon]"
 			}
-			parliament_progress_good  = { frame = ROOT.parliament_decision_days_left }
+			parliament_progress_good = { frame = ROOT.parliament_decision_days_left }
 		}
 
 		dynamic_lists = {
 			parliament_decisions_grid = {
 				array = parliament_decision_array_1
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_decision_container
 			}
 		}
@@ -308,7 +311,8 @@ scripted_gui = {
 		visible = {
 			check_variable = { show_parliament_window > 0 }
 			check_variable = { show_decisions_window  > 0 }
-			has_country_flag = parliament_voting_ongoing_flag
+			# Display the voting-status list only while the vote mission is active.
+			has_active_mission = parliament_voting_mission
 		}
 
 		effects = {
@@ -320,10 +324,12 @@ scripted_gui = {
 
 		triggers = {
 			parliament_decision_select_click_enabled = {
+				# the voting mission is a status entry - clicking it would restart its timer
+				NOT = { check_variable = { v = token:parliament_voting_mission } }
 				if = {
 					limit = { check_variable = { lp_cost@var:v > 0 } }
 					set_temp_variable = { lpcost = lp_cost@var:v }
-					has_political_power > var:lpcost
+					NOT = { has_political_power < var:lpcost }
 				}
 				if = {
 					limit = { check_variable = { money_cost@var:v > 0 } }
@@ -332,9 +338,6 @@ scripted_gui = {
 					has_less_than_specific_amount_of_money = no
 				}
 				NOT = { has_country_flag = Parliament_decision_active_flag }
-				check_variable = { clicked@var:v = 0 }
-				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
-
 				### Checking if the decision is available ###
 				if = {
 					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
@@ -373,16 +376,16 @@ scripted_gui = {
 				}
 			}
 			parliament_decision_timeout_visible = {
-				check_variable = { clicked@var:v > 0 }
+				check_variable = { v = token:parliament_voting_mission }
 			}
 			parliament_decision_cost_visible = {
-				NOT = { check_variable = { clicked@var:v > 0 } }
+				NOT = { check_variable = { v = token:parliament_voting_mission } }
 			}
 			parliament_decision_background_available_visible = {
 				if = {
 					limit = { check_variable = { lp_cost@var:v > 0 } }
 					set_temp_variable = { lpcost = lp_cost@var:v }
-					has_political_power > var:lpcost
+					NOT = { has_political_power < var:lpcost }
 				}
 				if = {
 					limit = { check_variable = { money_cost@var:v > 0 } }
@@ -391,9 +394,6 @@ scripted_gui = {
 					has_less_than_specific_amount_of_money = no
 				}
 				NOT = { has_country_flag = Parliament_decision_active_flag }
-				check_variable = { clicked@var:v = 0 }
-				NOT = { has_country_flag = parliament_decision_category_1_ongoing }
-
 				### Checking if the decision is available ###
 				if = {
 					limit = { check_variable = { v = token:parliament_give_tax_cuts } }
@@ -432,7 +432,10 @@ scripted_gui = {
 				}
 			}
 			parliament_decision_background_in_progress_visible = {
-				check_variable = { clicked@var:v = 1 }
+				check_variable = { v = token:parliament_voting_mission }
+			}
+			parliament_progress_good_visible = {
+				check_variable = { v = token:parliament_voting_mission }
 			}
 		}
 
@@ -440,12 +443,15 @@ scripted_gui = {
 			parliament_decision_icon = {
 				image = "[GetParliamentDecisionIcon]"
 			}
-			parliament_progress_good  = { frame = ROOT.parliament_decision_category_1_ongoing:days_left }
+			parliament_progress_good = { frame = ROOT.parliament_vote_progress }
 		}
 
 		dynamic_lists = {
 			parliament_decisions_grid = {
 				array = parliament_decision_array_2
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_decision_container
 			}
 		}
@@ -694,7 +700,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -711,6 +717,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_distribution_of_power = {
 				array = parliament_reform_array_1
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -738,7 +747,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -755,6 +764,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_discriminatory_laws = {
 				array = parliament_reform_array_2
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -782,7 +794,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -799,6 +811,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_status_of_church_and_state = {
 				array = parliament_reform_array_3
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -826,7 +841,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -843,6 +858,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_court_system = {
 				array = parliament_reform_array_4
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -870,7 +888,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -887,6 +905,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_policing = {
 				array = parliament_reform_array_5
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -914,7 +935,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -931,6 +952,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_health_system = {
 				array = parliament_reform_array_6
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -958,7 +982,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -975,6 +999,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_education_system = {
 				array = parliament_reform_array_7
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1002,7 +1029,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1019,6 +1046,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_conscription_laws = {
 				array = parliament_reform_array_8
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1046,7 +1076,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1063,6 +1093,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_press_laws = {
 				array = parliament_reform_array_9
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1090,7 +1123,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1107,6 +1140,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_freedom_of_assembly_laws = {
 				array = parliament_reform_array_10
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1134,7 +1170,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1151,6 +1187,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_trade_union_laws = {
 				array = parliament_reform_array_11
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1178,7 +1217,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1195,6 +1234,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_rights_of_women = {
 				array = parliament_reform_array_12
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1222,7 +1264,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1239,6 +1281,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_migration_policy = {
 				array = parliament_reform_array_13
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1266,7 +1311,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1283,6 +1328,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_status_of_slavery = {
 				array = parliament_reform_array_14
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1310,7 +1358,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1327,6 +1375,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_child_labour_policy = {
 				array = parliament_reform_array_15
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1354,7 +1405,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1371,6 +1422,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_economic_system = {
 				array = parliament_reform_array_16
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1398,7 +1452,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1415,6 +1469,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_trade_policy = {
 				array = parliament_reform_array_17
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1442,7 +1499,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1459,6 +1516,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_economic_mobilisation = {
 				array = parliament_reform_array_18
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1486,7 +1546,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1503,6 +1563,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_status_of_land = {
 				array = parliament_reform_array_19
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
@@ -1530,7 +1593,7 @@ scripted_gui = {
 		triggers = {
 			parliament_reform_select_click_enabled = {
 				set_temp_variable = { lpcost = lp_cost@var:v }
-				has_political_power > var:lpcost
+				NOT = { has_political_power < var:lpcost }
 				check_variable = { clicked@var:v = 0 }
 				parliament_reform_check = yes
 				parliament_reform_support_check = yes
@@ -1547,6 +1610,9 @@ scripted_gui = {
 		dynamic_lists = {
 			parliament_reform_grid_working_hours = {
 				array = parliament_reform_array_20
+				value = v
+				index = i
+				change_scope = no
 				entry_container = parliament_reform_container
 			}
 		}
