@@ -219,6 +219,151 @@ clear_coalitions = {
 	clear_array = parl_uno_coalitions
 }
 
+parliament_sanitize_coalition_arrays = {
+	clear_temp_array = parl_sanitize_temp
+	for_each_loop = {
+		array = parl_gov_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_sanitize_temp = parl_v } }
+			}
+			add_to_temp_array = { parl_sanitize_temp = parl_v }
+		}
+	}
+	clear_array = parl_gov_coalitions
+	for_each_loop = {
+		array = parl_sanitize_temp
+		value = parl_v
+		add_to_array = { parl_gov_coalitions = parl_v }
+	}
+
+	clear_temp_array = parl_sanitize_temp
+	for_each_loop = {
+		array = parl_opp_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_sanitize_temp = parl_v } }
+			}
+			add_to_temp_array = { parl_sanitize_temp = parl_v }
+		}
+	}
+	clear_array = parl_opp_coalitions
+	for_each_loop = {
+		array = parl_sanitize_temp
+		value = parl_v
+		add_to_array = { parl_opp_coalitions = parl_v }
+	}
+
+	clear_temp_array = parl_sanitize_temp
+	for_each_loop = {
+		array = parl_neu_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_sanitize_temp = parl_v } }
+			}
+			add_to_temp_array = { parl_sanitize_temp = parl_v }
+		}
+	}
+	clear_array = parl_neu_coalitions
+	for_each_loop = {
+		array = parl_sanitize_temp
+		value = parl_v
+		add_to_array = { parl_neu_coalitions = parl_v }
+	}
+
+	clear_temp_array = parl_sanitize_temp
+	for_each_loop = {
+		array = parl_ban_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_sanitize_temp = parl_v } }
+			}
+			add_to_temp_array = { parl_sanitize_temp = parl_v }
+		}
+	}
+	clear_array = parl_ban_coalitions
+	for_each_loop = {
+		array = parl_sanitize_temp
+		value = parl_v
+		add_to_array = { parl_ban_coalitions = parl_v }
+	}
+
+	clear_temp_array = parl_sanitize_temp
+	for_each_loop = {
+		array = parl_uno_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_sanitize_temp = parl_v } }
+			}
+			add_to_temp_array = { parl_sanitize_temp = parl_v }
+		}
+	}
+	clear_array = parl_uno_coalitions
+	for_each_loop = {
+		array = parl_sanitize_temp
+		value = parl_v
+		add_to_array = { parl_uno_coalitions = parl_v }
+	}
+
+}
+
+parliament_recompute_coalition_seats = {
+	parliament_sanitize_coalition_arrays = yes
+
+	set_variable = { coalition_seats_num = 0 }
+	if = { # Radical Socialist
+		limit = { is_in_array = { parl_gov_coalitions = 1 } }
+		add_to_variable = { var = coalition_seats_num value = radsoc_seats^num }
+	}
+	if = { # Social Liberal
+		limit = { is_in_array = { parl_gov_coalitions = 2 } }
+		add_to_variable = { var = coalition_seats_num value = soc_lib_seats^num }
+	}
+	if = { # Social Egalitarian
+		limit = { is_in_array = { parl_gov_coalitions = 3 } }
+		add_to_variable = { var = coalition_seats_num value = socegl_seats^num }
+	}
+	if = { # Conservative Liberal
+		limit = { is_in_array = { parl_gov_coalitions = 4 } }
+		add_to_variable = { var = coalition_seats_num value = cent_seats^num }
+	}
+	if = { # Traditional Conservative
+		limit = { is_in_array = { parl_gov_coalitions = 5 } }
+		add_to_variable = { var = coalition_seats_num value = trad_seats^num }
+	}
+	if = { # Peripheral
+		limit = { is_in_array = { parl_gov_coalitions = 6 } }
+		add_to_variable = { var = coalition_seats_num value = rade_seats^num }
+	}
+	if = { # Chauvinistic Populist
+		limit = { is_in_array = { parl_gov_coalitions = 7 } }
+		add_to_variable = { var = coalition_seats_num value = chav_seats^num }
+	}
+	if = { # Authoritarian
+		limit = { is_in_array = { parl_gov_coalitions = 8 } }
+		add_to_variable = { var = coalition_seats_num value = seats_auto^num }
+	}
+	if = { # Fundamentalist
+		limit = { is_in_array = { parl_gov_coalitions = 9 } }
+		add_to_variable = { var = coalition_seats_num value = seats_fund^num }
+	}
+}
+
 ##### SOG (Support of Government) Setup #####
 
 # The values are calulated based on government parties, political stability and government legitimacy 
@@ -2961,6 +3106,9 @@ setup_initial_party_values = { #Should be executed on startup, elections, puppet
 
 	# Fun
 	setup_fun_sog = yes
+
+	# resync the coalition seat total against the current seat arrays
+	parliament_recompute_coalition_seats = yes
 }
 
 ### SOG Value Change (Based on the add_money_with_tooltip_effect scripted effect)
@@ -3342,45 +3490,34 @@ add_sog_to_all_with_tooltip_effect = {
 }
 
 set_all_opposition_to_neutral = {
+	# Do NOT remove inside the loop. for_each_loop walks the array by index, so removing an
+	# element shifts every later entry down one - entries get skipped and the loop can read
+	# past the end of the array. Every member is moving anyway, so clear the source once.
 	for_each_loop = {
 	    array = parl_opp_coalitions
 	    value = parl_v
-	    index = parl_i
 	    
 		if = {
 			limit = { NOT = { is_in_array = { parl_neu_coalitions = parl_v } } }
 			add_to_array = { parl_neu_coalitions = parl_v }
 		}
-		remove_from_array = {
-			array = parl_opp_coalitions
-			index = parl_i
-		}
 	}
+	clear_array = parl_opp_coalitions
 }
 
 reverse_coalitions = {
 	# Extracts the two arrays into temp_arrays
+	# the in-loop remove_from_array corrupted the extraction (indices shift while iterating)
+	# and was redundant - both arrays are cleared immediately below anyway
 	for_each_loop = {
 	    array = parl_gov_coalitions
 	    value = parl_v
-	    index = parl_i
-	    
 	    add_to_temp_array = { parl_gov_temp = parl_v }
-		remove_from_array = {
-			array = parl_gov_coalitions
-			index = parl_i
-		}
 	}
 	for_each_loop = {
 	    array = parl_opp_coalitions
 	    value = parl_v
-	    index = parl_i
-	    
 	    add_to_temp_array = { parl_opp_temp = parl_v }
-		remove_from_array = {
-			array = parl_opp_coalitions
-			index = parl_i
-		}
 	}
 
 	# Clears the original arrays
@@ -3405,20 +3542,18 @@ reverse_coalitions = {
 }
 
 set_all_government_members_to_opposition = { # Used if you only want one opposition member to add to the coalition (in place of reverse_coalitions)
+
 	for_each_loop = {
 	    array = parl_gov_coalitions
 	    value = parl_v
-	    index = parl_i
 	    
 		if = {
 			limit = { NOT = { is_in_array = { parl_opp_coalitions = parl_v } } }
 			add_to_array = { parl_opp_coalitions = parl_v }
 		}
-		remove_from_array = {
-			array = parl_gov_coalitions
-			index = parl_i
-		}
 	}
+	clear_array = parl_gov_coalitions
+	parliament_recompute_coalition_seats = yes
 }
 
 ####################################################################################################
@@ -4132,7 +4267,7 @@ set_rad_dem_to_coalition = {
 
 set_chauv_pop_to_coalition = {
 	if = {
-		limit = { radical_democracy > 0 }
+		limit = { chauvinist_populism > 0 }
 		if = {
 			limit = {
 				check_variable = {
