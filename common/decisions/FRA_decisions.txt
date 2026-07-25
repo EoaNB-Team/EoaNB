@@ -505,7 +505,12 @@ FRA_decision_category_health_of_his_majesty = {
 		icon = medicine
 
 		activation = { always = no }
-		available = { always = no }
+		available = { 
+			OR = {
+				has_country_flag = FRA_napoleon_successful_liver_operation
+				has_country_flag = FRA_napoleon_failed_liver_operation
+		 	} 
+		}
 		cancel_trigger = {
 			NOT = {
 				has_country_leader = { character = FRA_napoleon_iii	ruling_only = yes }
@@ -693,7 +698,7 @@ FRA_decision_category_health_of_his_majesty = {
 						subtract_from_variable = {
 							var = FRA.napoleon_health
 							value = 5
-							tooltip = FRA_napoleon_improved_10_health_tt
+							tooltip = FRA_napoleon_worsened_10_health_tt
 						}
 						add_to_variable = {
 							var = FRA.napoleon_unhealthy
@@ -725,7 +730,7 @@ FRA_decision_category_health_of_his_majesty = {
 						subtract_from_variable = {
 							var = FRA.napoleon_health
 							value = 5
-							tooltip = FRA_napoleon_improved_10_health_tt
+							tooltip = FRA_napoleon_worsened_10_health_tt
 						}
 						add_to_variable = {
 							var = FRA.napoleon_unhealthy
@@ -6495,27 +6500,56 @@ FRA_decision_category_colonial_actions = {
 				custom_trigger_tooltip = {
 					tooltip = FRA_gabon_victroy_for_FRA
 					tag = FRA
-					OR = {
+					if = {
+						limit = {
+							country_exists = BKW
+						}
 						OR = {
-							FRA = {
-								controls_state = 876
-								controls_state = 539
+							OR = {
+								FRA = {
+									controls_state = 876
+									controls_state = 539
+								}
+								GAB = {
+									controls_state = 876
+									controls_state = 539
+								}
 							}
-							GAB = {
-								controls_state = 876
-								controls_state = 539
+							BKW = {
+								surrender_progress > 0.2
 							}
 						}
-						BKW = {
-							surrender_progress > 0.2
+					}
+					if = {
+						limit = {
+							country_exists = AFR
+						}
+						OR = {
+							OR = {
+								FRA = {
+									controls_state = 876
+									controls_state = 539
+								}
+								GAB = {
+									controls_state = 876
+									controls_state = 539
+								}
+							}
+							AFR = {
+								surrender_progress > 0.2
+							}
 						}
 					}
 				}
 				custom_trigger_tooltip = {
 					tooltip = FRA_gabon_victroy_for_BKW
-					tag = BKW
-					BKW = {
-						controls_state = 886
+					OR = {
+						BKW = {
+							controls_state = 886
+						}
+						AFR = {
+							controls_state = 886
+						}
 					}
 				}
 			}
@@ -6524,18 +6558,37 @@ FRA_decision_category_colonial_actions = {
 			if = {
 				limit = {
 					tag = FRA
-					OR = {
-						1382 = {
-							is_controlled_by = FRA
+					if = {
+						limit = {
+							country_exists = BKW
 						}
-						BKW = {
-							surrender_progress > 0.2
+						OR = {
+							1382 = {
+								is_controlled_by = FRA
+							}
+							BKW = {
+								surrender_progress > 0.2
+							}
+						}
+					}
+					if = {
+						limit = {
+							country_exists = AFR
+						}
+						OR = {
+							1382 = {
+								is_controlled_by = FRA
+							}
+							AFR = {
+								surrender_progress > 0.2
+							}
 						}
 					}
 				}
 				# Peace Treaty Event for French victory
 				FRA = {
 					white_peace = BKW
+					white_peace = AFR
 					transfer_state = 876
 					transfer_state = 539
 					country_event = {
@@ -6545,12 +6598,31 @@ FRA_decision_category_colonial_actions = {
 			}
 			if = {
 				limit = {
-					tag = BKW
 					BKW = {
 						controls_state = 886
 					}
 				}
 				BKW = {
+					white_peace = FRA
+					transfer_state = 886
+					add_war_support = 0.1
+					country_event = {
+						id = france.243
+					}
+				}
+				FRA = {
+					country_event = {
+						id = france.243
+					}
+				}
+			}
+			if = {
+				limit = {
+					AFR = {
+						controls_state = 886
+					}
+				}
+				AFR = {
 					white_peace = FRA
 					transfer_state = 886
 					add_war_support = 0.1
