@@ -1,12 +1,14 @@
 defined_text = {
 	name = GetParliamentDecisionCost
+
+	# --- Political power only ---
 	text = {
 		trigger = {
 			check_variable = { lp_cost@var:v > 0 }
 			check_variable = { money_cost@var:v = 0 }
 
-			# Checks if you have enough pp
 			set_temp_variable = { lpcost = lp_cost@var:v }
+			subtract_from_temp_variable = { lpcost = 0.005 }
 			has_political_power > var:lpcost
 		}
 		localization_key = parliament_cost_pp_yes
@@ -15,21 +17,17 @@ defined_text = {
 		trigger = {
 			check_variable = { lp_cost@var:v > 0 }
 			check_variable = { money_cost@var:v = 0 }
-
-			# Checks if you have enough pp
-			set_temp_variable = { lpcost = lp_cost@var:v }
-			has_political_power < var:lpcost
 		}
 		localization_key = parliament_cost_pp_no
 	}
+
+	# --- Money only ---
 	text = {
 		trigger = {
 			check_variable = { lp_cost@var:v = 0 }
 			check_variable = { money_cost@var:v > 0 }
 
-			# Checks if you have enough money
-			set_temp_variable = { moneycost = money_cost@var:v }
-			set_temp_variable = { amount_of_money_to_check = var:moneycost }
+			set_temp_variable = { amount_of_money_to_check = money_cost@var:v }
 			has_less_than_specific_amount_of_money = no
 		}
 		localization_key = parliament_cost_money_yes
@@ -38,53 +36,56 @@ defined_text = {
 		trigger = {
 			check_variable = { lp_cost@var:v = 0 }
 			check_variable = { money_cost@var:v > 0 }
-
-			# Checks if you have enough money
-			set_temp_variable = { moneycost = money_cost@var:v }
-			set_temp_variable = { amount_of_money_to_check = var:moneycost }
-			has_less_than_specific_amount_of_money = yes
 		}
 		localization_key = parliament_cost_money_no
 	}
+
+	# --- Both costs: all four affordability states are covered ---
 	text = {
 		trigger = {
 			check_variable = { lp_cost@var:v > 0 }
 			check_variable = { money_cost@var:v > 0 }
 
-			# Checks if you have enough pp
 			set_temp_variable = { lpcost = lp_cost@var:v }
+			subtract_from_temp_variable = { lpcost = 0.005 }
 			has_political_power > var:lpcost
-			
-			# Checks if you have enough money
-			set_temp_variable = { moneycost = money_cost@var:v }
-			set_temp_variable = { amount_of_money_to_check = var:moneycost }
+
+			set_temp_variable = { amount_of_money_to_check = money_cost@var:v }
 			has_less_than_specific_amount_of_money = no
 		}
 		localization_key = parliament_cost_pp_and_money_yes
 	}
-	text = {
+	text = { # can pay the political power but not the money
 		trigger = {
 			check_variable = { lp_cost@var:v > 0 }
 			check_variable = { money_cost@var:v > 0 }
 
-			# Checks if you have enough pp
 			set_temp_variable = { lpcost = lp_cost@var:v }
-			has_political_power < var:lpcost
-			
-			# Checks if you have enough money
-			set_temp_variable = { moneycost = money_cost@var:v }
-			set_temp_variable = { amount_of_money_to_check = var:moneycost }
-			has_less_than_specific_amount_of_money = yes
+			subtract_from_temp_variable = { lpcost = 0.005 }
+			has_political_power > var:lpcost
 		}
-		localization_key = parliament_cost_pp_and_money_no
+		localization_key = parliament_cost_pp_and_money_pp_only
+	}
+	text = { # can pay the money but not the political power
+		trigger = {
+			check_variable = { lp_cost@var:v > 0 }
+			check_variable = { money_cost@var:v > 0 }
+
+			set_temp_variable = { amount_of_money_to_check = money_cost@var:v }
+			has_less_than_specific_amount_of_money = no
+		}
+		localization_key = parliament_cost_pp_and_money_money_only
 	}
 	text = {
 		trigger = {
-			check_variable = { lp_cost@var:v = 0 }
-			check_variable = { money_cost@var:v = 0 }
+			check_variable = { lp_cost@var:v > 0 }
+			check_variable = { money_cost@var:v > 0 }
 		}
-		localization_key = parliament_cost_nothing
+		localization_key = parliament_cost_pp_and_money_no
 	}
+
+	# --- Free ---
+	text = { localization_key = parliament_cost_nothing }
 }
 defined_text = {
 	name = GetDecisionPrerequisitesAndEffects
@@ -119,6 +120,43 @@ defined_text = {
 	text = {
 		trigger = { check_variable = { v = token:parliament_invite_party_to_our_coalition } }
 		localization_key = parliament_decision_pe_invite_party_to_our_coalition
+	}
+
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_rad_soc_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_rad_soc_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_soc_lib_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_soc_lib_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_soc_ega_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_soc_ega_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_cen_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_cen_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_tra_con_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_tra_con_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_rad_dem_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_rad_dem_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_chauv_pop_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_chauv_pop_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_aut_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_aut_to_our_coalition
+	}
+	text = {
+		trigger = { check_variable = { v = token:parliament_invite_fun_to_our_coalition } }
+		localization_key = parliament_decision_pe_invite_fun_to_our_coalition
 	}
 	text = {
 		trigger = { check_variable = { v = token:parliament_coalition_rad_soc_breakaway_mission } }
@@ -156,146 +194,110 @@ defined_text = {
 		trigger = { check_variable = { v = token:parliament_coalition_fun_breakaway_mission } }
 		localization_key = parliament_decision_pe_fun_breakaway_mission
 	}
+
+	# Fallback so an unhandled decision token shows something readable.
+	text = { localization_key = PARLIAMENT_DECISION_DESCRIPTION_MISSING }
 }
 
 ### Please don't kill me for the next few scripted loc, but it's better than one big block, as the checks for each decision's requirements would spiral out quickly with one decision having 5! text option
 defined_text = {
 	name = GetParliamentPrerequisite1
 	text = {
-		trigger = { has_thirty_percent_government_support = no }
-		localization_key = parliament_prerequisite_1_no
-	}
-	text = {
 		trigger = { has_thirty_percent_government_support = yes }
 		localization_key = parliament_prerequisite_1_yes
 	}
+	text = { localization_key = parliament_prerequisite_1_no }
 }
-defined_text = { #Use this for all 'parliament_decision_category_1_ongoing' trigger
+defined_text = {
 	name = GetParliamentPrerequisite2
-	text = {
-		trigger = { has_country_flag = parliament_decision_category_1_ongoing }
-		localization_key = parliament_prerequisite_2_no
-	}
 	text = {
 		trigger = { NOT = { has_country_flag = parliament_decision_category_1_ongoing } }
 		localization_key = parliament_prerequisite_2_yes
 	}
+	text = { localization_key = parliament_prerequisite_2_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite3
 	text = {
-		trigger = { has_twenty_five_percent_government_support = no }
-		localization_key = parliament_prerequisite_3_no
-	}
-	text = {
 		trigger = { has_twenty_five_percent_government_support = yes }
 		localization_key = parliament_prerequisite_3_yes
 	}
+	text = { localization_key = parliament_prerequisite_3_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite4
 	text = {
-		trigger = { has_thirty_five_percent_government_support = no }
-		localization_key = parliament_prerequisite_4_no
-	}
-	text = {
 		trigger = { has_thirty_five_percent_government_support = yes }
 		localization_key = parliament_prerequisite_4_yes
 	}
+	text = { localization_key = parliament_prerequisite_4_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite5
 	text = {
-		trigger = { has_stability < 0.50 }
-		localization_key = parliament_prerequisite_5_no
-	}
-	text = {
 		trigger = { has_stability > 0.50 }
 		localization_key = parliament_prerequisite_5_yes
 	}
+	text = { localization_key = parliament_prerequisite_5_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite6
 	text = {
-		trigger = { has_fourty_percent_government_support = no }
-		localization_key = parliament_prerequisite_6_no
-	}
-	text = {
 		trigger = { has_fourty_percent_government_support = yes }
 		localization_key = parliament_prerequisite_6_yes
 	}
+	text = { localization_key = parliament_prerequisite_6_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite7
 	text = {
-		trigger = { has_stability < 0.40 }
-		localization_key = parliament_prerequisite_7_no
-	}
-	text = {
 		trigger = { has_stability > 0.40 }
 		localization_key = parliament_prerequisite_7_yes
 	}
+	text = { localization_key = parliament_prerequisite_7_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite8
 	text = {
-		trigger = { 
-			set_temp_variable = { amount_of_money_to_check = 10 }
-			has_less_than_specific_amount_of_money = no
-		}
-		localization_key = parliament_prerequisite_8_no
-	}
-	text = {
-		trigger = { 
+		trigger = {
 			set_temp_variable = { amount_of_money_to_check = 10 }
 			has_less_than_specific_amount_of_money = yes
 		}
 		localization_key = parliament_prerequisite_8_yes
 	}
+	text = { localization_key = parliament_prerequisite_8_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite9
 	text = {
-		trigger = { has_idea = parliament_idea_a_strict_budget }
-		localization_key = parliament_prerequisite_9_no
-	}
-	text = {
 		trigger = { NOT = { has_idea = parliament_idea_a_strict_budget } }
 		localization_key = parliament_prerequisite_9_yes
 	}
+	text = { localization_key = parliament_prerequisite_9_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite10
 	text = {
-		trigger = { check_variable = { political_legitimacy > 0.60 } }
-		localization_key = parliament_prerequisite_10_no
-	}
-	text = {
 		trigger = { check_variable = { political_legitimacy < 0.60 } }
 		localization_key = parliament_prerequisite_10_yes
 	}
+	text = { localization_key = parliament_prerequisite_10_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite11
 	text = {
-		trigger = { PS_pol_positive = no }
-		localization_key = parliament_prerequisite_11_no
-	}
-	text = {
 		trigger = { PS_pol_positive = yes }
 		localization_key = parliament_prerequisite_11_yes
 	}
+	text = { localization_key = parliament_prerequisite_11_no }
 }
 defined_text = {
 	name = GetParliamentPrerequisite12
 	text = {
-		trigger = { check_variable = { political_legitimacy < 0.60 } }
-		localization_key = parliament_prerequisite_12_no
-	}
-	text = {
 		trigger = { check_variable = { political_legitimacy > 0.60 } }
 		localization_key = parliament_prerequisite_12_yes
 	}
+	text = { localization_key = parliament_prerequisite_12_no }
 }
 
 defined_text = {
@@ -376,6 +378,7 @@ defined_text = {
 	text = {
 		trigger = {
 			set_temp_variable = { lpcost = lp_cost@var:v }
+			subtract_from_temp_variable = { lpcost = 0.005 }
 			has_political_power > var:lpcost
 		}
 		localization_key = parliament_cost_yes
@@ -497,7 +500,7 @@ defined_text = {
 	# HS ICONS
 	text = {
 		trigger = { check_variable = { icon@var:v = 25 } }
-		localization_key = "GFX_idea_health_sys_no_healthcare"
+		localization_key = "GFX_idea_health_sys_none"
 	}
 	text = {
 		trigger = { check_variable = { icon@var:v = 26 } }
@@ -691,7 +694,7 @@ defined_text = {
 	# CL ICONS
 	text = {
 		trigger = { check_variable = { icon@var:v = 69 } }
-		localization_key = "GFX_idea_cl_banned_child_labour"
+		localization_key = "GFX_idea_cl_legal_child_labour"	
 	}
 	text = {
 		trigger = { check_variable = { icon@var:v = 70 } }
@@ -807,6 +810,8 @@ defined_text = {
 		trigger = { check_variable = { icon@var:v = 96 } }
 		localization_key = "GFX_idea_working_hours_8_hours"
 	}
+
+	text = { localization_key = "GFX_idea_generic_constitutional_guarantee" }
 }
 
 defined_text = {
@@ -933,6 +938,10 @@ defined_text = {
 	text = {
 		trigger = { check_variable = { v = token:weighted_wealth_voting } }
 		localization_key = weighted_wealth_voting_effects
+	}
+	text = {
+		trigger = { check_variable = { v = token:wealth_voting } }
+		localization_key = wealth_voting_effects
 	}
 	text = {
 		trigger = { check_variable = { v = token:universal_male_suffrage } }
@@ -1210,6 +1219,9 @@ defined_text = {
 		trigger = { check_variable = { v = token:free_press } }
 		localization_key = free_press_effects
 	}
+
+	# Fallback so a law with no localisation is visible instead of blank.
+	text = { localization_key = parliament_law_effects_missing }
 }
 
 defined_text = {
@@ -1314,6 +1326,10 @@ defined_text = {
 	text = {
 		trigger = { check_variable = { v = token:weighted_wealth_voting } }
 		localization_key = weighted_wealth_voting_requirement
+	}
+	text = {
+		trigger = { check_variable = { v = token:wealth_voting } }
+		localization_key = wealth_voting_requirement
 	}
 	text = {
 		trigger = { check_variable = { v = token:universal_male_suffrage } }
@@ -1591,6 +1607,9 @@ defined_text = {
 		trigger = { check_variable = { v = token:free_press } }
 		localization_key = free_press_requirement
 	}
+
+	# Fallback so a law with no localisation is visible instead of blank.
+	text = { localization_key = parliament_law_requirement_missing }
 }
 
 defined_text = {
@@ -1695,6 +1714,10 @@ defined_text = {
 	text = {
 		trigger = { check_variable = { v = token:weighted_wealth_voting } }
 		localization_key = weighted_wealth_voting_requirement_and_effects
+	}
+	text = {
+		trigger = { check_variable = { v = token:wealth_voting } }
+		localization_key = wealth_voting_requirement_and_effects
 	}
 	text = {
 		trigger = { check_variable = { v = token:universal_male_suffrage } }
@@ -1972,6 +1995,9 @@ defined_text = {
 		trigger = { check_variable = { v = token:free_press } }
 		localization_key = free_press_requirement_and_effects
 	}
+
+	# Fallback so a law with no localisation is visible instead of blank.
+	text = { localization_key = parliament_law_req_and_eff_missing }
 }
 
 ### Party Issues ###
@@ -2006,6 +2032,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2037,6 +2065,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2068,6 +2098,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2099,6 +2131,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2130,6 +2164,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2161,6 +2197,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2192,6 +2230,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2223,6 +2263,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2254,6 +2296,8 @@ defined_text = {
 		}
 		localization_key = var_issue_culture_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 # Eco Issues
@@ -2286,6 +2330,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2297,7 +2343,7 @@ defined_text = {
 		localization_key = var_issue_economy_1
 	}
 
-		text = { # Interventionism
+	text = { # Interventionism
 		trigger = {
 			check_variable = { ideology_soc_lib_issues^1 = 2 }
 		}
@@ -2317,6 +2363,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2348,6 +2396,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2379,6 +2429,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2410,6 +2462,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2441,6 +2495,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2472,6 +2528,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2503,6 +2561,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2534,6 +2594,8 @@ defined_text = {
 		}
 		localization_key = var_issue_economy_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 # Demographic Issues
@@ -2566,6 +2628,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2597,6 +2661,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2628,6 +2694,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2659,6 +2727,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2690,6 +2760,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2721,6 +2793,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2752,6 +2826,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2783,6 +2859,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2814,6 +2892,8 @@ defined_text = {
 		}
 		localization_key = var_issue_demography_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 
@@ -2847,6 +2927,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2878,6 +2960,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2909,6 +2993,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2940,6 +3026,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -2971,6 +3059,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -3002,6 +3092,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -3033,6 +3125,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -3064,6 +3158,8 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
 
 defined_text = {
@@ -3095,4 +3191,6 @@ defined_text = {
 		}
 		localization_key = var_issue_war_policies_4
 	}
+
+	text = { localization_key = var_issue_unset }
 }
