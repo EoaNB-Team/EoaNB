@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 setup_initial_coalitions = {
 	# Coalition mechanic arrays:
 	# parl_neu_coalitions
@@ -210,6 +211,1338 @@ setup_initial_coalitions = {
 	}
 }
 
+=======
+####################################################################################################
+#
+#   PARLIAMENT - COALITION BLOCKS AND SUPPORT OF GOVERNMENT (SOG)
+#   common/scripted_effects/parliament_coalitions_scripted_effects.txt
+#
+#   Every public effect from the previous version still exists with the same name, so nothing
+#   outside this file has to change. The per-party copies were replaced by one generic engine
+#   plus a data table, which is now the only place you edit when you add or rebalance a party.
+#
+#   ------------------------------------------------------------------------------------------
+#   PARTY IDS                            BLOCK IDS (parl_target_block / parl_p_block)
+#   ------------------------------------------------------------------------------------------
+#   1  RadSoc    ideology_radical_socialism      0  not in any block
+#   2  SocLib    ideology_social_liberalism      1  government / coalition   parl_gov_coalitions
+#   3  SocEga    social_egalitarianism           2  neutral                  parl_neu_coalitions
+#   4  Cen       centrism                        3  opposition               parl_opp_coalitions
+#   5  TraCon    traditional_conservatism        4  banned                   parl_ban_coalitions
+#   6  RadDem    radical_democracy               5  unorganised              parl_uno_coalitions
+#   7  ChauvPop  chauvinist_populism
+#   8  Aut       autocracy                    Government is capped at 4 member parties.
+#   9  Fun       fundamentalism
+#
+#   ------------------------------------------------------------------------------------------
+#   TEMP VARIABLE CONVENTIONS
+#   ------------------------------------------------------------------------------------------
+#   parl_p               party id currently being worked on (input to almost everything)
+#   parl_target_block    where parl_p should end up
+#   parl_defer_refresh   set to 1 around a batch of moves so the refresh only runs once
+#   parl_sog             the support value being computed, 0.00 - 1.00
+#   parl_leader_id       party id of the largest party, 0 if it is none of the nine
+#   parl_second_id       party id of the largest party excluding the ruling one
+#
+####################################################################################################
+
+
+####################################################################################################
+#
+#   1. PARTY DATA TABLES - EDIT HERE WHEN ADDING OR REBALANCING A PARTY
+#
+####################################################################################################
+
+# Static facts about one party.
+# IN:  parl_p
+# OUT: parl_p_exists  1 if the party has any popular support, 0 otherwise
+#      parl_p_seats   how many seats it currently holds
+parl_load_party_facts = {
+	set_temp_variable = { parl_p_exists = 0 }
+	set_temp_variable = { parl_p_seats = 0 }
+
+	if = {
+		limit = { check_variable = { parl_p = 1 } }									# RadSoc
+		set_temp_variable = { parl_p_seats = radsoc_seats^num }
+		if = { limit = { ideology_radical_socialism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 2 } }									# SocLib
+		set_temp_variable = { parl_p_seats = soc_lib_seats^num }
+		if = { limit = { ideology_social_liberalism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 3 } }									# SocEga
+		set_temp_variable = { parl_p_seats = socegl_seats^num }
+		if = { limit = { social_egalitarianism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 4 } }									# Cen
+		set_temp_variable = { parl_p_seats = cent_seats^num }
+		if = { limit = { centrism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 5 } }									# TraCon
+		set_temp_variable = { parl_p_seats = trad_seats^num }
+		if = { limit = { traditional_conservatism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 6 } }									# RadDem
+		set_temp_variable = { parl_p_seats = rade_seats^num }
+		if = { limit = { radical_democracy > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 7 } }									# ChauvPop
+		set_temp_variable = { parl_p_seats = chav_seats^num }
+		if = { limit = { chauvinist_populism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 8 } }									# Aut
+		set_temp_variable = { parl_p_seats = seats_auto^num }
+		if = { limit = { autocracy > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 9 } }									# Fun
+		set_temp_variable = { parl_p_seats = seats_fund^num }
+		if = { limit = { fundamentalism > 0 } set_temp_variable = { parl_p_exists = 1 } }
+	}
+}
+
+parl_identify_leaders = {
+	set_temp_variable = { parl_leader_id = 0 }
+	set_temp_variable = { parl_second_id = 0 }
+
+	if = { limit = { check_variable = { var = highest_party_ideology value = token:ideology_radical_socialism compare = equals } } set_temp_variable = { parl_leader_id = 1 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:ideology_social_liberalism compare = equals } } set_temp_variable = { parl_leader_id = 2 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:social_egalitarianism compare = equals } } set_temp_variable = { parl_leader_id = 3 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:centrism compare = equals } } set_temp_variable = { parl_leader_id = 4 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:traditional_conservatism compare = equals } } set_temp_variable = { parl_leader_id = 5 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:radical_democracy compare = equals } } set_temp_variable = { parl_leader_id = 6 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:chauvinist_populism compare = equals } } set_temp_variable = { parl_leader_id = 7 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:autocracy compare = equals } } set_temp_variable = { parl_leader_id = 8 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology value = token:fundamentalism compare = equals } } set_temp_variable = { parl_leader_id = 9 } }
+
+	if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:ideology_radical_socialism compare = equals } } set_temp_variable = { parl_second_id = 1 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:ideology_social_liberalism compare = equals } } set_temp_variable = { parl_second_id = 2 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:social_egalitarianism compare = equals } } set_temp_variable = { parl_second_id = 3 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:centrism compare = equals } } set_temp_variable = { parl_second_id = 4 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:traditional_conservatism compare = equals } } set_temp_variable = { parl_second_id = 5 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:radical_democracy compare = equals } } set_temp_variable = { parl_second_id = 6 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:chauvinist_populism compare = equals } } set_temp_variable = { parl_second_id = 7 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:autocracy compare = equals } } set_temp_variable = { parl_second_id = 8 } }
+	else_if = { limit = { check_variable = { var = highest_party_ideology@exclude_ruling_party value = token:fundamentalism compare = equals } } set_temp_variable = { parl_second_id = 9 } }
+}
+
+# The whole SOG balance table. Ranges are whole percentages and the maximum is exclusive,
+# exactly like the set_variable_to_random calls it replaces (min 65 max 70 rolls 65-69).
+#
+# IN:  parl_p, parl_block  (1 government, 2 neutral, 3 opposition)
+# OUT: parl_a1 / parl_a2 / parl_a3        ideologically close parties, best first, 0 = unused
+#      parl_aN_min / parl_aN_max          support when that close party leads the government
+#      parl_near_min / parl_near_max      a close party sits in government but does not lead it
+#      parl_far_min / parl_far_max        no close party in government (government block: demote)
+#      parl_top_min / parl_top_max        this party is the largest one excluding the ruling party
+parl_load_sog_table = {
+	set_temp_variable = { parl_a1 = 0 }  set_temp_variable = { parl_a2 = 0 }  set_temp_variable = { parl_a3 = 0 }
+	set_temp_variable = { parl_a1_min = 0 }  set_temp_variable = { parl_a1_max = 0 }
+	set_temp_variable = { parl_a2_min = 0 }  set_temp_variable = { parl_a2_max = 0 }
+	set_temp_variable = { parl_a3_min = 0 }  set_temp_variable = { parl_a3_max = 0 }
+	set_temp_variable = { parl_near_min = 0 }  set_temp_variable = { parl_near_max = 0 }
+	set_temp_variable = { parl_far_min = 0 }  set_temp_variable = { parl_far_max = 0 }
+	set_temp_variable = { parl_top_min = 0 }  set_temp_variable = { parl_top_max = 0 }
+
+	####################################################################### 1 RadSoc
+	if = {
+		limit = { check_variable = { parl_p = 1 } }
+		set_temp_variable = { parl_a1 = 3 }  set_temp_variable = { parl_a2 = 2 }  set_temp_variable = { parl_a3 = 6 }	# SocEga, SocLib, RadDem
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 65 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_a2_min = 55 }  set_temp_variable = { parl_a2_max = 60 }
+			set_temp_variable = { parl_a3_min = 40 }  set_temp_variable = { parl_a3_max = 50 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_a3 = 0 }									# RadDem only counts inside government
+			set_temp_variable = { parl_top_min = 10 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 25 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_a2_min = 20 }  set_temp_variable = { parl_a2_max = 30 }
+			set_temp_variable = { parl_near_min = 15 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 15 }  set_temp_variable = { parl_far_max = 20 }
+		}
+		else = {
+			set_temp_variable = { parl_a3 = 0 }
+			set_temp_variable = { parl_top_min = 0 }  set_temp_variable = { parl_top_max = 15 }
+			set_temp_variable = { parl_a1_min = 25 }  set_temp_variable = { parl_a1_max = 30 }
+			set_temp_variable = { parl_a2_min = 15 }  set_temp_variable = { parl_a2_max = 25 }
+			set_temp_variable = { parl_near_min = 5 }  set_temp_variable = { parl_near_max = 15 }
+			set_temp_variable = { parl_far_min = 5 }  set_temp_variable = { parl_far_max = 10 }
+		}
+	}
+	####################################################################### 2 SocLib
+	else_if = {
+		limit = { check_variable = { parl_p = 2 } }
+		set_temp_variable = { parl_a1 = 3 }  set_temp_variable = { parl_a2 = 4 }								# SocEga, Cen
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 65 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_a2_min = 50 }  set_temp_variable = { parl_a2_max = 60 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 20 }  set_temp_variable = { parl_top_max = 25 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 40 }
+			set_temp_variable = { parl_a2_min = 20 }  set_temp_variable = { parl_a2_max = 25 }
+			set_temp_variable = { parl_near_min = 25 }  set_temp_variable = { parl_near_max = 30 }
+			set_temp_variable = { parl_far_min = 20 }  set_temp_variable = { parl_far_max = 25 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 10 }  set_temp_variable = { parl_top_max = 15 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_a2_min = 20 }  set_temp_variable = { parl_a2_max = 25 }
+			set_temp_variable = { parl_near_min = 15 }  set_temp_variable = { parl_near_max = 20 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 3 SocEga
+	else_if = {
+		limit = { check_variable = { parl_p = 3 } }
+		set_temp_variable = { parl_a1 = 2 }														# SocLib
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 60 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_near_min = 50 }  set_temp_variable = { parl_near_max = 60 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 20 }  set_temp_variable = { parl_top_max = 35 }
+			set_temp_variable = { parl_a1_min = 35 }  set_temp_variable = { parl_a1_max = 45 }
+			set_temp_variable = { parl_near_min = 35 }  set_temp_variable = { parl_near_max = 40 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 4 Cen
+	else_if = {
+		limit = { check_variable = { parl_p = 4 } }
+		set_temp_variable = { parl_a1 = 2 }														# SocLib
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 50 }  set_temp_variable = { parl_a1_max = 60 }
+			set_temp_variable = { parl_near_min = 45 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 20 }  set_temp_variable = { parl_top_max = 35 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 40 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 35 }
+			set_temp_variable = { parl_far_min = 20 }  set_temp_variable = { parl_far_max = 30 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 5 TraCon
+	else_if = {
+		limit = { check_variable = { parl_p = 5 } }
+		set_temp_variable = { parl_a1 = 9 }  set_temp_variable = { parl_a2 = 8 }								# Fun, Aut
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 60 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_a2_min = 45 }  set_temp_variable = { parl_a2_max = 55 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 30 }  set_temp_variable = { parl_top_max = 35 }
+			set_temp_variable = { parl_a1_min = 35 }  set_temp_variable = { parl_a1_max = 45 }
+			set_temp_variable = { parl_a2_min = 35 }  set_temp_variable = { parl_a2_max = 40 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 35 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_a2_min = 25 }  set_temp_variable = { parl_a2_max = 30 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 6 RadDem
+	else_if = {
+		limit = { check_variable = { parl_p = 6 } }
+		set_temp_variable = { parl_a1 = 8 }														# Aut
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 60 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 25 }  set_temp_variable = { parl_top_max = 30 }
+			set_temp_variable = { parl_a1_min = 35 }  set_temp_variable = { parl_a1_max = 45 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 35 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 7 ChauvPop
+	else_if = {
+		limit = { check_variable = { parl_p = 7 } }
+		set_temp_variable = { parl_a1 = 8 }														# Aut
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 50 }  set_temp_variable = { parl_a1_max = 60 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 30 }  set_temp_variable = { parl_top_max = 35 }
+			set_temp_variable = { parl_a1_min = 35 }  set_temp_variable = { parl_a1_max = 40 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 35 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 8 Aut
+	else_if = {
+		limit = { check_variable = { parl_p = 8 } }
+		set_temp_variable = { parl_a1 = 9 }  set_temp_variable = { parl_a2 = 7 }  set_temp_variable = { parl_a3 = 5 }	# Fun, ChauvPop, TraCon
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 60 }  set_temp_variable = { parl_a1_max = 70 }
+			set_temp_variable = { parl_a2_min = 50 }  set_temp_variable = { parl_a2_max = 60 }
+			set_temp_variable = { parl_a3_min = 45 }  set_temp_variable = { parl_a3_max = 55 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 30 }  set_temp_variable = { parl_top_max = 35 }
+			set_temp_variable = { parl_a1_min = 40 }  set_temp_variable = { parl_a1_max = 45 }
+			set_temp_variable = { parl_a2_min = 35 }  set_temp_variable = { parl_a2_max = 45 }
+			set_temp_variable = { parl_a3_min = 35 }  set_temp_variable = { parl_a3_max = 40 }
+			set_temp_variable = { parl_near_min = 30 }  set_temp_variable = { parl_near_max = 35 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 15 }  set_temp_variable = { parl_top_max = 20 }
+			set_temp_variable = { parl_a1_min = 30 }  set_temp_variable = { parl_a1_max = 35 }
+			set_temp_variable = { parl_a2_min = 25 }  set_temp_variable = { parl_a2_max = 30 }
+			set_temp_variable = { parl_a3_min = 20 }  set_temp_variable = { parl_a3_max = 30 }
+			set_temp_variable = { parl_near_min = 20 }  set_temp_variable = { parl_near_max = 25 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+	####################################################################### 9 Fun
+	else_if = {
+		limit = { check_variable = { parl_p = 9 } }
+		set_temp_variable = { parl_a1 = 5 }  set_temp_variable = { parl_a2 = 8 }								# TraCon, Aut
+		if = {
+			limit = { check_variable = { parl_block = 1 } }
+			set_temp_variable = { parl_a1_min = 65 }  set_temp_variable = { parl_a1_max = 75 }
+			set_temp_variable = { parl_a2_min = 60 }  set_temp_variable = { parl_a2_max = 65 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+		}
+		else_if = {
+			limit = { check_variable = { parl_block = 2 } }
+			set_temp_variable = { parl_top_min = 40 }  set_temp_variable = { parl_top_max = 45 }
+			set_temp_variable = { parl_a1_min = 50 }  set_temp_variable = { parl_a1_max = 55 }
+			set_temp_variable = { parl_a2_min = 45 }  set_temp_variable = { parl_a2_max = 50 }
+			set_temp_variable = { parl_near_min = 40 }  set_temp_variable = { parl_near_max = 50 }
+			set_temp_variable = { parl_far_min = 25 }  set_temp_variable = { parl_far_max = 35 }
+		}
+		else = {
+			set_temp_variable = { parl_top_min = 25 }  set_temp_variable = { parl_top_max = 30 }
+			set_temp_variable = { parl_a1_min = 35 }  set_temp_variable = { parl_a1_max = 40 }
+			set_temp_variable = { parl_a2_min = 30 }  set_temp_variable = { parl_a2_max = 35 }
+			set_temp_variable = { parl_near_min = 25 }  set_temp_variable = { parl_near_max = 32 }
+			set_temp_variable = { parl_far_min = 10 }  set_temp_variable = { parl_far_max = 15 }
+		}
+	}
+}
+
+
+####################################################################################################
+#
+#   2. LOW LEVEL STATE HELPERS
+#
+####################################################################################################
+
+# Which block a party currently sits in.
+# IN:  parl_p        OUT: parl_p_block  (0 none, 1 gov, 2 neutral, 3 opposition, 4 banned, 5 unorganised)
+parl_get_block = {
+	set_temp_variable = { parl_p_block = 0 }
+	if = { limit = { is_in_array = { parl_gov_coalitions = parl_p } } set_temp_variable = { parl_p_block = 1 } }
+	else_if = { limit = { is_in_array = { parl_neu_coalitions = parl_p } } set_temp_variable = { parl_p_block = 2 } }
+	else_if = { limit = { is_in_array = { parl_opp_coalitions = parl_p } } set_temp_variable = { parl_p_block = 3 } }
+	else_if = { limit = { is_in_array = { parl_ban_coalitions = parl_p } } set_temp_variable = { parl_p_block = 4 } }
+	else_if = { limit = { is_in_array = { parl_uno_coalitions = parl_p } } set_temp_variable = { parl_p_block = 5 } }
+}
+
+# Takes a party out of whichever block it currently sits in.
+#
+# remove_from_array resolves the value to an index and then removes that index. When the value
+# is not in the array it gets index -1 and writes "Invalid index to remove" to game.log. It does
+# no damage, but an unguarded five array sweep logs four errors on every single move, so each
+# removal is gated on the party actually being there. Sweeping all five rather than only the
+# known block also means a party that somehow ended up in two blocks gets cleaned up.
+# IN: parl_p
+parl_remove_from_all_blocks = {
+	if = { limit = { is_in_array = { parl_gov_coalitions = parl_p } } remove_from_array = { parl_gov_coalitions = parl_p } }
+	if = { limit = { is_in_array = { parl_neu_coalitions = parl_p } } remove_from_array = { parl_neu_coalitions = parl_p } }
+	if = { limit = { is_in_array = { parl_opp_coalitions = parl_p } } remove_from_array = { parl_opp_coalitions = parl_p } }
+	if = { limit = { is_in_array = { parl_ban_coalitions = parl_p } } remove_from_array = { parl_ban_coalitions = parl_p } }
+	if = { limit = { is_in_array = { parl_uno_coalitions = parl_p } } remove_from_array = { parl_uno_coalitions = parl_p } }
+}
+
+# Reads a party's stored support into the working temp variable.
+# IN:  parl_p        OUT: parl_sog, parl_sog_prev
+parl_read_sog = {
+	if = { limit = { check_variable = { parl_p = 1 } } set_temp_variable = { parl_sog = rad_soc_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 2 } } set_temp_variable = { parl_sog = soc_lib_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 3 } } set_temp_variable = { parl_sog = soc_ega_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 4 } } set_temp_variable = { parl_sog = cen_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 5 } } set_temp_variable = { parl_sog = tra_con_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 6 } } set_temp_variable = { parl_sog = rad_dem_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 7 } } set_temp_variable = { parl_sog = chauv_pop_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 8 } } set_temp_variable = { parl_sog = aut_approval_of_government } }
+	else_if = { limit = { check_variable = { parl_p = 9 } } set_temp_variable = { parl_sog = fun_approval_of_government } }
+	else = { set_temp_variable = { parl_sog = 0 } }
+	set_temp_variable = { parl_sog_prev = parl_sog }
+}
+
+# Writes the working value back to the public per-party variable, refreshes the <party>_sog_temp
+# snapshot the tooltips read, and keeps parl_voting_approval_array in sync.
+# IN: parl_p, parl_sog, parl_sog_prev
+parl_commit_sog = {
+	clamp_temp_variable = { var = parl_sog min = 0 max = 1 }
+
+	if = {
+		limit = { check_variable = { parl_p = 1 } }
+		set_temp_variable = { rad_soc_sog_temp = parl_sog_prev }
+		set_variable = { rad_soc_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 2 } }
+		set_temp_variable = { soc_lib_sog_temp = parl_sog_prev }
+		set_variable = { soc_lib_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 3 } }
+		set_temp_variable = { soc_ega_sog_temp = parl_sog_prev }
+		set_variable = { soc_ega_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 4 } }
+		set_temp_variable = { cen_sog_temp = parl_sog_prev }
+		set_variable = { cen_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 5 } }
+		set_temp_variable = { tra_con_sog_temp = parl_sog_prev }
+		set_variable = { tra_con_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 6 } }
+		set_temp_variable = { rad_dem_sog_temp = parl_sog_prev }
+		set_variable = { rad_dem_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 7 } }
+		set_temp_variable = { chauv_pop_sog_temp = parl_sog_prev }
+		set_variable = { chauv_pop_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 8 } }
+		set_temp_variable = { aut_sog_temp = parl_sog_prev }
+		set_variable = { aut_approval_of_government = parl_sog }
+	}
+	else_if = {
+		limit = { check_variable = { parl_p = 9 } }
+		set_temp_variable = { fun_sog_temp = parl_sog_prev }
+		set_variable = { fun_approval_of_government = parl_sog }
+	}
+
+	# Mirror array, index 0-8. The old code tried to write these elements before the array
+	# existed, which silently did nothing - array members can only be edited once created.
+	parliament_init_arrays = yes
+	set_temp_variable = { parl_idx = parl_p }
+	subtract_from_temp_variable = { parl_idx = 1 }
+	set_variable = { var = parl_voting_approval_array^parl_idx value = parl_sog }
+}
+
+# Creates the arrays this system relies on. Safe to call as often as you like.
+parliament_init_arrays = {
+	resize_array = { parl_voting_approval_array = 9 }
+}
+
+# Rolls a value out of a table range and converts it to the 0-1 scale.
+# set_variable_to_random only takes literal bounds, so the roll is done by hand here.
+# IN: parl_min, parl_max   OUT: parl_sog
+parl_roll_range = {
+	set_temp_variable = { parl_span = parl_max }
+	subtract_from_temp_variable = { parl_span = parl_min }
+	set_temp_variable_to_random = { var = parl_roll min = 0 max = 1 }		# decimal, 0 <= roll < 1
+	multiply_temp_variable = { parl_roll = parl_span }
+	subtract_from_temp_variable = { parl_roll = 0.5 }						# rounding after this behaves as a floor
+	round_temp_variable = parl_roll
+	clamp_temp_variable = { var = parl_roll min = 0 }						# guards min == max
+	set_temp_variable = { parl_sog = parl_min }
+	add_to_temp_variable = { parl_sog = parl_roll }
+	divide_temp_variable = { parl_sog = 100 }
+}
+
+
+####################################################################################################
+#
+#   3. MOVING A PARTY BETWEEN BLOCKS
+#
+#   This one effect replaced the forty five set_<party>_to_<block> bodies. Those names all still
+#   exist further down as one line wrappers, so existing decisions, events and focuses are fine.
+#
+#   Seat totals are no longer patched up by hand on every move. They are recalculated from the
+#   seat arrays during the refresh, which removes the drift the old add/subtract pairs caused
+#   whenever a party was moved twice or a move was rejected halfway through.
+#
+####################################################################################################
+
+# IN:  parl_p              party id
+#      parl_target_block   1 government, 2 neutral, 3 opposition, 4 banned, 5 unorganised
+#      parl_defer_refresh  optional, set to 1 to batch several moves behind a single refresh
+parl_move_party = {
+	parl_get_block = yes
+	parl_load_party_facts = yes
+
+	set_temp_variable = { parl_can_move = 1 }
+
+	# Already there, nothing to do.
+	if = {
+		limit = { check_variable = { var = parl_p_block value = parl_target_block compare = equals } }
+		set_temp_variable = { parl_can_move = 0 }
+	}
+	# A party with no popular support cannot sit in government, neutral or opposition.
+	# Banned and unorganised are deliberately exempt, matching the original guards.
+	if = {
+		limit = {
+			check_variable = { var = parl_target_block value = 4 compare = less_than }
+			check_variable = { parl_p_exists = 0 }
+		}
+		set_temp_variable = { parl_can_move = 0 }
+	}
+	# Government is capped at four member parties.
+	if = {
+		limit = {
+			check_variable = { parl_target_block = 1 }
+			check_variable = { var = parl_gov_coalitions^num value = 4 compare = greater_than_or_equals }
+		}
+		set_temp_variable = { parl_can_move = 0 }
+		if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] refused entry to government, already at four members" }
+	}
+
+	if = {
+		limit = { check_variable = { parl_can_move = 1 } }
+
+		# Remove from every block first. A party belongs to exactly one, so this also repairs
+		# any duplicate membership.
+		parl_remove_from_all_blocks = yes
+
+		if = { limit = { check_variable = { parl_target_block = 1 } } add_to_array = { parl_gov_coalitions = parl_p } }
+		else_if = { limit = { check_variable = { parl_target_block = 2 } } add_to_array = { parl_neu_coalitions = parl_p } }
+		else_if = { limit = { check_variable = { parl_target_block = 3 } } add_to_array = { parl_opp_coalitions = parl_p } }
+		else_if = { limit = { check_variable = { parl_target_block = 4 } } add_to_array = { parl_ban_coalitions = parl_p } }
+		else_if = { limit = { check_variable = { parl_target_block = 5 } } add_to_array = { parl_uno_coalitions = parl_p } }
+
+		if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] moved from block [?parl_p_block|0] to block [?parl_target_block|0]" }
+
+		if = {
+			limit = { NOT = { check_variable = { parl_defer_refresh = 1 } } }
+			parliament_refresh_coalitions = yes
+		}
+	}
+}
+
+
+####################################################################################################
+#
+#   4. INTEGRITY AND SEAT ACCOUNTING
+#
+####################################################################################################
+
+# Removes junk ids, removes duplicates, and enforces that a party sits in exactly one block.
+# The old version deduplicated each array on its own, so a party present in two different blocks
+# stayed in both. This walks the party ids instead of the arrays, which is cheaper as well
+parliament_sanitize_coalition_arrays = {
+	for_loop_effect = {
+		start = 1
+		end = 9
+		compare = less_than_or_equals
+		value = parl_p
+
+		parl_get_block = yes									# first block found wins
+		if = {
+			limit = { check_variable = { var = parl_p_block value = 0 compare = greater_than } }
+			set_temp_variable = { parl_target_block = parl_p_block }
+
+			parl_remove_from_all_blocks = yes
+
+			if = { limit = { check_variable = { parl_target_block = 1 } } add_to_array = { parl_gov_coalitions = parl_p } }
+			else_if = { limit = { check_variable = { parl_target_block = 2 } } add_to_array = { parl_neu_coalitions = parl_p } }
+			else_if = { limit = { check_variable = { parl_target_block = 3 } } add_to_array = { parl_opp_coalitions = parl_p } }
+			else_if = { limit = { check_variable = { parl_target_block = 4 } } add_to_array = { parl_ban_coalitions = parl_p } }
+			else_if = { limit = { check_variable = { parl_target_block = 5 } } add_to_array = { parl_uno_coalitions = parl_p } }
+		}
+	}
+
+	# Anything left that is not a valid party id, for example a stale entry from an older save.
+	parl_strip_invalid_ids = yes
+}
+
+# Rebuilds each array keeping only valid, non-duplicate ids.
+#
+# The dedupe check matters: remove_from_array only removes the first match, so a party listed
+# twice in the same array survives the remove-then-add pass above. Rebuilding through parl_keep
+# is the only thing that collapses it.
+parl_strip_invalid_ids = {
+	clear_temp_array = parl_keep
+	for_each_loop = {
+		array = parl_gov_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_keep = parl_v } }
+			}
+			add_to_temp_array = { parl_keep = parl_v }
+		}
+	}
+	clear_array = parl_gov_coalitions
+	for_each_loop = { array = parl_keep value = parl_v add_to_array = { parl_gov_coalitions = parl_v } }
+
+	clear_temp_array = parl_keep
+	for_each_loop = {
+		array = parl_neu_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_keep = parl_v } }
+			}
+			add_to_temp_array = { parl_keep = parl_v }
+		}
+	}
+	clear_array = parl_neu_coalitions
+	for_each_loop = { array = parl_keep value = parl_v add_to_array = { parl_neu_coalitions = parl_v } }
+
+	clear_temp_array = parl_keep
+	for_each_loop = {
+		array = parl_opp_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_keep = parl_v } }
+			}
+			add_to_temp_array = { parl_keep = parl_v }
+		}
+	}
+	clear_array = parl_opp_coalitions
+	for_each_loop = { array = parl_keep value = parl_v add_to_array = { parl_opp_coalitions = parl_v } }
+
+	clear_temp_array = parl_keep
+	for_each_loop = {
+		array = parl_ban_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_keep = parl_v } }
+			}
+			add_to_temp_array = { parl_keep = parl_v }
+		}
+	}
+	clear_array = parl_ban_coalitions
+	for_each_loop = { array = parl_keep value = parl_v add_to_array = { parl_ban_coalitions = parl_v } }
+
+	clear_temp_array = parl_keep
+	for_each_loop = {
+		array = parl_uno_coalitions
+		value = parl_v
+		if = {
+			limit = {
+				check_variable = { var = parl_v value = 0 compare = greater_than }
+				check_variable = { var = parl_v value = 10 compare = less_than }
+				NOT = { is_in_array = { parl_keep = parl_v } }
+			}
+			add_to_temp_array = { parl_keep = parl_v }
+		}
+	}
+	clear_array = parl_uno_coalitions
+	for_each_loop = { array = parl_keep value = parl_v add_to_array = { parl_uno_coalitions = parl_v } }
+}
+
+# Pushes the smallest members out of an oversized government until only four remain.
+
+parliament_enforce_gov_cap = {
+	set_temp_variable = { parl_stop = 0 }
+	for_loop_effect = {
+		start = 1
+		end = 6
+		compare = less_than_or_equals
+		value = parl_trim_round
+		break = parl_stop
+
+		if = {
+			limit = { check_variable = { var = parl_gov_coalitions^num value = 4 compare = greater_than } }
+			clear_temp_array = parl_gov_seats
+			for_each_loop = {
+				array = parl_gov_coalitions
+				value = parl_p
+				parl_load_party_facts = yes
+				add_to_temp_array = { parl_gov_seats = parl_p_seats }
+			}
+			find_lowest_in_array = { array = parl_gov_seats index = parl_low_i }
+			set_temp_variable = { parl_p = parl_gov_coalitions^parl_low_i }
+			set_temp_variable = { parl_target_block = 3 }
+			set_temp_variable = { parl_defer_refresh = 1 }
+			parl_move_party = yes
+			if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: government over cap, party [?parl_p|0] pushed to opposition" }
+		}
+		else = { set_temp_variable = { parl_stop = 1 } }
+	}
+}
+
+# Recalculates coalition_seats_num from scratch. This is the only place the total is produced.
+parliament_recompute_coalition_seats = {
+	set_variable = { coalition_seats_num = 0 }
+	for_each_loop = {
+		array = parl_gov_coalitions
+		value = parl_p
+		parl_load_party_facts = yes
+		add_to_variable = { var = coalition_seats_num value = parl_p_seats }
+	}
+	if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: coalition holds [?coalition_seats_num|0] seats" }
+}
+
+
+####################################################################################################
+#
+#   5. LEGITIMACY AND STABILITY MODIFIERS
+#
+#
+####################################################################################################
+
+parl_apply_modifiers_gov = {
+	if = {
+		limit = { check_variable = { political_legitimacy < 0.41 } }
+		subtract_from_temp_variable = { parl_sog = 0.10 }
+		if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: gov member [?parl_p|0] legitimacy 0-40% (-10%)" }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.51 } }
+		subtract_from_temp_variable = { parl_sog = 0.03 }
+		if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: gov member [?parl_p|0] legitimacy 41-50% (-3%)" }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.56 } }				# 51-55%, no change
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.61 } }
+		add_to_temp_variable = { parl_sog = 0.01 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.66 } }
+		add_to_temp_variable = { parl_sog = 0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.71 } }
+		add_to_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.81 } }				
+		add_to_temp_variable = { parl_sog = 0.08 }
+	}
+	else = {
+		add_to_temp_variable = { parl_sog = 0.10 }
+	}
+
+	if = {
+		limit = { OR = { PS_pol_stab_minus_five = yes  PS_pol_stab_minus_four = yes  PS_pol_stab_minus_three = yes } }
+		subtract_from_temp_variable = { parl_sog = 0.10 }
+	}
+	else_if = {
+		limit = { OR = { PS_pol_stab_minus_two = yes  PS_pol_stab_minus_one = yes } }
+		subtract_from_temp_variable = { parl_sog = 0.03 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_zero = yes }
+		subtract_from_temp_variable = { parl_sog = 0.01 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_one = yes }
+		add_to_temp_variable = { parl_sog = 0.02 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_two = yes }
+		add_to_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_three = yes }
+		add_to_temp_variable = { parl_sog = 0.10 }
+	}
+
+	if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: gov member [?parl_p|0] support after modifiers [?parl_sog|%1]" }
+}
+
+parl_apply_modifiers_opp_neu = {
+	if = {
+		limit = { check_variable = { political_legitimacy < 0.41 } }
+		subtract_from_temp_variable = { parl_sog = 0.13 }
+		if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] legitimacy 0-40% (-13%)" }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.51 } }
+		subtract_from_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.56 } }				# 51-55%, no change
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.61 } }
+		add_to_temp_variable = { parl_sog = 0.01 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.66 } }
+		add_to_temp_variable = { parl_sog = 0.03 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.71 } }
+		add_to_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { check_variable = { political_legitimacy < 0.81 } }				
+		add_to_temp_variable = { parl_sog = 0.07 }
+	}
+	else = {
+		add_to_temp_variable = { parl_sog = 0.08 }
+	}
+
+	if = {
+		limit = { OR = { PS_pol_stab_minus_five = yes  PS_pol_stab_minus_four = yes  PS_pol_stab_minus_three = yes } }
+		subtract_from_temp_variable = { parl_sog = 0.13 }
+	}
+	else_if = {
+		limit = { OR = { PS_pol_stab_minus_two = yes  PS_pol_stab_minus_one = yes } }
+		subtract_from_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_zero = yes }
+		subtract_from_temp_variable = { parl_sog = 0.02 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_one = yes }
+		add_to_temp_variable = { parl_sog = 0.02 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_two = yes }
+		add_to_temp_variable = { parl_sog = 0.05 }
+	}
+	else_if = {
+		limit = { PS_pol_stab_plus_three = yes }
+		add_to_temp_variable = { parl_sog = 0.08 }
+	}
+
+	if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] support after modifiers [?parl_sog|%1]" }
+}
+
+
+####################################################################################################
+#
+#   6. SUPPORT OF GOVERNMENT ENGINE
+#
+#
+####################################################################################################
+
+# Chooses which table range applies and rolls it.
+# IN:  the parl_a* / parl_near_* / parl_far_* table output, plus parl_leader_id
+# OUT: parl_sog, and parl_isolated = 1 when no close party is in government at all
+parl_pick_sog_range = {
+	set_temp_variable = { parl_isolated = 0 }
+
+	if = {																		# a close party leads the government
+		limit = {
+			check_variable = { var = parl_a1 value = 0 compare = greater_than }
+			check_variable = { var = parl_leader_id value = parl_a1 compare = equals }
+			is_in_array = { parl_gov_coalitions = parl_a1 }
+		}
+		set_temp_variable = { parl_min = parl_a1_min }  set_temp_variable = { parl_max = parl_a1_max }
+	}
+	else_if = {
+		limit = {
+			check_variable = { var = parl_a2 value = 0 compare = greater_than }
+			check_variable = { var = parl_leader_id value = parl_a2 compare = equals }
+			is_in_array = { parl_gov_coalitions = parl_a2 }
+		}
+		set_temp_variable = { parl_min = parl_a2_min }  set_temp_variable = { parl_max = parl_a2_max }
+	}
+	else_if = {
+		limit = {
+			check_variable = { var = parl_a3 value = 0 compare = greater_than }
+			check_variable = { var = parl_leader_id value = parl_a3 compare = equals }
+			is_in_array = { parl_gov_coalitions = parl_a3 }
+		}
+		set_temp_variable = { parl_min = parl_a3_min }  set_temp_variable = { parl_max = parl_a3_max }
+	}
+	else_if = {																	# a close party is in government but does not lead
+		limit = {
+			OR = {
+				AND = { check_variable = { var = parl_a1 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a1 } }
+				AND = { check_variable = { var = parl_a2 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a2 } }
+				AND = { check_variable = { var = parl_a3 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a3 } }
+			}
+		}
+		set_temp_variable = { parl_min = parl_near_min }  set_temp_variable = { parl_max = parl_near_max }
+	}
+	else = {																	# nobody close in government
+		set_temp_variable = { parl_min = parl_far_min }  set_temp_variable = { parl_max = parl_far_max }
+		set_temp_variable = { parl_isolated = 1 }
+	}
+
+	parl_roll_range = yes
+}
+
+# IN:  parl_p, parl_leader_id, parl_second_id      OUT: parl_sog, parl_sog_prev
+parl_evaluate_party_sog = {
+	parl_get_block = yes
+	parl_read_sog = yes															# fills parl_sog_prev for the tooltips
+	set_temp_variable = { parl_sog = 0 }
+	set_temp_variable = { parl_skip_mods = 0 }
+
+	if = {
+		limit = { check_variable = { parl_p_block = 1 } }						##### GOVERNMENT
+		set_temp_variable = { parl_block = 1 }
+		parl_load_sog_table = yes
+
+		if = {
+			limit = { check_variable = { parl_gov_coalitions^num = 1 } }			# sole member of the coalition
+			set_temp_variable = { parl_sog = 1 }
+		}
+		else_if = {
+			limit = { check_variable = { var = parl_leader_id value = parl_p compare = equals } }
+			set_temp_variable = { parl_sog = 1 }								# it leads the coalition itself
+		}
+		else = {
+			parl_pick_sog_range = yes
+			parl_apply_modifiers_gov = yes
+			# parl_isolated should never be 1 here because the demotion pass runs first.
+			if = {
+				limit = { check_variable = { parl_isolated = 1 } }
+				if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: WARNING party [?parl_p|0] is in government with no ally - call parliament_refresh_coalitions" }
+			}
+		}
+	}
+	else_if = {
+		limit = { OR = { check_variable = { parl_p_block = 2 } check_variable = { parl_p_block = 3 } } }	##### NEUTRAL / OPPOSITION
+		set_temp_variable = { parl_block = parl_p_block }
+		parl_load_sog_table = yes
+
+		if = {
+			limit = { check_variable = { var = parl_second_id value = parl_p compare = equals } }
+			set_temp_variable = { parl_min = parl_top_min }  set_temp_variable = { parl_max = parl_top_max }
+			parl_roll_range = yes
+
+			set_temp_variable = { parl_skip_mods = 1 }
+		}
+		else = {
+			parl_pick_sog_range = yes
+		}
+
+		if = {
+			limit = { check_variable = { parl_skip_mods = 0 } }
+			parl_apply_modifiers_opp_neu = yes
+		}
+	}
+	else = {																	##### BANNED / UNORGANISED / NOWHERE
+		set_temp_variable = { parl_sog = 0 }
+	}
+
+	clamp_temp_variable = { var = parl_sog min = 0 max = 1 }
+	if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] block [?parl_p_block|0] final support [?parl_sog|%1]" }
+}
+
+# Moves one government party to opposition if it has no ideological ally in the coalition.
+# IN:  parl_p, parl_leader_id      OUT: parl_demoted set to 1 if it moved
+parl_demote_if_isolated = {
+	if = {
+		limit = {
+			is_in_array = { parl_gov_coalitions = parl_p }
+			check_variable = { var = parl_gov_coalitions^num value = 1 compare = greater_than }
+			NOT = { check_variable = { var = parl_leader_id value = parl_p compare = equals } }
+		}
+		set_temp_variable = { parl_block = 1 }
+		parl_load_sog_table = yes
+		if = {
+			limit = {
+				NOT = {
+					OR = {
+						AND = { check_variable = { var = parl_a1 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a1 } }
+						AND = { check_variable = { var = parl_a2 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a2 } }
+						AND = { check_variable = { var = parl_a3 value = 0 compare = greater_than } is_in_array = { parl_gov_coalitions = parl_a3 } }
+					}
+				}
+			}
+			set_temp_variable = { parl_target_block = 3 }
+			set_temp_variable = { parl_defer_refresh = 1 }
+			parl_move_party = yes
+			set_temp_variable = { parl_demoted = 1 }
+			if = { limit = { has_global_flag = parl_debug_logging } log = "Parliament: party [?parl_p|0] left the coalition, no close party in it" }
+		}
+	}
+}
+
+# Government holds at most four parties and the leader never walks out, so three cascade
+# rounds is the most that can ever be needed.
+parliament_demote_isolated_gov_parties = {
+	set_temp_variable = { parl_stop = 0 }
+	for_loop_effect = {
+		start = 1
+		end = 3
+		compare = less_than_or_equals
+		value = parl_cascade
+		break = parl_stop
+
+		set_temp_variable = { parl_demoted = 0 }
+		for_loop_effect = {
+			start = 1
+			end = 9
+			compare = less_than_or_equals
+			value = parl_p
+			parl_demote_if_isolated = yes
+		}
+		if = {
+			limit = { check_variable = { parl_demoted = 0 } }
+			set_temp_variable = { parl_stop = 1 }
+		}
+	}
+}
+
+
+####################################################################################################
+#
+#   7. THE REFRESH PIPELINE
+#
+####################################################################################################
+
+# The single entry point that puts the whole mechanic back into a consistent state.
+# Call this after any batch of changes.
+parliament_refresh_coalitions = {
+	set_temp_variable = { parl_defer_refresh = 1 }								# nested moves must not re-enter
+
+	parliament_init_arrays = yes
+	parliament_sanitize_coalition_arrays = yes
+	parliament_enforce_gov_cap = yes
+	parl_identify_leaders = yes
+	parliament_demote_isolated_gov_parties = yes
+	parliament_recompute_coalition_seats = yes
+
+	for_loop_effect = {
+		start = 1
+		end = 9
+		compare = less_than_or_equals
+		value = parl_p
+		parl_evaluate_party_sog = yes
+		parl_commit_sog = yes
+	}
+
+	set_temp_variable = { parl_defer_refresh = 0 }
+}
+
+# Recomputes one party only. Falls back to the full refresh if that party had to leave the
+# coalition, because then everyone else's support is stale too.
+# IN: parl_p
+parl_update_party_sog = {
+	set_temp_variable = { parl_defer_refresh = 1 }
+	set_temp_variable = { parl_demoted = 0 }
+	parl_identify_leaders = yes
+	parl_demote_if_isolated = yes
+
+	if = {
+		limit = { check_variable = { parl_demoted = 1 } }
+		set_temp_variable = { parl_defer_refresh = 0 }
+		parliament_refresh_coalitions = yes
+	}
+	else = {
+		parl_evaluate_party_sog = yes
+		parl_commit_sog = yes
+		set_temp_variable = { parl_defer_refresh = 0 }
+	}
+}
+
+# Public name kept from the old file. Run on startup, elections, puppeting, and whenever a
+# nation gains a parliament.
+setup_initial_party_values = {
+	parliament_refresh_coalitions = yes
+}
+
+
+####################################################################################################
+#
+#   8. GAINING AND LOSING SUPPORT WITH A TOOLTIP
+#
+#
+####################################################################################################
+
+# IN: parl_p, sog_to_gain
+parl_apply_sog_delta = {
+	parl_read_sog = yes															# parl_sog + parl_sog_prev
+	add_to_temp_variable = { parl_sog = sog_to_gain }
+	parl_commit_sog = yes														# clamps to 0-1 and mirrors the array
+}
+
+add_rad_soc_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 1 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:ideology_radical_socialism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 1 } }
+			custom_effect_tooltip = LOSE_SOG_RAD_SOC_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_RAD_SOC_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 1 } } custom_effect_tooltip = GAIN_SOG_RAD_SOC_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_RAD_SOC_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_soc_lib_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 2 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:ideology_social_liberalism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 2 } }
+			custom_effect_tooltip = LOSE_SOG_SOC_LIB_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_SOC_LIB_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 2 } } custom_effect_tooltip = GAIN_SOG_SOC_LIB_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_SOC_LIB_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_soc_ega_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 3 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:social_egalitarianism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 3 } }
+			custom_effect_tooltip = LOSE_SOG_SOC_EGA_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_SOC_EGA_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 3 } } custom_effect_tooltip = GAIN_SOG_SOC_EGA_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_SOC_EGA_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_cen_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 4 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:centrism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 4 } }
+			custom_effect_tooltip = LOSE_SOG_CEN_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_CEN_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 4 } } custom_effect_tooltip = GAIN_SOG_CEN_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_CEN_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_tra_con_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 5 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:traditional_conservatism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 5 } }
+			custom_effect_tooltip = LOSE_SOG_TRA_CON_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_TRA_CON_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 5 } } custom_effect_tooltip = GAIN_SOG_TRA_CON_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_TRA_CON_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_rad_dem_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 6 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:radical_democracy compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 6 } }
+			custom_effect_tooltip = LOSE_SOG_RAD_DEM_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_RAD_DEM_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 6 } } custom_effect_tooltip = GAIN_SOG_RAD_DEM_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_RAD_DEM_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_chauv_pop_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 7 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:chauvinist_populism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 7 } }
+			custom_effect_tooltip = LOSE_SOG_CHAUV_POP_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_CHAUV_POP_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 7 } } custom_effect_tooltip = GAIN_SOG_CHAUV_POP_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_CHAUV_POP_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_aut_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 8 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:autocracy compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 8 } }
+			custom_effect_tooltip = LOSE_SOG_AUT_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_AUT_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 8 } } custom_effect_tooltip = GAIN_SOG_AUT_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_AUT_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+add_fun_sog_with_tooltip_effect = {
+	set_temp_variable = { parl_p = 9 }
+	if = {
+		limit = { NOT = { check_variable = { var = highest_party_ideology value = token:fundamentalism compare = equals } } }
+		if = {
+			limit = { check_variable = { sog_to_gain < 0 } is_in_array = { parl_gov_coalitions = 9 } }
+			custom_effect_tooltip = LOSE_SOG_FUN_LOYALTY_TT
+		}
+		else_if = { limit = { check_variable = { sog_to_gain < 0 } } custom_effect_tooltip = LOSE_SOG_FUN_TT }
+		else_if = { limit = { is_in_array = { parl_gov_coalitions = 9 } } custom_effect_tooltip = GAIN_SOG_FUN_LOYALTY_TT }
+		else = { custom_effect_tooltip = GAIN_SOG_FUN_TT }
+		hidden_effect = { parl_apply_sog_delta = yes }
+	}
+}
+
+# Banned and unorganised parties are skipped, as in the old version.
+add_sog_to_all_with_tooltip_effect = {
+	if = {
+		limit = { check_variable = { sog_to_gain < 0 } }
+		custom_effect_tooltip = LOSE_SOG_ALL_TT
+	}
+	else = {
+		custom_effect_tooltip = GAIN_SOG_ALL_TT
+	}
+	hidden_effect = {
+		for_loop_effect = {
+			start = 1
+			end = 9
+			compare = less_than_or_equals
+			value = parl_p
+			parl_get_block = yes
+			if = {
+				limit = {
+					NOT = { check_variable = { parl_p_block = 4 } }
+					NOT = { check_variable = { parl_p_block = 5 } }
+				}
+				parl_apply_sog_delta = yes
+			}
+		}
+	}
+}
+
+
+####################################################################################################
+#
+#   9. BULK BLOCK OPERATIONS
+#
+####################################################################################################
+
+set_all_opposition_to_neutral = {
+
+	for_each_loop = {
+		array = parl_opp_coalitions
+		value = parl_v
+		if = {
+			limit = { NOT = { is_in_array = { parl_neu_coalitions = parl_v } } }
+			add_to_array = { parl_neu_coalitions = parl_v }
+		}
+	}
+	clear_array = parl_opp_coalitions
+	parliament_refresh_coalitions = yes
+}
+
+set_all_government_members_to_opposition = {
+
+	for_each_loop = {
+		array = parl_gov_coalitions
+		value = parl_v
+		if = {
+			limit = { NOT = { is_in_array = { parl_opp_coalitions = parl_v } } }
+			add_to_array = { parl_opp_coalitions = parl_v }
+		}
+	}
+	clear_array = parl_gov_coalitions
+	parliament_refresh_coalitions = yes
+}
+
+reverse_coalitions = {
+	clear_temp_array = parl_gov_temp
+	clear_temp_array = parl_opp_temp
+
+	for_each_loop = { array = parl_gov_coalitions  value = parl_v  add_to_temp_array = { parl_gov_temp = parl_v } }
+	for_each_loop = { array = parl_opp_coalitions  value = parl_v  add_to_temp_array = { parl_opp_temp = parl_v } }
+
+	clear_array = parl_gov_coalitions
+	clear_array = parl_opp_coalitions
+
+	for_each_loop = { array = parl_gov_temp  value = parl_v  add_to_array = { parl_opp_coalitions = parl_v } }
+	for_each_loop = { array = parl_opp_temp  value = parl_v  add_to_array = { parl_gov_coalitions = parl_v } }
+
+	parliament_refresh_coalitions = yes
+}
+
+
+####################################################################################################
+#
+#   10. SETUP AND TEARDOWN
+#
+####################################################################################################
+
+>>>>>>> main
 clear_coalitions = {
 	set_variable = { coalition_seats_num = 0 }
 	clear_array = parl_neu_coalitions
@@ -217,6 +1550,7 @@ clear_coalitions = {
 	clear_array = parl_opp_coalitions
 	clear_array = parl_ban_coalitions
 	clear_array = parl_uno_coalitions
+<<<<<<< HEAD
 }
 
 ##### SOG (Support of Government) Setup #####
@@ -5238,3 +6572,269 @@ set_fun_to_unorganized = {
 		else = { add_to_array = { parl_uno_coalitions = 9 } }
 	}
 }
+=======
+
+	set_variable = { rad_soc_approval_of_government = 0 }
+	set_variable = { soc_lib_approval_of_government = 0 }
+	set_variable = { soc_ega_approval_of_government = 0 }
+	set_variable = { cen_approval_of_government = 0 }
+	set_variable = { tra_con_approval_of_government = 0 }
+	set_variable = { rad_dem_approval_of_government = 0 }
+	set_variable = { chauv_pop_approval_of_government = 0 }
+	set_variable = { aut_approval_of_government = 0 }
+	set_variable = { fun_approval_of_government = 0 }
+	clear_array = parl_voting_approval_array
+}
+
+setup_initial_coalitions = {
+	clear_coalitions = yes
+	parliament_init_arrays = yes
+	set_temp_variable = { parl_defer_refresh = 1 }
+
+	##### Parties with no popular support: unorganised, or banned if the ruling party outlaws them
+	for_loop_effect = {
+		start = 1
+		end = 9
+		compare = less_than_or_equals
+		value = parl_p
+
+		parl_load_party_facts = yes
+		if = {
+			limit = { check_variable = { parl_p_exists = 0 } }
+			set_temp_variable = { parl_target_block = 5 }
+			if = {
+				limit = {
+					OR = {
+						AND = {
+							check_variable = { parl_p = 1 }							# RadSoc
+							OR = {
+								has_government = autocracy
+								has_government = fundamentalism
+								has_government = chauvinist_populism
+								has_government = radical_democracy
+							}
+						}
+						AND = {
+							check_variable = { parl_p = 7 }							# ChauvPop
+							has_government = ideology_radical_socialism
+						}
+						AND = {
+							check_variable = { parl_p = 8 }							# Aut
+							OR = {
+								has_government = ideology_social_liberalism
+								has_government = social_egalitarianism
+								has_government = radical_democracy
+							}
+						}
+						AND = {
+							check_variable = { parl_p = 9 }							# Fun
+							has_government = ideology_radical_socialism
+						}
+					}
+				}
+				set_temp_variable = { parl_target_block = 4 }
+			}
+			parl_move_party = yes
+		}
+	}
+
+	##### Who governs, and who sits in the neutral block. Everyone else opposes.
+	set_temp_variable = { parl_ruling_id = 0 }
+	clear_temp_array = parl_init_neutral
+
+	if = {
+		limit = { has_government = ideology_radical_socialism }
+		set_temp_variable = { parl_ruling_id = 1 }
+		add_to_temp_array = { parl_init_neutral = 2 }								# SocLib
+		add_to_temp_array = { parl_init_neutral = 3 }								# SocEga
+	}
+	else_if = {
+		limit = { has_government = ideology_social_liberalism }
+		set_temp_variable = { parl_ruling_id = 2 }
+		add_to_temp_array = { parl_init_neutral = 1 }								# RadSoc
+		add_to_temp_array = { parl_init_neutral = 3 }								# SocEga
+		add_to_temp_array = { parl_init_neutral = 4 }								# Cen
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = social_egalitarianism }
+		set_temp_variable = { parl_ruling_id = 3 }
+		add_to_temp_array = { parl_init_neutral = 1 }								# RadSoc
+		add_to_temp_array = { parl_init_neutral = 2 }								# SocLib
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = centrism }
+		set_temp_variable = { parl_ruling_id = 4 }
+		add_to_temp_array = { parl_init_neutral = 2 }								# SocLib
+		add_to_temp_array = { parl_init_neutral = 3 }								# SocEga
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = traditional_conservatism }
+		set_temp_variable = { parl_ruling_id = 5 }
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = radical_democracy }
+		set_temp_variable = { parl_ruling_id = 6 }
+		add_to_temp_array = { parl_init_neutral = 7 }								# ChauvPop
+		add_to_temp_array = { parl_init_neutral = 8 }								# Aut
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = chauvinist_populism }
+		set_temp_variable = { parl_ruling_id = 7 }
+		add_to_temp_array = { parl_init_neutral = 8 }								# Aut
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = autocracy }
+		set_temp_variable = { parl_ruling_id = 8 }
+		add_to_temp_array = { parl_init_neutral = 5 }								# TraCon
+		add_to_temp_array = { parl_init_neutral = 7 }								# ChauvPop
+		add_to_temp_array = { parl_init_neutral = 9 }								# Fun
+	}
+	else_if = {
+		limit = { has_government = fundamentalism }
+		set_temp_variable = { parl_ruling_id = 9 }
+		add_to_temp_array = { parl_init_neutral = 5 }								# TraCon
+		add_to_temp_array = { parl_init_neutral = 8 }								# Aut
+	}
+
+	for_loop_effect = {
+		start = 1
+		end = 9
+		compare = less_than_or_equals
+		value = parl_p
+
+		if = {
+			limit = { check_variable = { var = parl_ruling_id value = parl_p compare = equals } }
+			set_temp_variable = { parl_target_block = 1 }
+		}
+		else_if = {
+			limit = { is_in_array = { parl_init_neutral = parl_p } }
+			set_temp_variable = { parl_target_block = 2 }
+		}
+		else = {
+			set_temp_variable = { parl_target_block = 3 }
+		}
+		parl_move_party = yes													# refused for parties with no support
+	}
+
+	set_temp_variable = { parl_defer_refresh = 0 }
+	parliament_refresh_coalitions = yes
+}
+
+
+####################################################################################################
+#
+#   11. PUBLIC PER-PARTY NAMES
+#
+#
+#       set_temp_variable = { parl_p = 5 }
+#       set_temp_variable = { parl_target_block = 1 }
+#       parl_move_party = yes
+#
+#   To move several parties at once, wrap the batch so the refresh only runs once:
+#
+#       set_temp_variable = { parl_defer_refresh = 1 }
+#       set_tra_con_to_coalition = yes
+#       set_fun_to_coalition = yes
+#       set_temp_variable = { parl_defer_refresh = 0 }
+#       parliament_refresh_coalitions = yes
+#
+####################################################################################################
+
+#--------------------------------------------------------------------------------------- NEUTRAL
+set_rad_soc_to_neutral   = { set_temp_variable = { parl_p = 1 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_soc_lib_to_neutral   = { set_temp_variable = { parl_p = 2 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_soc_ega_to_neutral   = { set_temp_variable = { parl_p = 3 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_cen_to_neutral       = { set_temp_variable = { parl_p = 4 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_tra_con_to_neutral   = { set_temp_variable = { parl_p = 5 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_rad_dem_to_neutral   = { set_temp_variable = { parl_p = 6 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_chauv_pop_to_neutral = { set_temp_variable = { parl_p = 7 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_aut_to_neutral       = { set_temp_variable = { parl_p = 8 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+set_fun_to_neutral       = { set_temp_variable = { parl_p = 9 }  set_temp_variable = { parl_target_block = 2 }  parl_move_party = yes }
+
+#------------------------------------------------------------------------------------- COALITION
+set_rad_soc_to_coalition   = { set_temp_variable = { parl_p = 1 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_soc_lib_to_coalition   = { set_temp_variable = { parl_p = 2 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_soc_ega_to_coalition   = { set_temp_variable = { parl_p = 3 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_cen_to_coalition       = { set_temp_variable = { parl_p = 4 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_tra_con_to_coalition   = { set_temp_variable = { parl_p = 5 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_rad_dem_to_coalition   = { set_temp_variable = { parl_p = 6 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_chauv_pop_to_coalition = { set_temp_variable = { parl_p = 7 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_aut_to_coalition       = { set_temp_variable = { parl_p = 8 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+set_fun_to_coalition       = { set_temp_variable = { parl_p = 9 }  set_temp_variable = { parl_target_block = 1 }  parl_move_party = yes }
+
+#------------------------------------------------------------------------------------ OPPOSITION
+set_rad_soc_to_opposition   = { set_temp_variable = { parl_p = 1 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_soc_lib_to_opposition   = { set_temp_variable = { parl_p = 2 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_soc_ega_to_opposition   = { set_temp_variable = { parl_p = 3 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_cen_to_opposition       = { set_temp_variable = { parl_p = 4 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_tra_con_to_opposition   = { set_temp_variable = { parl_p = 5 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_rad_dem_to_opposition   = { set_temp_variable = { parl_p = 6 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_chauv_pop_to_opposition = { set_temp_variable = { parl_p = 7 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_aut_to_opposition       = { set_temp_variable = { parl_p = 8 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+set_fun_to_opposition       = { set_temp_variable = { parl_p = 9 }  set_temp_variable = { parl_target_block = 3 }  parl_move_party = yes }
+
+#---------------------------------------------------------------------------------------- BANNED
+
+set_rad_soc_to_banned   = { set_temp_variable = { parl_p = 1 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_soc_lib_to_banned   = { set_temp_variable = { parl_p = 2 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_soc_ega_to_banned   = { set_temp_variable = { parl_p = 3 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_cen_to_banned       = { set_temp_variable = { parl_p = 4 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_tra_con_to_banned   = { set_temp_variable = { parl_p = 5 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_rad_dem_to_banned   = { set_temp_variable = { parl_p = 6 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_chauv_pop_to_banned = { set_temp_variable = { parl_p = 7 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_aut_to_banned       = { set_temp_variable = { parl_p = 8 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+set_fun_to_banned       = { set_temp_variable = { parl_p = 9 }  set_temp_variable = { parl_target_block = 4 }  parl_move_party = yes }
+
+#----------------------------------------------------------------------------------- UNORGANISED
+set_rad_soc_to_unorganized   = { set_temp_variable = { parl_p = 1 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_soc_lib_to_unorganized   = { set_temp_variable = { parl_p = 2 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_soc_ega_to_unorganized   = { set_temp_variable = { parl_p = 3 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_cen_to_unorganized       = { set_temp_variable = { parl_p = 4 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_tra_con_to_unorganized   = { set_temp_variable = { parl_p = 5 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_rad_dem_to_unorganized   = { set_temp_variable = { parl_p = 6 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_chauv_pop_to_unorganized = { set_temp_variable = { parl_p = 7 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_aut_to_unorganized       = { set_temp_variable = { parl_p = 8 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+set_fun_to_unorganized       = { set_temp_variable = { parl_p = 9 }  set_temp_variable = { parl_target_block = 5 }  parl_move_party = yes }
+
+#-------------------------------------------------------------------------- PER-PARTY SOG SETUP
+setup_rad_soc_sog   = { set_temp_variable = { parl_p = 1 }  parl_update_party_sog = yes }
+setup_soc_lib_sog   = { set_temp_variable = { parl_p = 2 }  parl_update_party_sog = yes }
+setup_soc_ega_sog   = { set_temp_variable = { parl_p = 3 }  parl_update_party_sog = yes }
+setup_cen_sog       = { set_temp_variable = { parl_p = 4 }  parl_update_party_sog = yes }
+setup_tra_con_sog   = { set_temp_variable = { parl_p = 5 }  parl_update_party_sog = yes }
+setup_rad_dem_sog   = { set_temp_variable = { parl_p = 6 }  parl_update_party_sog = yes }
+setup_chauv_pop_sog = { set_temp_variable = { parl_p = 7 }  parl_update_party_sog = yes }
+setup_aut_sog       = { set_temp_variable = { parl_p = 8 }  parl_update_party_sog = yes }
+setup_fun_sog       = { set_temp_variable = { parl_p = 9 }  parl_update_party_sog = yes }
+
+#------------------------------------------------------------------- PER-PARTY MODIFIER WRAPPERS
+
+parl_legacy_modifiers_gov = { parl_read_sog = yes  parl_apply_modifiers_gov = yes  parl_commit_sog = yes }
+parl_legacy_modifiers_opp = { parl_read_sog = yes  parl_apply_modifiers_opp_neu = yes  parl_commit_sog = yes }
+
+RAD_SOC_modifiers_government   = { set_temp_variable = { parl_p = 1 }  parl_legacy_modifiers_gov = yes }
+SOC_LIB_modifiers_government   = { set_temp_variable = { parl_p = 2 }  parl_legacy_modifiers_gov = yes }
+SOC_EGA_modifiers_government   = { set_temp_variable = { parl_p = 3 }  parl_legacy_modifiers_gov = yes }
+CEN_modifiers_government       = { set_temp_variable = { parl_p = 4 }  parl_legacy_modifiers_gov = yes }
+TRA_CON_modifiers_government   = { set_temp_variable = { parl_p = 5 }  parl_legacy_modifiers_gov = yes }
+RAD_DEM_modifiers_government   = { set_temp_variable = { parl_p = 6 }  parl_legacy_modifiers_gov = yes }
+CHAUV_POP_modifiers_government = { set_temp_variable = { parl_p = 7 }  parl_legacy_modifiers_gov = yes }
+AUT_modifiers_government       = { set_temp_variable = { parl_p = 8 }  parl_legacy_modifiers_gov = yes }
+FUN_modifiers_government       = { set_temp_variable = { parl_p = 9 }  parl_legacy_modifiers_gov = yes }
+
+RAD_SOC_modifiers_opp_neutral   = { set_temp_variable = { parl_p = 1 }  parl_legacy_modifiers_opp = yes }
+SOC_LIB_modifiers_opp_neutral   = { set_temp_variable = { parl_p = 2 }  parl_legacy_modifiers_opp = yes }
+SOC_EGA_modifiers_opp_neutral   = { set_temp_variable = { parl_p = 3 }  parl_legacy_modifiers_opp = yes }
+CEN_modifiers_opp_neutral       = { set_temp_variable = { parl_p = 4 }  parl_legacy_modifiers_opp = yes }
+TRA_CON_modifiers_opp_neutral   = { set_temp_variable = { parl_p = 5 }  parl_legacy_modifiers_opp = yes }
+RAD_DEM_modifiers_opp_neutral   = { set_temp_variable = { parl_p = 6 }  parl_legacy_modifiers_opp = yes }
+CHAUV_POP_modifiers_opp_neutral = { set_temp_variable = { parl_p = 7 }  parl_legacy_modifiers_opp = yes }
+AUT_modifiers_opp_neutral       = { set_temp_variable = { parl_p = 8 }  parl_legacy_modifiers_opp = yes }
+FUN_modifiers_opp_neutral       = { set_temp_variable = { parl_p = 9 }  parl_legacy_modifiers_opp = yes }
+>>>>>>> main
