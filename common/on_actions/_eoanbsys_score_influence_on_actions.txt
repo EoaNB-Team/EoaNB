@@ -2,6 +2,10 @@ on_actions = {
 	# Setup
 	on_startup = {
 		effect = {
+			# Must run before the first calc - history files only create
+			# prestige_score for the handful of nations that start with one
+			every_country = { eoanb_score_vars_init = yes }
+
 			UCT = {
 				set_variable = { global.time_counter = 3 }
 				eoanb_score_system_calc = yes
@@ -56,34 +60,38 @@ on_actions = {
 	# ROOT is winner #FROM gets annexed - For civil wars on_civil_war_end is also fired
 	on_annex = {
 		effect = {
-			FROM = {
-				set_temp_variable = { modified_military_score_temp2 = modified_military_score }
-				set_temp_variable = { modified_industrial_score_temp = modified_industrial_score }
-			}	
+			FROM = { eoanb_score_vars_init = yes }
 			ROOT = {
-				multiply_temp_variable = { modified_military_score_temp2 = 0.50 }
-				add_to_variable = { modified_military_score_temp2 = modified_military_score }
-				multiply_temp_variable = { modified_industrial_score_temp = 0.50 }
-				add_to_variable = { modified_industrial_score_temp = modified_industrial_score }
+				eoanb_score_vars_init = yes
+				# winner absorbs half of the annexed nation's modified scores
+				add_to_variable = { modified_military_score   = { value = FROM.modified_military_score   multiply = 0.50 } }
+				add_to_variable = { modified_industrial_score = { value = FROM.modified_industrial_score multiply = 0.50 } }
 			}
 		}
 	}
 	
 	# FROM is the one that joins the faction
-	on_create_faction = { effect = { FROM = { add_to_variable = { modified_military_score = 25 } } } }
+	on_create_faction = {
+		effect = {
+			FROM = {
+				eoanb_score_vars_init = yes
+				add_to_variable = { modified_military_score = 25 }
+			}
+		}
+	}
 	
+	# NOTE: direction kept as in the original script (FROM gains, ROOT loses).
+	# Swap the two multipliers if testing shows the scopes are the other way round.
 	on_peaceconference_ended = {
 		effect = {
 			FROM = {
-				set_temp_variable = { modified_military_score_temp = modified_military_score }
-				multiply_temp_variable = { modified_military_score_temp = 1.20 }
-				add_to_variable = { modified_military_score_temp = modified_military_score }
-			}	
+				eoanb_score_vars_init = yes
+				multiply_variable = { modified_military_score = 1.20 }
+			}
 			ROOT = {
-				set_temp_variable = { modified_military_score_temp1 = modified_military_score }
-				multiply_temp_variable = { modified_military_score_temp1 = 0.80 }
-				add_to_variable = { modified_military_score_temp1 = modified_military_score }
-			}			    			
+				eoanb_score_vars_init = yes
+				multiply_variable = { modified_military_score = 0.80 }
+			}
 		}
 	}
 }
