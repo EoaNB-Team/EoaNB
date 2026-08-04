@@ -235,12 +235,16 @@ PixelShader =
 		// 3x3 Gaussian-like kernel for a fraction of the cost (4 samples vs 9).
 		float MultiSampleTexX( in sampler2D TexCh, in float2 vUV )
 		{
-			const float2 vHalfTexel = float2( 0.5f / MAP_SIZE_X, 0.5f / MAP_SIZE_Y );
-			float vResult  = tex2D( TexCh, vUV + float2( -vHalfTexel.x, -vHalfTexel.y ) ).x;
-			vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x, -vHalfTexel.y ) ).x;
-			vResult       += tex2D( TexCh, vUV + float2( -vHalfTexel.x,  vHalfTexel.y ) ).x;
-			vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x,  vHalfTexel.y ) ).x;
-			return vResult * 0.25f;
+			#ifdef LOW_END_GFX
+				return tex2D( TexCh, vUV ).x;
+			#else
+				const float2 vHalfTexel = float2( 0.5f / MAP_SIZE_X, 0.5f / MAP_SIZE_Y );
+				float vResult  = tex2D( TexCh, vUV + float2( -vHalfTexel.x, -vHalfTexel.y ) ).x;
+				vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x, -vHalfTexel.y ) ).x;
+				vResult       += tex2D( TexCh, vUV + float2( -vHalfTexel.x,  vHalfTexel.y ) ).x;
+				vResult       += tex2D( TexCh, vUV + float2(  vHalfTexel.x,  vHalfTexel.y ) ).x;
+				return vResult * 0.25f;
+			#endif
 		}
 
 		float3 ApplyIce( float3 vColor, float2 vPos, inout float3 vNormal, float4 vMudSnowColor, float2 vIceUV, float vIceFade )
@@ -317,7 +321,11 @@ PixelShader =
 			M *= vSpecMap * vSpecMap;
 
 			// --- Sun direction ---
-			float3 SunDirWater = CalculateSunDirectionWater( Input.pos );
+			#ifdef LOW_END_GFX
+				float3 SunDirWater = float3( 0.0f, -1.0f, 0.0f );
+			#else
+				float3 SunDirWater = CalculateSunDirectionWater( Input.pos );
+			#endif
 
 			// Cache view direction once: was being normalize()'d 3 separate times.
 			float3 vToCam  = normalize( vCamPos - Input.pos );
@@ -360,7 +368,11 @@ PixelShader =
 
 			float3 reflectiveColor = texCUBE( ReflectionCubeMap, reflection ).rgb;
 
-			float3 refractiveColor = tex2D( WaterRefraction, refractiveUV - vRefractionDistortion ).rgb;
+			#ifdef NO_REFRACTIONS
+				float3 refractiveColor = float3( 0.0f, 0.1f, 0.2f );
+			#else
+				float3 refractiveColor = tex2D( WaterRefraction, refractiveUV - vRefractionDistortion ).rgb;
+			#endif
 
 			// --- Fresnel: replace pow(x,10) with 3 muls ---
 			const float fresnelBias = 0.5f;
@@ -419,7 +431,11 @@ PixelShader =
 				vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,
 				vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f );
 
-			DebugReturn( vOut, lightingProperties, fShadowTerm );
+			#ifdef LOW_END_GFX
+				DebugReturn( vOut, lightingProperties, 0.0f );
+			#else
+				DebugReturn( vOut, lightingProperties, fShadowTerm );
+			#endif
 			return float4( vOut, 1.0f - waterShore );
 		}
 	]]
