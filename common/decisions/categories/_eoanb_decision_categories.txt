@@ -2284,110 +2284,167 @@ VEN_decision_category_the_caudillos_crisis = {
 		allowed = { original_tag = GRE }
 	}
 
-	### Montenegro ###
-
+	### 1857 Herzegovinian uprising — shared panel: MNT / SER / OTO / AUS / RUS / FRA ###
 	MNT_decision_category_Herzegovinian_uprising_1857 = {
+
 		icon = border_conflicts
 		#scripted_gui = MNT_WAR_1858_gui
 		visible_when_empty = yes
+
+		# original_tag instead of tag: allowed is evaluated once, so it must survive
+		# cosmetic/dynamic tag changes (civil war splinters, formable nations).
 		allowed = {
 			OR = {
-				tag = MNT
-				tag = SER
-				tag = OTO
-				tag = AUS
-				tag = RUS
-				tag = FRA
+				original_tag = MNT
+				original_tag = SER
+				original_tag = OTO
+				original_tag = AUS
+				original_tag = RUS
+				original_tag = FRA
 			}
 		}
+
 		visible = {
-			NOT = { 
-				MNT = { has_completed_focus = MNT_focus_new_goals_for_our_nation }
-			}
-			if = {
-				limit = {
+			# The whole 1857 crisis closes down once Montenegro moves on.
+			NOT = { MNT = { has_completed_focus = MNT_focus_new_goals_for_our_nation } }
+
+			OR = {
+				# Montenegro always sees its own crisis panel.
+				original_tag = MNT
+
+				# Great powers only get drawn in once MNT has opened the door.
+				AND = {
 					OR = {
-						tag = FRA
-						tag = RUS 
-						tag = AUS
+						original_tag = FRA
+						original_tag = RUS
+						original_tag = AUS
 					}
-				}
-				OR = {
-					MNT = { has_completed_focus = MNT_focus_outbreak_of_the_pro_Montenegro_revolt }
-					if = {
-						limit = {
-							NOT = { has_completed_focus = MNT_focus_outbreak_of_the_pro_Montenegro_revolt }
+					MNT = {
+						OR = {
+							has_completed_focus = MNT_focus_outbreak_of_the_pro_Montenegro_revolt
+							has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n
 						}
-						MNT = { has_completed_focus = MNT_focus_negotiations_with_the_ottomans_n }
 					}
 				}
-			}
-			else_if = {
-				limit = {
+
+				# Ottomans / Serbia only once the uprising is actually running.
+				AND = {
 					OR = {
-						tag = OTO
-						tag = SER
+						original_tag = OTO
+						original_tag = SER
 					}
+					has_global_flag = OTO_herzegovina_uprising_1857
 				}
-				has_global_flag = OTO_herzegovina_uprising_1857
 			}
 		}
 	}
 
-	MNT_decision_category_clans = {
-		icon = generic_political_actions
-		allowed = { tag = MNT }
-	}
-	MNT_decision_category_foreign_politics = {
-		icon = generic_political_actions
-		allowed = { tag = MNT }
-	}
 
-	MNT_decision_category_resolve_national_policy = {
-		icon = generic_political_actions
-		allowed = { tag = MNT }
-			visible = { has_completed_focus = MNT_focus_normalization_of_the_relations_with_russia }
-	}
-
-	MNT_decision_category_economy = {
-		icon = generic_economy
-		allowed = { tag = MNT }
-		visible = { has_completed_focus = MNT_focus_into_the_new_age }
-	}
-
-	MNT_decision_category_agriculture = {
-		icon = generic_economy
-		allowed = { tag = MNT }
-		visible = { has_completed_focus = MNT_focus_into_the_new_age }
-	}
-
-	MNT_decision_category_administration = {
-		icon = generic_economy
-		allowed = { tag = MNT }
-		visible = { has_completed_focus = MNT_focus_into_the_new_age }
-	}
-
-	MNT_decision_category_army = {
-		icon = generic_economy
-		allowed = { tag = MNT }
-		visible = {
-			#has_completed_focus = MNT_danilos_army_reform
-		}
-	}
-
+	### Ongoing Herzegovina uprising (post-1857 war state) ###
 	MNT_decision_category_Herzegovinian_uprising = {
+
 		icon = border_conflicts
 		visible_when_empty = yes
-		allowed = { tag = MNT }
-		visible = { HRZ = { has_war_with = OTO } }
+
+		allowed = { original_tag = MNT }
+
+		visible = {
+			country_exists = HRZ			# cheap short-circuit, avoids the scope jump when HRZ is not released
+			HRZ = { has_war_with = OTO }
+		}
 	}
-		
+
+
+	### Clans ###
+	MNT_decision_category_clans = {
+
+		icon = generic_political_actions
+
+		allowed = { original_tag = MNT }
+	}
+
+
+	### Foreign politics ###
+	MNT_decision_category_foreign_politics = {
+
+		icon = generic_political_actions
+
+		allowed = { original_tag = MNT }
+	}
+
+
+	### Resolve national policy ###
+	MNT_decision_category_resolve_national_policy = {
+
+		icon = generic_political_actions
+
+		allowed = { original_tag = MNT }
+
+		visible = { has_completed_focus = MNT_focus_normalization_of_the_relations_with_russia }
+	}
+
+
+	### Economy ###
+	MNT_decision_category_economy = {
+
+		icon = generic_economy
+
+		allowed = { original_tag = MNT }
+
+		visible = { has_completed_focus = MNT_focus_into_the_new_age }
+	}
+
+
+	### Agriculture ###
+	MNT_decision_category_agriculture = {
+
+		icon = generic_economy
+
+		allowed = { original_tag = MNT }
+
+		visible = { has_completed_focus = MNT_focus_into_the_new_age }
+	}
+
+
+	### Administration ###
+	MNT_decision_category_administration = {
+
+		icon = generic_economy
+
+		allowed = { original_tag = MNT }
+
+		visible = { has_completed_focus = MNT_focus_into_the_new_age }
+	}
+
+
+	### Army ###
+	MNT_decision_category_army = {
+
+		icon = generic_economy		# TODO: military category sprite would fit better than the economy one
+
+		allowed = { original_tag = MNT }
+
+		# No gate yet — re-enable once the reform focus exists.
+		# An empty "visible = { }" block is always true, so it is better left commented out entirely.
+		#visible = { has_completed_focus = MNT_danilos_army_reform }
+	}
+
+
+	### Balance of power — foreign interest ###
+	# NOTE: key is misspelled ("foregin"). Kept as-is so nothing breaks.
+	# To rename to MNT_decision_category_foreign_interest you must update, in the same commit:
+	#   1. this key
+	#   2. the matching block in MNT_decisions.txt
+	#   3. the localisation keys (name + _desc)
 	MNT_Balance_of_Power_foregin_interest = {
+
 		icon = generic_economy
 		visible_when_empty = yes
-		allowed = { tag = MNT }
+
+		allowed = { original_tag = MNT }
+
 		visible = { has_completed_focus = MNT_focus_Montenegrin_question }
-		}
+	}
 		
 
 	### Norway ###
@@ -3195,6 +3252,129 @@ VEN_decision_category_the_caudillos_crisis = {
 		}
 	}
 
+	VIN_western_influence_category = {
+		priority = 50
+		icon = power_struggle
+	 
+		allowed = { original_tag = VIN }
+	 
+		# Attached to VIN_western_influence_bop, so the game draws
+		# the balance-of-power bar at the top of this tab.
+		visible = { has_country_flag = VIN_Dai_Nam_Tree_Active }
+	}
+	 
+	VIN_opium_category = {
+		priority = 45
+		icon = generic_political_actions
+	 
+		allowed = { original_tag = VIN }
+	 
+		visible = {
+			has_country_flag = VIN_Opium_Tab_Open
+			NOT = { has_country_flag = VIN_Opium_Resolved }
+		}
+	}
+	 
+	VIN_silver_category = {
+		priority = 55
+		icon = generic_industry
+	 
+		allowed = { original_tag = VIN }
+	 
+		visible = {
+			has_country_flag = VIN_Silver_Mechanic_Unlocked
+			controls_state = 671
+		}
+	}
+	 
+	VIN_royal_court_category = {
+		priority = 48
+		icon = generic_political_actions
+		allowed = { original_tag = VIN }
+		visible = {
+			OR = {
+				has_country_flag = VIN_Send_Advisors_Europe_Unlocked
+				has_country_flag = VIN_Diplomat_Language_Choice_Unlocked
+				has_country_flag = VIN_International_Law_Unlocked
+			}
+		}
+	}
+	 
+	VIN_finance_category = {
+		priority = 47
+		icon = generic_economy
+		allowed = { original_tag = VIN }
+		visible = {
+			OR = {
+				has_country_flag = VIN_Mass_Agrarianism_Unlocked
+				has_country_flag = VIN_Where_Do_We_Focus_Unlocked
+				has_country_flag = VIN_Industrial_Investment_Raw_Materials
+				has_country_flag = VIN_Humble_Factory_Unlocked
+			}
+		}
+	}
+	 
+	VIN_public_works_category = {
+		priority = 46
+		icon = generic_construction
+		allowed = { original_tag = VIN }
+		visible = { has_country_flag = VIN_Invest_In_Rivers_Unlocked }
+	}
+	 
+	VIN_justice_category = {
+		priority = 44
+		icon = power_struggle
+		allowed = { original_tag = VIN }
+		visible = {
+			has_country_flag = VIN_Crucifixions_Unlocked
+			NOT = { has_country_flag = VIN_Catholic_Missionaries_Broken }
+		}
+	}
+	 
+	VIN_rites_category = {
+		priority = 43
+		icon = generic_political_actions
+		allowed = { original_tag = VIN }
+		visible = {
+			OR = {
+				has_country_flag = VIN_Rites_Board_Unlocked
+				has_country_flag = VIN_Advisor_Exams_Unlocked
+				has_country_flag = VIN_Traditional_Education_Unlocked
+			}
+		}
+	}
+	 
+	VIN_military_category = {
+		priority = 42
+		icon = generic_industry
+		allowed = { original_tag = VIN }
+		visible = {
+			OR = {
+				has_country_flag = VIN_Matchlock_Production_Unlocked
+				has_country_flag = VIN_Western_Stocks_Unlocked
+			}
+		}
+	}
+	 
+	VIN_naval_category = {
+		priority = 41
+		icon = generic_construction
+		allowed = { original_tag = VIN }
+		visible = {
+			OR = {
+				has_country_flag = VIN_Import_Rubber_Trees_Unlocked
+				has_country_flag = VIN_Naval_Effort_Unlocked
+			}
+		}
+	}
+	 
+	VIN_war_category = {
+		priority = 60
+		icon = power_struggle
+		allowed = { original_tag = VIN }
+		visible = { has_country_flag = VIN_War_Decisions_Unlocked }
+	}	
+	
 	INDOC_Colonial_Aggression_Category = {
 		icon = generic_formable_nations
 
