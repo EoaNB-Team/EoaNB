@@ -1,0 +1,212 @@
+###########################################################################
+# Portuguese colonial empire - shared scripted effects
+###########################################################################
+
+###########################################################################
+# THE SOLOR AND TIMOR INFLUENCE CONTEST
+#
+# POR_timor_influence holds the Portuguese share of the archipelago (0-100);
+# POR_timor_influence_dutch is the mirrored Dutch share, kept only so the
+# scripted GUI can draw both bars.
+#
+# The GUI map draws five areas cut from the province bitmap. Each area variable
+# is a sprite frame: 1 Portuguese, 2 contested, 3 Dutch. Every area except the
+# Oecusse enclave is backed by a real state, and the campaign map is kept in
+# step with the panel by POR_timor_apply_map_effect.
+#
+#   30  Eastern Timor    state  721  held by POR, lost to INS below the threshold
+#   35  Oecusse          province 12206, inside state 721 - settled by treaty,
+#                        so it is driven by the border flags, not by a transfer
+#   55  Eastern Sunda    state  667  held by SUN
+#   70  Western Timor    state 1180  held by INS, the Netherlands East Indies
+#   80  Western Sunda    state 1189  held by SUN
+#
+# INS carries the cosmetic tag HOL_east_indies_comp - it is the Dutch colonial
+# administration, so it is the side that gains whatever Portugal fails to hold.
+###########################################################################
+
+# State scope helper: hand a contested state back to the power that held it before
+# Portugal moved in. SUN is absorbed by INS over the course of the campaign, so
+# fall back to the Dutch when it is gone.
+POR_timor_return_state_to_sunda_effect = {
+	if = {
+		limit = { country_exists = SUN }
+		SUN = { transfer_state = PREV }
+	}
+	else = { INS = { transfer_state = PREV } }
+}
+
+# Country scope: POR. Moves the four contested states so the campaign map shows
+# exactly what the influence panel shows.
+POR_timor_apply_map_effect = {
+	if = {
+		limit = { check_variable = { POR_timor_influence > 29 } NOT = { 721 = { is_owned_by = POR } } }
+		transfer_state = 721
+	}
+	if = {
+		limit = { NOT = { check_variable = { POR_timor_influence > 29 } } 721 = { is_owned_by = POR } }
+		INS = { transfer_state = 721 }
+	}
+
+	if = {
+		limit = { check_variable = { POR_timor_influence > 54 } NOT = { 667 = { is_owned_by = POR } } }
+		transfer_state = 667
+	}
+	if = {
+		limit = { NOT = { check_variable = { POR_timor_influence > 54 } } 667 = { is_owned_by = POR } }
+		667 = { POR_timor_return_state_to_sunda_effect = yes }
+	}
+
+	if = {
+		limit = { check_variable = { POR_timor_influence > 69 } NOT = { 1180 = { is_owned_by = POR } } }
+		transfer_state = 1180
+	}
+	if = {
+		limit = { NOT = { check_variable = { POR_timor_influence > 69 } } 1180 = { is_owned_by = POR } }
+		INS = { transfer_state = 1180 }
+	}
+
+	if = {
+		limit = { check_variable = { POR_timor_influence > 79 } NOT = { 1189 = { is_owned_by = POR } } }
+		transfer_state = 1189
+	}
+	if = {
+		limit = { NOT = { check_variable = { POR_timor_influence > 79 } } 1189 = { is_owned_by = POR } }
+		1189 = { POR_timor_return_state_to_sunda_effect = yes }
+	}
+}
+
+# Country scope: POR. Keeps the Dutch share, the five map areas and the campaign
+# map in step with the Portuguese share.
+POR_timor_influence_recalc_effect = {
+	clamp_variable = { var = POR_timor_influence min = 0 max = 100 }
+	set_variable = { POR_timor_influence_dutch = 100 }
+	subtract_from_variable = { POR_timor_influence_dutch = POR_timor_influence }
+
+	set_variable = { POR_timor_area_east_timor = 3 }
+	set_variable = { POR_timor_area_oecusse = 3 }
+	set_variable = { POR_timor_area_east_sunda = 3 }
+	set_variable = { POR_timor_area_west_timor = 3 }
+	set_variable = { POR_timor_area_west_sunda = 3 }
+	if = { limit = { check_variable = { POR_timor_influence > 29 } } set_variable = { POR_timor_area_east_timor = 1 } }
+	if = { limit = { check_variable = { POR_timor_influence > 54 } } set_variable = { POR_timor_area_east_sunda = 1 } }
+	if = { limit = { check_variable = { POR_timor_influence > 69 } } set_variable = { POR_timor_area_west_timor = 1 } }
+	if = { limit = { check_variable = { POR_timor_influence > 79 } } set_variable = { POR_timor_area_west_sunda = 1 } }
+
+	# Oecusse sits inside Portuguese Timor, so it follows the demarcation treaty
+	# rather than a state transfer. Its in-game counterpart is the undecided
+	# border modifier carried by state 721.
+	if = {
+		limit = { check_variable = { POR_timor_area_east_timor = 1 } }
+		set_variable = { POR_timor_area_oecusse = 2 }
+		if = {
+			limit = { has_country_flag = POR_timor_border_settled }
+			set_variable = { POR_timor_area_oecusse = 1 }
+		}
+	}
+
+	POR_timor_apply_map_effect = yes
+	add_to_variable = { POR_timor_gui_dirty = 1 }
+}
+
+# Country scope: POR. Raise Portuguese influence over the Solor and Timor archipelago.
+# Expects: set_temp_variable = { POR_timor_influence_change = X }
+por_colonial_change_timor_influence_effect = {
+	custom_effect_tooltip = por_colonial_timor_influence_change_tt
+	add_to_variable = { POR_timor_influence = POR_timor_influence_change }
+	POR_timor_influence_recalc_effect = yes
+}
+
+# Country scope: POR. Applies the "Undecided Border" penalty to Portuguese Timor.
+por_colonial_timor_undecided_border_effect = {
+	set_country_flag = POR_timor_undecided_border
+	721 = {
+		if = {
+			limit = { NOT = { has_dynamic_modifier = { modifier = dynmod_POR_timor_undecided_border } } }
+			add_dynamic_modifier = { modifier = dynmod_POR_timor_undecided_border }
+		}
+	}
+}
+
+# Country scope: POR. The frontier is agreed - lift the penalty and pay the concession.
+por_colonial_settle_timor_border_effect = {
+	clr_country_flag = POR_timor_undecided_border
+	clr_country_flag = POR_timor_second_offer_available
+	clr_country_flag = POR_timor_demilitarization_available
+	set_country_flag = POR_timor_border_settled
+	721 = {
+		if = {
+			limit = { has_dynamic_modifier = { modifier = dynmod_POR_timor_undecided_border } }
+			remove_dynamic_modifier = { modifier = dynmod_POR_timor_undecided_border }
+		}
+	}
+	custom_effect_tooltip = por_colonial_oecusse_settled_tt
+	set_temp_variable = { money_to_gain = -0.1 }
+	add_money_with_inflation_included_with_tooltip_effect = yes
+	add_stability = 0.02
+	set_temp_variable = { eoanb_prestige_change = 2 }
+	eoanb_change_prestige_score = yes
+	hidden_effect = { POR_timor_influence_recalc_effect = yes }
+}
+
+# Country scope: POR. Locks in the territorial result of the influence contest and
+# switches the Timor influence mechanic off. The states have already changed hands
+# as the thresholds were crossed - this only makes the gains permanent.
+por_colonial_resolve_timor_influence_effect = {
+	POR_timor_influence_recalc_effect = yes
+	set_country_flag = POR_timor_governance_settled
+	clr_country_flag = POR_timor_influence_active
+	if = {
+		limit = { check_variable = { POR_timor_influence > 54 } }
+		custom_effect_tooltip = por_colonial_timor_gain_east_sunda_tt
+		667 = { add_core_of = POR }
+	}
+	if = {
+		limit = { check_variable = { POR_timor_influence > 69 } }
+		custom_effect_tooltip = por_colonial_timor_gain_west_timor_tt
+		1180 = { add_core_of = POR }
+	}
+	if = {
+		limit = { check_variable = { POR_timor_influence > 79 } }
+		custom_effect_tooltip = por_colonial_timor_gain_west_sunda_tt
+		1189 = { add_core_of = POR }
+	}
+	# The unrest of 1861 is fired by the KDE system; catch late governors here.
+	if = {
+		limit = { date > 1861.7.1 }
+		hidden_effect = { country_event = { id = portugal.75 days = 60 } }
+	}
+}
+
+###########################################################################
+# THE KONGO SUCCESSION
+###########################################################################
+
+# Country scope: KON. Opens the succession struggle between the two pretenders.
+por_colonial_start_kongo_succession_crisis_effect = {
+	set_country_flag = KON_succession_crisis
+	set_power_balance = {
+		id = KON_Balance_of_Power_Succession_Crisis
+		left_side = KON_BOP_Alvaro_Faction
+		right_side = KON_BOP_Pedro_Faction
+		set_value = 0
+	}
+	custom_effect_tooltip = por_colonial_kongo_bop_unlocked_tt
+	POR = { set_country_flag = POR_kongo_succession_crisis }
+}
+
+###########################################################################
+# THE MACAU TREATY CAMPAIGN
+###########################################################################
+
+# Country scope: POR. One more step of the campaign to have the treaty ratified.
+# Six successful approaches are enough to move the Qing court.
+POR_qing_sway_progress_effect = {
+	add_to_variable = { POR_qing_sway_progress = 1 }
+	custom_effect_tooltip = POR_qing_sway_progress_tt
+	if = {
+		limit = { check_variable = { POR_qing_sway_progress > 5 } }
+		clr_country_flag = POR_sino_treaty_pending
+		country_event = { id = portugal.56 days = 3 }
+	}
+}

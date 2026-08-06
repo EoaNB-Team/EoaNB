@@ -1,0 +1,68 @@
+###########################################################################
+#	Cochinchina Expedition - Scripted Triggers
+###########################################################################
+
+cochinchina_expedition_is_participant_trigger = {
+	OR = {
+		has_country_flag = SPR_cochinchina_intervention_flag
+		has_country_flag = FRA_cochinchina_intervention_flag
+	}
+}
+
+cochinchina_expedition_is_participant_or_subject_trigger = {
+	OR = {
+		cochinchina_expedition_is_participant_trigger = yes
+		AND = {
+			is_subject = yes
+			OVERLORD = { cochinchina_expedition_is_participant_trigger = yes }
+		}
+	}
+}
+
+cochinchina_expedition_is_leader_trigger = {
+	if = {
+		limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
+		TAG = FRA
+	}
+	else = {
+		TAG = SPR
+		has_country_flag = SPR_cochinchina_intervention_flag
+	}
+}
+
+cochinchina_expedition_partners_ready_trigger = {
+	if = {
+		limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
+		SPR = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
+	}
+	if = {
+		limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
+		FRA = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
+	}
+}
+
+cochinchina_expedition_state_is_secured_trigger = {
+	custom_trigger_tooltip = {
+		tooltip = SPR_cochinchina_expedition_state_not_controlled_trigger
+		VIN = { NOT = { controls_state = PREV } }
+	}
+	custom_trigger_tooltip = {
+		tooltip = SPR_cochinchina_expedition_state_controlled_trigger
+		any_country = {
+			controls_state = PREV
+			cochinchina_expedition_is_participant_or_subject_trigger = yes
+		}
+	}
+}
+
+cochinchina_expedition_saigon_secured_trigger = {
+	784 = { cochinchina_expedition_state_is_secured_trigger = yes }
+}
+
+cochinchina_expedition_france_kept_to_history_trigger = {
+	FRA = { NOT = { has_country_flag = FRA_cochinchina_broke_from_history_flag } }
+}
+
+cochinchina_expedition_holds_tourane_trigger = {
+	controls_province = 10309
+}

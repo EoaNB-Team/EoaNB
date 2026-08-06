@@ -1,0 +1,397 @@
+###########################################################################
+#	Cochinchina Expedition - Scripted Effects
+###########################################################################
+
+#--------------------------------------------------------------------------
+#	Joining the expedition
+#--------------------------------------------------------------------------
+cochinchina_expedition_join_effect = {
+	if = {
+		limit = { TAG = SPR }
+		set_country_flag = SPR_cochinchina_intervention_flag
+		hidden_effect = {
+			set_global_flag = SPR_cochinchina_intervention_flag
+			set_country_flag = SPR_cochinchina_expedition_focus_flag
+		}
+	}
+	else_if = {
+		limit = { TAG = FRA }
+		set_country_flag = FRA_cochinchina_intervention_flag
+		complete_national_focus = FRA_french_indochina
+		hidden_effect = { set_global_flag = FRA_cochinchina_intervention_flag }
+	}
+	hidden_effect = {
+		if = {
+			limit = { NOT = { has_global_flag = SPR_cochinchina_intervention_global_flag } }
+			set_global_flag = SPR_cochinchina_intervention_global_flag
+		}
+		activate_mission = SPR_cochinchina_expedition_ready_for_invasion
+		activate_mission = SPR_cochinchina_expedition_begin_invasion
+	}
+}
+
+cochinchina_expedition_abort_effect = {
+	hidden_effect = {
+		every_country = {
+			limit = { OR = { TAG = SPR TAG = FRA } }
+			clr_country_flag = SPR_cochinchina_intervention_flag
+			clr_country_flag = FRA_cochinchina_intervention_flag
+			clr_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag
+			remove_mission = SPR_cochinchina_expedition_ready_for_invasion
+			remove_mission = SPR_cochinchina_expedition_begin_invasion
+		}
+		clr_global_flag = SPR_cochinchina_intervention_global_flag
+		clr_global_flag = SPR_cochinchina_intervention_flag
+		clr_global_flag = FRA_cochinchina_intervention_flag
+	}
+}
+
+#--------------------------------------------------------------------------
+#	Waging the expedition
+#--------------------------------------------------------------------------
+cochinchina_expedition_ai_land_campaign_effect = {
+	add_ai_strategy = {
+		type = conquer
+		id = VIN
+		value = 200
+	}
+	add_ai_strategy = {
+		type = area_priority
+		id = 142
+		value = 200
+	}
+	add_ai_strategy = {
+		type = front_control
+		tag = VIN
+		state = 784
+		strategic_region = 142
+		ratio = 1.0
+		priority = 200
+		ordertype = front
+		execution_type = balanced
+		execute_order = yes
+		manual_attack = yes
+	}
+
+	add_ai_strategy = {
+		type = strike_force_home_base
+		id = 142
+		value = 100
+	}
+}
+
+#--------------------------------------------------------------------------
+#	The landings
+#--------------------------------------------------------------------------
+cochinchina_expedition_tourane_landing_effect = {
+	hidden_effect = {
+		every_country = {
+			limit = { cochinchina_expedition_is_leader_trigger = yes }
+			set_province_controller = 10309
+		}
+		if = {
+			limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
+			FRA = {
+				load_oob = FRA_COCHINCHINA_LANDING
+				cochinchina_expedition_ai_land_campaign_effect = yes
+			}
+		}
+		if = {
+			limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
+			SPR = {
+				load_oob = SPR_COCHINCHINA_LANDING
+				cochinchina_expedition_ai_land_campaign_effect = yes
+			}
+			if = {
+				limit = {
+					country_exists = SPH
+					SPH = { is_subject_of = SPR }
+				}
+				SPH = { cochinchina_expedition_ai_land_campaign_effect = yes }
+			}
+		}
+		VIN = {
+			if = {
+				limit = { NOT = { has_idea = VIN_cochinchina_expedition_resolve } }
+				add_ideas = VIN_cochinchina_expedition_resolve
+				set_country_flag = VIN_cochinchina_expedition_resolve_flag
+			}
+		}
+		set_global_flag = SPR_cochinchina_expedition_tourane_landing
+		news_event = { id = cochinchina_expedition.19 }
+	}
+}
+
+cochinchina_expedition_saigon_redeployment_effect = {
+	hidden_effect = {
+		every_country = {
+			limit = { cochinchina_expedition_is_leader_trigger = yes }
+			set_province_controller = 1396
+		}
+		1336 = {
+			teleport_armies = {
+				limit = { cochinchina_expedition_is_participant_or_subject_trigger = yes }
+				to_province = 1396
+			}
+		}
+		if = {
+			limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
+			784 = {
+				create_unit = {
+					division = "name = \"3e régiment d'infanterie de marine\" division_template = \"Infanterie de Marine\" start_experience_factor = 0.4 start_equipment_factor = 0.9"
+					owner = FRA
+					prioritize_location = 1396
+				}
+			}
+		}
+		if = {
+			limit = { country_exists = VIN }
+			VIN = { set_province_controller = 10309 }
+		}
+		set_global_flag = SPR_cochinchina_expedition_saigon_landing
+		news_event = { id = cochinchina_expedition.20 }
+	}
+}
+
+cochinchina_expedition_withdraw_expeditionary_force_effect = {
+	hidden_effect = {
+		FRA = {
+			delete_unit_template_and_units = { division_template = "Infanterie de Marine" }
+			delete_unit_template_and_units = { division_template = "Compagnie de Débarquement" }
+		}
+		SPR = {
+			delete_unit_template_and_units = { division_template = "Tiradores Filipinos" }
+		}
+		VIN = {
+			if = {
+				limit = { has_country_flag = VIN_cochinchina_expedition_resolve_flag }
+				remove_ideas = VIN_cochinchina_expedition_resolve
+				clr_country_flag = VIN_cochinchina_expedition_resolve_flag
+			}
+		}
+		clr_global_flag = SPR_cochinchina_expedition_tourane_landing
+		clr_global_flag = SPR_cochinchina_expedition_saigon_landing
+	}
+}
+
+cochinchina_expedition_open_joint_access_effect = {
+	if = {
+		limit = {
+			SPR = { has_country_flag = SPR_cochinchina_intervention_flag }
+			FRA = { has_country_flag = FRA_cochinchina_intervention_flag }
+		}
+		SPR = {
+			if = {
+				limit = { NOT = { has_military_access_to = FRA } }
+				diplomatic_relation = { country = FRA relation = military_access active = yes }
+				set_country_flag = cochinchina_expedition_opened_access_flag
+			}
+			if = {
+				limit = { NOT = { has_non_aggression_pact_with = FRA } }
+				diplomatic_relation = { country = FRA relation = non_aggression_pact active = yes }
+				set_country_flag = cochinchina_expedition_opened_nap_flag
+			}
+		}
+		FRA = {
+			if = {
+				limit = { NOT = { has_military_access_to = SPR } }
+				diplomatic_relation = { country = SPR relation = military_access active = yes }
+				set_country_flag = cochinchina_expedition_opened_access_flag
+			}
+		}
+		if = {
+			limit = {
+				country_exists = SPH
+				SPH = { is_subject_of = SPR }
+			}
+			SPH = {
+				if = {
+					limit = { NOT = { has_military_access_to = FRA } }
+					diplomatic_relation = { country = FRA relation = military_access active = yes }
+					set_country_flag = cochinchina_expedition_opened_access_flag
+				}
+				if = {
+					limit = { NOT = { has_non_aggression_pact_with = FRA } }
+					diplomatic_relation = { country = FRA relation = non_aggression_pact active = yes }
+					set_country_flag = cochinchina_expedition_opened_nap_flag
+				}
+			}
+			FRA = {
+				if = {
+					limit = { NOT = { has_military_access_to = SPH } }
+					diplomatic_relation = { country = SPH relation = military_access active = yes }
+					set_country_flag = cochinchina_expedition_opened_sph_access_flag
+				}
+			}
+		}
+	}
+}
+
+cochinchina_expedition_close_joint_access_effect = {
+	SPR = {
+		if = {
+			limit = { has_country_flag = cochinchina_expedition_opened_access_flag }
+			diplomatic_relation = { country = FRA relation = military_access active = no }
+			clr_country_flag = cochinchina_expedition_opened_access_flag
+		}
+		if = {
+			limit = { has_country_flag = cochinchina_expedition_opened_nap_flag }
+			diplomatic_relation = { country = FRA relation = non_aggression_pact active = no }
+			clr_country_flag = cochinchina_expedition_opened_nap_flag
+		}
+	}
+	FRA = {
+		if = {
+			limit = { has_country_flag = cochinchina_expedition_opened_access_flag }
+			diplomatic_relation = { country = SPR relation = military_access active = no }
+			clr_country_flag = cochinchina_expedition_opened_access_flag
+		}
+		if = {
+			limit = { has_country_flag = cochinchina_expedition_opened_sph_access_flag }
+			diplomatic_relation = { country = SPH relation = military_access active = no }
+			clr_country_flag = cochinchina_expedition_opened_sph_access_flag
+		}
+	}
+	if = {
+		limit = { country_exists = SPH }
+		SPH = {
+			if = {
+				limit = { has_country_flag = cochinchina_expedition_opened_access_flag }
+				diplomatic_relation = { country = FRA relation = military_access active = no }
+				clr_country_flag = cochinchina_expedition_opened_access_flag
+			}
+			if = {
+				limit = { has_country_flag = cochinchina_expedition_opened_nap_flag }
+				diplomatic_relation = { country = FRA relation = non_aggression_pact active = no }
+				clr_country_flag = cochinchina_expedition_opened_nap_flag
+			}
+		}
+	}
+}
+
+#--------------------------------------------------------------------------
+#	Ending the expedition
+#--------------------------------------------------------------------------
+cochinchina_expedition_end_war_effect = {
+	every_country = {
+		limit = { cochinchina_expedition_is_participant_or_subject_trigger = yes }
+		every_country = {
+			limit = {
+				OR = {
+					TAG = VIN
+					is_subject_of = VIN
+				}
+			}
+			white_peace = PREV
+		}
+	}
+}
+
+cochinchina_expedition_capitulation_effect = {
+	set_global_flag = SPR_cochinchina_expedition_capitulation_flag
+	cochinchina_expedition_end_war_effect = yes
+	every_country = {
+		limit = { cochinchina_expedition_is_participant_trigger = yes }
+		remove_mission = SPR_cochinchina_expedition_take_port_mission
+		country_event = { id = cochinchina_expedition.364 }
+	}
+	VIN = { remove_mission = SPR_cochinchina_expedition_take_port_mission }
+}
+
+cochinchina_expedition_white_peace_effect = {
+	every_country = {
+		limit = {
+			OR = {
+				TAG = ROOT
+				is_subject_of = ROOT
+			}
+		}
+		every_country = {
+			limit = {
+				OR = {
+					TAG = VIN
+					is_subject_of = VIN
+				}
+			}
+			white_peace = PREV
+		}
+	}
+}
+
+cochinchina_expedition_settlement_effect = {
+	CCH = { transfer_state = 784 }
+	if = {
+		limit = {
+			SPR = { has_country_flag = SPR_cochinchina_intervention_flag }
+			FRA = { has_country_flag = FRA_cochinchina_intervention_flag }
+		}
+		CCH = {
+			set_cosmetic_tag = FRA_cochin_protect
+			FRA = {
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_colony
+				}
+			}
+		}
+		if = {
+			limit = {
+				SPR = { has_completed_focus = SPR_spanish_victory_cochinchina }
+				country_exists = SPH
+			}
+			SPH = { transfer_state = 998 }
+		}
+		else = {
+			CCH = { transfer_state = 998 }
+		}
+	}
+	else_if = {
+		limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
+		CCH = {
+			transfer_state = 998
+			set_cosmetic_tag = SPR_cochin_protect
+			SPR = {
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_colony
+				}
+			}
+		}
+	}
+	else_if = {
+		limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
+		CCH = {
+			transfer_state = 998
+			set_cosmetic_tag = FRA_cochin_protect
+			FRA = {
+				set_autonomy = {
+					target = PREV
+					autonomy_state = autonomy_colony
+				}
+			}
+		}
+	}
+	if = {
+		limit = {
+			FRA = { has_country_flag = FRA_cochinchina_intervention_flag }
+			cochinchina_expedition_france_kept_to_history_trigger = yes
+		}
+		FRA = { set_country_flag = FRA_cochinchina_historical_settlement_flag }
+	}
+	cochinchina_expedition_end_war_effect = yes
+	cochinchina_expedition_peace_out_cochinchina_effect = yes
+	#if = {
+	#	limit = { VIN = { is_ai = no } }
+	#	CCH = { change_tag_from = VIN }
+	#}
+}
+
+cochinchina_expedition_peace_out_cochinchina_effect = {
+	if = {
+		limit = { country_exists = CCH }
+		every_country = {
+			limit = { has_war_with = CCH }
+			white_peace = CCH
+		}
+	}
+}
