@@ -1,366 +1,307 @@
+###########################################################################
+#	The Cochinchina Expedition - Decisions & Missions
+###########################################################################
+
 war_planning = {
-	
+
 	#######################
 	# Preparing Decisions #
 	#######################
 	FRA_cochinchina_expedition_support_malina_port = {
-	    icon = generic_decision
-	    available = {
-			SPR = { has_country_flag = SPR_develop_manila_port_decision_started }
-			custom_trigger_tooltip = {
-				tooltip = SPR_interest_in_cochinchina_expedition_trigger
-				has_country_flag = FRA_cochinchina_intervention_flag
-			}
-			custom_trigger_tooltip = {
-				tooltip = SPR_cochinchina_expedition_has_not_began
-				NOT = { VIN = { has_country_flag = VIN_cochinchina_intervention_flag } }
-			}
-	    }
+		icon = generic_decision
+
+		allowed = { original_tag = FRA }
+
 		visible = {
 			has_country_flag = FRA_cochinchina_intervention_flag
 			SPR = { has_country_flag = SPR_cochinchina_intervention_flag }
-	    }
-		allowed = {
-			TAG = FRA
 		}
+
+		available = {
+			SPR = { has_country_flag = SPR_develop_manila_port_decision_started }
+			custom_trigger_tooltip = {
+				tooltip = SPR_interest_in_cochinchina_expedition_trigger
+				SPR = { has_country_flag = SPR_cochinchina_intervention_flag }
+			}
+			custom_trigger_tooltip = {
+				tooltip = SPR_cochinchina_expedition_has_not_began
+				NOT = { has_global_flag = SPR_cochinchina_expedition_cochinchina_landing }
+				VIN = { NOT = { has_country_flag = VIN_cochinchina_intervention_flag } }
+			}
+		}
+
 		fire_only_once = yes
 		cost = 50
+
 		complete_effect = {
+			custom_effect_tooltip = FRA_cochinchina_expedition_support_malina_port_tooltip
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_tooltip_effect = yes
 			SPR = {
 				country_event = { id = cochinchina_expedition.8 }
-				clr_country_flag = SPR_develop_manila_port_decision_started 
+				hidden_effect = { clr_country_flag = SPR_develop_manila_port_decision_started }
 			}
-			custom_effect_tooltip = FRA_cochinchina_expedition_support_malina_port_tooltip
 		}
-		ai_will_do = { 
-			base = 10 
+
+		ai_will_do = {
+			base = 10
 			modifier = {
-				factor = 0 
+				factor = 0
 				is_historical_focus_on = yes
 			}
 		}
 	}
+
 	SPR_cochinchina_expedition_ready_for_invasion = {
-	    icon = generic_decision
-	    available = {
+		icon = generic_decision
+
+		allowed = {
+			OR = {
+				original_tag = SPR
+				original_tag = FRA
+			}
+		}
+
+		available = {
 			if = {
 				limit = { TAG = SPR }
 				has_completed_focus = SPR_prepare_at_manila
 				has_completed_focus = SPR_patriotic_call
 			}
-	    }
-		activation = {
-			OR = {
-				has_country_flag = FRA_cochinchina_intervention_flag
-				has_country_flag = SPR_cochinchina_intervention_flag
-			}
-	    }
-		allowed = { 
-			OR = {
-				TAG = SPR 
-				TAG = FRA
+			else = {
+				has_completed_focus = FRA_french_indochina
 			}
 		}
+
+		cancel_trigger = {
+			NOT = { has_global_flag = SPR_cochinchina_intervention_global_flag }
+		}
+
 		selectable_mission = yes
 		is_good = yes
 		fire_only_once = yes
-		#cost = 0
+
 		days_mission_timeout = 1000
 		days_remove = 90
+
 		remove_effect = {
-			hidden_effect = {
-				set_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag
-			}
+			hidden_effect = { set_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
 		}
 		timeout_effect = {
-			hidden_effect = {
-				set_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag
-			}
+			hidden_effect = { set_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
 		}
+
 		ai_will_do = { base = 100 }
 	}
+
 	#####################
 	# Starting Decision #
 	#####################
 	SPR_cochinchina_expedition_begin_invasion = {
 		icon = generic_prepare_civil_war
-		ai_will_do = { factor = 100 }
+
+		allowed = {
+			OR = {
+				original_tag = SPR
+				original_tag = FRA
+			}
+		}
+
 		available = {
+			custom_trigger_tooltip = {
+				tooltip = SPR_cochinchina_expedition_begin_invasion_ready_trigger
+				cochinchina_expedition_partners_ready_trigger = yes
+			}
 			if = {
-				limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
-				if = {
-					limit = { TAG = FRA }
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_begin_invasion_ready_trigger
-						if = {
-							limit = { country_exists = SPR }
-							if = {
-								limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
-								SPR = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
-							}
-						}
-						if = {
-							limit = { country_exists = FRA }
-							if = {
-								limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
-								FRA = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
-							}
-						}	
-					}
+				limit = {
+					NOT = { cochinchina_expedition_is_leader_trigger = yes }
+					FRA = { has_country_flag = FRA_cochinchina_intervention_flag }
 				}
-				else = {
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_begin_invasion_trigger
-						always = no
-					}
+				custom_trigger_tooltip = {
+					tooltip = FRA_cochinchina_expedition_begin_invasion_trigger
+					always = no
 				}
 			}
 			else_if = {
-				limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
-				if = {
-					limit = { TAG = SPR }
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_begin_invasion_ready_trigger
-						if = {
-							limit = { country_exists = SPR }
-							if = {
-								limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
-								SPR = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
-							}
-						}
-						if = {
-							limit = { country_exists = FRA }
-							if = {
-								limit = { FRA = { has_country_flag = FRA_cochinchina_intervention_flag } }
-								FRA = { has_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag }
-							}
-						}	
-					}
-				}
-				else = {
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_begin_invasion_trigger
-						always = no
-					}
+				limit = { NOT = { cochinchina_expedition_is_leader_trigger = yes } }
+				custom_trigger_tooltip = {
+					tooltip = SPR_cochinchina_expedition_begin_invasion_trigger
+					always = no
 				}
 			}
 		}
-		activation = {
-			has_global_flag = SPR_cochinchina_intervention_global_flag
-			OR = {
-				has_country_flag = SPR_cochinchina_intervention_flag
-				has_country_flag = FRA_cochinchina_intervention_flag
-			}
-		}
-		allowed = { 
-			OR = {
-				tag = SPR 
-				tag = FRA
-			}
-		}
+
 		selectable_mission = yes
 		is_good = no
 		fire_only_once = yes
-		#cost = 0
+
 		days_mission_timeout = 1180
+
 		complete_effect = {
-			#Invasion Commences 
 			country_event = { id = cochinchina_expedition.18 }
 			if = {
-				limit = { TAG = SPR } 
+				limit = { TAG = SPR }
 				complete_national_focus = SPR_champa_campaign
 			}
-			else_if = {
-				if = {
-					limit = { country_exists = SPR }
+			else = {
+				hidden_effect = {
 					if = {
 						limit = { SPR = { has_country_flag = SPR_cochinchina_intervention_flag } }
-						hidden_effect = { SPR = { complete_national_focus = SPR_champa_campaign } }
+						SPR = { complete_national_focus = SPR_champa_campaign }
 					}
 				}
 			}
 			hidden_effect = {
-				SPR = { 
-					clr_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag 
-					clr_country_flag = SPR_cochinchina_expedition_initial_yes
-				}
-				FRA = { 
-					clr_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag 
-					clr_country_flag = SPR_cochinchina_expedition_initial_yes
+				every_country = {
+					limit = { OR = { TAG = SPR TAG = FRA } }
+					clr_country_flag = SPR_cochinchina_expedition_begin_invasion_ready_flag
 				}
 				if = {
 					limit = { TAG = SPR }
 					FRA = { remove_mission = SPR_cochinchina_expedition_begin_invasion }
 				}
-				else_if = {
-					limit = { TAG = FRA }
+				else = {
 					SPR = { remove_mission = SPR_cochinchina_expedition_begin_invasion }
 				}
 				clr_global_flag = SPR_cochinchina_intervention_global_flag
 			}
 		}
+
 		timeout_effect = {
-			#Spain Doesnt Have it's Shit Together
-			hidden_effect = {
-				
+			hidden_effect = { cochinchina_expedition_abort_effect = yes }
+		}
+
+		ai_will_do = { base = 100 }
+	}
+
+	#----------------------------------------------------------
+	# Tourane -> Saigon, February 1859
+	#----------------------------------------------------------
+	SPR_cochinchina_expedition_sail_for_saigon = {
+		icon = generic_naval
+
+		allowed = {
+			OR = {
+				original_tag = SPR
+				original_tag = FRA
+			}
+		}
+
+		visible = {
+			has_global_flag = SPR_cochinchina_expedition_tourane_landing
+			NOT = { has_global_flag = SPR_cochinchina_expedition_saigon_landing }
+			cochinchina_expedition_is_participant_trigger = yes
+		}
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = SPR_cochinchina_expedition_holds_tourane_trigger
+				cochinchina_expedition_holds_tourane_trigger = yes
+			}
+			if = {
+				limit = { NOT = { cochinchina_expedition_is_leader_trigger = yes } }
+				custom_trigger_tooltip = {
+					tooltip = SPR_cochinchina_expedition_not_the_senior_partner_trigger
+					always = no
+				}
+			}
+		}
+
+		cancel_trigger = {
+			NOT = { cochinchina_expedition_holds_tourane_trigger = yes }
+		}
+
+		fire_only_once = yes
+		cost = 25
+		days_remove = 30
+
+		highlight_states = {
+			highlight_state_targets = {
+				state = 784
+			}
+		}
+
+		remove_effect = {
+			cochinchina_expedition_saigon_redeployment_effect = yes
+		}
+
+		ai_will_do = {
+			base = 0
+			modifier = {
+				add = 100
+				date > 1859.1.1
+			}
+			modifier = {
+				factor = 2
+				is_historical_focus_on = yes
 			}
 		}
 	}
-#----------------------------------------------------------
-#Take Cochinchina
-#----------------------------------------------------------
+
+	#----------------------------------------------------------
+	# Take Cochinchina
+	#----------------------------------------------------------
 	SPR_cochinchina_expedition_take_port_mission = {
 		icon = generic_naval
-		ai_will_do = { factor = 100 }
+
+		allowed = {
+			OR = {
+				original_tag = SPR
+				original_tag = FRA
+				original_tag = VIN
+			}
+		}
+
 		available = {
 			if = {
-				limit = {
-					NOT = { TAG = VIN }
-				}
-				784 = {
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_state_not_controlled_trigger
-						VIN = { NOT = { controls_state = PREV } }
-					}
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_state_controlled_trigger
-						any_country = {
-							controls_state = PREV
-							OR = {
-								AND = {
-									is_subject = yes
-									OVERLORD = {
-										OR = {
-											has_country_flag = SPR_cochinchina_intervention_flag
-											has_country_flag = FRA_cochinchina_intervention_flag
-										}
-									}
-								}
-								has_country_flag = SPR_cochinchina_intervention_flag
-								has_country_flag = FRA_cochinchina_intervention_flag
-							}
-						}
-					}
-				}
-				1336 = {
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_state_not_controlled_trigger
-						VIN = { NOT = { controls_state = PREV } }
-					}
-					custom_trigger_tooltip = {
-						tooltip = SPR_cochinchina_expedition_state_controlled_trigger
-						any_country = {
-							controls_state = PREV
-							OR = {
-								AND = {
-									is_subject = yes
-									OVERLORD = {
-										OR = {
-											has_country_flag = SPR_cochinchina_intervention_flag
-											has_country_flag = FRA_cochinchina_intervention_flag
-										}
-									}
-								}
-								has_country_flag = SPR_cochinchina_intervention_flag
-								has_country_flag = FRA_cochinchina_intervention_flag
-							}
-						}
-					}
+				limit = { NOT = { TAG = VIN } }
+				custom_trigger_tooltip = {
+					tooltip = SPR_cochinchina_expedition_dai_nam_broken_trigger
+					has_global_flag = SPR_cochinchina_expedition_capitulation_flag
 				}
 			}
 			else = {
-				hidden_trigger = { always = no }
-				784 = { VIN = { controls_state = PREV } }
-				1336 = { VIN = { controls_state = PREV } }
+				custom_trigger_tooltip = {
+					tooltip = VIN_cochinchina_expedition_hold_the_ports_trigger
+					always = no
+				}
 			}
 		}
-		
-		allowed = { 
-			OR = { 
-				TAG = SPR
-				TAG = FRA
-				TAG = VIN
-			}
-		}
-		activation = { 
-			NOT = { has_global_flag = SPR_cochinchina_expedition_cochinchina_landing }
-			OR = {
-				has_country_flag = SPR_cochinchina_intervention_flag
-				has_country_flag = FRA_cochinchina_intervention_flag
-				has_country_flag = VIN_cochinchina_intervention_flag
-			}
-			VIN = { has_country_flag = VIN_cochinchina_intervention_flag }
-		}
+
 		selectable_mission = no
 		is_good = no
-		
 		fire_only_once = yes
 
-		#cost = 0
-		
-		days_mission_timeout = 1460
-		
+		days_mission_timeout = 2190
+
 		highlight_states = {
-			STATE = 784	
+			highlight_state_targets = {
+				state = 784
+				state = 1353
+			}
 		}
-		
+
 		complete_effect = {
-			#Europeans Take the Port
 			hidden_effect = {
 				if = {
-					limit = {
-						TAG = SPR
-						SPR = { has_country_flag = SPR_cochinchina_intervention_flag } 
-					}
-					SPR = { country_event = { id = cochinchina_expedition.364 } }
-					if = {
-						limit = { NOT = { has_global_flag = SPR_cochinchina_expedition_cochinchina_landing } }
-						set_global_flag = SPR_cochinchina_expedition_cochinchina_landing
-						VIN = { remove_mission = SPR_cochinchina_expedition_take_port_mission }
-					}
-				}
-				if = {
-					limit = {
-						TAG = FRA
-						FRA = { has_country_flag = FRA_cochinchina_intervention_flag } 
-					}
-					FRA = { country_event = { id = cochinchina_expedition.364 } }
-					if = {
-						limit = { NOT = { has_global_flag = SPR_cochinchina_expedition_cochinchina_landing } }
-						set_global_flag = SPR_cochinchina_expedition_cochinchina_landing
-						VIN = { remove_mission = SPR_cochinchina_expedition_take_port_mission }
-					}
+					limit = { NOT = { has_global_flag = SPR_cochinchina_expedition_cochinchina_landing } }
+					set_global_flag = SPR_cochinchina_expedition_cochinchina_landing
 				}
 			}
 		}
+
 		timeout_effect = {
-			#Mexico Holds Out
 			hidden_effect = {
 				if = {
-					limit = {
-						TAG = SPR
-						SPR = { has_country_flag = SPR_cochinchina_intervention_flag } 
-					}
-					SPR = { country_event = { id = cochinchina_expedition.23 } }
+					limit = { TAG = VIN }
+					country_event = { id = cochinchina_expedition.24 }
 				}
-				if = {
-					limit = {
-						TAG = FRA
-						FRA = { has_country_flag = FRA_cochinchina_intervention_flag } 
-					}
-					FRA = { country_event = { id = cochinchina_expedition.23 } }
-				}
-				if = {
-					limit = { 
-						TAG = VIN
-						VIN = { 
-							exists = yes
-							has_country_flag = VIN_cochinchina_intervention_flag 
-						} 
-					}
-					VIN = { country_event = { id = cochinchina_expedition.24 } }
+				else = {
+					country_event = { id = cochinchina_expedition.23 }
 				}
 			}
 		}
+
+		ai_will_do = { base = 100 }
 	}
 }

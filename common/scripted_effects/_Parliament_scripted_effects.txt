@@ -14,7 +14,11 @@
 		set_variable = { money_cost@var:parliament_decision_token = parliament_decision_money_cost }
 		set_variable = { icon@var:parliament_decision_token = parliament_decision_icon }
 		if = {
-			limit = { check_variable = { parliament_decision_category = 1 } }
+
+			limit = {
+				check_variable = { parliament_decision_category = 1 }
+				NOT = { is_in_array = { parliament_decision_array_1 = parliament_decision_token } }
+			}
 			add_to_array = {
 				array = parliament_decision_array_1
 				value = parliament_decision_token
@@ -22,7 +26,10 @@
 			set_variable = { clicked@var:parliament_decision_token = 0 }
 		}
 		if = {
-			limit = { check_variable = { parliament_decision_category = 2 } } # -> voting decision
+			limit = {
+				check_variable = { parliament_decision_category = 2 } # -> voting decision
+				NOT = { is_in_array = { parliament_decision_array_2 = parliament_decision_token } }
+			}
 			add_to_array = {
 				array = parliament_decision_array_2
 				value = parliament_decision_token
@@ -48,9 +55,43 @@
 		}
 	}
 
-	# # set_temp_variable = { mne = token:<decision_token> } # this is automatic when scoped to an array
+	# # set_temp_variable = { mne = token:<decision_token> } 
+	parliament_release_stale_decision_lock = {
+		if = {
+			limit = { has_country_flag = parliament_decision_category_1_ongoing }
+
+			set_temp_variable = { parl_lock_holders = 0 }
+			for_each_loop = {
+				array = parliament_decision_array_1
+				value = parl_lock_v
+				if = {
+					limit = { check_variable = { clicked@var:parl_lock_v = 1 } }
+					add_to_temp_variable = { parl_lock_holders = 1 }
+				}
+			}
+
+			if = {
+				limit = {
+					check_variable = { parl_lock_holders = 0 }
+					NOT = { has_active_mission = parliament_coalition_rad_soc_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_soc_lib_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_soc_ega_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_cen_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_tra_con_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_rad_dem_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_chauv_pop_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_aut_breakaway_mission }
+					NOT = { has_active_mission = parliament_coalition_fun_breakaway_mission }
+				}
+				clr_country_flag = parliament_decision_category_1_ongoing
+				set_variable = { parliament_decision_target_day = 0 }
+				set_variable = { parliament_decision_days_left = 0 }
+			}
+		}
+	}
+
 	parliament_enact_decision = {
-		# custom_effect_tooltip = mne_enact_decision_tt
+
 
 		if = {
 			limit = { check_variable = { lp_cost@var:v > 0 } }
@@ -64,7 +105,7 @@
 		if = {
 			limit = { check_variable = { money_cost@var:v > 0 } }
 			custom_effect_tooltip = RUS_peasant_reform_enact_decision_debt_cost_tt
-			set_temp_variable = { money_cost = mone_costy@var:v }
+			set_temp_variable = { money_cost = money_cost@var:v } # fixed: was mone_costy@var:v
 			multiply_temp_variable = { money_cost = -1 }
 			log = "[?money_cost]"
 			set_temp_variable = { money_to_gain = var:money_cost }
@@ -103,11 +144,145 @@
 			limit = { check_variable = { v = token:parliament_negotiate_with_the_breakaway_party } }
 			activate_decision = parliament_negotiate_with_the_breakaway_party
 		}
+
 		if = {
-			limit = { check_variable = { v = token:parliament_invite_party_to_our_coalition } }
-			activate_decision = parliament_invite_party_to_our_coalition
+			limit = { check_variable = { v = token:parliament_coalition_rad_soc_breakaway_mission } }
+			activate_mission = parliament_coalition_rad_soc_breakaway_mission
 		}
-	}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_soc_lib_breakaway_mission } }
+			activate_mission = parliament_coalition_soc_lib_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_soc_ega_breakaway_mission } }
+			activate_mission = parliament_coalition_soc_ega_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_cen_breakaway_mission } }
+			activate_mission = parliament_coalition_cen_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_tra_con_breakaway_mission } }
+			activate_mission = parliament_coalition_tra_con_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_rad_dem_breakaway_mission } }
+			activate_mission = parliament_coalition_rad_dem_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_chauv_pop_breakaway_mission } }
+			activate_mission = parliament_coalition_chauv_pop_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_aut_breakaway_mission } }
+			activate_mission = parliament_coalition_aut_breakaway_mission
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_coalition_fun_breakaway_mission } }
+			activate_mission = parliament_coalition_fun_breakaway_mission
+		}
+	
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_rad_soc_to_our_coalition } }
+			activate_decision = parliament_invite_rad_soc_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_soc_lib_to_our_coalition } }
+			activate_decision = parliament_invite_soc_lib_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_soc_ega_to_our_coalition } }
+			activate_decision = parliament_invite_soc_ega_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_cen_to_our_coalition } }
+			activate_decision = parliament_invite_cen_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_tra_con_to_our_coalition } }
+			activate_decision = parliament_invite_tra_con_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_rad_dem_to_our_coalition } }
+			activate_decision = parliament_invite_rad_dem_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_chauv_pop_to_our_coalition } }
+			activate_decision = parliament_invite_chauv_pop_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_aut_to_our_coalition } }
+			activate_decision = parliament_invite_aut_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_invite_fun_to_our_coalition } }
+			activate_decision = parliament_invite_fun_to_our_coalition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_rad_soc_representatives } }
+			activate_decision = parliament_meet_with_rad_soc_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_soc_lib_representatives } }
+			activate_decision = parliament_meet_with_soc_lib_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_soc_ega_representatives } }
+			activate_decision = parliament_meet_with_soc_ega_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_cen_representatives } }
+			activate_decision = parliament_meet_with_cen_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_tra_con_representatives } }
+			activate_decision = parliament_meet_with_tra_con_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_rad_dem_representatives } }
+			activate_decision = parliament_meet_with_rad_dem_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_chauv_pop_representatives } }
+			activate_decision = parliament_meet_with_chauv_pop_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_aut_representatives } }
+			activate_decision = parliament_meet_with_aut_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_fun_representatives } }
+			activate_decision = parliament_meet_with_fun_representatives
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_meet_with_the_leader_of_the_opposition } }
+			activate_decision = parliament_meet_with_the_leader_of_the_opposition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_try_a_deal_with_the_hardliners } }
+			activate_decision = parliament_try_a_deal_with_the_hardliners
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_make_a_speech_in_parliament_voting } }
+			activate_decision = parliament_make_a_speech_in_parliament_voting
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_find_compromises } }
+			activate_decision = parliament_find_compromises
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_put_pressure_on_the_lobbies } }
+			activate_decision = parliament_put_pressure_on_the_lobbies
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_silence_the_oppposition } }
+			activate_decision = parliament_silence_the_oppposition
+		}
+		if = {
+			limit = { check_variable = { v = token:parliament_bribe_representatives } }
+			activate_decision = parliament_bribe_representatives
+		}
+}
 
 	### REFORM EFFECTS ###
 
@@ -704,6 +879,39 @@
 		clear_variable = show_sol_laws
 	}
 
+
 	parliament_enact_reform = {
-		### FINISH !!!! ###
+		if = {
+			limit = {
+				NOT = { has_country_flag = parliament_reform_vote_ongoing }
+			}
+
+			# pay the legislative power cost of the reform
+			if = {
+				limit = { check_variable = { lp_cost@var:v > 0 } }
+				custom_effect_tooltip = AUS_multinational_empire_enact_decision_lp_cost_tt
+				set_temp_variable = { lp_cost = lp_cost@var:v }
+				multiply_temp_variable = { lp_cost = -1 }
+				add_political_power = var:lp_cost
+			}
+
+			# lock the reform in the gui while the vote is ongoing
+			set_variable = { clicked@var:v = 1 }
+
+			# remember which reform is being voted on - the whole pipeline reads this
+			set_variable = { current_reform_token = v }
+
+			set_country_flag = parliament_reform_vote_ongoing
+
+			custom_effect_tooltip = parliament_enact_reform_tt
+
+			hidden_effect = {
+				country_event = { id = parliament_event.10 }
+			}
+		}
+		else = {
+			# a vote is already ongoing - refuse the click, do not charge anything
+			custom_effect_tooltip = parliament_enact_reform_blocked_tt
+			log = "parliament_enact_reform: vote already ongoing, ignored click on [?v.GetTokenLocalizedKey]"
+		}
 	}

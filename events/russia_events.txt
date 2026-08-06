@@ -2785,8 +2785,8 @@ country_event = {
 		if = {
 			limit = { has_idea = high_judge_courtroom }
 			swap_ideas = {
-				remove_idea = high_judge_courtroom
-				add_idea = quasi_jury_court
+				remove_idea = aristocratic_courts
+				add_idea = quasi_jury_courts
 			}
 		}
 		if = {
@@ -2856,9 +2856,20 @@ country_event = {
 		
 	option = {
 		name = rossiya.249.a
-		swap_ideas = {
-				remove_idea = state_controlled_press
-				add_idea = censored_press
+		if = {
+			limit = { has_idea = state_controlled_press }
+			swap_ideas = { remove_idea = state_controlled_press add_idea = censored_press }
+		}
+		else_if = {
+			limit = { has_idea = censored_press }
+			swap_ideas = { remove_idea = censored_press add_idea = regulated_press }
+		}
+		else_if = {
+			limit = { has_idea = regulated_press }
+			swap_ideas = { remove_idea = regulated_press add_idea = free_press }
+		}
+		else = {
+			add_political_power = 50
 		}
 	}
 }
@@ -3173,11 +3184,9 @@ country_event = {
 	option = {
 		name = rossiya.268.a
 		custom_effect_tooltip = RUS_zemstvo_reform_effect_tt
-			custom_effect_tooltip = RUS_zemstvo_reform_effect_tt
-			add_to_variable = { RUS_zemstvo_ppg = -0.02 tooltip = political_power_gain_tooltip }
-			add_to_variable = { RUS_zemstvo_mp = 0.02 }
-			add_to_variable = { RUS_zemstvo_sf = 0.01 tooltip = stability_factor_tooltip }
-			
+		add_to_variable = { RUS_zemstvo_ppg = -0.02 tooltip = political_power_gain_tooltip }
+		add_to_variable = { RUS_zemstvo_mp = 0.02 }
+		add_to_variable = { RUS_zemstvo_sf = 0.01 tooltip = stability_factor_tooltip }
 	}
 }
 
@@ -3618,7 +3627,7 @@ country_event = {
 	
 	option = {
 		name = rossiya.250.a
-		953 = { add_dynamic_modifier = { modifier = dynmod_RUS_moscow } }
+		953 = { add_dynamic_modifier = { modifier = dynmod_RUS_major_cities } }
 	}
 }
 
@@ -3634,9 +3643,9 @@ country_event = {
 	
 	option = {
 		name = rossiya.251.a
-		195 = { add_dynamic_modifier = { modifier = dynmod_RUS_moscow days = 1800 } }
-		192 = { add_dynamic_modifier = { modifier = dynmod_RUS_moscow days = 1800 } }
-		1120 = { add_dynamic_modifier = { modifier = dynmod_RUS_moscow days = 1800 } }
+		195 = { add_dynamic_modifier = { modifier = dynmod_RUS_major_cities days = 1800 } }
+		192 = { add_dynamic_modifier = { modifier = dynmod_RUS_major_cities days = 1800 } }
+		1120 = { add_dynamic_modifier = { modifier = dynmod_RUS_major_cities days = 1800 } }
 	}
 }
 
@@ -3994,10 +4003,7 @@ country_event = {
 	
 	option = {
 		name = rossiya.276.a
-		swap_ideas = {
-				remove_idea = privileged_education
-				add_idea = open_schools
-			}
+		effect_increase_education = yes
 	}
 }
 
@@ -5283,10 +5289,6 @@ country_event = {
 	
 	option = {
 		name = rossiya.355.a
-		every_owned_state = {
-			limit = { any_state_of = { target = constant:state_groups.siberia_2 } }
-			add_dynamic_modifier = { modifier = oblastnik_tensions }
-		}
 	}
 }
 
@@ -5379,6 +5381,23 @@ country_event = {
 	}
 }
 
+#Poles Marching to Mongolia
+country_event = {
+	id = rossiya.361
+	title = rossiya.361.t
+	desc = rossiya.361.d
+	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = rossiya.361.a
+		add_stability = -0.05
+		add_political_power = -50
+		decrease_ps_by_one = yes
+	}
+}
+
 #The Trail of Poles
 country_event = {
 	id = rossiya.362
@@ -5396,20 +5415,163 @@ country_event = {
 	}
 }
 
-#Poles Marching to Mongolia
+#Creation of the Semirechensk Cossack Army (1867)
 country_event = {
-	id = rossiya.361
-	title = rossiya.361.t
-	desc = rossiya.361.d
-	
+	id = rossiya.363
+	title = rossiya.363.t
+	desc = rossiya.363.d
+	picture = GFX_report_event_russian_railway_troops
+
 	fire_only_once = yes
 	is_triggered_only = yes
-	
+
 	option = {
-		name = rossiya.361.a
-		add_stability = -0.05
-		add_political_power = -50
-		decrease_ps_by_one = yes
+		name = rossiya.363.a
+		ai_chance = { factor = 100 }
+		custom_effect_tooltip = RUS_tt_semirechensk_russians_settle
+		943 = {
+			add_manpower = 14000
+			set_temp_variable = { type_temp = global.velikorossy }
+			set_temp_variable = { percentage_temp = 0.30 }
+			pops_increase_culture = yes
+			add_dynamic_modifier = { modifier = dynmod_RUS_cossack_host }
+		}
+		custom_effect_tooltip = RUS_tt_semirechensk_russians_move
+		590 = {
+			add_manpower = -7000
+			set_temp_variable = { type_temp = global.velikorossy }
+			set_temp_variable = { percentage_temp = 0.05 }
+			pops_decrease_culture = yes
+		}
+		588 = {
+			add_manpower = -7000
+			set_temp_variable = { type_temp = global.velikorossy }
+			set_temp_variable = { percentage_temp = 0.05 }
+			pops_decrease_culture = yes
+		}
+	}
+}
+
+#Urbanisation Report (1870)
+country_event = {
+	id = rossiya.364
+	title = rossiya.364.t
+	desc = rossiya.364.d
+	picture = GFX_report_event_cities_regulations
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.364.a
+		ai_chance = { factor = 100 }
+		set_country_flag = RUS_flag_urbanisation_report_fired
+		custom_effect_tooltip = RUS_tt_urbanisation_russians_to_moscow
+		953 = {
+			add_manpower = 126000
+			set_temp_variable = { type_temp = global.velikorossy }
+			set_temp_variable = { percentage_temp = 0.05 }
+			pops_increase_culture = yes
+		}
+		custom_effect_tooltip = RUS_tt_urbanisation_russians_to_petersburg
+		195 = {
+			add_manpower = 180000
+			set_temp_variable = { type_temp = global.velikorossy }
+			set_temp_variable = { percentage_temp = 0.02 }
+			pops_increase_culture = yes
+		}
+		custom_effect_tooltip = RUS_tt_urbanisation_finnish_to_petersburg
+		195 = {
+			add_manpower = 20000
+			set_temp_variable = { type_temp = global.finnish }
+			set_temp_variable = { percentage_temp = 0.02 }
+			pops_increase_culture = yes
+		}
+		custom_effect_tooltip = RUS_tt_urbanisation_rural_exodus
+		219 = { add_manpower = -21000 }
+		205 = { add_manpower = -21000 }
+		242 = { add_manpower = -21000 }
+		253 = { add_manpower = -21000 }
+		254 = { add_manpower = -21000 }
+		223 = { add_manpower = -21000 }
+		custom_effect_tooltip = RUS_tt_urbanisation_finnish_exodus
+		146 = {
+			add_manpower = -20000
+			set_temp_variable = { type_temp = global.finnish }
+			set_temp_variable = { percentage_temp = 0.10 }
+			pops_decrease_culture = yes
+		}
+		custom_effect_tooltip = RUS_tt_urbanisation_rural_exodus_2
+		208 = { add_manpower = -20000 }
+		209 = { add_manpower = -20000 }
+		263 = { add_manpower = -20000 }
+		244 = { add_manpower = -20000 }
+		264 = { add_manpower = -20000 }
+		210 = { add_manpower = -20000 }
+		246 = { add_manpower = -20000 }
+		247 = { add_manpower = -20000 }
+		351 = { add_manpower = -20000 }
+	}
+}
+
+#The Far East under American influence
+country_event = {
+	id = rossiya.365
+	title = rossiya.365.t
+	desc = rossiya.365.d
+	picture = GFX_report_event_establishment_state_bank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.365.a
+		ai_chance = { factor = 100 }
+		565 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		574 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		562 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		560 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		1375 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		408 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		714 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		717 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		USA = {
+			if = {
+				limit = { has_idea = USA_idea_trade_far_east_2 }
+				swap_ideas = {
+					remove_idea = USA_idea_trade_far_east_2
+					add_idea = USA_idea_trade_far_east_4
+				}
+			}
+		}
+	}
+}
+
+#American influence is spreading across the Amur River
+country_event = {
+	id = rossiya.366
+	title = rossiya.366.t
+	desc = rossiya.366.d
+	picture = GFX_report_event_establishment_state_bank
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.366.a
+		ai_chance = { factor = 100 }
+		560 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		1375 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		408 = { add_dynamic_modifier = { modifier = dynmod_RUS_american_trade_dominance } }
+		USA = {
+			if = {
+				limit = { has_idea = USA_idea_trade_far_east_1 }
+				swap_ideas = {
+					remove_idea = USA_idea_trade_far_east_1
+					add_idea = USA_idea_trade_far_east_3
+				}
+			}
+		}
 	}
 }
 
@@ -7244,12 +7406,12 @@ country_event = {
 	
 	option = {
 		name = rossiya.511.a
-		add_political_power = -75
-		set_temp_variable = { eoanb_prestige_change = 3 }
+		add_political_power = -50
+		set_temp_variable = { eoanb_prestige_change = 1 }
 		eoanb_change_prestige_score = yes
 		add_tech_bonus = { 
-			bonus = 1
-			uses = 2 
+			bonus = 0.5
+			uses = 1 
 			category = mechanical_engineering_tech 
 			category = humanities_tech
 			category = biochemistry_tech
@@ -7258,12 +7420,12 @@ country_event = {
 	
 	option = {
 		name = rossiya.511.b
-		add_political_power = -50
-		set_temp_variable = { eoanb_prestige_change = 1 }
+		add_political_power = -75
+		set_temp_variable = { eoanb_prestige_change = 3 }
 		eoanb_change_prestige_score = yes
 		add_tech_bonus = { 
-			bonus = 0.5
-			uses = 1 
+			bonus = 1
+			uses = 2 
 			category = mechanical_engineering_tech 
 			category = humanities_tech
 			category = biochemistry_tech
@@ -8666,12 +8828,177 @@ country_event = {
 		}
 
 		#Rename the provinces to Czech names
-		set_province_name = { id = 13809 name = "New Prague" }
-		set_province_name = { id = 4731 name = "Czechville" }
-		set_province_name = { id = 11765 name = "Malin" }
+		hidden_effect = {
+			set_province_name = { id = 13809 name = "New Prague" }
+			set_province_name = { id = 4731 name = "Czechville" }
+			set_province_name = { id = 11765 name = "Malin" }
+		}
 
 		#Ends the mechanic
 		clr_country_flag = RUS_flag_czech_project_started
+	}
+}
+
+#Collins' Suggestion (December 1857)
+country_event = {
+	id = rossiya.585
+	title = rossiya.585.t
+	desc = rossiya.585.d
+	picture = GFX_report_event_generic_russian_diplomacy
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#We are abandoning this plan. (Historical)
+	option = {
+		name = rossiya.585.a
+		ai_chance = { factor = 100 }
+		add_political_power = 15
+		hidden_effect = { set_country_flag = RUS_flag_collins_suggestion_fired }
+	}
+
+	#We are not abandoning this plan, but it requires significant refinement.
+	option = {
+		name = rossiya.585.b
+		ai_chance = {
+			factor = 50
+			modifier = {
+				factor = 0
+				NOT = {
+					has_opinion = {
+						target = USA
+						value > 50
+					}
+				}
+			}
+		}
+		add_political_power = 20
+		hidden_effect = { set_country_flag = RUS_flag_collins_suggestion_fired }
+		country_event = { id = rossiya.586 days = 20 }
+	}
+
+	#We are ready to accept the plan as it is.
+	option = {
+		name = rossiya.585.c
+		ai_chance = { factor = 0 }
+		add_stability = -0.05
+		add_political_power = -50
+		set_country_flag = RUS_flag_american_investments_unlocked
+		hidden_effect = {
+			set_country_flag = RUS_flag_collins_suggestion_fired
+			activate_decision = RUS_decision_open_doors_american_capital
+			country_event = { id = rossiya.365 days = 2000 }
+		}
+	}
+}
+
+#The Response Project
+country_event = {
+	id = rossiya.586
+	title = rossiya.586.t
+	desc = rossiya.586.d
+	picture = GFX_report_event_generic_russian_diplomacy
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#The first compromise.
+	option = {
+		name = rossiya.586.a
+		ai_chance = { factor = 75 }
+		USA = { country_event = { id = rossiya.587 days = 7 } }
+	}
+
+	#The second, assertive one.
+	option = {
+		name = rossiya.586.b
+		ai_chance = { factor = 25 }
+		country_event = { id = rossiya.590 days = 7 }
+	}
+}
+
+#Counterproposal (USA event)
+country_event = {
+	id = rossiya.587
+	title = rossiya.587.t
+	desc = rossiya.587.d
+	picture = GFX_news_event_generic_white_house
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	#Yes, there will be a deal.
+	option = {
+		name = rossiya.587.a
+		ai_chance = {
+			factor = 75
+			modifier = {
+				factor = 0
+				NOT = {
+					has_opinion = {
+						target = RUS
+						value > 50
+					}
+				}
+			}
+		}
+		RUS = { country_event = { id = rossiya.588 days = 7 } }
+	}
+
+	#No, we will probably refuse.
+	option = {
+		name = rossiya.587.b
+		ai_chance = {
+			factor = 25
+			modifier = {
+				factor = 100
+				NOT = {
+					has_opinion = {
+						target = RUS
+						value > 50
+					}
+				}
+			}
+		}
+		RUS = { country_event = { id = rossiya.590 days = 7 } }
+	}
+}
+
+#An agreement has been reached!
+country_event = {
+	id = rossiya.588
+	title = rossiya.588.t
+	desc = rossiya.588.d
+	picture = GFX_report_event_generic_russian_diplomacy
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.588.a
+		ai_chance = { factor = 100 }
+		set_country_flag = RUS_flag_american_investments_unlocked
+		set_country_flag = RUS_flag_american_investments_agreement
+		hidden_effect = {
+			activate_decision = RUS_decision_american_investments
+			country_event = { id = rossiya.366 days = 10000 }
+		}
+	}
+}
+
+#The failure of negotiations
+country_event = {
+	id = rossiya.590
+	title = rossiya.590.t
+	desc = rossiya.590.d
+	picture = GFX_report_event_generic_russian_diplomacy
+
+	fire_only_once = yes
+	is_triggered_only = yes
+
+	option = {
+		name = rossiya.590.a
+		ai_chance = { factor = 100 }
 	}
 }
 
@@ -9183,9 +9510,9 @@ country_event = {
 	option = {
 		name = rossiya.638.a
 		add_power_balance_value = {
-				id = RUS_Balance_of_Power_Russian_Establishment
-				value = 0.05
-			}
+			id = RUS_Balance_of_Power_Russian_Establishment
+			value = 0.05
+		}
 		increase_ps_by_one = yes
 		increase_legitimacy_by_five = yes
 	}
@@ -9474,12 +9801,8 @@ country_event = {
 		#	add_idea = limited_constitution
 		#}
 		swap_ideas = {
-			remove_idea = parliamentary_suffrage
-			add_idea = property_owners_suffrage
-		}
-		swap_ideas = {
-			remove_idea = pp_underground_parties
-			add_idea = pp_limited_party_freedom
+			remove_idea = landed_voting
+			add_idea = weighted_wealth_voting
 		}
 		add_popularity = {
 			ideology = centrism
@@ -9508,12 +9831,8 @@ country_event = {
 		#	add_idea = limited_constitution
 		#}
 		swap_ideas = {
-			remove_idea = parliamentary_suffrage
-			add_idea = property_owners_suffrage
-		}
-		swap_ideas = {
-			remove_idea = pp_underground_parties
-			add_idea = pp_limited_party_freedom
+			remove_idea = landed_voting
+			add_idea = weighted_wealth_voting
 		}
 		add_popularity = {
 			ideology = centrism
@@ -10752,12 +11071,9 @@ country_event = {
 	option = {
 		name = rossiya.751.a
 		ai_chance = {
-			factor = 50
-			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
-			}
+			factor = 100
 		}
+		custom_effect_tooltip = historical_option
 		add_political_power = 15
 		set_country_flag = rus_flag_ural_cossacks_original_design
 		set_country_flag = rus_flag_ural_cossacks_forceful_solution
@@ -10766,9 +11082,12 @@ country_event = {
 	option = {
 		name = rossiya.751.b
 		ai_chance = {
-			factor = 100
+			factor = 50
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
-		custom_effect_tooltip = historical_option
 		add_political_power = -25
 		set_country_flag = rus_flag_ural_cossacks_divided_territories
 		set_country_flag = rus_flag_ural_cossacks_forceful_solution
@@ -10910,7 +11229,7 @@ country_event = {
 	id = rossiya.755
 	title = rossiya.755.t
 	desc = rossiya.755.d
-	picture = GFX_report_event_generic_negotiations
+	picture = GFX_report_event_russian_horses
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -10933,7 +11252,7 @@ country_event = {
 	id = rossiya.756
 	title = rossiya.756.t
 	desc = rossiya.756.d
-	picture = GFX_report_event_generic_burning_fields
+	picture = GFX_report_event_russian_talking_on_horse
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -10955,7 +11274,7 @@ country_event = {
 	id = rossiya.757
 	title = rossiya.757.t
 	desc = rossiya.757.d
-	picture = GFX_report_event_krenholm_manufacture
+	picture = GFX_report_event_russian_talking_on_horse
 
 	is_triggered_only = yes
 	fire_only_once = yes
@@ -10987,14 +11306,11 @@ country_event = {
 	option = {
 		name = rossiya.758.a
 		ai_chance = {
-			factor = 50
-			modifier = {
-				factor = 0
-				is_historical_focus_on = yes
-			}
+			factor = 100
 		}
+		custom_effect_tooltip = historical_option
 		add_political_power = 15
-		402 = {
+		406 = {
 			set_temp_variable = { type_temp = global.kazakh }
 			set_temp_variable = { percentage_temp = 0.006 }
 			pops_decrease_culture = yes
@@ -11008,9 +11324,12 @@ country_event = {
 	option = {
 		name = rossiya.758.b
 		ai_chance = {
-			factor = 100
+			factor = 50
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+			}
 		}
-		custom_effect_tooltip = historical_option
 		add_political_power = 40
 		set_country_flag = rus_flag_ural_cossacks_end_the_horde
 		set_country_flag = rus_flag_ural_cossacks_settlement_unlocked
@@ -11022,7 +11341,7 @@ country_event = {
 	id = rossiya.759
 	title = rossiya.759.t
 	desc = rossiya.759.d
-	picture = GFX_report_event_krenholm_manufacture
+	picture = GFX_report_event_russian_horses
 
 	is_triggered_only = yes
 	fire_only_once = yes
