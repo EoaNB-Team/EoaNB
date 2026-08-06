@@ -26,7 +26,7 @@ BAV_decision_category_economy = {
 		
 		activation = { always = no }
 
-		priority = 95
+		priority = 100
 
 		fire_only_once = yes
 
@@ -1910,13 +1910,13 @@ BAV_decision_category_military = {
 		allowed = { always = no }
 		
 		available = {
-			NOT = { has_idea = BAV_idea_unexperienced_generals }
+			NOT = { has_idea = BAV_idea_inexperienced_generals }
 			NOT = { has_idea = BAV_idea_landtag_hindrance }
 		}
 		
 		activation = { always = no }
 
-		priority = 95
+		priority = 100
 
 		fire_only_once = yes
 
@@ -2183,29 +2183,41 @@ BAV_decision_category_military = {
 			command_power > 49.99
 		}
 		custom_cost_text = eoanb_political_power_20_command_power_50
+
+		days_remove = 7
 		
-		days_re_enable = 365
-		
+		days_re_enable = 358
+
 		complete_effect = {
-			army_experience = 10
-			add_war_support = 0.02
 			add_political_power = -20
 			add_command_power = -50
-			set_temp_variable = { eoanb_prestige_change = 1 }
-			eoanb_change_prestige_score = yes
+		}
+		
+		remove_effect = {
+			army_experience = 10
+			add_war_support = 0.02
 			random_list = {
-				40 = {
+				50 = {
 					#nothing happens
 				}
-				30 = {
+				25 = {
 					random_unit_leader = {
 						gain_xp = 300
 					}
 				}
-				30 = {
+				25 = {
 					random_unit_leader = {
 						gain_xp = 150
 					}
+				}
+			}
+			hidden_effect = {
+				add_to_variable = { BAV_training_our_generals = 1 }
+				if = {
+					limit = {
+						check_variable = { var = BAV_training_our_generals value = 5 compare = greater_than_or_equals }
+					}
+					# country_event remove NS + clear variable
 				}
 			}
 		}
@@ -2856,7 +2868,7 @@ BAV_decision_category_military = {
 			add_to_variable = { BAV_army_cf = -0.01 tooltip = conscription_factor_tooltip }
 			add_to_variable = { BAV_army_egaf = 0.05 tooltip = experience_gain_army_tooltip }
 			add_to_variable = { BAV_army_aof = 0.05 tooltip = army_org_factor_tooltip }
-			add_to_variable = { BAV_army_iaf = 0.05 tooltip = army_org_factor_tooltip }
+			add_to_variable = { BAV_army_aiaf = 0.05 tooltip = army_infantry_attack_factor_tooltip }
 			add_to_variable = { BAV_army_aaaf = 0.05 tooltip = army_artillery_attack_factor_tooltip }
 			add_to_variable = { BAV_army_caf = 0.05 tooltip = attack_cavalry_factor_tooltip }
 			army_experience = 50
@@ -2949,7 +2961,12 @@ BAV_decision_category_politics = {
 		}
 
 		visible = {
-			NOT = { has_idea = full_equality }
+			NOT = {
+				OR = {
+					has_idea = limited_equality
+					has_idea = full_equality
+				}
+			}
 		}
 
 		fire_only_once = yes
@@ -2981,11 +2998,11 @@ BAV_decision_category_politics = {
 		remove_effect = {
 			if = {
 				limit = {
-					has_idea = limited_equality
+					has_idea = racial_laws
 				}
 				swap_ideas = {
-					remove_idea = limited_equality
-					add_idea = full_equality
+					remove_idea = racial_laws
+					add_idea = limited_equality
 				}
 			}
 			else_if = {
@@ -3195,7 +3212,7 @@ BAV_decision_category_politics = {
 		
 		activation = { always = no }
 
-		priority = 95
+		priority = 100
 
 		fire_only_once = yes
 
@@ -3210,11 +3227,14 @@ BAV_decision_category_politics = {
 				}
 				add_political_power = -50
 				add_stability = -0.02
+				decrease_ps_by_one = yes
 			}
 		}
 		
 		complete_effect = {
-			add_research_slot = 1
+			increase_ps_by_two = yes
+			add_stability = 0.05
+			add_war_support = 0.03
 		}
 
 		ai_will_do = {
@@ -3223,6 +3243,7 @@ BAV_decision_category_politics = {
 	}
 }
 
+#OLD STUFF THAT NEEDS ADAPTATION TO SAXONY'S TRIAS CONTENT
 BAV_decision_category_common_policy = {
 
 	#WUR
