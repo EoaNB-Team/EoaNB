@@ -4,7 +4,7 @@
 #prussia.101-500	Political and War Events
 #prussia.501-700	Economy and Trade Events
 #prussia.701-900	Military Events
-#prussia.901-999	Parliamentary Events
+#prussia.901-999	Alt-history Events (incl. Freddy III Path)
 
 ##### SUCCESSION, STARTING, ADVISOR, GENERAL INFO AND FLAVOUR EVENTS (prussia.1-200) #####
 
@@ -101,6 +101,8 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
+
+	timeout_days = 2
 	
 	option = {
 		name = prussia.4.a
@@ -109,8 +111,8 @@ country_event = {
 		add_political_power = -50
 		add_stability = -0.03
 		decrease_ps_by_one = yes
-		#swap_ideas = { remove_idea = PRS_Wilhelm_I add_idea = hos_is_leader }
-		PRS = { country_event = { days = 2 id = prussia.5 } }
+		remove_ideas = PRS_Wilhelm_I
+		country_event = { days = 1 id = prussia.5 }
 	}
 }
 
@@ -123,13 +125,15 @@ country_event = {
 	
 	fire_only_once = yes
 	is_triggered_only = yes
+
+	timeout_days = 2
 	
 	option = {
 		name = prussia.5.a
 		ai_chance = { base = 100 }
 		add_political_power = 25
 		add_stability = 0.01
-		swap_ideas = { remove_idea = PRS_Wilhelm_I add_idea = PRS_Friedrich_III }
+		add_ideas = PRS_Friedrich_III
 		if = {
 			limit = {
 				has_idea = PRS_idea_new_era
@@ -157,10 +161,11 @@ country_event = {
 					PRS = { has_completed_focus = PRS_focus_find_compromise }
 					NOT = { PRS = { has_idea = PRS_idea_constitutional_crisis } }
 				}
-				PRS = { country_event = { days = 2 id = prussia.276 } }
+				PRS = { country_event = { days = 2 id = prussia.901 } }
 			}
 			ENG = { add_opinion_modifier = { target = PRS modifier = royal_ties } }
 			add_opinion_modifier = { target = ENG modifier = royal_ties }
+			country_event = { days = 60 id = prussia.908 }
 		}
 	}
 }
@@ -3443,7 +3448,7 @@ country_event = {
 	#Rejection
 	option = {
 		name = prussia.218.a
-		ai_chance = { base = 100 }
+		ai_chance = { base = 75 }
 		hidden_effect = {
 			PRS = { country_event = { days = 6 id = prussia.219 } }
 		}
@@ -3452,7 +3457,7 @@ country_event = {
 	#Abdication
 	option = {
 		name = prussia.218.b 
-		ai_chance = { base = 0 }
+		ai_chance = { base = 25 }
 		hidden_effect = {
 			PRS = { country_event = { days = 2 id = prussia.4 } }
 		}
@@ -4835,546 +4840,6 @@ country_event = {
 				is_ai = no
 			}
 			PRS = { change_tag_from = ROOT }
-		}
-	}
-}
-
-## REIGN OF FRIEDRICH III
-
-#Friedrich III Agrees to Compromise
-country_event = {
-	id = prussia.276
-	title = prussia.276.t
-	desc = prussia.276.d
-	picture = GFX_report_event_generic_sign_treaty2
-	
-	fire_only_once = yes
-	is_triggered_only = yes
-	
-	option = {
-		name = prussia.276.a
-		ai_chance = { base = 100 }
-		add_political_power = 50
-		add_stability = 0.02
-		hidden_effect = {
-			PRS = { set_country_flag = PRS_compromise_successful }
-		}
-	}
-}
-
-#Sack Prime Minister zu Hohenlohe-Ingelfingen
-country_event = {
-	id = prussia.277
-	title = prussia.277.t
-	desc = prussia.277.d
-	picture = GFX_report_event_prussia_berliner_schloss
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	timeout_days = 5
-	
-	option = {
-		name = prussia.277.a
-		ai_chance = { base = 100 }
-		add_political_power = -50
-		PRS_friedrich_iii_young = {
-			add_country_leader_role = {
-				promote_leader = yes
-				country_leader = {
-					expire = "1889.1.1"
-					ideology = conserv
-					traits = {
-						PRS_trait_Friedrich_III
-					}
-				}
-			}
-		}
-		retire_character = PRS_adolf_zu_hohenlohe_ingelfingen
-	}
-}
-
-#Negotiate Compromise with Parliament
-country_event = {
-	id = prussia.278
-	title = prussia.278.t
-	desc = prussia.278.d
-	picture = GFX_report_event_prussian_parliament_king
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	timeout_days = 7
-	
-	option = {
-		name = prussia.278.a
-		trigger = {
-			OR = {
-				has_completed_focus = PRS_focus_adjust_draft
-				has_completed_focus = PRS_focus_expand_draft
-			}
-			NOT = { has_completed_focus = PRS_focus_promote_landwehr }
-		}
-		ai_chance = { base = 100 }
-		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
-		if = {
-			limit = {
-				has_idea = PRS_generalstab_alt_1
-			}
-			swap_ideas = {
-				remove_idea = PRS_generalstab_alt_1
-				add_idea = PRS_generalstab
-			}
-		}
-		else_if = {
-			limit = {
-				has_idea = PRS_generalstab_hist_1
-			}
-			swap_ideas = {
-				remove_idea = PRS_generalstab_hist_1
-				add_idea = PRS_generalstab_alt_1
-			}
-		}
-		add_popularity = {
-			ideology = traditional_conservatism
-			popularity = 0.15
-		}
-		hidden_effect = {
-			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
-		}
-	}
-	
-	option = {
-		name = prussia.278.b
-		trigger = {
-			OR = {
-				has_completed_focus = PRS_focus_promote_landwehr
-				has_completed_focus = PRS_focus_demote_landwehr
-			}
-			NOT = { has_completed_focus = PRS_focus_expand_draft }
-		}
-		ai_chance = { base = 100 }
-		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
-		if = {
-			limit = {
-				has_idea = PRS_landwehr_1
-			}
-			swap_ideas = {
-				remove_idea = PRS_landwehr_1
-				add_idea = PRS_landwehr
-			}
-		}
-		else_if = {
-			limit = {
-				has_idea = PRS_landwehr_2
-			}
-			swap_ideas = {
-				remove_idea = PRS_landwehr_2
-				add_idea = PRS_landwehr
-			}
-		}
-		else_if = {
-			limit = {
-				has_idea = PRS_landwehr_3
-			}
-			swap_ideas = {
-				remove_idea = PRS_landwehr_3
-				add_idea = PRS_landwehr
-			}
-		}
-		add_popularity = {
-			ideology = centrism
-			popularity = 0.05
-		}
-		hidden_effect = {
-			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
-		}
-	}
-}
-
-#A New Prime Minister
-country_event = {
-	id = prussia.279
-	title = prussia.279.t
-	desc = prussia.279.d
-	picture = GFX_report_event_four_prime_minister_candidates
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	timeout_days = 5
-	
-	option = {
-		name = prussia.279.a
-		ai_chance = { base = 25 }
-		custom_effect_tooltip = PRS_new_pm_Vincke_tt
-		set_party_name = { ideology = centrism long_name = PRS_centrism_party_vincke name = PRS_centrism_party_vincke }
-		hidden_effect = {
-			set_politics = { ruling_party = centrism }
-			PRS_georg_von_vincke = {
-				add_country_leader_role = {
-					promote_leader = yes
-					country_leader = {
-						expire = "1900.1.1"
-						desc = "PRS_GEORG_VON_VINCKE_LEADER_DESC"
-						ideology = moderatism
-						traits = {
-							#
-						}
-					}
-				}
-			}
-			PRS = { set_country_flag = PRS_new_prime_minister_flag }
-
-		}
-	}
-	
-	option = {
-		name = prussia.279.b
-		ai_chance = { base = 25 }
-		custom_effect_tooltip = PRS_new_pm_Simson_tt
-		set_party_name = { ideology = centrism long_name = PRS_centrism_party name = PRS_centrism_party }
-		hidden_effect = {
-			set_politics = { ruling_party = centrism }
-			PRS_eduard_simson = {
-				add_country_leader_role = {
-					promote_leader = yes
-					country_leader = {
-						expire = "1900.1.1"
-						desc = "PRS_EDUARD_SIMSON_LEADER_DESC"
-						ideology = conserv_liberal
-						traits = {
-							#
-						}
-					}
-				}
-			}
-			PRS = { set_country_flag = PRS_new_prime_minister_flag }
-		}
-	}
-	
-	option = {
-		name = prussia.279.c
-		ai_chance = { base = 25 }
-		custom_effect_tooltip = PRS_new_pm_Virchow_tt
-		set_party_name = { ideology = ideology_social_liberalism long_name = PRS_ideology_social_liberalism_progressive_party_long name = PRS_ideology_social_liberalism_progressive_party }
-		hidden_effect = {
-			set_politics = { ruling_party = ideology_social_liberalism }
-			PRS_rudolf_virchow = {
-			#	add_country_leader_role = {
-			#		promote_leader = yes
-			#		country_leader = {
-			#			expire = "1902.1.1"
-			#			desc = "PRS_RUDOLF_VIRCHOW_LEADER_DESC"
-			#			ideology = ideology_sub_social_liberal
-			#			traits = {
-			#				#
-			#			}
-			#		}
-			#	}
-				remove_advisor_role = {
-					slot = political_advisor
-				}
-			}
-			PRS = { set_country_flag = PRS_new_prime_minister_flag }
-			remove_ideas = PRS_advisor_rudolf_virchow
-		}
-	}
-	
-	option = {
-		name = prussia.279.e
-		ai_chance = { base = 25 }
-		custom_effect_tooltip = PRS_new_pm_Heydt_tt
-		add_popularity = {
-			ideology = traditional_conservatism
-			popularity = 0.1
-		}
-		hidden_effect = {
-			PRS_august_von_der_heydt = {
-				add_country_leader_role = {
-					promote_leader = yes
-					country_leader = {
-						expire = "1900.1.1"
-						desc = "PRS_AUGUST_VON_DER_HEYDT_LEADER_DESC"
-						ideology = conserv
-						traits = {
-							#
-						}
-					}
-				}
-				remove_advisor_role = {
-					slot = political_advisor
-				}
-			}
-			PRS = { set_country_flag = PRS_new_prime_minister_flag }
-			remove_ideas = PRS_advisor_august_von_der_heydt
-		}
-	}
-}
-
-#State Visit to the United Kingdom
-country_event = {
-	id = prussia.280
-	title = prussia.280.t
-	desc = prussia.280.d
-	picture = GFX_report_event_friedrich_III_and_victoria
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = prussia.280.a
-		ai_chance = { base = 100 }
-		add_political_power = 10
-		add_popularity = {
-			ideology = centrism
-			popularity = 0.02
-		}
-	}
-}
-
-#How to Proceed? - Enforcement of Voting Rights Expansion
-country_event = {
-	id = prussia.281
-	title = prussia.281.t
-	desc = prussia.281.d
-	picture = GFX_report_event_prussia_berliner_schloss
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = prussia.281.a
-		ai_chance = { base = 0 }
-		custom_effect_tooltip = PRS_force_change_effect_tt
-		PRS = { country_event = { id = prussia.901 } }
-	}
-	
-	option = {
-		name = prussia.281.b
-		ai_chance = { base = 100 }
-		add_political_power = -75
-		decrease_ps_by_one = yes
-		if = {
-			limit = {
-				has_idea = PRS_idea_three_class_franchise
-			}
-			remove_ideas = PRS_idea_three_class_franchise
-		}
-		PRS = {
-			if = {
-				limit = {
-					has_idea = absolutism
-				}
-
-			}
-			else_if = {
-				limit = {
-					has_idea = landed_voting 
-				}
-
-			}
-			else_if = {
-				limit = {
-
-				}
-
-			}
-		}
-		hidden_effect = {
-			clr_country_flag = PRS_liberalization_in_progress_flag
-		}
-	}
-}
-
-#How to Proceed? - Enforcement of Ministerial Responsibility
-country_event = {
-	id = prussia.282
-	title = prussia.282.t
-	desc = prussia.282.d
-	picture = GFX_report_event_prussia_berliner_schloss
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = prussia.282.a
-		ai_chance = { base = 0 }
-		custom_effect_tooltip = PRS_force_change_effect_tt
-		PRS = { country_event = { id = prussia.903 } }
-	}
-	
-	option = {
-		name = prussia.282.b
-		ai_chance = { base = 100 }
-		add_political_power = -75
-		decrease_ps_by_one = yes
-		add_stability = 0.05
-		swap_ideas = { remove_idea = PRS_idea_british_style_rule add_idea = PRS_idea_british_style_rule_2 }
-		hidden_effect = {
-			clr_country_flag = PRS_liberalization_in_progress_flag
-		}
-	}
-}
-
-#How to Proceed? - Enforcement of Constitutional Changes
-country_event = {
-	id = prussia.283
-	title = prussia.283.t
-	desc = prussia.283.d
-	picture = GFX_report_event_prussia_berliner_schloss
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = prussia.283.a
-		ai_chance = { base = 0 }
-		custom_effect_tooltip = PRS_force_change_effect_tt
-		if = {
-			limit = {
-				has_government = centrism
-			}
-			PRS = { country_event = { id = prussia.905 } }
-		}
-		else = {
-			PRS = { country_event = { id = prussia.913 } }
-		}
-	}
-	
-	option = {
-		name = prussia.283.b
-		ai_chance = { base = 100 }
-		add_political_power = -75
-		decrease_ps_by_one = yes
-		if = {
-			limit = {
-				has_government = centrism
-			}
-			if = {
-				limit = {
-					NOT = { has_idea = PRS_idea_rule_of_law }
-				}
-				add_ideas = PRS_idea_rule_of_law
-			}
-			#PRS = {
-			#	if = {
-			#		limit = {
-			#			has_idea = no_constitution
-			#		}
-			#		swap_ideas = { remove_idea = no_constitution add_idea = constitution_adopted }
-			#	}
-			#	else_if = {
-			#		limit = {
-			#			has_idea = limited_constitution
-			#		}
-			#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
-			#	}
-			#	else_if = {
-			#		limit = {
-			#			has_idea = human_rights
-			#		}
-			#		swap_ideas = { remove_idea = human_rights add_idea = constitution_adopted }
-			#	}
-			#}
-		}
-		else = {
-			if = {
-				limit = {
-					NOT = { has_idea = PRS_idea_prussian_constitutionalism }
-				}
-				add_ideas = PRS_idea_prussian_constitutionalism
-			}
-			#PRS = {
-			#	if = {
-			#		limit = {
-			#			has_idea = no_constitution
-			#		}
-			#		swap_ideas = { remove_idea = no_constitution add_idea = limited_constitution }
-			#	}
-			#	else_if = {
-			#		limit = {
-			#			has_idea = limited_constitution
-			#		}
-			#		swap_ideas = { remove_idea = limited_constitution add_idea = human_rights }
-			#	}
-			#	else_if = {
-			#		limit = {
-			#			has_idea = human_rights
-			#		}
-			#		swap_ideas = { remove_idea = human_rights add_idea = constitution_adopted }
-			#	}
-			#}
-		}
-		#PRS = {
-		#	if = {
-		#		limit = {
-		#			has_idea = absolute_monarchy
-		#		}
-		#		swap_ideas = { remove_idea = absolute_monarchy add_idea = constitutional_monarchy }
-		#	}
-		#}
-		hidden_effect = {
-			clr_country_flag = PRS_liberalization_in_progress_flag
-		}
-	}
-}
-
-#How to Proceed? - Enforcement of Freedom of Trade
-country_event = {
-	id = prussia.284
-	title = prussia.284.t
-	desc = prussia.284.d
-	picture = GFX_report_event_prussia_berliner_schloss
-	
-	is_triggered_only = yes
-	fire_only_once = yes
-	
-	option = {
-		name = prussia.284.a
-		ai_chance = { base = 0 }
-		custom_effect_tooltip = PRS_force_change_effect_tt
-		if = {
-			limit = {
-				has_government = centrism
-			}
-			PRS = { country_event = { id = prussia.909 } }
-		}
-		else = {
-			PRS = { country_event = { id = prussia.915 } }
-		}
-	}
-	
-	option = {
-		name = prussia.284.b
-		ai_chance = { base = 100 }
-		add_political_power = -75
-		decrease_ps_by_one = yes
-		if = {
-			limit = {
-				has_government = centrism
-			}
-			if = {
-				limit = {
-					has_idea = protectionism
-				}
-				swap_ideas = { remove_idea = protectionism add_idea = free_trade }
-			}
-			else_if = {
-				limit = {
-					has_idea = mercantilism
-				}
-				swap_ideas = { remove_idea = mercantilism add_idea = free_trade }
-			}
-		}
-		else_if = {
-			limit = {
-				has_idea = protectionism
-			}
-			swap_ideas = { remove_idea = protectionism add_idea = mercantilism }
-		}
-		hidden_effect = {
-			clr_country_flag = PRS_liberalization_in_progress_flag
 		}
 	}
 }
@@ -8811,1297 +8276,864 @@ country_event = {
 	}
 }
 
-##### PARLIAMENTARY EVENTS (prussia.901-999) #####
+##### ALT-HISTORY EVENTS (prussia.901-999) #####
 
-##Vote on Expanding Voting Rights
-#country_event = {
-#	id = prussia.901
-#	title = prussia.901.t
-#	desc = prussia.901.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.1
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_disagree = yes
-#		set_2_approval_disagree = yes
-#		set_3_approval_highly_agree = yes
-#		set_4_approval_highly_agree = yes
-#
-#		set_vote_cul = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.901.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.902
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.901.b
-#		ai_chance = { base = 0 }
-#		
-#		add_political_power = -50
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#		}
-#		if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Expanding Voting Rights
-#country_event = {
-#	id = prussia.902
-#	title = prussia.902.t
-#	desc = prussia.902.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.902.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.902.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.902.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.901 days = 16 } }
-#	}
-#}
-#
-##Vote on Responsible Ministers
-#country_event = {
-#	id = prussia.903
-#	title = prussia.903.t
-#	desc = prussia.903.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.2
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_disagree = yes
-#		set_2_approval_disagree = yes
-#		set_3_approval_highly_agree = yes
-#		set_4_approval_highly_agree = yes
-#
-#		set_vote_cul = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#	
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.903.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.904
-#			days = 31
-#		}
-#	}
-#	
-#	#Abandon the idea
-#	option = {
-#		name = prussia.903.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Responsible Ministers
-#country_event = {
-#	id = prussia.904
-#	title = prussia.904.t
-#	desc = prussia.904.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.904.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.904.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.904.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.903 days = 16 } }
-#	}
-#}
-#
-##Vote on Adoption of the New Constitution
-#country_event = {
-#	id = prussia.905
-#	title = prussia.905.t
-#	desc = prussia.905.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.3
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_disagree = yes
-#		set_2_approval_disagree = yes
-#		set_3_approval_highly_agree = yes
-#		set_4_approval_highly_agree = yes
-#
-#		set_vote_cul = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.905.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.906
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.905.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Adoption of the New Constitution
-#country_event = {
-#	id = prussia.906
-#	title = prussia.906.t
-#	desc = prussia.906.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.906.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.906.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.906.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.905 days = 16 } }
-#	}
-#}
-#
-##Get Parliamentary Approval for Anglo-Prussian Naval Treaty
-#country_event = {
-#	id = prussia.907
-#	title = prussia.907.t
-#	desc = prussia.907.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.4
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_disagree = yes
-#		set_2_approval_disagree = yes
-#		set_3_approval_highly_agree = yes
-#		set_4_approval_highly_agree = yes
-#
-#		set_vote_war = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.907.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.908
-#			days = 31
-#		}
-#	}
-#	
-#	#Abandon the idea
-#	option = {
-#		name = prussia.907.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Parliamentary Approval for Anglo-Prussian Naval Treaty
-#country_event = {
-#	id = prussia.908
-#	title = prussia.908.t
-#	desc = prussia.908.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.908.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.908.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.908.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.907 days = 16 } }
-#	}
-#}
-#
-##Vote on Trade and Tariffs Act - Free
-#country_event = {
-#	id = prussia.909
-#	title = prussia.909.t
-#	desc = prussia.909.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.5
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_agree = yes
-#		set_2_approval_highly_disagree = yes
-#		set_3_approval_highly_disagree = yes
-#		set_4_approval_highly_disagree = yes
-#
-#		set_vote_eco = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.909.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.910
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.909.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Trade and Tariffs Act - Free
-#country_event = {
-#	id = prussia.910
-#	title = prussia.910.t
-#	desc = prussia.910.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.910.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.910.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.910.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.909 days = 16 } }
-#	}
-#}
-#
-##Vote on Longer Legislative Terms - Quinquennial Act
-#country_event = {
-#	id = prussia.911
-#	title = prussia.911.t
-#	desc = prussia.911.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.6
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_agree = yes
-#		set_2_approval_highly_agree = yes
-#		set_3_approval_disagree = yes
-#		set_4_approval_disagree = yes
-#
-#		set_vote_cul = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.911.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.912
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.911.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Longer Legislative Terms - Quinquennial Act
-#country_event = {
-#	id = prussia.912
-#	title = prussia.912.t
-#	desc = prussia.912.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.912.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.912.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.912.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.911 days = 16 } }
-#	}
-#}
-#
-##Vote on Adoption of Prussian Constitutionalism
-#country_event = {
-#	id = prussia.913
-#	title = prussia.913.t
-#	desc = prussia.913.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.7
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_disagree = yes
-#		set_2_approval_neutral = yes
-#		set_3_approval_agree = yes
-#		set_4_approval_highly_disagree = yes
-#
-#		set_vote_cul = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.913.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.914
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.913.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Adoption of Prussian Constitutionalism
-#country_event = {
-#	id = prussia.914
-#	title = prussia.914.t
-#	desc = prussia.914.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.914.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.914.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.914.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.913 days = 16 } }
-#	}
-#}
-#
-##Vote on Trade and Tariffs Act - Open
-#country_event = {
-#	id = prussia.915
-#	title = prussia.915.t
-#	desc = prussia.915.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		set_variable = {
-#			var = current_reform_id
-#			value = 25.8
-#		}
-#
-#		reset_approval_arrays = yes
-#		set_1_approval_highly_agree = yes
-#		set_2_approval_disagree = yes
-#		set_3_approval_highly_disagree = yes
-#		set_4_approval_highly_disagree = yes
-#
-#		set_vote_eco = yes
-#		compute_voting_approval = yes
-#
-#		compute_number_seats_tot = yes
-#		compute_number_seats_approve_est = yes
-#	}
-#
-#	#Let's vote in a month
-#	option = {
-#		name = prussia.915.a
-#		ai_chance = { base = 100 }
-#		
-#		country_event = {
-#			id = prussia.916
-#			days = 31
-#		}
-#	}
-#
-#	#Abandon the idea
-#	option = {
-#		name = prussia.915.b
-#		ai_chance = { base = 0 }
-#		
-#		add_stability = -0.05
-#		if = {
-#			limit = {
-#				has_government = traditional_conservatism
-#			}
-#			add_popularity = { ideology = traditional_conservatism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else_if = {
-#			limit = {
-#				has_government = centrism
-#			}
-#			add_popularity = { ideology = centrism popularity = -0.05 }
-#			add_political_power = -50
-#		}
-#		else = {
-#			add_political_power = -100
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#}
-#
-##Results of Vote on Trade and Tariffs Act - Open
-#country_event = {
-#	id = prussia.916
-#	title = prussia.916.t
-#	desc = prussia.916.d
-#	picture = GFX_event_prussian_parliament_king
-#
-#	is_triggered_only = yes
-#
-#	immediate = {
-#		hidden_effect = {
-#			calculate_vote_result = yes
-#		}
-#	}
-#
-#	#It's a success!
-#	option = {
-#		name = prussia.916.a
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_success
-#		}
-#		clr_country_flag = eoanb_reform_vote_success
-#		enact_voted_reform = yes
-#		
-#		PRS = {
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a failure...
-#	option = {
-#		name = prussia.916.b
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_failure
-#		}
-#		clr_country_flag = eoanb_reform_vote_failure
-#
-#		PRS = {
-#			add_political_power = -50
-#			if = {
-#				limit = {
-#					has_government = traditional_conservatism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = -0.01 }
-#				add_popularity = { ideology = centrism popularity = 0.01 }
-#			}
-#			if = {
-#				limit = {
-#					has_government = centrism
-#				}
-#				add_popularity = { ideology = traditional_conservatism popularity = 0.01 }
-#				add_popularity = { ideology = centrism popularity = -0.01 }
-#			}
-#		}
-#		
-#		set_variable = {
-#			var = current_reform_id
-#			value = 0
-#		}
-#	}
-#
-#	#It's a tie...
-#	option = {
-#		name = prussia.916.c
-#		trigger = {
-#			has_country_flag = eoanb_reform_vote_tie
-#		}
-#		clr_country_flag = eoanb_reform_vote_tie
-#		
-#		add_political_power = -25
-#		PRS = { country_event = { id = prussia.915 days = 16 } }
-#	}
-#}
+## REIGN OF FRIEDRICH III
+
+#Friedrich III Agrees to Compromise
+country_event = {
+	id = prussia.901
+	title = prussia.901.t
+	desc = prussia.901.d
+	picture = GFX_report_event_generic_sign_treaty2
 	
+	fire_only_once = yes
+	is_triggered_only = yes
+	
+	option = {
+		name = prussia.901.a
+		ai_chance = { base = 100 }
+		add_political_power = 100
+		add_stability = 0.05
+		add_popularity = { ideology = centrism popularity = 0.05 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = 0.05 }
+		increase_ps_by_one = yes
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_compromise_successful }
+			country_event = { days = 60 id = prussia.908 }
+		}
+	}
+}
+
+#Sack Prime Minister zu Hohenlohe-Ingelfingen
+country_event = {
+	id = prussia.902
+	title = prussia.902.t
+	desc = prussia.902.d
+	picture = GFX_report_event_prussia_berliner_schloss
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = prussia.902.a
+		ai_chance = { base = 100 }
+		add_political_power = -50
+		PRS_friedrich_iii_young = {
+			add_country_leader_role = {
+				promote_leader = yes
+				country_leader = {
+					expire = "1889.1.1"
+					ideology = conserv
+					traits = {
+						PRS_trait_Friedrich_III
+					}
+				}
+			}
+		}
+		retire_character = PRS_adolf_zu_hohenlohe_ingelfingen
+	}
+}
+
+#Negotiate Compromise with Parliament
+country_event = {
+	id = prussia.903
+	title = prussia.903.t
+	desc = prussia.903.d
+	picture = GFX_report_event_prussian_parliament_king
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 7
+	
+	option = {
+		name = prussia.903.a
+		trigger = {
+			has_idea = PRS_generalstab_hist_1
+		}
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
+		swap_ideas = {
+			remove_idea = PRS_generalstab_hist_1
+			add_idea = PRS_generalstab_alt_1
+		}
+		add_popularity = { ideology = centrism popularity = 0.05 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = 0.05 }
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
+			country_event = { days = 2 id = prussia.904 }
+		}
+	}
+	
+	option = {
+		name = prussia.903.b
+		trigger = {
+			has_idea = PRS_landwehr_hist_1
+		}
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
+		swap_ideas = {
+			remove_idea = PRS_landwehr_hist_1
+			add_idea = PRS_landwehr
+		}
+		add_popularity = { ideology = centrism popularity = 0.05 }
+		add_popularity = { ideology = ideology_social_liberalism popularity = 0.05 }
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
+			country_event = { days = 2 id = prussia.904 }
+		}
+	}
+
+	option = {
+		name = prussia.903.c
+		trigger = {
+			has_idea = PRS_generalstab_alt_1
+		}
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
+		swap_ideas = {
+			remove_idea = PRS_generalstab_alt_1
+			add_idea = PRS_generalstab_hist_1
+		}
+		add_popularity = { ideology = traditional_conservatism popularity = 0.1 }
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
+		}
+	}
+
+	option = {
+		name = prussia.903.d
+		trigger = {
+			OR = {
+				has_idea = PRS_landwehr_alt_1
+				has_idea = PRS_landwehr_alt_2
+			}
+		}
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = PRS_compromise_negotiated_effect_tt
+		if = {
+			limit = {
+				has_idea = PRS_landwehr_alt_2
+			}
+			swap_ideas = {
+				remove_idea = PRS_landwehr_alt_2
+				add_idea = PRS_landwehr
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = PRS_landwehr_alt_1
+			}
+			swap_ideas = {
+				remove_idea = PRS_landwehr_alt_1
+				add_idea = PRS_landwehr
+			}
+		}
+		add_popularity = { ideology = traditional_conservatism popularity = 0.1 }
+		hidden_effect = {
+			PRS = { set_country_flag = PRS_compromise_negotiated_flag }
+		}
+	}
+}
+
+#The Military Opposition
+country_event = {
+	id = prussia.904
+	title = prussia.904.t
+	desc = prussia.904.d
+	picture = GFX_report_event_generic_prussian_general
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = prussia.904.a
+		ai_chance = { base = 100 }
+		add_political_power = -25
+		add_stability = -0.025
+		add_ideas = PRS_idea_military_opposition_1
+		hidden_effect = {
+			country_event = { days = 60 id = prussia.905 }
+		}
+	}
+}
+
+#The Manteuffel Crisis
+country_event = {
+	id = prussia.905
+	title = prussia.905.t
+	desc = prussia.905.d
+	picture = GFX_report_event_generic_prussian_general
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = prussia.905.a
+		ai_chance = { base = 100 }
+		add_political_power = -50
+		add_stability = -0.05
+		swap_ideas = {
+			remove_idea = PRS_idea_military_opposition_1
+			add_idea = PRS_idea_military_opposition_2
+		}
+		set_power_balance = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			left_side = PRS_BOP_Glienicke_Circle
+			right_side = PRS_BOP_Babelsberg_Circle
+			set_value = -0.1
+		}
+	}
+}
+
+#Sack Conservative Ministers and Advisors?
+country_event = {
+	id = prussia.906
+	title = prussia.906.t
+	desc = prussia.906.d
+	picture = GFX_report_event_generic_prussian_general
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#Yes
+	option = {
+		name = prussia.906.a
+		ai_chance = { base = 75 }
+		add_political_power = 50
+		add_stability = 0.025
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = -0.1
+		}
+		if = {
+			limit = {
+				PRS_carl_von_bodelschwingh = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_carl_von_bodelschwingh
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_ernst_gerlach = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_ernst_gerlach
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_friedrich_stahl = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_friedrich_stahl
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_friedrich_von_holstein = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_friedrich_von_holstein
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_friedrich_von_wrangel = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_friedrich_von_wrangel
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_heinrich_von_itzenplitz = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_heinrich_von_itzenplitz
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_moritz_bethmann_hollweg = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_moritz_bethmann_hollweg
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+		if = {
+			limit = {
+				PRS_rudolph_delbruck = {
+					is_hired_as_advisor = yes
+				}
+			}
+			deactivate_advisor = PRS_advisor_rudolph_delbruck
+			add_political_power = 75
+			add_power_balance_value = {
+				id = PRS_Balance_of_Power_Military_Opposition
+				value = -0.01
+			}
+		}
+	}
+
+	#No
+	option = {
+		name = prussia.906.b
+		ai_chance = { base = 25 }
+		add_political_power = -50
+		add_stability = -0.025
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = 0.1
+		}
+	}
+}
+
+#A New Prime Minister
+country_event = {
+	id = prussia.907
+	title = prussia.907.t
+	desc = prussia.907.d
+	picture = GFX_report_event_four_prime_minister_candidates
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	timeout_days = 5
+	
+	option = {
+		name = prussia.907.a
+		ai_chance = { base = 25 }
+		custom_effect_tooltip = PRS_new_pm_Vincke_tt
+		add_political_power = 50
+		set_party_name = { ideology = centrism long_name = PRS_centrism_party_vincke name = PRS_centrism_party_vincke }
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = -0.02
+		}
+		hidden_effect = {
+			set_politics = { ruling_party = centrism }
+			PRS_georg_von_vincke = {
+				add_country_leader_role = {
+					promote_leader = yes
+					country_leader = {
+						expire = "1900.1.1"
+						desc = "PRS_GEORG_VON_VINCKE_LEADER_DESC"
+						ideology = moderatism
+						traits = {
+							#
+						}
+					}
+				}
+			}
+			PRS = { set_country_flag = PRS_new_prime_minister_flag }
+		}
+	}
+	
+	option = {
+		name = prussia.907.b
+		ai_chance = { base = 25 }
+		custom_effect_tooltip = PRS_new_pm_Simson_tt
+		add_political_power = 50
+		set_party_name = { ideology = centrism long_name = PRS_centrism_party name = PRS_centrism_party }
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = -0.01
+		}
+		hidden_effect = {
+			set_politics = { ruling_party = centrism }
+			PRS_eduard_simson = {
+				add_country_leader_role = {
+					promote_leader = yes
+					country_leader = {
+						expire = "1900.1.1"
+						desc = "PRS_EDUARD_SIMSON_LEADER_DESC"
+						ideology = conserv_liberal
+						traits = {
+							#
+						}
+					}
+				}
+			}
+			PRS = { set_country_flag = PRS_new_prime_minister_flag }
+		}
+	}
+	
+	option = {
+		name = prussia.907.c
+		ai_chance = { base = 25 }
+		custom_effect_tooltip = PRS_new_pm_Virchow_tt
+		add_political_power = 50
+		set_party_name = { ideology = ideology_social_liberalism long_name = PRS_ideology_social_liberalism_progressive_party_long name = PRS_ideology_social_liberalism_progressive_party }
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = -0.05
+		}
+		if = {
+			limit = {
+				limit = {
+					PRS_rudolf_virchow = {
+						is_hired_as_advisor = yes
+					}
+				}
+				deactivate_advisor = PRS_advisor_rudolf_virchow
+				add_political_power = 100
+			}
+		}
+		hidden_effect = {
+			set_politics = { ruling_party = ideology_social_liberalism }
+			PRS_rudolf_virchow = {
+				remove_advisor_role = {
+					slot = political_advisor
+				}
+			}
+			PRS = { set_country_flag = PRS_new_prime_minister_flag }
+		}
+	}
+	
+	option = {
+		name = prussia.907.e
+		ai_chance = { base = 25 }
+		custom_effect_tooltip = PRS_new_pm_Heydt_tt
+		add_popularity = { ideology = traditional_conservatism popularity = 0.05 }
+		if = {
+			limit = {
+				limit = {
+					PRS_august_von_der_heydt = {
+						is_hired_as_advisor = yes
+					}
+				}
+				deactivate_advisor = PRS_advisor_august_von_der_heydt
+				add_political_power = 100
+			}
+		}
+		hidden_effect = {
+			PRS_august_von_der_heydt = {
+				add_country_leader_role = {
+					promote_leader = yes
+					country_leader = {
+						expire = "1900.1.1"
+						desc = "PRS_AUGUST_VON_DER_HEYDT_LEADER_DESC"
+						ideology = conserv
+						traits = {
+							#
+						}
+					}
+				}
+				remove_advisor_role = {
+					slot = political_advisor
+				}
+			}
+			PRS = { set_country_flag = PRS_new_prime_minister_flag }
+		}
+	}
+}
+
+#The King's Coronation
+country_event = {
+	id = prussia.908
+	title = prussia.908.t
+	desc = prussia.908.d
+	picture = GFX_report_event_friedrich_III_and_victoria
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	#Königsberg
+	option = {
+		name = prussia.908.a
+		ai_chance = { base = 75 }
+		country_event = { days = 30 id = prussia.909 }
+	}
+
+	#Berlin
+	option = {
+		name = prussia.908.b
+		ai_chance = { base = 25 }
+		country_event = { days = 30 id = prussia.910 }
+	}
+}
+
+#The King's Coronation at Königsberg
+country_event = {
+	id = prussia.909
+	title = prussia.909.t
+	desc = prussia.909.d
+	picture = GFX_report_event_friedrich_III_and_victoria
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.909.a
+		ai_chance = { base = 100 }
+		add_political_power = 50
+		add_stability = 0.05
+		increase_ps_by_one = yes
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = 0.05
+		}
+		hidden_effect = {
+			country_event = { days = 60 id = prussia.911 }
+		}
+	}
+}
+
+#The King's Coronation in Berlin
+country_event = {
+	id = prussia.910
+	title = prussia.910.t
+	desc = prussia.910.d
+	picture = GFX_report_event_friedrich_III_and_victoria
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.910.a
+		ai_chance = { base = 100 }
+		add_political_power = 100
+		add_stability = 0.02
+		increase_ps_by_one = yes
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = 0.02
+		}
+		hidden_effect = {
+			country_event = { days = 60 id = prussia.911 }
+		}
+	}
+}
+
+#A Royal Visit to the Rhineland
+country_event = {
+	id = prussia.911
+	title = prussia.911.t
+	desc = prussia.911.d
+	picture = GFX_report_event_friedrich_III_and_victoria
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.911.a
+		ai_chance = { base = 100 }
+		add_political_power = 50
+		add_stability = 0.025
+		add_power_balance_value = {
+			id = PRS_Balance_of_Power_Military_Opposition
+			value = 0.03
+		}
+	}
+}
+
+#State Visit to the United Kingdom
+country_event = {
+	id = prussia.280
+	title = prussia.280.t
+	desc = prussia.280.d
+	picture = GFX_report_event_friedrich_III_and_victoria
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.280.a
+		ai_chance = { base = 100 }
+		add_political_power = 10
+		add_popularity = {
+			ideology = centrism
+			popularity = 0.02
+		}
+	}
+}
+
+#How to Proceed? - Enforcement of Voting Rights Expansion
+country_event = {
+	id = prussia.281
+	title = prussia.281.t
+	desc = prussia.281.d
+	picture = GFX_report_event_prussia_berliner_schloss
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.281.a
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = PRS_force_change_effect_tt
+		PRS = { country_event = { id = prussia.901 } }
+	}
+	
+	option = {
+		name = prussia.281.b
+		ai_chance = { base = 100 }
+		add_political_power = -75
+		decrease_ps_by_one = yes
+		if = {
+			limit = {
+				has_idea = PRS_idea_three_class_franchise
+			}
+			remove_ideas = PRS_idea_three_class_franchise
+		}
+		PRS = {
+			if = {
+				limit = {
+					has_idea = absolutism
+				}
+
+			}
+			else_if = {
+				limit = {
+					has_idea = landed_voting 
+				}
+
+			}
+			else_if = {
+				limit = {
+
+				}
+
+			}
+		}
+		hidden_effect = {
+			clr_country_flag = PRS_liberalization_in_progress_flag
+		}
+	}
+}
+
+#How to Proceed? - Enforcement of Ministerial Responsibility
+country_event = {
+	id = prussia.282
+	title = prussia.282.t
+	desc = prussia.282.d
+	picture = GFX_report_event_prussia_berliner_schloss
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.282.a
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = PRS_force_change_effect_tt
+		PRS = { country_event = { id = prussia.903 } }
+	}
+	
+	option = {
+		name = prussia.282.b
+		ai_chance = { base = 100 }
+		add_political_power = -75
+		decrease_ps_by_one = yes
+		add_stability = 0.05
+		swap_ideas = { remove_idea = PRS_idea_british_style_rule add_idea = PRS_idea_british_style_rule_2 }
+		hidden_effect = {
+			clr_country_flag = PRS_liberalization_in_progress_flag
+		}
+	}
+}
+
+#How to Proceed? - Enforcement of Constitutional Changes
+country_event = {
+	id = prussia.283
+	title = prussia.283.t
+	desc = prussia.283.d
+	picture = GFX_report_event_prussia_berliner_schloss
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.283.a
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = PRS_force_change_effect_tt
+		if = {
+			limit = {
+				has_government = centrism
+			}
+			PRS = { country_event = { id = prussia.905 } }
+		}
+		else = {
+			PRS = { country_event = { id = prussia.913 } }
+		}
+	}
+	
+	option = {
+		name = prussia.283.b
+		ai_chance = { base = 100 }
+		add_political_power = -75
+		decrease_ps_by_one = yes
+		if = {
+			limit = {
+				has_government = centrism
+			}
+			if = {
+				limit = {
+					NOT = { has_idea = PRS_idea_rule_of_law }
+				}
+				add_ideas = PRS_idea_rule_of_law
+			}
+			#PRS = {
+			#	if = {
+			#		limit = {
+			#			has_idea = no_constitution
+			#		}
+			#		swap_ideas = { remove_idea = no_constitution add_idea = constitution_adopted }
+			#	}
+			#	else_if = {
+			#		limit = {
+			#			has_idea = limited_constitution
+			#		}
+			#		swap_ideas = { remove_idea = limited_constitution add_idea = constitution_adopted }
+			#	}
+			#	else_if = {
+			#		limit = {
+			#			has_idea = human_rights
+			#		}
+			#		swap_ideas = { remove_idea = human_rights add_idea = constitution_adopted }
+			#	}
+			#}
+		}
+		else = {
+			if = {
+				limit = {
+					NOT = { has_idea = PRS_idea_prussian_constitutionalism }
+				}
+				add_ideas = PRS_idea_prussian_constitutionalism
+			}
+			#PRS = {
+			#	if = {
+			#		limit = {
+			#			has_idea = no_constitution
+			#		}
+			#		swap_ideas = { remove_idea = no_constitution add_idea = limited_constitution }
+			#	}
+			#	else_if = {
+			#		limit = {
+			#			has_idea = limited_constitution
+			#		}
+			#		swap_ideas = { remove_idea = limited_constitution add_idea = human_rights }
+			#	}
+			#	else_if = {
+			#		limit = {
+			#			has_idea = human_rights
+			#		}
+			#		swap_ideas = { remove_idea = human_rights add_idea = constitution_adopted }
+			#	}
+			#}
+		}
+		#PRS = {
+		#	if = {
+		#		limit = {
+		#			has_idea = absolute_monarchy
+		#		}
+		#		swap_ideas = { remove_idea = absolute_monarchy add_idea = constitutional_monarchy }
+		#	}
+		#}
+		hidden_effect = {
+			clr_country_flag = PRS_liberalization_in_progress_flag
+		}
+	}
+}
+
+#How to Proceed? - Enforcement of Freedom of Trade
+country_event = {
+	id = prussia.284
+	title = prussia.284.t
+	desc = prussia.284.d
+	picture = GFX_report_event_prussia_berliner_schloss
+	
+	is_triggered_only = yes
+	fire_only_once = yes
+	
+	option = {
+		name = prussia.284.a
+		ai_chance = { base = 0 }
+		custom_effect_tooltip = PRS_force_change_effect_tt
+		if = {
+			limit = {
+				has_government = centrism
+			}
+			PRS = { country_event = { id = prussia.909 } }
+		}
+		else = {
+			PRS = { country_event = { id = prussia.915 } }
+		}
+	}
+	
+	option = {
+		name = prussia.284.b
+		ai_chance = { base = 100 }
+		add_political_power = -75
+		decrease_ps_by_one = yes
+		if = {
+			limit = {
+				has_government = centrism
+			}
+			if = {
+				limit = {
+					has_idea = protectionism
+				}
+				swap_ideas = { remove_idea = protectionism add_idea = free_trade }
+			}
+			else_if = {
+				limit = {
+					has_idea = mercantilism
+				}
+				swap_ideas = { remove_idea = mercantilism add_idea = free_trade }
+			}
+		}
+		else_if = {
+			limit = {
+				has_idea = protectionism
+			}
+			swap_ideas = { remove_idea = protectionism add_idea = mercantilism }
+		}
+		hidden_effect = {
+			clr_country_flag = PRS_liberalization_in_progress_flag
+		}
+	}
+}
