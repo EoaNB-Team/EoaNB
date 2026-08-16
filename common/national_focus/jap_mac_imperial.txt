@@ -8,13 +8,16 @@ focus_tree = {
 		}
 	}
 	default = no
+	continuous_focus_position = {
+		x = 10
+		y = 3000
+	}
 
-continuous_focus_position = { x = 400 y = 1250 }
 	### INDUSTRIAL BRANCH ###
 	focus = {
 		id = JAP_formalize_plans
 		icon = GFX_Focus_Law_economic
-		x = 42
+		x = 27
 		y = 0
 		cost = 70
 
@@ -122,8 +125,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			}
         }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = { country_event = japindustrialrevolution.18 }
@@ -141,8 +142,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_POLITICAL }
 
@@ -206,8 +205,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_POLITICAL }
 
 		completion_reward = { country_event = japindustrialrevolution.21 }
@@ -225,8 +222,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_POLITICAL }
 
@@ -249,11 +244,64 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_POLITICAL }
 
-		completion_reward = { }
+		completion_reward = {
+			if = {
+				limit = {
+					has_idea = taxation_level_1
+				}
+				swap_ideas = { remove_idea = taxation_level_1 add_idea = taxation_level_4 }
+			}
+			else_if = {
+				limit = {
+					has_idea = taxation_level_2
+				}
+				swap_ideas = { remove_idea = taxation_level_2 add_idea = taxation_level_4 }
+			}
+			else_if = {
+				limit = {
+					has_idea = taxation_level_3
+				}
+				swap_ideas = { remove_idea = taxation_level_3 add_idea = taxation_level_4 }
+			}
+			else_if = {
+				limit = {
+					has_idea = taxation_level_5
+				}
+				swap_ideas = { remove_idea = taxation_level_5 add_idea = taxation_level_4 }
+			}
+			else = {
+				add_political_power = 50
+			}
+			if = {
+				limit = {
+					has_idea = serfdom
+				}
+				swap_ideas = { remove_idea = serfdom add_idea = farmer_owned_land }
+			}
+			else_if = {
+				limit = {
+					has_idea = tenant_farmers
+				}
+				swap_ideas = { remove_idea = tenant_farmers add_idea = farmer_owned_land }
+			}
+			else_if = {
+				limit = {
+					has_idea = capitalist_agriculture
+				}
+				swap_ideas = { remove_idea = capitalist_agriculture add_idea = farmer_owned_land }
+			}
+			else_if = {
+				limit = {
+					has_idea = state_owned_farmland
+				}
+				swap_ideas = { remove_idea = state_owned_farmland add_idea = farmer_owned_land }
+			}
+			else = {
+				add_political_power = 50
+			}
+		}
 	}
 
 	focus = {
@@ -270,20 +318,33 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_POLITICAL }
 
-
-
 		completion_reward = {
+			add_to_variable = { JAP_political_power_gain_modifier = -1.5  }
+			add_to_variable = { JAP_consumer_goods_factor_modifier = 0.05 }
+			add_to_variable = { JAP_min_export_modifier = -0.08 }
+			add_to_variable = { JAP_local_resources_factor_modifier = 0.1 }
+			add_to_variable = { JAP_production_speed_industrial_complex_factor_modifier = 0.2 }
+			add_to_variable = { JAP_industrial_capacity_factory_modifier = 0.15 }
+			add_to_variable = { JAP_production_speed_arms_factory_factor_modifier = 0.2 }
+			add_to_variable = { JAP_production_speed_dockyard_factor_modifier = 0.1 }
+			add_to_variable = { JAP_production_speed_naval_base_factor_modifier = 0.1 }
+			add_to_variable = { JAP_industrial_capacity_dockyard_modifier = 0.15 }
+			add_to_variable = { JAP_production_speed_infrastructure_factor_modifier = 0.15 }
+			add_to_variable = { JAP_production_speed_buildings_factor_modifier = 0.05 }
+			add_to_variable = { JAP_production_speed_rail_way_factor_modifier = 0.02 }
 			custom_effect_tooltip = JAP_focus_industrial_revolution_effect_tt
-			add_ideas = JAP_industrial_revolution_part1
-			add_ideas = JAP_industrial_revolution_part2
-			add_ideas = JAP_industrial_revolution_part3
-			add_ideas = JAP_industrial_revolution_part4
+			custom_effect_tooltip = tooltip_white_line
 			custom_effect_tooltip = JAP_unlocks_decision_category_industrialization_tt
 			hidden_effect = {
+				add_dynamic_modifier = {
+					modifier = JAP_industrial_revolution_fake
+				}
+				add_dynamic_modifier = {
+					modifier = JAP_industrial_revolution
+				}
+				add_ideas = JAP_industrial_revolution_part_hidden
 				if = {
 					limit = {
 						JAP = {
@@ -410,9 +471,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 
 		ai_will_do = { factor = 100 }
 
-        available = { has_idea = JAP_industrial_revolution_part1 }
-
-        
+        available = { has_active_mission = JAP_industrialization_mission }
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -422,11 +481,12 @@ continuous_focus_position = { x = 400 y = 1250 }
 				uses = 1
 				category = humanities_tech
 			}
+			add_political_power = -25
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
 			}
-			add_political_power = -25
 		}
 	}
 
@@ -443,12 +503,18 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part1 add_idea = JAP_industrial_revolution_part1_2 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -469,8 +535,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
@@ -479,6 +543,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				uses = 1
 				category = mechanical_engineering_tech
 			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 240
@@ -499,8 +564,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_HISTORICAL }
 
@@ -523,9 +586,9 @@ continuous_focus_position = { x = 400 y = 1250 }
 				}
 				swap_ideas = { remove_idea = mercantilism add_idea = free_trade }
 			}
-		add_days_mission_timeout = {
-			mission = JAP_industrialization_mission
-			days = 210
+			add_days_mission_timeout = {
+				mission = JAP_industrialization_mission
+				days = 210
 			}
 		}
 	}
@@ -543,8 +606,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 90 }
 
         available = { has_active_mission = JAP_industrialization_mission }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_ALTHISTORY }
 
@@ -591,13 +652,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_HISTORICAL }
 
 		completion_reward = {
 			add_ideas = JAP_privately_owned_idea
-
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -619,13 +678,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_ALTHISTORY }
 
 		completion_reward = {
 			add_ideas = JAP_imperial_owned_idea
-
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -646,37 +703,35 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			#if = {
-			#	limit = {
-			#		has_idea = unlimited_work_day
-			#	}
-			#	swap_ideas = { remove_idea = unlimited_work_day add_idea = fourteen_hour_work_day }
-			#}
-			#else_if = {
-			#	limit = {
-			#		has_idea = fourteen_hour_work_day
-			#	}
-			#	swap_ideas = { remove_idea = fourteen_hour_work_day add_idea = twelve_hour_work_day }
-			#}
-			#else_if = {
-			#	limit = {
-			#		has_idea = twelve_hour_work_day
-			#	}
-			#	swap_ideas = { remove_idea = twelve_hour_work_day add_idea = ten_hour_work_day }
-			#}
-			#else_if = {
-			#	limit = {
-			#		has_idea = ten_hour_work_day
-			#	}
-			#	swap_ideas = { remove_idea = ten_hour_work_day add_idea = eight_hour_work_day }
-			#}
 			add_political_power = -25
 			add_stability = -0.1
+			if = {
+				limit = {
+					has_idea = no_limit
+				}
+				swap_ideas = { remove_idea = no_limit add_idea = hours_14 }
+			}
+			else_if = {
+				limit = {
+					has_idea = hours_14
+				}
+				swap_ideas = { remove_idea = hours_14 add_idea = hours_12 }
+			}
+			else_if = {
+				limit = {
+					has_idea = hours_12
+				}
+				swap_ideas = { remove_idea = hours_12 add_idea = hours_10 }
+			}
+			else_if = {
+				limit = {
+					has_idea = hours_10
+				}
+				swap_ideas = { remove_idea = hours_10 add_idea = hours_8 }
+			}
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -697,12 +752,18 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part1_2 add_idea = JAP_industrial_revolution_part1_3 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_factory_modifier = 0.05
+				tooltip = industrial_capacity_factory_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -722,8 +783,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 90 }
 
         available = { has_completed_focus = JAP_creation_of_the_ministry_of_public_works }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -770,12 +829,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_railroads_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -796,12 +854,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_mines_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -822,12 +879,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_telecommunication_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -848,12 +904,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_shipyards_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -874,12 +929,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_steel_and_iron_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -900,12 +954,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_manufacturing_department_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 120
@@ -932,8 +985,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			hidden_trigger = { always = no }
         }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
@@ -958,10 +1009,8 @@ continuous_focus_position = { x = 400 y = 1250 }
         available = {
 			has_active_mission = JAP_industrialization_mission
 			has_tech = electrical_engineering
-			has_completed_focus = JAP_tokyo_civilian_industry
+			#has_completed_focus = JAP_tokyo_civilian_industry
         }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH }
 
@@ -971,6 +1020,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				uses = 2
 				category = electronics_devices_tech
 			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -991,8 +1041,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -1001,6 +1049,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				uses = 1
 				category = electronics_devices_tech
 			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission
 				days = 210
@@ -1024,17 +1073,19 @@ continuous_focus_position = { x = 400 y = 1250 }
 			has_tech = mining_rig_2
         }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part1_4 add_idea = JAP_industrial_revolution_part1_5 }
-			activate_mission_tooltip = JAP_coal_mine_mission
-			add_days_mission_timeout = {
-				mission = JAP_industrialization_mission
-				days = 210
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
 			}
+			add_to_variable = {
+				JAP_local_resources_factor_modifier = 0.02
+				tooltip = local_resources_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
+			activate_mission_tooltip = JAP_coal_mine_mission
 			hidden_effect = { activate_mission = JAP_coal_mine_mission }
 		}
 	}
@@ -1052,20 +1103,21 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = {
 			has_active_mission = JAP_industrialization_mission
-			has_completed_focus = JAP_nagasaki_coal_mine
         }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part1_5 add_idea = JAP_industrial_revolution_part1_6 }
-			activate_mission_tooltip = JAP_steel_mill_mission
-			add_days_mission_timeout = {
-				mission = JAP_industrialization_mission
-				days = 210
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
 			}
+			add_to_variable = {
+				JAP_local_resources_factor_modifier = 0.02
+				tooltip = local_resources_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
+			activate_mission_tooltip = JAP_steel_mill_mission
 			hidden_effect = { activate_mission = JAP_steel_mill_mission }
 		}
 	}
@@ -1082,8 +1134,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -1108,8 +1158,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -1136,12 +1184,18 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part1_3 add_idea = JAP_industrial_revolution_part1_4 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_production_speed_industrial_complex_factor_modifier = 0.05
+				tooltip = production_speed_industrial_complex_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_tech_bonus = {
 				bonus = 0.5
 				uses = 1
@@ -1181,6 +1235,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 					NOT = { has_idea = failed_civ }
 				}
 				add_stability = 0.05
+				increase_slider_research_spending = yes
 				custom_effect_tooltip = end_industrial_revolution_1
 			}
 			else = { }
@@ -1198,23 +1253,17 @@ continuous_focus_position = { x = 400 y = 1250 }
 
 		ai_will_do = { factor = 100 }
 
-        available = { has_idea = JAP_industrial_revolution_part2 }
-
-        
+        available = { has_active_mission = JAP_industrialization_mission2 }
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			increase_slider_army = yes
-			# activate_mission_tooltip = JAP_industrialization_mission2
+			add_political_power = -25
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 120
 			}
-			add_political_power = -25
-			# hidden_effect = {
-			# 	activate_mission = JAP_industrialization_mission2
-			# }
 		}
 	}
 
@@ -1231,12 +1280,22 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part2 add_idea = JAP_industrial_revolution_part2_2 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_factory_modifier = 0.03
+				tooltip = industrial_capacity_factory_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1257,15 +1316,24 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = {
 			has_active_mission = JAP_industrialization_mission2
-			has_completed_focus = JAP_expand_arms_production
         }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part2_2 add_idea = JAP_industrial_revolution_part2_3 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_factory_modifier = 0.03
+				tooltip = industrial_capacity_factory_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1286,8 +1354,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -1295,6 +1361,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				idea = JAP_industrial_revolution_arsenal_1
 				days = 75
 			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1318,13 +1385,12 @@ continuous_focus_position = { x = 400 y = 1250 }
 			has_tech = machine_tools_1
         }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			activate_mission_tooltip = JAP_kagoshima_machinefactory_mission
 			hidden_effect = { activate_mission = JAP_kagoshima_machinefactory_mission }
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1345,8 +1411,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -1354,6 +1418,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				idea = JAP_industrial_revolution_arsenal_2
 				days = 75
 			}
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1377,13 +1442,12 @@ continuous_focus_position = { x = 400 y = 1250 }
 			has_tech = machine_tools_1
         }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			activate_mission_tooltip = JAP_kokura_machinefactory_mission
 			hidden_effect = { activate_mission = JAP_kokura_machinefactory_mission }
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1405,12 +1469,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			country_event = japindustrialrevolution.1
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 90
@@ -1431,13 +1494,12 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			activate_mission_tooltip = JAP_kure_arms_mission
 			hidden_effect = { activate_mission = JAP_kure_arms_mission }
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1458,13 +1520,12 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
 			activate_mission_tooltip = JAP_muroran_arms_mission
-				hidden_effect = { activate_mission = JAP_muroran_arms_mission }
+			hidden_effect = { activate_mission = JAP_muroran_arms_mission }
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1502,10 +1563,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			reverse_add_opinion_modifier = { target = ENG modifier = eoanb_om_RUS_increase_small }
 			add_opinion_modifier = { target = FRA modifier = eoanb_om_RUS_decrease_small }
 			reverse_add_opinion_modifier = { target = FRA modifier = eoanb_om_RUS_decrease_small }
-			add_days_mission_timeout = {
-				mission = JAP_industrialization_mission2
-				days = 210
-			}
 		}
 	}
 
@@ -1539,10 +1596,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			reverse_add_opinion_modifier = { target = FRA modifier = eoanb_om_RUS_increase_small}
 			add_opinion_modifier = { target = ENG modifier = eoanb_om_RUS_decrease_small}
 			reverse_add_opinion_modifier = { target = ENG modifier = eoanb_om_RUS_decrease_small }
-			add_days_mission_timeout = {
-				mission = JAP_industrialization_mission2
-				days = 210
-			}
 		}
 	}
 
@@ -1559,8 +1612,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission2 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -1574,6 +1625,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 				add_extra_state_shared_building_slots = 1
 			}
 			random_owned_controlled_state = { add_extra_state_shared_building_slots = 1 }
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission2
 				days = 210
@@ -1632,23 +1684,38 @@ continuous_focus_position = { x = 400 y = 1250 }
 
 		ai_will_do = { factor = 100 }
 
-        available = { has_idea = JAP_industrial_revolution_part3 }
-
-        
+        available = { has_active_mission = JAP_industrialization_mission3 }
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3 add_idea = JAP_industrial_revolution_part3_2 }
-			# activate_mission_tooltip = JAP_industrialization_mission3
-			# hidden_effect = {
-			# 	activate_mission = JAP_industrialization_mission3
-			# }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			add_to_variable = {
+				JAP_production_speed_naval_base_factor_modifier = 0.05
+				tooltip = production_speed_naval_base_factor_tooltip
+			}
+			add_to_variable = {
+				production_speed_dockyard_factor = 0.05
+				tooltip = production_speed_dockyard_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
+			add_political_power = -25
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
 				days = 120
 			}
-			add_political_power = -25
 		}
 	}
 
@@ -1665,13 +1732,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_2 add_idea = JAP_industrial_revolution_part3_3 }
 			activate_mission_tooltip = JAP_seasbo_naval_base_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_seasbo_naval_base_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1694,13 +1771,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_3 add_idea = JAP_industrial_revolution_part3_4 }
 			activate_mission_tooltip = JAP_yokohama_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_yokohama_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1722,13 +1809,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_4 add_idea = JAP_industrial_revolution_part3_5 }
 			activate_mission_tooltip = JAP_ishikawajima_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_ishikawajima_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1751,13 +1848,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_5 add_idea = JAP_industrial_revolution_part3_6 }
 			activate_mission_tooltip = JAP_kure_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_kure_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1779,13 +1886,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_6 add_idea = JAP_industrial_revolution_part3_7 }
 			activate_mission_tooltip = JAP_yokosuka_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_yokosuka_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1808,13 +1925,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_7 add_idea = JAP_industrial_revolution_part3_8 }
 			activate_mission_tooltip = JAP_kobe_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_kobe_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1836,13 +1963,23 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part3_8 add_idea = JAP_industrial_revolution_part3_9 }
 			activate_mission_tooltip = JAP_maizuru_shipyard_mission
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_industrial_capacity_dockyard_modifier = 0.02
+				tooltip = industrial_capacity_dockyard_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			hidden_effect = { activate_mission = JAP_maizuru_shipyard_mission }
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission3
@@ -1874,7 +2011,19 @@ continuous_focus_position = { x = 400 y = 1250 }
 				limit = {
 					NOT = { has_idea = failed_navy }
 				}
-				swap_ideas = { remove_idea = JAP_industrial_revolution_part3_9 add_idea = JAP_industrial_revolution_part3_10 }
+				custom_effect_tooltip = {
+					localization_key = JAP_modify_by
+					DYNMOD = JAP_industrial_revolution
+				}
+				add_to_variable = {
+					JAP_political_power_gain_modifier = -0.05
+					tooltip = political_power_gain_tooltip
+				}
+				add_to_variable = {
+					JAP_industrial_capacity_dockyard_modifier = 0.02
+					tooltip = industrial_capacity_dockyard_tooltip
+				}
+				custom_effect_tooltip = tooltip_white_line
 				activate_mission_tooltip = JAP_nagasaki_shipyard_mission
 				hidden_effect = { activate_mission = JAP_nagasaki_shipyard_mission }
 				custom_effect_tooltip = end_industrial_revolution_3
@@ -1895,8 +2044,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
@@ -1922,8 +2069,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
@@ -1947,8 +2092,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
@@ -1974,8 +2117,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission3 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_NAVY }
 
 		completion_reward = {
@@ -1998,19 +2139,18 @@ continuous_focus_position = { x = 400 y = 1250 }
 
 		ai_will_do = { factor = 100 }
 
-        available = { has_idea = JAP_industrial_revolution_part4 }
-
-        
+        available = { has_active_mission = JAP_industrialization_mission4 }
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_unlocks_decision_category_british_trains_tt
+			add_political_power = -25
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission4
 				days = 210
 			}
-			add_political_power = -25
 		}
 	}
 
@@ -2027,13 +2167,22 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part4 add_idea = JAP_industrial_revolution_part4_2 }
-
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_political_power_gain_modifier = -0.05
+				tooltip = political_power_gain_tooltip
+			}
+			add_to_variable = {
+				JAP_production_speed_infrastructure_factor_modifier = 0.05
+				tooltip = production_speed_infrastructure_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			activate_mission_tooltip = JAP_mission_tokyo_yokohama_rail
 			hidden_effect = { activate_mission = JAP_mission_tokyo_yokohama_rail }
 		}
@@ -2050,8 +2199,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2073,8 +2220,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2098,12 +2243,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_unlocks_decision_category_sanyo_company_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission4
 				days = 90
@@ -2124,8 +2268,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_DIPLOMACY }
 
 		completion_reward = { country_event = japindustrialrevolution.24 }
@@ -2143,8 +2285,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2167,8 +2307,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
@@ -2189,8 +2327,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2213,12 +2349,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_unlocks_decision_category_mito_company_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission4
 				days = 90
@@ -2239,12 +2374,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_unlocks_decision_category_hokkaido_company_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission4
 				days = 90
@@ -2266,12 +2400,18 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = JAP_industrial_revolution_part4_10 add_idea = JAP_industrial_revolution_part4_11 }
+			custom_effect_tooltip = {
+				localization_key = JAP_modify_by
+				DYNMOD = JAP_industrial_revolution
+			}
+			add_to_variable = {
+				JAP_production_speed_infrastructure_factor_modifier = 0.02
+				tooltip = production_speed_infrastructure_factor_tooltip
+			}
+			custom_effect_tooltip = tooltip_white_line
 			add_stability = 0.1
 		}
 	}
@@ -2288,8 +2428,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2311,8 +2449,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2336,12 +2472,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
 			custom_effect_tooltip = JAP_unlocks_decision_category_kyushu_company_tt
+			custom_effect_tooltip = tooltip_white_line
 			add_days_mission_timeout = {
 				mission = JAP_industrialization_mission4
 				days = 90
@@ -2362,8 +2497,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_DIPLOMACY }
 
 		completion_reward = { country_event = japindustrialrevolution.23 }
@@ -2381,8 +2514,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2405,8 +2536,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2453,8 +2582,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
 
-        
-
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
 		completion_reward = {
@@ -2499,8 +2626,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { has_active_mission = JAP_industrialization_mission4 }
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY }
 
@@ -2557,254 +2682,150 @@ continuous_focus_position = { x = 400 y = 1250 }
 			custom_trigger_tooltip = {
 				tooltip = end_revolution
 				NOT = {
-					has_idea = JAP_industrial_revolution_part4
-					has_idea = JAP_industrial_revolution_part4_2
-					has_idea = JAP_industrial_revolution_part4_3
-					has_idea = JAP_industrial_revolution_part4_4
-					has_idea = JAP_industrial_revolution_part4_5
-					has_idea = JAP_industrial_revolution_part4_6
-					has_idea = JAP_industrial_revolution_part4_7
-					has_idea = JAP_industrial_revolution_part4_8
-					has_idea = JAP_industrial_revolution_part4_9
-					has_idea = JAP_industrial_revolution_part4_10
-					has_idea = JAP_industrial_revolution_part4_11
+					has_active_mission = JAP_coal_mine_mission
+					has_active_mission = JAP_steel_mill_mission
+					has_active_mission = JAP_kagoshima_machinefactory_mission
+					has_active_mission = JAP_kokura_machinefactory_mission
+					has_active_mission = JAP_seasbo_naval_base_mission
+					has_active_mission = JAP_yokohama_shipyard_mission
+					has_active_mission = JAP_ishikawajima_shipyard_mission
+					has_active_mission = JAP_kure_shipyard_mission
+					has_active_mission = JAP_yokosuka_shipyard_mission
+					has_active_mission = JAP_kobe_shipyard_mission
+					has_active_mission = JAP_maizuru_shipyard_mission
+					has_active_mission = JAP_nagasaki_shipyard_mission
+					has_active_mission = JAP_kure_arms_mission
+					has_active_mission = JAP_muroran_arms_mission
+					has_active_mission = JAP_mission_tokyo_yokohama_rail
+					has_active_mission = JAP_mission_tokaido_rail
+					has_active_mission = JAP_mission_hokurika_rail
+					has_active_mission = JAP_mission_sanyo_rail
+					has_active_mission = JAP_mission_osaka_kobe_rail
+					has_active_mission = JAP_mission_hokkaido_rail
+					has_active_mission = JAP_mission_iyotetsu_rail
+					has_active_mission = JAP_mission_kansai_rail
+					has_active_mission = JAP_mission_kyushu_rail
 				}
 			}
 		}
-
-        
 
 		search_filters = { FOCUS_FILTER_INDUSTRY FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
-			swap_ideas = { remove_idea = industrializing add_idea = industrialized }
-			add_timed_idea = {
-				idea = JAP_well_oiled_economy_base
-				days = 730
-				}
-				set_variable = {
+			custom_effect_tooltip = JAP_ir_civ_tt
+			effect_tooltip = { swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_fake } }
+			custom_effect_tooltip = JAP_ir_mil_tt
+			effect_tooltip = { swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_fake } }
+			custom_effect_tooltip = JAP_ir_navy_tt
+			effect_tooltip = { swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_fake } }
+			custom_effect_tooltip = JAP_ir_rail_tt
+			effect_tooltip = { swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_fake } }
+			custom_effect_tooltip = JAP_end_of_the_industrial_revolution_final_tt
+
+			set_variable = { var = JAP_industry_check value = 0 }
+
+			# Count completed industrial development areas
+			if = {
+				limit = { has_country_flag = civ }
+				add_to_variable = {
 					var = JAP_industry_check
-					value = 0
-				}
-				if = {
-					limit = {
-						JAP = {
-							has_country_flag = civ
-							has_country_flag = mil
-							has_country_flag = navy
-							has_country_flag = rail
-						}
-					}
-					swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_4 }
-				}
-				else_if = {
-					limit = {
-						JAP = {
-							NOT = {
-								OR = {
-									has_country_flag = civ
-									has_country_flag = mil
-									has_country_flag = navy
-									has_country_flag = rail
-								}
-							}
-						}
-					}
-					#do nothing
-				}
-				else = {
-					# limit = { #im an idiot
-					# 	OR = {
-					# 		has_country_flag = civ
-					# 		has_country_flag = mil
-					# 		has_country_flag = navy
-					# 		has_country_flag = rail
-					# 	}
-					# }
-					if = {
-						limit = { has_country_flag = civ }
-						add_to_variable = {
-							var = JAP_industry_check
-							value = 1
-						}
-					}
-					if = {
-						limit = { has_country_flag = mil }
-						add_to_variable = {
-							var = JAP_industry_check
-							value = 1
-						}
-					}
-					if = {
-						limit = { has_country_flag = navy }
-						add_to_variable = {
-							var = JAP_industry_check
-							value = 1
-						}
-					}
-					if = {
-						limit = { has_country_flag = rail }
-						add_to_variable = {
-							var = JAP_industry_check
-							value = 1
-						}
-					}
-					if = {
-						limit = {
-							check_variable = {
-								var = JAP_industry_check
-								value = 3
-							}
-						}
-						swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_3 }
-					}
-					else_if = {
-						limit = {
-							check_variable = {
-								var = JAP_industry_check
-								value = 2
-							}
-						}
-						swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_2 }
-					}
-					else = {
-						swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
-					}
-					clear_variable = JAP_industry_check
-					clear_variable = JAP_civ_recalibration_ramp_major
-					clear_variable = JAP_mil_recalibration_ramp_major
-					clear_variable = JAP_navy_recalibration_ramp_major
-					clear_variable = JAP_rail_recalibration_ramp_major
-					clear_variable = JAP_civ_recalibration_ramp_medium
-					clear_variable = JAP_mil_recalibration_ramp_medium
-					clear_variable = JAP_navy_recalibration_ramp_medium
-					clear_variable = JAP_rail_recalibration_ramp_medium
-					clear_variable = JAP_civ_recalibration_ramp_minor
-					clear_variable = JAP_mil_recalibration_ramp_minor
-					clear_variable = JAP_navy_recalibration_ramp_minor
-					clear_variable = JAP_rail_recalibration_ramp_minor
-					clear_variable = JAP_recalibration_ramp_combined
-				}
-				# if = {
-				# 	limit = {
-				# 		has_country_flag = civ
-				# 		has_idea = JAP_well_oiled_economy_base
-				# 	}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_1
-				# 			has_country_flag = civ
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_1 add_idea = JAP_well_oiled_economy_2 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_2
-				# 			has_country_flag = civ
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_2 add_idea = JAP_well_oiled_economy_3 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_3
-				# 			has_country_flag = civ
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_3 add_idea = JAP_well_oiled_economy_4 }
-				# 	}
-				# if = {
-				# 	limit = {
-				# 		has_country_flag = mil
-				# 		has_idea = JAP_well_oiled_economy_base
-				# 	}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_1
-				# 			has_country_flag = mil
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_1 add_idea = JAP_well_oiled_economy_2 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_2
-				# 			has_country_flag = mil
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_2 add_idea = JAP_well_oiled_economy_3 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_3
-				# 			has_country_flag = mil
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_3 add_idea = JAP_well_oiled_economy_4 }
-				# 	}
-				# if = {
-				# 	limit = {
-				# 		has_country_flag = navy
-				# 		has_idea = JAP_well_oiled_economy_base
-				# 	}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_1
-				# 			has_country_flag = navy
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_1 add_idea = JAP_well_oiled_economy_2 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_2
-				# 			has_country_flag = navy
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_2 add_idea = JAP_well_oiled_economy_3 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_3
-				# 			has_country_flag = navy
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_3 add_idea = JAP_well_oiled_economy_4 }
-				# 	}
-				# if = {
-				# 	limit = {
-				# 		has_country_flag = rail
-				# 		has_idea = JAP_well_oiled_economy_base
-				# 	}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_1
-				# 			has_country_flag = rail
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_1 add_idea = JAP_well_oiled_economy_2 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_2
-				# 			has_country_flag = rail
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_2 add_idea = JAP_well_oiled_economy_3 }
-				# 	}
-				# 	else_if = {
-				# 		limit = {
-				# 			has_idea = JAP_well_oiled_economy_3
-				# 			has_country_flag = rail
-				# 		}
-				# 		swap_ideas = { remove_idea = JAP_well_oiled_economy_3 add_idea = JAP_well_oiled_economy_4 }
-				# 	}
-				increase_ps_by_one = yes
-				add_research_slot = 1
-				hidden_effect = {
-					clr_country_flag = jap_industralisation_funding_events_flag
-					clr_country_flag = jap_industralisation_funding_mission_flag
+					value = 1
 				}
 			}
+			if = {
+				limit = { has_country_flag = mil }
+				add_to_variable = {
+					var = JAP_industry_check
+					value = 1
+				}
+			}
+			if = {
+				limit = { has_country_flag = navy }
+				add_to_variable = {
+					var = JAP_industry_check
+					value = 1
+				}
+			}
+			if = {
+				limit = { has_country_flag = rail }
+				add_to_variable = {
+					var = JAP_industry_check
+					value = 1
+				}
+			}
+			# Apply the appropriate Well-Oiled Economy level
+			if = {
+				limit = {
+					check_variable = {
+						var = JAP_industry_check
+						value = 4
+					}
+				}
+				swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_4 }
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						var = JAP_industry_check
+						value = 3
+					}
+				}
+				swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_3 }
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						var = JAP_industry_check
+						value = 2
+					}
+				}
+				swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_2 }
+			}
+			else_if = {
+				limit = {
+					check_variable = {
+						var = JAP_industry_check
+						value = 1
+					}
+				}
+				swap_ideas = { remove_idea = JAP_well_oiled_economy_base add_idea = JAP_well_oiled_economy_1 }
+			}
+			else = {
+				add_ideas = JAP_well_oiled_economy_base
+			}
+			clear_variable = JAP_industry_check
+			clear_variable = JAP_civ_recalibration_ramp_major
+			clear_variable = JAP_mil_recalibration_ramp_major
+			clear_variable = JAP_navy_recalibration_ramp_major
+			clear_variable = JAP_rail_recalibration_ramp_major
+			clear_variable = JAP_civ_recalibration_ramp_medium
+			clear_variable = JAP_mil_recalibration_ramp_medium
+			clear_variable = JAP_navy_recalibration_ramp_medium
+			clear_variable = JAP_rail_recalibration_ramp_medium
+			clear_variable = JAP_civ_recalibration_ramp_minor
+			clear_variable = JAP_mil_recalibration_ramp_minor
+			clear_variable = JAP_navy_recalibration_ramp_minor
+			clear_variable = JAP_rail_recalibration_ramp_minor
+			clear_variable = JAP_recalibration_ramp_combined
+
+			increase_ps_by_one = yes
+			add_research_slot = 1
+			hidden_effect = {
+				remove_dynamic_modifier = {
+					modifier = JAP_industrial_revolution
+				}
+				remove_dynamic_modifier = {
+					modifier = JAP_industrial_revolution_fake
+				}
+				swap_ideas = {
+					remove_idea = industrializing
+					add_idea = industrialized
+				}
+				clr_country_flag = jap_industralisation_funding_events_flag
+				clr_country_flag = jap_industralisation_funding_mission_flag
+			}
 		}
+	}
 # ### POLITICAL TREE ###
 	focus = {
  		id = JAP_imperalist_victory
@@ -2816,8 +2837,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 100 }
 
         available = { }
-
-        
 
  		search_filters = { FOCUS_FILTER_POLITICAL }
 
@@ -2840,8 +2859,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 80 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
@@ -2909,8 +2926,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = {
@@ -2951,8 +2966,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 60 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
@@ -3000,8 +3013,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 60 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
@@ -3070,8 +3081,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_HISTORICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = { #### COME BACK TO THIS LATER
@@ -3092,8 +3101,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = { country_event = JAP_imperial.9 }
@@ -3112,8 +3119,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = { }
@@ -3129,14 +3134,11 @@ continuous_focus_position = { x = 400 y = 1250 }
 		y = 3
 		relative_position_id = JAP_five_charter_oath
 
-
 		cost = 70
 
 		ai_will_do = { factor = 80 }
 
         available = { always = no }
-
-        
 
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_FRA_POLITICAL_VIOLENCE FOCUS_FILTER_INTERNAL_AFFAIRS }
 
@@ -3222,8 +3224,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_HISTORICAL FOCUS_FILTER_FRA_POLITICAL_VIOLENCE FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = {
@@ -3247,8 +3247,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY FOCUS_FILTER_FRA_POLITICAL_VIOLENCE FOCUS_FILTER_INTERNAL_AFFAIRS }
 
 		completion_reward = {
@@ -3262,7 +3260,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 		id = JAP_japanese_education
 		icon = GFX_Focus_electronics_concern
 		prerequisite = { focus = JAP_imperalist_victory }
-		x = 13
+		x = 10
 		y = 1
 		relative_position_id = JAP_imperalist_victory
 		cost = 70
@@ -3270,8 +3268,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3290,8 +3286,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3319,8 +3313,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3344,8 +3336,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3365,8 +3355,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3388,8 +3376,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3409,8 +3395,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3433,8 +3417,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH}
 
 		completion_reward = {
@@ -3456,8 +3438,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3477,8 +3457,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3503,8 +3481,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = {
@@ -3524,8 +3500,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -3551,8 +3525,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_completed_focus = JAP_goverment_owned_schools }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = {
@@ -3575,8 +3547,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 60 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY FOCUS_FILTER_RESEARCH }
 
@@ -3605,8 +3575,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_HISTORICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = { add_ideas = coed_learning }
@@ -3624,8 +3592,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3648,8 +3614,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_completed_focus = JAP_manufacturing_department }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3671,8 +3635,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { has_completed_focus = JAP_kyoto_university }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
@@ -3710,8 +3672,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			}
 		}
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_RESEARCH }
 
 		completion_reward = {
@@ -3723,7 +3683,7 @@ continuous_focus_position = { x = 400 y = 1250 }
 		id = JAP_bank_of_japan
 		icon = GFX_Focus_SER_Serbian_Bank
 		prerequisite = { focus = JAP_imperalist_victory }
-		x = -12
+		x = -8
 		y = 1
 		relative_position_id = JAP_imperalist_victory
 		cost = 70
@@ -3731,8 +3691,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 80 }
 
         available = { always = no }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -3759,8 +3717,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_HISTORICAL }
 
 		completion_reward = { add_ideas = JAP_idea_gold_standard }
@@ -3780,8 +3736,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY }
 
 		completion_reward = { add_ideas = JAP_idea_silver_standard }
@@ -3799,8 +3753,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 60 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -3852,8 +3804,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = { add_ideas = JAP_wage_increase }
@@ -3871,8 +3821,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -3924,8 +3872,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = {
@@ -3950,8 +3896,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = { add_ideas = JAP_bank_note_system }
@@ -3970,8 +3914,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -3994,8 +3936,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = { country_event = JAP_imperial.1 }
@@ -4013,8 +3953,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 50 }
 
         available = { has_country_flag = our_system }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_HISTORICAL }
 
@@ -4038,8 +3976,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_country_flag = UK_system }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY }
 
 		completion_reward = { add_ideas = JAP_british_banking }
@@ -4058,8 +3994,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { has_country_flag = US_system }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL FOCUS_FILTER_ALTHISTORY }
 
 		completion_reward = { add_ideas = JAP_american_banking }
@@ -4077,8 +4011,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 70 }
 
         available = { }
-
-        
 
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
@@ -4101,8 +4033,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = {  FOCUS_FILTER_POLITICAL }
 
 		completion_reward = { country_event = JAP_imperial.10 }
@@ -4111,15 +4041,13 @@ continuous_focus_position = { x = 400 y = 1250 }
 	focus = {
 		id = JAP_modernize_our_military
 		icon = GFX_goal_focus_sword_of_the_shogun
-		x = 9
-		y = 11
+		x = 0
+		y = 8
 		cost = 70
 
 		ai_will_do = { factor = 85 }
 
         available = { has_completed_focus = JAP_imperalist_victory }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4143,8 +4071,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -4167,8 +4093,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = { country_event = JAP_imperial.12 }
@@ -4186,8 +4110,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 85 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4207,8 +4129,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 85 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4265,8 +4185,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { date > 1872.1.1 }
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY FOCUS_FILTER_DIPLOMACY }
 
 		completion_reward = {
@@ -4290,8 +4208,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			date > 1871.7.1
 			has_war_support > 0.5
         }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4346,8 +4262,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -4369,8 +4283,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 
         available = { }
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = { add_ideas = educate_conscripts }
@@ -4388,8 +4300,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 85 }
 
         available = { date > 1882.1.1 }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4414,8 +4324,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 85 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4444,8 +4352,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 				}
 			}
 		}
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4478,8 +4384,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			}
 		}
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -4510,8 +4414,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 				}
 			}
 		}
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
@@ -4544,8 +4446,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 			}
 		}
 
-        
-
 		search_filters = { FOCUS_FILTER_MILITARY }
 
 		completion_reward = {
@@ -4566,8 +4466,6 @@ continuous_focus_position = { x = 400 y = 1250 }
 		ai_will_do = { factor = 90 }
 
         available = { }
-
-        
 
 		search_filters = { FOCUS_FILTER_MILITARY }
 
