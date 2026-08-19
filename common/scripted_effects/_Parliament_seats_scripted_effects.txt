@@ -1,0 +1,1209 @@
+parl_print_variables = {
+	print_variables = {
+	    file = parl_log_file
+	    append = no
+	    print_global = yes
+	}
+}
+
+set_initial_weights = {
+	resize_array = {
+	    array = parl_weights
+	    value = 1
+	    size = 9
+	}
+
+	resize_array = {
+	    array = parl_weights_normalized
+	    value = 0
+	    size = 9
+	}
+
+	set_variable = { parl_weights^0 = party_popularity@ideology_radical_socialism }
+	set_variable = { parl_weights^1 = party_popularity@ideology_social_liberalism }
+	set_variable = { parl_weights^2 = party_popularity@social_egalitarianism }
+	set_variable = { parl_weights^3 = party_popularity@centrism }
+	set_variable = { parl_weights^4 = party_popularity@traditional_conservatism }
+	set_variable = { parl_weights^5 = party_popularity@radical_democracy }
+	set_variable = { parl_weights^6 = party_popularity@chauvinist_populism }
+	set_variable = { parl_weights^7 = party_popularity@autocracy }
+	set_variable = { parl_weights^8 = party_popularity@fundamentalism }
+
+	set_variable = {
+	    var = tot_parl_weight
+	    value = 0
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_variable = {
+		    var = tot_parl_weight
+		    value = parl_v
+		}
+	}
+
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+
+	    set_variable = { parl_weights_normalized^parl_i = parl_weights^parl_i }
+	    
+	    divide_variable = {
+		    var = parl_weights_normalized^parl_i
+		    value = tot_parl_weight
+		}
+	}
+}
+
+apply_coalition_modifier = {
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+	    
+	    if = {
+	    	limit = {
+	    		check_variable = { parl_coalitions^parl_i = 1 }
+	    	}
+
+	    	multiply_variable = { parl_weights_normalized^parl_i = 1.02 }
+	    }
+
+	    else = {
+	    	if = {
+		    	limit = {
+		    		check_variable = { parl_coalitions^parl_i = 2 }
+		    	}
+
+		    	multiply_variable = { parl_weights_normalized^parl_i = 0.98 }
+	    	}
+
+	    	else = {
+	    		if = {
+			    	limit = {
+			    		check_variable = { parl_coalitions^parl_i = 3 }
+			    	}
+
+			    	set_variable = { parl_weights_normalized^parl_i = 0 }
+		    	}
+
+		    	else = {
+		    		if = {
+				    	limit = {
+				    		check_variable = { parl_coalitions^parl_i = 4 }
+				    	}
+
+				    	multiply_variable = { parl_weights_normalized^parl_i = 0.25 }
+			    	}
+		    	}
+	    	}
+	    }
+	}
+}
+
+compute_weights = {
+	set_variable = {
+	    var = tot_parl_weight
+	    value = 0
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    set_variable = { parl_weights^parl_i = parl_weights_normalized^parl_i }
+	}
+
+	for_each_loop = {
+	    array = parl_weights
+	    value = parl_v
+	    index = parl_i
+	    
+	    add_to_variable = {
+		    var = tot_parl_weight
+		    value = parl_v
+		}
+	}
+
+	for_each_loop = {
+	    array = parl_weights_normalized
+	    value = parl_v
+	    index = parl_i
+
+	    set_variable = { parl_weights_normalized^parl_i = parl_weights^parl_i }
+	    
+	    divide_variable = {
+		    var = parl_weights_normalized^parl_i
+		    value = tot_parl_weight
+		}
+	}
+}
+
+compute_seats = {
+	resize_array = {
+	    array = seats_array
+	    value = -1
+	    size = 256
+	}
+	compute_national_vote = yes
+
+	# for_each_loop = {
+		# array = seats_array
+		# value = parl_seats_v
+		# index = parl_seats_i
+
+		# set_temp_variable = { parl_r = random }
+
+		# set_temp_variable = { sum_of_the_parl_weights = 0 }
+
+		# set_temp_variable = { parl_seat_flag = 0 }
+
+		# for_each_loop = {
+		    # array = parl_weights_normalized
+		    # value = parl_v
+		    # index = parl_i
+
+		    # add_to_temp_variable = {
+			    # var = sum_of_the_parl_weights
+			    # value = parl_weights_normalized^parl_i
+			# }
+		    
+		    # if = {
+		    	# limit = {
+		    		# check_variable = { parl_r < sum_of_the_parl_weights }
+		    		# check_variable = { parl_seat_flag = 0 }
+		    	# }
+
+		    	# set_temp_variable = { parl_seat_ideology = parl_i }
+		    	# set_temp_variable = { parl_seat_flag = 1 }
+		    # }
+		# }
+
+		# set_variable = { seats_array^parl_seats_i = parl_seat_ideology }
+	# }
+
+	set_variable = { parl_rad_soc_seats_count = 0 }
+	set_variable = { parl_soc_lib_seats_count = 0 }
+	set_variable = { parl_soc_ega_seats_count = 0 }
+	set_variable = { parl_cen_seats_count = 0 }
+	set_variable = { parl_tra_con_seats_count = 0 }
+	set_variable = { parl_rad_dem_seats_count = 0 }
+	set_variable = { parl_chauv_pop_seats_count = 0 }
+	set_variable = { parl_aut_seats_count = 0 }
+	set_variable = { parl_fun_seats_count = 0 }
+
+	resize_array = {
+	    array = seats_count_array
+	    value = 0
+	    size = 9
+	}
+
+	for_each_loop = {
+		array = seats_array
+		value = parl_seats_v
+		index = parl_seats_i
+
+		if = {
+		    limit = {
+		    	check_variable = { seats_array^parl_seats_i = 0 }
+		    }
+		    add_to_variable = {
+				var = seats_count_array^0
+				value = 1
+			}
+		}
+
+		else = {
+			if = {
+			    limit = {
+			    	check_variable = { seats_array^parl_seats_i = 1 }
+			    }
+			    add_to_variable = {
+					var = seats_count_array^1
+					value = 1
+				}
+			}
+
+			else = {
+				if = {
+				    limit = {
+				    	check_variable = { seats_array^parl_seats_i = 2 }
+				    }
+				    add_to_variable = {
+						var = seats_count_array^2
+						value = 1
+					}
+				}
+
+				else = {
+					if = {
+					    limit = {
+					    	check_variable = { seats_array^parl_seats_i = 3 }
+					    }
+					    add_to_variable = {
+							var = seats_count_array^3
+							value = 1
+						}
+					}
+
+					else = {
+						if = {
+						    limit = {
+						    	check_variable = { seats_array^parl_seats_i = 4 }
+						    }
+						    add_to_variable = {
+								var = seats_count_array^4
+								value = 1
+							}
+						}
+
+						else = {
+							if = {
+							    limit = {
+							    	check_variable = { seats_array^parl_seats_i = 5 }
+							    }
+							    add_to_variable = {
+									var = seats_count_array^5
+									value = 1
+								}
+							}
+
+							else = {
+								if = {
+								    limit = {
+								    	check_variable = { seats_array^parl_seats_i = 6 }
+								    }
+								    add_to_variable = {
+										var = seats_count_array^6
+										value = 1
+									}
+								}
+
+								else = {
+									if = {
+									    limit = {
+									    	check_variable = { seats_array^parl_seats_i = 7 }
+									    }
+									    add_to_variable = {
+											var = seats_count_array^7
+											value = 1
+										}
+									}
+
+									else = {
+									    add_to_variable = {
+											var = seats_count_array^8
+											value = 1
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+draw_seats = {
+	resize_array = {
+	    array = parl_seats_gfx
+	    value = -1
+	    size = 32
+	}
+
+	for_each_loop = { # RESET ALL SEAT GFX
+	    array = parl_seats_gfx
+	    value = parl_gfx_v
+	    index = parl_gfx_i
+
+	    set_temp_variable = { parl_seat_id_plus_one = parl_gfx_i }
+	    add_to_temp_variable = { parl_seat_id_plus_one = 1 }
+
+	    meta_effect = {
+			text = {
+				set_variable = { 
+					var = seat_[SEAT_ID]
+					value = -1
+				}
+			}
+			SEAT_ID = parl_seat_id_plus_one
+			IDEOLOGY_VALUE = parl_seat_ideology_id
+		}
+	}
+
+	for_each_loop = { # LOOP ON ALL SEAT GFX
+	    array = parl_seats_gfx
+	    value = parl_gfx_v
+	    index = parl_gfx_i
+
+	    set_temp_variable = { parl_seat_gfx_id = -1 }
+	    set_temp_variable = { parl_sum_seat_count = 0 }
+	    set_temp_variable = { parl_seat_gfx_flag = 0 }
+
+	    for_each_loop = { # LOOP ON EACH IDEOLOGY
+		    array = seats_count_array
+		    value = parl_v
+		    index = parl_i
+
+		    add_to_temp_variable = {
+			    var = parl_sum_seat_count
+			    value = seats_count_array^parl_i
+			}
+
+			set_temp_variable = { parl_seat_gfx_times_eight_id = parl_gfx_i } # Don't judge me, life is full of mistake patched over with duct tape
+			multiply_temp_variable = { parl_seat_gfx_times_eight_id = 8 }
+		    
+		    if = {
+		    	limit = {
+		    		check_variable = { parl_seat_gfx_times_eight_id < parl_sum_seat_count }
+		    		check_variable = { parl_seat_gfx_flag = 0 }
+		    	}
+
+		    	set_temp_variable = { parl_seat_ideology_id = parl_i }
+
+		    	add_to_temp_variable = { # I SAID DON'T JUDGE ME
+				    var = parl_seat_ideology_id
+				    value = 1
+				}
+
+				set_temp_variable = { parl_seat_id_plus_one = parl_gfx_i }
+
+		    	add_to_temp_variable = { 
+				    var = parl_seat_id_plus_one
+				    value = 1
+				}
+
+		    	meta_effect = {
+				    text = {
+				        set_variable = { 
+				          var = seat_[SEAT_ID]
+				          value = [IDEOLOGY_VALUE]
+				        }
+				    }
+				    SEAT_ID = parl_seat_id_plus_one
+				    IDEOLOGY_VALUE = parl_seat_ideology_id
+				}
+
+		    	set_temp_variable = { parl_seat_ideology = parl_i }
+		    	set_temp_variable = { parl_seat_gfx_flag = 1 }
+		    }
+		}
+	}
+}
+
+#####new system for seats -> for the GUI
+set_global_seats_posistions={
+	clear_array=global.internal_politics_house_x
+	clear_array=global.internal_politics_house_y
+	add_to_array = { global.internal_politics_house_x = 0 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 13 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 25 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 38 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 51 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 63 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 76 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 89 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 1 }
+	add_to_array = { global.internal_politics_house_y = 148 }
+	add_to_array = { global.internal_politics_house_x = 101 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 14 }
+	add_to_array = { global.internal_politics_house_y = 148 }
+	add_to_array = { global.internal_politics_house_x = 27 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 40 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 52 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 65 }
+	add_to_array = { global.internal_politics_house_y = 150 }
+	add_to_array = { global.internal_politics_house_x = 4 }
+	add_to_array = { global.internal_politics_house_y = 135 }
+	add_to_array = { global.internal_politics_house_x = 17 }
+	add_to_array = { global.internal_politics_house_y = 135 }
+	add_to_array = { global.internal_politics_house_x = 78 }
+	add_to_array = { global.internal_politics_house_y = 150 }
+	add_to_array = { global.internal_politics_house_x = 29 }
+	add_to_array = { global.internal_politics_house_y = 136 }
+	add_to_array = { global.internal_politics_house_x = 91 }
+	add_to_array = { global.internal_politics_house_y = 151 }
+	add_to_array = { global.internal_politics_house_x = 42 }
+	add_to_array = { global.internal_politics_house_y = 136 }
+	add_to_array = { global.internal_politics_house_x = 7 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 56 }
+	add_to_array = { global.internal_politics_house_y = 137 }
+	add_to_array = { global.internal_politics_house_x = 104 }
+	add_to_array = { global.internal_politics_house_y = 151 }
+	add_to_array = { global.internal_politics_house_x = 20 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 69 }
+	add_to_array = { global.internal_politics_house_y = 138 }
+	add_to_array = { global.internal_politics_house_x = 33 }
+	add_to_array = { global.internal_politics_house_y = 124 }
+	add_to_array = { global.internal_politics_house_x = 82 }
+	add_to_array = { global.internal_politics_house_y = 138 }
+	add_to_array = { global.internal_politics_house_x = 47 }
+	add_to_array = { global.internal_politics_house_y = 124 }
+	add_to_array = { global.internal_politics_house_x = 11 }
+	add_to_array = { global.internal_politics_house_y = 110 }
+	add_to_array = { global.internal_politics_house_x = 25 }
+	add_to_array = { global.internal_politics_house_y = 110 }
+	add_to_array = { global.internal_politics_house_x = 95 }
+	add_to_array = { global.internal_politics_house_y = 140 }
+	add_to_array = { global.internal_politics_house_x = 60 }
+	add_to_array = { global.internal_politics_house_y = 125 }
+	add_to_array = { global.internal_politics_house_x = 38 }
+	add_to_array = { global.internal_politics_house_y = 112 }
+	add_to_array = { global.internal_politics_house_x = 73 }
+	add_to_array = { global.internal_politics_house_y = 126 }
+	add_to_array = { global.internal_politics_house_x = 17 }
+	add_to_array = { global.internal_politics_house_y = 98 }
+	add_to_array = { global.internal_politics_house_x = 52 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 108 }
+	add_to_array = { global.internal_politics_house_y = 141 }
+	add_to_array = { global.internal_politics_house_x = 31 }
+	add_to_array = { global.internal_politics_house_y = 98 }
+	add_to_array = { global.internal_politics_house_x = 87 }
+	add_to_array = { global.internal_politics_house_y = 127 }
+	add_to_array = { global.internal_politics_house_x = 44 }
+	add_to_array = { global.internal_politics_house_y = 101 }
+	add_to_array = { global.internal_politics_house_x = 66 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 23 }
+	add_to_array = { global.internal_politics_house_y = 86 }
+	add_to_array = { global.internal_politics_house_x = 100 }
+	add_to_array = { global.internal_politics_house_y = 130 }
+	add_to_array = { global.internal_politics_house_x = 79 }
+	add_to_array = { global.internal_politics_house_y = 116 }
+	add_to_array = { global.internal_politics_house_x = 58 }
+	add_to_array = { global.internal_politics_house_y = 101 }
+	add_to_array = { global.internal_politics_house_x = 38 }
+	add_to_array = { global.internal_politics_house_y = 87 }
+	add_to_array = { global.internal_politics_house_x = 51 }
+	add_to_array = { global.internal_politics_house_y = 90 }
+	add_to_array = { global.internal_politics_house_x = 30 }
+	add_to_array = { global.internal_politics_house_y = 75 }
+	add_to_array = { global.internal_politics_house_x = 73 }
+	add_to_array = { global.internal_politics_house_y = 102 }
+	add_to_array = { global.internal_politics_house_x = 94 }
+	add_to_array = { global.internal_politics_house_y = 117 }
+	add_to_array = { global.internal_politics_house_x = 114 }
+	add_to_array = { global.internal_politics_house_y = 132 }
+	add_to_array = { global.internal_politics_house_x = 45 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 66 }
+	add_to_array = { global.internal_politics_house_y = 91 }
+	add_to_array = { global.internal_politics_house_x = 86 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 39 }
+	add_to_array = { global.internal_politics_house_y = 65 }
+	add_to_array = { global.internal_politics_house_x = 107 }
+	add_to_array = { global.internal_politics_house_y = 121 }
+	add_to_array = { global.internal_politics_house_x = 59 }
+	add_to_array = { global.internal_politics_house_y = 80 }
+	add_to_array = { global.internal_politics_house_x = 81 }
+	add_to_array = { global.internal_politics_house_y = 93 }
+	add_to_array = { global.internal_politics_house_x = 54 }
+	add_to_array = { global.internal_politics_house_y = 66 }
+	add_to_array = { global.internal_politics_house_x = 101 }
+	add_to_array = { global.internal_politics_house_y = 108 }
+	add_to_array = { global.internal_politics_house_x = 74 }
+	add_to_array = { global.internal_politics_house_y = 81 }
+	add_to_array = { global.internal_politics_house_x = 47 }
+	add_to_array = { global.internal_politics_house_y = 55 }
+	add_to_array = { global.internal_politics_house_x = 68 }
+	add_to_array = { global.internal_politics_house_y = 70 }
+	add_to_array = { global.internal_politics_house_x = 95 }
+	add_to_array = { global.internal_politics_house_y = 97 }
+	add_to_array = { global.internal_politics_house_x = 122 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 64 }
+	add_to_array = { global.internal_politics_house_y = 57 }
+	add_to_array = { global.internal_politics_house_x = 115 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 57 }
+	add_to_array = { global.internal_politics_house_y = 46 }
+	add_to_array = { global.internal_politics_house_x = 90 }
+	add_to_array = { global.internal_politics_house_y = 84 }
+	add_to_array = { global.internal_politics_house_x = 84 }
+	add_to_array = { global.internal_politics_house_y = 73 }
+	add_to_array = { global.internal_politics_house_x = 77 }
+	add_to_array = { global.internal_politics_house_y = 62 }
+	add_to_array = { global.internal_politics_house_x = 110 }
+	add_to_array = { global.internal_politics_house_y = 100 }
+	add_to_array = { global.internal_politics_house_x = 104 }
+	add_to_array = { global.internal_politics_house_y = 89 }
+	add_to_array = { global.internal_politics_house_x = 74 }
+	add_to_array = { global.internal_politics_house_y = 48 }
+	add_to_array = { global.internal_politics_house_x = 68 }
+	add_to_array = { global.internal_politics_house_y = 37 }
+	add_to_array = { global.internal_politics_house_x = 100 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 94 }
+	add_to_array = { global.internal_politics_house_y = 65 }
+	add_to_array = { global.internal_politics_house_x = 88 }
+	add_to_array = { global.internal_politics_house_y = 54 }
+	add_to_array = { global.internal_politics_house_x = 130 }
+	add_to_array = { global.internal_politics_house_y = 117 }
+	add_to_array = { global.internal_politics_house_x = 124 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 85 }
+	add_to_array = { global.internal_politics_house_y = 41 }
+	add_to_array = { global.internal_politics_house_x = 79 }
+	add_to_array = { global.internal_politics_house_y = 30 }
+	add_to_array = { global.internal_politics_house_x = 121 }
+	add_to_array = { global.internal_politics_house_y = 93 }
+	add_to_array = { global.internal_politics_house_x = 114 }
+	add_to_array = { global.internal_politics_house_y = 82 }
+	add_to_array = { global.internal_politics_house_x = 99 }
+	add_to_array = { global.internal_politics_house_y = 47 }
+	add_to_array = { global.internal_politics_house_x = 105 }
+	add_to_array = { global.internal_politics_house_y = 58 }
+	add_to_array = { global.internal_politics_house_x = 111 }
+	add_to_array = { global.internal_politics_house_y = 69 }
+	add_to_array = { global.internal_politics_house_x = 90 }
+	add_to_array = { global.internal_politics_house_y = 23 }
+	add_to_array = { global.internal_politics_house_x = 96 }
+	add_to_array = { global.internal_politics_house_y = 34 }
+	add_to_array = { global.internal_politics_house_x = 134 }
+	add_to_array = { global.internal_politics_house_y = 100 }
+	add_to_array = { global.internal_politics_house_x = 140 }
+	add_to_array = { global.internal_politics_house_y = 111 }
+	add_to_array = { global.internal_politics_house_x = 125 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 110 }
+	add_to_array = { global.internal_politics_house_y = 42 }
+	add_to_array = { global.internal_politics_house_x = 131 }
+	add_to_array = { global.internal_politics_house_y = 87 }
+	add_to_array = { global.internal_politics_house_x = 117 }
+	add_to_array = { global.internal_politics_house_y = 53 }
+	add_to_array = { global.internal_politics_house_x = 102 }
+	add_to_array = { global.internal_politics_house_y = 18 }
+	add_to_array = { global.internal_politics_house_x = 108 }
+	add_to_array = { global.internal_politics_house_y = 29 }
+	add_to_array = { global.internal_politics_house_x = 123 }
+	add_to_array = { global.internal_politics_house_y = 64 }
+	add_to_array = { global.internal_politics_house_x = 122 }
+	add_to_array = { global.internal_politics_house_y = 37 }
+	add_to_array = { global.internal_politics_house_x = 115 }
+	add_to_array = { global.internal_politics_house_y = 13 }
+	add_to_array = { global.internal_politics_house_x = 121 }
+	add_to_array = { global.internal_politics_house_y = 24 }
+	add_to_array = { global.internal_politics_house_x = 129 }
+	add_to_array = { global.internal_politics_house_y = 48 }
+	add_to_array = { global.internal_politics_house_x = 137 }
+	add_to_array = { global.internal_politics_house_y = 72 }
+	add_to_array = { global.internal_politics_house_x = 144 }
+	add_to_array = { global.internal_politics_house_y = 96 }
+	add_to_array = { global.internal_politics_house_x = 135 }
+	add_to_array = { global.internal_politics_house_y = 59 }
+	add_to_array = { global.internal_politics_house_x = 143 }
+	add_to_array = { global.internal_politics_house_y = 84 }
+	add_to_array = { global.internal_politics_house_x = 150 }
+	add_to_array = { global.internal_politics_house_y = 108 }
+	add_to_array = { global.internal_politics_house_x = 127 }
+	add_to_array = { global.internal_politics_house_y = 9 }
+	add_to_array = { global.internal_politics_house_x = 135 }
+	add_to_array = { global.internal_politics_house_y = 33 }
+	add_to_array = { global.internal_politics_house_x = 134 }
+	add_to_array = { global.internal_politics_house_y = 21 }
+	add_to_array = { global.internal_politics_house_x = 141 }
+	add_to_array = { global.internal_politics_house_y = 45 }
+	add_to_array = { global.internal_politics_house_x = 149 }
+	add_to_array = { global.internal_politics_house_y = 69 }
+	add_to_array = { global.internal_politics_house_x = 148 }
+	add_to_array = { global.internal_politics_house_y = 57 }
+	add_to_array = { global.internal_politics_house_x = 140 }
+	add_to_array = { global.internal_politics_house_y = 7 }
+	add_to_array = { global.internal_politics_house_x = 155 }
+	add_to_array = { global.internal_politics_house_y = 94 }
+	add_to_array = { global.internal_politics_house_x = 148 }
+	add_to_array = { global.internal_politics_house_y = 31 }
+	add_to_array = { global.internal_politics_house_x = 155 }
+	add_to_array = { global.internal_politics_house_y = 81 }
+	add_to_array = { global.internal_politics_house_x = 147 }
+	add_to_array = { global.internal_politics_house_y = 18 }
+	add_to_array = { global.internal_politics_house_x = 154 }
+	add_to_array = { global.internal_politics_house_y = 43 }
+	add_to_array = { global.internal_politics_house_x = 161 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 154 }
+	add_to_array = { global.internal_politics_house_y = 5 }
+	add_to_array = { global.internal_politics_house_x = 161 }
+	add_to_array = { global.internal_politics_house_y = 68 }
+	add_to_array = { global.internal_politics_house_x = 160 }
+	add_to_array = { global.internal_politics_house_y = 55 }
+	add_to_array = { global.internal_politics_house_x = 160 }
+	add_to_array = { global.internal_politics_house_y = 30 }
+	add_to_array = { global.internal_politics_house_x = 160 }
+	add_to_array = { global.internal_politics_house_y = 17 }
+	add_to_array = { global.internal_politics_house_x = 167 }
+	add_to_array = { global.internal_politics_house_y = 80 }
+	add_to_array = { global.internal_politics_house_x = 167 }
+	add_to_array = { global.internal_politics_house_y = 93 }
+	add_to_array = { global.internal_politics_house_x = 167 }
+	add_to_array = { global.internal_politics_house_y = 42 }
+	add_to_array = { global.internal_politics_house_x = 167 }
+	add_to_array = { global.internal_politics_house_y = 5 }
+	add_to_array = { global.internal_politics_house_x = 173 }
+	add_to_array = { global.internal_politics_house_y = 17 }
+	add_to_array = { global.internal_politics_house_x = 173 }
+	add_to_array = { global.internal_politics_house_y = 30 }
+	add_to_array = { global.internal_politics_house_x = 173 }
+	add_to_array = { global.internal_politics_house_y = 55 }
+	add_to_array = { global.internal_politics_house_x = 173 }
+	add_to_array = { global.internal_politics_house_y = 68 }
+	add_to_array = { global.internal_politics_house_x = 180 }
+	add_to_array = { global.internal_politics_house_y = 5 }
+	add_to_array = { global.internal_politics_house_x = 172 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 180 }
+	add_to_array = { global.internal_politics_house_y = 43 }
+	add_to_array = { global.internal_politics_house_x = 187 }
+	add_to_array = { global.internal_politics_house_y = 18 }
+	add_to_array = { global.internal_politics_house_x = 179 }
+	add_to_array = { global.internal_politics_house_y = 81 }
+	add_to_array = { global.internal_politics_house_x = 186 }
+	add_to_array = { global.internal_politics_house_y = 31 }
+	add_to_array = { global.internal_politics_house_x = 178 }
+	add_to_array = { global.internal_politics_house_y = 94 }
+	add_to_array = { global.internal_politics_house_x = 193 }
+	add_to_array = { global.internal_politics_house_y = 7 }
+	add_to_array = { global.internal_politics_house_x = 186 }
+	add_to_array = { global.internal_politics_house_y = 57 }
+	add_to_array = { global.internal_politics_house_x = 185 }
+	add_to_array = { global.internal_politics_house_y = 69 }
+	add_to_array = { global.internal_politics_house_x = 192 }
+	add_to_array = { global.internal_politics_house_y = 45 }
+	add_to_array = { global.internal_politics_house_x = 200 }
+	add_to_array = { global.internal_politics_house_y = 21 }
+	add_to_array = { global.internal_politics_house_x = 199 }
+	add_to_array = { global.internal_politics_house_y = 33 }
+	add_to_array = { global.internal_politics_house_x = 206 }
+	add_to_array = { global.internal_politics_house_y = 9 }
+	add_to_array = { global.internal_politics_house_x = 183 }
+	add_to_array = { global.internal_politics_house_y = 108 }
+	add_to_array = { global.internal_politics_house_x = 191 }
+	add_to_array = { global.internal_politics_house_y = 84 }
+	add_to_array = { global.internal_politics_house_x = 198 }
+	add_to_array = { global.internal_politics_house_y = 59 }
+	add_to_array = { global.internal_politics_house_x = 189 }
+	add_to_array = { global.internal_politics_house_y = 96 }
+	add_to_array = { global.internal_politics_house_x = 197 }
+	add_to_array = { global.internal_politics_house_y = 72 }
+	add_to_array = { global.internal_politics_house_x = 205 }
+	add_to_array = { global.internal_politics_house_y = 48 }
+	add_to_array = { global.internal_politics_house_x = 213 }
+	add_to_array = { global.internal_politics_house_y = 24 }
+	add_to_array = { global.internal_politics_house_x = 219 }
+	add_to_array = { global.internal_politics_house_y = 13 }
+	add_to_array = { global.internal_politics_house_x = 211 }
+	add_to_array = { global.internal_politics_house_y = 37 }
+	add_to_array = { global.internal_politics_house_x = 211 }
+	add_to_array = { global.internal_politics_house_y = 64 }
+	add_to_array = { global.internal_politics_house_x = 225 }
+	add_to_array = { global.internal_politics_house_y = 29 }
+	add_to_array = { global.internal_politics_house_x = 232 }
+	add_to_array = { global.internal_politics_house_y = 18 }
+	add_to_array = { global.internal_politics_house_x = 217 }
+	add_to_array = { global.internal_politics_house_y = 53 }
+	add_to_array = { global.internal_politics_house_x = 202 }
+	add_to_array = { global.internal_politics_house_y = 87 }
+	add_to_array = { global.internal_politics_house_x = 223 }
+	add_to_array = { global.internal_politics_house_y = 42 }
+	add_to_array = { global.internal_politics_house_x = 209 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 194 }
+	add_to_array = { global.internal_politics_house_y = 111 }
+	add_to_array = { global.internal_politics_house_x = 200 }
+	add_to_array = { global.internal_politics_house_y = 100 }
+	add_to_array = { global.internal_politics_house_x = 237 }
+	add_to_array = { global.internal_politics_house_y = 34 }
+	add_to_array = { global.internal_politics_house_x = 244 }
+	add_to_array = { global.internal_politics_house_y = 23 }
+	add_to_array = { global.internal_politics_house_x = 222 }
+	add_to_array = { global.internal_politics_house_y = 69 }
+	add_to_array = { global.internal_politics_house_x = 229 }
+	add_to_array = { global.internal_politics_house_y = 58 }
+	add_to_array = { global.internal_politics_house_x = 235 }
+	add_to_array = { global.internal_politics_house_y = 47 }
+	add_to_array = { global.internal_politics_house_x = 219 }
+	add_to_array = { global.internal_politics_house_y = 82 }
+	add_to_array = { global.internal_politics_house_x = 213 }
+	add_to_array = { global.internal_politics_house_y = 93 }
+	add_to_array = { global.internal_politics_house_x = 255 }
+	add_to_array = { global.internal_politics_house_y = 30 }
+	add_to_array = { global.internal_politics_house_x = 249 }
+	add_to_array = { global.internal_politics_house_y = 41 }
+	add_to_array = { global.internal_politics_house_x = 210 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 203 }
+	add_to_array = { global.internal_politics_house_y = 117 }
+	add_to_array = { global.internal_politics_house_x = 246 }
+	add_to_array = { global.internal_politics_house_y = 54 }
+	add_to_array = { global.internal_politics_house_x = 240 }
+	add_to_array = { global.internal_politics_house_y = 65 }
+	add_to_array = { global.internal_politics_house_x = 233 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 266 }
+	add_to_array = { global.internal_politics_house_y = 37 }
+	add_to_array = { global.internal_politics_house_x = 260 }
+	add_to_array = { global.internal_politics_house_y = 48 }
+	add_to_array = { global.internal_politics_house_x = 230 }
+	add_to_array = { global.internal_politics_house_y = 89 }
+	add_to_array = { global.internal_politics_house_x = 223 }
+	add_to_array = { global.internal_politics_house_y = 100 }
+	add_to_array = { global.internal_politics_house_x = 256 }
+	add_to_array = { global.internal_politics_house_y = 62 }
+	add_to_array = { global.internal_politics_house_x = 250 }
+	add_to_array = { global.internal_politics_house_y = 73 }
+	add_to_array = { global.internal_politics_house_x = 243 }
+	add_to_array = { global.internal_politics_house_y = 84 }
+	add_to_array = { global.internal_politics_house_x = 276 }
+	add_to_array = { global.internal_politics_house_y = 46 }
+	add_to_array = { global.internal_politics_house_x = 219 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 270 }
+	add_to_array = { global.internal_politics_house_y = 57 }
+	add_to_array = { global.internal_politics_house_x = 212 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 239 }
+	add_to_array = { global.internal_politics_house_y = 97 }
+	add_to_array = { global.internal_politics_house_x = 266 }
+	add_to_array = { global.internal_politics_house_y = 70 }
+	add_to_array = { global.internal_politics_house_x = 286 }
+	add_to_array = { global.internal_politics_house_y = 55 }
+	add_to_array = { global.internal_politics_house_x = 259 }
+	add_to_array = { global.internal_politics_house_y = 81 }
+	add_to_array = { global.internal_politics_house_x = 232 }
+	add_to_array = { global.internal_politics_house_y = 108 }
+	add_to_array = { global.internal_politics_house_x = 280 }
+	add_to_array = { global.internal_politics_house_y = 66 }
+	add_to_array = { global.internal_politics_house_x = 252 }
+	add_to_array = { global.internal_politics_house_y = 93 }
+	add_to_array = { global.internal_politics_house_x = 275 }
+	add_to_array = { global.internal_politics_house_y = 80 }
+	add_to_array = { global.internal_politics_house_x = 227 }
+	add_to_array = { global.internal_politics_house_y = 121 }
+	add_to_array = { global.internal_politics_house_x = 295 }
+	add_to_array = { global.internal_politics_house_y = 65 }
+	add_to_array = { global.internal_politics_house_x = 247 }
+	add_to_array = { global.internal_politics_house_y = 106 }
+	add_to_array = { global.internal_politics_house_x = 268 }
+	add_to_array = { global.internal_politics_house_y = 91 }
+	add_to_array = { global.internal_politics_house_x = 288 }
+	add_to_array = { global.internal_politics_house_y = 76 }
+	add_to_array = { global.internal_politics_house_x = 219 }
+	add_to_array = { global.internal_politics_house_y = 132 }
+	add_to_array = { global.internal_politics_house_x = 240 }
+	add_to_array = { global.internal_politics_house_y = 117 }
+	add_to_array = { global.internal_politics_house_x = 261 }
+	add_to_array = { global.internal_politics_house_y = 102 }
+	add_to_array = { global.internal_politics_house_x = 303 }
+	add_to_array = { global.internal_politics_house_y = 75 }
+	add_to_array = { global.internal_politics_house_x = 283 }
+	add_to_array = { global.internal_politics_house_y = 90 }
+	add_to_array = { global.internal_politics_house_x = 296 }
+	add_to_array = { global.internal_politics_house_y = 87 }
+	add_to_array = { global.internal_politics_house_x = 275 }
+	add_to_array = { global.internal_politics_house_y = 101 }
+	add_to_array = { global.internal_politics_house_x = 254 }
+	add_to_array = { global.internal_politics_house_y = 116 }
+	add_to_array = { global.internal_politics_house_x = 234 }
+	add_to_array = { global.internal_politics_house_y = 130 }
+	add_to_array = { global.internal_politics_house_x = 310 }
+	add_to_array = { global.internal_politics_house_y = 86 }
+	add_to_array = { global.internal_politics_house_x = 268 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 290 }
+	add_to_array = { global.internal_politics_house_y = 101 }
+	add_to_array = { global.internal_politics_house_x = 247 }
+	add_to_array = { global.internal_politics_house_y = 127 }
+	add_to_array = { global.internal_politics_house_x = 303 }
+	add_to_array = { global.internal_politics_house_y = 98 }
+	add_to_array = { global.internal_politics_house_x = 225 }
+	add_to_array = { global.internal_politics_house_y = 141 }
+	add_to_array = { global.internal_politics_house_x = 282 }
+	add_to_array = { global.internal_politics_house_y = 113 }
+	add_to_array = { global.internal_politics_house_x = 317 }
+	add_to_array = { global.internal_politics_house_y = 98 }
+	add_to_array = { global.internal_politics_house_x = 260 }
+	add_to_array = { global.internal_politics_house_y = 126 }
+	add_to_array = { global.internal_politics_house_x = 296 }
+	add_to_array = { global.internal_politics_house_y = 112 }
+	add_to_array = { global.internal_politics_house_x = 274 }
+	add_to_array = { global.internal_politics_house_y = 125 }
+	add_to_array = { global.internal_politics_house_x = 239 }
+	add_to_array = { global.internal_politics_house_y = 140 }
+	add_to_array = { global.internal_politics_house_x = 309 }
+	add_to_array = { global.internal_politics_house_y = 110 }
+	add_to_array = { global.internal_politics_house_x = 322 }
+	add_to_array = { global.internal_politics_house_y = 110 }
+	add_to_array = { global.internal_politics_house_x = 287 }
+	add_to_array = { global.internal_politics_house_y = 124 }
+	add_to_array = { global.internal_politics_house_x = 252 }
+	add_to_array = { global.internal_politics_house_y = 138 }
+	add_to_array = { global.internal_politics_house_x = 300 }
+	add_to_array = { global.internal_politics_house_y = 124 }
+	add_to_array = { global.internal_politics_house_x = 265 }
+	add_to_array = { global.internal_politics_house_y = 138 }
+	add_to_array = { global.internal_politics_house_x = 313 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 230 }
+	add_to_array = { global.internal_politics_house_y = 151 }
+	add_to_array = { global.internal_politics_house_x = 278 }
+	add_to_array = { global.internal_politics_house_y = 137 }
+	add_to_array = { global.internal_politics_house_x = 327 }
+	add_to_array = { global.internal_politics_house_y = 123 }
+	add_to_array = { global.internal_politics_house_x = 291 }
+	add_to_array = { global.internal_politics_house_y = 136 }
+	add_to_array = { global.internal_politics_house_x = 243 }
+	add_to_array = { global.internal_politics_house_y = 151 }
+	add_to_array = { global.internal_politics_house_x = 304 }
+	add_to_array = { global.internal_politics_house_y = 136 }
+	add_to_array = { global.internal_politics_house_x = 256 }
+	add_to_array = { global.internal_politics_house_y = 150 }
+	add_to_array = { global.internal_politics_house_x = 317 }
+	add_to_array = { global.internal_politics_house_y = 135 }
+	add_to_array = { global.internal_politics_house_x = 330 }
+	add_to_array = { global.internal_politics_house_y = 135 }
+	add_to_array = { global.internal_politics_house_x = 268 }
+	add_to_array = { global.internal_politics_house_y = 150 }
+	add_to_array = { global.internal_politics_house_x = 281 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 294 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 307 }
+	add_to_array = { global.internal_politics_house_y = 149 }
+	add_to_array = { global.internal_politics_house_x = 320 }
+	add_to_array = { global.internal_politics_house_y = 148 }
+	add_to_array = { global.internal_politics_house_x = 232 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 332 }
+	add_to_array = { global.internal_politics_house_y = 148 }
+	add_to_array = { global.internal_politics_house_x = 245 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 258 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 270 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 283 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 296 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 308 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 321 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+	add_to_array = { global.internal_politics_house_x = 334 }
+	add_to_array = { global.internal_politics_house_y = 162 }
+}
+
+####################################################################################################
+### NATIONAL VOTE -> SEATS ###
+####################################################################################################
+
+# Turns party popularity into parliament seats. This effect is called by compute_seats but was
+# never carried over when the parliament system was split into the new files - without it
+# seats_array stayed at its -1 fill, every per-party seat array stayed empty, and so:
+#   - draw_seats painted all 256 seats with the fallback colour
+#   - seats_count_array stayed at 0, showing 'Government Support: 0/256'
+#   - coalition_seats_num stayed at 0, since the coalition setters read <party>_seats^num
+# Ported from the old system with three fixes: the seat counts are rounded instead of
+# truncated, the writes are bounded to the 256 seats of seats_array, and any seats left over
+# by rounding are handed to the largest party instead of staying at -1.
+compute_national_vote = {
+	parliament_compute_highest_party = yes
+
+	# kept for compatibility - the old weight based path read these
+	set_variable = { n_parl_weights^0 = party_popularity@ideology_radical_socialism }
+	set_variable = { n_parl_weights^1 = party_popularity@ideology_social_liberalism }
+	set_variable = { n_parl_weights^2 = party_popularity@social_egalitarianism }
+	set_variable = { n_parl_weights^3 = party_popularity@centrism }
+	set_variable = { n_parl_weights^4 = party_popularity@traditional_conservatism }
+	set_variable = { n_parl_weights^5 = party_popularity@radical_democracy }
+	set_variable = { n_parl_weights^6 = party_popularity@chauvinist_populism }
+	set_variable = { n_parl_weights^7 = party_popularity@autocracy }
+	set_variable = { n_parl_weights^8 = party_popularity@fundamentalism }
+
+	# popularity -> seat count (256 seats)
+	set_variable = { parl_rad_soc_seats_count = party_popularity@ideology_radical_socialism }
+	multiply_variable = { parl_rad_soc_seats_count = 256 }
+	round_variable = parl_rad_soc_seats_count
+	set_variable = { parl_soc_lib_seats_count = party_popularity@ideology_social_liberalism }
+	multiply_variable = { parl_soc_lib_seats_count = 256 }
+	round_variable = parl_soc_lib_seats_count
+	set_variable = { parl_soc_ega_seats_count = party_popularity@social_egalitarianism }
+	multiply_variable = { parl_soc_ega_seats_count = 256 }
+	round_variable = parl_soc_ega_seats_count
+	set_variable = { parl_cen_seats_count = party_popularity@centrism }
+	multiply_variable = { parl_cen_seats_count = 256 }
+	round_variable = parl_cen_seats_count
+	set_variable = { parl_tra_con_seats_count = party_popularity@traditional_conservatism }
+	multiply_variable = { parl_tra_con_seats_count = 256 }
+	round_variable = parl_tra_con_seats_count
+	set_variable = { parl_rad_dem_seats_count = party_popularity@radical_democracy }
+	multiply_variable = { parl_rad_dem_seats_count = 256 }
+	round_variable = parl_rad_dem_seats_count
+	set_variable = { parl_chauv_pop_seats_count = party_popularity@chauvinist_populism }
+	multiply_variable = { parl_chauv_pop_seats_count = 256 }
+	round_variable = parl_chauv_pop_seats_count
+	set_variable = { parl_aut_seats_count = party_popularity@autocracy }
+	multiply_variable = { parl_aut_seats_count = 256 }
+	round_variable = parl_aut_seats_count
+	set_variable = { parl_fun_seats_count = party_popularity@fundamentalism }
+	multiply_variable = { parl_fun_seats_count = 256 }
+	round_variable = parl_fun_seats_count
+
+	# the coalition setters read <party>_seats^num to maintain coalition_seats_num,
+	# so these arrays have to exist even when a party holds no seats
+	resize_array = {
+	    array = radsoc_seats
+	    value = 1
+	    size = parl_rad_soc_seats_count
+	}
+	resize_array = {
+	    array = soc_lib_seats
+	    value = 1
+	    size = parl_soc_lib_seats_count
+	}
+	resize_array = {
+	    array = socegl_seats
+	    value = 1
+	    size = parl_soc_ega_seats_count
+	}
+	resize_array = {
+	    array = cent_seats
+	    value = 1
+	    size = parl_cen_seats_count
+	}
+	resize_array = {
+	    array = trad_seats
+	    value = 1
+	    size = parl_tra_con_seats_count
+	}
+	resize_array = {
+	    array = rade_seats
+	    value = 1
+	    size = parl_rad_dem_seats_count
+	}
+	resize_array = {
+	    array = chav_seats
+	    value = 1
+	    size = parl_chauv_pop_seats_count
+	}
+	resize_array = {
+	    array = seats_auto
+	    value = 1
+	    size = parl_aut_seats_count
+	}
+	resize_array = {
+	    array = seats_fund
+	    value = 1
+	    size = parl_fun_seats_count
+	}
+
+	set_temp_variable = { current_seat_posistion = 0 }
+
+	if = {
+		limit = {
+			NOT = { has_country_flag = IP_CUSTOM_PARTIES_SET }
+		}
+
+		# seat order is kept identical to the old system so the hemicycle layout does not shift
+		for_each_loop = {
+			array = seats_fund
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 8 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = seats_auto
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 7 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = chav_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 6 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = rade_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 5 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = trad_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 4 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = cent_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 3 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = socegl_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 2 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = soc_lib_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 1 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+		for_each_loop = {
+			array = radsoc_seats
+			value = ipp_v
+			index = ipp_i
+
+			if = {
+				limit = { check_variable = { current_seat_posistion < 256 } }
+				set_variable = { seats_array^current_seat_posistion = 0 }
+				add_to_temp_variable = { current_seat_posistion = 1 }
+			}
+		}
+
+		# rounding can leave a handful of seats unassigned - give them to the largest party
+		# so that no seat is left at -1 (which would draw with the fallback colour)
+		for_each_loop = {
+			array = seats_array
+			value = parl_fill_v
+			index = parl_fill_i
+
+			if = {
+				limit = { check_variable = { seats_array^parl_fill_i < 0 } }
+				set_variable = { seats_array^parl_fill_i = highest_party_index }
+			}
+		}
+	}
+}
+
+# Works out which party is the largest and stores it as both a token and an array index.
+# highest_party_ideology is read by setup_<party>_sog and by add_<party>_sog_with_tooltip_effect
+# in the coalition scripted effects, but nothing ever wrote it - it stayed at 0, so every
+# 'this party is the largest' branch was dead code.
+parliament_compute_highest_party = {
+	set_temp_variable = { highest_party_pop = -1 }
+	set_variable = { highest_party_index = 0 }
+	set_variable = { highest_party_ideology = token:ideology_radical_socialism }
+
+	if = {
+		limit = { check_variable = { party_popularity@ideology_radical_socialism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@ideology_radical_socialism }
+		set_variable = { highest_party_index = 0 }
+		set_variable = { highest_party_ideology = token:ideology_radical_socialism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@ideology_social_liberalism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@ideology_social_liberalism }
+		set_variable = { highest_party_index = 1 }
+		set_variable = { highest_party_ideology = token:ideology_social_liberalism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@social_egalitarianism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@social_egalitarianism }
+		set_variable = { highest_party_index = 2 }
+		set_variable = { highest_party_ideology = token:social_egalitarianism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@centrism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@centrism }
+		set_variable = { highest_party_index = 3 }
+		set_variable = { highest_party_ideology = token:centrism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@traditional_conservatism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@traditional_conservatism }
+		set_variable = { highest_party_index = 4 }
+		set_variable = { highest_party_ideology = token:traditional_conservatism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@radical_democracy > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@radical_democracy }
+		set_variable = { highest_party_index = 5 }
+		set_variable = { highest_party_ideology = token:radical_democracy }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@chauvinist_populism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@chauvinist_populism }
+		set_variable = { highest_party_index = 6 }
+		set_variable = { highest_party_ideology = token:chauvinist_populism }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@autocracy > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@autocracy }
+		set_variable = { highest_party_index = 7 }
+		set_variable = { highest_party_ideology = token:autocracy }
+	}
+	if = {
+		limit = { check_variable = { party_popularity@fundamentalism > highest_party_pop } }
+		set_temp_variable = { highest_party_pop = party_popularity@fundamentalism }
+		set_variable = { highest_party_index = 8 }
+		set_variable = { highest_party_ideology = token:fundamentalism }
+	}
+}

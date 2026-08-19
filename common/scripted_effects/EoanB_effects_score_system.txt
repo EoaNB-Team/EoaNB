@@ -1,3 +1,21 @@
+########################################################################
+# EoaNB - Score & Ledger system
+########################################################################
+
+eoanb_score_vars_init = {
+	add_to_variable = { prestige_score = 0 }
+	add_to_variable = { tech_score = 0 }
+	add_to_variable = { industrial_score = 0 }
+	add_to_variable = { military_score = 0 }
+	add_to_variable = { overall_score = 0 }
+	add_to_variable = { modified_industrial_score = 0 }
+	add_to_variable = { modified_military_score = 0 }
+	add_to_variable = { score_array_position_var = 0 }
+	add_to_variable = { score_array_position_var_real = 0 }
+	add_to_variable = { show_overview_info = 0 }
+}
+
+
 eoanb_change_prestige_score = {
 	custom_effect_tooltip = eoanb_change_prestige_score_tt
 	add_to_variable = { prestige_score = eoanb_prestige_change }
@@ -8,258 +26,201 @@ eoanb_change_tech_score = {
 	add_to_variable = { tech_score = eoanb_tech_score_change }
 }
 
+
+eoanb_score_calc_industrial_score = {
+	set_temp_variable = { eoanb_ind = 0 }
+
+	add_to_temp_variable = { eoanb_ind = num_of_military_factories }
+	add_to_temp_variable = { eoanb_ind = num_of_civilian_factories }
+	add_to_temp_variable = { eoanb_ind = num_of_naval_factories }
+
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@wood          multiply = 0.10 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@coal          multiply = 0.45 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@cotton        multiply = 0.20 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@fabric        multiply = 0.30 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@iron          multiply = 0.35 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@steel         multiply = 0.45 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@rubber        multiply = 0.35 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@oil           multiply = 0.70 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@aluminium     multiply = 0.60 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@tungsten      multiply = 0.45 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@chromium      multiply = 0.40 } }
+	add_to_temp_variable = { eoanb_ind = { value = resource_produced@machine_parts multiply = 0.55 } }
+	# Not in the game yet - re-enable by removing the #
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@plastics          multiply = 0.45 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@titanium          multiply = 0.40 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@silicates         multiply = 0.45 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@ceramics          multiply = 0.20 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@rare_earth_metals multiply = 0.70 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@eletronics        multiply = 0.50 } }
+	#add_to_temp_variable = { eoanb_ind = { value = resource_produced@portable_power    multiply = 0.50 } }
+
+	add_to_temp_variable = { eoanb_ind = { value = modifier@industrial_capacity_factory             add = 1 multiply = 1.5 } }
+	add_to_temp_variable = { eoanb_ind = { value = modifier@production_speed_industrial_complex_factor add = 1 multiply = 1.5 } }
+	add_to_temp_variable = { eoanb_ind = { value = modifier@production_factory_efficiency_gain_factor add = 1 multiply = 1.5 } }
+	add_to_temp_variable = { eoanb_ind = { value = modifier@consumer_goods_expected_value           add = 1 multiply = 1.5 } }
+	add_to_temp_variable = { eoanb_ind = { value = modifier@production_factory_start_efficiency_factor add = 1 multiply = 1.5 } }
+
+	# --- Debt penalty: score * (1 - debt_level / 150) ---
+	#if = {
+	#	limit = {
+	#		has_variable = debt_level		# debt_level is defined outside this system - guard it
+	#		check_variable = { debt_level > 0 }
+	#	}
+	#	set_temp_variable = { eoanb_debt = debt_level }
+	#	divide_temp_variable = { eoanb_debt = 150 }
+	#	set_temp_variable = { eoanb_debt_mult = 1 }
+	#	subtract_from_temp_variable = { eoanb_debt_mult = eoanb_debt }
+	#	clamp_temp_variable = { var = eoanb_debt_mult min = 0 max = 1 }
+	#	multiply_temp_variable = { eoanb_ind = eoanb_debt_mult }
+	#}
+
+	# --- Industrialisation law ---
+	if = {
+		limit = { has_idea = agrarian }
+		multiply_temp_variable = { eoanb_ind = 0.50 }
+	}
+	else_if = {
+		limit = { has_idea = industrializing }
+		multiply_temp_variable = { eoanb_ind = 0.75 }
+	}
+	else_if = {
+		limit = { has_idea = industrialized }
+		multiply_temp_variable = { eoanb_ind = 0.85 }
+	}
+	else_if = {
+		limit = { has_idea = electrification }
+		multiply_temp_variable = { eoanb_ind = 0.90 }
+	}
+
+	if = {
+		limit = { is_puppet = yes }
+		multiply_temp_variable = { eoanb_ind = 0.20 }
+	}
+
+	set_variable = { industrial_score = eoanb_ind }
+}
+
+
+eoanb_score_calc_military_score = {
+	set_temp_variable = { eoanb_mil = 0 }
+
+	add_to_temp_variable = { eoanb_mil = { value = num_divisions        multiply = 2 } }
+	add_to_temp_variable = { eoanb_mil = { value = num_ships            multiply = 2 } }	# change this
+	add_to_temp_variable = { eoanb_mil = { value = land_doctrine_level  multiply = 2 } }
+	add_to_temp_variable = { eoanb_mil = { value = has_war_support      add = 1 multiply = 1.5 } }
+	add_to_temp_variable = { eoanb_mil = { value = modifier@max_planning add = 1 multiply = 2 } }
+
+	if = {
+		limit = { has_idea = law_army_tribal_neolithic }
+		multiply_temp_variable = { eoanb_mil = 0.35 }
+	}
+	else_if = {
+		limit = { has_idea = law_army_tribal_basic }
+		multiply_temp_variable = { eoanb_mil = 0.45 }
+	}
+	else_if = {
+		limit = { has_idea = law_army_tribal_improved }
+		multiply_temp_variable = { eoanb_mil = 0.55 }
+	}
+	else_if = {
+		limit = { has_idea = law_army_tribal_advanced }
+		multiply_temp_variable = { eoanb_mil = 0.60 }
+	}
+	else_if = {
+		limit = { has_idea = law_pre_industrial_army_chinese }
+		multiply_temp_variable = { eoanb_mil = 0.33 }
+	}
+	else_if = {
+		limit = { has_idea = law_pre_industrial_army }
+		multiply_temp_variable = { eoanb_mil = 0.65 }
+	}
+	else_if = {
+		limit = { has_idea = doctrine_victorian_army_1 }
+		multiply_temp_variable = { eoanb_mil = 0.75 }
+	}
+	else_if = {
+		limit = { has_idea = doctrine_victorian_army_5 }
+		multiply_temp_variable = { eoanb_mil = 0.80 }
+	}
+	else_if = {
+		limit = { has_idea = law_trench_infantry }
+		multiply_temp_variable = { eoanb_mil = 0.85 }
+	}
+	else_if = {
+		limit = { has_idea = law_combined_arms }
+		multiply_temp_variable = { eoanb_mil = 0.90 }
+	}
+	else_if = {
+		limit = { has_idea = law_modern_army }
+		multiply_temp_variable = { eoanb_mil = 0.95 }
+	}
+
+	if = {
+		limit = { is_puppet = yes }
+		multiply_temp_variable = { eoanb_mil = 0.20 }
+	}
+
+	set_variable = { military_score = eoanb_mil }
+}
+
+
 eoanb_score_system_calc = {
 	clear_array = global.score_array
 	clear_array = global.score_tag_array
 	clear_array = global.score_array_position
 
 	every_country = {
-		limit = { is_non_player_tag = no }
-
-		# Initial calculation
-		# Whenever this calculation runs, also add modified_liberty, which is a separate variable that stores
-		# liberty from events, decisions and other sources.
-
-		set_variable = { overall_score = 0 }
-		set_variable = { industrial_score = 0 }
-		set_variable = { military_score = 0 }
-		if = {
-			limit = { NOT = { has_variable = prestige_score } }
-			set_variable = { prestige_score = 0 }
-		}
-
-
-		add_to_variable = { modified_industrial_score = num_of_military_factories }
-		add_to_variable = { modified_industrial_score = num_of_civilian_factories }
-		add_to_variable = { modified_industrial_score = num_of_naval_factories }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@wood }
-		multiply_temp_variable = { eoanb_ind_temp = 0.10 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@coal }
-		multiply_temp_variable = { eoanb_ind_temp = 0.45 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@cotton }
-		multiply_temp_variable = { eoanb_ind_temp = 0.20 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@fabric }
-		multiply_temp_variable = { eoanb_ind_temp = 0.30 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@iron }
-		multiply_temp_variable = { eoanb_ind_temp = 0.35 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@steel }
-		multiply_temp_variable = { eoanb_ind_temp = 0.45 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@rubber }
-		multiply_temp_variable = { eoanb_ind_temp = 0.35 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@oil }
-		multiply_temp_variable = { eoanb_ind_temp = 0.70 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@plastics }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.45 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@aluminium }
-		multiply_temp_variable = { eoanb_ind_temp = 0.60 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@tungsten }
-		multiply_temp_variable = { eoanb_ind_temp = 0.45 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@chromium }
-		multiply_temp_variable = { eoanb_ind_temp = 0.40 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@titanium }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.40 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@silicates }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.45 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@ceramics }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.20 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = resource_produced@machine_parts }
-		multiply_temp_variable = { eoanb_ind_temp = 0.55 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@rare_earth_metals }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.70 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@eletronics }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.50 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		#set_temp_variable = { eoanb_ind_temp = resource_produced@portable_power }
-		#multiply_temp_variable = { eoanb_ind_temp = 0.50 }
-		#add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		# Industrial modifiers: (modifier + 1) * 1.5
-		set_temp_variable = { eoanb_ind_temp = modifier@industrial_capacity_factory }
-		add_to_temp_variable = { eoanb_ind_temp = 1 }
-		multiply_temp_variable = { eoanb_ind_temp = 1.5 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = modifier@production_speed_industrial_complex_factor }
-		add_to_temp_variable = { eoanb_ind_temp = 1 }
-		multiply_temp_variable = { eoanb_ind_temp = 1.5 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = modifier@production_factory_efficiency_gain_factor }
-		add_to_temp_variable = { eoanb_ind_temp = 1 }
-		multiply_temp_variable = { eoanb_ind_temp = 1.5 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = modifier@consumer_goods_expected_value }
-		add_to_temp_variable = { eoanb_ind_temp = 1 }
-		multiply_temp_variable = { eoanb_ind_temp = 1.5 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		set_temp_variable = { eoanb_ind_temp = modifier@production_factory_start_efficiency_factor }
-		add_to_temp_variable = { eoanb_ind_temp = 1 }
-		multiply_temp_variable = { eoanb_ind_temp = 1.5 }
-		add_to_variable = { modified_industrial_score = eoanb_ind_temp }
-
-		if = {
-			limit = { is_puppet = yes }
-			multiply_variable = { modified_industrial_score = 0.20 }
-			OVERLORD = {
-				add_to_variable = { modified_industrial_score = PREV.modified_industrial_score }
+		limit = {
+			NOT = {
+				OR = {
+					tag = UCT
+					tag = AFR
+				}
 			}
 		}
-		else_if = {
-			limit = { has_idea = agrarian }
-			multiply_variable = { modified_industrial_score = 0.50 }
-		}
-		else_if = {
-			limit = { has_idea = industrializing }
-			multiply_variable = { modified_industrial_score = 0.75 }
-		}
-		else_if = {
-			limit = { has_idea = industrialized }
-			multiply_variable = { modified_industrial_score = 0.85 }
-		}
-		else_if = {
-			limit = { has_idea = electrification }
-			multiply_variable = { modified_industrial_score = 0.90 }
-		}
-
-		#debt
-		#if = {
-		#	limit = { check_variable = { debt_level > 0 } }
-		#	set_temp_variable = { debt_level_temp = debt_level }
-		#	set_temp_variable = { debt_level_temp_mod = 1 }
-		#	divide_temp_variable = { debt_level_temp = 150 }
-		#	subtract_from_temp_variable = { debt_level_temp_mod = debt_level_temp }
-		#	multiply_variable = { modified_industrial_score = debt_level_temp_mod }
-		#}
-
-		add_to_variable = { industrial_score = modified_industrial_score }
-		set_variable = { modified_industrial_score = 0 }
-
-		set_temp_variable = { eoanb_mil_temp = num_divisions }
-		multiply_temp_variable = { eoanb_mil_temp = 2 }
-		add_to_variable = { modified_military_score = eoanb_mil_temp }
-
-		set_temp_variable = { eoanb_mil_temp = has_war_support }
-		add_to_temp_variable = { eoanb_mil_temp = 1 }
-		multiply_temp_variable = { eoanb_mil_temp = 1.5 }
-		add_to_variable = { modified_military_score = eoanb_mil_temp }
-
-		set_temp_variable = { eoanb_mil_temp = land_doctrine_level }
-		multiply_temp_variable = { eoanb_mil_temp = 2 }
-		add_to_variable = { modified_military_score = eoanb_mil_temp }
-
-		set_temp_variable = { eoanb_mil_temp = modifier@max_planning }
-		add_to_temp_variable = { eoanb_mil_temp = 1 }
-		multiply_temp_variable = { eoanb_mil_temp = 2 }
-		add_to_variable = { modified_military_score = eoanb_mil_temp }
-
-		set_temp_variable = { eoanb_mil_temp = num_ships } #change this
-		multiply_temp_variable = { eoanb_mil_temp = 2 }
-		add_to_variable = { modified_military_score = eoanb_mil_temp }
-
-		if = {
-			limit = { is_puppet = yes }
-			multiply_variable = { modified_military_score = 0.20 }
-			OVERLORD = {
-				add_to_variable = { modified_military_score = PREV.modified_military_score }
+		eoanb_score_vars_init = yes			# guarantees prestige_score / tech_score exist before they are read or clamped
+		eoanb_score_calc_industrial_score = yes
+		eoanb_score_calc_military_score = yes
+	}
+	
+	every_country = {
+		limit = {
+			is_puppet = yes
+			NOT = {
+				OR = {
+					tag = UCT
+					tag = AFR
+				}
 			}
 		}
+		OVERLORD = {
+			add_to_variable = { industrial_score = PREV.industrial_score }
+			add_to_variable = { military_score = PREV.military_score }
+		}
+	}
 
-		if = {
-			limit = { has_idea = law_army_tribal_neolithic }
-			multiply_variable = { modified_military_score = 0.35 }
+	every_country = {
+		limit = {
+			NOT = {
+				OR = {
+					tag = UCT
+					tag = AFR
+				}
+			}
 		}
-		else_if = {
-			limit = { has_idea = law_army_tribal_basic }
-			multiply_variable = { modified_military_score = 0.45 }
-		}
-		else_if = {
-			limit = { has_idea = law_army_tribal_improved }
-			multiply_variable = { modified_military_score = 0.55 }
-		}
-		else_if = {
-			limit = { has_idea = law_army_tribal_advanced }
-			multiply_variable = { modified_military_score = 0.60 }
-		}
-		else_if = {
-			limit = { has_idea = law_pre_industrial_army_chinese }
-			multiply_variable = { modified_military_score = 0.33 }
-		}
-		else_if = {
-			limit = { has_idea = law_pre_industrial_army }
-			multiply_variable = { modified_military_score = 0.65 }
-		}
-		else_if = {
-			limit = { has_idea = doctrine_victorian_army_1 }
-			multiply_variable = { modified_military_score = 0.75 }
-		}
-		else_if = {
-			limit = { has_idea = doctrine_victorian_army_5 }
-			multiply_variable = { modified_military_score = 0.80 }
-		}
-		else_if = {
-			limit = { has_idea = law_trench_infantry }
-			multiply_variable = { modified_military_score = 0.85 }
-		}
-		else_if = {
-			limit = { has_idea = law_combined_arms }
-			multiply_variable = { modified_military_score = 0.90 }
-		}
-		else_if = {
-			limit = { has_idea = law_modern_army }
-			multiply_variable = { modified_military_score = 0.95 }
-		}
-
-		add_to_variable = { military_score = modified_military_score }
-		set_variable = { modified_military_score = 0 }
 
 		multiply_variable = { industrial_score = 0.5 }
 		multiply_variable = { military_score = 0.5 }
-		add_to_variable = { overall_score = industrial_score }
-		add_to_variable = { overall_score = military_score }
 
 		clamp_variable = {
 			var = prestige_score
 			min = 0
 			max = 1000000
 		}
+
+		set_variable = { overall_score = industrial_score }
+		add_to_variable = { overall_score = military_score }
 		add_to_variable = { overall_score = prestige_score }
 		add_to_variable = { overall_score = tech_score }
 		clamp_variable = {
@@ -268,66 +229,39 @@ eoanb_score_system_calc = {
 			max = 1000000
 		}
 
-		add_to_array = { global.score_array = overall_score }
-		add_to_array = { global.score_tag_array = THIS.id }
+		add_to_temp_array = { eoanb_sort_scores = overall_score }
+		add_to_temp_array = { eoanb_sort_tags = THIS }
 	}
 
-	set_temp_variable = { length_temp = global.score_array^num }
-
-	for_loop_effect = {
-		start = 0
-		end = length_temp
-		add = 1
-		value = v
+	while_loop_effect = {
+		limit = { check_variable = { eoanb_sort_scores^num > 0 } }
 		find_highest_in_array = {
-			array = global.score_array
-			value = score_array_highest_value
-			index = score_array_highest_index
+			array = eoanb_sort_scores
+			value = eoanb_top_value
+			index = eoanb_top_index
 		}
-		set_temp_variable = { tag_temp = global.score_tag_array^score_array_highest_index }
-		remove_from_array = {
-			array = global.score_array
-			index = score_array_highest_index
-		}
-		remove_from_array = {
-			array = global.score_tag_array
-			index = score_array_highest_index
-		}
-		add_to_temp_array = {
-			array = global.score_array_temp
-			value = score_array_highest_value
-		}
-		add_to_temp_array = {
-			array = global.score_tag_array_temp
-			value = tag_temp
-		}
+		add_to_array = { global.score_array = eoanb_top_value }
+		add_to_array = { global.score_tag_array = eoanb_sort_tags^eoanb_top_index }
+		remove_from_temp_array = { array = eoanb_sort_scores index = eoanb_top_index }
+		remove_from_temp_array = { array = eoanb_sort_tags index = eoanb_top_index }
 	}
 
 	for_loop_effect = {
 		start = 0
-		end = length_temp
-		add = 1
-		value = v
-		add_to_array = {
-			array = global.score_array
-			value = global.score_array_temp^v
-		}
-		add_to_array = {
-			array = global.score_tag_array
-			value = global.score_tag_array_temp^v
-		}
-		add_to_array = {
-			array = global.score_array_position
-			value = v
-		}
-		add_to_variable = { global.score_array_position^v = 1 }
-		set_temp_variable = { eoanb_rank_tag = global.score_tag_array_temp^v }
-		var:eoanb_rank_tag = {
-			set_variable = { score_array_position_var = v }
-			add_to_variable = { score_array_position_var = 1 }
+		end = global.score_tag_array^num
+		value = eoanb_index
+
+		set_temp_variable = { eoanb_rank = eoanb_index }
+		add_to_temp_variable = { eoanb_rank = 1 }
+		add_to_array = { global.score_array_position = eoanb_rank }
+
+		var:global.score_tag_array^eoanb_index = {
+			set_variable = { score_array_position_var = eoanb_rank }
+			set_variable = { score_array_position_var_real = eoanb_index }
 		}
 	}
 }
+
 
 eoanb_ledger_system_calc = {
 	clear_array = global.population_array
@@ -336,36 +270,62 @@ eoanb_ledger_system_calc = {
 	clear_array = global.divisions_array
 	clear_array = global.ships_array
 
-	set_temp_variable = { length_temp = global.score_tag_array^num }
-
-	resize_array = { array = global.population_array    value = 1  size = length_temp }
-	resize_array = { array = global.population_array_b  value = 1  size = length_temp }
-	resize_array = { array = global.factories_array     value = 1  size = length_temp }
-	resize_array = { array = global.divisions_array     value = 1  size = length_temp }
-	resize_array = { array = global.ships_array         value = 1  size = length_temp }
-
 	for_loop_effect = {
 		start = 0
-		end = length_temp
-		add = 1
-		value = v
-		set_temp_variable = { eoanb_tag_temp = global.score_tag_array^v }
-		var:eoanb_tag_temp = {
+		end = global.score_tag_array^num
+		value = eoanb_index
+
+		set_temp_variable = { eoanb_pop = 1 }
+		set_temp_variable = { eoanb_pop_b = 1 }
+		set_temp_variable = { eoanb_fac = 1 }
+		set_temp_variable = { eoanb_div = 1 }
+		set_temp_variable = { eoanb_ships = 1 }
+		set_temp_variable = { eoanb_listed = 0 }
+
+		var:global.score_tag_array^eoanb_index = {
 			if = {
 				limit = {
-					NOT = { OR = { tag = UCT  tag = AFR } }
+					NOT = {
+						OR = {
+							tag = UCT
+							tag = AFR
+						}
+					}
 				}
-				set_variable = { score_array_position_var_real = v }
+				set_temp_variable = { eoanb_listed = 1 }
+				set_temp_variable = { eoanb_pop   = max_manpower_k }	# total population, in thousands
+				set_temp_variable = { eoanb_fac   = num_of_factories }
+				set_temp_variable = { eoanb_div   = num_divisions }
+				set_temp_variable = { eoanb_ships = num_ships }
 
-				set_variable = { global.population_array^v = max_manpower_k }
-				multiply_variable = { global.population_array^v = 0.001 }
-				set_variable = { global.population_array_b^v = global.population_array^v }
-				multiply_variable = { global.population_array_b^v = 0.001 }
-
-				set_variable = { global.factories_array^v = num_of_factories }
-				set_variable = { global.divisions_array^v = num_divisions }
-				set_variable = { global.ships_array^v = num_ships }
 			}
 		}
+
+		if = {
+			limit = { check_variable = { eoanb_listed > 0 } }
+			multiply_temp_variable = { eoanb_pop = 0.001 }		# thousands -> millions
+			set_temp_variable = { eoanb_pop_b = eoanb_pop }
+			multiply_temp_variable = { eoanb_pop_b = 0.001 }
+		}
+
+		add_to_array = { global.population_array = eoanb_pop }
+		add_to_array = { global.population_array_b = eoanb_pop_b }
+		add_to_array = { global.factories_array = eoanb_fac }
+		add_to_array = { global.divisions_array = eoanb_div }
+		add_to_array = { global.ships_array = eoanb_ships }
+	}
+}
+
+
+d_eoanb_recalc_score = {
+	eoanb_score_system_calc = yes
+	eoanb_ledger_system_calc = yes
+}
+
+d_eoanb_pop_test = {
+	every_country = {
+		limit = { is_major = yes }
+		set_temp_variable = { eoanb_dbg_raw = max_manpower_k }
+		log = "[?THIS.GetName]: max_manpower_k = [?eoanb_dbg_raw]"
 	}
 }
