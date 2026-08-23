@@ -1062,24 +1062,33 @@ news_event = {
 	}
 }
 
-country_event = { #ENG - a plan to stop EGY using forced labour on the suez
+country_event = { #ENG - reports of the corvee reach London
 	id = afr_EGY_vic.21
 	title = afr_EGY_vic.21.t
 	desc = afr_EGY_vic.21.d
-
+ 
 	is_triggered_only = yes
-
-	immediate={
-		set_country_flag = EGY_corvee_suez_disabled
+ 
+	immediate = {
+		hidden_effect = {
+			set_country_flag = EGY_corvee_suez_protest_sent
+		}
 	}
-
+ 
 	option = {#pressure the Egyptian government
 		name = afr_EGY_vic.21.a
+		ai_chance = { base = 70 }
 		add_political_power = -50
-		EGY={country_event={id = afr_EGY_vic.25 days = 2}}
+		EGY = { country_event = { id = afr_EGY_vic.25 days = 2 } }
 	}
 	option = {#Incite the Egyptian Bedouins to revolt
 		name = afr_EGY_vic.21.b
+		ai_chance = { base = 30 }
+		add_political_power = -25
+		EGY = {
+			add_stability = -0.03
+			add_war_support = -0.02
+		}
 	}
 }
 
@@ -1172,10 +1181,22 @@ country_event = {
 			}
 		}
 		custom_effect_tooltip = Suez_Canal_investment_effect_tt
-		add_to_array = { EGY.suezInvestors = THIS.id }
 		hidden_effect = {
 			set_country_flag = suez_contributor_flag
 			set_variable = { suez_investment = 0 }
+			if = {
+				limit = {
+					NOT = {
+						EGY = {
+							is_in_array = {
+								array = suezInvestors
+								value = THIS.id
+							}
+						}
+					}
+				}
+				add_to_array = { EGY.suezInvestors = THIS.id }
+			}
 		}
 	}
 
@@ -1211,33 +1232,45 @@ country_event = { # ETH - EGY offers shares in the suez canal
 
 	option = {#yes
 		name = afr_EGY_vic.26.a
-		custom_effect_tooltip=Suez_Canal_investment_effect_tt
-		add_to_array = { EGY.suezInvestors = THIS.id }
-		hidden_effect={
-			set_country_flag = suez_constructor_flag
-			set_variable = { suez_investment = 0 }
-		}
 		ai_chance = {
-			factor = 30
+			base = 30
 			modifier = {
 				factor = 0.5
 				TAG = ENG
 			}
 			modifier = {
 				factor = 0.2
-				OR={
+				OR = {
 					TAG = AUS
 					TAG = RUS
 				}
 			}
 			modifier = {
 				factor = 0.1
-				OR={
+				OR = {
 					TAG = PRS
 					TAG = SPA
 					TAG = SWE
 					TAG = OTO
 				}
+			}
+		}
+		custom_effect_tooltip = Suez_Canal_investment_effect_tt
+		hidden_effect = {
+			set_country_flag = suez_constructor_flag
+			set_variable = { suez_investment = 0 }
+			if = {
+				limit = {
+					NOT = {
+						EGY = {
+							is_in_array = {
+								array = suezInvestors
+								value = THIS.id
+							}
+						}
+					}
+				}
+				add_to_array = { EGY.suezInvestors = THIS.id }
 			}
 		}
 	}
