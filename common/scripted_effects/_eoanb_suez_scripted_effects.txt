@@ -1,0 +1,49 @@
+# complete_effect: reserve this decision's contribution as "in progress"
+EGY_suez_begin_work = {
+	add_to_variable = { var = EGY.suez_inprogress value = suez_step }
+	EGY_suez_recalculate_total = yes
+}
+
+# remove_effect: the timer finished, bank the progress and release the reservation
+EGY_suez_finish_work = {
+	if = {
+		limit = {
+			check_variable = {
+				var = EGY.suez_progress
+				value = EGY.suez_progress_max
+				compare = less_than
+			}
+		}
+		add_to_variable = { var = EGY.suez_progress value = suez_step }
+		add_to_variable = { var = suez_investment value = suez_step }
+		clamp_variable = {
+			var = EGY.suez_progress
+			min = 0
+			max = EGY.suez_progress_max
+		}
+	}
+	subtract_from_variable = { var = EGY.suez_inprogress value = suez_step }
+	EGY_suez_recalculate_total = yes
+}
+
+# cancel_effect: cancelled by the player or by cancel_trigger.
+EGY_suez_abort_work = {
+	subtract_from_variable = { var = EGY.suez_inprogress value = suez_step }
+	EGY_suez_recalculate_total = yes
+}
+
+# Single place where the "banked + reserved" figure the GUI reads is derived.
+EGY_suez_recalculate_total = {
+	clamp_variable = {
+		var = EGY.suez_inprogress
+		min = 0
+		max = EGY.suez_progress_max
+	}
+	set_variable = { EGY.suez_inprogress_total = EGY.suez_progress }
+	add_to_variable = { var = EGY.suez_inprogress_total value = EGY.suez_inprogress }
+	clamp_variable = {
+		var = EGY.suez_inprogress_total
+		min = 0
+		max = EGY.suez_progress_max
+	}
+}
