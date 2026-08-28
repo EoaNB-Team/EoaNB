@@ -570,3 +570,435 @@ FRA_decrease_legitimist_bonapartist_influence = {
 		FRA_refresh_imperial_influence = yes
 	}
 }
+
+# The Imperial Ministry (inner circle) - state handling
+#
+# Seat variables hold the identity of the sitting minister:
+# 0 = vacant, 1 = Walewski, 2 = de Morny, 3 = Eugenie, 4 = Thouvenel,
+# 5 = Rouher, 6 = Persigny, 7 = Fould
+
+FRA_imperial_ministry_initialise = {
+	custom_effect_tooltip = FRA_imperial_ministry_unlocked_tt
+	hidden_effect = {
+		set_variable = { FRA_ministry_seat_1 = 0 }
+		set_variable = { FRA_ministry_seat_2 = 0 }
+		set_variable = { FRA_ministry_seat_3 = 0 }
+		set_variable = { FRA_ministry_seats_used = 0 }
+		set_country_flag = FRA_imperial_ministry_active
+	}
+}
+
+# Expects FRA_ministry_appointee to be set beforehand.
+FRA_ministry_seat_assign = {
+	if = {
+		limit = { check_variable = { FRA_ministry_seat_1 = 0 } }
+		set_variable = { FRA_ministry_seat_1 = FRA_ministry_appointee }
+		add_to_variable = { FRA_ministry_seats_used = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { FRA_ministry_seat_2 = 0 } }
+		set_variable = { FRA_ministry_seat_2 = FRA_ministry_appointee }
+		add_to_variable = { FRA_ministry_seats_used = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { FRA_ministry_seat_3 = 0 } }
+		set_variable = { FRA_ministry_seat_3 = FRA_ministry_appointee }
+		add_to_variable = { FRA_ministry_seats_used = 1 }
+	}
+	clamp_variable = { var = FRA_ministry_seats_used min = 0 max = 3 }
+}
+
+# Expects FRA_ministry_leaver to be set beforehand.
+FRA_ministry_seat_vacate = {
+	if = {
+		limit = { check_variable = { FRA_ministry_seat_1 = FRA_ministry_leaver } }
+		set_variable = { FRA_ministry_seat_1 = 0 }
+		subtract_from_variable = { FRA_ministry_seats_used = 1 }
+	}
+	if = {
+		limit = { check_variable = { FRA_ministry_seat_2 = FRA_ministry_leaver } }
+		set_variable = { FRA_ministry_seat_2 = 0 }
+		subtract_from_variable = { FRA_ministry_seats_used = 1 }
+	}
+	if = {
+		limit = { check_variable = { FRA_ministry_seat_3 = FRA_ministry_leaver } }
+		set_variable = { FRA_ministry_seat_3 = 0 }
+		subtract_from_variable = { FRA_ministry_seats_used = 1 }
+	}
+	clamp_variable = { var = FRA_ministry_seats_used min = 0 max = 3 }
+}
+
+#---------------------------------------------------------------------------------------
+#	OPINION UPKEEP
+#---------------------------------------------------------------------------------------
+
+FRA_ministry_clear_eugenie_opinions = {
+	if = {
+		limit = { country_exists = PAP }
+		PAP = {
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_20 }
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_25 }
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_35 }
+		}
+	}
+	if = {
+		limit = { country_exists = ITA }
+		ITA = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_italy_malus } }
+	}
+	if = {
+		limit = { country_exists = AUS }
+		AUS = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_austria_bonus } }
+	}
+	if = {
+		limit = { country_exists = SPR }
+		SPR = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_spain_bonus } }
+	}
+}
+
+FRA_ministry_refresh_eugenie_opinions = {
+	FRA_ministry_clear_eugenie_opinions = yes
+	if = {
+		limit = { has_idea = FRA_ministry_eugenie_1 }
+		if = {
+			limit = { country_exists = PAP }
+			PAP = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_20 } }
+		}
+	}
+	else_if = {
+		limit = { has_idea = FRA_ministry_eugenie_4 }
+		if = {
+			limit = { country_exists = PAP }
+			PAP = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_35 } }
+		}
+		FRA_ministry_apply_eugenie_court_opinions = yes
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_idea = FRA_ministry_eugenie_2
+				has_idea = FRA_ministry_eugenie_3
+			}
+		}
+		if = {
+			limit = { country_exists = PAP }
+			PAP = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_pap_25 } }
+		}
+		FRA_ministry_apply_eugenie_court_opinions = yes
+	}
+}
+
+FRA_ministry_apply_eugenie_court_opinions = {
+	if = {
+		limit = { country_exists = ITA }
+		ITA = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_italy_malus } }
+	}
+	if = {
+		limit = { country_exists = AUS }
+		AUS = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_austria_bonus } }
+	}
+	if = {
+		limit = { country_exists = SPR }
+		SPR = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_eugenie_spain_bonus } }
+	}
+}
+
+FRA_ministry_clear_thouvenel_opinions = {
+	if = {
+		limit = { country_exists = TUR }
+		TUR = {
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_ottoman_15 }
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_ottoman_20 }
+		}
+	}
+	if = {
+		limit = { country_exists = ITA }
+		ITA = {
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_italy_25 }
+			remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_italy_35 }
+		}
+	}
+	if = {
+		limit = { country_exists = AUS }
+		AUS = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_austria_malus } }
+	}
+	if = {
+		limit = { country_exists = ENG }
+		ENG = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_britain_bonus } }
+	}
+}
+
+FRA_ministry_refresh_thouvenel_opinions = {
+	FRA_ministry_clear_thouvenel_opinions = yes
+	if = {
+		limit = { has_idea = FRA_ministry_thouvenel_1 }
+		if = {
+			limit = { country_exists = TUR }
+			TUR = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_ottoman_15 } }
+		}
+		if = {
+			limit = { country_exists = ITA }
+			ITA = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_italy_25 } }
+		}
+	}
+	else_if = {
+		limit = {
+			OR = {
+				has_idea = FRA_ministry_thouvenel_2
+				has_idea = FRA_ministry_thouvenel_3
+				has_idea = FRA_ministry_thouvenel_4
+			}
+		}
+		if = {
+			limit = { country_exists = TUR }
+			TUR = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_ottoman_20 } }
+		}
+		if = {
+			limit = { country_exists = ITA }
+			ITA = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_italy_35 } }
+		}
+		if = {
+			limit = { country_exists = AUS }
+			AUS = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_austria_malus } }
+		}
+		if = {
+			limit = { country_exists = ENG }
+			ENG = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_thouvenel_britain_bonus } }
+		}
+	}
+}
+
+FRA_ministry_refresh_persigny_opinions = {
+	if = {
+		limit = { country_exists = ENG }
+		ENG = { remove_opinion_modifier = { target = FRA modifier = FRA_ministry_persigny_britain_malus } }
+	}
+	if = {
+		limit = {
+			country_exists = ENG
+			OR = {
+				has_idea = FRA_ministry_persigny_2
+				has_idea = FRA_ministry_persigny_3
+				has_idea = FRA_ministry_persigny_4
+			}
+		}
+		ENG = { add_opinion_modifier = { target = FRA modifier = FRA_ministry_persigny_britain_malus } }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	APPOINTMENTS
+#---------------------------------------------------------------------------------------
+
+FRA_ministry_appoint_walewski = {
+	set_country_flag = FRA_ministry_member_walewski
+	add_ideas = FRA_ministry_walewski_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 1 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+FRA_ministry_appoint_de_morny = {
+	set_country_flag = FRA_ministry_member_de_morny
+	add_ideas = FRA_ministry_de_morny_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 2 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+FRA_ministry_appoint_eugenie = {
+	set_country_flag = FRA_ministry_member_eugenie
+	add_ideas = FRA_ministry_eugenie_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 3 }
+		FRA_ministry_seat_assign = yes
+		FRA_ministry_refresh_eugenie_opinions = yes
+	}
+}
+
+FRA_ministry_appoint_thouvenel = {
+	set_country_flag = FRA_ministry_member_thouvenel
+	add_ideas = FRA_ministry_thouvenel_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 4 }
+		FRA_ministry_seat_assign = yes
+		FRA_ministry_refresh_thouvenel_opinions = yes
+	}
+}
+
+FRA_ministry_appoint_rouher = {
+	set_country_flag = FRA_ministry_member_rouher
+	add_ideas = FRA_ministry_rouher_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 5 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+FRA_ministry_appoint_persigny = {
+	set_country_flag = FRA_ministry_member_persigny
+	add_ideas = FRA_ministry_persigny_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 6 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+FRA_ministry_appoint_fould = {
+	set_country_flag = FRA_ministry_member_fould
+	add_ideas = FRA_ministry_fould_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 7 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	PROMOTIONS
+#---------------------------------------------------------------------------------------
+
+FRA_ministry_walewski_to_tier_2 = { swap_ideas = { remove_idea = FRA_ministry_walewski_1 add_idea = FRA_ministry_walewski_2 } }
+FRA_ministry_walewski_to_tier_3 = { swap_ideas = { remove_idea = FRA_ministry_walewski_2 add_idea = FRA_ministry_walewski_3 } }
+FRA_ministry_walewski_to_tier_4 = { swap_ideas = { remove_idea = FRA_ministry_walewski_3 add_idea = FRA_ministry_walewski_4 } }
+
+FRA_ministry_de_morny_to_tier_2 = { swap_ideas = { remove_idea = FRA_ministry_de_morny_1 add_idea = FRA_ministry_de_morny_2 } }
+FRA_ministry_de_morny_to_tier_3 = { swap_ideas = { remove_idea = FRA_ministry_de_morny_2 add_idea = FRA_ministry_de_morny_3 } }
+FRA_ministry_de_morny_to_tier_4 = { swap_ideas = { remove_idea = FRA_ministry_de_morny_3 add_idea = FRA_ministry_de_morny_4 } }
+
+FRA_ministry_eugenie_to_tier_2 = {
+	swap_ideas = { remove_idea = FRA_ministry_eugenie_1 add_idea = FRA_ministry_eugenie_2 }
+	hidden_effect = { FRA_ministry_refresh_eugenie_opinions = yes }
+}
+FRA_ministry_eugenie_to_tier_3 = {
+	swap_ideas = { remove_idea = FRA_ministry_eugenie_2 add_idea = FRA_ministry_eugenie_3 }
+	hidden_effect = { FRA_ministry_refresh_eugenie_opinions = yes }
+}
+FRA_ministry_eugenie_to_tier_4 = {
+	swap_ideas = { remove_idea = FRA_ministry_eugenie_3 add_idea = FRA_ministry_eugenie_4 }
+	hidden_effect = { FRA_ministry_refresh_eugenie_opinions = yes }
+}
+
+FRA_ministry_thouvenel_to_tier_2 = {
+	swap_ideas = { remove_idea = FRA_ministry_thouvenel_1 add_idea = FRA_ministry_thouvenel_2 }
+	hidden_effect = { FRA_ministry_refresh_thouvenel_opinions = yes }
+}
+FRA_ministry_thouvenel_to_tier_3 = {
+	swap_ideas = { remove_idea = FRA_ministry_thouvenel_2 add_idea = FRA_ministry_thouvenel_3 }
+	hidden_effect = { FRA_ministry_refresh_thouvenel_opinions = yes }
+}
+FRA_ministry_thouvenel_to_tier_4 = {
+	swap_ideas = { remove_idea = FRA_ministry_thouvenel_3 add_idea = FRA_ministry_thouvenel_4 }
+	hidden_effect = { FRA_ministry_refresh_thouvenel_opinions = yes }
+}
+
+FRA_ministry_rouher_to_tier_2 = { swap_ideas = { remove_idea = FRA_ministry_rouher_1 add_idea = FRA_ministry_rouher_2 } }
+FRA_ministry_rouher_to_tier_3 = { swap_ideas = { remove_idea = FRA_ministry_rouher_2 add_idea = FRA_ministry_rouher_3 } }
+FRA_ministry_rouher_to_tier_4 = { swap_ideas = { remove_idea = FRA_ministry_rouher_3 add_idea = FRA_ministry_rouher_4 } }
+
+FRA_ministry_persigny_to_tier_2 = {
+	swap_ideas = { remove_idea = FRA_ministry_persigny_1 add_idea = FRA_ministry_persigny_2 }
+	hidden_effect = { FRA_ministry_refresh_persigny_opinions = yes }
+}
+FRA_ministry_persigny_to_tier_3 = {
+	swap_ideas = { remove_idea = FRA_ministry_persigny_2 add_idea = FRA_ministry_persigny_3 }
+	hidden_effect = { FRA_ministry_refresh_persigny_opinions = yes }
+}
+FRA_ministry_persigny_to_tier_4 = {
+	swap_ideas = { remove_idea = FRA_ministry_persigny_3 add_idea = FRA_ministry_persigny_4 }
+	hidden_effect = { FRA_ministry_refresh_persigny_opinions = yes }
+}
+
+FRA_ministry_fould_to_tier_2 = { swap_ideas = { remove_idea = FRA_ministry_fould_1 add_idea = FRA_ministry_fould_2 } }
+FRA_ministry_fould_to_tier_3 = { swap_ideas = { remove_idea = FRA_ministry_fould_2 add_idea = FRA_ministry_fould_3 } }
+FRA_ministry_fould_to_tier_4 = { swap_ideas = { remove_idea = FRA_ministry_fould_3 add_idea = FRA_ministry_fould_4 } }
+
+#---------------------------------------------------------------------------------------
+#	THE PARLIAMENTARY DEBATE DISCOUNT
+#---------------------------------------------------------------------------------------
+#
+# Only Persigny's half-price clause is implemented here; the Debate mechanic itself
+# (Strengthen Parliament -> Parliamentary Debate, and Discussion of Amendments ->
+# Debate the Emperor's Policy) is not written yet. When it is, it should price every
+# political power cost through FRA_pay_debate_pp_cost so the discount applies
+# automatically:
+#
+#	set_temp_variable = { FRA_debate_pp_cost = 50 }   # the undiscounted PP cost
+#	FRA_pay_debate_pp_cost = yes
+#
+# and it may read `FRA_debate_pp_cost_factor` (0.5 or 1) to display a discounted price.
+
+FRA_ministry_grant_debate_discount = {
+	custom_effect_tooltip = FRA_persigny_debate_discount_tt
+	hidden_effect = {
+		set_country_flag = FRA_persigny_debate_discount
+		FRA_refresh_debate_pp_cost_factor = yes
+	}
+}
+
+FRA_refresh_debate_pp_cost_factor = {
+	if = {
+		limit = { FRA_has_persigny_debate_discount = yes }
+		set_variable = { FRA_debate_pp_cost_factor = 0.5 }
+	}
+	else = { set_variable = { FRA_debate_pp_cost_factor = 1 } }
+}
+
+# Expects FRA_debate_pp_cost to hold the undiscounted cost as a positive number.
+FRA_pay_debate_pp_cost = {
+	hidden_effect = { FRA_refresh_debate_pp_cost_factor = yes }
+	multiply_temp_variable = { FRA_debate_pp_cost = FRA_debate_pp_cost_factor }
+	multiply_temp_variable = { FRA_debate_pp_cost = -1 }
+	add_political_power = FRA_debate_pp_cost
+}
+
+#---------------------------------------------------------------------------------------
+#	DEPARTURES
+#---------------------------------------------------------------------------------------
+
+# Called from france.601 (death of Charles de Morny, 10.03.1865).
+FRA_ministry_remove_de_morny = {
+	if = {
+		limit = { has_country_flag = FRA_ministry_member_de_morny }
+		custom_effect_tooltip = FRA_ministry_de_morny_departs_tt
+		hidden_effect = {
+			set_variable = { FRA_ministry_de_morny_tier = 1 }
+			if = { limit = { has_idea = FRA_ministry_de_morny_2 } set_variable = { FRA_ministry_de_morny_tier = 2 } }
+			else_if = { limit = { has_idea = FRA_ministry_de_morny_3 } set_variable = { FRA_ministry_de_morny_tier = 3 } }
+			else_if = { limit = { has_idea = FRA_ministry_de_morny_4 } set_variable = { FRA_ministry_de_morny_tier = 4 } }
+			remove_ideas = {
+				FRA_ministry_de_morny_1
+				FRA_ministry_de_morny_2
+				FRA_ministry_de_morny_3
+				FRA_ministry_de_morny_4
+			}
+			set_temp_variable = { FRA_ministry_leaver = 2 }
+			FRA_ministry_seat_vacate = yes
+		}
+	}
+	set_country_flag = FRA_ministry_de_morny_departed
+}
+
+# Hook for the future "Responsible Ministries" focus, which seats Emile Ollivier in
+# de Morny's place on the same track. It restores the seat and the tier the branch had
+# already reached, so the remaining de Morny focuses become available again.
+# TODO: give Ollivier his own portrait and ideas once that focus is written.
+FRA_ministry_ollivier_succeeds_de_morny = {
+	custom_effect_tooltip = FRA_ministry_ollivier_succeeds_de_morny_tt
+	hidden_effect = {
+		set_country_flag = FRA_ministry_ollivier_succeeded_de_morny
+		if = {
+			limit = { NOT = { has_variable = FRA_ministry_de_morny_tier } }
+			set_variable = { FRA_ministry_de_morny_tier = 1 }
+		}
+		if = { limit = { check_variable = { FRA_ministry_de_morny_tier = 4 } } add_ideas = FRA_ministry_de_morny_4 }
+		else_if = { limit = { check_variable = { FRA_ministry_de_morny_tier = 3 } } add_ideas = FRA_ministry_de_morny_3 }
+		else_if = { limit = { check_variable = { FRA_ministry_de_morny_tier = 2 } } add_ideas = FRA_ministry_de_morny_2 }
+		else = { add_ideas = FRA_ministry_de_morny_1 }
+		if = {
+			limit = { FRA_imperial_ministry_has_free_seat = yes }
+			set_temp_variable = { FRA_ministry_appointee = 2 }
+			FRA_ministry_seat_assign = yes
+		}
+	}
+}
