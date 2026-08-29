@@ -545,32 +545,32 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		
-		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 reflection = reflect( -lightingProperties._ToCameraDir, vNormal );
-			float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-			
-			float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor, lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
-		#endif
-		
-		#ifdef PDX_SNOW
+
+			#ifdef PDX_IMPROVED_BLINN_PHONG
+				float3 reflection = reflect( -lightingProperties._ToCameraDir, vNormal );
+				float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
+				
+				float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
+				specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor, lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
+			#endif
+
+			#ifdef PDX_SNOW
 			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
-		#else
+			#else
 			vColor = ComposeLightMesh(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
-		#endif
+			#endif
 
 			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
 
 			float alpha = 0.0f;
-		#ifdef EMISSIVE
-			float vDayNightFactor = DayNightFactor( vGlobalNormal );
-			vEmissive = vEmissive * vDayNightFactor;
-			//vColor = lerp( vColor, float3(1,0.7,0), vEmissive * vDayNightFactor );	
-			vColor = lerp( vColor, vDiffuse.rgb, vEmissive );
-			alpha = vEmissive;
-		#endif
-		
+			#ifdef EMISSIVE
+				float vDayNightFactor = DayNightFactor( vGlobalNormal );
+				vEmissive = vEmissive * vDayNightFactor;
+				//vColor = lerp( vColor, float3(1,0.7,0), vEmissive * vDayNightFactor );	
+				vColor = lerp( vColor, vDiffuse.rgb, vEmissive );
+				alpha = vEmissive;
+			#endif
+
 			float FogColorFactor = 0.0;
 			float FogAlphaFactor = 0.0;
 			GetFogFactors( FogColorFactor, FogAlphaFactor, vPos, 0.0 /*In.vPos_Height.w * 1.0 + 2.5*/, FOWNoise, FOWHeight, IntelMap);
@@ -578,8 +578,6 @@ PixelShader =
 
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
 			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
-
-			DebugReturn(vColor, lightingProperties, fShadowTerm);
 			
 		#ifdef TRAIN
 			alpha = TrainColor.a;

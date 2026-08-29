@@ -244,20 +244,20 @@ PixelShader =
 			float lod = clamp( mipmapLevel( vTileRepeat ) - 0.5f, 0.0f, 6.0f );
 			float vMipTexels = exp2( ATLAS_TEXEL_POW2_EXPONENT - lod );
 					
-		#ifdef LOW_END_GFX
-			float3 normal = float3( 0, 1, 0 );
-		#else
-			float3 normal = normalize( tex2D( HeightNormal, Input.uv2 ).rbg - 0.5f );
-		#endif
+			#ifdef LOW_END_GFX
+				float3 normal = float3( 0, 1, 0 );
+			#else
+				float3 normal = normalize( tex2D( HeightNormal, Input.uv2 ).rbg - 0.5f );
+			#endif
 			float4 diffuse = tex2Dlod( TerrainDiffuse, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) ).rgba;
 			float vGlossiness = diffuse.a;
 									
-		#ifdef NO_SHADER_TEXTURE_LOD
-			float3 terrain_normal = float3( 0,1,0 );
-		#else	
-			float3 terrain_normal;
-			float4 terrain_normalRaw = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) );
-		#endif //NO_SHADER_TEXTURE_LOD
+			#ifdef NO_SHADER_TEXTURE_LOD
+				float3 terrain_normal = float3( 0,1,0 );
+			#else	
+				float3 terrain_normal;
+				float4 terrain_normalRaw = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) );
+			#endif
 			
 			if ( vAllSame < 1.0f )
 			{
@@ -265,30 +265,23 @@ PixelShader =
 				float4 ColorLU = tex2Dlod( TerrainDiffuse, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) ).rgba;
 				float4 ColorRU = tex2Dlod( TerrainDiffuse, sample_terrain( IndexU.z, IndexV.z, vTileRepeat, vMipTexels, lod ) ).rgba;
 		
-		#ifndef NO_SHADER_TEXTURE_LOD	
-				float4 terrain_normalRD = tex2Dlod( TerrainNormal, sample_terrain( IndexU.x, IndexV.x, vTileRepeat, vMipTexels, lod ) );
-				float4 terrain_normalLU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) );
-				float4 terrain_normalRU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.z, IndexV.z, vTileRepeat, vMipTexels, lod ) );
-		#endif //NO_SHADER_TEXTURE_LOD
+				#ifndef NO_SHADER_TEXTURE_LOD	
+					float4 terrain_normalRD = tex2Dlod( TerrainNormal, sample_terrain( IndexU.x, IndexV.x, vTileRepeat, vMipTexels, lod ) );
+					float4 terrain_normalLU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) );
+					float4 terrain_normalRU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.z, IndexV.z, vTileRepeat, vMipTexels, lod ) );
+				#endif
 		
 				float2 vFrac = frac( float2( Input.uv.x * MAP_SIZE_X - 0.5f, Input.uv.y * MAP_SIZE_Y - 0.5f ) );
 		
-				diffuse = lerp( 
-					lerp( ColorRU, ColorLU, vFrac.x ),
-					lerp( ColorRD, diffuse, vFrac.x ), 
-						vFrac.y );
+				diffuse = lerp( lerp( ColorRU, ColorLU, vFrac.x ), lerp( ColorRD, diffuse, vFrac.x ), vFrac.y );
 		
-		#ifndef NO_SHADER_TEXTURE_LOD
-				terrain_normalRaw = lerp( 
-					lerp( terrain_normalRU, terrain_normalLU, vFrac.x ),
-					lerp( terrain_normalRD, terrain_normalRaw, vFrac.x ), 
-						vFrac.y );
-		#endif //NO_SHADER_TEXTURE_LOD
+				#ifndef NO_SHADER_TEXTURE_LOD
+						terrain_normalRaw = lerp( lerp( terrain_normalRU, terrain_normalLU, vFrac.x ), lerp( terrain_normalRD, terrain_normalRaw, vFrac.x ), vFrac.y );
+				#endif
 			}
 			
-		#ifndef NO_SHADER_TEXTURE_LOD
-			terrain_normal =  terrain_normalRaw.rbg - 0.5f; //UnpackRRxGNormal(terrain_normalRaw).rgb;
-			//return float4(terrain_normal.rgb, 1.0f);
+			#ifndef NO_SHADER_TEXTURE_LOD
+				terrain_normal =  terrain_normalRaw.rbg - 0.5f; //UnpackRRxGNormal(terrain_normalRaw).rgb;
 			#ifdef LOW_END_GFX
 				float vSpec = 0.0f;
 			#else
@@ -359,15 +352,14 @@ PixelShader =
 		
 			CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
 
-		#ifndef LOW_END_GFX
-			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		#endif
-			
-		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 reflectiveColor = FAKE_CUBEMAP_COLOR; //texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor,
-    			lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
-		#endif
+			#ifndef LOW_END_GFX
+				CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
+			#endif
+				
+			#ifdef PDX_IMPROVED_BLINN_PHONG
+				float3 reflectiveColor = FAKE_CUBEMAP_COLOR; //texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
+				specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor, lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
+			#endif
 			
 			float3 vOut = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
 		
@@ -376,27 +368,23 @@ PixelShader =
 			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
 			float vNightFactor = DayNightFactor( vGlobeNormal );
 
-		#ifndef LOW_END_GFX
-			float3 CityLights = tex2D( CityLightsAndSnowNoise, Input.prepos.xz * CITY_LIGHTS_TILING ).rgb;
-			vOut += CityLights * CITY_LIGHTS_INTENSITY * CityLightsMask * vNightFactor;
-		#endif
-
-			float3 vFOW = ApplyFOW( vOut, ShadowMap, Input.vScreenCoord );
-			vOut = lerp( vFOW, vOut, BORDER_FOW_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
-		
-		#ifndef LOW_END_GFX
-			vOut = ApplyDistanceFog( vOut, Input.prepos );
-		#endif
-			
+			#ifndef LOW_END_GFX
+				float3 CityLights = tex2D( CityLightsAndSnowNoise, Input.prepos.xz * CITY_LIGHTS_TILING ).rgb;
+				vOut += CityLights * CITY_LIGHTS_INTENSITY * CityLightsMask * vNightFactor;
+			#endif
+				float3 vFOW = ApplyFOW( vOut, ShadowMap, Input.vScreenCoord );
+				vOut = lerp( vFOW, vOut, BORDER_FOW_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
+			#ifndef LOW_END_GFX
+				vOut = ApplyDistanceFog( vOut, Input.prepos );
+			#endif
+				
 			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
-			
-			DebugReturn(vOut, lightingProperties, fShadowTerm);
 
-		#ifdef LOW_END_GFX
-			return float4( vOut, vNightFactor * CITY_LIGHTS_BLOOM_FACTOR );
-		#else
-			return float4( vOut, saturate(CityLightsMask * vNightFactor * CITY_LIGHTS_BLOOM_FACTOR) );
-		#endif
+			#ifdef LOW_END_GFX
+				return float4( vOut, vNightFactor * CITY_LIGHTS_BLOOM_FACTOR );
+			#else
+				return float4( vOut, saturate(CityLightsMask * vNightFactor * CITY_LIGHTS_BLOOM_FACTOR) );
+			#endif
 		}		
 	]]
 

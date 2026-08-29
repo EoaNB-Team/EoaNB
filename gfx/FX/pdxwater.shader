@@ -422,20 +422,10 @@ PixelShader =
 
 			float3 vOut = ComposeLight( lightingProperties, diffuseLight, specularLight );
 
-			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.pos.xz ),
-				lerp( BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha ) );
+			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.pos.xz ), lerp( BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha ) );
 
-			dominance_fx_apply( vOut, normal,
-				Input.uv,
-				GradientBorderChannel1, GradientBorderChannel2, GradientBorderChannel3,
-				vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA,
-				vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f );
+			dominance_fx_apply( vOut, normal, Input.uv, GradientBorderChannel1, GradientBorderChannel2, GradientBorderChannel3, vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA, vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f );
 
-			#ifdef LOW_END_GFX
-				DebugReturn( vOut, lightingProperties, 0.0f );
-			#else
-				DebugReturn( vOut, lightingProperties, fShadowTerm );
-			#endif
 			return float4( vOut, 1.0f - waterShore );
 		}
 	]]

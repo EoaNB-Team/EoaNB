@@ -415,9 +415,6 @@ PixelShader =
 			// fade slower if water, faster if land(help river crossings)
 			float vDesiredFade = (lerp( vFadeValue * 2.0f, 0.0f, saturate( waterSideAlpha.x * 4.0f ) ));
 			float vAlphaMultiplier = saturate(lerp( vDesiredFade, 1.0f, vFastFade ));
-			
-
-			DebugReturn(vOut, lightingProperties, fShadowTerm);
 
 			return float4( vOut, waterSideAlpha.y * vAlphaMultiplier * Input.vTransp );
 		}

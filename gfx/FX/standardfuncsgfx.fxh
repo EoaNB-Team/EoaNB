@@ -226,8 +226,7 @@ PixelShader =
 	}
 
 	
-	float3 GetMudColor( in float3 vResult, in float4 vMudSnowColor, in float3 vPos, inout float3 vNormal, inout float vGlossiness, inout float vSpec,
-						 in sampler2D MudDiffuseGlossSampler, in sampler2D MudNormalSpecSampler, in float3 TerrainColor, in sampler2D SnowNoise )
+	float3 GetMudColor( in float3 vResult, in float4 vMudSnowColor, in float3 vPos, inout float3 vNormal, inout float vGlossiness, inout float vSpec, in sampler2D MudDiffuseGlossSampler, in sampler2D MudNormalSpecSampler, in float3 TerrainColor, in sampler2D SnowNoise )
 	{
 		float vOpacity = cam_distance( MUD_CAM_MIN, MUD_CAM_MAX );
 		float vNoise = lerp( 1.0, (0.5 + tex2D( SnowNoise, vPos.xz * 0.01f ).a) * 0.5, vOpacity);
@@ -253,8 +252,7 @@ PixelShader =
 		return lerp( vMudSnowColor.b, vMudSnowColor.g, vFoWOpacity_FoWTime_SnowMudFade_MaxGameSpeed.z ); //Get winter;
 	}
 
-	float3 ApplySnow( float3 vColor, float3 vPos, inout float3 vNormal, float4 vMudSnowColor, in sampler2D SnowTextureSampler,
-					 in sampler2D SnowNoise, inout float vGlossiness, inout float vSnowAlphaOut )
+	float3 ApplySnow( float3 vColor, float3 vPos, inout float3 vNormal, float4 vMudSnowColor, in sampler2D SnowTextureSampler, in sampler2D SnowNoise, inout float vGlossiness, inout float vSnowAlphaOut )
 	{
 		float vSnowFade = saturate( vPos.y - SNOW_START_HEIGHT );
 		float vNormalFade = saturate( saturate( vNormal.y - SNOW_NORMAL_START ) * SNOW_CLIFFS );
@@ -345,8 +343,6 @@ PixelShader =
 		// OPT: paired sin/cos on the same angle (was two separate calls).
 		float sinX, cosX;
 		sincos( x * TWO_PI, sinX, cosX );
-		return normalize( float3( sinX * xzLen, y, cosX * xzLen ) );
-
 		return normalize( float3( sinX * xzLen, y, cosX * xzLen ) );
 	}
 
@@ -448,15 +444,13 @@ PixelShader =
 		WorldNormal = lerp( WorldNormal, normalize(WorldNormal - smoothstep(-0.6, 0.5, dot(WorldNormal, float3(0, -1, 0))) * float3(0, 0.9, 0)), NegFogMultiplier );
 
 		float3 Squared = WorldNormal * WorldNormal; 
-	#ifdef	PDX_OPENGL
-		int3 isNegative = int3(lessThan(WorldNormal, vec3(0.0)));
-	#else
-		int3 isNegative = (WorldNormal < 0.0);
-	#endif
+		#ifdef	PDX_OPENGL
+			int3 isNegative = int3(lessThan(WorldNormal, vec3(0.0)));
+		#else
+			int3 isNegative = (WorldNormal < 0.0);
+		#endif
 	
-		float3 Color = Squared.x * lerp( DayAmbientColors_[isNegative.x], saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.x]), vDayFactor )
-			+ Squared.y * lerp( DayAmbientColors_[isNegative.y+2],  saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.y+2]), vDayFactor )
-			+ Squared.z * lerp( DayAmbientColors_[isNegative.z+4],  saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.z+4]), vDayFactor );
+		float3 Color = Squared.x * lerp( DayAmbientColors_[isNegative.x], saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.x]), vDayFactor ) + Squared.y * lerp( DayAmbientColors_[isNegative.y+2],  saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.y+2]), vDayFactor ) + Squared.z * lerp( DayAmbientColors_[isNegative.z+4],  saturate(NIGHT_AMBIENT_BOOST * NightAmbientColors_[isNegative.z+4]), vDayFactor );
 
 		return Color;
 	}
@@ -661,12 +655,12 @@ PixelShader =
 		float3 sunIntensity = SunDiffuseIntensity.rgb * SunDiffuseIntensity.a * aShadowTerm * vDayFactor + MoonDiffuseIntensity.rgb * MoonDiffuseIntensity.a * aShadowTerm * vNightFactor;
 
 
-	#ifdef PDX_IMPROVED_BLINN_PHONG
-		ImprovedBlinnPhong(sunIntensity, -vLightSourceDirection, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#else
-		aDiffuseLightOut = CalculateLight(aProperties._Normal, vLightSourceDirection, sunIntensity);
-		aSpecularLightOut = CalculatePBRSpecularPower(aProperties._ToCameraDir, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
-	#endif
+		#ifdef PDX_IMPROVED_BLINN_PHONG
+			ImprovedBlinnPhong(sunIntensity, -vLightSourceDirection, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#else
+			aDiffuseLightOut = CalculateLight(aProperties._Normal, vLightSourceDirection, sunIntensity);
+			aSpecularLightOut = CalculatePBRSpecularPower(aProperties._ToCameraDir, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
+		#endif
 		aSpecularLightOut *= SunSpecularIntensity;
 	}
 
@@ -678,11 +672,11 @@ PixelShader =
 
 	void CalculatePointLight(PointLight aPointlight, LightingProperties aProperties, inout float3 aDiffuseLightOut, inout float3 aSpecularLightOut)
 	{
-	#ifdef PDX_IMPROVED_BLINN_PHONG
-		ImprovedBlinnPhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#else
-		PhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#endif
+		#ifdef PDX_IMPROVED_BLINN_PHONG
+			ImprovedBlinnPhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#else
+			PhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#endif
 	}
 
 	float3 ComposeLight(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight )
@@ -703,12 +697,12 @@ PixelShader =
 	{
 		float vDayNight = DayNightFactor( CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
 		float3 vAmbientColor = AmbientLight(aProperties._Normal, vDayNight);
-	#ifdef LOW_END_GFX
-		return ( ( vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
-	#else
-		float3 SnowAmbient = CalcSnowAmbient(aDiffuseLight, vSnowFactor);
-		return ( ( SnowAmbient + vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
-	#endif
+		#ifdef LOW_END_GFX
+			return ( ( vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
+		#else
+			float3 SnowAmbient = CalcSnowAmbient(aDiffuseLight, vSnowFactor);
+			return ( ( SnowAmbient + vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
+		#endif
 	}
 
 	float3 ComposeLightMesh(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
@@ -736,85 +730,30 @@ PixelShader =
 		return ( ( SnowAmbient + vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
 	}
 
-
-	//-------------------------------
-	// Debugging --------------------
-	//-------------------------------
-	//#define PDX_DEBUG_NORMAL
-	//#define PDX_DEBUG_DIFFUSE
-	//#define PDX_DEBUG_SPEC
-	//#define PDX_DEBUG_GLOSSINESS
-	//#define PDX_DEBUG_SHADOW
-	//#define PDX_DEBUG_SUN_LIGHT
-	//#define PDX_DEBUG_SUN_LIGHT_WITH_SHADOW
-	//#define PDX_DEBUG_AMBIENT
-	void DebugReturn(inout float3 aReturn, LightingProperties aProperties, float aShadowTerm)//
-	{
-	#ifdef PDX_DEBUG_NORMAL
-		aReturn = saturate(aProperties._Normal);
-	#endif
-
-	#ifdef PDX_DEBUG_DIFFUSE
-		aReturn = aProperties._Diffuse;
-	#endif
-
-	#ifdef PDX_DEBUG_SPEC
-		aReturn = aProperties._SpecularColor;
-	#endif
-
-	#ifdef PDX_DEBUG_GLOSSINESS
-		aReturn = vec3(aProperties._Glossiness);
-	#endif
-
-	#ifdef PDX_DEBUG_SHADOW
-		aReturn = vec3(aShadowTerm);
-	#endif
-
-	#if defined(PDX_DEBUG_SUN_LIGHT) || defined (PDX_DEBUG_SUN_LIGHT_WITH_SHADOW)
-		float3 diffuseLight = vec3(0.0);
-		float3 specularLight = vec3(0.0);
-		aProperties._SpecularColor = vec3(0);
-		aProperties._Diffuse = vec3(0.5);
-		
-		#ifdef PDX_DEBUG_SUN_LIGHT_WITH_SHADOW
-			CalculateSunLight(aProperties, aShadowTerm, diffuseLight, specularLight);
-		#else
-			CalculateSunLight(aProperties, 1.0, diffuseLight, specularLight);
-		#endif
-		
-		aReturn = ComposeLight(aProperties, diffuseLight, specularLight);
-	#endif
-
-	#ifdef PDX_DEBUG_AMBIENT 
-		float vDayNight = DayNightFactor( CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
-		aReturn = AmbientLight(aProperties._Normal, vDayNight) * aProperties._Diffuse;
-	#endif
-	}
-
 	float4 gradient_border_multisample_alpha( in float4 vCh, in sampler2D TexCh, in float2 vUV )
 	{
-	#ifdef LOW_END_GFX
-		return vCh;
-	#else
-		// NOTE: 9-tap box blur. Hardware bilinear could collapse the 4 diagonal
-		// taps into a single tap each (with sub-pixel offset), reducing this to
-		// ~5 samples — non-trivial change so left as-is.
-		float vOffsetX = -0.5f / MAP_SIZE_X;
-		float vOffsetY = -0.5f / MAP_SIZE_Y;
-		float4 vResult = vCh;
-		vResult += tex2D( TexCh, vUV + float2( -vOffsetX, 0 ) );
-		vResult += tex2D( TexCh, vUV + float2( 0, -vOffsetY ) );
-		vResult += tex2D( TexCh, vUV + float2( vOffsetX, 0 ) );
-		vResult += tex2D( TexCh, vUV + float2( 0, vOffsetY ) );
-		vResult += tex2D( TexCh, vUV + float2( -vOffsetX, -vOffsetY ) );
-		vResult += tex2D( TexCh, vUV + float2(  vOffsetX, -vOffsetY ) );
-		vResult += tex2D( TexCh, vUV + float2(  vOffsetX,  vOffsetY ) );
-		vResult += tex2D( TexCh, vUV + float2( -vOffsetX,  vOffsetY ) );
-		// OPT: replaced div with reciprocal-mul (compiler usually does this anyway,
-		// but explicit here for the FXC path).
-		vResult *= ( 1.0f / 9.0f );
-		return vResult;
-	#endif
+		#ifdef LOW_END_GFX
+			return vCh;
+		#else
+			// NOTE: 9-tap box blur. Hardware bilinear could collapse the 4 diagonal
+			// taps into a single tap each (with sub-pixel offset), reducing this to
+			// ~5 samples — non-trivial change so left as-is.
+			float vOffsetX = -0.5f / MAP_SIZE_X;
+			float vOffsetY = -0.5f / MAP_SIZE_Y;
+			float4 vResult = vCh;
+			vResult += tex2D( TexCh, vUV + float2( -vOffsetX, 0 ) );
+			vResult += tex2D( TexCh, vUV + float2( 0, -vOffsetY ) );
+			vResult += tex2D( TexCh, vUV + float2( vOffsetX, 0 ) );
+			vResult += tex2D( TexCh, vUV + float2( 0, vOffsetY ) );
+			vResult += tex2D( TexCh, vUV + float2( -vOffsetX, -vOffsetY ) );
+			vResult += tex2D( TexCh, vUV + float2(  vOffsetX, -vOffsetY ) );
+			vResult += tex2D( TexCh, vUV + float2(  vOffsetX,  vOffsetY ) );
+			vResult += tex2D( TexCh, vUV + float2( -vOffsetX,  vOffsetY ) );
+			// OPT: replaced div with reciprocal-mul (compiler usually does this anyway,
+			// but explicit here for the FXC path).
+			vResult *= ( 1.0f / 9.0f );
+			return vResult;
+		#endif
 	}
 
 	float gradient_border_camera_distance()
@@ -900,15 +839,13 @@ PixelShader =
 		return vBlendAmount * FX_Alpha.g;
 	}
 
-	void gradient_border_apply( inout float3 vColor, float3 vNormal, float2 vUV, 
-		in sampler2D TexCh1, in sampler2D TexCh2, 
-		float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, inout float vBloomAlpha )
+	void gradient_border_apply( inout float3 vColor, float3 vNormal, float2 vUV, in sampler2D TexCh1, in sampler2D TexCh2, float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, inout float vBloomAlpha )
 	{
 
-	#ifndef GRADIENT_BORDERS
-		vBloomAlpha = 1.0f;
-		return;
-	#endif
+		#ifndef GRADIENT_BORDERS
+			vBloomAlpha = 1.0f;
+			return;
+		#endif
 
 		// Check the distance of camera (value 0-1)
 		float vGBCamDist = gradient_border_camera_distance();
@@ -1060,38 +997,38 @@ PixelShader =
 
 	float mipmapLevel( float2 uv )
 	{
-	#ifdef PDX_OPENGL
+		#ifdef PDX_OPENGL
 
-	#ifdef NO_SHADER_TEXTURE_LOD
-		return 1.0f;
-	#else
+			#ifdef NO_SHADER_TEXTURE_LOD
+				return 1.0f;
+			#else
 
-	#ifdef	PIXEL_SHADER
-		float dx = fwidth( uv.x * TEXELS_PER_TILE );
-		float dy = fwidth( uv.y * TEXELS_PER_TILE );
-	    float d = max( dot(dx, dx), dot(dy, dy) );
-		return 0.5 * log2( d );
-	#else
-		return 3.0f;
-	#endif //PIXEL_SHADER
+			#ifdef	PIXEL_SHADER
+				float dx = fwidth( uv.x * TEXELS_PER_TILE );
+				float dy = fwidth( uv.y * TEXELS_PER_TILE );
+				float d = max( dot(dx, dx), dot(dy, dy) );
+				return 0.5 * log2( d );
+			#else
+				return 3.0f;
+		#endif //PIXEL_SHADER
 
-	#endif // NO_SHADER_TEXTURE_LOD
+		#endif // NO_SHADER_TEXTURE_LOD 
 
-	#else
-	    float2 dx = ddx( uv * TEXELS_PER_TILE );
-	    float2 dy = ddy( uv * TEXELS_PER_TILE );
-	    float d = max( dot(dx, dx), dot(dy, dy) );
-	    return 0.5f * log2( d );
-	#endif //PDX_OPENGL
+		#else
+			float2 dx = ddx( uv * TEXELS_PER_TILE );
+			float2 dy = ddy( uv * TEXELS_PER_TILE );
+			float d = max( dot(dx, dx), dot(dy, dy) );
+			return 0.5f * log2( d );
+		#endif //PDX_OPENGL
 	}
 
 	float4 sample_terrain( float IndexU, float IndexV, float2 vTileRepeat, float vMipTexels, float lod )
 	{
 		vTileRepeat = frac( vTileRepeat );
-	#ifdef NO_SHADER_TEXTURE_LOD
-		vTileRepeat *= 0.96;
-		vTileRepeat += 0.02;
-	#endif
+		#ifdef NO_SHADER_TEXTURE_LOD
+			vTileRepeat *= 0.96;
+			vTileRepeat += 0.02;
+		#endif
 		
 		float vTexelsPerTile = vMipTexels / MAP_NUM_TILES;
 
@@ -1168,15 +1105,9 @@ PixelShader =
 		float3 M1;
 		float3 M2;
 
-		SampleBlendLEAN( 0.5f,
-			uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0],
-			uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1],
-			B1, M1, Lean1, Lean2 );
+		SampleBlendLEAN( 0.5f, uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0], uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1], B1, M1, Lean1, Lean2 );
 
-		SampleBlendLEAN( 0.5f, 
-			uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2],
-			uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3],
-			B2, M2, Lean1, Lean2 );
+		SampleBlendLEAN( 0.5f,  uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2], uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3], B2, M2, Lean1, Lean2 );
 
 		BlendLEAN( 0.5f, B1, M1, B2, M2, B, M );
 

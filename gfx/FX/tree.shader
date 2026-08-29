@@ -389,7 +389,6 @@ PixelShader =
 
 			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
 
-			DebugReturn(vColor, lightingProperties, fShadowTerm);
 			return float4( vColor, vTreeFade );
 		}
 	]]
