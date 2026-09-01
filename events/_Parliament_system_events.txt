@@ -552,6 +552,12 @@ country_event = {
 			set_tra_con_to_coalition = yes
 			set_aut_to_coalition = yes
 			set_fun_to_neutral = yes
+
+			set_temp_variable = { sog_to_gain = 0.9 }
+			add_aut_sog_with_tooltip_effect = yes
+
+			set_temp_variable = { sog_to_gain = 0.3 }
+			add_fun_sog_with_tooltip_effect = yes
 		}
 
 		if = {
@@ -571,5 +577,137 @@ country_event = {
 		setup_initial_party_values = yes
 		# authoritative seat total after the whole parliament has been built
 		parliament_recompute_coalition_seats = yes
+	}
+}
+
+
+### PRUSSIAN CUSTOM PARLIAMENTARY VOTES (parliament_event.121-150)
+
+## FREDDY III ALT-HISTORY PATH
+
+# Vote on Expanding Voting Rights
+country_event = {
+	id = parliament_event.121
+	title = parliament_event.121.t
+	desc = parliament_event.121.d
+	picture = GFX_report_event_prussian_parliament_king
+
+	is_triggered_only = yes
+
+	immediate = {
+		set_country_flag = parliament_reform_vote_ongoing
+		set_country_flag = PRS_expand_voting_rights_flag
+
+		set_variable = { current_reform_token = token:PRS_expand_voting_rights }
+		
+		set_vote_dem = yes
+
+		set_variable = { parliament_reform_majority = 2 }
+
+		reset_approval_arrays = yes
+		parl_ap_stance_3_narrow = yes
+
+		compute_voting_approval = yes
+		compute_number_seats_tot = yes
+		compute_number_seats_approve_est = yes
+	}
+
+	option = { #Schedule the vote - resolves through the parliament_voting_mission timeout
+		name = parliament_event.121.a
+		ai_chance = { factor = 100 }
+
+		activate_mission = prussian_voting_mission
+
+		hidden_effect = {
+			PRS_show_voting_decisions = yes
+		}
+	}
+
+	option = { #Urgent vote - the parliament votes tomorrow
+		name = parliament_event.121.b
+		ai_chance = { factor = 0 }
+
+		trigger = {
+			has_political_power > 49.9
+		}
+
+		add_political_power = -50
+
+		hidden_effect = {
+			country_event = { id = parliament_event.11 days = 1 }
+		}
+	}
+
+	option = { #Abandon the proposal
+		name = parliament_event.121.c
+		ai_chance = { factor = 0 }
+
+		custom_effect_tooltip = parliament_vote_abandon_tt
+
+		add_political_power = -50
+		add_stability = -0.05
+
+		hidden_effect = {
+
+			set_variable = { clicked@var:current_reform_token = 0 }
+			clear_variable = current_reform_token
+			clr_country_flag = parliament_reform_vote_ongoing
+		}
+	}
+}
+
+# Results of Vote on Expanding Voting Rights
+country_event = {
+	id = parliament_event.122
+	title = parliament_event.122.t
+	desc = parliament_event.122.d
+	picture = GFX_report_event_constitutional_era_parliament
+
+	is_triggered_only = yes
+
+	immediate = {
+		parliament_tally_vote = yes
+	}
+
+	option = { #The vote passed
+		name = parliament_event.122.a
+		trigger = { has_country_flag = eoanb_reform_vote_success }
+		ai_chance = { factor = 100 }
+
+		add_political_power = 50
+		add_stability = -0.05
+		remove_ideas = PRS_idea_three_class_franchise
+		if = {
+			limit = {
+				has_idea = weighted_wealth_voting
+			}
+			add_ideas = universal_male_suffrage
+		}
+		
+		hidden_effect = {
+			#country_event for new elections
+			clr_country_flag = eoanb_reform_vote_success
+			parliament_reform_vote_cleanup = yes
+			country_event = { id = parliament_event.21 }
+			country_event = { id = parliament_event.22 }
+		}
+	}
+
+	option = { #The vote failed
+		name = parliament_event.122.b
+		trigger = { has_country_flag = eoanb_reform_vote_failure }
+		ai_chance = { factor = 100 }
+
+		add_political_power = -50
+		add_stability = -0.05
+
+		hidden_effect = {
+			clr_country_flag = eoanb_reform_vote_failure
+			# unlock the reform so it can be proposed again
+			set_variable = { clicked@var:current_reform_token = 0 }
+			parliament_reform_vote_cleanup = yes
+			country_event = { id = parliament_event.21 }
+			country_event = { id = parliament_event.22 }
+		}
 	}
 }
