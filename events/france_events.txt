@@ -3051,8 +3051,6 @@ country_event = {
 	}
 }
 
-### THE IMPERIAL MINISTRY (france.275-290)
-
 # The State Loan - unlocked by "The Fiscal Straightjacket"
 country_event = {
 	id = france.275
@@ -3098,6 +3096,699 @@ country_event = {
 		ai_chance = { base = 10 }
 		add_stability = -0.02
 		add_timed_idea = { idea = FRA_idea_state_loan_public_works days = 60 }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE LIBERAL EMPIRE
+#---------------------------------------------------------------------------------------
+
+# The Cobden-Chevalier Treaty - put to the British cabinet. FROM is France.
+country_event = {
+	id = france.276
+	title = france.276.t
+	desc = france.276.d
+	picture = GFX_report_event_generic_sign_treaty1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Sign
+		name = france.276.a
+		ai_chance = { base = 70 }
+		add_ideas = FRA_idea_cobden_chevalier_treaty
+		FROM = {
+			FRA_sign_cobden_chevalier = yes
+			country_event = { id = france.278 hours = 6 }
+		}
+	}
+
+	option = { # Decline
+		name = france.276.b
+		ai_chance = { base = 30 }
+		add_political_power = 25
+		FROM = { country_event = { id = france.279 hours = 6 } }
+	}
+}
+
+# An Offer unto Victor Hugo
+country_event = {
+	id = france.277
+	title = france.277.t
+	desc = france.277.d
+	picture = GFX_report_event_nap_france_victor_hugo
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # Write to Guernsey
+		name = france.277.a
+		ai_chance = { base = 70 }
+		random_list = {
+			30 = {
+				add_political_power = 150
+				set_country_flag = FRA_victor_hugo_returned
+				custom_effect_tooltip = FRA_victor_hugo_returns_tt
+			}
+			70 = {
+				add_political_power = -75
+				custom_effect_tooltip = FRA_victor_hugo_refuses_tt
+			}
+		}
+	}
+
+	option = { # Let the exile stay an exile
+		name = france.277.b
+		ai_chance = { base = 30 }
+	}
+}
+
+# Britain signs
+country_event = {
+	id = france.278
+	title = france.278.t
+	desc = france.278.d
+	picture = GFX_report_event_generic_sign_treaty1
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { name = france.278.a }
+}
+
+# Britain declines
+country_event = {
+	id = france.279
+	title = france.279.t
+	desc = france.279.d
+	picture = GFX_report_event_generic_read_write
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france.279.a
+		add_political_power = -25
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	DEBATE THE EMPEROR'S POLICY
+#---------------------------------------------------------------------------------------
+
+# A heckler challenges the Emperor
+country_event = {
+	id = france.280
+	title = france.280.t
+	desc = france.280.d
+	picture = GFX_report_event_nap_france_legislative_elections
+
+	is_triggered_only = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_emperors_policy_debates_active
+		NOT = { has_country_flag = FRA_the_new_decade_reached }
+	}
+
+	immediate = {
+		hidden_effect = {
+			FRA_pick_the_heckling_party = yes
+			FRA_calculate_challenge_cost = yes
+		}
+	}
+
+	option = { # Refuse to answer
+		name = france.280.a
+		ai_chance = { base = 20 }
+		add_stability = -0.01
+		decrease_legitimacy_by_two = yes
+		add_popularity = { ideology = autocracy popularity = -0.02 }
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = { # Answer the Chamber
+		name = france.280.b
+		ai_chance = { base = 80 }
+		trigger = { check_variable = { political_power > FRA_challenge_pp_cost } }
+		custom_effect_tooltip = FRA_challenge_pp_cost_tt
+		set_temp_variable = { FRA_challenge_payment = FRA_challenge_pp_cost }
+		multiply_temp_variable = { FRA_challenge_payment = -1 }
+		add_political_power = FRA_challenge_payment
+		random_list = {
+			25 = { country_event = { id = france.286 hours = 6 } }
+			25 = { country_event = { id = france.287 hours = 6 } }
+			25 = { country_event = { id = france.288 hours = 6 } }
+			25 = { country_event = { id = france.289 hours = 6 } }
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE PARLIAMENTARY DEBATE
+#---------------------------------------------------------------------------------------
+
+# Step 1 - how much do we invest in the debate?
+country_event = {
+	id = france.281
+	title = france.281.t
+	desc = france.281.d
+	picture = GFX_report_event_nap_france_tuilleries
+
+	is_triggered_only = yes
+
+	option = { # Little
+		name = france.281.a
+		ai_chance = { base = 20 }
+		set_variable = { FRA_debate_preparation = 1 }
+		hidden_effect = { country_event = { id = france.282 days = 14 } }
+	}
+
+	option = { # Mildly
+		name = france.281.b
+		ai_chance = { base = 40 }
+		add_political_power = -25
+		set_temp_variable = { money_to_gain = -0.1 }
+		add_money_with_tooltip_effect = yes
+		set_variable = { FRA_debate_preparation = 2 }
+		hidden_effect = { country_event = { id = france.282 days = 14 } }
+	}
+
+	option = { # This debate matters
+		name = france.281.c
+		ai_chance = { base = 40 }
+		add_political_power = -50
+		set_temp_variable = { money_to_gain = -0.2 }
+		add_money_with_tooltip_effect = yes
+		set_variable = { FRA_debate_preparation = 3 }
+		hidden_effect = { country_event = { id = france.282 days = 14 } }
+	}
+}
+
+# Step 2 - who are we debating?
+country_event = {
+	id = france.282
+	title = france.282.t
+	desc = france.282.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	option = { # The Republicans
+		name = france.282.a
+		ai_chance = { base = 40 }
+		set_variable = { FRA_debate_opponent = 1 }
+		hidden_effect = { country_event = { id = france.283 days = 14 } }
+	}
+
+	option = { # The Conservative-Liberals
+		name = france.282.b
+		ai_chance = { base = 40 }
+		set_variable = { FRA_debate_opponent = 2 }
+		hidden_effect = { country_event = { id = france.283 days = 14 } }
+	}
+
+	option = { # The differing Bonapartists
+		name = france.282.c
+		ai_chance = { base = 20 }
+		set_variable = { FRA_debate_opponent = 3 }
+		hidden_effect = { country_event = { id = france.283 days = 14 } }
+	}
+}
+
+# Step 3 - who remains when the papers settle?
+country_event = {
+	id = france.283
+	title = france.283.t
+	desc = france.283.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+	hidden = yes
+
+	immediate = {
+		FRA_calculate_debate_odds = yes
+		set_temp_variable = { FRA_debate_roll = random }
+		if = {
+			limit = { check_variable = { FRA_debate_roll < FRA_debate_win_chance } }
+			country_event = { id = france.284 hours = 2 }
+		}
+		else = {
+			country_event = { id = france.285 hours = 2 }
+		}
+		clr_country_flag = FRA_debate_in_progress
+	}
+}
+
+# The Emperor's men carry the Chamber
+country_event = {
+	id = france.284
+	title = france.284.t
+	desc = france.284.d
+	picture = GFX_report_event_generic_parliament_2
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.284.a
+		set_country_flag = FRA_won_a_parliamentary_debate
+		if = {
+			limit = { check_variable = { FRA_debate_opponent = 3 } }
+			add_political_power = 40
+			custom_effect_tooltip = FRA_debate_internal_reward_tt
+			# Reuses the Imperial Influence adjustment panel of "Meeting with de Morny".
+			hidden_effect = { country_event = { id = france.106 hours = 6 } }
+		}
+		else = {
+			add_political_power = 60
+			set_variable = { FRA_debate_swing = 0.02 }
+			FRA_apply_debate_popularity_swing = yes
+		}
+	}
+}
+
+# The Emperor's men are shouted down
+country_event = {
+	id = france.285
+	title = france.285.t
+	desc = france.285.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.285.a
+		add_political_power = -50
+		if = {
+			limit = { check_variable = { FRA_debate_opponent = 3 } }
+			add_popularity = { ideology = autocracy popularity = -0.03 }
+		}
+		else = {
+			set_variable = { FRA_debate_swing = -0.02 }
+			FRA_apply_debate_popularity_swing = yes
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE EMPEROR'S POLICY QUESTS
+#---------------------------------------------------------------------------------------
+
+# Economic policy
+country_event = {
+	id = france.286
+	title = france.286.t
+	desc = france.286.d
+	picture = GFX_report_event_generic_factory
+
+	is_triggered_only = yes
+
+	immediate = { hidden_effect = { FRA_pick_an_economic_quest = yes } }
+
+	option = { # Accept the challenge
+		name = france.286.a
+		ai_chance = { base = 80 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		FRA_activate_the_current_quest = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = { # The Emperor will not be pushed
+		name = france.286.b
+		ai_chance = { base = 20 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		add_political_power = -50
+		decrease_legitimacy_by_two = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = { # Nothing left to answer for
+		name = france.286.c
+		trigger = { check_variable = { FRA_current_quest = 0 } }
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+}
+
+# Workers' rights
+country_event = {
+	id = france.287
+	title = france.287.t
+	desc = france.287.d
+	picture = GFX_report_event_worker_protests
+
+	is_triggered_only = yes
+
+	immediate = { hidden_effect = { FRA_pick_a_workers_quest = yes } }
+
+	option = {
+		name = france.287.a
+		ai_chance = { base = 80 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		FRA_activate_the_current_quest = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.287.b
+		ai_chance = { base = 20 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		add_political_power = -50
+		decrease_legitimacy_by_two = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.287.c
+		trigger = { check_variable = { FRA_current_quest = 0 } }
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+}
+
+# Political policy
+country_event = {
+	id = france.288
+	title = france.288.t
+	desc = france.288.d
+	picture = GFX_report_event_generic_parliament
+
+	is_triggered_only = yes
+
+	immediate = { hidden_effect = { FRA_pick_a_political_quest = yes } }
+
+	option = {
+		name = france.288.a
+		ai_chance = { base = 80 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		FRA_activate_the_current_quest = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.288.b
+		ai_chance = { base = 20 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		add_political_power = -50
+		decrease_legitimacy_by_two = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.288.c
+		trigger = { check_variable = { FRA_current_quest = 0 } }
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+}
+
+# Foreign policy
+country_event = {
+	id = france.289
+	title = france.289.t
+	desc = france.289.d
+	picture = GFX_report_event_nigra_henri_diplomacy
+
+	is_triggered_only = yes
+
+	immediate = { hidden_effect = { FRA_pick_a_foreign_quest = yes } }
+
+	option = {
+		name = france.289.a
+		ai_chance = { base = 80 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		FRA_activate_the_current_quest = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.289.b
+		ai_chance = { base = 20 }
+		trigger = { check_variable = { FRA_current_quest > 0 } }
+		add_political_power = -50
+		decrease_legitimacy_by_two = yes
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+
+	option = {
+		name = france.289.c
+		trigger = { check_variable = { FRA_current_quest = 0 } }
+		hidden_effect = { FRA_schedule_next_heckler = yes }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	A SUCCESSOR TO DE MORNY - the elections of 1869
+#---------------------------------------------------------------------------------------
+
+country_event = {
+	id = france.290
+	title = france.290.t
+	desc = france.290.d
+	picture = GFX_report_event_nap_france_legislative_elections
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = { # The Liberal Bonapartists
+		name = france.290.a
+		ai_chance = { base = 30 }
+		set_variable = { FRA_imperial_endorsement = 1 }
+		hidden_effect = { country_event = { id = france.291 days = 30 } }
+	}
+
+	option = { # The Conservative Bonapartists
+		name = france.290.b
+		ai_chance = { base = 30 }
+		set_variable = { FRA_imperial_endorsement = 2 }
+		hidden_effect = { country_event = { id = france.291 days = 30 } }
+	}
+
+	option = { # The Legitimists
+		name = france.290.c
+		ai_chance = { base = 20 }
+		set_variable = { FRA_imperial_endorsement = 3 }
+		hidden_effect = { country_event = { id = france.291 days = 30 } }
+	}
+
+	option = { # No one
+		name = france.290.e
+		ai_chance = { base = 20 }
+		set_variable = { FRA_imperial_endorsement = 0 }
+		hidden_effect = { country_event = { id = france.291 days = 30 } }
+	}
+}
+
+country_event = {
+	id = france.291
+	title = france.291.t
+	desc = france.291.d
+	picture = GFX_report_event_nap_france_legislative_elections
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	immediate = {
+		hidden_effect = {
+			random_list = {
+				20 = {
+					set_variable = { FRA_election_outcome = 1 }
+					set_variable = { FRA_election_swing = 0.15 }
+					set_temp_variable = { FRA_election_extra = random }
+					multiply_temp_variable = { FRA_election_extra = 0.1 }
+					add_to_variable = { FRA_election_swing = FRA_election_extra }
+				}
+				30 = {
+					modifier = {
+						add = 10
+						OR = {
+							check_variable = { FRA_imperial_endorsement = 1 }
+							check_variable = { FRA_imperial_endorsement = 2 }
+						}
+					}
+					set_variable = { FRA_election_outcome = 2 }
+					set_variable = { FRA_election_swing = 0 }
+					set_temp_variable = { FRA_election_extra = random }
+					multiply_temp_variable = { FRA_election_extra = 0.1 }
+					add_to_variable = { FRA_election_swing = FRA_election_extra }
+				}
+				50 = {
+					set_variable = { FRA_election_outcome = 3 }
+					set_variable = { FRA_election_swing = 0.05 }
+					set_temp_variable = { FRA_election_extra = random }
+					multiply_temp_variable = { FRA_election_extra = 0.1 }
+					add_to_variable = { FRA_election_swing = FRA_election_extra }
+				}
+			}
+			FRA_apply_the_election_result = yes
+		}
+	}
+
+	option = {
+		name = france.291.a
+		if = {
+			limit = { check_variable = { party_popularity@autocracy > 0.5 } }
+			hidden_effect = { country_event = { id = france.292 days = 5 } }
+		}
+	}
+}
+
+country_event = {
+	id = france.292
+	title = france.292.t
+	desc = france.292.d
+	picture = GFX_report_event_generic_riot_uproar_unrest
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france.292.a
+		set_temp_variable = { money_to_gain = -0.3 }
+		add_money_with_tooltip_effect = yes
+		add_stability = -0.02
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	RESULTS OF OUR STUDIES - once a year, at a random moment
+#---------------------------------------------------------------------------------------
+
+country_event = {
+	id = france.293
+	title = france.293.t
+	desc = france.293.d
+	picture = GFX_report_event_generic_research_lab
+
+	is_triggered_only = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_results_of_our_studies
+	}
+
+	option = {
+		name = france.293.a
+		FRA_results_of_our_studies_bonus = yes
+		hidden_effect = { country_event = { id = france.293 days = 30 random_days = 335 } }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	TAMING ALGERIA - the queued compliance is paid out two years after the decree
+#---------------------------------------------------------------------------------------
+
+country_event = {
+	id = france.294
+	title = france.294.t
+	desc = france.294.d
+
+	is_triggered_only = yes
+	hidden = yes
+
+	immediate = {
+		if = {
+			limit = { check_variable = { FRA_algeria_compliance_queue > 0 } }
+			set_temp_variable = { FRA_algeria_compliance_payout = FRA_algeria_compliance_queue }
+			every_owned_state = {
+				limit = { FRA_is_algerian_state = yes }
+				add_compliance = FRA_algeria_compliance_payout
+			}
+			set_variable = { FRA_algeria_compliance_queue = 0 }
+		}
+	}
+
+	option = { name = france.294.a }
+}
+
+#---------------------------------------------------------------------------------------
+#	THE CONSERVATIVE UPRISING
+#---------------------------------------------------------------------------------------
+
+# The 60-day check. The accumulated risk decays by three points a year.
+country_event = {
+	id = france.295
+	title = france.295.t
+	desc = france.295.d
+
+	is_triggered_only = yes
+	hidden = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_conservative_uprising_watch
+		NOT = { has_country_flag = FRA_southern_uprising_ongoing }
+	}
+
+	immediate = {
+		subtract_from_variable = { FRA_conservative_uprising_chance = 0.5 }
+		clamp_variable = { var = FRA_conservative_uprising_chance min = 0 max = 100 }
+		set_temp_variable = { FRA_uprising_roll = random }
+		multiply_temp_variable = { FRA_uprising_roll = 100 }
+		if = {
+			limit = {
+				check_variable = { FRA_uprising_roll < FRA_conservative_uprising_chance }
+				has_civil_war = no
+				NOT = { has_war = yes }
+			}
+			country_event = { id = france.296 hours = 6 }
+		}
+		else = {
+			country_event = { id = france.295 days = 60 }
+		}
+	}
+
+	option = { name = france.295.a }
+}
+
+# The Midi rises
+country_event = {
+	id = france.296
+	title = france.296.t
+	desc = france.296.d
+	picture = GFX_report_event_generic_riot
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france.296.a
+		FRA_start_the_southern_uprising = yes
+	}
+}
+
+# A month on, the Vendee takes its chance
+country_event = {
+	id = france.297
+	title = france.297.t
+	desc = france.297.d
+	picture = GFX_report_event_francstireurs
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		tag = FRA
+		has_civil_war = yes
+		NOT = { has_country_flag = FRA_vendee_rising_ongoing }
+	}
+
+	option = {
+		name = france.297.a
+		FRA_start_the_vendee_rising = yes
+	}
+}
+
+# In the Name of Free Trade - the manufacturers protest
+country_event = {
+	id = france.298
+	title = france.298.t
+	desc = france.298.d
+	picture = GFX_report_event_gathering_protest
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = france.298.a
+		add_political_power = -50
 	}
 }
 

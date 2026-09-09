@@ -1002,3 +1002,724 @@ FRA_ministry_ollivier_succeeds_de_morny = {
 		}
 	}
 }
+
+#---------------------------------------------------------------------------------------
+#	THE GRAND CHOICE
+#---------------------------------------------------------------------------------------
+
+# The faction the Emperor does NOT already lean on is twice as expensive to raise.
+FRA_grand_choice_open = {
+	custom_effect_tooltip = FRA_grand_choice_open_tt
+	hidden_effect = {
+		set_variable = { FRA_grand_choice_liberal_cost = 50 }
+		set_variable = { FRA_grand_choice_conservative_cost = 50 }
+		if = {
+			limit = { check_variable = { FRA_conservative_bonapartists_influence > FRA_liberal_bonapartists_influence } }
+			set_variable = { FRA_grand_choice_liberal_cost = 100 }
+		}
+		else_if = {
+			limit = { check_variable = { FRA_liberal_bonapartists_influence > FRA_conservative_bonapartists_influence } }
+			set_variable = { FRA_grand_choice_conservative_cost = 100 }
+		}
+		set_country_flag = FRA_grand_choice_available
+	}
+}
+
+FRA_take_the_liberal_path = {
+	set_temp_variable = { FRA_grand_choice_payment = FRA_grand_choice_liberal_cost }
+	multiply_temp_variable = { FRA_grand_choice_payment = -1 }
+	add_political_power = FRA_grand_choice_payment
+	set_country_flag = FRA_liberal_bonapartist_path
+	clr_country_flag = FRA_grand_choice_available
+	complete_national_focus = FRA_liberte_sous_laigle
+}
+
+FRA_take_the_conservative_path = {
+	set_temp_variable = { FRA_grand_choice_payment = FRA_grand_choice_conservative_cost }
+	multiply_temp_variable = { FRA_grand_choice_payment = -1 }
+	add_political_power = FRA_grand_choice_payment
+	set_country_flag = FRA_conservative_bonapartist_path
+	clr_country_flag = FRA_grand_choice_available
+}
+
+#---------------------------------------------------------------------------------------
+#	LAW LADDERS
+#---------------------------------------------------------------------------------------
+
+FRA_press_law_one_step_stricter = {
+	if = { limit = { has_idea = free_press } swap_ideas = { remove_idea = free_press add_idea = regulated_press } }
+	else_if = { limit = { has_idea = regulated_press } swap_ideas = { remove_idea = regulated_press add_idea = censored_press } }
+	else_if = { limit = { has_idea = censored_press } swap_ideas = { remove_idea = censored_press add_idea = state_controlled_press } }
+	else_if = { limit = { has_idea = state_controlled_press } swap_ideas = { remove_idea = state_controlled_press add_idea = no_press } }
+}
+
+FRA_press_law_one_step_freer = {
+	if = { limit = { has_idea = no_press } swap_ideas = { remove_idea = no_press add_idea = state_controlled_press } }
+	else_if = { limit = { has_idea = state_controlled_press } swap_ideas = { remove_idea = state_controlled_press add_idea = censored_press } }
+	else_if = { limit = { has_idea = censored_press } swap_ideas = { remove_idea = censored_press add_idea = regulated_press } }
+	else_if = { limit = { has_idea = regulated_press } swap_ideas = { remove_idea = regulated_press add_idea = free_press } }
+}
+
+FRA_press_law_set_free_press = {
+	if = { limit = { has_idea = no_press } swap_ideas = { remove_idea = no_press add_idea = free_press } }
+	else_if = { limit = { has_idea = state_controlled_press } swap_ideas = { remove_idea = state_controlled_press add_idea = free_press } }
+	else_if = { limit = { has_idea = censored_press } swap_ideas = { remove_idea = censored_press add_idea = free_press } }
+	else_if = { limit = { has_idea = regulated_press } swap_ideas = { remove_idea = regulated_press add_idea = free_press } }
+}
+
+FRA_court_law_one_step_stricter = {
+	if = { limit = { has_idea = full_jury_courts } swap_ideas = { remove_idea = full_jury_courts add_idea = quasi_jury_courts } }
+	else_if = { limit = { has_idea = quasi_jury_courts } swap_ideas = { remove_idea = quasi_jury_courts add_idea = aristocratic_courts } }
+	else_if = { limit = { has_idea = aristocratic_courts } swap_ideas = { remove_idea = aristocratic_courts add_idea = kangaroo_courts } }
+	else_if = { limit = { has_idea = kangaroo_courts } swap_ideas = { remove_idea = kangaroo_courts add_idea = appointed_courts } }
+}
+
+FRA_policing_law_one_step_stricter = {
+	if = { limit = { has_idea = no_police } swap_ideas = { remove_idea = no_police add_idea = local_police } }
+	else_if = { limit = { has_idea = local_police } swap_ideas = { remove_idea = local_police add_idea = dedicated_police } }
+	else_if = { limit = { has_idea = dedicated_police } swap_ideas = { remove_idea = dedicated_police add_idea = police_state } }
+}
+
+FRA_trade_union_law_one_step_freer = {
+	if = { limit = { has_idea = prohibited_trade_unions } swap_ideas = { remove_idea = prohibited_trade_unions add_idea = state_controlled_unions } }
+	else_if = { limit = { has_idea = state_controlled_unions } swap_ideas = { remove_idea = state_controlled_unions add_idea = non_socialist_unions } }
+	else_if = { limit = { has_idea = non_socialist_unions } swap_ideas = { remove_idea = non_socialist_unions add_idea = free_regulatory_bodies } }
+	else_if = { limit = { has_idea = free_regulatory_bodies } swap_ideas = { remove_idea = free_regulatory_bodies add_idea = worker_controlled_unions } }
+}
+
+FRA_economic_system_one_step_towards_planned = {
+	if = { limit = { has_idea = unorganized_economy } swap_ideas = { remove_idea = unorganized_economy add_idea = agrarian_economy } }
+	else_if = { limit = { has_idea = agrarian_economy } swap_ideas = { remove_idea = agrarian_economy add_idea = interventionist_economy } }
+	else_if = { limit = { has_idea = interventionist_economy } swap_ideas = { remove_idea = interventionist_economy add_idea = laissez_faire_economy } }
+	else_if = { limit = { has_idea = laissez_faire_economy } swap_ideas = { remove_idea = laissez_faire_economy add_idea = planned_economy } }
+}
+
+FRA_church_and_state_one_tier_up = {
+	if = { limit = { has_idea = state_atheism } swap_ideas = { remove_idea = state_atheism add_idea = total_separation } }
+	else_if = { limit = { has_idea = total_separation } swap_ideas = { remove_idea = total_separation add_idea = freedom_of_religion } }
+	else_if = { limit = { has_idea = freedom_of_religion } swap_ideas = { remove_idea = freedom_of_religion add_idea = state_religion } }
+	else_if = { limit = { has_idea = state_religion } swap_ideas = { remove_idea = state_religion add_idea = theocracy } }
+}
+
+FRA_church_and_state_one_tier_down = {
+	if = { limit = { has_idea = theocracy } swap_ideas = { remove_idea = theocracy add_idea = state_religion } }
+	else_if = { limit = { has_idea = state_religion } swap_ideas = { remove_idea = state_religion add_idea = freedom_of_religion } }
+	else_if = { limit = { has_idea = freedom_of_religion } swap_ideas = { remove_idea = freedom_of_religion add_idea = total_separation } }
+	else_if = { limit = { has_idea = total_separation } swap_ideas = { remove_idea = total_separation add_idea = state_atheism } }
+}
+
+FRA_trade_policy_set_mercantilism = {
+	if = { limit = { has_idea = isolationism } swap_ideas = { remove_idea = isolationism add_idea = mercantilism } }
+	else_if = { limit = { has_idea = protectionism } swap_ideas = { remove_idea = protectionism add_idea = mercantilism } }
+	else_if = { limit = { has_idea = free_trade } swap_ideas = { remove_idea = free_trade add_idea = mercantilism } }
+}
+
+FRA_trade_policy_set_free_trade = {
+	if = { limit = { has_idea = isolationism } swap_ideas = { remove_idea = isolationism add_idea = free_trade } }
+	else_if = { limit = { has_idea = protectionism } swap_ideas = { remove_idea = protectionism add_idea = free_trade } }
+	else_if = { limit = { has_idea = mercantilism } swap_ideas = { remove_idea = mercantilism add_idea = free_trade } }
+}
+
+#---------------------------------------------------------------------------------------
+#	DE MORNY'S IDEALISM
+#---------------------------------------------------------------------------------------
+
+FRA_de_mornys_idealism_begin = {
+	if = {
+		limit = { has_idea = FRA_empire_autoritaire }
+		swap_ideas = { remove_idea = FRA_empire_autoritaire add_idea = FRA_idea_lempire_reformateur }
+	}
+	else = { add_ideas = FRA_idea_lempire_reformateur }
+	custom_effect_tooltip = FRA_de_mornys_reforms_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_de_mornys_idealism
+		set_variable = { FRA_de_morny_reforms_done = 0 }
+	}
+}
+
+# Called at the end of every De Morny reform decision.
+FRA_de_morny_reform_finished = {
+	clr_country_flag = FRA_de_morny_reform_in_progress
+	add_to_variable = { FRA_de_morny_reforms_done = 1 }
+	if = {
+		limit = {
+			check_variable = { FRA_de_morny_reforms_done > 6 }
+			has_idea = FRA_idea_lempire_reformateur
+		}
+		swap_ideas = { remove_idea = FRA_idea_lempire_reformateur add_idea = FRA_idea_lempire_reforme }
+		if = {
+			limit = { country_exists = ENG }
+			add_opinion_modifier = { target = ENG modifier = FRA_lempire_reforme_opinion }
+			ENG = { add_opinion_modifier = { target = FRA modifier = FRA_lempire_reforme_opinion } }
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE DECREE OF 1860
+#---------------------------------------------------------------------------------------
+
+FRA_decree_of_1860_lock_press = {
+	if = {
+		limit = { NOT = { has_country_flag = FRA_decree_of_1860_press_floor } }
+		custom_effect_tooltip = FRA_decree_of_1860_press_floor_set_tt
+		hidden_effect = { set_country_flag = FRA_decree_of_1860_press_floor }
+	}
+	if = {
+		limit = {
+			OR = {
+				has_idea = no_press
+				has_idea = state_controlled_press
+				has_idea = censored_press
+			}
+		}
+		FRA_press_law_set_regulated_press = yes
+	}
+}
+
+FRA_press_law_set_regulated_press = {
+	if = { limit = { has_idea = no_press } swap_ideas = { remove_idea = no_press add_idea = regulated_press } }
+	else_if = { limit = { has_idea = state_controlled_press } swap_ideas = { remove_idea = state_controlled_press add_idea = regulated_press } }
+	else_if = { limit = { has_idea = censored_press } swap_ideas = { remove_idea = censored_press add_idea = regulated_press } }
+}
+
+FRA_decree_of_1860_lock_trade = {
+	custom_effect_tooltip = FRA_decree_of_1860_trade_floor_set_tt
+	hidden_effect = { set_country_flag = FRA_decree_of_1860_trade_floor }
+	if = {
+		limit = { has_idea = isolationism }
+		swap_ideas = { remove_idea = isolationism add_idea = protectionism }
+	}
+	custom_effect_tooltip = FRA_free_trade_choice_unlocked_tt
+	hidden_effect = { set_country_flag = FRA_free_trade_choice_available }
+}
+
+FRA_decree_of_1860_add_drift_clause = {
+	if = {
+		limit = { has_idea = FRA_idea_decree_of_1860 }
+		swap_ideas = { remove_idea = FRA_idea_decree_of_1860 add_idea = FRA_idea_decree_of_1860_2 }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE COBDEN-CHEVALIER TREATY
+#---------------------------------------------------------------------------------------
+
+FRA_sign_cobden_chevalier = {
+	add_ideas = FRA_idea_cobden_chevalier_treaty
+	set_country_flag = FRA_cobden_chevalier_signed
+	if = {
+		limit = { country_exists = ENG }
+		add_opinion_modifier = { target = ENG modifier = FRA_cobden_chevalier_opinion }
+		ENG = { add_opinion_modifier = { target = FRA modifier = FRA_cobden_chevalier_opinion } }
+	}
+	custom_effect_tooltip = FRA_free_trade_decisions_unlocked_tt
+	hidden_effect = { set_country_flag = FRA_free_trade_agreements_available }
+}
+
+FRA_check_european_economic_cooperation = {
+	if = {
+		limit = {
+			has_country_flag = FRA_dutch_free_trade_signed
+			has_country_flag = FRA_italian_free_trade_signed
+			has_idea = FRA_idea_cobden_chevalier_treaty
+		}
+		swap_ideas = { remove_idea = FRA_idea_cobden_chevalier_treaty add_idea = FRA_idea_european_economic_cooperation }
+		if = {
+			limit = { country_exists = ITA }
+			add_opinion_modifier = { target = ITA modifier = FRA_european_economic_cooperation_opinion }
+			ITA = { add_opinion_modifier = { target = FRA modifier = FRA_european_economic_cooperation_opinion } }
+		}
+		if = {
+			limit = { country_exists = HOL }
+			add_opinion_modifier = { target = HOL modifier = FRA_european_economic_cooperation_opinion }
+			HOL = { add_opinion_modifier = { target = FRA modifier = FRA_european_economic_cooperation_opinion } }
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE PARLIAMENTARY DEBATE
+#---------------------------------------------------------------------------------------
+
+FRA_unlock_debate_mechanic = {
+	custom_effect_tooltip = FRA_debate_mechanic_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_debate_mechanic_active
+		set_variable = { FRA_debate_preparation = 1 }
+		set_variable = { FRA_debate_opponent = 0 }
+	}
+}
+
+# Victory chance = Bonapartist popularity / 3 x preparation, or x2 for an internal
+# debate; clamped to the 5%-95% band demanded by the design.
+FRA_calculate_debate_odds = {
+	set_variable = { FRA_debate_win_chance = party_popularity@autocracy }
+	if = {
+		limit = { check_variable = { FRA_debate_opponent = 3 } }
+		multiply_variable = { FRA_debate_win_chance = 2 }
+		divide_variable = { FRA_debate_win_chance = 3 }
+	}
+	else = {
+		divide_variable = { FRA_debate_win_chance = 3 }
+		multiply_variable = { FRA_debate_win_chance = FRA_debate_preparation }
+	}
+	clamp_variable = { var = FRA_debate_win_chance min = 0.05 max = 0.95 }
+}
+
+# Moves 2% of popularity between the Bonapartists and the chosen opponent.
+# Expects FRA_debate_swing to hold the swing towards the Bonapartists.
+FRA_apply_debate_popularity_swing = {
+	add_popularity = { ideology = autocracy popularity = FRA_debate_swing }
+	set_temp_variable = { FRA_debate_counter_swing = FRA_debate_swing }
+	multiply_temp_variable = { FRA_debate_counter_swing = -1 }
+	if = {
+		limit = { check_variable = { FRA_debate_opponent = 1 } }
+		add_popularity = { ideology = ideology_social_liberalism popularity = FRA_debate_counter_swing }
+	}
+	else_if = {
+		limit = { check_variable = { FRA_debate_opponent = 2 } }
+		add_popularity = { ideology = centrism popularity = FRA_debate_counter_swing }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	DEBATE THE EMPEROR'S POLICY - the quests
+#---------------------------------------------------------------------------------------
+
+FRA_unlock_emperors_policy_debates = {
+	custom_effect_tooltip = FRA_emperors_policy_debates_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_emperors_policy_debates_active
+		set_variable = { FRA_heckler_party = 1 }
+		country_event = { id = france.280 days = 90 random_days = 180 }
+	}
+}
+
+# Picks the opposition party that heckles the Emperor, weighted by its popularity.
+FRA_pick_the_heckling_party = {
+	set_temp_variable = { FRA_heckle_republicans = party_popularity@ideology_social_liberalism }
+	set_temp_variable = { FRA_heckle_conservative_liberals = party_popularity@centrism }
+	set_temp_variable = { FRA_heckle_socialists = party_popularity@social_egalitarianism }
+	set_temp_variable = { FRA_heckle_total = FRA_heckle_republicans }
+	add_to_temp_variable = { FRA_heckle_total = FRA_heckle_conservative_liberals }
+	add_to_temp_variable = { FRA_heckle_total = FRA_heckle_socialists }
+	if = {
+		limit = { check_variable = { FRA_heckle_total < 0.01 } }
+		set_variable = { FRA_heckler_party = 1 }
+	}
+	else = {
+		set_temp_variable = { FRA_heckle_roll = random }
+		multiply_temp_variable = { FRA_heckle_roll = FRA_heckle_total }
+		if = {
+			limit = { check_variable = { FRA_heckle_roll < FRA_heckle_republicans } }
+			set_variable = { FRA_heckler_party = 1 }
+		}
+		else = {
+			subtract_from_temp_variable = { FRA_heckle_roll = FRA_heckle_republicans }
+			if = {
+				limit = { check_variable = { FRA_heckle_roll < FRA_heckle_conservative_liberals } }
+				set_variable = { FRA_heckler_party = 2 }
+			}
+			else = { set_variable = { FRA_heckler_party = 3 } }
+		}
+	}
+}
+
+# The political price of answering a heckler rises as the Emperor's health falls.
+FRA_calculate_challenge_cost = {
+	set_variable = { FRA_challenge_pp_cost = 25 }
+	if = {
+		limit = {
+			has_country_flag = FRA_napoleon_health_activated
+			check_variable = { FRA.napoleon_health < 26 }
+		}
+		set_variable = { FRA_challenge_pp_cost = 100 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = FRA_napoleon_health_activated
+			check_variable = { FRA.napoleon_health < 51 }
+		}
+		set_variable = { FRA_challenge_pp_cost = 75 }
+	}
+	else_if = {
+		limit = {
+			has_country_flag = FRA_napoleon_health_activated
+			check_variable = { FRA.napoleon_health < 76 }
+		}
+		set_variable = { FRA_challenge_pp_cost = 50 }
+	}
+}
+
+# Every quest resolution also moves the popularity of the party that called the Emperor out.
+FRA_quest_success_popularity = {
+	add_popularity = { ideology = autocracy popularity = 0.02 }
+	if = { limit = { check_variable = { FRA_heckler_party = 1 } } add_popularity = { ideology = ideology_social_liberalism popularity = 0.01 } }
+	else_if = { limit = { check_variable = { FRA_heckler_party = 2 } } add_popularity = { ideology = centrism popularity = 0.01 } }
+	else = { add_popularity = { ideology = social_egalitarianism popularity = 0.01 } }
+}
+
+FRA_quest_failure_popularity = {
+	add_popularity = { ideology = autocracy popularity = -0.01 }
+	if = { limit = { check_variable = { FRA_heckler_party = 1 } } add_popularity = { ideology = ideology_social_liberalism popularity = 0.02 } }
+	else_if = { limit = { check_variable = { FRA_heckler_party = 2 } } add_popularity = { ideology = centrism popularity = 0.02 } }
+	else = { add_popularity = { ideology = social_egalitarianism popularity = 0.02 } }
+}
+
+FRA_schedule_next_heckler = {
+	country_event = { id = france.280 days = 90 random_days = 180 }
+}
+
+# Each picker leaves FRA_current_quest at 0 when every quest of its category has
+# already been carried out or is still running.
+FRA_pick_an_economic_quest = {
+	set_variable = { FRA_current_quest = 0 }
+	random_list = {
+		20 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_the_tariff_question has_country_flag = FRA_quest_done_tariff } }
+			set_variable = { FRA_current_quest = 1 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_banking_reform has_country_flag = FRA_quest_done_banking } }
+			set_variable = { FRA_current_quest = 2 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_the_grain_question has_country_flag = FRA_quest_done_grain } }
+			set_variable = { FRA_current_quest = 3 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_rails_across_the_empire has_country_flag = FRA_quest_done_rails } }
+			set_variable = { FRA_current_quest = 4 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_the_wine_tariff_dispute has_country_flag = FRA_quest_done_wine } }
+			set_variable = { FRA_current_quest = 5 }
+		}
+	}
+}
+
+FRA_pick_a_workers_quest = {
+	set_variable = { FRA_current_quest = 0 }
+	random_list = {
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_the_question_of_hours has_country_flag = FRA_quest_done_hours } }
+			set_variable = { FRA_current_quest = 6 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_combination_acts has_country_flag = FRA_quest_done_combination } }
+			set_variable = { FRA_current_quest = 7 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_child_labour_reform has_country_flag = FRA_quest_done_child_labour } }
+			set_variable = { FRA_current_quest = 8 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_housing_for_the_poor has_country_flag = FRA_quest_done_housing } }
+			set_variable = { FRA_current_quest = 9 }
+		}
+	}
+}
+
+FRA_pick_a_political_quest = {
+	set_variable = { FRA_current_quest = 0 }
+	random_list = {
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_amnesty_for_exiles has_country_flag = FRA_quest_done_amnesty } }
+			set_variable = { FRA_current_quest = 10 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_municipal_self_government has_country_flag = FRA_quest_done_municipal } }
+			set_variable = { FRA_current_quest = 11 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_judicial_independence has_country_flag = FRA_quest_done_judicial } }
+			set_variable = { FRA_current_quest = 12 }
+		}
+		25 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_interpellation_rights has_country_flag = FRA_quest_done_interpellation } }
+			set_variable = { FRA_current_quest = 13 }
+		}
+	}
+}
+
+FRA_pick_a_foreign_quest = {
+	set_variable = { FRA_current_quest = 0 }
+	random_list = {
+		34 = {
+			# The Italian mission is lost for good if Italy never comes into being.
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_the_italian_mission has_country_flag = FRA_quest_done_italy NOT = { country_exists = ITA } } }
+			set_variable = { FRA_current_quest = 14 }
+		}
+		33 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_defend_the_pope has_country_flag = FRA_quest_done_pope NOT = { country_exists = PAP } } }
+			set_variable = { FRA_current_quest = 15 }
+		}
+		33 = {
+			modifier = { factor = 0 OR = { has_decision = FRA_quest_colonial_ambitions has_country_flag = FRA_quest_done_colonial } }
+			set_variable = { FRA_current_quest = 16 }
+		}
+	}
+}
+
+FRA_activate_the_current_quest = {
+	if = { limit = { check_variable = { FRA_current_quest = 1 } } activate_mission = FRA_quest_the_tariff_question }
+	else_if = { limit = { check_variable = { FRA_current_quest = 2 } } activate_mission = FRA_quest_banking_reform }
+	else_if = { limit = { check_variable = { FRA_current_quest = 3 } } activate_mission = FRA_quest_the_grain_question }
+	else_if = { limit = { check_variable = { FRA_current_quest = 4 } } activate_mission = FRA_quest_rails_across_the_empire }
+	else_if = { limit = { check_variable = { FRA_current_quest = 5 } } activate_mission = FRA_quest_the_wine_tariff_dispute }
+	else_if = { limit = { check_variable = { FRA_current_quest = 6 } } activate_mission = FRA_quest_the_question_of_hours }
+	else_if = { limit = { check_variable = { FRA_current_quest = 7 } } activate_mission = FRA_quest_combination_acts }
+	else_if = { limit = { check_variable = { FRA_current_quest = 8 } } activate_mission = FRA_quest_child_labour_reform }
+	else_if = { limit = { check_variable = { FRA_current_quest = 9 } } activate_mission = FRA_quest_housing_for_the_poor }
+	else_if = { limit = { check_variable = { FRA_current_quest = 10 } } activate_mission = FRA_quest_amnesty_for_exiles }
+	else_if = { limit = { check_variable = { FRA_current_quest = 11 } } activate_mission = FRA_quest_municipal_self_government }
+	else_if = { limit = { check_variable = { FRA_current_quest = 12 } } activate_mission = FRA_quest_judicial_independence }
+	else_if = { limit = { check_variable = { FRA_current_quest = 13 } } activate_mission = FRA_quest_interpellation_rights }
+	else_if = { limit = { check_variable = { FRA_current_quest = 14 } } activate_mission = FRA_quest_the_italian_mission }
+	else_if = { limit = { check_variable = { FRA_current_quest = 15 } } activate_mission = FRA_quest_defend_the_pope }
+	else_if = { limit = { check_variable = { FRA_current_quest = 16 } } activate_mission = FRA_quest_colonial_ambitions }
+}
+
+#---------------------------------------------------------------------------------------
+#	A SUCCESSOR TO DE MORNY - the elections of 1869
+#---------------------------------------------------------------------------------------
+
+# Outcome 2 swings the Chamber towards the government; 1 and 3 swing it away.
+FRA_apply_the_election_result = {
+	set_temp_variable = { FRA_election_shift = FRA_election_swing }
+	set_temp_variable = { FRA_election_counter = FRA_election_swing }
+	if = {
+		limit = { check_variable = { FRA_election_outcome = 2 } }
+		multiply_temp_variable = { FRA_election_counter = -0.5 }
+		add_popularity = { ideology = autocracy popularity = FRA_election_shift }
+		add_popularity = { ideology = ideology_social_liberalism popularity = FRA_election_counter }
+		add_popularity = { ideology = centrism popularity = FRA_election_counter }
+		add_stability = -0.01
+	}
+	else = {
+		multiply_temp_variable = { FRA_election_shift = -1 }
+		multiply_temp_variable = { FRA_election_counter = 0.5 }
+		add_popularity = { ideology = autocracy popularity = FRA_election_shift }
+		add_popularity = { ideology = ideology_social_liberalism popularity = FRA_election_counter }
+		add_popularity = { ideology = centrism popularity = FRA_election_counter }
+		if = {
+			limit = { check_variable = { FRA_election_outcome = 1 } }
+			add_stability = -0.05
+		}
+		else = { add_stability = -0.02 }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	RESPONSIBLE MINISTRIES - Emile Ollivier
+#---------------------------------------------------------------------------------------
+
+FRA_seat_ollivier_in_the_ministry = {
+	add_ideas = FRA_idea_emile_ollivier
+	custom_effect_tooltip = FRA_ollivier_succeeds_de_morny_tt
+	# Read by the Imperial Ministry branch when it is written: Ollivier takes de Morny's
+	# seat on the same track.
+	hidden_effect = { set_country_flag = FRA_ministry_ollivier_succeeded_de_morny }
+}
+
+#---------------------------------------------------------------------------------------
+#	THE CONSERVATIVE CRACKDOWN
+#---------------------------------------------------------------------------------------
+
+FRA_conservative_crackdown_to_tier_2 = { swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_1 add_idea = FRA_idea_conservative_crackdown_2 } }
+FRA_conservative_crackdown_to_tier_3 = { swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_2 add_idea = FRA_idea_conservative_crackdown_3 } }
+FRA_conservative_crackdown_to_tier_4 = { swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_3 add_idea = FRA_idea_conservative_crackdown_4 } }
+
+FRA_forge_the_iron_fist = {
+	if = {
+		limit = { has_idea = FRA_idea_conservative_crackdown_4 }
+		swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_4 add_idea = FRA_idea_the_iron_fist }
+	}
+	else_if = {
+		limit = { has_idea = FRA_idea_conservative_crackdown_3 }
+		swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_3 add_idea = FRA_idea_the_iron_fist }
+	}
+	else_if = {
+		limit = { has_idea = FRA_idea_conservative_crackdown_2 }
+		swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_2 add_idea = FRA_idea_the_iron_fist }
+	}
+	else_if = {
+		limit = { has_idea = FRA_idea_conservative_crackdown_1 }
+		swap_ideas = { remove_idea = FRA_idea_conservative_crackdown_1 add_idea = FRA_idea_the_iron_fist }
+	}
+	else = { add_ideas = FRA_idea_the_iron_fist }
+}
+
+FRA_subdue_the_radical_bonapartists = {
+	custom_effect_tooltip = FRA_radicals_subdued_tt
+	hidden_effect = {
+		set_variable = { FRA_radical_bonapartists_influence = 1 }
+		FRA_refresh_imperial_influence = yes
+	}
+}
+
+FRA_end_the_imperial_influence = {
+	custom_effect_tooltip = FRA_imperial_influence_ended_tt
+	hidden_effect = {
+		FRA_clear_imperial_influence_ideas = yes
+		FRA_clear_imperial_influence_opinions = yes
+		clr_country_flag = FRA_imperial_influence_active
+		set_country_flag = FRA_imperial_influence_ended
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	TAMING ALGERIA
+#---------------------------------------------------------------------------------------
+
+FRA_open_algerian_assimilation = {
+	custom_effect_tooltip = FRA_algerian_assimilation_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_algerian_assimilation_active
+		set_variable = { FRA_algerian_assimilation_taken = 0 }
+	}
+}
+
+FRA_algerian_assimilation_finished = {
+	clr_country_flag = FRA_algerian_assimilation_in_progress
+	add_to_variable = { FRA_algerian_assimilation_taken = 1 }
+	if = {
+		limit = { check_variable = { FRA_algerian_assimilation_taken < 5 } }
+		set_temp_variable = { FRA_uprising_delta = 1 }
+		FRA_add_uprising_chance = yes
+	}
+	if = {
+		limit = {
+			check_variable = { FRA_algerian_assimilation_taken > 5 }
+			NOT = { has_idea = FRA_idea_taming_algeria }
+		}
+		add_ideas = FRA_idea_taming_algeria
+	}
+}
+
+# The colonial decrees bite before they pay: compliance drops at once and the promised
+# gain is queued for two years' time (france.294 pays out the whole queue).
+FRA_algeria_lower_compliance = {
+	every_owned_state = {
+		limit = { FRA_is_algerian_state = yes }
+		add_compliance = -5
+	}
+}
+
+# Expects FRA_algeria_compliance_gain to hold the promised gain.
+FRA_algeria_raise_compliance = {
+	custom_effect_tooltip = FRA_algeria_compliance_queued_tt
+	hidden_effect = {
+		if = {
+			limit = { NOT = { has_variable = FRA_algeria_compliance_queue } }
+			set_variable = { FRA_algeria_compliance_queue = 0 }
+		}
+		add_to_variable = { FRA_algeria_compliance_queue = FRA_algeria_compliance_gain }
+		country_event = { id = france.294 days = 650 }
+	}
+}
+
+# "+2% Stability in Algeria" - the engine has no per-state stability, so the Empire
+# takes the credit nationally.
+FRA_algeria_add_stability = {
+	add_stability = 0.02
+}
+
+#---------------------------------------------------------------------------------------
+#	THE CONSERVATIVE UPRISING
+#---------------------------------------------------------------------------------------
+
+# Expects FRA_uprising_delta to hold the number of percentage points to add.
+FRA_add_uprising_chance = {
+	custom_effect_tooltip = FRA_uprising_chance_increased_tt
+	hidden_effect = {
+		if = {
+			limit = { NOT = { has_variable = FRA_conservative_uprising_chance } }
+			set_variable = { FRA_conservative_uprising_chance = 0 }
+		}
+		add_to_variable = { FRA_conservative_uprising_chance = FRA_uprising_delta }
+		clamp_variable = { var = FRA_conservative_uprising_chance min = 0 max = 100 }
+	}
+}
+
+FRA_start_uprising_watch = {
+	if = {
+		limit = { NOT = { has_country_flag = FRA_conservative_uprising_watch } }
+		hidden_effect = {
+			set_country_flag = FRA_conservative_uprising_watch
+			country_event = { id = france.295 days = 60 }
+		}
+	}
+}
+
+# The Midi rises first: Charente, Limousin, Auvergne, the Rhone and everything south,
+# plus Corsica. Algeria only joins once four or more crackdown decrees have been signed.
+FRA_start_the_southern_uprising = {
+	set_variable = { FRA_uprising_size = FRA_conservative_uprising_chance }
+	divide_variable = { FRA_uprising_size = 100 }
+	add_to_variable = { FRA_uprising_size = 0.3 }
+	clamp_variable = { var = FRA_uprising_size min = 0.3 max = 0.6 }
+	if = {
+		limit = { FRA_algeria_joins_the_uprising = yes }
+		start_civil_war = {
+			ruling_party = autocracy
+			ideology = ideology_social_liberalism
+			size = FRA_uprising_size
+			keep_political_leader = yes
+			states = { 1 19 20 21 22 23 25 26 31 32 33 971 459 460 513 1013 1382 1384 1415 }
+		}
+	}
+	else = {
+		start_civil_war = {
+			ruling_party = autocracy
+			ideology = ideology_social_liberalism
+			size = FRA_uprising_size
+			keep_political_leader = yes
+			states = { 1 19 20 21 22 23 25 26 31 32 33 971 }
+		}
+	}
+	set_country_flag = FRA_southern_uprising_ongoing
+	clr_country_flag = FRA_conservative_uprising_watch
+	country_event = { id = france.297 days = 30 }
+}
+
+# If the Midi has not been pacified within a month the Vendee rises for the Bourbons.
+FRA_start_the_vendee_rising = {
+	start_civil_war = {
+		ruling_party = autocracy
+		ideology = traditional_conservatism
+		size = 0.2
+		keep_political_leader = yes
+		states = { 14 30 }
+	}
+	set_country_flag = FRA_vendee_rising_ongoing
+}
+
+#---------------------------------------------------------------------------------------
+#	EDUCATION REFORM
+#---------------------------------------------------------------------------------------
+
+FRA_education_reform_to_tier_2 = { swap_ideas = { remove_idea = FRA_idea_education_reform_1 add_idea = FRA_idea_education_reform_2 } }
+FRA_education_reform_to_tier_3 = { swap_ideas = { remove_idea = FRA_idea_education_reform_2 add_idea = FRA_idea_education_reform_3 } }
+FRA_education_reform_to_tier_4 = { swap_ideas = { remove_idea = FRA_idea_education_reform_3 add_idea = FRA_idea_education_reform_4 } }
+
+FRA_education_reform_to_tier_5 = {
+	swap_ideas = { remove_idea = FRA_idea_education_reform_4 add_idea = FRA_idea_education_reform_5 }
+	custom_effect_tooltip = FRA_results_of_our_studies_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_results_of_our_studies
+		country_event = { id = france.293 days = 30 random_days = 335 }
+	}
+}
+
+# One free 75% bonus a year, in a random civilian field.
+FRA_results_of_our_studies_bonus = {
+	random_list = {
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = mechanical_engineering_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = process_engineering_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = biochemistry_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = electronics_devices_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = humanities_tech } }
+	}
+}
