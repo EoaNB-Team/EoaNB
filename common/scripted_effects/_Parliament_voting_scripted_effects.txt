@@ -374,6 +374,9 @@ parliament_set_reform_approvals = {
 	else_if = { limit = { check_variable = { var = current_reform_token value = token:hours_10 compare = equals } }                   parl_ap_stance_3_strong = yes }
 	else_if = { limit = { check_variable = { var = current_reform_token value = token:hours_8 compare = equals } }                    parl_ap_stance_4_strong = yes }
 
+	# PRS (Prussia) - Custom Prussian Reforms
+	else_if = { limit = { check_variable = { var = current_reform_token value = token:PRS_expand_voting_rights compare = equals } }	  parl_ap_stance_3_narrow = yes }
+
 	else = {
 		log = "parliament_set_reform_approvals: no approval data for token [?current_reform_token]"
 	}
@@ -494,6 +497,111 @@ compute_number_seats_approve_est = {
 # (the urgent vote path). Requires parliament_reform_majority to be set (see
 # parliament_set_reform_majority); an unset value falls back to a simple majority.
 parliament_calculate_vote_result = {
+	# Prevent result flags from an interrupted or previously unresolved vote
+	# from activating the wrong event option.
+	clr_country_flag = eoanb_reform_vote_success
+	clr_country_flag = eoanb_reform_vote_failure
+	clr_country_flag = eoanb_reform_vote_tie
+
+	set_variable = { yay_votes = 0 }
+	set_variable = { nay_votes = 0 }
+
+	# Every seat rolls against the approval of the party that holds it.
+	for_each_loop = {
+		array = seats_array
+		value = parl_seat_party
+
+		set_temp_variable = { parl_r = random }
+
+		if = {
+			limit = {
+				check_variable = {
+					var = parl_r
+					value = parl_voting_approval_array^parl_seat_party
+					compare = less_than
+				}
+			}
+			add_to_variable = { yay_votes = 1 }
+		}
+		else = {
+			add_to_variable = { nay_votes = 1 }
+		}
+	}
+
+	compute_number_seats_tot = yes
+
+	# Threshold in seats: 65% of the whole parliament for a super majority, half of it otherwise.
+	set_variable = {
+		parl_votes_threshold = {
+			value = parl_tot_num_seats
+			if = {
+				limit = { value = parliament_reform_majority equals = 2 }
+				multiply = 0.65
+			}
+			else = { multiply = 0.50 }
+		}
+	}
+
+	# Convert the fractional threshold into the smallest whole number of votes that passes it.
+	# Example: 65% of 256 is 166.4, so 167 votes are required.
+	# A simple majority needs one extra vote when the threshold is a whole number, since exactly
+	# half of the seats is not a majority: 128 of 256 seats ties, 129 wins.
+	set_variable = { parl_votes_required = { value = parl_votes_threshold round = yes } }
+	if = {
+		limit = {
+			OR = {
+				check_variable = {
+					var = parl_votes_required
+					value = parl_votes_threshold
+					compare = less_than
+				}
+				AND = {
+					NOT = { check_variable = { parliament_reform_majority = 2 } }
+					check_variable = {
+						var = parl_votes_required
+						value = parl_votes_threshold
+						compare = equals
+					}
+				}
+			}
+		}
+		add_to_variable = { parl_votes_required = 1 }
+	}
+
+	if = {
+		limit = {
+			check_variable = {
+				var = yay_votes
+				value = parl_votes_required
+				compare = greater_than_or_equals
+			}
+		}
+		set_country_flag = eoanb_reform_vote_success
+	}
+	else_if = {
+		# Only a simple majority can end in a tie - a super majority proposal that falls short
+		# simply fails, even when the yays outnumber the nays.
+		limit = {
+			NOT = { check_variable = { parliament_reform_majority = 2 } }
+			check_variable = {
+				var = yay_votes
+				value = nay_votes
+				compare = equals
+			}
+		}
+		set_country_flag = eoanb_reform_vote_tie
+	}
+	else = {
+		set_country_flag = eoanb_reform_vote_failure
+	}
+
+	hidden_effect = {
+		country_event = { id = parliament_event.12 }
+	}
+}
+
+# For custom parliamentary votes.
+parliament_tally_vote = {
 	# Prevent result flags from an interrupted or previously unresolved vote
 	# from activating the wrong event option.
 	clr_country_flag = eoanb_reform_vote_success
@@ -948,6 +1056,95 @@ parliament_hide_voting_decisions = {
 	}
 }
 
+# Prussian Custom Parliamentary Votes
+PRS_show_voting_decisions = {
+	# The running vote itself.
+	set_temp_variable = { parliament_decision_token = token:PRS_expand_voting_rights }
+	set_temp_variable = { parliament_decision_lp_cost = 0 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 1 }
+	parliament_propose_decision = yes
+	# The mission is a status row rather than a clickable custom decision.
+	set_variable = { clicked@var:parliament_decision_token = 1 }
+
+	set_variable = { parliament_vote_days_left = 60 }
+	set_variable = { parliament_vote_total_days = 60 }
+	set_variable = { parliament_vote_progress = 0 }
+
+	# One meeting decision per party - same cost and icon for all nine.
+	clear_temp_array = parl_meet_decision_array
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_rad_soc_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_soc_lib_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_soc_ega_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_cen_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_tra_con_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_rad_dem_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_chauv_pop_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_aut_representatives }
+	add_to_temp_array = { parl_meet_decision_array = token:parliament_meet_with_fun_representatives }
+
+	for_each_loop = {
+		array = parl_meet_decision_array
+		value = parliament_decision_token
+
+		set_temp_variable = { parliament_decision_lp_cost = 40 }
+		set_temp_variable = { parliament_decision_money_cost = 0 }
+		set_temp_variable = { parliament_decision_category = 2 }
+		set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+		parliament_propose_decision = yes
+	}
+
+	set_temp_variable = { parliament_decision_token = token:parliament_meet_with_the_leader_of_the_opposition }
+	set_temp_variable = { parliament_decision_lp_cost = 20 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_try_a_deal_with_the_hardliners }
+	set_temp_variable = { parliament_decision_lp_cost = 50 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 8 } # political discourse
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_make_a_speech_in_parliament_voting }
+	set_temp_variable = { parliament_decision_lp_cost = 15 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 9 } # speech
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_find_compromises }
+	set_temp_variable = { parliament_decision_lp_cost = 30 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 11 } # civil support
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_put_pressure_on_the_lobbies }
+	set_temp_variable = { parliament_decision_lp_cost = 20 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 12 } # investment
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_silence_the_oppposition }
+	set_temp_variable = { parliament_decision_lp_cost = 35 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 2 } # wreckers
+	parliament_propose_decision = yes
+
+	set_temp_variable = { parliament_decision_token = token:parliament_bribe_representatives }
+	set_temp_variable = { parliament_decision_lp_cost = 35 }
+	set_temp_variable = { parliament_decision_money_cost = 0 }
+	set_temp_variable = { parliament_decision_category = 2 }
+	set_temp_variable = { parliament_decision_icon = 12 } # investment
+	parliament_propose_decision = yes
+}
+
 ####################################################################################################
 ### VOTE STATE CLEANUP ###
 ####################################################################################################
@@ -978,4 +1175,34 @@ parliament_reform_vote_cleanup = {
 		remove_mission = parliament_voting_mission
 	}
 	parliament_hide_voting_decisions = yes
+}
+
+# Prussian Reform Missions Cleanup
+prussian_voting_mission_cleanup = {
+	clr_country_flag = parliament_reform_vote_ongoing
+
+	if = {
+		limit = {
+			has_active_mission = prussian_voting_mission
+		}
+		remove_mission = prussian_voting_mission
+	}
+
+	if = {
+		limit = {
+			has_country_flag = PRS_expand_voting_rights_flag
+		}
+		set_temp_variable = { parliament_decision_token = token:PRS_expand_voting_rights }
+	}
+
+	parliament_hide_decision = yes
+	parliament_reform_vote_cleanup = yes
+	parliament_recompute_coalition_seats = yes
+
+	if = {
+		limit = {
+			has_country_flag = PRS_expand_voting_rights_flag
+		}
+		clr_country_flag = PRS_expand_voting_rights_flag
+	}
 }
