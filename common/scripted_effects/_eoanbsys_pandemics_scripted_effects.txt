@@ -1,0 +1,526 @@
+EOANBSYS_pandemics_constants_setup = {
+
+	set_variable = { global.eoanb_flu_r_rate = 1.8 }
+	set_variable = { global.eoanb_flu_mortality_warm = 0.03 }
+	set_variable = { global.eoanb_flu_mortality_cold = 0.06 }
+	set_variable = { global.eoanb_flu_mortality_relief = 0.01 }
+	set_variable = { global.eoanb_flu_immunity_target = 0.97 }
+	set_variable = { global.eoanb_flu_min_spread_weeks = 1 }
+	set_variable = { global.eoanb_flu_seed_infection = 0.01 }
+	set_variable = { global.eoanb_flu_jump_chance_base = 25 }
+	set_variable = { global.eoanb_flu_jump_chance_domestic = 33 }
+	set_variable = { global.eoanb_flu_jump_chance_foreign = 25 }
+	set_variable = { global.eoanb_flu_sea_trips_short = 3 }
+	set_variable = { global.eoanb_flu_naval_base_long = 4 }
+}
+
+EOANBSYS_influenza_weekly_tick = {
+
+	set_temp_variable = { flu_mortality = global.eoanb_flu_mortality_cold }
+	if = {
+		limit = {
+			check_variable = { global.month > 1 }
+			check_variable = { global.month < 10 }
+		}
+		set_temp_variable = { flu_mortality = global.eoanb_flu_mortality_warm }
+	}
+
+	if = {
+		limit = { check_variable = { country_influenza_spread_factor < 0 } }
+		subtract_from_temp_variable = { flu_mortality = global.eoanb_flu_mortality_relief }
+	}
+	clamp_temp_variable = { var = flu_mortality min = 0 max = 1 }
+
+	set_temp_variable = { flu_country_spread = 1 }
+	add_to_temp_variable = { flu_country_spread = country_influenza_spread_factor }
+
+	if = {
+		limit = {
+			has_country_flag = country_influenza
+			NOT = { has_country_flag = country_influenza_immunity }
+		}
+		EOANBSYS_influenza_progress_infection = yes
+	}
+
+	if = {
+		limit = { NOT = { has_country_flag = country_influenza_immunity } }
+		EOANBSYS_influenza_spread = yes
+	}
+}
+
+EOANBSYS_influenza_progress_infection = {
+
+	set_temp_variable = { flu_deaths_k = 0 }
+
+	every_owned_state = {
+		limit = {
+			has_state_flag = state_influenza
+			NOT = { has_state_flag = state_influenza_immunity }
+		}
+
+		set_temp_variable = { flu_state_spread = flu_country_spread }
+		add_to_temp_variable = { flu_state_spread = state_influenza_spread_factor }
+		clamp_temp_variable = { var = flu_state_spread min = 0 }
+
+		set_temp_variable = { flu_state_deaths_k = state_population_k }
+		multiply_temp_variable = { flu_state_deaths_k = infected_population_percentage }
+		multiply_temp_variable = { flu_state_deaths_k = flu_mortality }
+		add_to_temp_variable = { flu_deaths_k = flu_state_deaths_k }
+
+		add_to_variable = { immune_population_percentage = infected_population_percentage }
+		clamp_variable = { var = immune_population_percentage min = 0 max = 1 }
+		add_to_variable = { influenza_duration = 1 }
+
+		if = {
+			limit = { check_variable = { immune_population_percentage > global.eoanb_flu_immunity_target } }
+
+			set_state_flag = state_influenza_immunity
+			EOANBSYS_influenza_clear_impact_modifier = yes
+			add_dynamic_modifier = { modifier = influenza_aftermath }
+			# TODO: influenza_aftermath is never removed anywhere. It needs
+			# either a duration on the dynamic modifier or a cleanup pass.
+		}
+		else = {
+			set_temp_variable = { flu_remaining = 1 }
+			subtract_from_temp_variable = { flu_remaining = immune_population_percentage }
+			clamp_temp_variable = { var = flu_remaining min = 0 max = 1 }
+
+			multiply_variable = { infected_population_percentage = global.eoanb_flu_r_rate }
+			multiply_variable = { infected_population_percentage = flu_state_spread }
+			if = {
+				limit = { check_variable = { infected_population_percentage > flu_remaining } }
+				set_variable = { infected_population_percentage = flu_remaining }
+			}
+
+			EOANBSYS_influenza_refresh_impact_modifier = yes
+		}
+	}
+
+	if = {
+		limit = { check_variable = { flu_deaths_k > 0 } }
+		multiply_temp_variable = { flu_deaths_k = -1000 }
+		round_temp_variable = flu_deaths_k
+		add_manpower = var:flu_deaths_k
+	}
+
+	if = {
+		limit = { all_owned_state = { has_state_flag = state_influenza_immunity } }
+		set_country_flag = country_influenza_immunity
+		# TODO: fire the "the epidemic has passed" country event here.
+	}
+}
+
+
+EOANBSYS_influenza_refresh_impact_modifier = {
+
+	set_temp_variable = { flu_new_tier = 5 }
+	if = {
+		limit = { check_variable = { infected_population_percentage < 0.03 } }
+		set_temp_variable = { flu_new_tier = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { infected_population_percentage < 0.11 } }
+		set_temp_variable = { flu_new_tier = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { infected_population_percentage < 0.26 } }
+		set_temp_variable = { flu_new_tier = 3 }
+	}
+	else_if = {
+		limit = { check_variable = { infected_population_percentage < 0.51 } }
+		set_temp_variable = { flu_new_tier = 4 }
+	}
+
+	if = {
+		limit = { NOT = { check_variable = { influenza_impact_tier = flu_new_tier } } }
+
+		EOANBSYS_influenza_clear_impact_modifier = yes
+		set_variable = { influenza_impact_tier = flu_new_tier }
+
+		if = {
+			limit = { check_variable = { influenza_impact_tier = 1 } }
+			add_dynamic_modifier = { modifier = influenza_impact_01 }
+		}
+		else_if = {
+			limit = { check_variable = { influenza_impact_tier = 2 } }
+			add_dynamic_modifier = { modifier = influenza_impact_02 }
+		}
+		else_if = {
+			limit = { check_variable = { influenza_impact_tier = 3 } }
+			add_dynamic_modifier = { modifier = influenza_impact_03 }
+		}
+		else_if = {
+			limit = { check_variable = { influenza_impact_tier = 4 } }
+			add_dynamic_modifier = { modifier = influenza_impact_04 }
+		}
+		else = {
+			add_dynamic_modifier = { modifier = influenza_impact_05 }
+		}
+	}
+}
+
+EOANBSYS_influenza_clear_impact_modifier = {
+	if = {
+		limit = { check_variable = { influenza_impact_tier = 1 } }
+		remove_dynamic_modifier = { modifier = influenza_impact_01 }
+	}
+	else_if = {
+		limit = { check_variable = { influenza_impact_tier = 2 } }
+		remove_dynamic_modifier = { modifier = influenza_impact_02 }
+	}
+	else_if = {
+		limit = { check_variable = { influenza_impact_tier = 3 } }
+		remove_dynamic_modifier = { modifier = influenza_impact_03 }
+	}
+	else_if = {
+		limit = { check_variable = { influenza_impact_tier = 4 } }
+		remove_dynamic_modifier = { modifier = influenza_impact_04 }
+	}
+	else_if = {
+		limit = { check_variable = { influenza_impact_tier = 5 } }
+		remove_dynamic_modifier = { modifier = influenza_impact_05 }
+	}
+	set_variable = { influenza_impact_tier = 0 }
+}
+
+
+EOANBSYS_influenza_spread = {
+
+	set_temp_variable = { flu_border_policy = 15 }
+	if = {
+		limit = { has_idea = closed_borders }
+		set_temp_variable = { flu_border_policy = -12 }
+	}
+	else_if = {
+		limit = { has_idea = strict_border_control }
+		set_temp_variable = { flu_border_policy = -5 }
+	}
+	else_if = {
+		limit = { has_idea = open_borders }
+		set_temp_variable = { flu_border_policy = 5 }
+	}
+
+	every_owned_state = {
+		limit = {
+			NOT = { has_state_flag = state_influenza }
+			any_neighbor_state = { has_state_flag = state_influenza }
+		}
+		EOANBSYS_influenza_try_land_jump = yes
+	}
+
+	every_owned_state = {
+		limit = {
+			has_state_flag = state_influenza
+			naval_base > 1
+			check_variable = { influenza_duration > 1 }
+			OR = {
+				is_coastal = yes
+				is_island_state = yes
+			}
+		}
+		EOANBSYS_influenza_try_sea_jump = yes
+	}
+}
+
+EOANBSYS_influenza_try_land_jump = {
+
+	set_temp_variable = { flu_jump_chance = global.eoanb_flu_jump_chance_base }
+
+	every_neighbor_state = {
+		limit = {
+			has_state_flag = state_influenza
+			check_variable = { influenza_duration > global.eoanb_flu_min_spread_weeks }
+		}
+
+		set_temp_variable = { flu_carriers = 1 }
+		subtract_from_temp_variable = { flu_carriers = immune_population_percentage }
+		clamp_temp_variable = { var = flu_carriers min = 0 max = 1 }
+
+		if = {
+			limit = {
+				check_variable = {
+					var = controller
+					value = PREV.controller
+					compare = equals
+				}
+			}
+
+			set_temp_variable = { flu_neighbor_spread = global.eoanb_flu_jump_chance_domestic }
+			EOANBSYS_influenza_quarantine_domestic = yes
+		}
+		else = {
+			set_temp_variable = { flu_neighbor_spread = global.eoanb_flu_jump_chance_foreign }
+			add_to_temp_variable = { flu_neighbor_spread = flu_border_policy }
+
+			controller = {
+				if = {
+					limit = { has_idea = closed_borders }
+					add_to_temp_variable = { flu_neighbor_spread = -16 }
+				}
+				else_if = {
+					limit = { has_idea = strict_border_control }
+					add_to_temp_variable = { flu_neighbor_spread = -7 }
+				}
+				else_if = {
+					limit = { has_idea = open_borders }
+					add_to_temp_variable = { flu_neighbor_spread = 8 }
+				}
+			}
+
+			EOANBSYS_influenza_quarantine_foreign = yes
+		}
+
+		multiply_temp_variable = { flu_neighbor_spread = flu_carriers }
+
+		add_to_temp_variable = { flu_jump_chance = flu_neighbor_spread }
+	}
+
+	clamp_temp_variable = { var = flu_jump_chance min = 0 max = 100 }
+
+	set_temp_variable_to_random = {
+		var = flu_roll
+		min = 0
+		max = 100
+	}
+
+	if = {
+		limit = { check_variable = { flu_roll < flu_jump_chance } }
+		EOANBSYS_influenza_infect_state = yes
+	}
+}
+
+EOANBSYS_influenza_try_sea_jump = {
+
+	for_loop_effect = {
+		start = 0
+		end = global.eoanb_flu_sea_trips_short
+		value = flu_trip
+
+		random_state = {
+			limit = {
+				naval_base > 0
+				NOT = { has_state_flag = state_influenza }
+				OR = {
+					is_coastal = yes
+					is_island_state = yes
+				}
+				check_variable = { distance_to@PREV > 30 }
+				check_variable = { distance_to@PREV < 300 }
+			}
+			EOANBSYS_influenza_infect_state = yes
+		}
+	}
+
+	if = {
+		limit = { naval_base > global.eoanb_flu_naval_base_long }
+		random_state = {
+			limit = {
+				naval_base > 0
+				NOT = { has_state_flag = state_influenza }
+				OR = {
+					is_coastal = yes
+					is_island_state = yes
+				}
+				check_variable = { distance_to@PREV > 1000 }
+			}
+			EOANBSYS_influenza_infect_state = yes
+		}
+	}
+}
+
+EOANBSYS_influenza_infect_state = {
+	set_variable = { influenza_duration = 0 }
+	set_variable = { immune_population_percentage = 0 }
+	set_variable = { infected_population_percentage = global.eoanb_flu_seed_infection }
+
+	set_state_flag = state_influenza
+	clr_state_flag = state_influenza_immunity
+
+	set_variable = { influenza_impact_tier = 1 }
+	add_dynamic_modifier = { modifier = influenza_impact_01 }
+
+	controller = {
+		clr_country_flag = country_influenza_immunity
+
+		if = {
+			limit = { NOT = { has_country_flag = country_influenza } }
+			set_country_flag = country_influenza
+			EOANBSYS_influenza_refresh_spread_factors = yes
+			# TODO: fire the "first outbreak" country event here.
+		}
+	}
+}
+
+
+EOANBSYS_influenza_refresh_spread_factors = {
+
+	set_variable = { country_influenza_spread_factor = -0.2 }
+	if = {
+		limit = { has_idea = social_spending_level_1 }
+		set_variable = { country_influenza_spread_factor = 0.3 }
+	}
+	else_if = {
+		limit = { has_idea = social_spending_level_2 }
+		set_variable = { country_influenza_spread_factor = 0.15 }
+	}
+	else_if = {
+		limit = { has_idea = social_spending_level_3 }
+		set_variable = { country_influenza_spread_factor = 0 }
+	}
+	else_if = {
+		limit = { has_idea = social_spending_level_4 }
+		set_variable = { country_influenza_spread_factor = -0.1 }
+	}
+
+	if = {
+		limit = { has_idea = isolationism }
+		add_to_variable = { country_influenza_spread_factor = -0.1 }
+	}
+	else_if = {
+		limit = { has_idea = protectionism }
+		add_to_variable = { country_influenza_spread_factor = 0.05 }
+	}
+	else_if = {
+		limit = { has_idea = mercantilism }
+		add_to_variable = { country_influenza_spread_factor = 0.15 }
+	}
+	else = {
+		add_to_variable = { country_influenza_spread_factor = 0.25 }
+	}
+
+	set_temp_variable = { flu_quarantine_bonus = 0 }
+	if = {
+		limit = { has_idea = law_spending_level_2 }
+		set_temp_variable = { flu_quarantine_bonus = -0.05 }
+	}
+	else_if = {
+		limit = { has_idea = law_spending_level_5 }
+		set_temp_variable = { flu_quarantine_bonus = -0.15 }
+	}
+	else_if = {
+		limit = { has_idea = law_spending_level_4 }
+		set_temp_variable = { flu_quarantine_bonus = -0.35 }
+	}
+	else_if = {
+		limit = { has_idea = law_spending_level_3 }
+		set_temp_variable = { flu_quarantine_bonus = -0.5 }
+	}
+
+	every_owned_state = {
+		EOANBSYS_influenza_refresh_state_spread_factor = yes
+	}
+}
+
+
+EOANBSYS_influenza_refresh_state_spread_factor = {
+
+	### Urbanisation. ###
+	set_variable = { state_influenza_spread_factor = 0 }
+	if = {
+		limit = { has_state_category = rural }
+		set_variable = { state_influenza_spread_factor = -0.25 }
+	}
+	else_if = {
+		limit = { has_state_category = town }
+		set_variable = { state_influenza_spread_factor = 0.05 }
+	}
+	else_if = {
+		limit = { has_state_category = city }
+		set_variable = { state_influenza_spread_factor = 0.1 }
+	}
+	else_if = {
+		limit = { has_state_category = large_town }
+		set_variable = { state_influenza_spread_factor = 0.15 }
+	}
+	else_if = {
+		limit = { has_state_category = large_city }
+		set_variable = { state_influenza_spread_factor = 0.2 }
+	}
+	else_if = {
+		limit = { has_state_category = metropolis }
+		set_variable = { state_influenza_spread_factor = 0.25 }
+	}
+	else_if = {
+		limit = { has_state_category = megalopolis }
+		set_variable = { state_influenza_spread_factor = 0.3 }
+	}
+
+	set_temp_variable = { flu_pop_step = state_population_k }
+	divide_temp_variable = { flu_pop_step = 100 }
+	set_temp_variable = { flu_pop_frac = flu_pop_step }
+	modulo_temp_variable = { flu_pop_frac = 1 }
+	subtract_from_temp_variable = { flu_pop_step = flu_pop_frac }
+	add_to_temp_variable = { flu_pop_step = 1 }
+	clamp_temp_variable = { var = flu_pop_step min = 1 max = 10 }
+	multiply_temp_variable = { flu_pop_step = 0.05 }
+	add_to_variable = { state_influenza_spread_factor = flu_pop_step }
+
+	if = {
+		limit = { infrastructure < 5 }
+		add_to_variable = { state_influenza_spread_factor = -0.1 }
+	}
+	else_if = {
+		limit = { infrastructure < 10 }
+		add_to_variable = { state_influenza_spread_factor = 0.05 }
+	}
+	else_if = {
+		limit = { infrastructure < 15 }
+		add_to_variable = { state_influenza_spread_factor = 0.1 }
+	}
+	else = {
+		add_to_variable = { state_influenza_spread_factor = 0.25 }
+	}
+
+	if = {
+		limit = { has_state_flag = state_quarantine }
+		add_to_variable = { state_influenza_spread_factor = flu_quarantine_bonus }
+	}
+}
+
+EOANBSYS_influenza_quarantine_domestic = {
+	if = {
+		limit = { has_state_flag = state_quarantine }
+		controller = {
+			if = {
+				limit = { has_idea = law_spending_level_2 }
+				add_to_temp_variable = { flu_neighbor_spread = -5 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_5 }
+				add_to_temp_variable = { flu_neighbor_spread = -11 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_4 }
+				add_to_temp_variable = { flu_neighbor_spread = -18 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_3 }
+				add_to_temp_variable = { flu_neighbor_spread = -26 }
+			}
+		}
+	}
+}
+
+EOANBSYS_influenza_quarantine_foreign = {
+	if = {
+		limit = { has_state_flag = state_quarantine }
+		controller = {
+			if = {
+				limit = { has_idea = law_spending_level_2 }
+				add_to_temp_variable = { flu_neighbor_spread = -4 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_5 }
+				add_to_temp_variable = { flu_neighbor_spread = -9 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_4 }
+				add_to_temp_variable = { flu_neighbor_spread = -15 }
+			}
+			else_if = {
+				limit = { has_idea = law_spending_level_3 }
+				add_to_temp_variable = { flu_neighbor_spread = -21 }
+			}
+		}
+	}
+}
