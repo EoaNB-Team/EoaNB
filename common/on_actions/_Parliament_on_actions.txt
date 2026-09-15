@@ -604,23 +604,51 @@ on_actions = {
 
 			### Parliament vote GUI timer, progress###
 			if = {
-				limit = { has_active_mission = parliament_voting_mission }
+				limit = { parliament_vote_mission_active = yes }
 
+				# Re-seed the gui rows if they fell out of the array and read the
+				# countdown off whichever vote mission is the one running. The
+				# mission name cannot be pulled from a variable, so each vote
+				# mission needs its own branch here.
 				if = {
-					limit = {
-						NOT = {
-							is_in_array = {
-								array = parliament_decision_array_2
-								value = token:parliament_voting_mission
+					limit = { has_active_mission = parliament_voting_mission }
+
+					if = {
+						limit = {
+							NOT = {
+								is_in_array = {
+									array = parliament_decision_array_2
+									value = token:parliament_voting_mission
+								}
 							}
 						}
+						parliament_show_voting_decisions = yes
 					}
-					parliament_show_voting_decisions = yes
-				}
 
-				set_variable = {
-					var = parliament_vote_days_left
-					value = days_mission_timeout@parliament_voting_mission
+					set_variable = {
+						var = parliament_vote_days_left
+						value = days_mission_timeout@parliament_voting_mission
+					}
+				}
+				else_if = {
+					limit = { has_active_mission = prussian_voting_mission }
+
+					if = {
+						limit = {
+							NOT = {
+								is_in_array = {
+									array = parliament_decision_array_2
+									value = token:PRS_expand_voting_rights
+								}
+							}
+						}
+						PRS_show_voting_decisions = yes
+					}
+
+					set_variable = {
+						var = parliament_vote_days_left
+						value = days_mission_timeout@prussian_voting_mission
+					}
 				}
 
 				if = {
