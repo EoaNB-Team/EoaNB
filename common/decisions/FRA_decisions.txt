@@ -2,10 +2,8 @@ political_actions = {
 	FRA_decision_enact_loi_ollivier = {
 
 		available = {
-			power_balance_value = {
-    		id = FRA_Balance_of_Power_Napoleon
-    		value < -0.6
-		}
+			date > 1869.1.1
+			has_idea = FRA_idea_republican_spirit
 		}
 
 		allowed = { TAG = FRA }
@@ -21,19 +19,13 @@ political_actions = {
 			}
 		}
 
-		ai_will_do = {
-			base = 100
-		}
+		ai_will_do = { base = 100 }
 	}
+	
 
 	FRA_decision_enact_loi_duruy = {
 
-		available = {
-			power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value < -0.6
-			}
-		}
+		available = { }
 
 		allowed = { TAG = FRA }
 
@@ -48,9 +40,7 @@ political_actions = {
 			}
 		}
 
-		ai_will_do = {
-			base = 100
-		}
+		ai_will_do = { base = 100 }
 	}
 
 	FRA_decision_enact_loi_niel = {
@@ -59,21 +49,18 @@ political_actions = {
 
 		allowed = { TAG = FRA }
 
+		visible = {
+			has_completed_focus = FRA_listen_to_niel_and_the_reformers
+			NOT = { has_country_flag = FRA_loi_niel_enacted }
+		}
+
 		fire_only_once = yes
 
 		cost = 200
 
-		complete_effect = {
-			swap_ideas = {
-				add_idea = FRA_idea_amateur_tacticians_2
-				remove_idea = FRA_idea_amateur_tacticians
-			}
-			add_ideas = FRA_idea_defensive_strategy
-		}
+		complete_effect = { FRA_enact_loi_niel_effect = yes }
 
-		ai_will_do = {
-			base = 100
-		}
+		ai_will_do = { base = 100 }
 	}
 
 	FRA_decision_general_amnesty = {
@@ -7687,137 +7674,6 @@ FRA_indochina_colonial_category = {
 	}
 }
 
-FRA_BOP_category_decisions = {
-	### Liberal ###
-	FRA_BOP_appease_the_left = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-
-		cost = 50
-		days_remove = 30
-		days_re_enable = 180
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = -0.05
-				tooltip_side = FRA_BOP_Progressive_Emperor
-			}
-		}
-	}
-	FRA_BOP_prepare_progressive_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-
-		fire_only_once = yes
-		cost = 100
-		days_remove = 60
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = -0.1
-				tooltip_side = FRA_BOP_Progressive_Emperor
-			}
-		}
-
-		remove_effect = {
-			unlock_decision_tooltip = FRA_BOP_enact_progressive_laws
-			hidden_effect = { set_country_flag = FRA_BOP_progressive_laws_prepared_flag }
-		}
-	}
-	FRA_BOP_enact_progressive_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-		visible = { has_country_flag = FRA_BOP_progressive_laws_prepared_flag }
-
-		cost = 150
-		days_remove = 90
-		days_re_enable = 360
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = -0.1
-				tooltip_side = FRA_BOP_Progressive_Emperor
-			}
-		}
-	}
-	### Authoritarian ###
-	FRA_BOP_appease_the_right = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-
-		cost = 50
-		days_remove = 30
-		days_re_enable = 180
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = 0.02
-				tooltip_side = FRA_BOP_Authoritarian_Emperor
-			}
-		}
-	}
-	FRA_BOP_prepare_conservative_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-
-		fire_only_once = yes
-		cost = 100
-		days_remove = 60
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = 0.05
-				tooltip_side = FRA_BOP_Authoritarian_Emperor
-			}
-		}
-
-		remove_effect = {
-			unlock_decision_tooltip = FRA_BOP_enact_conservative_laws
-			hidden_effect = { set_country_flag = FRA_BOP_conservative_laws_prepared_flag }
-		}
-	}
-	FRA_BOP_enact_conservative_laws = {
-		icon = constitution
-		allowed = { tag = FRA }
-		
-		visible = { has_country_flag = FRA_BOP_conservative_laws_prepared_flag }
-
-		cost = 150
-		days_remove = 90
-		days_re_enable = 360
-
-		modifier = { political_power_gain = -0.05 }
-
-		complete_effect = {
-			add_power_balance_value = {
-				id = FRA_Balance_of_Power_Napoleon
-				value = 0.1
-				tooltip_side = FRA_BOP_Authoritarian_Emperor
-			}
-		}
-	}
-}
-
 FRA_pre_orsini_imperial_programme = {
 	FRA_decision_consult_de_morny = {
 		icon = generic_political_discourse
@@ -9128,6 +8984,649 @@ FRA_algerian_assimilation_decisions = {
 			add_ideas = FRA_idea_algerian_settler_grants
 			FRA_algerian_assimilation_finished = yes
 		}
+		ai_will_do = { base = 100 }
+	}
+}
+
+#=========================================================================================
+#	ARMY REFORM - BALANCE OF POWER DECISIONS
+#	All cost 25 PP, take 14 days and go on a 90 day cooldown
+#=========================================================================================
+
+FRA_army_reform_category_decisions = {
+
+	### Towards A New Model Army ###
+
+	FRA_army_reform_analyze_foreign_equipment = {
+		icon = generic_research
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = 0.03
+				tooltip_side = FRA_ARMY_BOP_Reformers_side
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_army_reform_study_prussian_methods = {
+		icon = generic_research
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = 0.03
+				tooltip_side = FRA_ARMY_BOP_Reformers_side
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_army_reform_officer_examinations = {
+		icon = generic_political_discourse
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = 0.03
+				tooltip_side = FRA_ARMY_BOP_Reformers_side
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_army_reform_fund_weapon_designers = {
+		icon = generic_industry
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = 0.03
+				tooltip_side = FRA_ARMY_BOP_Reformers_side
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	### Towards the Old Guard ###
+
+	FRA_army_reform_repair_old_equipment = {
+		icon = generic_industry
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = -0.03
+				tooltip_side = FRA_ARMY_BOP_Old_Guard_side
+			}
+		}
+
+		ai_will_do = { base = 25 }
+	}
+
+	FRA_army_reform_aristocratic_tradition = {
+		icon = generic_monarchy
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = -0.03
+				tooltip_side = FRA_ARMY_BOP_Old_Guard_side
+			}
+		}
+
+		ai_will_do = { base = 25 }
+	}
+
+	FRA_army_reform_honor_the_old_regiments = {
+		icon = generic_political_rally
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = -0.03
+				tooltip_side = FRA_ARMY_BOP_Old_Guard_side
+			}
+		}
+
+		ai_will_do = { base = 25 }
+	}
+
+	FRA_army_reform_allow_more_substitutions = {
+		icon = generic_civil_support
+		allowed = { tag = FRA }
+
+		cost = 25
+		days_remove = 14
+		days_re_enable = 90
+
+		complete_effect = {
+			add_power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value = -0.03
+				tooltip_side = FRA_ARMY_BOP_Old_Guard_side
+			}
+		}
+
+		ai_will_do = { base = 25 }
+	}
+}
+
+#=========================================================================================
+#	FRANCE - PRE-FRANCO-PRUSSIAN WAR ARMY TREE
+#	Decisions attached to the army focus branch and to the Army Reform balance of power.
+#=========================================================================================
+
+FRA_army_prefpw_decisions = {
+
+	#--- The Army and the People ---------------------------------------------------------
+
+	FRA_decision_listen_to_the_populace = {
+		icon = generic_political_rally
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_people_choice_available
+			NOT = { has_country_flag = FRA_army_people_choice_made }
+		}
+
+		available = {
+			power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value < -0.5
+			}
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_chose_populace
+			set_country_flag = FRA_army_people_choice_made
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_decision_listen_to_niel = {
+		icon = generic_military
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_people_choice_available
+			NOT = { has_country_flag = FRA_army_people_choice_made }
+		}
+
+		available = {
+			power_balance_value = {
+				id = FRA_Balance_of_Power_Army_Reform
+				value > -0.5
+			}
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_chose_niel
+			set_country_flag = FRA_army_people_choice_made
+		}
+
+		ai_will_do = { base = 100 }
+	}
+
+	#--- Glory... and Peace? -------------------------------------------------------------
+
+	FRA_decision_industrialization_will_win = {
+		icon = generic_industry
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_glory_choice_available
+			NOT = { has_country_flag = FRA_army_glory_choice_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_faith_in_diplomacy
+			set_country_flag = FRA_army_glory_choice_made
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_decision_necessitate_defense = {
+		icon = generic_fortification
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_glory_choice_available
+			NOT = { has_country_flag = FRA_army_glory_choice_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_faith_in_defense
+			set_country_flag = FRA_army_glory_choice_made
+		}
+
+		ai_will_do = { base = 100 }
+	}
+
+	#--- Discipline in the Ranks ---------------------------------------------------------
+
+	FRA_decision_to_the_ranges = {
+		icon = generic_army_support
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_discipline_choice_available
+			NOT = { has_country_flag = FRA_army_discipline_choice_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_chose_ranges
+			set_country_flag = FRA_army_discipline_choice_made
+		}
+
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_decision_focus_on_formations = {
+		icon = generic_military
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_discipline_choice_available
+			NOT = { has_country_flag = FRA_army_discipline_choice_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_chose_formations
+			set_country_flag = FRA_army_discipline_choice_made
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- Review the Jourdan Laws ---------------------------------------------------------
+
+	FRA_decision_jourdan_keep_the_laws = {
+		icon = generic_political_discourse
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_jourdan_review_available
+			NOT = { has_country_flag = FRA_army_jourdan_review_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_jourdan_review_made
+			add_stability = -0.02
+			decrease_legitimacy_by_three = yes
+		}
+
+		ai_will_do = { base = 25 }
+	}
+
+	FRA_decision_jourdan_expand_conscription = {
+		icon = generic_civil_support
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_jourdan_review_available
+			NOT = { has_country_flag = FRA_army_jourdan_review_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_jourdan_review_made
+			add_manpower = 6000
+			add_stability = -0.05
+			add_political_power = 100
+			if = {
+				limit = { country_exists = PRS }
+				add_opinion_modifier = { target = PRS modifier = FRA_army_conscription_scare }
+				PRS = { add_opinion_modifier = { target = FRA modifier = FRA_army_conscription_scare } }
+			}
+		}
+
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_decision_jourdan_limit_conscription = {
+		icon = generic_military
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_jourdan_review_available
+			NOT = { has_country_flag = FRA_army_jourdan_review_made }
+		}
+
+		fire_only_once = yes
+		cost = 25
+
+		complete_effect = {
+			set_country_flag = FRA_army_jourdan_review_made
+			add_manpower = -2000
+			add_ideas = FRA_idea_long_service_army
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- Napoleon's Million --------------------------------------------------------------
+
+	FRA_decision_napoleons_million = {
+		icon = generic_civil_support
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_napoleons_million_available }
+
+		cost = 25
+		days_remove = 180
+
+		modifier = { political_power_gain = -0.05 }
+
+		remove_effect = {
+			add_manpower = 5000
+			custom_effect_tooltip = FRA_napoleons_million_tt
+			hidden_effect = {
+				add_to_variable = { var = FRA_napoleons_million_count value = 1 }
+				set_temp_variable = { FRA_napoleons_million_stability = FRA_napoleons_million_count }
+				multiply_temp_variable = { FRA_napoleons_million_stability = 0.01 }
+				add_to_temp_variable = { FRA_napoleons_million_stability = 0.01 }
+				multiply_temp_variable = { FRA_napoleons_million_stability = -1 }
+				add_stability = FRA_napoleons_million_stability
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- Rework Soldier Autonomy / Rifle-Toting Machines ---------------------------------
+
+	FRA_decision_soldier_autonomy = {
+		icon = generic_army_support
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_soldier_autonomy_available }
+
+		cost = 25
+		days_remove = 180
+		days_re_enable = 180
+
+		modifier = { training_time_army_factor = -0.10 }
+
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_decision_rifle_toting_machines = {
+		icon = generic_army_support
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_rifle_toting_available }
+
+		cost = 25
+		days_remove = 90
+		days_re_enable = 90
+
+		modifier = { planning_speed = 0.10 }
+
+		ai_will_do = { base = 100 }
+	}
+
+	#--- Chalons Camp Maneuvers ----------------------------------------------------------
+
+	FRA_decision_chalons_camp_maneuvers = {
+		icon = generic_military
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_chalons_camp_available }
+
+		available = {
+			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 0.5 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+
+		days_remove = 360
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.5 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+		}
+
+		remove_effect = { army_experience = 100 }
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- American Civil War Observers ----------------------------------------------------
+
+	FRA_decision_observers_to_the_union = {
+		icon = generic_operation
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_acw_observers_available
+			NOT = { has_country_flag = FRA_army_acw_observers_sent }
+		}
+
+		available = {
+			has_global_flag = ACW_American_Civil_War_Happened
+			country_exists = USA
+		}
+
+		fire_only_once = yes
+		cost = 25
+		days_remove = 180
+
+		complete_effect = { set_country_flag = FRA_army_acw_observers_sent }
+
+		remove_effect = {
+			army_experience = 50
+			if = {
+				limit = { country_exists = USA }
+				add_opinion_modifier = { target = USA modifier = FRA_army_military_observers }
+				USA = { add_opinion_modifier = { target = FRA modifier = FRA_army_military_observers } }
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_decision_observers_to_the_confederacy = {
+		icon = generic_operation
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_acw_observers_available
+			NOT = { has_country_flag = FRA_army_acw_observers_sent }
+		}
+
+		available = {
+			has_global_flag = ACW_American_Civil_War_Happened
+			country_exists = CSA
+			has_completed_focus = FRA_recognize_csa
+		}
+
+		fire_only_once = yes
+		cost = 25
+		days_remove = 180
+
+		complete_effect = { set_country_flag = FRA_army_acw_observers_sent }
+
+		remove_effect = {
+			army_experience = 50
+			if = {
+				limit = { country_exists = CSA }
+				add_opinion_modifier = { target = CSA modifier = FRA_army_military_observers }
+				CSA = { add_opinion_modifier = { target = FRA modifier = FRA_army_military_observers } }
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- Closely Watch the Brother's War --------------------------------------------------
+
+	FRA_decision_observers_to_prussia = {
+		icon = generic_operation
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_brothers_war_observers_available
+			NOT = { has_country_flag = FRA_army_brothers_war_observers_sent }
+		}
+
+		available = {
+			has_global_flag = eoanb_flag_seven_weeks_war_ongoing
+			country_exists = PRS
+		}
+
+		fire_only_once = yes
+		cost = 25
+		days_remove = 90
+
+		complete_effect = { set_country_flag = FRA_army_brothers_war_observers_sent }
+
+		remove_effect = {
+			army_experience = 30
+			if = {
+				limit = { country_exists = PRS }
+				add_opinion_modifier = { target = PRS modifier = FRA_army_military_observers }
+				PRS = { add_opinion_modifier = { target = FRA modifier = FRA_army_military_observers } }
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	FRA_decision_observers_to_austria = {
+		icon = generic_operation
+		allowed = { tag = FRA }
+
+		visible = {
+			has_country_flag = FRA_army_brothers_war_observers_available
+			NOT = { has_country_flag = FRA_army_brothers_war_observers_sent }
+		}
+
+		available = {
+			has_global_flag = eoanb_flag_seven_weeks_war_ongoing
+			country_exists = AUS
+		}
+
+		fire_only_once = yes
+		cost = 25
+		days_remove = 90
+
+		complete_effect = { set_country_flag = FRA_army_brothers_war_observers_sent }
+
+		remove_effect = {
+			army_experience = 30
+			if = {
+				limit = { country_exists = AUS }
+				add_opinion_modifier = { target = AUS modifier = FRA_army_military_observers }
+				AUS = { add_opinion_modifier = { target = FRA modifier = FRA_army_military_observers } }
+			}
+		}
+
+		ai_will_do = { base = 50 }
+	}
+
+	#--- Italian preparations -------------------------------------------------------------
+
+	FRA_decision_prepare_for_the_po = {
+		icon = generic_military
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_prepare_for_the_po_available }
+
+		cost = 25
+		days_remove = 180
+		days_re_enable = 360
+
+		modifier = { max_planning = 0.15 }
+
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_decision_mobilize_the_railways = {
+		icon = generic_train
+		allowed = { tag = FRA }
+
+		visible = { has_country_flag = FRA_army_mobilize_railways_available }
+
+		cost = 25
+		days_remove = 90
+		days_re_enable = 180
+
+		modifier = {
+			mobilization_speed = 0.15
+			army_speed_factor = 0.07
+		}
+
 		ai_will_do = { base = 100 }
 	}
 }
