@@ -1,0 +1,116 @@
+convert_bar_scratch_to_frame = {
+	if = { limit = { check_variable = { bar_scratch < 0 } } set_temp_variable = { bar_scratch = 0 } }
+	if = {
+		limit = { check_variable = { bar_denom > 0.001 } }
+		divide_temp_variable = { bar_scratch = bar_denom }
+	}
+	else = { set_temp_variable = { bar_scratch = 0 } }
+	if = { limit = { check_variable = { bar_scratch > 1 } } set_temp_variable = { bar_scratch = 1 } }
+	multiply_temp_variable = { bar_scratch = 20 }
+	round_temp_variable = bar_scratch
+	add_to_temp_variable = { bar_scratch = 1 }
+}
+
+# Months of treasury left at the current balance. 0 when running a surplus.
+calculate_treasury_runway = {
+	set_temp_variable = { treasury_runway_months = 0 }
+	if = {
+		limit = { check_variable = { total_balance_temp < -0.001 } }
+		set_temp_variable = { treasury_runway_months = money }
+		set_temp_variable = { bar_denom = total_balance_temp }
+		multiply_temp_variable = { bar_denom = -1 }
+		divide_temp_variable = { treasury_runway_months = bar_denom }
+		round_temp_variable = treasury_runway_months
+		if = { limit = { check_variable = { treasury_runway_months < 0 } } set_temp_variable = { treasury_runway_months = 0 } }
+	}
+}
+
+calculate_budget_bars = {
+	# Denominators. Expenses are stored negative, so flip the sign.
+	set_temp_variable = { bar_income_total = total_income_temp }
+	set_temp_variable = { bar_expense_total = total_expenses_temp }
+	multiply_temp_variable = { bar_expense_total = -1 }
+
+	# ---- Income ----
+	set_temp_variable = { bar_scratch = income_from_our_taxes }
+	set_temp_variable = { bar_denom = bar_income_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_taxes_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = income_from_tariffs }
+	set_temp_variable = { bar_denom = bar_income_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_tariffs_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = income_from_our_consumer_goods_factories }
+	set_temp_variable = { bar_denom = bar_income_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_consumer_goods_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = income_from_our_free_civilian_factories }
+	set_temp_variable = { bar_denom = bar_income_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_unused_civilian_factories_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = income_from_other_sources }
+	set_temp_variable = { bar_denom = bar_income_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_other_bar_frame = bar_scratch }
+
+	# ---- Expenses ----
+	set_temp_variable = { bar_scratch = expenses_from_our_social_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_social_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_law_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_law_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_road_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_road_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_army_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_army_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_navy_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_navy_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_research_spending }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { income_entry_research_spending_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_our_used_mil_factories }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { expenses_entry_used_military_factories_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_loans }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { expenses_entry_interests_bar_frame = bar_scratch }
+
+	set_temp_variable = { bar_scratch = expenses_from_other_sources }
+	multiply_temp_variable = { bar_scratch = -1 }
+	set_temp_variable = { bar_denom = bar_expense_total }
+	convert_bar_scratch_to_frame = yes
+	set_temp_variable = { expenses_entry_other_bar_frame = bar_scratch }
+
+	calculate_treasury_runway = yes
+}
