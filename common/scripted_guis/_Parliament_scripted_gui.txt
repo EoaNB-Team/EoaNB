@@ -1,5 +1,19 @@
 scripted_gui = {
 
+	##################################################################################################
+	#   PARLIAMENT - window and tab wiring
+	#
+	#   show_parliament_window  master switch for the whole view
+	#   show_parties_window  )
+	#   show_decisions_window)  exactly one is set; it picks which content panel is on screen
+	#   show_reform_window   )
+	#
+	#   The tab buttons live in parliament_window (interface/_Parliament.gui) and are named
+	#   parties_button / decision_button / reform_button. Their sprite frame (1 = inactive,
+	#   2 = active) comes from parl_tab_*_frame, set by the parliament_open_*_tab scripted
+	#   effects in common/scripted_effects/_Parliament_scripted_effects.txt.
+	##################################################################################################
+
 	open_parliament_window = {
 		context_type = player_context
 
@@ -15,24 +29,15 @@ scripted_gui = {
 			open_button_click = {
 				if = {
 					limit = { has_variable = show_parliament_window }
-					clear_variable = show_parliament_window
+					parliament_close_window = yes
 				}
 				else = {
 					clear_variable = show_demographics_window
 					set_variable = { show_parliament_window = 1 }
-					set_variable = { show_decisions_window = 1 }
+					parliament_open_decisions_tab = yes
 				}
 			}
 		}
-
-		ai_enabled = { always = no }
-	}
-
-	parliament_panel_window = {
-		context_type = player_context
-		window_name = "parliament_panel_window"
-
-		visible = { has_variable = show_parliament_window }
 
 		ai_enabled = { always = no }
 	}
@@ -41,81 +46,149 @@ scripted_gui = {
 		context_type = player_context
 
 		window_name = "parliament_window"
-		#parent_window_name = "parliament_panel_window_instance"
+
+		# Rebuilding 256 seat icons every tick is the single most expensive thing this GUI does.
+		# parliament_seats_dirty is bumped by compute_seats, draw_seats, set_global_seats_posistions,
+		# parliament_recompute_coalition_seats and by every parliament button, so the chamber
+		# refreshes whenever it can actually have changed. Delete this one line to go back to
+		# updating every tick.
+		dirty = parliament_seats_dirty
 
 		visible = { check_variable = { show_parliament_window > 0 } }
 
 		properties = {
 			parliament_dot_icon = {
-                x = global.internal_politics_house_x^seat_idx
-                y = global.internal_politics_house_y^seat_idx
-                frame = seats_array^seat_idx
-            }
+				x = global.internal_politics_house_x^seat_idx
+				y = global.internal_politics_house_y^seat_idx
+				frame = seats_array^seat_idx
+			}
+			# Government support bar, 0-100. parliament_support_percent is maintained by
+			# parliament_recompute_coalition_seats.
+			parliament_support_bar = { frame = parliament_support_percent }
+
+			# Tab highlight.
+			parties_button  = { frame = parl_tab_parties_frame }
+			decision_button = { frame = parl_tab_decisions_frame }
+			reform_button   = { frame = parl_tab_reforms_frame }
 		}
 
 		dynamic_lists = {
 			parliament_diagram = {
-                array = global.internal_politics_house_x
-                change_scope = no
-                entry_container = internal_politics_house_seat
-                index = seat_idx
-            }
-			parliament_parties_government = {
-                array = parl_gov_coalitions
-                change_scope = no
-                entry_container = internal_politics_parties_gov
-                index = party_posistion_idx
-            }
-			parliament_parties_opposition = {
-                array = parl_opp_coalitions
-                change_scope = no
-                entry_container = internal_politics_parties_opp
-                index = party_posistion_idx
-            }
-			parliament_parties_neutral = {
-                array = parl_neu_coalitions
-                change_scope = no
-                entry_container = internal_politics_parties_neu
-                index = party_posistion_idx
-            }
-			parliament_parties_banned = {
-                array = parl_ban_coalitions
-                change_scope = no
-                entry_container = internal_politics_parties_ban
-                index = party_posistion_idx
-            }
-			parliament_parties_unorganized = {
-                array = parl_uno_coalitions
-                change_scope = no
-                entry_container = internal_politics_parties_uno
-                index = party_posistion_idx
-            }
+				array = global.internal_politics_house_x
+				change_scope = no
+				entry_container = internal_politics_house_seat
+				index = seat_idx
+			}
 		}
 
-		#triggers = {
-		#	parliament_parties_banned_visible = { has_banned_party = yes }
-		#	parliament_parties_unorganized = { has_unorganized_party = yes }
-		#	eoanb_internal_politics_parties_container_uno_visible = {
-		#		has_banned_party = yes
-		#		has_unorganized_party = yes
-		#	}
-		#	parliament_parties_neutral_visible = { has_neutral_party = yes }
-		#	parliament_parties_opposition_visible = { has_opposition_party = yes }
-		#}
-
 		effects = {
-			close_button_click = {
-				clear_variable = show_parliament_window
-				clear_variable = show_reform_window
-				clear_variable = show_decisions_window
+			close_button_click    = { parliament_close_window = yes }
+			parties_button_click  = { parliament_open_parties_tab = yes }
+			decision_button_click = { parliament_open_decisions_tab = yes }
+			reform_button_click   = { parliament_open_reforms_tab = yes }
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	# Tab 1. The party lists used to live in parliament_window; they are their own panel now so
+	# the seat arc and the support bar stay pinned while the lists scroll.
+	#
+	# Government and Opposition always exist, so they sit in the panel itself. Neutral, Banned
+	# and Unorganised are usually empty, and an <element>_visible trigger does NOT reliably hide
+	# a nested containerWindowType - the boxes render anyway. So each of those three is its own
+	# window with the has_*_party check in its visible = { } block, which does work.
+	parliament_parties_window = {
+		context_type = player_context
+
+		window_name = "parliament_parties_window"
+
+		visible = {
+			check_variable = { show_parliament_window > 0 }
+			check_variable = { show_parties_window > 0 }
+		}
+
+		dynamic_lists = {
+			parliament_parties_government = {
+				array = parl_gov_coalitions
+				change_scope = no
+				entry_container = internal_politics_parties_gov
+				index = party_posistion_idx
 			}
-			decision_button_click = {
-				clear_variable = show_reform_window
-				set_variable = { show_decisions_window = 1 }
+			parliament_parties_opposition = {
+				array = parl_opp_coalitions
+				change_scope = no
+				entry_container = internal_politics_parties_opp
+				index = party_posistion_idx
 			}
-			reform_button_click = {
-				clear_variable = show_decisions_window
-				set_variable = { show_reform_window = 1 }
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	parliament_parties_unorganized_window = {
+		context_type = player_context
+
+		window_name = "parliament_parties_unorganized_window"
+
+		visible = {
+			check_variable = { show_parliament_window > 0 }
+			check_variable = { show_parties_window > 0 }
+			has_unorganized_party = yes
+		}
+
+		dynamic_lists = {
+			parliament_parties_unorganized = {
+				array = parl_uno_coalitions
+				change_scope = no
+				entry_container = internal_politics_parties_uno
+				index = party_posistion_idx
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	parliament_parties_neutral_window = {
+		context_type = player_context
+
+		window_name = "parliament_parties_neutral_window"
+
+		visible = {
+			check_variable = { show_parliament_window > 0 }
+			check_variable = { show_parties_window > 0 }
+			has_neutral_party = yes
+		}
+
+		dynamic_lists = {
+			parliament_parties_neutral = {
+				array = parl_neu_coalitions
+				change_scope = no
+				entry_container = internal_politics_parties_neu
+				index = party_posistion_idx
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	parliament_parties_banned_window = {
+		context_type = player_context
+
+		window_name = "parliament_parties_banned_window"
+
+		visible = {
+			check_variable = { show_parliament_window > 0 }
+			check_variable = { show_parties_window > 0 }
+			has_banned_party = yes
+		}
+
+		dynamic_lists = {
+			parliament_parties_banned = {
+				array = parl_ban_coalitions
+				change_scope = no
+				entry_container = internal_politics_parties_ban
+				index = party_posistion_idx
 			}
 		}
 
