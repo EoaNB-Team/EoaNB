@@ -813,6 +813,7 @@ NMilitary = {
 	VPS_FOR_HIGH_HISTORY_ENTRY = 8,				-- VPs required for high-level history entry
 	ENTRIES_TO_CHECK_FOR_DUPLICATE = 2,			-- Max number of history entries to check back to see if we're being awarded the same entry
 	COST_INCREASE_PER_ACTIVE_MEDAL = 0.25,		-- Additional cost factor per active medal
+	MEDAL_AWARD_CONFIRM_PP_THRESHOLD = 200.0,	-- Below this much political power, awarding a medal asks for confirmation; at or above it is granted directly
 	MAX_ENTRY_ELISION_COUNT = 4,				-- If we do the same type of thing consecutively, each entry will stack locations up to this number
 	GENERATE_AI_DIV_COMMAND_HISTORY_ENTRIES = true,	--Should we generate history entries for the AI (may cause savegame bloat)
 	GENERATE_AI_DIV_COMMAND_MEDALS = 0.10,		-- Chance for AI to award a medal when receiving a history entry that allows it. Also gives a chance for AI to gain history entries irrespective of the setting above
