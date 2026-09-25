@@ -4711,24 +4711,8 @@ country_event = {
 	option = {
 		name = rossiya.322.a
 		add_political_power = -50
+		ABK = { country_event = { id = rossiya.323 days = 20 } }
 		custom_effect_tooltip = eoanb_tt_RUS_Abkhazia_Annexation
-		# AI Abkhazia: annex directly so the annexation cannot be lost to the 50/50 option roll in rossiya.323
-		if = {
-			limit = { ABK = { is_ai = yes } }
-			hidden_effect = {
-				ABK = {
-					every_owned_state = {
-						remove_core_of = ABK
-						add_core_of = RUS
-					}
-				}
-				annex_country = {
-					target = ABK
-					transfer_troops = yes
-				}
-			}
-		}
-		else = { ABK = { country_event = { id = rossiya.323 days = 20 } } }
 	}
 }
 
@@ -12337,6 +12321,238 @@ country_event = {
 				}
 			}
 			load_oob = RUS_general_admiral_class_mtg
+		}
+	}
+}
+
+
+###########################################################################
+# Russian-Chinese Border Commission (1861-1864)
+# Decisions: RUS_QNG_* (Great_Game_decisions.txt), QNG_QNG_border_* (QNG_decisions.txt)
+# Opened by KDE_bi_yearly_event_fire_1860 on 13 May 1861, resolved 7 October 1864.
+# Qing side: qing.800 - qing.807
+###########################################################################
+
+country_event = { # The Russian-Chinese Border Commission opens
+	id = rossiya.2000
+	title = rossiya.2000.t
+	desc = rossiya.2000.d
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = {
+		country_exists = QNG
+		NOT = { has_war_with = QNG }
+	}
+
+	immediate = {
+		hidden_effect = {
+			set_country_flag = RUS_QNG_border_commission_active
+			set_variable = { rus_qng_border_points = 0 }
+			QNG = {
+				set_country_flag = RUS_QNG_border_commission_active
+				set_variable = { rus_qng_border_points = 0 }
+				country_event = { id = qing.800 }
+			}
+			country_event = { id = rossiya.2010 days = 1242 } # 7 October 1864
+		}
+	}
+
+	option = {
+		name = rossiya.2000.a
+		custom_effect_tooltip = RUS_QNG_border_commission_tt
+		unlock_decision_tooltip = RUS_QNG_border_send_garrisons
+		unlock_decision_tooltip = RUS_QNG_border_bribe_tribes
+		unlock_decision_tooltip = RUS_QNG_border_convince_tribes
+	}
+}
+
+country_event = { # The Chuguchak Protocol - Russia prevails
+	id = rossiya.2001
+	title = rossiya.2001.t
+	desc = rossiya.2001.d
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2001.a
+		RUS_QNG_chuguchak_protocol_effect = yes
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+country_event = { # Negotiations have failed
+	id = rossiya.2003
+	title = rossiya.2003.t
+	desc = rossiya.2003.d
+	picture = GFX_report_event_generic_negotiation
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2003.a
+		add_war_support = 0.02
+		custom_effect_tooltip = RUS_QNG_negotiations_failed_tt
+	}
+}
+
+country_event = { # Border Commission Resolution (hidden)
+	id = rossiya.2010
+	title = rossiya.2010.t
+	desc = rossiya.2010.d
+
+	is_triggered_only = yes
+	fire_only_once = yes
+	hidden = yes
+
+	immediate = {
+		clr_country_flag = RUS_QNG_border_commission_active
+		set_country_flag = RUS_QNG_border_commission_concluded
+		if = {
+			limit = { country_exists = QNG }
+			QNG = {
+				clr_country_flag = RUS_QNG_border_commission_active
+				set_country_flag = RUS_QNG_border_commission_concluded
+			}
+		}
+		if = {
+			limit = {
+				OR = {
+					NOT = { country_exists = QNG }
+					check_variable = {
+						var = rus_qng_border_points
+						value = QNG.rus_qng_border_points
+						compare = greater_than
+					}
+				}
+			}
+			country_event = { id = rossiya.2001 }
+			if = {
+				limit = { country_exists = QNG }
+				QNG = { country_event = { id = qing.801 } }
+			}
+		}
+		else = {
+			set_country_flag = RUS_QNG_negotiations_failed
+			country_event = { id = rossiya.2003 }
+			QNG = {
+				set_country_flag = RUS_QNG_negotiations_failed
+				country_event = { id = qing.802 }
+			}
+		}
+	}
+
+	option = {
+		name = rossiya.2010.a
+	}
+}
+
+country_event = { # Victory on the Northern Frontier (Qing attack repelled)
+	id = rossiya.2011
+	title = rossiya.2011.t
+	desc = rossiya.2011.d
+	picture = GFX_report_event_generic_battle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2011.a
+		RUS_QNG_chuguchak_protocol_effect = yes
+		add_war_support = 0.03
+		set_temp_variable = { eoanb_prestige_change = 2 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+country_event = { # Defeat on the Northern Frontier
+	id = rossiya.2012
+	title = rossiya.2012.t
+	desc = rossiya.2012.d
+	picture = GFX_report_event_generic_battle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2012.a
+		add_war_support = -0.03
+		set_country_flag = RUS_QNG_first_battle_won
+		set_country_flag = RUS_QNG_second_battle_pending
+		activate_mission = RUS_QNG_counter_attack_mission
+		unlock_decision_tooltip = RUS_QNG_border_counter_attack_south
+	}
+}
+
+country_event = { # Victory on the Southern Frontier (counter-attack succeeds)
+	id = rossiya.2013
+	title = rossiya.2013.t
+	desc = rossiya.2013.d
+	picture = GFX_report_event_generic_battle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2013.a
+		if = {
+			limit = { 943 = { NOT = { is_owned_by = ROOT } } }
+			transfer_state = 943
+		}
+		if = {
+			limit = { 1444 = { NOT = { is_owned_by = ROOT } } }
+			transfer_state = 1444
+		}
+		RUS_QNG_chuguchak_protocol_effect = yes
+		add_war_support = 0.05
+		set_temp_variable = { eoanb_prestige_change = 3 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+country_event = { # Defeat on the Southern Frontier (counter-attack fails)
+	id = rossiya.2014
+	title = rossiya.2014.t
+	desc = rossiya.2014.d
+	picture = GFX_report_event_generic_battle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2014.a
+		add_war_support = -0.05
+		add_stability = -0.03
+		set_country_flag = RUS_QNG_border_war_resolved
+		set_temp_variable = { eoanb_prestige_change = -3 }
+		eoanb_change_prestige_score = yes
+	}
+}
+
+country_event = { # Our counter-offensive has failed (mission timed out)
+	id = rossiya.2015
+	title = rossiya.2015.t
+	desc = rossiya.2015.d
+	picture = GFX_report_event_generic_battle
+
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	option = {
+		name = rossiya.2015.a
+		add_stability = -0.03
+		set_country_flag = RUS_QNG_border_war_resolved
+		set_temp_variable = { eoanb_prestige_change = -5 }
+		eoanb_change_prestige_score = yes
+		if = {
+			limit = { country_exists = QNG }
+			QNG = { country_event = { id = qing.803 days = 5 } }
 		}
 	}
 }
