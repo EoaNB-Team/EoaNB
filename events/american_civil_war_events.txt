@@ -629,12 +629,12 @@ country_event = {
 			USA_Slavery_Debate_Tension_Modify = yes
 			
 			# Lock division templates to prevent modification during critical period
-			set_division_template_lock = { division_template = "American Infantry Regiment" is_locked = yes }
-			set_division_template_lock = { division_template = "American Infantry Brigade" is_locked = yes }
-			set_division_template_lock = { division_template = "American Infantry Brigade with Support" is_locked = yes }
-			set_division_template_lock = { division_template = "American State Guard" is_locked = yes }
-			set_division_template_lock = { division_template = "American National Guard" is_locked = yes }
-			set_division_template_lock = { division_template = "American Cavalry Battalion" is_locked = yes }
+			if = { limit = { has_template = "American Infantry Regiment" } set_division_template_lock = { division_template = "American Infantry Regiment" is_locked = yes } }
+			if = { limit = { has_template = "American Infantry Brigade" } set_division_template_lock = { division_template = "American Infantry Brigade" is_locked = yes } }
+			if = { limit = { has_template = "American Infantry Brigade with Support" } set_division_template_lock = { division_template = "American Infantry Brigade with Support" is_locked = yes } }
+			if = { limit = { has_template = "American State Guard" } set_division_template_lock = { division_template = "American State Guard" is_locked = yes } }
+			if = { limit = { has_template = "American National Guard" } set_division_template_lock = { division_template = "American National Guard" is_locked = yes } }
+			if = { limit = { has_template = "American Cavalry Battalion" } set_division_template_lock = { division_template = "American Cavalry Battalion" is_locked = yes } }
 		}
 
 		option = { # Lincoln - Anti-slavery candidate
@@ -11379,25 +11379,40 @@ news_event = {
 				delete_unit_template_and_units = { division_template = "Union Regimental" }
 				
 				# Unlock peacetime templates
-				set_division_template_lock = {
-					division_template = "American Infantry Regiment"
-					is_locked = no
+				if = {
+					limit = { has_template = "American Infantry Regiment" }
+					set_division_template_lock = {
+						division_template = "American Infantry Regiment"
+						is_locked = no
+					}
 				}
-				set_division_template_lock = {
-					division_template = "American Infantry Brigade"
-					is_locked = no
+				if = {
+					limit = { has_template = "American Infantry Brigade" }
+					set_division_template_lock = {
+						division_template = "American Infantry Brigade"
+						is_locked = no
+					}
 				}
-				set_division_template_lock = {
-					division_template = "American Infantry Brigade with Support"
-					is_locked = no
+				if = {
+					limit = { has_template = "American Infantry Brigade with Support" }
+					set_division_template_lock = {
+						division_template = "American Infantry Brigade with Support"
+						is_locked = no
+					}
 				}
-				set_division_template_lock = {
-					division_template = "American National Guard"
-					is_locked = no
+				if = {
+					limit = { has_template = "American National Guard" }
+					set_division_template_lock = {
+						division_template = "American National Guard"
+						is_locked = no
+					}
 				}
-				set_division_template_lock = {
-					division_template = "National Guard"
-					is_locked = no
+				if = {
+					limit = { has_template = "National Guard" }
+					set_division_template_lock = {
+						division_template = "National Guard"
+						is_locked = no
+					}
 				}
 				
 				# Handle CSA occupation
@@ -11410,10 +11425,6 @@ news_event = {
 					delete_unit_template_and_units = { division_template = "South American Confederate Volunteers" }
 					
 					# Set up occupation government
-					set_autonomy = {
-						target = CSA
-						autonomous_state = autonomy_unintegrated_seceded_state
-					}
 					set_politics = {
 						ruling_party = radical_democracy
 						elections_allowed = no
@@ -11519,11 +11530,24 @@ news_event = {
 				add_idea = USA_recovery
 			}
 			
-			# Make peace with CSA
-			white_peace = CSA
+			if = {
+				limit = { has_war_with = CSA }
+				white_peace = CSA
+			}
+			
+			if = {
+				limit = { CSA = { exists = yes NOT = { is_subject_of = USA } } }
+				puppet = CSA
+			}
+			if = {
+				limit = { CSA = { exists = yes } }
+				set_autonomy = {
+					target = CSA
+					autonomous_state = autonomy_unintegrated_seceded_state
+				}
+			}
 			
 			# Fire follow-up events
-			news_event = { id = acw_generic.131 days = 1 }
 			country_event = { id = usa.314 days = 30 }
 		}
 	}
