@@ -1,4 +1,7 @@
 scripted_gui = {
+	# ------------------------------------------------------------------------
+	#  Topbar chip - Innovative Institutions
+	# ------------------------------------------------------------------------
 	innovation_progress = {
 		window_name = "innovation_progress_container"
 
@@ -8,26 +11,18 @@ scripted_gui = {
 
 		ai_enabled = { always = no }
 
-		visible = {
-		# 	OR = {
-		# 		# has_idea = AF_T_unorganized_tribal_nation
-		# 		# has_idea = AF_T_unorganized_tribal_nation_2
-		# 		# has_idea = AF_T_unorganized_tribal_nation_3
-		# 		# has_idea = AF_T_unorganized_tribal_nation_4
-		# 		# has_idea = AF_T_unorganized_tribal_nation_5
-		# 		# has_idea = AF_T_organized_tribal_nation
-		# 		has_idea = afr_reforming_kingdom
-		# 		has_country_flag = Oceania_industrializing
-		# 		has_country_flag = afr_colony_industrializing
-		# 		has_country_flag = afr_an_african_industrializing
-		# 	}
-		}
+		visible = { always = yes }
 
 		effects = {
 			innovation_progress_bg_click = {
+				# Both chips now toggle the same panel.
 				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_innovation_progress }
-				set_variable = { show_innovation_progress = show }
+				subtract_from_temp_variable = { show = show_institutions_panel }
+				set_variable = { show_institutions_panel = show }
+
+				# TODO: this Russia toggle is piggybacking on an unrelated button.
+				# It belongs on its own button in RUS_peasant_reform.gui. Kept here
+				# so RUS behaviour is unchanged.
 				if = {
 					limit = { tag = RUS }
 					if = {
@@ -48,12 +43,20 @@ scripted_gui = {
 			innovation_progress_bg_click_enabled = { always = yes }
 		}
 
+		triggers = {
+			innovation_progress_bg_click_enabled = { always = yes }
+			innovation_ready_glow_visible = { has_institution_progress_complete = yes }
+		}
+
 		properties = {
-			innovation_progress_icon = {
-				frame = ROOT.institutions_country_era
-			}
+			innovation_progress_icon    = { frame = ROOT.institutions_country_era }
+			innovation_progress_minibar = { frame = ROOT.innovation_progress }
 		}
 	}
+
+	# ------------------------------------------------------------------------
+	#  Topbar chip - Humanitive Institutions
+	# ------------------------------------------------------------------------
 	humanities_progress = {
 		window_name = "humanities_progress_container"
 
@@ -63,15 +66,13 @@ scripted_gui = {
 
 		ai_enabled = { always = no }
 
-		visible = {
-
-		}
+		visible = { always = yes }
 
 		effects = {
 			humanities_progress_bg_click = {
 				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_humanities_progress }
-				set_variable = { show_humanities_progress = show }
+				subtract_from_temp_variable = { show = show_institutions_panel }
+				set_variable = { show_institutions_panel = show }
 			}
 			# humanities_progress_bg_click = {
 			# 	add_to_variable = { humanities_progress = 10 }
@@ -82,12 +83,51 @@ scripted_gui = {
 			humanities_progress_bg_click_enabled = { always = yes }
 		}
 
+		triggers = {
+			humanities_progress_bg_click_enabled = { always = yes }
+			humanities_ready_glow_visible = { has_institution_progress_complete = yes }
+		}
+
 		properties = {
-			humanities_progress_icon = {
-				frame = ROOT.institutions_country_era
+			humanities_progress_icon    = { frame = ROOT.institutions_country_era }
+			humanities_progress_minibar = { frame = ROOT.humanities_progress }
+		}
+	}
+
+	institutions_overview = {
+		window_name = "institutions_overview_container"
+		context_type = player_context
+		parent_window_token = topbar
+		ai_enabled = { always = no }
+
+		visible = { check_variable = { show_institutions_panel > 0 } }
+
+		effects = {
+			institutions_close_button_click = {
+				set_variable = { show_institutions_panel = 0 }
 			}
 		}
-	}	
+
+		triggers = {
+			institutions_close_button_click_enabled = { always = yes }
+
+			institutions_ready_banner_visible = { has_institution_progress_complete = yes }
+			institutions_pending_banner_visible = {
+				NOT = { has_institution_progress_complete = yes }
+			}
+		}
+
+		properties = {
+			institutions_era_icon        = { frame = ROOT.institutions_country_era }
+
+			institutions_innovative_icon = { frame = ROOT.institutions_country_era }
+			institutions_innovative_bar  = { frame = ROOT.innovation_progress }
+
+			institutions_humanitive_icon = { frame = ROOT.institutions_country_era }
+			institutions_humanitive_bar  = { frame = ROOT.humanities_progress }
+		}
+	}
+
 	suez_canal_construction = {
 		context_type = decision_category
 		window_name = "suez_canal_construction_window"
@@ -121,17 +161,11 @@ scripted_gui = {
 		context_type = player_context
 		window_name = "superevents_container"
 
-		visible = {
-			check_variable = {super_event_displayed > 0}
-		}
-		properties = {
-			debug_super_event = { image = "[get_super_event_image]"}
-		}
-        effects = {
-			ok_button_click={
-				set_variable = {super_event_displayed = 0}
-			}
-        }
+		visible = { check_variable = { super_event_displayed > 0 } }
+
+		properties = { debug_super_event = { image = "[get_super_event_image]" } }
+
+		effects = { ok_button_click = { set_variable = { super_event_displayed = 0 } } }
 	}
 	#sound effects
 	eoanb_se_berlin_conference_sound = {#berlin conference is 1
@@ -455,17 +489,7 @@ scripted_gui = {
 		window_name = "taiping_princely_influence_window"
 
 		properties = {
-			taiping_princely_influence_li_xiucheng = {
-				frame = tai_li_xiucheng
-			}
-		}
-		triggers={
-			# suez_construction_header_visible={
-				# NOT={has_global_flag = SUEZ_CANAL_BUILT}
-			# }
-			# suez_operation_header_visible={
-				# has_global_flag = SUEZ_CANAL_BUILT
-			# }
+			taiping_princely_influence_li_xiucheng = { frame = tai_li_xiucheng }
 		}
 	}
 }

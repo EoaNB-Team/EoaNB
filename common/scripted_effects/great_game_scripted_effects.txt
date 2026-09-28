@@ -1,0 +1,253 @@
+# Called once from on_startup for every start date before 1904.
+great_game_setup = {
+	set_global_flag = EDC_great_game_progress
+	set_variable = { global.great_game_stage = 3 }
+
+	set_variable = { global.great_game_bukara = 2 }
+	set_variable = { global.great_game_khiva = 3 }
+	set_variable = { global.great_game_afghan = 3 }
+	set_variable = { global.great_game_kokand = 2 }
+	set_variable = { global.great_game_s_turkmen = 3 }
+	set_variable = { global.great_game_n_turkmen = 3 }
+	set_variable = { global.great_game_panjeh = 3 }
+	set_variable = { global.great_game_peshawar = 4 }
+	set_variable = { global.great_game_samarkand = 3 }
+	set_variable = { global.great_game_persian_coast = 3 }
+	set_variable = { global.great_game_central_persia = 3 }
+	set_variable = { global.great_game_persian_highlands = 3 }
+	set_variable = { global.great_game_wukhan = 3 }
+	set_variable = { global.great_game_tibet = 6 }
+	set_variable = { global.great_game_sikang = 6 }
+	set_variable = { global.great_game_kazakh = 6 }
+
+	RUS = { set_variable = { great_game_points = 20 } }
+	ENG = { set_variable = { great_game_points = 5 } }
+
+	RUS_great_game_map_update = yes
+}
+gg_set_stage = {
+	if = {
+		limit = { check_variable = { global.great_game_stage < gg_new_stage } }
+		set_variable = { global.great_game_stage = gg_new_stage }
+		if = {
+			limit = { check_variable = { global.great_game_stage > 5 } }
+			gg_refresh_all_spheres = yes
+		}
+	}
+}
+gg_update_stage = {
+	if = {
+		limit = {
+			check_variable = { global.great_game_stage < 4 }
+			OR = {
+				has_global_flag = great_game_1873_agreement_signed
+				date > 1874.1.1
+			}
+		}
+		set_temp_variable = { gg_new_stage = 4 }
+		gg_set_stage = yes
+	}
+	if = {
+		limit = {
+			check_variable = { global.great_game_stage = 4 }
+			OR = {
+				1361 = { is_owned_by = RUS }
+				date > 1885.1.1
+			}
+		}
+		set_temp_variable = { gg_new_stage = 5 }
+		gg_set_stage = yes
+	}
+	if = {
+		limit = {
+			check_variable = { global.great_game_stage = 5 }
+			OR = {
+				has_global_flag = great_game_pamir_settled
+				date > 1895.1.1
+			}
+		}
+		set_temp_variable = { gg_new_stage = 6 }
+		gg_set_stage = yes
+	}
+}
+gg_spend_points = {
+	custom_effect_tooltip = gg_tt_spend_points
+	subtract_from_variable = { great_game_points = gg_points_to_spend }
+	clamp_variable = {
+		var = great_game_points
+		min = 0
+	}
+}
+
+gg_add_points = {
+	custom_effect_tooltip = gg_tt_add_points
+	add_to_variable = { great_game_points = gg_points_to_add }
+}
+
+gg_add_dip_power = {
+	custom_effect_tooltip = gg_tt_add_dip_power
+	add_to_variable = { gg_dip_power = gg_power_change }
+}
+gg_add_mil_power = {
+	custom_effect_tooltip = gg_tt_add_mil_power
+	add_to_variable = { gg_mil_power = gg_power_change }
+}
+gg_add_eco_power = {
+	custom_effect_tooltip = gg_tt_add_eco_power
+	add_to_variable = { gg_eco_power = gg_power_change }
+}
+
+gg_add_influence = {
+	if = {
+		limit = { ROOT = { tag = RUS } }
+		gg_add_influence_RUS = yes
+	}
+	else_if = {
+		limit = { ROOT = { tag = ENG } }
+		gg_add_influence_ENG = yes
+	}
+}
+
+gg_add_influence_RUS = {
+	custom_effect_tooltip = gg_tt_add_influence_RUS
+	add_to_variable = {
+		var = great_game_influence@RUS
+		value = gg_influence_change
+	}
+	clamp_variable = {
+		var = great_game_influence@RUS
+		min = 0
+	}
+	hidden_effect = { gg_after_influence_change = yes }
+}
+gg_add_influence_ENG = {
+	custom_effect_tooltip = gg_tt_add_influence_ENG
+	add_to_variable = {
+		var = great_game_influence@ENG
+		value = gg_influence_change
+	}
+	clamp_variable = {
+		var = great_game_influence@ENG
+		min = 0
+	}
+	hidden_effect = { gg_after_influence_change = yes }
+}
+
+gg_after_influence_change = {
+	if = {
+		limit = { check_variable = { global.great_game_stage > 5 } }
+		gg_refresh_all_spheres = yes
+	}
+	RUS_great_game_map_update = yes
+}
+
+gg_refresh_all_spheres = {
+	PER = { gg_sphere_update_dominance = yes }
+	TIB = { gg_sphere_update_dominance = yes }
+	SIK = { gg_sphere_update_dominance = yes }
+	AFG = { gg_sphere_update_dominance = yes }
+}
+
+gg_sphere_update_dominance = {
+	if = {
+		limit = { gg_sphere_is_open = yes }
+		set_temp_variable = { gg_sphere_lead = great_game_influence@RUS }
+		subtract_from_temp_variable = { gg_sphere_lead = great_game_influence@ENG }
+		if = {
+			limit = { check_variable = { gg_sphere_lead > 4 } }
+			set_country_flag = RUS_becoming_dominate
+			clr_country_flag = ENG_becoming_dominate
+		}
+		else_if = {
+			limit = { check_variable = { gg_sphere_lead < -4 } }
+			set_country_flag = ENG_becoming_dominate
+			clr_country_flag = RUS_becoming_dominate
+		}
+		else = {
+			clr_country_flag = RUS_becoming_dominate
+			clr_country_flag = ENG_becoming_dominate
+		}
+	}
+}
+
+gg_sphere_invest = {
+	set_temp_variable = { gg_influence_change = 1 }
+	gg_add_influence = yes
+}
+
+gg_sphere_lock_for_rival = {
+	if = {
+		limit = { ROOT = { tag = ENG } }
+		set_country_flag = RUS_sphere
+		clr_country_flag = RUS_becoming_dominate
+		RUS = {
+			set_temp_variable = { eoanb_prestige_change = 5 }
+			eoanb_change_prestige_score = yes
+		}
+	}
+	else = {
+		set_country_flag = ENG_sphere
+		clr_country_flag = ENG_becoming_dominate
+		ENG = {
+			set_temp_variable = { eoanb_prestige_change = 5 }
+			eoanb_change_prestige_score = yes
+		}
+	}
+}
+
+gg_ENG_fortify_frontier_state = {
+	if = {
+		limit = {
+			OR = {
+				is_owned_by = ROOT
+				is_owned_by = RAJ
+			}
+		}
+		add_building_construction = {
+			type = bunker
+			level = 2
+			instant_build = yes
+			province = {
+				all_provinces = yes
+				limit_to_border = yes
+			}
+		}
+	}
+}
+
+RUS_QNG_chuguchak_protocol_effect = {
+	if = {
+		limit = { 944 = { is_owned_by = QNG } }
+		transfer_state = 944
+	}
+	if = {
+		limit = { owns_state = 944 }
+		add_state_core = 944
+	}
+	custom_effect_tooltip = RUS_QNG_qing_renounce_claims_tt
+	hidden_effect = {
+		943 = {
+			remove_core_of = QNG
+			remove_claim_by = QNG
+		}
+		944 = {
+			remove_core_of = QNG
+			remove_claim_by = QNG
+		}
+		1443 = {
+			remove_core_of = QNG
+			remove_claim_by = QNG
+		}
+		1444 = {
+			remove_core_of = QNG
+			remove_claim_by = QNG
+		}
+		clr_country_flag = RUS_QNG_negotiations_failed
+		clr_country_flag = RUS_QNG_second_battle_pending
+		set_country_flag = RUS_QNG_border_war_resolved
+	}
+	944 = {
+		set_temp_variable = { gg_influence_change = 3 }
+		gg_add_influence_RUS = yes
+	}
+}

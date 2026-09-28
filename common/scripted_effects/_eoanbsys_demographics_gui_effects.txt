@@ -1,0 +1,89 @@
+eoanb_build_national_demographics = {
+
+	clear_array = national_culture_array_2
+	clear_array = national_culture_array_2_percentage
+	clear_array = national_culture_array_2_num
+
+	clear_array = national_religion_array_2
+	clear_array = national_religion_array_2_percentage
+	clear_array = national_religion_array_2_num
+
+	every_owned_state = {
+		for_each_loop = {
+			array = state_culture_array
+			value = v
+			if = {
+				limit = { NOT = { is_in_array = { ROOT.national_culture_array_2 = v } } }
+				add_to_array = { ROOT.national_culture_array_2 = v }
+			}
+		}
+		for_each_loop = {
+			array = state_religion_array
+			value = v
+			if = {
+				limit = { NOT = { is_in_array = { ROOT.national_religion_array_2 = v } } }
+				add_to_array = { ROOT.national_religion_array_2 = v }
+			}
+		}
+	}
+
+	update_culture_pops = yes
+	update_percentage_pop_culture = yes
+
+	update_religion_pops = yes
+	update_percentage_pop_religion = yes
+
+	eoanb_build_demographic_bars = yes
+	eoanb_build_demographic_summary = yes
+
+	# total population for the summary strip, in millions
+	set_variable = { demo_total_pop_m = max_manpower_k }
+	divide_variable = { demo_total_pop_m = 1000 }
+}
+
+# Converts the 0-1 share fractions into 0-100 progress bar frames.
+eoanb_build_demographic_bars = {
+
+	clear_array = national_culture_array_2_bar
+	for_each_loop = {
+		array = national_culture_array_2_percentage
+		value = v
+
+		set_temp_variable = { bar_temp = v }
+		multiply_temp_variable = { bar_temp = 100 }
+		round_temp_variable = bar_temp
+		add_to_array = {
+			array = national_culture_array_2_bar
+			value = bar_temp
+		}
+	}
+
+	clear_array = national_religion_array_2_bar
+	for_each_loop = {
+		array = national_religion_array_2_percentage
+		value = v
+
+		set_temp_variable = { bar_temp = v }
+		multiply_temp_variable = { bar_temp = 100 }
+		round_temp_variable = bar_temp
+		add_to_array = {
+			array = national_religion_array_2_bar
+			value = bar_temp
+		}
+	}
+}
+
+eoanb_build_demographic_summary = {
+
+	clear_array = demo_top_culture
+	if = {
+		limit = { check_variable = { national_culture_array_2^num > 0 } }
+		add_to_array = { demo_top_culture = national_culture_array_2^0 }
+	}
+
+	clear_array = demo_top_religion
+	if = {
+		limit = { check_variable = { national_religion_array_2^num > 0 } }
+		add_to_array = { demo_top_religion = national_religion_array_2^0 }
+	}
+}
