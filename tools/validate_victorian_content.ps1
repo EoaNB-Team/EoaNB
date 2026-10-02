@@ -84,7 +84,7 @@ foreach ($f in Get-ChildItem events -Recurse -File -Filter *.txt) {
 }$focusIds = [System.Collections.Hashtable]::new()
 foreach ($f in Get-ChildItem common/national_focus -File -Filter *.txt) {
     $t = Strip-Comments ([IO.File]::ReadAllText($f.FullName))
-    foreach ($m in [regex]::Matches($t, '(?m)^\s{1,2}focus\s*=\s*\{\s*(?:\r?\n\s*)?id\s*=\s*([\w\.]+)')) {
+    foreach ($m in [regex]::Matches($t, '(?m)^\s{1,2}(?:shared_)?focus\s*=\s*\{\s*(?:\r?\n\s*)?id\s*=\s*([\w\.]+)')) {
         $id = $m.Groups[1].Value
         if ($focusIds.ContainsKey($id)) { Err "DUP-ID   focus '$id' in $($f.Name) and $($focusIds[$id])" } else { $focusIds[$id] = $f.Name }
     }
@@ -123,8 +123,19 @@ foreach ($f in $projectFiles | Where-Object { $_.Extension -eq '.txt' }) {
     }
     # 7. focus prerequisites inside project focus files
     if ($f.FullName -match 'national_focus') {
-        foreach ($m in [regex]::Matches($t, '(?:prerequisite|mutually_exclusive)\s*=\s*\{[^}]*?focus\s*=\s*([\w\.]+)')) {
-            if (-not $focusIds.ContainsKey($m.Groups[1].Value)) { Err "MISSING  $($f.Name): focus reference '$($m.Groups[1].Value)'" }
+        foreach ($blk in [regex]::Matches($t, '(?:prerequisite|mutually_exclusive)\s*=\s*\{([^}]*)\}')) {
+            foreach ($m in [regex]::Matches($blk.Groups[1].Value, 'focus\s*=\s*([\w\.]+)')) {
+                if (-not $focusIds.ContainsKey($m.Groups[1].Value)) { Err "MISSING  $($f.Name): focus reference '$($m.Groups[1].Value)'" }
+            }
+        }
+        # shared focuses written by the generators: icon exists, name and description localised
+        $iconFile = 'docs/generated_focus_icons.txt'
+        if (-not $script:iconSet -and (Test-Path $iconFile)) { $script:iconSet = [System.Collections.Generic.HashSet[string]]::new([string[]](Get-Content $iconFile)) }
+        foreach ($sf in [regex]::Matches($t, '(?s)shared_focus\s*=\s*\{\s*id\s*=\s*([\w\.]+)\s*icon\s*=\s*([\w]+)')) {
+            $fid = $sf.Groups[1].Value; $ic = $sf.Groups[2].Value
+            if ($script:iconSet -and -not $script:iconSet.Contains($ic)) { Err "GFX      $($f.Name): focus '$fid' uses unknown icon '$ic'" }
+            if (-not $localKeys.ContainsKey($fid)) { Err "LOC      $($f.Name): missing name for focus '$fid'" }
+            if (-not $localKeys.ContainsKey($fid + '_desc')) { Err "LOC      $($f.Name): missing description for focus '$fid'" }
         }
     }
 }
