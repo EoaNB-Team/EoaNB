@@ -64,3 +64,17 @@ Expected noise: errors that already exist in the upstream baseline (`local_suppl
 7. **Danubian turn**: after the Ausgleich (flag `v54_austria_hungary_established`), `v54_aus.30` fires about 60 days later.
 
 The decisions and events were written against the game's documented effects and triggers; the risk areas to watch in `error.log` are `puppet` plus `set_autonomy` on an independent state, and `add_timed_idea` when the idea is already present.
+
+## 7. Opening branches 1854-1857 (all four countries)
+
+General: the new focuses sit left of the upstream tree (scroll to the left edge of the focus window). Every historical focus and event option carries the `[Historical]` mark and, in the event options, a "Historically:" line. Console: `tag XXX`, `date`, `event <id>`, `effect ...`, `focus` shows the tree, `research_on_icon_click`/`instant_focus` are not needed (use `effect complete_national_focus = ID`).
+
+1. **Start state**: as Austria, Prussia, France and Britain the first row of the opening branch (`..._the_eastern_question` etc.) must be available, and the upstream focuses that were unlocked at the 1857 start must be locked or already bypassed (check `AUS_...`, `PRS_...`, `FRA_...`, `ENG_focus_sepoy_rebellion`). Britain must start under Lord Aberdeen (PM in the political screen). `error.log` must have no `v54_`-related lines.
+2. **Stance focuses**: the four stance focuses of each country become available after the Crimean decision event (about day 60) according to the stance flag. To test directly: `effect set_country_flag = v54_gbr_stance_war` and look at `ENG_v54_for_the_sultan`.
+3. **Events**: fire each with `event v54_gbr.NN` (ENG), `v54_fra.NN` (FRA), `v54_pru.NN` (PRS), `v54_aus.NN` (AUS). Check that every option appears with the right tooltips, that the historical option is the first one, and that `fire_only_once` events do not repeat.
+4. **Britain, Aberdeen to Palmerston**: `event v54_gbr.57` option a: Palmerston must become leader and the "Coalition Cabinet" spirit disappear; `ENG_v54_the_palmerston_ministry` becomes available.
+5. **India switch** (key test): as ENG, `effect set_variable = { v54_india_unrest = 60 }` and `date 1857.5.10` (or advance to it), expect within a day the hidden event: `v54_sepoy_rebellion_started` global flag, SRS in existence with states 439/438/1128/1006, a war SRS vs RAJ, the event `v54_gbr.81`, and `ENG_focus_sepoy_rebellion` bypassed. Repeat on a fresh start with `v54_india_unrest = 30`: expect `v54_gbr.82`, flag `v54_mutiny_contained`, no SRS war. Watch `error.log` for `transfer_state`, `create_faction_from_template`, `load_oob`, `add_to_faction` and `annex_country` (Oudh) errors.
+6. **Decisions**: category "Britain in 1854" (and the equivalent ones for the other countries) must appear in the decisions window; `European Regiments for Bengal` lowers the unrest by 3 (check with `effect log = "[?v54_india_unrest]"`).
+7. **Validation**: `pwsh tools/validate_victorian_content.ps1` must end with `0 error(s)`; `pwsh tools/index_flags.ps1` rebuilds the flag index.
+
+Risk areas not yet exercised in play: everything in this section (nothing was play-tested at the time of writing), plus the risky effects listed at the end of section 6.

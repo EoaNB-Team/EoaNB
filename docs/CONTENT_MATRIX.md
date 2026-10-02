@@ -25,9 +25,13 @@ Columns: country, focus, event, decision, idea, historical trigger, alternate tr
 | Austria: victory 1866 settlement | AUS, PRS | - | Y (`v54_aus.20-25`, option in `sevenweekswar.73`) | Y (3 + 7 bind) | Y (3) | - (counterfactual) | 4 philosophies | Y | Y | N | |
 | Austria: Danubian turn | AUS | - | Y (`v54_aus.30`) | - | Y | Danubian strategy | return to Germany | Y | Y | N | |
 | Austria: 1870-1900 | AUS | Y (upstream, large) | Y (upstream) | Y (upstream) | Y | upstream | upstream | Y | Y (upstream plan) | N | not changed in Phase C |
-| Prussian tree | PRS | N | N | N | N | - | - | N | N | N | Phase D |
-| French tree | FRA | N | N | N | N | - | - | N | N | N | Phase E |
-| British tree | ENG | N | N | N | N | - | - | N | N | N | Phase F |
+| Prussia: opening 1854-1857 | PRS | Y (42 shared) | Y (`v54_pru.50-85`, 20) | Y (5) | Y (12) | Crimean neutrality, Zollverein and army reform, marriage with Britain | alternate options in every event | Y | Y (weights) | N | Zollverein, army, constitution, Neuchatel |
+| Prussian tree 1857-1900 | PRS | N | N | N | N | - | - | N | N | N | Phase D |
+| France: opening 1854-1857 | FRA | Y (45 shared) | Y (`v54_fra.50-72`, 16) | Y (5) | Y (11) | alliance with Britain, Crimean expedition | mediation / neutrality / Russia | Y | Y (weights) | N | Haussmann, Credit Mobilier, Suez, imperial institutions |
+| French tree 1857-1900 | FRA | N | N | N | N | - | - | N | N | N | Phase E |
+| Britain: opening 1854-1857 | ENG | Y (51 shared) | Y (`v54_gbr.50-82`, 28) | Y (7) | Y (27) | Aberdeen, Palmerston, Crimean war, India as in 1857 | stance flags, Russell/Aberdeen, conciliatory India choices | Y | Y (weights) | N | Eastern war, Parliament, economy, army, India |
+| India: Sepoy switch | ENG, RAJ, SRS | gated upstream | Y (`v54_gbr.70-82`) | Y (3) | - | unrest 50 or more on 10 May 1857 -> rebellion | unrest below 50 -> contained mutiny | Y | Y | N | variable `v54_india_unrest`, effect `v54_start_sepoy_rebellion` |
+| British tree 1857-1900 | ENG | N | N | N | N | - | - | N | N | N | Phase F |
 | Historical AI plans | all | - | - | - | - | - | - | - | N | N | Phase H (upstream plans exist) |
 | Custom game rules | all | - | - | - | - | - | - | N | N | N | |
 | Post-1871 content | all | N | N | N | N | - | - | N | N | N | Phase G |

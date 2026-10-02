@@ -100,3 +100,22 @@ Country flags on **AUS** unless stated. Variables are on AUS.
 | variable `v54_aus_bound_count`, flags `v54_aus_bound_BAV/WUR/SAX/HAN/BAD/HSD/HES`, `v54_aus_hegemony_done` | decisions `v54_aus_bind_*` | German states bound to Vienna (as `autonomy_confederation_member` puppets) |
 | global `v54_aus_german_hegemony_established` | `v54_aus.21` | Three or more states bound |
 | `v54_aus_danubian_decided`, `v54_aus_danubian_strategy`, `v54_aus_german_revanche` | `v54_aus.30` | Eastern turn after the Ausgleich |
+
+## Opening 1854-1857 (Phase C-bis)
+
+The complete, machine-generated list of every `v54_` country flag, global flag and variable (with the files that set and read it) is `docs/generated_flag_index.csv`; rebuild it with `pwsh tools/index_flags.ps1` (the tool also lists flags that are read but never set; at the moment only `v54_ems_crisis_occurred`, which is the documented FUTURE bridge flag). The tables above cover the Crimean and reaction chains; the opening branches add the flags below.
+
+| Flag / variable | Scope | Set by | Meaning |
+|---|---|---|---|
+| `v54_gbr_stance_war` / `_mediation` / `_neutral` / `_russia` | ENG | events `v54_eur.2` and `.4` | British attitude to the Eastern crisis; they unlock the matching stance focus (`ENG_v54_for_the_sultan` etc.). The French (`v54_fra_stance_*`) flags work the same way |
+| `v54_gbr_pm_palmerston` / `_russell` / `_aberdeen` | ENG | `v54_gbr.57` | Who governs after the Roebuck motion; `_palmerston` is historical and unlocks `ENG_v54_the_palmerston_ministry` |
+| `v54_gbr_aims_sevastopol` / `_limited` / `_maximal` | ENG | `v54_gbr.51` | British war aims |
+| `v54_gbr_crimea_army_full` / `_small`, `v54_gbr_inquiry`, `v54_gbr_cover_up` | ENG | `v54_gbr.54`, `.56` | Expedition size, answer to the winter of 1854-55 |
+| variable `v54_india_unrest` (0-100, starts at 20) | ENG | `v54_initialise`; events `v54_gbr.70-77`, `.82`; focuses; decisions | Unrest in the Bengal army. Historical choices add up to 58 (20 + 6 + 10 + 5 + 12 + 5), so the mutiny of 10 May 1857 becomes a rebellion; a couple of conciliatory choices bring it under 50 |
+| `v54_gbr_lapse_applied` / `_adoptions_recognised`, `v54_gbr_oudh_annexed` / `_oudh_residency`, `v54_gbr_gse_act` / `_gse_exempt`, `v54_gbr_cartridge_*`, `v54_gbr_rumours_*`, `v54_gbr_pandey_*` | ENG | `v54_gbr.70-77` | Record of the choices in the India chain |
+| global `v54_oudh_annexed` | global | `v54_gbr.71` | Oudh was annexed in 1856; its state 756 joins the rebellion |
+| global `v54_sepoy_rebellion_started` | global | `v54_start_sepoy_rebellion` | The Bengal army has risen (unlocks `ENG_focus_sepoy_rebellion`) |
+| global `v54_mutiny_contained` | global | `v54_gbr.80` | Unrest was below 50; the upstream rebellion never starts |
+| `v54_gbr_prussian_marriage` / `_marriage_deferred`; `v54_pru_english_marriage` | ENG / PRS | `v54_gbr.65`, `v54_pru.85` | Engagement of the Princess Royal and Prince Friedrich Wilhelm of Prussia |
+| `v54_gbr_reform_withdrawn` / `_reform_1854_passed`, `v54_gbr_income_tax_doubled` / `_war_borrowing`, `v54_gbr_civil_service_reformed` / `_patronage_kept`, `v54_gbr_sanitary_reform` / `_snow_dismissed`, `v54_gbr_victoria_cross` / `_old_orders`, `v54_gbr_bessemer` / `_puddling_lobby` | ENG | `v54_gbr.60-67` | Home-front choices |
+| `v54_fra_*`, `v54_pru_*`, `v54_aus_*` (opening) | FRA / PRS / AUS | `v54_fra.50-72`, `v54_pru.50-85`, `v54_aus.50-75` | Choices of the opening branches; see the CSV |
