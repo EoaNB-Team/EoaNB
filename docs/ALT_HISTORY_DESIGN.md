@@ -2,6 +2,8 @@
 
 Status as of Phase B. **IMPLEMENTED** = content exists in this repository (project or upstream) and is wired to the `v54_` state; **PARTIAL** = state and reactions exist but follow-up branches are missing; **FUTURE** = not started. Nothing below has been played end to end; see `TESTING.md`.
 
+Every choice with a historical option marks it `[Historical]` and adds a grey line `Historically: ...` giving what actually happened. Reaction events 100-102, 310-311 and 600-601 follow counterfactual outcomes and so have no historical option.
+
 Principle: the date guides history, the state controls it. Wars are upstream (EoaNB) event chains; the project mirrors their outcome into `v54_` global flags monthly (`v54_sync_upstream_state`) and fires reaction events once. Flag names: `FLAG_REGISTRY.md`.
 
 ## 1. France and Britain avoid the Crimean intervention
