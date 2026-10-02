@@ -1,0 +1,1030 @@
+add_namespace = v54_gbr
+
+# =====================================================================================
+# Britain 1854-1857 (see docs/EVENT_NAMESPACE_REGISTRY.md).
+# 50-59 Eastern war and the army; 60-69 Parliament, economy and the Crown;
+# 70-79 India and the Empire; 80-89 the Mutiny switch (hidden event 80 decides whether the Bengal army
+# rises, see common/scripted_effects/v54_india_effects.txt).
+# Events that also exist as a focus reward carry a mean_time_to_happen so that they still occur at about
+# the historical date when the player does not take the focus.
+# =====================================================================================
+
+# ---------- A. The Eastern war ----------
+
+country_event = {
+	id = v54_gbr.50
+	title = v54_gbr.50.t
+	desc = v54_gbr.50.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.50.a
+		ai_chance = { base = 10 }
+	}
+}
+
+# War aims of the British Cabinet
+country_event = {
+	id = v54_gbr.51
+	title = v54_gbr.51.t
+	desc = v54_gbr.51.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.51.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_aims_sevastopol
+		add_war_support = 0.02
+		add_political_power = 25
+	}
+	option = {
+		name = v54_gbr.51.b
+		ai_chance = { base = 4 }
+		set_country_flag = v54_gbr_aims_limited
+		add_stability = 0.01
+		if = {
+			limit = { country_exists = AUS }
+			add_opinion_modifier = { target = AUS modifier = v54_om_crimean_sympathy }
+			reverse_add_opinion_modifier = { target = AUS modifier = v54_om_crimean_sympathy }
+		}
+	}
+	option = {
+		name = v54_gbr.51.c
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_aims_maximal
+		add_war_support = 0.05
+		add_stability = -0.02
+		if = {
+			limit = { country_exists = AUS }
+			add_opinion_modifier = { target = AUS modifier = v54_om_crimean_disfavour }
+			reverse_add_opinion_modifier = { target = AUS modifier = v54_om_crimean_disfavour }
+		}
+	}
+}
+
+# The Baltic campaign (also fired by the Baltic Fleet focus)
+country_event = {
+	id = v54_gbr.52
+	title = v54_gbr.52.t
+	desc = v54_gbr.52.d
+	picture = GFX_report_event_crimean_war_navy
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.52.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_bomarsund
+		add_to_variable = { prestige_score = 1 }
+		add_war_support = 0.01
+		navy_experience = 10
+	}
+	option = {
+		name = v54_gbr.52.b
+		ai_chance = { base = 3 }
+		random_list = {
+			35 = {
+				set_country_flag = v54_gbr_kronstadt_bombarded
+				add_to_variable = { prestige_score = 3 }
+				add_war_support = 0.03
+				navy_experience = 15
+			}
+			65 = {
+				set_country_flag = v54_gbr_kronstadt_repulsed
+				add_political_power = -50
+				add_war_support = -0.03
+				navy_experience = 5
+			}
+		}
+	}
+	option = {
+		name = v54_gbr.52.c
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_baltic_blockade
+		add_political_power = 25
+		if = {
+			limit = { country_exists = RUS }
+			RUS = { add_stability = -0.01 }
+		}
+	}
+}
+
+# Balaclava
+country_event = {
+	id = v54_gbr.53
+	title = v54_gbr.53.t
+	desc = v54_gbr.53.d
+	picture = GFX_report_event_british_army2
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 3
+		modifier = { factor = 0 date < 1854.10.25 }
+	}
+
+	trigger = {
+		original_tag = ENG
+		has_country_flag = v54_crimea_participant
+		has_global_flag = v54_crimean_war_active
+	}
+
+	option = {
+		name = v54_gbr.53.a
+		ai_chance = { base = 10 }
+		add_war_support = 0.02
+	}
+	option = {
+		name = v54_gbr.53.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_light_brigade_inquiry
+		add_political_power = -10
+		army_experience = 10
+	}
+}
+
+# The expeditionary force
+country_event = {
+	id = v54_gbr.54
+	title = v54_gbr.54.t
+	desc = v54_gbr.54.d
+	picture = GFX_report_event_british_inspect_troops
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.54.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_crimea_army_full
+		add_ideas = ENG_v54_idea_expeditionary_army
+		add_war_support = 0.02
+	}
+	option = {
+		name = v54_gbr.54.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_crimea_army_small
+		add_manpower = 5000
+		add_stability = 0.01
+	}
+}
+
+# Raglan's death
+country_event = {
+	id = v54_gbr.55
+	title = v54_gbr.55.t
+	desc = v54_gbr.55.d
+	picture = GFX_report_event_british_army3
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 4
+		modifier = { factor = 0 date < 1855.6.28 }
+	}
+
+	trigger = {
+		original_tag = ENG
+		has_country_flag = v54_crimea_participant
+		has_global_flag = v54_crimean_war_active
+	}
+
+	option = {
+		name = v54_gbr.55.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		add_political_power = 10
+	}
+	option = {
+		name = v54_gbr.55.b
+		ai_chance = { base = 3 }
+		army_experience = 20
+		add_stability = -0.01
+	}
+}
+
+# The winter before Sevastopol (also fired by the focus of the same name)
+country_event = {
+	id = v54_gbr.56
+	title = v54_gbr.56.t
+	desc = v54_gbr.56.d
+	picture = GFX_report_event_crimean_war
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 20
+		modifier = { factor = 0 date < 1854.12.1 }
+	}
+
+	trigger = {
+		original_tag = ENG
+		has_country_flag = v54_crimea_participant
+		has_global_flag = v54_crimean_war_active
+	}
+
+	option = {
+		name = v54_gbr.56.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_inquiry
+		add_ideas = ENG_v54_idea_crimean_winter
+		add_political_power = -25
+	}
+	option = {
+		name = v54_gbr.56.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_cover_up
+		add_ideas = ENG_v54_idea_crimean_winter
+		add_ideas = ENG_v54_idea_army_scandal
+	}
+}
+
+# The Roebuck motion: the fall of Aberdeen (also fired by the Sebastopol Committee focus)
+country_event = {
+	id = v54_gbr.57
+	title = v54_gbr.57.t
+	desc = v54_gbr.57.d
+	picture = GFX_report_event_british_parliament
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 10
+		modifier = { factor = 0 date < 1855.1.26 }
+	}
+
+	trigger = {
+		original_tag = ENG
+		has_country_flag = v54_crimea_participant
+		has_global_flag = v54_crimean_war_active
+	}
+
+	option = {
+		name = v54_gbr.57.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_pm_palmerston
+		if = { limit = { has_idea = ENG_v54_idea_coalition_cabinet } remove_ideas = ENG_v54_idea_coalition_cabinet }
+		promote_character = ENG_lord_palmerston
+		add_political_power = 50
+		add_war_support = 0.03
+	}
+	option = {
+		name = v54_gbr.57.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_pm_russell
+		if = { limit = { has_idea = ENG_v54_idea_coalition_cabinet } remove_ideas = ENG_v54_idea_coalition_cabinet }
+		promote_character = ENG_John_Russell
+		add_political_power = 25
+	}
+	option = {
+		name = v54_gbr.57.c
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_pm_aberdeen
+		add_stability = -0.03
+		add_war_support = -0.03
+	}
+}
+
+# The Declaration of Paris
+country_event = {
+	id = v54_gbr.58
+	title = v54_gbr.58.t
+	desc = v54_gbr.58.d
+	picture = GFX_report_event_crimean_war_navy
+	is_triggered_only = yes
+	fire_only_once = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.58.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_paris_declaration
+		add_ideas = ENG_v54_idea_paris_declaration
+		if = { limit = { has_idea = ENG_v54_idea_crimean_winter } remove_ideas = ENG_v54_idea_crimean_winter }
+		if = {
+			limit = { country_exists = FRA }
+			add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+			reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+		}
+	}
+	option = {
+		name = v54_gbr.58.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_paris_reservation
+		add_to_variable = { prestige_score = -1 }
+		if = {
+			limit = { country_exists = FRA }
+			add_opinion_modifier = { target = FRA modifier = v54_om_crimean_disfavour }
+			reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_disfavour }
+		}
+	}
+}
+
+# ---------- B. Parliament, economy and the Crown ----------
+
+# Russell's Reform Bill (also fired by the focus)
+country_event = {
+	id = v54_gbr.60
+	title = v54_gbr.60.t
+	desc = v54_gbr.60.d
+	picture = GFX_report_event_public_supports_reform
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 30
+		modifier = { factor = 0 date < 1854.2.13 }
+		modifier = { factor = 0 date > 1854.9.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.60.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_reform_withdrawn
+		add_political_power = -25
+	}
+	option = {
+		name = v54_gbr.60.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_reform_1854_passed
+		add_political_power = 50
+		add_stability = 0.02
+		add_war_support = -0.02
+		add_power_balance_value = {
+			id = ENG_Balance_of_Power_Parliament
+			value = -0.1
+			tooltip_side = ENG_BOP_House_of_Commons_Strength
+		}
+	}
+}
+
+# Gladstone's war budget (also fired by the focus)
+country_event = {
+	id = v54_gbr.61
+	title = v54_gbr.61.t
+	desc = v54_gbr.61.d
+	picture = GFX_report_event_financial_reform_default
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 20
+		modifier = { factor = 0 date < 1854.3.6 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.61.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_income_tax_doubled
+		add_ideas = ENG_v54_idea_income_tax_doubled
+		set_temp_variable = { money_to_gain = 4 }
+		add_money_with_tooltip_effect = yes
+	}
+	option = {
+		name = v54_gbr.61.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_war_borrowing
+		set_temp_variable = { loans_amount = 8 }
+		take_loan_effect = yes
+		add_stability = 0.01
+	}
+}
+
+# Ireland after the Famine (also fired by the focus)
+country_event = {
+	id = v54_gbr.62
+	title = v54_gbr.62.t
+	desc = v54_gbr.62.d
+	picture = GFX_report_event_british_belfast
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 60
+		modifier = { factor = 0 date < 1854.7.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.62.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_ireland_landlords
+		add_political_power = 25
+	}
+	option = {
+		name = v54_gbr.62.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_tenant_right
+		add_ideas = ENG_v54_idea_tenant_right
+		add_political_power = -25
+	}
+	option = {
+		name = v54_gbr.62.c
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_ireland_coercion
+		add_stability = -0.01
+		add_manpower = 3000
+	}
+}
+
+# The Northcote-Trevelyan Report (also fired by the focus)
+country_event = {
+	id = v54_gbr.63
+	title = v54_gbr.63.t
+	desc = v54_gbr.63.d
+	picture = GFX_report_event_british_museum_reading_room
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 90
+		modifier = { factor = 0 date < 1854.11.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.63.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_civil_service_reformed
+		add_ideas = ENG_v54_idea_civil_service_reform
+		add_political_power = -25
+	}
+	option = {
+		name = v54_gbr.63.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_patronage_kept
+		add_stability = 0.01
+		add_political_power = 25
+	}
+}
+
+# Cholera in Soho
+country_event = {
+	id = v54_gbr.64
+	title = v54_gbr.64.t
+	desc = v54_gbr.64.d
+	picture = GFX_report_event_british_museum_reading_room
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 10
+		modifier = { factor = 0 date < 1854.9.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.64.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_snow_dismissed
+		add_stability = 0.01
+	}
+	option = {
+		name = v54_gbr.64.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_sanitary_reform
+		add_ideas = ENG_v54_idea_sanitary_reform
+		add_political_power = -25
+		add_stability = -0.01
+	}
+}
+
+# The Princess Royal's engagement (also fired by the focus; counterpart of v54_pru.85)
+country_event = {
+	id = v54_gbr.65
+	title = v54_gbr.65.t
+	desc = v54_gbr.65.d
+	picture = GFX_report_event_generic_royal_wedding
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 5
+		modifier = { factor = 0 date < 1855.9.20 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.65.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_prussian_marriage
+		add_political_power = 25
+		if = {
+			limit = { country_exists = PRS }
+			add_opinion_modifier = { target = PRS modifier = v54_om_royal_match }
+			reverse_add_opinion_modifier = { target = PRS modifier = v54_om_royal_match }
+		}
+	}
+	option = {
+		name = v54_gbr.65.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_marriage_deferred
+		add_stability = 0.01
+	}
+}
+
+# The Victoria Cross
+country_event = {
+	id = v54_gbr.66
+	title = v54_gbr.66.t
+	desc = v54_gbr.66.d
+	picture = GFX_report_event_british_army1
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 5
+		modifier = { factor = 0 date < 1856.1.29 }
+	}
+
+	trigger = {
+		original_tag = ENG
+		has_country_flag = v54_crimea_participant
+	}
+
+	option = {
+		name = v54_gbr.66.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_victoria_cross
+		add_ideas = ENG_v54_idea_victoria_cross
+		add_to_variable = { prestige_score = 1 }
+	}
+	option = {
+		name = v54_gbr.66.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_old_orders
+		add_stability = 0.01
+	}
+}
+
+# Bessemer's converter
+country_event = {
+	id = v54_gbr.67
+	title = v54_gbr.67.t
+	desc = v54_gbr.67.d
+	picture = GFX_report_event_bryansk_machine_factory
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 10
+		modifier = { factor = 0 date < 1856.8.11 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.67.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_bessemer
+		add_ideas = ENG_v54_idea_bessemer
+	}
+	option = {
+		name = v54_gbr.67.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_puddling_lobby
+		add_political_power = 25
+	}
+}
+
+# ---------- C. India and the Empire ----------
+
+# The doctrine of lapse (also fired by the focus)
+country_event = {
+	id = v54_gbr.70
+	title = v54_gbr.70.t
+	desc = v54_gbr.70.d
+	picture = GFX_report_event_indian_parade
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 90
+		modifier = { factor = 0 date < 1854.3.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.70.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_lapse_applied
+		add_political_power = 25
+		add_to_variable = { v54_india_unrest = 6 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+	option = {
+		name = v54_gbr.70.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_adoptions_recognised
+		add_to_variable = { v54_india_unrest = -4 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = -25
+	}
+}
+
+# The annexation of Oudh (also fired by the focus)
+country_event = {
+	id = v54_gbr.71
+	title = v54_gbr.71.t
+	desc = v54_gbr.71.d
+	picture = GFX_report_event_india_protests
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 30
+		modifier = { factor = 0 date < 1856.1.15 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.71.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_global_flag = v54_oudh_annexed
+		set_country_flag = v54_gbr_oudh_annexed
+		add_to_variable = { v54_india_unrest = 10 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = 25
+		if = {
+			limit = { country_exists = OUD country_exists = RAJ }
+			RAJ = { annex_country = { target = OUD transfer_troops = yes } }
+		}
+	}
+	option = {
+		name = v54_gbr.71.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_oudh_residency
+		add_to_variable = { v54_india_unrest = -3 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+}
+
+# The General Service Enlistment Act (also fired by the focus)
+country_event = {
+	id = v54_gbr.72
+	title = v54_gbr.72.t
+	desc = v54_gbr.72.d
+	picture = GFX_report_event_indian_soldiers
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 30
+		modifier = { factor = 0 date < 1856.7.25 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.72.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_gse_act
+		add_manpower = 5000
+		add_to_variable = { v54_india_unrest = 5 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+	option = {
+		name = v54_gbr.72.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_gse_exempt
+		add_to_variable = { v54_india_unrest = -3 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = -25
+	}
+}
+
+# The Enfield cartridge (also fired by the focus)
+country_event = {
+	id = v54_gbr.73
+	title = v54_gbr.73.t
+	desc = v54_gbr.73.d
+	picture = GFX_report_event_indian_soldiers
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 30
+		modifier = { factor = 0 date < 1857.1.10 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.73.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_cartridge_dismissed
+		add_to_variable = { v54_india_unrest = 12 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+	option = {
+		name = v54_gbr.73.b
+		ai_chance = { base = 4 }
+		set_country_flag = v54_gbr_cartridge_withdrawn
+		add_to_variable = { v54_india_unrest = 4 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = -25
+	}
+	option = {
+		name = v54_gbr.73.c
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_cartridge_inquiry
+		add_to_variable = { v54_india_unrest = 8 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+}
+
+# The Persian war (also fired by the focus)
+country_event = {
+	id = v54_gbr.74
+	title = v54_gbr.74.t
+	desc = v54_gbr.74.d
+	picture = GFX_report_event_british_army4
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 20
+		modifier = { factor = 0 date < 1856.11.1 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.74.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_persian_war
+		add_to_variable = { prestige_score = 2 }
+		add_political_power = -25
+		if = {
+			limit = { country_exists = PER }
+			add_opinion_modifier = { target = PER modifier = v54_om_persian_war }
+			reverse_add_opinion_modifier = { target = PER modifier = v54_om_persian_war }
+		}
+	}
+	option = {
+		name = v54_gbr.74.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_persian_protest
+		add_political_power = -10
+	}
+}
+
+# The Arrow incident (also fired by the focus)
+country_event = {
+	id = v54_gbr.75
+	title = v54_gbr.75.t
+	desc = v54_gbr.75.d
+	picture = GFX_report_event_china_politicians_captured
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 5
+		modifier = { factor = 0 date < 1856.10.8 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.75.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_arrow_war
+		add_war_support = 0.02
+		if = {
+			limit = { country_exists = QNG }
+			add_opinion_modifier = { target = QNG modifier = v54_om_arrow_war }
+			reverse_add_opinion_modifier = { target = QNG modifier = v54_om_arrow_war }
+		}
+	}
+	option = {
+		name = v54_gbr.75.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_arrow_disavowed
+		add_stability = 0.01
+		add_political_power = -25
+	}
+}
+
+# Rumours in the bazaars
+country_event = {
+	id = v54_gbr.76
+	title = v54_gbr.76.t
+	desc = v54_gbr.76.d
+	picture = GFX_report_event_india_protests2
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 10
+		modifier = { factor = 0 date < 1857.2.20 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.76.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_rumours_ignored
+	}
+	option = {
+		name = v54_gbr.76.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_rumours_answered
+		add_to_variable = { v54_india_unrest = -6 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = -25
+	}
+}
+
+# Mangal Pandey at Barrackpore
+country_event = {
+	id = v54_gbr.77
+	title = v54_gbr.77.t
+	desc = v54_gbr.77.d
+	picture = GFX_report_event_indian_soldiers
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 3
+		modifier = { factor = 0 date < 1857.3.29 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.77.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_pandey_hanged
+		add_to_variable = { v54_india_unrest = 5 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+	}
+	option = {
+		name = v54_gbr.77.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_gbr_pandey_lenient
+		add_to_variable = { v54_india_unrest = -2 }
+		clamp_variable = { var = v54_india_unrest min = 0 max = 100 }
+		add_political_power = -25
+	}
+}
+
+# ---------- D. The Mutiny switch ----------
+
+# Meerut, 10 May 1857. Hidden: breaks out as a rebellion when the unrest has reached breaking point.
+country_event = {
+	id = v54_gbr.80
+	hidden = yes
+	fire_only_once = yes
+
+	mean_time_to_happen = {
+		days = 1
+		modifier = { factor = 0 date < 1857.5.10 }
+	}
+
+	trigger = { original_tag = ENG }
+
+	immediate = {
+		if = {
+			limit = { check_variable = { v54_india_unrest > 49 } }
+			v54_start_sepoy_rebellion = yes
+			set_country_flag = v54_gbr_mutiny_became_rebellion
+			country_event = { id = v54_gbr.81 }
+		}
+		else = {
+			set_global_flag = v54_mutiny_contained
+			country_event = { id = v54_gbr.82 }
+		}
+	}
+}
+
+country_event = {
+	id = v54_gbr.81
+	title = v54_gbr.81.t
+	desc = v54_gbr.81.d
+	picture = GFX_report_event_india_protests
+	is_triggered_only = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.81.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_mutiny_response_firm
+		add_war_support = 0.03
+		if = {
+			limit = { country_exists = RAJ }
+			RAJ = { add_stability = 0.02 }
+		}
+	}
+	option = {
+		name = v54_gbr.81.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_mutiny_response_clemency
+		add_stability = 0.02
+		if = {
+			limit = { country_exists = RAJ }
+			RAJ = { add_war_support = -0.02 }
+		}
+	}
+}
+
+country_event = {
+	id = v54_gbr.82
+	title = v54_gbr.82.t
+	desc = v54_gbr.82.d
+	picture = GFX_report_event_indian_soldiers
+	is_triggered_only = yes
+
+	trigger = { original_tag = ENG }
+
+	option = {
+		name = v54_gbr.82.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_gbr_bengal_army_reformed
+		add_political_power = -25
+		add_to_variable = { prestige_score = 1 }
+		set_variable = { v54_india_unrest = 10 }
+	}
+	option = {
+		name = v54_gbr.82.b
+		ai_chance = { base = 2 }
+		set_country_flag = v54_gbr_mutiny_punished
+		add_stability = 0.01
+		set_variable = { v54_india_unrest = 25 }
+	}
+}
