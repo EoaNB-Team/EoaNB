@@ -1,0 +1,115 @@
+# Victorian 1854-1900 project: shared scripted triggers.
+# Prefix v54_ is reserved for this project (checked unused in EoaNB). Global flag names are listed in docs/FLAG_REGISTRY.md.
+# Principle: date guides history, state controls it. Triggers test flags and country existence, never the calendar alone.
+
+# --- Mode ---------------------------------------------------------------------------------
+
+# True when the 1854 scenario setup has run (it is set by v54_initialise on game start).
+v54_scenario_active = {
+	has_global_flag = v54_scenario_1854
+}
+
+# --- Crimean War --------------------------------------------------------------------------
+
+v54_crimean_war_ongoing = {
+	has_global_flag = v54_crimean_war_active
+	NOT = { has_global_flag = v54_crimean_war_ended }
+}
+
+# --- Italy --------------------------------------------------------------------------------
+
+# Italian crisis (Plombieres / 1859) may still unfold: no war over Italy has been decided yet.
+v54_italian_question_open = {
+	NOT = { has_global_flag = v54_franco_austrian_war_ended }
+	NOT = { has_global_flag = v54_franco_austrian_war_active }
+}
+
+# --- Germany ------------------------------------------------------------------------------
+
+# The historical 1866 outcome (Prussia wins, Confederation dissolved) has happened.
+v54_prussian_hegemony_established = {
+	has_global_flag = v54_prussia_won_1866
+	NOT = { has_global_flag = v54_austria_won_1866 }
+}
+
+# Austria won the German war: Prussian hegemony and the historical unification chain are blocked.
+v54_prussian_hegemony_blocked = {
+	has_global_flag = v54_austria_won_1866
+}
+
+# Austria may still claim leadership of Germany (country scope: any, global state checked).
+v54_austria_eligible_for_german_leadership = {
+	country_exists = AUS
+	NOT = { has_global_flag = v54_prussia_won_1866 }
+	NOT = { has_global_flag = v54_german_empire_proclaimed }
+	NOT = { has_global_flag = v54_austria_hungary_established }
+}
+
+# German unification under Prussia is possible: the northern confederation exists and
+# no event has blocked it (Austrian victory in 1866 or French victory in 1870).
+v54_german_unification_possible = {
+	country_exists = PRS
+	has_global_flag = v54_north_german_confederation_formed
+	NOT = { has_global_flag = v54_austria_won_1866 }
+	NOT = { has_global_flag = v54_france_won_1870 }
+	NOT = { has_global_flag = v54_german_empire_proclaimed }
+}
+
+# Each southern German state is tied to Prussia: subject, same faction, or guaranteed by Prussia.
+v54_southern_german_states_aligned = {
+	country_exists = BAV
+	country_exists = WUR
+	country_exists = BAD
+	country_exists = HSD
+	BAV = { OR = { is_subject_of = PRS is_in_faction_with = PRS is_guaranteed_by = PRS } }
+	WUR = { OR = { is_subject_of = PRS is_in_faction_with = PRS is_guaranteed_by = PRS } }
+	BAD = { OR = { is_subject_of = PRS is_in_faction_with = PRS is_guaranteed_by = PRS } }
+	HSD = { OR = { is_subject_of = PRS is_in_faction_with = PRS is_guaranteed_by = PRS } }
+}
+
+# --- The road to 1870 ---------------------------------------------------------------------
+
+# The historical Franco-Prussian crisis can arise only if the preconditions exist (not by date alone).
+v54_historical_1870_crisis_possible = {
+	country_exists = FRA
+	country_exists = PRS
+	has_global_flag = v54_north_german_confederation_formed
+	NOT = { has_global_flag = v54_austria_won_1866 }
+	NOT = { has_global_flag = v54_franco_prussian_war_active }
+	NOT = { has_global_flag = v54_franco_prussian_war_ended }
+	NOT = { has_global_flag = v54_ems_crisis_occurred }
+	FRA = {
+		NOT = { has_war_with = PRS }
+		NOT = { is_in_faction_with = PRS }
+	}
+}
+
+# France is still the Second Empire (no collapse, no republic yet).
+v54_second_empire_stable = {
+	country_exists = FRA
+	NOT = { has_global_flag = v54_second_empire_collapsed }
+	NOT = { has_global_flag = v54_third_republic_established }
+}
+
+# --- Austria ------------------------------------------------------------------------------
+
+# Historical Ausgleich path: Austria lost the German war and has not yet settled with Hungary.
+v54_austria_eligible_for_ausgleich = {
+	country_exists = AUS
+	has_global_flag = v54_prussia_won_1866
+	NOT = { has_global_flag = v54_ausgleich_completed }
+	NOT = { has_global_flag = v54_austria_hungary_established }
+}
+
+# --- Limited wars -------------------------------------------------------------------------
+
+# Any of the five scripted limited wars is currently being fought.
+v54_limited_war_ongoing = {
+	OR = {
+		has_global_flag = v54_crimean_war_active
+		has_global_flag = v54_franco_austrian_war_active
+		has_global_flag = v54_danish_war_active
+		has_global_flag = v54_austro_prussian_war_active
+		has_global_flag = v54_franco_prussian_war_active
+	}
+}

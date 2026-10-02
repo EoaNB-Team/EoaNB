@@ -1,0 +1,141 @@
+# Victorian 1854-1900 project: shared scripted effects.
+# Prefix v54_ is reserved for this project. Flag names are listed in docs/FLAG_REGISTRY.md.
+# Outcome effects keep the global state consistent (mutually exclusive outcomes) so that
+# historical events can test state instead of the calendar.
+
+# Runs once on game start (see common/on_actions/v54_on_actions.txt).
+v54_initialise = {
+	set_global_flag = v54_scenario_1854
+	# Russia and the Ottoman Empire are already at war on 1 January 1854 (Crimean crisis).
+	# The war itself is declared by the Crimean chain (Phase B); here only the state is recorded.
+	set_global_flag = v54_crimean_crisis_pending
+}
+
+# --- Crimean War ---------------------------------------------------------------------------
+
+v54_set_crimean_war_started = {
+	set_global_flag = v54_crimean_war_active
+	clr_global_flag = v54_crimean_crisis_pending
+}
+
+v54_set_crimean_war_ended = {
+	set_global_flag = v54_crimean_war_ended
+	clr_global_flag = v54_crimean_war_active
+	set_global_flag = v54_treaty_of_paris
+}
+
+# --- Italy 1859 ----------------------------------------------------------------------------
+
+v54_set_italian_war_started = {
+	set_global_flag = v54_franco_austrian_war_active
+	clr_global_flag = v54_italian_crisis_escalating
+}
+
+# Historical outcome: France and Sardinia-Piedmont prevail.
+v54_set_italian_war_franco_sardinian_victory = {
+	clr_global_flag = v54_franco_austrian_war_active
+	set_global_flag = v54_franco_austrian_war_ended
+	set_global_flag = v54_austria_lost_italy
+	clr_global_flag = v54_austria_won_italy
+}
+
+# Alternate outcome: Austria prevails; Italian unification is delayed, not erased.
+v54_set_italian_war_austrian_victory = {
+	clr_global_flag = v54_franco_austrian_war_active
+	set_global_flag = v54_franco_austrian_war_ended
+	set_global_flag = v54_austria_won_italy
+	clr_global_flag = v54_austria_lost_italy
+}
+
+# --- Denmark and Germany 1864-1866 ----------------------------------------------------------
+
+v54_set_danish_war_started = {
+	set_global_flag = v54_danish_war_active
+	clr_global_flag = v54_schleswig_crisis_active
+}
+
+v54_set_danish_war_ended = {
+	clr_global_flag = v54_danish_war_active
+	set_global_flag = v54_danish_war_ended
+}
+
+v54_set_gastein_completed = {
+	set_global_flag = v54_gastein_completed
+	set_global_flag = v54_german_crisis_active
+}
+
+# Historical outcome: Prussia defeats Austria; the Confederation is dissolved.
+v54_set_1866_prussian_victory = {
+	clr_global_flag = v54_austro_prussian_war_active
+	clr_global_flag = v54_german_crisis_active
+	set_global_flag = v54_austro_prussian_war_ended
+	set_global_flag = v54_prussia_won_1866
+	clr_global_flag = v54_austria_won_1866
+	set_global_flag = v54_german_confederation_dissolved
+}
+
+# Alternate outcome: Austria defeats Prussia; the historical Prussian chain is blocked.
+v54_set_1866_austrian_victory = {
+	clr_global_flag = v54_austro_prussian_war_active
+	clr_global_flag = v54_german_crisis_active
+	set_global_flag = v54_austro_prussian_war_ended
+	set_global_flag = v54_austria_won_1866
+	clr_global_flag = v54_prussia_won_1866
+	clr_global_flag = v54_german_confederation_dissolved
+	# the historical Prussian road must not remain open
+	clr_global_flag = v54_north_german_confederation_formed
+}
+
+v54_set_north_german_confederation_formed = {
+	set_global_flag = v54_north_german_confederation_formed
+}
+
+# --- 1870 -----------------------------------------------------------------------------------
+
+v54_set_franco_prussian_war_started = {
+	set_global_flag = v54_franco_prussian_war_active
+	clr_global_flag = v54_spanish_succession_active
+}
+
+# Historical outcome: Germany prevails and the Second Empire falls.
+v54_set_1870_german_victory = {
+	clr_global_flag = v54_franco_prussian_war_active
+	set_global_flag = v54_franco_prussian_war_ended
+	set_global_flag = v54_germany_won_1870
+	clr_global_flag = v54_france_won_1870
+	set_global_flag = v54_second_empire_collapsed
+}
+
+# Alternate outcome: France prevails; no automatic German Empire.
+v54_set_1870_french_victory = {
+	clr_global_flag = v54_franco_prussian_war_active
+	set_global_flag = v54_franco_prussian_war_ended
+	set_global_flag = v54_france_won_1870
+	clr_global_flag = v54_germany_won_1870
+	clr_global_flag = v54_second_empire_collapsed
+}
+
+v54_set_third_republic_established = {
+	set_global_flag = v54_third_republic_established
+}
+
+v54_set_german_empire_proclaimed = {
+	set_global_flag = v54_german_empire_proclaimed
+}
+
+# --- Austria-Hungary ------------------------------------------------------------------------
+
+v54_set_ausgleich_completed = {
+	set_global_flag = v54_ausgleich_completed
+	set_global_flag = v54_austria_hungary_established
+}
+
+# --- Cleanup --------------------------------------------------------------------------------
+
+# Removes the transient "crisis active" flags once a war chain is settled.
+v54_clear_crisis_flags = {
+	clr_global_flag = v54_italian_crisis_escalating
+	clr_global_flag = v54_schleswig_crisis_active
+	clr_global_flag = v54_german_crisis_active
+	clr_global_flag = v54_spanish_succession_active
+}
