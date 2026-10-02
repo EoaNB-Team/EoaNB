@@ -13,3 +13,5 @@ All project namespaces use the prefix `v54_`. None of them exists in EoaNB (chec
 Sub-ranges inside `v54_eur` (proposal): 1-99 Crimean War, 100-199 Italian War, 200-299 Danish War, 300-399 German War 1866, 400-499 Luxembourg, 500-599 Spanish succession / Ems, 600-699 Franco-Prussian War, 700-799 aftermath and cross-country reactions.
 
 Existing EoaNB namespaces (do not reuse) include `austria`, `prussia`, `france`, `nap_france`, `britain`, `britainirishunrest`, `nationality`, `pssystem`, `score_handler`, `parliament_event`, `tech_news`, `eoanbworldfair`; the repository declares about 128 in total. `tools/validate_victorian_content.ps1` reports duplicate event IDs repository-wide.
+
+Because the 1864-1871 wars already exist upstream (see `EOANB_CHAINS_MAP.md`), `v54_eur` holds only the Crimean War, the 1859 reactions and the cross-country reaction events; ranges 400-599 (Luxembourg, Ems) are intentionally empty for now.

@@ -103,6 +103,12 @@ Not yet reviewed (approximations kept): rulers/leaders, military leaders and OOB
 
 `map/` (provinces, strategic regions, definition), `history/states/` (except verified ownership changes), the economy/culture/stability systems (`common/scripted_effects/_eoanbsys_*`, `common/on_actions/_eoanbsys_*`), `common/technologies/`, `gfx/` art, `common/ideologies/`, `common/peace_conference/`, upstream licence files.
 
+## 10b. Phase B additions
+
+New files: `common/wargoals/v54_wargoals.txt`, `common/opinion_modifiers/v54_opinion_modifiers.txt`, `common/ideas/v54_ideas.txt`, `common/decisions/categories/v54_decision_categories.txt`, `common/decisions/v54_crimean_decisions.txt`, `common/scripted_effects/v54_crimean_effects.txt`, `common/scripted_effects/v54_bridge_effects.txt`, `events/v54_shared_europe_events.txt`, `localisation/english/v54_crimea_l_english.yml`, and docs `EOANB_CHAINS_MAP.md`, `ALT_HISTORY_DESIGN.md`, `HISTORICAL_TIMELINE_1854_1900.md`, `CONTENT_MATRIX.md`, `ART_BACKLOG.md`. Modified: `common/on_actions/v54_on_actions.txt` (war start, monthly sync), `history/countries/RUS - Russia.txt` and `history/countries/OTO - Ottomans.txt` (1856 leftovers commented with `#[v54-1854]`: guarantees of ROM/MOL, Arrow-incident modifiers, `OTO_idea_crimean_war_debt`).
+
+Resolved in Phase B: dated history blocks after the start date (`1870.5.19` etc.) are **not** executed during a 1854 campaign; the game log shows history is executed only up to the start date.
+
 ## 11. State index
 
 `generated_state_index.csv` (1485 states) is built by `tools/index_states.ps1`: id, localisation key and name, owner, cores, victory points, strategic region, province count and owner changes by date. All territorial scripts must use IDs from this file. Frequently needed IDs (verified in the index): Vienna 956, Berlin 951, Paris 814, London 952, Lombardy 159 and Venetia 160 (tag `LVN`), Holstein 949 (`HLS`), Schleswig 58 and North Schleswig 1032 (`SCH`), Savoy 735 and Nice 822 (owned by `PIE` at start), Alsace-Lorraine 28, Moselle 972, Luxembourg 8, Hannover 59, Upper Bavaria 52, Saxony 65, Wurttemberg 50, Baden 744, Trentino 1234, Trieste 1235, Istria 1236.

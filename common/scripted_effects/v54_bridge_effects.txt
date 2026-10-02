@@ -1,0 +1,229 @@
+# Victorian 1854-1900 project: bridge to the upstream (EoaNB) 1864-1871 chains.
+# EoaNB already implements the Second Schleswig War, the Seven Weeks' War, the Luxembourg crisis and the
+# Franco-Prussian War as long event chains. Instead of duplicating them, this effect mirrors their state
+# into the shared v54_ global flags (docs/FLAG_REGISTRY.md), so that cross-country content, AI and the
+# Britain/Austria/France branches can test one consistent state.
+# Called once a month from common/on_actions/v54_on_actions.txt (scope irrelevant; flags are global/read-only).
+# It only reads upstream flags; it never changes upstream state.
+
+v54_sync_upstream_state = {
+
+	# --- War of 1859 (upstream: PIE_2I_war_active on Piedmont; PIE_2IW_Victory global; AUS_triumph_in_italy_flag on Austria) ---
+	if = {
+		limit = {
+			country_exists = PIE
+			PIE = { has_country_flag = PIE_2I_war_active }
+			NOT = { has_global_flag = v54_franco_austrian_war_active }
+			NOT = { has_global_flag = v54_franco_austrian_war_ended }
+		}
+		v54_set_italian_war_started = yes
+	}
+	if = {
+		limit = {
+			has_global_flag = PIE_2IW_Victory
+			NOT = { has_global_flag = v54_franco_austrian_war_ended }
+		}
+		v54_set_italian_war_franco_sardinian_victory = yes
+		v54_fire_1859_reactions = yes
+	}
+	if = {
+		limit = {
+			country_exists = AUS
+			AUS = { has_country_flag = AUS_triumph_in_italy_flag }
+			NOT = { has_global_flag = v54_franco_austrian_war_ended }
+		}
+		v54_set_italian_war_austrian_victory = yes
+		v54_fire_1859_reactions = yes
+	}
+	# --- Second Schleswig War (global flag set on the declaration, cleared at every peace) ---
+	if = {
+		limit = {
+			has_global_flag = eoanb_flag_second_schleswig_war
+			NOT = { has_global_flag = v54_danish_war_active }
+			NOT = { has_global_flag = v54_danish_war_ended }
+		}
+		v54_set_danish_war_started = yes
+		if = {
+			limit = { country_exists = ENG }
+			ENG = { country_event = { id = v54_eur.200 days = 3 } }
+		}
+	}
+	if = {
+		limit = {
+			has_global_flag = eoanb_flag_second_schleswig_war_end
+			NOT = { has_global_flag = eoanb_flag_second_schleswig_war }
+			NOT = { has_global_flag = v54_danish_war_ended }
+		}
+		v54_set_danish_war_ended = yes
+		# Prussia and Austria now administer the duchies together (Gastein-type phase)
+		if = {
+			limit = { NOT = { has_global_flag = v54_gastein_completed } }
+			v54_set_gastein_completed = yes
+		}
+	}
+
+	# --- Seven Weeks' War ---
+	if = {
+		limit = {
+			has_global_flag = eoanb_flag_seven_weeks_war_ongoing
+			NOT = { has_global_flag = v54_austro_prussian_war_active }
+			NOT = { has_global_flag = v54_austro_prussian_war_ended }
+		}
+		set_global_flag = v54_austro_prussian_war_active
+		if = {
+			limit = { country_exists = ENG }
+			ENG = { country_event = { id = v54_eur.320 days = 3 } }
+		}
+	}
+	# Outcome: Prussia (Prague peace) ...
+	if = {
+		limit = {
+			country_exists = PRS
+			PRS = { has_country_flag = eoanb_flag_won_7_weeks_war }
+			NOT = { has_global_flag = v54_prussia_won_1866 }
+			NOT = { has_global_flag = v54_austria_won_1866 }
+		}
+		v54_set_1866_prussian_victory = yes
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = v54_eur.300 days = 5 } }
+		}
+	}
+	# ... or Austria (Breslau peace)
+	if = {
+		limit = {
+			country_exists = AUS
+			AUS = { has_country_flag = AUS_flag_won_sww }
+			NOT = { has_global_flag = v54_prussia_won_1866 }
+			NOT = { has_global_flag = v54_austria_won_1866 }
+		}
+		v54_set_1866_austrian_victory = yes
+		if = {
+			limit = { country_exists = PRS }
+			PRS = { country_event = { id = v54_eur.310 days = 5 } }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = v54_eur.311 days = 8 } }
+		}
+	}
+
+	# --- North German Confederation (upstream: cosmetic tag on Prussia after the war) ---
+	if = {
+		limit = {
+			has_global_flag = v54_prussia_won_1866
+			NOT = { has_global_flag = v54_north_german_confederation_formed }
+			country_exists = PRS
+			PRS = { has_cosmetic_tag = GER_north_confederation }
+		}
+		v54_set_north_german_confederation_formed = yes
+	}
+
+	# --- Luxembourg crisis ---
+	if = {
+		limit = {
+			country_exists = PRS
+			PRS = { has_country_flag = eoanb_flag_won_luxembourg_crisis }
+			NOT = { has_global_flag = v54_luxembourg_crisis_occurred }
+		}
+		set_global_flag = v54_luxembourg_crisis_occurred
+	}
+
+	# --- Franco-Prussian War ---
+	if = {
+		limit = {
+			has_global_flag = eoanb_flag_franco_prussian_war_ongoing
+			NOT = { has_global_flag = v54_franco_prussian_war_active }
+			NOT = { has_global_flag = v54_franco_prussian_war_ended }
+		}
+		v54_set_franco_prussian_war_started = yes
+		if = {
+			limit = { country_exists = ENG }
+			ENG = { country_event = { id = v54_eur.620 days = 3 } }
+		}
+	}
+	if = {
+		limit = {
+			country_exists = FRA
+			FRA = { has_country_flag = eoanb_flag_fra_won_fra_prs_war }
+			NOT = { has_global_flag = v54_france_won_1870 }
+			NOT = { has_global_flag = v54_germany_won_1870 }
+		}
+		v54_set_1870_french_victory = yes
+		if = {
+			limit = { country_exists = PRS }
+			PRS = { country_event = { id = v54_eur.600 days = 10 } }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = v54_eur.601 days = 5 } }
+		}
+	}
+	if = {
+		limit = {
+			country_exists = PRS
+			PRS = { has_country_flag = eoanb_flag_won_fra_prs_war }
+			NOT = { has_global_flag = v54_france_won_1870 }
+			NOT = { has_global_flag = v54_germany_won_1870 }
+		}
+		v54_set_1870_german_victory = yes
+	}
+
+	# --- German Empire (upstream: cosmetic tags PRS_GER_bismarck*; event fraprswar.400) ---
+	if = {
+		limit = {
+			has_global_flag = v54_germany_won_1870
+			NOT = { has_global_flag = v54_german_empire_proclaimed }
+			country_exists = PRS
+			OR = {
+				PRS = { has_cosmetic_tag = PRS_GER_bismarck }
+				PRS = { has_cosmetic_tag = PRS_GER_bismarck_imperial }
+				PRS = { has_cosmetic_tag = PRS_GER_bismarck_standard }
+				PRS = { has_cosmetic_tag = PRS_GER_bismarck_hre }
+				PRS = { has_cosmetic_tag = PRS_GER_bismarck_national }
+			}
+		}
+		v54_set_german_empire_proclaimed = yes
+	}
+
+	# --- Austria-Hungary (upstream: cosmetic tag AUS_HUN_dual) ---
+	if = {
+		limit = {
+			NOT = { has_global_flag = v54_austria_hungary_established }
+			country_exists = AUS
+			AUS = { has_cosmetic_tag = AUS_HUN_dual }
+		}
+		v54_set_ausgleich_completed = yes
+	}
+}
+
+# Cross-country consequences of the 1859 outcome. Runs once, right after the outcome flags are set.
+# Events: v54_eur.100-104 (docs/ALT_HISTORY_DESIGN.md will list them).
+v54_fire_1859_reactions = {
+	if = {
+		limit = { has_global_flag = v54_austria_won_italy }
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = v54_eur.100 days = 10 } }
+		}
+		if = {
+			limit = { country_exists = AUS }
+			AUS = { country_event = { id = v54_eur.101 days = 12 } }
+		}
+		if = {
+			limit = { country_exists = PIE }
+			PIE = { country_event = { id = v54_eur.102 days = 14 } }
+		}
+	}
+	if = {
+		limit = { has_global_flag = v54_austria_lost_italy }
+		if = {
+			limit = { country_exists = AUS }
+			AUS = { country_event = { id = v54_eur.103 days = 10 } }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			FRA = { country_event = { id = v54_eur.104 days = 12 } }
+		}
+	}
+}

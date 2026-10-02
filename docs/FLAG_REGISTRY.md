@@ -64,3 +64,21 @@ EoaNB already runs its own chains. Do not duplicate them; derive `v54_` state fr
 | `v54_aus_crimea_decided` / `_armed_neutrality` / `_pro_russia` / `_joined_west` / `_mediation` | country (AUS) | event `v54_eur.10` | Austrian attitude; `_armed_neutrality` is the historical one |
 | `v54_pru_crimea_decided` / `_neutral` / `_pro_russia` / `_pro_west` | country (PRS) | event `v54_eur.15` | Prussian attitude; `_neutral` is the historical one |
 | `v54_crimean_crisis_pending` | global | `v54_initialise` | Cleared when the war starts |
+
+## Reaction flags (Phase B; consumed by Phases C-F)
+
+All are **country flags** set by the events in `events/v54_shared_europe_events.txt`. They record a decision and are meant to gate or weight later content; nothing reads them yet except the AI-chance hooks noted in `ALT_HISTORY_DESIGN.md`.
+
+| Flag | Country | Event | Meaning |
+|---|---|---|---|
+| `v54_fra_authoritarian_reaction` / `v54_fra_liberal_opening` | FRA | 100, 104 | Domestic course chosen after the 1859 outcome |
+| `v54_aus_italy_repression` / `v54_aus_italy_reform` | AUS | 101 | Austrian victory in Italy: how to rule the provinces |
+| `v54_pie_rebuild` / `v54_pie_nationalist_agitation` | PIE | 102 | After an Austrian victory |
+| `v54_aus_reform_pressure_accepted` / `v54_aus_neoabsolutism_persists` | AUS | 103 | After the defeat of 1859 (`reform_pressure_accepted` is historical) |
+| `v54_gbr_london_conference` / `_pressure_german_powers` / `_schleswig_neutral` | ENG | 200 | Britain in the Danish war (`london_conference` is historical) |
+| `v54_fra_german_policy_contain` / `_accommodate` / `_support_austria` / `_balance` / `_decisive_war` | FRA | 300, 311 | French answer to the 1866 outcome (`_balance` is historical) |
+| `v54_pru_after_defeat_reform` / `_revanche` / `_abandon_hegemony` / `_reconcile` | PRS | 310 | After an Austrian victory in 1866 |
+| `v54_gbr_german_war_neutral` / `_mediation` | ENG | 320 | Britain in the 1866 war |
+| `v54_pru_after_1870_revanche` / `_consolidate` / `_liberal_germany` | PRS | 600 | After a French victory in 1870 |
+| `v54_fra_imperial_triumph_dynasty` / `_liberal` / `_containment` | FRA | 601 | After a French victory in 1870 |
+| `v54_gbr_belgium_guarantee` / `v54_gbr_franco_prussian_mediation` / `_pressure` | ENG | 620 | Britain in the 1870 war |
