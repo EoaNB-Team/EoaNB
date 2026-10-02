@@ -8,7 +8,7 @@ Principle: the date guides history, the state controls it. Wars are upstream (Eo
 - **Trigger**: events `v54_eur.2` (Britain), `.3` (France), `.4` (second chance after failed mediation), 60-63 days after the start.
 - **Historical**: both join the Ottoman side (option marked [Historical]); the historical AI is pushed toward it (`is_historical_focus_on`).
 - **Alternate**: mediation, neutrality or an understanding with Russia. The war continues between Russia and the Ottoman Empire; the Ottoman side may collapse (`OTO` surrender > 0.6 or capitulation), giving a Russian victory.
-- **Consequences**: peace by mission `v54_mission_crimean_peace` (Russian defeat > 0.35 surrender progress: Peace of Paris; Ottoman defeat: Russian victory with Kars (state 1122) to Russia; 850 days without decision: negotiated settlement). Outcome flags `v54_crimean_outcome_*`.
+- **Consequences**: peace by mission `v54_mission_crimean_peace` (Russian defeat > 0.35 surrender progress: Peace of Paris; Ottoman defeat: Russian victory with Kars (state 1122) and Guria (state 1116) to Russia; 850 days without decision: negotiated settlement). Outcome flags `v54_crimean_outcome_*`.
 - **Disabled**: Black Sea neutralisation, French timed idea and prestige gains only on a Russian defeat.
 - **Status**: IMPLEMENTED (needs in-game test).
 

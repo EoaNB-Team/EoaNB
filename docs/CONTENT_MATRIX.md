@@ -12,7 +12,7 @@ Columns: country, focus, event, decision, idea, historical trigger, alternate tr
 | Crimean decision: Austria | AUS | N | Y (`.10`) | - | - | armed neutrality | pro-Russia / join West / mediation | Y | Y | N | Russia-side war not modelled |
 | Crimean decision: Prussia | PRS | N | Y (`.15`) | - | - | neutrality | pro-Russia / pro-West | Y | Y | N | |
 | Piedmont in the Crimea / Paris Congress | PIE | N | Y (`.20`, `.21`) | - | - | join; raise Italy | decline | Y | Y | N | |
-| Peace of Paris | RUS | - | Y (`.30`) | Y (mission) | Y (Black Sea) | Russian defeat | Ottoman defeat / timeout | Y | - | N | state 791 and 1122 verified in the state index |
+| Peace of Paris | RUS | - | Y (`.30`) | Y (mission) | Y (Black Sea) | Russian defeat | Ottoman defeat / timeout | Y | - | N | states 791, 1122 and 1116 verified in the state index |
 | Pontic clauses | RUS | - | Y (`.35`) | - | - | Oct 1870 | stay bound | Y | Y | N | |
 | Bridge to upstream wars | all | - | - | - | - | upstream flags | upstream flags | - | - | N | monthly effect |
 | 1859 reactions | FRA, AUS, PIE | N | Y (`.100-104`) | - | - | Franco-Sardinian victory | Austrian victory | Y | Y | N | flags unused so far |
