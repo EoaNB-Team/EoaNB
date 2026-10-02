@@ -17,7 +17,8 @@ Principle: the date guides history, the state controls it. Wars are upstream (Eo
 ## 2. Austria sides with Russia
 - **Trigger**: `v54_eur.10` option b. Flags `v54_aus_crimea_pro_russia`.
 - **Effect**: opinion shifts at the peace (`v54_apply_austrian_crimean_opinions`): Russia very good, Britain/France very bad, Ottomans bad. The historical choice (armed neutrality) gives Russia very bad.
-- **Missing**: Austria does not fight alongside Russia (no mechanism); later Russian attitude toward Austria in 1859/1866 is not yet used. **PARTIAL**.
+- **Later effect (Phase C)**: at the start of the wars of 1859 and 1866 (54_aus.10, 54_aus.11) Austria receives a two-year spirit by stance: isolated (armed neutrality, historical), friend of Russia, or Western sympathy.
+- **Missing**: Austria does not fight alongside Russia (no mechanism). **PARTIAL**.
 
 ## 3. Austria wins 1859 / 4. France loses 1859
 - **Upstream outcome**: `AUS_triumph_in_italy_flag` (Austria) -> `v54_austria_won_italy`.
@@ -35,7 +36,8 @@ Principle: the date guides history, the state controls it. Wars are upstream (Eo
 - **Upstream**: Breslau peace (`sevenweekswar.73/74`); `AUS_flag_won_sww`. Upstream terms are heavy (Silesia to Austria; see `EOANB_CHAINS_MAP.md`).
 - **Bridge**: `v54_austria_won_1866`; `v54_north_german_confederation_formed` is cleared and `v54_german_unification_possible` becomes false; `v54_prussian_hegemony_blocked` true.
 - **Reactions**: Prussia `v54_eur.310` (reform the kingdom, revanche, abandon hegemony, reconcile); France `.311` (welcome the settlement or stay watchful).
-- **Missing**: Austrian choice of settlement philosophy (moderate restoration, federal reform, Habsburg hegemony, humiliate Prussia) and the Prussian recovery branches in the tree. **PARTIAL**.
+- **Austria (Phase C)**: 54_aus.20 offers the four philosophies. **Moderate restoration**: no Silesian transfer (new option in sevenweekswar.73), duchies restored, German states friendly. **Federal reform**: decision chain 54_aus_gc_1..3, Federal Act (54_aus.22). **Habsburg leadership**: decisions 54_aus_bind_* bind BAV, WUR, SAX, HAN, BAD, HSD, HES as confederation-member subjects (opinion above 20 required, 100 political power each); three bound states give 54_aus.21. **Humiliate Prussia**: the upstream harsh terms plus the Prussian spirit 54_idea_pru_humiliation. **IMPLEMENTED** (not play-tested).
+- **Missing**: Prussian recovery branches in the Prussian tree (Phase D). **PARTIAL**.
 
 ## 9. Prussia wins 1866 (historical)
 - Bridge: `v54_prussia_won_1866`, `v54_german_confederation_dissolved`; NGC flag from cosmetic tag `GER_north_confederation`. Reaction: France `v54_eur.300` with five strategic policies (`_balance` is [Historical]). **PARTIAL**.
@@ -54,5 +56,8 @@ Principle: the date guides history, the state controls it. Wars are upstream (Eo
 - Germany wins: `v54_germany_won_1870`, `v54_second_empire_collapsed`; German Empire flag via cosmetic tags. Britain `v54_eur.620` at war start (Belgian guarantee [Historical]).
 - **PARTIAL**: Third Republic, Commune and restoration branches are not bridged.
 
-## 15-18. Second Empire survives; Commune succeeds; monarchy restored; Austria rejects Ausgleich / federalises; British Home Rule
-- **FUTURE** (Phases C, E, F). Upstream already has Commune-related localisation (13 files), Ausgleich/dual cosmetic tag, `ireland_events.txt`/`ireland_focus.txt`, `france_republic_focus.txt`: audit before building.
+## 15. Austria rejects the Ausgleich / 16. Austria federalises
+- 54_aus.1 (after the defeat of 1866): Ausgleich [Historical], centralist reaction (spirit, +0.30 Hungarian and +0.05 Czech revolt risk; the upstream Hungarian revolution chain follows when the risk reaches 0.6), or federal reform (decisions 54_aus_fed_1..4, 54_aus.3, lowers the four nationality risks). **IMPLEMENTED** (not play-tested).
+
+## 17-19. Second Empire survives; Commune succeeds; monarchy restored; British Home Rule
+- **FUTURE** (Phases E, F). Upstream already has Commune-related localisation (13 files), Ausgleich/dual cosmetic tag, `ireland_events.txt`/`ireland_focus.txt`, `france_republic_focus.txt`: audit before building.

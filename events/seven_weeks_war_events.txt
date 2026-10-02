@@ -2182,7 +2182,8 @@ country_event = {
 		add_stability = 0.1
 		add_war_support = -0.5
 		hidden_effect = {
-			AUS = { country_event = { days = 28 id = sevenweekswar.73 } }
+			# [v54] Austria chooses its peace philosophy first; v54_aus.20 then fires sevenweekswar.73
+			AUS = { country_event = { days = 28 id = v54_aus.20 } }
 			BAD = { complete_national_focus = BAD_focus_austrian_victory }
 		}
 	}
@@ -2473,7 +2474,8 @@ country_event = {
 		eoanb_change_prestige_score = yes
 		hidden_effect = {
 			AUS = { set_variable = { rival_country = OTO.id } }
-			AUS = { country_event = { days = 30 id = austria.401 } }
+			# [v54] Ausgleich, centralist reaction or federal reform: v54_aus.1 (its historical option fires austria.401)
+			AUS = { country_event = { days = 30 id = v54_aus.1 } }
 		}
 	}
 }
@@ -2490,6 +2492,13 @@ country_event = {
 	
 	option = {
 		name = sevenweekswar.73.a
+		# [v54] upstream terms apply to the harsh settlement, or when no v54 choice was made
+		trigger = {
+			OR = {
+				has_country_flag = v54_aus_1866_harsh_terms
+				NOT = { has_country_flag = v54_aus_1866_choice_made }
+			}
+		}
 		ai_chance = { base = 100 }
 		custom_effect_tooltip = AUS_breslau_peace_treaty_effect_tt
 		set_temp_variable = {
@@ -2563,6 +2572,59 @@ country_event = {
 			}
 			AUS = { set_country_flag = AUS_flag_won_sww }
 			PRS = { country_event = { id = sevenweekswar.74 } }
+			ITA = { country_event = { days = 41 id = sevenweekswar.85 } }
+			AUS = { clr_country_flag = AUS_FRA_convention_1866_signed }
+		}
+	}
+	# [v54] moderate settlement: no Silesian transfer; the duchies are restored (same block as upstream)
+	option = {
+		name = v54_sww73_moderate_terms
+		trigger = {
+			has_country_flag = v54_aus_1866_choice_made
+			NOT = { has_country_flag = v54_aus_1866_harsh_terms }
+		}
+		ai_chance = { base = 100 }
+		custom_effect_tooltip = v54_sww73_moderate_terms_tt
+		set_temp_variable = {
+			eoanb_prestige_change = 25
+		}
+		eoanb_change_prestige_score = yes
+		hidden_effect = {
+			if = {
+				limit = {
+					SCH = { exists = no }
+					PRS = {
+						owns_state = 58
+						owns_state = 949
+						owns_state = 1032
+					}
+				}
+				SCH = {
+					transfer_state = 58
+					transfer_state = 949
+					transfer_state = 1032
+					give_military_access = AUS
+					load_oob = "SCH_free_GC_member"
+					set_politics = { ruling_party = autocracy }
+					set_party_name = { ideology = autocracy name = SCH_autocracy_party_augustenburg }
+					SCH_friedrich_von_augustenburg = {
+						add_country_leader_role = {
+							promote_leader = yes
+							country_leader = {
+								expire = "1950.1.1"
+								desc = "POLITICS_GENERIC_EOANB_DESC"
+								ideology = constit_monarch
+								traits = {
+									#
+								}
+							}
+						}
+					}
+					country_event = { days = 14 id = secschwar.54 }
+				}
+			}
+			AUS = { set_country_flag = AUS_flag_won_sww }
+			PRS = { country_event = { id = v54_aus.25 } }
 			ITA = { country_event = { days = 41 id = sevenweekswar.85 } }
 			AUS = { clr_country_flag = AUS_FRA_convention_1866_signed }
 		}

@@ -19,7 +19,12 @@ Columns: country, focus, event, decision, idea, historical trigger, alternate tr
 | Danish war: Britain | ENG | N | Y (`.200`) | - | - | London conference | pressure / neutral | Y | Y | N | |
 | 1866 reactions | FRA, PRS, ENG | N | Y (`.300,.310,.311,.320`) | - | - | Prussian victory | Austrian victory | Y | Y | N | |
 | 1870 reactions | PRS, FRA, ENG | N | Y (`.600,.601,.620`) | - | - | German victory (ENG) | French victory | Y | Y | N | |
-| Austrian tree (extend/re-gate) | AUS | N | N | N | N | - | - | N | N | N | Phase C |
+| Austria: Crimean/Concordat gating | AUS | Y (2 upstream focuses re-gated) | Y (54_aus.40) | - | Y (upstream) | sign Concordat 1855 | refuse | Y | Y | N | |
+| Austria: position in 1859/1866 | AUS | - | Y (.10, .11) | - | Y (3 spirits) | armed neutrality (isolated) | pro-Russia / joined West | Y | - | N | |
+| Austria: defeat 1866 choice | AUS | - | Y (54_aus.1, .3) | Y (4 federal) | Y (3) | Ausgleich | centralist / federal | Y | Y | N | upstream Ausgleich chain intact |
+| Austria: victory 1866 settlement | AUS, PRS | - | Y (.20-.25, option in sevenweekswar.73) | Y (3 + 7 bind) | Y (3) | - (counterfactual) | 4 philosophies | Y | Y | N | |
+| Austria: Danubian turn | AUS | - | Y (.30) | - | Y | Danubian strategy | return to Germany | Y | Y | N | |
+| Austria: 1870-1900 | AUS | Y (upstream, large) | Y (upstream) | Y (upstream) | Y | upstream | upstream | Y | Y (upstream plan) | N | not changed in Phase C |
 | Prussian tree | PRS | N | N | N | N | - | - | N | N | N | Phase D |
 | French tree | FRA | N | N | N | N | - | - | N | N | N | Phase E |
 | British tree | ENG | N | N | N | N | - | - | N | N | N | Phase F |

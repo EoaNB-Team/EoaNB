@@ -16,13 +16,15 @@ Status keys: **IMPLEMENTED** (in this repository, project or upstream, not yet p
 | 1860 | Savoy and Nice; Garibaldi | IMPLEMENTED upstream | `risorgimento.132-200` |
 | 1860 | Anglo-French free trade | FUTURE (France/Britain trees) | - |
 | 1861-1867 | Mexican intervention | IMPLEMENTED upstream (events), to audit | `expedition_mexico_events.txt` |
-| 1860-61 | October Diploma, February Patent | FUTURE (Austria, Phase C) | - |
+| 1855-08 | Concordat | IMPLEMENTED | `v54_aus.40` |
+| 1860-61 | October Diploma, February Patent | IMPLEMENTED upstream | `austria.302-326`, Reichsrat focuses |
 | 1861-1862 | Prussian army reform, constitutional conflict, Bismarck | PARTIALLY (upstream Prussian tree and events) | `prussia_focus.txt` |
 | 1864 | Second Schleswig War | IMPLEMENTED upstream; bridged; Britain event | `secschwar.*`, `v54_eur.200` |
 | 1865 | Convention of Gastein | IMPLEMENTED upstream; bridge sets flag at war end | `v54_gastein_completed` |
 | 1866 | Austro-Prussian War | IMPLEMENTED upstream; bridged; reactions | `sevenweekswar.*`, `v54_eur.300/310/311/320` |
 | 1866 | North German Confederation | IMPLEMENTED upstream (cosmetic tag); bridged | `GER_north_confederation` |
-| 1867 | Ausgleich; Austria-Hungary | IMPLEMENTED upstream; bridged | `austria_hungary_events.txt`, `AUS_HUN_dual` |
+| 1867 | Ausgleich; Austria-Hungary | IMPLEMENTED upstream; bridged; choice added | `austria.401-405`, `v54_aus.1`, `AUS_HUN_dual` |
+| 1867+ | Austria turns to the Danube | IMPLEMENTED | `v54_aus.30` |
 | 1867 | Luxembourg crisis | IMPLEMENTED upstream; partly bridged | `lux_crisis.*` |
 | 1868-70 | Spanish succession, Ems | IMPLEMENTED upstream; not bridged | `fraprswar.1-19` |
 | 1870 | Franco-Prussian War | IMPLEMENTED upstream; bridged; reactions | `fraprswar.*`, `v54_eur.600/601/620` |

@@ -1,0 +1,46 @@
+# Victorian 1854-1900 project: Austria. Scope: AUS unless stated.
+# Mechanic notes: HUN/CZE/CRO/POL_REVOLT_RISK are the upstream "multinational empire" variables (0-1 on Austria).
+
+# Austria's position at the start of a war depends on its stance in the Crimean crisis
+# (flags set by event v54_eur.10). Historical stance: armed neutrality = isolation.
+v54_aus_apply_diplomatic_position = {
+	if = {
+		limit = { has_country_flag = v54_aus_crimea_armed_neutrality }
+		add_timed_idea = { idea = v54_idea_aus_isolated days = 730 }
+	}
+	else_if = {
+		limit = { has_country_flag = v54_aus_crimea_pro_russia }
+		add_timed_idea = { idea = v54_idea_aus_friend_of_russia days = 730 }
+	}
+	else_if = {
+		limit = { has_country_flag = v54_aus_crimea_joined_west }
+		add_timed_idea = { idea = v54_idea_aus_western_sympathy days = 730 }
+	}
+}
+
+# Opinion of the German Confederation members (except Austria and Prussia) toward Austria.
+# Usage: v54_aus_german_opinions = { MOD = v54_om_vienna_settlement_fair }
+v54_aus_german_opinions = {
+	every_country = {
+		limit = {
+			is_part_of_the_german_confederation = yes
+			NOT = { original_tag = AUS }
+			NOT = { original_tag = PRS }
+		}
+		add_opinion_modifier = { target = AUS modifier = $MOD$ }
+		reverse_add_opinion_modifier = { target = AUS modifier = $MOD$ }
+	}
+}
+
+# Adds (or subtracts) nationality risk on Austria and keeps the variables in 0-1.
+# Usage: v54_aus_change_risk = { HUN = 0.1 CZE = 0 CRO = 0 POL = 0 }
+v54_aus_change_risk = {
+	add_to_variable = { HUN_REVOLT_RISK = $HUN$ }
+	add_to_variable = { CZE_REVOLT_RISK = $CZE$ }
+	add_to_variable = { CRO_REVOLT_RISK = $CRO$ }
+	add_to_variable = { POL_REVOLT_RISK = $POL$ }
+	clamp_variable = { var = HUN_REVOLT_RISK min = 0 max = 1 }
+	clamp_variable = { var = CZE_REVOLT_RISK min = 0 max = 1 }
+	clamp_variable = { var = CRO_REVOLT_RISK min = 0 max = 1 }
+	clamp_variable = { var = POL_REVOLT_RISK min = 0 max = 1 }
+}

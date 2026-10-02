@@ -1,0 +1,326 @@
+add_namespace = v54_aus
+
+# =====================================================================================
+# Austria. See docs/EVENT_NAMESPACE_REGISTRY.md.
+# 1-9 after the defeat of 1866; 10-19 diplomatic position in 1859/1866; 20-29 Austrian victory in 1866;
+# 30-39 later strategy. Upstream chains used: austria.401-405 (Ausgleich), sevenweekswar.73 (peace terms).
+# =====================================================================================
+
+# 1 - After Koniggratz: Ausgleich, centralist reaction or federal reform (fired from sevenweekswar.72)
+country_event = {
+	id = v54_aus.1
+	title = v54_aus.1.t
+	desc = v54_aus.1.d
+	picture = GFX_report_event_budapest_1
+	is_triggered_only = yes
+
+	trigger = { original_tag = AUS }
+
+	option = {
+		name = v54_aus.1.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_aus_ausgleich_path
+		country_event = { id = austria.401 days = 1 }
+	}
+	option = {
+		name = v54_aus.1.b
+		ai_chance = { base = 4 }
+		set_country_flag = v54_aus_centralist_reaction
+		add_ideas = v54_idea_aus_centralist_reaction
+		v54_aus_change_risk = { HUN = 0.3 CZE = 0.05 CRO = 0 POL = 0 }
+		add_political_power = 50
+		add_stability = -0.03
+	}
+	option = {
+		name = v54_aus.1.c
+		ai_chance = { base = 3 }
+		set_country_flag = v54_aus_federal_reform
+		add_ideas = v54_idea_aus_federal_reform_underway
+		set_variable = { v54_aus_federal_progress = 0 }
+		v54_aus_change_risk = { HUN = 0.1 CZE = 0 CRO = 0 POL = 0 }
+		add_political_power = 25
+	}
+}
+
+# 3 - The federal constitution is proclaimed (end of the federal decision chain)
+country_event = {
+	id = v54_aus.3
+	title = v54_aus.3.t
+	desc = v54_aus.3.d
+	picture = GFX_report_event_franz_joseph_coronation
+	is_triggered_only = yes
+
+	trigger = { original_tag = AUS }
+
+	immediate = {
+		remove_ideas = v54_idea_aus_federal_reform_underway
+		add_ideas = v54_idea_aus_federal_empire
+		set_global_flag = v54_aus_federal_empire_established
+		v54_aus_change_risk = { HUN = -0.2 CZE = -0.15 CRO = -0.1 POL = -0.1 }
+	}
+
+	option = {
+		name = v54_aus.3.a
+		add_stability = 0.05
+		add_to_variable = { prestige_score = 10 }
+	}
+}
+
+# 10 - Austria's position at the outbreak of the war of 1859 (depends on its Crimean stance)
+country_event = {
+	id = v54_aus.10
+	title = v54_aus.10.t
+	desc = {
+		text = v54_aus.10.d.isolated
+		trigger = { has_country_flag = v54_aus_crimea_armed_neutrality }
+	}
+	desc = {
+		text = v54_aus.10.d.russian
+		trigger = { has_country_flag = v54_aus_crimea_pro_russia }
+	}
+	desc = {
+		text = v54_aus.10.d.western
+		trigger = { has_country_flag = v54_aus_crimea_joined_west }
+	}
+	picture = GFX_report_event_vienna_1
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = AUS
+		OR = {
+			has_country_flag = v54_aus_crimea_armed_neutrality
+			has_country_flag = v54_aus_crimea_pro_russia
+			has_country_flag = v54_aus_crimea_joined_west
+		}
+	}
+
+	option = {
+		name = v54_aus.10.a
+		v54_aus_apply_diplomatic_position = yes
+	}
+}
+
+# 11 - Austria's position at the outbreak of the war of 1866
+country_event = {
+	id = v54_aus.11
+	title = v54_aus.11.t
+	desc = {
+		text = v54_aus.11.d.isolated
+		trigger = { has_country_flag = v54_aus_crimea_armed_neutrality }
+	}
+	desc = {
+		text = v54_aus.11.d.russian
+		trigger = { has_country_flag = v54_aus_crimea_pro_russia }
+	}
+	desc = {
+		text = v54_aus.11.d.western
+		trigger = { has_country_flag = v54_aus_crimea_joined_west }
+	}
+	picture = GFX_report_event_battle_of_koniggratz
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = AUS
+		OR = {
+			has_country_flag = v54_aus_crimea_armed_neutrality
+			has_country_flag = v54_aus_crimea_pro_russia
+			has_country_flag = v54_aus_crimea_joined_west
+		}
+	}
+
+	option = {
+		name = v54_aus.11.a
+		v54_aus_apply_diplomatic_position = yes
+	}
+}
+
+# 20 - Austrian victory in 1866: the settlement of the German question (fired from sevenweekswar.63)
+country_event = {
+	id = v54_aus.20
+	title = v54_aus.20.t
+	desc = v54_aus.20.d
+	picture = GFX_report_event_battle_of_koniggratz
+	is_triggered_only = yes
+
+	trigger = { original_tag = AUS }
+
+	option = {
+		name = v54_aus.20.a
+		ai_chance = { base = 10 }
+		set_country_flag = v54_aus_1866_choice_made
+		set_country_flag = v54_aus_1866_moderate
+		v54_aus_german_opinions = { MOD = v54_om_vienna_settlement_fair }
+		add_stability = 0.03
+		add_to_variable = { prestige_score = 10 }
+		country_event = { id = sevenweekswar.73 days = 1 }
+	}
+	option = {
+		name = v54_aus.20.b
+		ai_chance = { base = 6 }
+		set_country_flag = v54_aus_1866_choice_made
+		set_country_flag = v54_aus_1866_german_federal_reform
+		set_variable = { v54_gc_reform_progress = 0 }
+		v54_aus_german_opinions = { MOD = v54_om_vienna_settlement_fair }
+		add_political_power = 50
+		country_event = { id = sevenweekswar.73 days = 1 }
+	}
+	option = {
+		name = v54_aus.20.c
+		ai_chance = { base = 5 }
+		set_country_flag = v54_aus_1866_choice_made
+		set_country_flag = v54_aus_1866_hegemony
+		set_variable = { v54_aus_bound_count = 0 }
+		v54_aus_german_opinions = { MOD = v54_om_habsburg_leadership }
+		add_political_power = 50
+		country_event = { id = sevenweekswar.73 days = 1 }
+	}
+	option = {
+		name = v54_aus.20.e
+		ai_chance = { base = 8 }
+		set_country_flag = v54_aus_1866_choice_made
+		set_country_flag = v54_aus_1866_harsh_terms
+		add_to_variable = { prestige_score = 5 }
+		if = {
+			limit = { country_exists = PRS }
+			PRS = { add_ideas = v54_idea_pru_humiliation }
+			add_opinion_modifier = { target = PRS modifier = v54_om_vienna_settlement_harsh }
+			reverse_add_opinion_modifier = { target = PRS modifier = v54_om_vienna_settlement_harsh }
+		}
+		country_event = { id = sevenweekswar.73 days = 1 }
+	}
+}
+
+# 21 - A Habsburg-led confederation takes shape (three German states bound to Vienna)
+country_event = {
+	id = v54_aus.21
+	title = v54_aus.21.t
+	desc = v54_aus.21.d
+	picture = GFX_report_event_vienna_1
+	is_triggered_only = yes
+
+	trigger = { original_tag = AUS }
+
+	immediate = {
+		add_ideas = v54_idea_aus_german_hegemony
+		set_global_flag = v54_aus_german_hegemony_established
+	}
+
+	option = {
+		name = v54_aus.21.a
+		add_to_variable = { prestige_score = 15 }
+	}
+}
+
+# 22 - The Federal Act: the German Confederation is reformed
+country_event = {
+	id = v54_aus.22
+	title = v54_aus.22.t
+	desc = v54_aus.22.d
+	picture = GFX_report_event_vienna_1
+	is_triggered_only = yes
+
+	trigger = { original_tag = AUS }
+
+	immediate = {
+		add_ideas = v54_idea_aus_german_federal_reform
+		set_global_flag = v54_german_federal_reform_done
+		v54_aus_german_opinions = { MOD = v54_om_habsburg_leadership }
+	}
+
+	option = {
+		name = v54_aus.22.a
+		add_to_variable = { prestige_score = 15 }
+	}
+}
+
+# 25 - Prussia: a moderate peace (fired from the moderate option of sevenweekswar.73)
+country_event = {
+	id = v54_aus.25
+	title = v54_aus.25.t
+	desc = v54_aus.25.d
+	picture = GFX_report_event_battle_of_koniggratz
+	is_triggered_only = yes
+
+	trigger = { original_tag = PRS }
+
+	option = {
+		name = v54_aus.25.a
+		set_temp_variable = {
+			eoanb_prestige_change = -25
+		}
+		eoanb_change_prestige_score = yes
+	}
+}
+
+# 30 - After the Ausgleich: Germany or the Danube?
+country_event = {
+	id = v54_aus.30
+	title = v54_aus.30.t
+	desc = v54_aus.30.d
+	picture = GFX_report_event_vienna_1
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = AUS
+		NOT = { has_country_flag = v54_aus_danubian_decided }
+	}
+
+	option = {
+		name = v54_aus.30.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_aus_danubian_decided
+		set_country_flag = v54_aus_danubian_strategy
+		add_ideas = v54_idea_aus_danubian_strategy
+	}
+	option = {
+		name = v54_aus.30.b
+		ai_chance = { base = 4 }
+		set_country_flag = v54_aus_danubian_decided
+		set_country_flag = v54_aus_german_revanche
+		add_war_support = 0.05
+	}
+}
+
+# 40 - The Concordat of 1855 (dated event, state-controlled by flags)
+country_event = {
+	id = v54_aus.40
+	title = v54_aus.40.t
+	desc = v54_aus.40.d
+	picture = GFX_report_event_franz_joseph_coronation
+
+	fire_only_once = yes
+
+	trigger = {
+		original_tag = AUS
+		date > 1855.8.1
+		NOT = { has_country_flag = v54_aus_concordat_decided }
+	}
+
+	mean_time_to_happen = {
+		days = 15
+	}
+
+	option = {
+		name = v54_aus.40.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_aus_concordat_decided
+		add_ideas = AUS_idea_concordat_of_1855_1
+	}
+	option = {
+		name = v54_aus.40.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_aus_concordat_decided
+		set_country_flag = v54_aus_no_concordat
+		add_stability = 0.02
+		add_political_power = -25
+	}
+}

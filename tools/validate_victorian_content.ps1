@@ -112,7 +112,7 @@ foreach ($f in $projectFiles | Where-Object { $_.Extension -eq '.txt' }) {
         foreach ($line in ($t -split "`r?`n")) {
             if ($line -match '^\s*(v54_[a-z0-9_]+)\s*=\s*\{') {
                 $id = $Matches[1]
-                if ($f.FullName -match 'opinion_modifiers' -or $d -ge 0) { if (-not $localKeys.ContainsKey($id)) { Err "LOC      $($f.Name): missing localisation key for id '$id'" } }
+                if (-not $definedEffects.ContainsKey($id) -and -not $definedTriggers.ContainsKey($id)) { if (-not $localKeys.ContainsKey($id)) { Err "LOC      $($f.Name): missing localisation key for id '$id'" } }
             }
             $d += ([regex]::Matches($line, '\{')).Count - ([regex]::Matches($line, '\}')).Count
         }

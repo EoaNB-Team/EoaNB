@@ -82,3 +82,21 @@ All are **country flags** set by the events in `events/v54_shared_europe_events.
 | `v54_pru_after_1870_revanche` / `_consolidate` / `_liberal_germany` | PRS | 600 | After a French victory in 1870 |
 | `v54_fra_imperial_triumph_dynasty` / `_liberal` / `_containment` | FRA | 601 | After a French victory in 1870 |
 | `v54_gbr_belgium_guarantee` / `v54_gbr_franco_prussian_mediation` / `_pressure` | ENG | 620 | Britain in the 1870 war |
+
+## Austria (Phase C)
+
+Country flags on **AUS** unless stated. Variables are on AUS.
+
+| Flag / variable | Set by | Meaning |
+|---|---|---|
+| `v54_aus_concordat_decided`, `v54_aus_no_concordat` | event `v54_aus.40` | Concordat of 1855 decided / refused |
+| `v54_aus_ausgleich_path` | `v54_aus.1` a | Historical Ausgleich (upstream chain started) |
+| `v54_aus_centralist_reaction` | `v54_aus.1` b | Hungarian demands rejected |
+| `v54_aus_federal_reform`, `v54_aus_fed_step1`..`step3`, `v54_aus_federal_done`; variable `v54_aus_federal_progress` | `v54_aus.1` c and the decisions `v54_aus_fed_1..4` | Federal reform of the Empire |
+| global `v54_aus_federal_empire_established` | `v54_aus.3` | Federal constitution proclaimed |
+| `v54_aus_1866_choice_made`, `v54_aus_1866_moderate`, `v54_aus_1866_german_federal_reform`, `v54_aus_1866_hegemony`, `v54_aus_1866_harsh_terms` | `v54_aus.20` | Settlement philosophy after an Austrian victory (read by `sevenweekswar.73`) |
+| variable `v54_gc_reform_progress`, flags `v54_aus_gc_step1/2` | decisions `v54_aus_gc_1..3` | Federal reform of the Confederation |
+| global `v54_german_federal_reform_done` | `v54_aus.22` | Federal Act adopted |
+| variable `v54_aus_bound_count`, flags `v54_aus_bound_BAV/WUR/SAX/HAN/BAD/HSD/HES`, `v54_aus_hegemony_done` | decisions `v54_aus_bind_*` | German states bound to Vienna (as `autonomy_confederation_member` puppets) |
+| global `v54_aus_german_hegemony_established` | `v54_aus.21` | Three or more states bound |
+| `v54_aus_danubian_decided`, `v54_aus_danubian_strategy`, `v54_aus_german_revanche` | `v54_aus.30` | Eastern turn after the Ausgleich |

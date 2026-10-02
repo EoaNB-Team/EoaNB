@@ -5,7 +5,7 @@ All project namespaces use the prefix `v54_`. None of them exists in EoaNB (chec
 | Namespace | File (planned) | ID range | Purpose | Status |
 |---|---|---|---|---|
 | `v54_eur` | `events/v54_shared_europe_events.txt` | 1-999 | Shared crises: Crimea, Italy, Denmark, 1866, Luxembourg, Ems, 1870 | reserved |
-| `v54_aus` | `events/v54_austria_events.txt` | 1-999 | Austria | reserved |
+| `v54_aus` | `events/v54_austria_events.txt` | 1-999 | Austria | **in use**: 1, 3, 10, 11, 20, 21, 22, 25, 30, 40 |
 | `v54_pru` | `events/v54_prussia_events.txt` | 1-999 | Prussia / Germany | reserved |
 | `v54_fra` | `events/v54_france_events.txt` | 1-999 | France | reserved |
 | `v54_gbr` | `events/v54_britain_events.txt` | 1-999 | Britain | reserved |

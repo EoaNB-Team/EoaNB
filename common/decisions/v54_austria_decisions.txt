@@ -1,0 +1,345 @@
+# Victorian 1854-1900 project: Austrian decisions (federal Empire, German settlement after 1866).
+# Progress variables live on Austria: v54_aus_federal_progress, v54_gc_reform_progress, v54_aus_bound_count.
+
+v54_decisions_category_aus_federal_empire = {
+	v54_aus_fed_1 = {
+		icon = generic_political_actions
+		cost = 50
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_federal_reform }
+		complete_effect = {
+			set_country_flag = v54_aus_fed_step1
+			add_to_variable = { v54_aus_federal_progress = 25 }
+			add_stability = -0.01
+		}
+		ai_will_do = { base = 20 }
+	}
+	v54_aus_fed_2 = {
+		icon = generic_political_actions
+		cost = 75
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_federal_reform }
+		available = { has_country_flag = v54_aus_fed_step1 }
+		complete_effect = {
+			set_country_flag = v54_aus_fed_step2
+			add_to_variable = { v54_aus_federal_progress = 25 }
+			v54_aus_change_risk = { HUN = -0.05 CZE = 0 CRO = 0 POL = 0 }
+		}
+		ai_will_do = { base = 20 }
+	}
+	v54_aus_fed_3 = {
+		icon = generic_political_actions
+		cost = 75
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_federal_reform }
+		available = { has_country_flag = v54_aus_fed_step2 }
+		complete_effect = {
+			set_country_flag = v54_aus_fed_step3
+			add_to_variable = { v54_aus_federal_progress = 25 }
+			v54_aus_change_risk = { HUN = 0 CZE = -0.05 CRO = 0 POL = 0 }
+		}
+		ai_will_do = { base = 20 }
+	}
+	v54_aus_fed_4 = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_federal_reform }
+		available = {
+			has_country_flag = v54_aus_fed_step3
+			custom_trigger_tooltip = {
+				tooltip = v54_aus_fed_progress_tt
+				check_variable = { var = v54_aus_federal_progress value = 75 compare = greater_than_or_equals }
+			}
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_federal_done
+			country_event = { id = v54_aus.3 days = 3 }
+		}
+		ai_will_do = { base = 20 }
+	}
+}
+
+v54_decisions_category_aus_german_settlement = {
+
+	# Path: federal reform of the German Confederation
+	v54_aus_gc_1 = {
+		icon = generic_political_actions
+		cost = 50
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_1866_german_federal_reform }
+		complete_effect = {
+			set_country_flag = v54_aus_gc_step1
+			add_to_variable = { v54_gc_reform_progress = 30 }
+			v54_aus_german_opinions = { MOD = v54_om_habsburg_leadership }
+		}
+		ai_will_do = { base = 20 }
+	}
+	v54_aus_gc_2 = {
+		icon = generic_political_actions
+		cost = 75
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_1866_german_federal_reform }
+		available = { has_country_flag = v54_aus_gc_step1 }
+		complete_effect = {
+			set_country_flag = v54_aus_gc_step2
+			add_to_variable = { v54_gc_reform_progress = 35 }
+		}
+		ai_will_do = { base = 20 }
+	}
+	v54_aus_gc_3 = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = { has_country_flag = v54_aus_1866_german_federal_reform }
+		available = {
+			has_country_flag = v54_aus_gc_step2
+			custom_trigger_tooltip = {
+				tooltip = v54_aus_gc_progress_tt
+				check_variable = { var = v54_gc_reform_progress value = 65 compare = greater_than_or_equals }
+			}
+		}
+		complete_effect = {
+			country_event = { id = v54_aus.22 days = 3 }
+		}
+		ai_will_do = { base = 20 }
+	}
+
+	v54_aus_bind_BAV = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = BAV
+		}
+		available = {
+			BAV = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = BAV }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_BAV
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = BAV
+			set_autonomy = {
+				target = BAV
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_WUR = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = WUR
+		}
+		available = {
+			WUR = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = WUR }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_WUR
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = WUR
+			set_autonomy = {
+				target = WUR
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_SAX = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = SAX
+		}
+		available = {
+			SAX = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = SAX }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_SAX
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = SAX
+			set_autonomy = {
+				target = SAX
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_HAN = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = HAN
+		}
+		available = {
+			HAN = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = HAN }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_HAN
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = HAN
+			set_autonomy = {
+				target = HAN
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_BAD = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = BAD
+		}
+		available = {
+			BAD = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = BAD }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_BAD
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = BAD
+			set_autonomy = {
+				target = BAD
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_HSD = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = HSD
+		}
+		available = {
+			HSD = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = HSD }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_HSD
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = HSD
+			set_autonomy = {
+				target = HSD
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}
+	v54_aus_bind_HES = {
+		icon = generic_political_actions
+		cost = 100
+		fire_only_once = yes
+		visible = {
+			has_country_flag = v54_aus_1866_hegemony
+			country_exists = HES
+		}
+		available = {
+			HES = {
+				is_subject = no
+				has_opinion = { target = AUS value > 20 }
+			}
+			NOT = { has_war_with = HES }
+		}
+		complete_effect = {
+			set_country_flag = v54_aus_bound_HES
+			add_to_variable = { v54_aus_bound_count = 1 }
+			puppet = HES
+			set_autonomy = {
+				target = HES
+				autonomy_state = autonomy_confederation_member
+			}
+			if = {
+				limit = {
+					check_variable = { var = v54_aus_bound_count value = 3 compare = greater_than_or_equals }
+					NOT = { has_country_flag = v54_aus_hegemony_done }
+				}
+				set_country_flag = v54_aus_hegemony_done
+				country_event = { id = v54_aus.21 days = 5 }
+			}
+		}
+		ai_will_do = { base = 10 }
+	}}

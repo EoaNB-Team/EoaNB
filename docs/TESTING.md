@@ -52,3 +52,15 @@ Use the console (`~`). `tag XXX` switches the controlled country in debug mode; 
 6. **Pontic clauses**: needs `v54_idea_black_sea_neutralised` on Russia and a date after 1 October 1870; use `date` and test `v54_eur.35`.
 
 Expected noise: errors that already exist in the upstream baseline (`local_supplies` in state 974, Faidherbe-type token errors, duplicate textures) are not caused by this project.
+
+## 6. Phase C test script (Austria)
+
+1. **Concordat**: advance past 1 August 1855 as Austria; `v54_aus.40` should fire within about 15 days. Signing adds `AUS_idea_concordat_of_1855_1`; the focus "Ramifications of the Concordat" becomes available only after the decision.
+2. **Crimean aftermath focus**: "Aftermath of the Crimean War" must be unavailable while the Crimean War is active and available once it has ended (`effect set_global_flag = v54_crimean_war_ended`, `effect clr_global_flag = v54_crimean_war_active`).
+3. **Diplomatic position**: `tag AUS`, `effect set_country_flag = v54_aus_crimea_armed_neutrality`, then `event v54_aus.10`: the text should be the "stands alone" variant and a timed spirit should appear. Repeat with `_pro_russia` / `_joined_west`.
+4. **Defeat 1866**: `event v54_aus.1`. Option a should fire `austria.401` the next day (Ausgleich chain intact). Option b adds the spirit and raises `HUN_REVOLT_RISK` by 0.30. Option c adds the federal spirit and the category "A Federal Empire": take the four decisions in order (50, 75, 75, 100 political power); the last one needs 75 progress and ends with `v54_aus.3`.
+5. **Victory 1866**: `event v54_aus.20`, pick each option. Each fires `sevenweekswar.73` one day later; with option a, b or c the Silesian states stay Prussian and only the duchies (SCH) are restored; with option e (harsh) the upstream transfers apply and Prussia gets `v54_idea_pru_humiliation`. Check that the 1866 flags `AUS_flag_won_sww` appear after the treaty and that no `sevenweekswar.73` option is missing (the event must always offer one option).
+6. **Hegemony decisions**: after option c, the decisions `Bind ... to Vienna` need an opinion above 20 and 100 political power; the third one fires `v54_aus.21`. The bound state must become a subject (`autonomy_confederation_member`); report any autonomy error in `error.log`.
+7. **Danubian turn**: after the Ausgleich (flag `v54_austria_hungary_established`), `v54_aus.30` fires about 60 days later.
+
+The decisions and events were written against the game's documented effects and triggers; the risk areas to watch in `error.log` are `puppet` plus `set_autonomy` on an independent state, and `add_timed_idea` when the idea is already present.
