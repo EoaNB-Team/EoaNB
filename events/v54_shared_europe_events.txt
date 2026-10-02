@@ -1,0 +1,507 @@
+add_namespace = v54_eur
+
+# =====================================================================================
+# Shared European crises. See docs/EVENT_NAMESPACE_REGISTRY.md (v54_eur ranges).
+# 1-99: Crimean War.   Historical options carry $V54_HISTORICAL_MARK$ in their text.
+# =====================================================================================
+
+# 1 - Hidden: the Russo-Turkish war is under way on 1 January 1854 (scope: Russia)
+country_event = {
+	id = v54_eur.1
+	hidden = yes
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = RUS
+		v54_scenario_active = yes
+		NOT = { has_global_flag = v54_crimean_war_active }
+		NOT = { has_global_flag = v54_crimean_war_ended }
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				country_exists = OTO
+				NOT = { has_war_with = OTO }
+			}
+			declare_war_on = {
+				target = OTO
+				type = v54_wargoal_eastern_question
+			}
+			activate_mission = v54_mission_crimean_peace
+			v54_set_crimean_war_started = yes
+			if = {
+				limit = { country_exists = AUS }
+				AUS = { country_event = { id = v54_eur.10 days = 20 } }
+			}
+			if = {
+				limit = { country_exists = PRS }
+				PRS = { country_event = { id = v54_eur.15 days = 30 } }
+			}
+			if = {
+				limit = { country_exists = ENG }
+				ENG = { country_event = { id = v54_eur.2 days = 60 } }
+			}
+			if = {
+				limit = { country_exists = FRA }
+				FRA = { country_event = { id = v54_eur.3 days = 63 } }
+			}
+			if = {
+				limit = { country_exists = PIE }
+				PIE = { country_event = { id = v54_eur.20 days = 330 } }
+			}
+		}
+	}
+
+	option = {
+		name = v54_eur.1.a
+	}
+}
+
+# 2 - Britain: the Eastern ultimatum
+country_event = {
+	id = v54_eur.2
+	title = v54_eur.2.t
+	desc = v54_eur.2.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = ENG
+		v54_crimean_war_ongoing = yes
+		NOT = { has_war_with = RUS }
+		NOT = { has_country_flag = v54_crimea_decided }
+	}
+
+	option = {
+		name = v54_eur.2.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_crimea_decided
+		v54_crimean_join_war = yes
+		add_war_support = 0.05
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						original_tag = OTO
+						original_tag = RUS
+						original_tag = FRA
+						original_tag = AUS
+						original_tag = PRS
+					}
+				}
+				country_event = { id = v54_eur.5 }
+			}
+		}
+	}
+	option = {
+		name = v54_eur.2.b
+		ai_chance = { base = 12 }
+		set_country_flag = v54_crimea_mediation
+		country_event = { id = v54_eur.4 days = 120 }
+	}
+	option = {
+		name = v54_eur.2.c
+		ai_chance = { base = 4 }
+		set_country_flag = v54_crimea_decided
+		add_war_support = -0.05
+	}
+	option = {
+		name = v54_eur.2.e
+		ai_chance = { base = 2 }
+		set_country_flag = v54_crimea_decided
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		add_opinion_modifier = { target = OTO modifier = v54_om_crimean_disfavour }
+		reverse_add_opinion_modifier = { target = OTO modifier = v54_om_crimean_disfavour }
+	}
+}
+
+# 3 - France: the Holy Places and the Straits
+country_event = {
+	id = v54_eur.3
+	title = v54_eur.3.t
+	desc = v54_eur.3.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = FRA
+		v54_crimean_war_ongoing = yes
+		NOT = { has_war_with = RUS }
+		NOT = { has_country_flag = v54_crimea_decided }
+	}
+
+	option = {
+		name = v54_eur.3.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+			modifier = { add = 60 ENG = { has_country_flag = v54_crimea_participant } }
+		}
+		set_country_flag = v54_crimea_decided
+		v54_crimean_join_war = yes
+		add_war_support = 0.05
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						original_tag = OTO
+						original_tag = RUS
+						original_tag = ENG
+						original_tag = AUS
+						original_tag = PRS
+					}
+				}
+				country_event = { id = v54_eur.5 }
+			}
+		}
+	}
+	option = {
+		name = v54_eur.3.b
+		ai_chance = { base = 12 }
+		set_country_flag = v54_crimea_mediation
+		country_event = { id = v54_eur.4 days = 120 }
+	}
+	option = {
+		name = v54_eur.3.c
+		ai_chance = { base = 4 }
+		set_country_flag = v54_crimea_decided
+		add_war_support = -0.05
+	}
+	option = {
+		name = v54_eur.3.e
+		ai_chance = { base = 2 }
+		set_country_flag = v54_crimea_decided
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+		reverse_add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+	}
+}
+
+# 4 - Britain or France: mediation has failed
+country_event = {
+	id = v54_eur.4
+	title = v54_eur.4.t
+	desc = v54_eur.4.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		OR = {
+			original_tag = ENG
+			original_tag = FRA
+		}
+		v54_crimean_war_ongoing = yes
+		NOT = { has_war_with = RUS }
+		NOT = { has_country_flag = v54_crimea_decided }
+	}
+
+	option = {
+		name = v54_eur.4.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_crimea_decided
+		v54_crimean_join_war = yes
+		add_war_support = 0.05
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						original_tag = OTO
+						original_tag = RUS
+						original_tag = AUS
+						original_tag = PRS
+					}
+				}
+				country_event = { id = v54_eur.5 }
+			}
+		}
+	}
+	option = {
+		name = v54_eur.4.b
+		ai_chance = { base = 8 }
+		set_country_flag = v54_crimea_decided
+		add_war_support = -0.05
+	}
+}
+
+# 5 - Notification: a great power enters the war (FROM = the new belligerent)
+country_event = {
+	id = v54_eur.5
+	title = v54_eur.5.t
+	desc = v54_eur.5.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	option = {
+		name = v54_eur.5.a
+	}
+}
+
+# 10 - Austria: the Danubian Principalities
+country_event = {
+	id = v54_eur.10
+	title = v54_eur.10.t
+	desc = v54_eur.10.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = AUS
+		v54_crimean_war_ongoing = yes
+		NOT = { has_country_flag = v54_aus_crimea_decided }
+	}
+
+	option = {
+		name = v54_eur.10.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_aus_crimea_decided
+		set_country_flag = v54_aus_crimea_armed_neutrality
+		add_war_support = 0.03
+		add_to_variable = { prestige_score = 3 }
+	}
+	option = {
+		name = v54_eur.10.b
+		ai_chance = { base = 3 }
+		set_country_flag = v54_aus_crimea_decided
+		set_country_flag = v54_aus_crimea_pro_russia
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+	}
+	option = {
+		name = v54_eur.10.c
+		ai_chance = { base = 4 }
+		set_country_flag = v54_aus_crimea_decided
+		set_country_flag = v54_aus_crimea_joined_west
+		v54_crimean_join_war = yes
+		add_war_support = 0.05
+		hidden_effect = {
+			every_country = {
+				limit = {
+					OR = {
+						original_tag = OTO
+						original_tag = RUS
+						original_tag = ENG
+						original_tag = FRA
+						original_tag = PRS
+					}
+				}
+				country_event = { id = v54_eur.5 }
+			}
+		}
+	}
+	option = {
+		name = v54_eur.10.e
+		ai_chance = { base = 8 }
+		set_country_flag = v54_aus_crimea_decided
+		set_country_flag = v54_aus_crimea_mediation
+		add_political_power = 25
+	}
+}
+
+# 15 - Prussia: diplomacy in the Eastern crisis
+country_event = {
+	id = v54_eur.15
+	title = v54_eur.15.t
+	desc = v54_eur.15.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = PRS
+		v54_crimean_war_ongoing = yes
+		NOT = { has_country_flag = v54_pru_crimea_decided }
+	}
+
+	option = {
+		name = v54_eur.15.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_country_flag = v54_pru_crimea_decided
+		set_country_flag = v54_pru_crimea_neutral
+		add_political_power = 25
+	}
+	option = {
+		name = v54_eur.15.b
+		ai_chance = { base = 8 }
+		set_country_flag = v54_pru_crimea_decided
+		set_country_flag = v54_pru_crimea_pro_russia
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_sympathy }
+		add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+		reverse_add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+		add_opinion_modifier = { target = FRA modifier = v54_om_crimean_disfavour }
+		reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_disfavour }
+	}
+	option = {
+		name = v54_eur.15.c
+		ai_chance = { base = 5 }
+		set_country_flag = v54_pru_crimea_decided
+		set_country_flag = v54_pru_crimea_pro_west
+		add_opinion_modifier = { target = ENG modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = ENG modifier = v54_om_crimean_sympathy }
+		add_opinion_modifier = { target = FRA modifier = v54_om_crimean_sympathy }
+		reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_sympathy }
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_disfavour }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_disfavour }
+	}
+}
+
+# 20 - Sardinia-Piedmont: the Western invitation
+country_event = {
+	id = v54_eur.20
+	title = v54_eur.20.t
+	desc = v54_eur.20.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	trigger = {
+		original_tag = PIE
+		v54_crimean_war_ongoing = yes
+		NOT = { has_country_flag = v54_crimea_participant }
+		OR = {
+			ENG = { has_war_with = RUS }
+			FRA = { has_war_with = RUS }
+		}
+	}
+
+	option = {
+		name = v54_eur.20.a
+		ai_chance = {
+			base = 15
+			modifier = { add = 100 is_historical_focus_on = yes }
+		}
+		v54_crimean_join_war = yes
+		add_war_support = 0.05
+		if = {
+			limit = { country_exists = FRA }
+			add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+			reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+		}
+		if = {
+			limit = { country_exists = ENG }
+			add_opinion_modifier = { target = ENG modifier = v54_om_crimean_comrades_in_arms }
+			reverse_add_opinion_modifier = { target = ENG modifier = v54_om_crimean_comrades_in_arms }
+		}
+	}
+	option = {
+		name = v54_eur.20.b
+		ai_chance = { base = 10 }
+		add_political_power = 25
+	}
+}
+
+# 21 - Sardinia-Piedmont: a seat at the peace congress
+country_event = {
+	id = v54_eur.21
+	title = v54_eur.21.t
+	desc = v54_eur.21.d
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	option = {
+		name = v54_eur.21.a
+		ai_chance = {
+			base = 10
+			modifier = { add = 150 is_historical_focus_on = yes }
+		}
+		set_global_flag = v54_italian_question_raised
+		if = {
+			limit = { country_exists = AUS }
+			add_opinion_modifier = { target = AUS modifier = v54_om_crimean_disfavour }
+			reverse_add_opinion_modifier = { target = AUS modifier = v54_om_crimean_disfavour }
+		}
+		if = {
+			limit = { country_exists = FRA }
+			add_opinion_modifier = { target = FRA modifier = v54_om_crimean_sympathy }
+			reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_sympathy }
+		}
+	}
+	option = {
+		name = v54_eur.21.b
+		ai_chance = { base = 5 }
+		if = {
+			limit = { country_exists = AUS }
+			add_opinion_modifier = { target = AUS modifier = v54_om_crimean_sympathy }
+			reverse_add_opinion_modifier = { target = AUS modifier = v54_om_crimean_sympathy }
+		}
+	}
+}
+
+# 30 - The Peace of Paris (notification, outcome-dependent text)
+country_event = {
+	id = v54_eur.30
+	title = v54_eur.30.t
+	desc = {
+		text = v54_eur.30.d.allied
+		trigger = { has_global_flag = v54_crimean_outcome_allied_victory }
+	}
+	desc = {
+		text = v54_eur.30.d.russian
+		trigger = { has_global_flag = v54_crimean_outcome_russian_victory }
+	}
+	desc = {
+		text = v54_eur.30.d.negotiated
+		trigger = { has_global_flag = v54_crimean_outcome_negotiated }
+	}
+	picture = GFX_report_event_crimean_war
+	is_triggered_only = yes
+
+	option = {
+		name = v54_eur.30.a
+	}
+}
+
+# 35 - Russia: the Pontic clauses (October 1870 onwards)
+country_event = {
+	id = v54_eur.35
+	title = v54_eur.35.t
+	desc = v54_eur.35.d
+	picture = GFX_report_event_crimean_war
+
+	fire_only_once = yes
+
+	trigger = {
+		original_tag = RUS
+		has_idea = v54_idea_black_sea_neutralised
+		date > 1870.10.1
+	}
+
+	mean_time_to_happen = {
+		days = 30
+	}
+
+	option = {
+		name = v54_eur.35.a
+		ai_chance = {
+			base = 20
+			modifier = { add = 100 is_historical_focus_on = yes }
+		}
+		remove_ideas = v54_idea_black_sea_neutralised
+		if = {
+			limit = { country_exists = OTO }
+			OTO = { remove_ideas = v54_idea_black_sea_neutralised }
+		}
+		if = {
+			limit = { country_exists = ENG }
+			add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+			reverse_add_opinion_modifier = { target = ENG modifier = v54_om_crimean_disfavour }
+		}
+	}
+	option = {
+		name = v54_eur.35.b
+		ai_chance = { base = 5 }
+	}
+}

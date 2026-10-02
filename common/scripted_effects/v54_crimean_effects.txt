@@ -1,0 +1,234 @@
+# Victorian 1854-1900 project: Crimean War effects.
+# Scope notes: v54_crimean_join_war runs in the joining country. The peace effects run in RUSSIA's scope
+# (mission v54_mission_crimean_peace); ROOT is Russia there.
+
+# A Western power or Austria joins the Ottoman side of the war against Russia.
+v54_crimean_join_war = {
+	if = {
+		limit = {
+			country_exists = OTO
+			OTO = { has_war_with = RUS }
+		}
+		add_to_war = {
+			targeted_alliance = OTO
+			enemy = RUS
+			hostility_reason = asked_to_join
+		}
+		set_country_flag = v54_crimea_participant
+	}
+}
+
+# Ends the war between Russia and the Crimean belligerents only. Russia's wars in the Caucasus continue.
+v54_crimean_end_war_for_participants = {
+	every_country = {
+		limit = {
+			has_war_with = ROOT
+			OR = {
+				original_tag = OTO
+				original_tag = ENG
+				original_tag = FRA
+				original_tag = PIE
+				original_tag = AUS
+			}
+		}
+		white_peace = ROOT
+	}
+}
+
+# Collective guarantee of the Danubian Principalities (Treaty of Paris).
+v54_crimean_guarantee_principalities = {
+	every_country = {
+		limit = {
+			OR = {
+				original_tag = ENG
+				original_tag = FRA
+				original_tag = AUS
+				original_tag = PRS
+				original_tag = RUS
+				original_tag = PIE
+			}
+		}
+		if = {
+			limit = { country_exists = ROM }
+			give_guarantee = ROM
+		}
+		if = {
+			limit = { country_exists = MOL }
+			give_guarantee = MOL
+		}
+	}
+}
+
+# Austria's attitude in the crisis shapes how the other powers see it afterwards (uses the upstream
+# AUS_CRIMEAN_WAR_AFTERMATH_* modifiers). Flags are set by events v54_eur.10 on AUS.
+v54_apply_austrian_crimean_opinions = {
+	if = {
+		limit = { country_exists = AUS }
+		# Historical: armed neutrality with pressure on Russia
+		if = {
+			limit = { AUS = { has_country_flag = v54_aus_crimea_armed_neutrality } }
+			AUS = {
+				add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				reverse_add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				add_opinion_modifier = { target = PRS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+				reverse_add_opinion_modifier = { target = PRS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+				add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+				reverse_add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+				add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+				reverse_add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+				add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+				reverse_add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_GOOD }
+			}
+		}
+		# Austria joined the Western powers
+		if = {
+			limit = { AUS = { has_country_flag = v54_aus_crimea_joined_west } }
+			AUS = {
+				add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_DISASTROUS }
+				reverse_add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_DISASTROUS }
+				add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				reverse_add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				reverse_add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				reverse_add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				add_opinion_modifier = { target = PRS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+				reverse_add_opinion_modifier = { target = PRS modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+			}
+		}
+		# Austria stood by Russia
+		if = {
+			limit = { AUS = { has_country_flag = v54_aus_crimea_pro_russia } }
+			AUS = {
+				add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				reverse_add_opinion_modifier = { target = RUS modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_GOOD }
+				add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				reverse_add_opinion_modifier = { target = ENG modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				reverse_add_opinion_modifier = { target = FRA modifier = AUS_CRIMEAN_WAR_AFTERMATH_VERY_BAD }
+				add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+				reverse_add_opinion_modifier = { target = OTO modifier = AUS_CRIMEAN_WAR_AFTERMATH_BAD }
+			}
+		}
+	}
+}
+
+# Participants of the Western side and Russia see each other as former enemies.
+v54_crimean_set_war_memory = {
+	every_country = {
+		limit = {
+			has_country_flag = v54_crimea_participant
+			NOT = { original_tag = RUS }
+			NOT = { original_tag = OTO }
+		}
+		add_opinion_modifier = { target = RUS modifier = v54_om_crimean_enemy }
+		reverse_add_opinion_modifier = { target = RUS modifier = v54_om_crimean_enemy }
+		if = {
+			limit = { country_exists = OTO }
+			add_opinion_modifier = { target = OTO modifier = v54_om_crimean_comrades_in_arms }
+			reverse_add_opinion_modifier = { target = OTO modifier = v54_om_crimean_comrades_in_arms }
+		}
+	}
+	# Western powers that fought together
+	if = {
+		limit = {
+			country_exists = ENG
+			country_exists = FRA
+			ENG = { has_country_flag = v54_crimea_participant }
+			FRA = { has_country_flag = v54_crimea_participant }
+		}
+		ENG = {
+			add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+			reverse_add_opinion_modifier = { target = FRA modifier = v54_om_crimean_comrades_in_arms }
+		}
+	}
+}
+
+# --- Peace outcomes (scope: RUS) ---------------------------------------------------------------
+
+# Allied / Ottoman victory: the historical Peace of Paris.
+v54_crimean_peace_allied_victory = {
+	v54_crimean_end_war_for_participants = yes
+	v54_set_crimean_war_ended = yes
+	set_global_flag = v54_crimean_outcome_allied_victory
+	# Southern Bessarabia returns to Moldavia (state 791, verified in docs/generated_state_index.csv)
+	if = {
+		limit = {
+			country_exists = MOL
+			791 = { is_owned_by = RUS }
+		}
+		MOL = { transfer_state = 791 }
+	}
+	add_ideas = v54_idea_black_sea_neutralised
+	add_to_variable = { prestige_score = -25 }
+	if = {
+		limit = { country_exists = OTO }
+		OTO = {
+			add_ideas = v54_idea_black_sea_neutralised
+			add_ideas = OTO_idea_crimean_war_debt
+		}
+	}
+	v54_crimean_guarantee_principalities = yes
+	v54_crimean_set_war_memory = yes
+	v54_apply_austrian_crimean_opinions = yes
+	every_country = {
+		limit = {
+			has_country_flag = v54_crimea_participant
+			OR = {
+				original_tag = ENG
+				original_tag = FRA
+			}
+		}
+		add_to_variable = { prestige_score = 15 }
+	}
+	if = {
+		limit = {
+			country_exists = FRA
+			FRA = { has_country_flag = v54_crimea_participant }
+		}
+		FRA = { add_timed_idea = { idea = FRA_idea_aftermath_crimean_war days = 730 } }
+	}
+}
+
+# Ottoman defeat: Russian victory. Kars (state 1122) passes to Russia; the West is humbled.
+v54_crimean_peace_russian_victory = {
+	v54_crimean_end_war_for_participants = yes
+	v54_set_crimean_war_ended = yes
+	set_global_flag = v54_crimean_outcome_russian_victory
+	if = {
+		limit = { 1122 = { is_owned_by = OTO } }
+		transfer_state = 1122
+	}
+	add_to_variable = { prestige_score = 15 }
+	if = {
+		limit = { country_exists = OTO }
+		OTO = { add_ideas = OTO_idea_crimean_war_debt }
+	}
+	v54_crimean_guarantee_principalities = yes
+	v54_crimean_set_war_memory = yes
+	v54_apply_austrian_crimean_opinions = yes
+	every_country = {
+		limit = {
+			has_country_flag = v54_crimea_participant
+			OR = {
+				original_tag = ENG
+				original_tag = FRA
+			}
+		}
+		add_to_variable = { prestige_score = -10 }
+	}
+}
+
+# Exhaustion on both sides: status quo ante, the Principalities are evacuated and guaranteed.
+v54_crimean_peace_negotiated = {
+	v54_crimean_end_war_for_participants = yes
+	v54_set_crimean_war_ended = yes
+	set_global_flag = v54_crimean_outcome_negotiated
+	if = {
+		limit = { country_exists = OTO }
+		OTO = { add_ideas = OTO_idea_crimean_war_debt }
+	}
+	v54_crimean_guarantee_principalities = yes
+	v54_crimean_set_war_memory = yes
+	v54_apply_austrian_crimean_opinions = yes
+}

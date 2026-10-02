@@ -1,0 +1,91 @@
+# Victorian 1854-1900 project: scripted peace for the Crimean War.
+# Same pattern as the upstream ITA_Mission_AUS_PIE_Peace_Treaty_1860: a mission activated by an event whose
+# available block reads surrender progress and whose complete_effect resolves the peace by script.
+# Scope: Russia. Outcomes: Russian defeat (allied victory), Ottoman defeat (Russian victory), or
+# negotiated settlement when the mission times out.
+v54_decisions_category_crimea = {
+
+	v54_mission_crimean_peace = {
+		allowed = { always = no }
+		# not visible at game start; activated by event v54_eur.1
+		icon = generic_political_actions
+		is_good = no
+		days_mission_timeout = 850
+		activation = { always = no }
+
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = v54_mission_crimean_peace_tt
+				OR = {
+					surrender_progress > 0.35
+					OTO = {
+						OR = {
+							has_capitulated = yes
+							surrender_progress > 0.6
+						}
+					}
+				}
+			}
+		}
+
+		complete_effect = {
+			if = {
+				limit = { surrender_progress > 0.35 }
+				v54_crimean_peace_allied_victory = yes
+			}
+			else = {
+				v54_crimean_peace_russian_victory = yes
+			}
+			hidden_effect = {
+				country_event = { id = v54_eur.30 }
+				every_country = {
+					limit = {
+						OR = {
+							original_tag = ENG
+							original_tag = FRA
+							original_tag = AUS
+							original_tag = PRS
+							original_tag = OTO
+							original_tag = PIE
+						}
+					}
+					country_event = { id = v54_eur.30 }
+				}
+				if = {
+					limit = {
+						country_exists = PIE
+						PIE = { has_country_flag = v54_crimea_participant }
+					}
+					PIE = { country_event = { id = v54_eur.21 days = 3 } }
+				}
+			}
+		}
+
+		timeout_effect = {
+			v54_crimean_peace_negotiated = yes
+			hidden_effect = {
+				country_event = { id = v54_eur.30 }
+				every_country = {
+					limit = {
+						OR = {
+							original_tag = ENG
+							original_tag = FRA
+							original_tag = AUS
+							original_tag = PRS
+							original_tag = OTO
+							original_tag = PIE
+						}
+					}
+					country_event = { id = v54_eur.30 }
+				}
+				if = {
+					limit = {
+						country_exists = PIE
+						PIE = { has_country_flag = v54_crimea_participant }
+					}
+					PIE = { country_event = { id = v54_eur.21 days = 3 } }
+				}
+			}
+		}
+	}
+}

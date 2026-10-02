@@ -49,3 +49,18 @@ EoaNB already runs its own chains. Do not duplicate them; derive `v54_` state fr
 | `south_germans_participate_in_fpw_flag` | informs `v54_southern_german_states_aligned` |
 
 (Scopes of the EoaNB flags were not verified; check before wiring.)
+
+## Crimean War flags and country flags (Phase B)
+
+| Flag | Scope | Set by | Meaning |
+|---|---|---|---|
+| `v54_crimean_outcome_allied_victory` | global | `v54_crimean_peace_allied_victory` | Russia was defeated (historical Peace of Paris) |
+| `v54_crimean_outcome_russian_victory` | global | `v54_crimean_peace_russian_victory` | Ottoman Empire was defeated |
+| `v54_crimean_outcome_negotiated` | global | `v54_crimean_peace_negotiated` | Status quo settlement after the mission timed out |
+| `v54_italian_question_raised` | global | event `v54_eur.21` option a | Piedmont raised Italy at the Paris Congress |
+| `v54_crimea_decided` | country (ENG, FRA) | events `v54_eur.2`, `.3`, `.4` | The country has taken its decision |
+| `v54_crimea_mediation` | country (ENG, FRA) | events `v54_eur.2`, `.3` | The country attempted mediation first |
+| `v54_crimea_participant` | country | `v54_crimean_join_war` | The country fought on the Ottoman side |
+| `v54_aus_crimea_decided` / `_armed_neutrality` / `_pro_russia` / `_joined_west` / `_mediation` | country (AUS) | event `v54_eur.10` | Austrian attitude; `_armed_neutrality` is the historical one |
+| `v54_pru_crimea_decided` / `_neutral` / `_pro_russia` / `_pro_west` | country (PRS) | event `v54_eur.15` | Prussian attitude; `_neutral` is the historical one |
+| `v54_crimean_crisis_pending` | global | `v54_initialise` | Cleared when the war starts |

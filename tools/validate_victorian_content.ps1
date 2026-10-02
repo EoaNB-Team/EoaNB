@@ -102,9 +102,20 @@ foreach ($f in $projectFiles | Where-Object { $_.Extension -eq '.txt' }) {
         if (-not $definedEffects.ContainsKey($id) -and -not $definedTriggers.ContainsKey($id)) { Err "MISSING  $($f.Name): '$id = yes' is not a defined scripted effect/trigger" }
     }
     # 5. localisation keys used by project files
-    foreach ($m in [regex]::Matches($t, '\b(?:name|desc|title|text|history|custom_effect_tooltip|tooltip|custom_trigger_tooltip)\s*=\s*"?([A-Z][A-Z0-9_]{5,})"?')) {
+    foreach ($m in [regex]::Matches($t, '\b(?:name|desc|title|text|history|war_name|custom_effect_tooltip|tooltip|custom_trigger_tooltip)\s*=\s*"?((?:V54_|v54_)[\w\.]+)"?')) {
         $k = $m.Groups[1].Value
-        if ($k.StartsWith('V54_') -and -not $localKeys.ContainsKey($k)) { Err "LOC      $($f.Name): missing localisation key '$k'" }
+        if (-not $localKeys.ContainsKey($k)) { Err "LOC      $($f.Name): missing localisation key '$k'" }
+    }
+    # ids defined in decisions / ideas / opinion modifier / category files need a name (and decisions a _desc)
+    if ($f.FullName -match 'common[\\/](decisions|ideas|opinion_modifiers)[\\/]') {
+        $d = 0
+        foreach ($line in ($t -split "`r?`n")) {
+            if ($line -match '^\s*(v54_[a-z0-9_]+)\s*=\s*\{') {
+                $id = $Matches[1]
+                if ($f.FullName -match 'opinion_modifiers' -or $d -ge 0) { if (-not $localKeys.ContainsKey($id)) { Err "LOC      $($f.Name): missing localisation key for id '$id'" } }
+            }
+            $d += ([regex]::Matches($line, '\{')).Count - ([regex]::Matches($line, '\}')).Count
+        }
     }
     # 6. event references
     foreach ($m in [regex]::Matches($t, '\b(?:country_event|news_event)\s*=\s*(?:\{[^}]*\bid\s*=\s*)?(v54_\w+\.\d+)')) {
