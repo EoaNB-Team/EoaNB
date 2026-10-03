@@ -162,17 +162,17 @@ PixelShader =
 
 VertexStruct VS_INPUT
 {
-	float4 vPosition   : POSITION;
+    float4 vPosition   : POSITION;
 	float4 vUV_Tangent : TEXCOORD0;
 };
 
 VertexStruct VS_OUTPUT
 {
-	float4 vPosition	    : PDX_POSITION;
+    float4 vPosition	    : PDX_POSITION;
 	float2 vUV			    : TEXCOORD0;
 	float2 vTangent			: TEXCOORD1;
 	float4 vPrePos_Fade		: TEXCOORD2;
-	float4 vScreenCoord		: TEXCOORD3;
+	float4 vScreenCoord		: TEXCOORD3;		
 	float2 vWorldUV			: TEXCOORD4;
 	float vTransp			: TEXCOORD5;
 };
@@ -194,54 +194,44 @@ VertexShader =
 		VS_OUTPUT main( const VS_INPUT v )
 		{
 			VS_OUTPUT Out;
-
-			// World-space position is just the input xyz; w channel carries fade/transparency.
-			float4 vWorldPos = float4( v.vPosition.xyz, 1.0f );
-			Out.vPrePos_Fade.xyz = vWorldPos.xyz;
-			Out.vTransp          = v.vPosition.w;
-
-			// Standard projection.
-			float4 vClipPos = mul( ViewProjectionMatrix, vWorldPos );
-
-			// Push z slightly toward the camera (along view direction) so the river
-			// surface doesn't z-fight with the terrain at grazing angles.
-			float4 vDistortedPos = vWorldPos - float4( vCamLookAtDir * 0.05f, 0.0f );
-
-			// Row 2 of the view-projection matrix gives clip-space z for any point.
-			// Pulling it as a single row read is much cheaper than 4x GetMatrixData calls.
-			float4 vRow2 = float4(
-				GetMatrixData( ViewProjectionMatrix, 2, 0 ),
-				GetMatrixData( ViewProjectionMatrix, 2, 1 ),
-				GetMatrixData( ViewProjectionMatrix, 2, 2 ),
-				GetMatrixData( ViewProjectionMatrix, 2, 3 ) );
-			float vNewZ = dot( vDistortedPos, vRow2 );
-
-			Out.vPosition = float4( vClipPos.xy, vNewZ, vClipPos.w );
-
-			// UVs: original code swapped components and scaled x by 0.15.
-			Out.vUV = float2( v.vUV_Tangent.y * 0.15f, v.vUV_Tangent.x );
-
-			Out.vTangent       = v.vUV_Tangent.zw;
+		
+			Out.vPosition = float4( v.vPosition.xyz, 1.0f );
+		
+			Out.vTransp = v.vPosition.w;
+		
+			float4 vTmpPos = float4( v.vPosition.xyz, 1.0f );
+			Out.vPrePos_Fade.xyz = vTmpPos.xyz;
+		
+			float4 vDistortedPos = vTmpPos - float4( vCamLookAtDir * 0.05f, 0.0f );
+		
+			vTmpPos = mul( ViewProjectionMatrix, vTmpPos );
+			
+			// move z value slightly closer to camera to avoid intersections with terrain
+			float vNewZ = dot( vDistortedPos, float4( GetMatrixData( ViewProjectionMatrix, 2, 0 ), GetMatrixData( ViewProjectionMatrix, 2, 1 ), GetMatrixData( ViewProjectionMatrix, 2, 2 ), GetMatrixData( ViewProjectionMatrix, 2, 3 ) ) );
+			Out.vPosition = float4( vTmpPos.xy, vNewZ, vTmpPos.w );
+			
+			Out.vUV.yx = v.vUV_Tangent.xy;
+			Out.vUV.x *= 0.15f;
+		
+			Out.vTangent = v.vUV_Tangent.zw;
 			Out.vPrePos_Fade.w = saturate( 1.0f - v.vUV_Tangent.y );
-
-			// Screen-space coordinates for shadow / FOW sampling.
-			// (.zw both equal w, so a single swizzle covers them.)
-			Out.vScreenCoord.x  = ( Out.vPosition.x + Out.vPosition.w ) * 0.5f;
-			Out.vScreenCoord.y  = ( Out.vPosition.w - Out.vPosition.y ) * 0.5f;
+		
+			// Output the screen-space texture coordinates
+			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 );
+			Out.vScreenCoord.y = ( Out.vPosition.w * 0.5 - Out.vPosition.y * 0.5 );
 		#ifdef PDX_OPENGL
 			Out.vScreenCoord.y = -Out.vScreenCoord.y;
-		#endif
-			Out.vScreenCoord.zw = Out.vPosition.ww;
-
-			// World-space UVs in [0,1] mapped onto the power-of-two atlas.
-			Out.vWorldUV = float2(
-				 ( vWorldPos.x + 0.5f )            /  MAP_SIZE_X,
-				-( vWorldPos.z + 0.5f - MAP_SIZE_Y ) / MAP_SIZE_Y
-			) * float2( MAP_POW2_X, MAP_POW2_Y );
-
+		#endif			
+			Out.vScreenCoord.z = Out.vPosition.w;
+			Out.vScreenCoord.w = Out.vPosition.w;
+		
+			Out.vWorldUV.x = ( Out.vPrePos_Fade.x + 0.5f ) / MAP_SIZE_X;
+			Out.vWorldUV.y = ( Out.vPrePos_Fade.z + 0.5f - MAP_SIZE_Y ) / -MAP_SIZE_Y;	
+			Out.vWorldUV.xy *= float2( MAP_POW2_X, MAP_POW2_Y );
+		
 			return Out;
 		}
-
+		
 	]]
 }
 
@@ -270,7 +260,7 @@ PixelShader =
 		
 			return vColor;
 		}
-
+	
 		float4 main( VS_OUTPUT Input ) : PDX_COLOR
 		{
 			float2 vNewUV = Input.vUV;
@@ -323,7 +313,9 @@ PixelShader =
 		#else
 			float3 SunDirWater = CalculateSunDirectionWater( Input.vPrePos_Fade.xyz );
 		#endif
-			float3 H = normalize( normalize(vCamPos - Input.vPrePos_Fade.xyz).xzy + -SunDirWater.xzy );
+			// one normalize for the three places that need the pixel-to-camera direction
+			float3 vToCameraDir = normalize( vCamPos - Input.vPrePos_Fade.xyz );
+			float3 H = normalize( vToCameraDir.xzy + -SunDirWater.xzy );
 			float2 HWave = H.xy/H.z - B;
 		
 			float3 sigma = M - float3( B*B, B.x*B.y);
@@ -338,9 +330,13 @@ PixelShader =
 			float3 vCanalNormal = normalize( tex2D( NormalMap, float2( vNewUV.x, 1.0f - vNewUV.y ) ).rbg - 0.5f );
 			vCanalNormal.z *= vFlip;
 			
-			float3 vTangent = normalize( float3( Input.vTangent.x, 0.0f, Input.vTangent.y ) );
-			float3 vBitangent = normalize( float3( Input.vTangent.y, 0.0f, -Input.vTangent.x ) );
-			float3 vTmpNormal = normalize( cross( vTangent, vBitangent ) );
+			// The tangent lies in the XZ plane and the bitangent is the same vector turned by 90
+			// degrees, so both have the same length (one normalize instead of three) and their
+			// cross product is always straight up.
+			float2 vTangentDir = normalize( Input.vTangent );
+			float3 vTangent = float3( vTangentDir.x, 0.0f, vTangentDir.y );
+			float3 vBitangent = float3( vTangentDir.y, 0.0f, -vTangentDir.x );
+			float3 vTmpNormal = float3( 0.0f, 1.0f, 0.0f );
 			float3x3 TNB = Create3x3( vTangent, vTmpNormal, vBitangent );
 			float3 vSideNormal = normalize( mul( vCanalNormal, TNB ) );
 			float3 normal = normalize( lerp( waterNormal, vSideNormal, waterSideAlpha.x ) );
@@ -351,20 +347,19 @@ PixelShader =
 
 			float vBloomAlpha = 0.0f;	
 		#ifndef LOW_END_GFX
-			gradient_border_apply( diffuseColor.rgb, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
-		
+			// both colours sit at the same map position: evaluate the borders once, blend twice
 			float3 gradientBorderWaterColor = waterColor;
-			gradient_border_apply( gradientBorderWaterColor, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
+			gradient_border_apply2( diffuseColor.rgb, gradientBorderWaterColor, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
 			waterColor = lerp( waterColor, gradientBorderWaterColor, gradientBorderFactor );
 		#endif
 			
-			float3 vEyeDir = normalize( Input.vPrePos_Fade.xyz - vCamPos.xyz );
+			float3 vEyeDir = -vToCameraDir;
 			float3 reflection = reflect( vEyeDir, normal );
 			float3 reflectiveColor = texCUBE( ReflectionCubeMap, reflection ).rgb * 1.3;
 
 			float fresnelBias = 0.5f;
 			float fresnel = saturate( dot( -vEyeDir, normal ) ) * 0.5f;
-			fresnel = saturate( fresnelBias + ( 1.0f - fresnelBias ) * pow( 1.0f - fresnel, 10.0) );
+			fresnel = saturate( fresnelBias + ( 1.0f - fresnelBias ) * Pow10( 1.0f - fresnel ) );
 			waterColor = waterColor * ( 1.0f - fresnel ) + reflectiveColor * fresnel;
 
 			float3 diffuse = lerp( waterColor, diffuseColor.rgb, waterSideAlpha.x );
@@ -381,7 +376,7 @@ PixelShader =
 			
 			LightingProperties lightingProperties;
 			lightingProperties._WorldSpacePos = Input.vPrePos_Fade.xyz;
-			lightingProperties._ToCameraDir = normalize(vCamPos - Input.vPrePos_Fade.xyz);
+			lightingProperties._ToCameraDir = vToCameraDir;
 			lightingProperties._Diffuse = diffuse;
 			lightingProperties._Normal = normal;
 			lightingProperties._Glossiness = vGlossiness;
@@ -415,6 +410,9 @@ PixelShader =
 			// fade slower if water, faster if land(help river crossings)
 			float vDesiredFade = (lerp( vFadeValue * 2.0f, 0.0f, saturate( waterSideAlpha.x * 4.0f ) ));
 			float vAlphaMultiplier = saturate(lerp( vDesiredFade, 1.0f, vFastFade ));
+			
+
+			DebugReturn(vOut, lightingProperties, fShadowTerm);
 
 			return float4( vOut, waterSideAlpha.y * vAlphaMultiplier * Input.vTransp );
 		}
