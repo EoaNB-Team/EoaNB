@@ -349,8 +349,9 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 
 			float fShadowTerm = max(GetShadowScaled( SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap ), 0.1f );
-		
-			CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
+			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
+
+			CalculateSunLightGlobe( lightingProperties, fShadowTerm, vGlobeNormal, diffuseLight, specularLight );
 
 			#ifndef LOW_END_GFX
 				CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
@@ -361,11 +362,10 @@ PixelShader =
 				specularLight += reflectiveColor * FresnelGlossy( lightingProperties._SpecularColor, lightingProperties._ToCameraDir, lightingProperties._Normal, lightingProperties._Glossiness );
 			#endif
 			
-			float3 vOut = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
+			float3 vOut = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobeNormal);
 		
 			vOut = lerp( vOut, diffuse.rgb, BORDER_LIGHT_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
-				
-			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
+
 			float vNightFactor = DayNightFactor( vGlobeNormal );
 
 			#ifndef LOW_END_GFX
@@ -419,11 +419,12 @@ PixelShader =
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);		
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap );
-		
-			CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
+			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
+
+			CalculateSunLightGlobe( lightingProperties, fShadowTerm, vGlobeNormal, diffuseLight, specularLight );
 			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 			
-			float3 vOut = ComposeLight(lightingProperties, diffuseLight, specularLight );
+			float3 vOut = ComposeLight(lightingProperties, diffuseLight, specularLight, vGlobeNormal );
 						
 			vOut = lerp( waterColorTint, vOut, vWaterAlpha );			
 		

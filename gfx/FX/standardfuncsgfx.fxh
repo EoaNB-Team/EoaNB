@@ -607,9 +607,9 @@ PixelShader =
 		}
 	}
 
-	float3 CalculateSunDirection( float3 vWorldPos, float3 SunPos, float3 SecondSunPos, float3 MoonPos, float3 SecondMoonPos )
+	float3 CalculateSunDirection( float3 vWorldPos, float3 SunPos, float3 SecondSunPos, float3 MoonPos, float3 SecondMoonPos, float3 vGlobeNormal )
 	{
-		float vSelected = DayNightFactor( CalcGlobeNormal( vWorldPos.xz ), 0.0f, 0.0001f  );
+		float vSelected = DayNightFactor( vGlobeNormal, 0.0f, 0.0001f  );
 		float3 vSourcePos = lerp( SunPos, MoonPos, vSelected );
 		float3 vSecondSourcePos = lerp( SecondSunPos, SecondMoonPos, vSelected );
 
@@ -628,6 +628,11 @@ PixelShader =
 
 		return normalize( vWorldPos - vSourcePos );
 	}
+
+	float3 CalculateSunDirection( float3 vWorldPos, float3 SunPos, float3 SecondSunPos, float3 MoonPos, float3 SecondMoonPos )
+	{
+		return CalculateSunDirection( vWorldPos, SunPos, SecondSunPos, MoonPos, SecondMoonPos, CalcGlobeNormal( vWorldPos.xz ) );
+	}
 	
 	float3 CalculateSunDirection( float3 vWorldPos )
 	{
@@ -642,11 +647,8 @@ PixelShader =
 	//-------------------------------
 	// Common lighting functions ----
 	//-------------------------------
-	void CalculateSunLight(LightingProperties aProperties, float aShadowTerm, float3 vLightSourceDirection, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
+	void CalculateSunLight(LightingProperties aProperties, float aShadowTerm, float3 vLightSourceDirection, float3 vGlobeNormal, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
 	{
-		// OPT: cache the globe normal — was being computed twice for the
-		// day/night feather pair, now just once.
-		float3 vGlobeNormal = CalcGlobeNormal( aProperties._WorldSpacePos.xz );
 		float vDayFactor = 1.0f - DayNightFactor( vGlobeNormal );
 		float vNightFactor = DayNightFactor( vGlobeNormal, MOON_FEATHER_MIN, MOON_FEATHER_MAX );
 
@@ -664,10 +666,24 @@ PixelShader =
 		aSpecularLightOut *= SunSpecularIntensity;
 	}
 
+	void CalculateSunLight(LightingProperties aProperties, float aShadowTerm, float3 vLightSourceDirection, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
+	{
+		float3 vGlobeNormal = CalcGlobeNormal( aProperties._WorldSpacePos.xz );
+		CalculateSunLight(aProperties, aShadowTerm, vLightSourceDirection, vGlobeNormal, aDiffuseLightOut, aSpecularLightOut );
+	}
+
 	void CalculateSunLight(LightingProperties aProperties, float aShadowTerm, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
 	{
 		float3 vLightSourceDirection = CalculateSunDirection( aProperties._WorldSpacePos );
 		CalculateSunLight(aProperties, aShadowTerm, vLightSourceDirection, aDiffuseLightOut, aSpecularLightOut );
+	}
+
+	// Named separately: a 5-arg CalculateSunLight(out,out,globe) is the same types as
+	// CalculateSunLight(lightDir,out,out) in HLSL (out is ignored for overload resolution).
+	void CalculateSunLightGlobe(LightingProperties aProperties, float aShadowTerm, float3 vGlobeNormal, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
+	{
+		float3 vLightSourceDirection = CalculateSunDirection( aProperties._WorldSpacePos, vVirtualSunPos.xyz, vSecondVirtualSunPos.xyz, vVirtualMoonPos.xyz, vSecondVirtualMoonPos.xyz, vGlobeNormal );
+		CalculateSunLight(aProperties, aShadowTerm, vLightSourceDirection, vGlobeNormal, aDiffuseLightOut, aSpecularLightOut );
 	}
 
 	void CalculatePointLight(PointLight aPointlight, LightingProperties aProperties, inout float3 aDiffuseLightOut, inout float3 aSpecularLightOut)
@@ -679,13 +695,18 @@ PixelShader =
 		#endif
 	}
 
-	float3 ComposeLight(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight )
+	float3 ComposeLight(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float3 vGlobeNormal )
 	{
-		float vDayNight = DayNightFactor( CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
+		float vDayNight = DayNightFactor( vGlobeNormal );
 
 		float3 vAmbientColor = AmbientLight(aProperties._Normal, vDayNight);
 		// OPT: combined the multiply and add — was diffuse=...; specular=...; return diffuse+specular;
 		return ( ( vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
+	}
+
+	float3 ComposeLight(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight )
+	{
+		return ComposeLight( aProperties, aDiffuseLight, aSpecularLight, CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
 	}
 
 	float3 CalcSnowAmbient( float3 aDiffuseLight, float vSnowFactor )
@@ -693,9 +714,9 @@ PixelShader =
 		return float3(0.2, 0.7, 1) * 0.07 * smoothstep(0.0, 0.1, vSnowFactor );
 	}
 
-	float3 ComposeLightSnow(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
+	float3 ComposeLightSnow(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor, float3 vGlobeNormal )
 	{
-		float vDayNight = DayNightFactor( CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
+		float vDayNight = DayNightFactor( vGlobeNormal );
 		float3 vAmbientColor = AmbientLight(aProperties._Normal, vDayNight);
 		#ifdef LOW_END_GFX
 			return ( ( vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
@@ -705,9 +726,14 @@ PixelShader =
 		#endif
 	}
 
-	float3 ComposeLightMesh(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
+	float3 ComposeLightSnow(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
 	{
-		float vDayNight = DayNightFactor( CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
+		return ComposeLightSnow( aProperties, aDiffuseLight, aSpecularLight, vSnowFactor, CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
+	}
+
+	float3 ComposeLightMesh(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor, float3 vGlobeNormal )
+	{
+		float vDayNight = DayNightFactor( vGlobeNormal );
 
 		float3 DayAmbientColors[6];
 		DayAmbientColors[0] = AmbientPosX;
@@ -728,6 +754,11 @@ PixelShader =
 		float3 vAmbientColor = AmbientLight(aProperties._Normal, vDayNight, DayAmbientColors, NightAmbientColors);
 		float3 SnowAmbient = CalcSnowAmbient(aDiffuseLight, vSnowFactor);
 		return ( ( SnowAmbient + vAmbientColor + aDiffuseLight ) * aProperties._Diffuse ) * HdrRange + aSpecularLight;
+	}
+
+	float3 ComposeLightMesh(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
+	{
+		return ComposeLightMesh( aProperties, aDiffuseLight, aSpecularLight, vSnowFactor, CalcGlobeNormal( aProperties._WorldSpacePos.xz ) );
 	}
 
 	float4 gradient_border_multisample_alpha( in float4 vCh, in sampler2D TexCh, in float2 vUV )

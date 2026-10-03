@@ -417,12 +417,13 @@ PixelShader =
 			vShadowCoord.xz    += vRefractionDistortion * 20.0f;
 			float fShadowTerm   = GetShadowScaled( SHADOW_WEIGHT_WATER, vShadowCoord, ShadowMap );
 
-			CalculateSunLight( lightingProperties, fShadowTerm, SunDirWater, diffuseLight, specularLight );
+			float3 vGlobeNormal = CalcGlobeNormal( Input.pos.xz );
+			CalculateSunLight( lightingProperties, fShadowTerm, SunDirWater, vGlobeNormal, diffuseLight, specularLight );
 			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight );
 
-			float3 vOut = ComposeLight( lightingProperties, diffuseLight, specularLight );
+			float3 vOut = ComposeLight( lightingProperties, diffuseLight, specularLight, vGlobeNormal );
 
-			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.pos.xz ), lerp( BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha ) );
+			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp( BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha ) );
 
 			dominance_fx_apply( vOut, normal, Input.uv, GradientBorderChannel1, GradientBorderChannel2, GradientBorderChannel3, vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA, vGBCamDistOverride_GBOutlineCutoff.xy, 0.0f );
 

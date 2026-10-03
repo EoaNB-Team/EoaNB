@@ -392,20 +392,21 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 		
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_RIVER, Input.vScreenCoord, ShadowMap );
-		
-			CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
+			float3 vGlobeNormal = CalcGlobeNormal( Input.vPrePos_Fade.xz );
+
+			CalculateSunLightGlobe( lightingProperties, fShadowTerm, vGlobeNormal, diffuseLight, specularLight );
 
 		#ifndef LOW_END_GFX
 			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 		#endif
 
-			float3 vOut = ComposeLight(lightingProperties, diffuseLight, specularLight);
+			float3 vOut = ComposeLight(lightingProperties, diffuseLight, specularLight, vGlobeNormal);
 			
 			vOut = ApplyFOW( vOut, ShadowMap, Input.vScreenCoord );
 		#ifndef LOW_END_GFX
 			vOut = ApplyDistanceFog( vOut, Input.vPrePos_Fade.xyz );
 		#endif
-			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.vPrePos_Fade.xz ), lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
+			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
 				
 			float vFadeValue = ( 1.0f - Input.vPrePos_Fade.w );
 		
