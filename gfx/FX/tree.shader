@@ -377,11 +377,12 @@ PixelShader =
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
 		
-			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TREE, In.vScreenCoord, ShadowMap );
-			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
-			CalculateSunLightGlobe(lightingProperties, fShadowTerm, vGlobalNormal, diffuseLight, specularLight);
+			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TREE, In.vScreenCoord, ShadowMap );	
+			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
 			
-			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal );
+			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha );
+
+			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
 		
 			float3 vFOWColor = ApplyFOW( vColor, ShadowMap, In.vScreenCoord );
 			vColor = lerp( vFOWColor, vColor, BORDER_FOW_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );

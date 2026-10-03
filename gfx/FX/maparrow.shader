@@ -311,7 +311,7 @@ PixelShader =
 	#endif
 	}
 
-	float3 CalculateLighting( float3 prepos, float4 vScreenCoord, float3 vNormal, float4 vColor, float3 vGlobeNormal )
+	float3 CalculateLighting( float3 prepos, float4 vScreenCoord, float3 vNormal, float4 vColor )
 	{
 		LightingProperties lightingProperties;
 		lightingProperties._WorldSpacePos = prepos;
@@ -324,9 +324,9 @@ PixelShader =
 		float3 diffuseLight = vec3(0.0);
 		float3 specularLight = vec3(0.0);
 		float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TERRAIN, vScreenCoord, ShadowMap );
-		CalculateSunLightGlobe( lightingProperties, fShadowTerm, vGlobeNormal, diffuseLight, specularLight );
+		CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
 		CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		return ComposeLight(lightingProperties, diffuseLight, specularLight, vGlobeNormal);
+		return ComposeLight(lightingProperties, diffuseLight, specularLight);
 	}
 
 	float FxMask( in float2 vUV, in float vIsHead )
@@ -387,12 +387,11 @@ PixelShader =
 			vArrowColor.rgb = HSVtoRGBPost(vArrowColor.rgb);
 
 			float4 vColor = saturate( vPattern * vArrowColor );
-			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
-			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor, vGlobeNormal );
+			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			vColor.rgb = lerp(vColor.rgb, vColor2, 0.5);
 
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
-			vColor.rgb = DayNightWithBlend( vColor.rgb, vGlobeNormal, 0.2f );
+			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			return float4( vColor.rgb, vColor.a * vMaskValue );
 		}
 		
@@ -431,12 +430,11 @@ PixelShader =
 			vArrowColor.rgb = HSVtoRGBPost(vArrowColor.rgb);
 
 			float4 vColor = saturate( vPattern * vArrowColor );
-			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
-			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor, vGlobeNormal );
+			float3 vColor2 = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			vColor.rgb = lerp(vColor.rgb, vColor2, 0.5);
 			
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
-			vColor.rgb = DayNightWithBlend( vColor.rgb, vGlobeNormal, 0.2f );
+			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			#ifdef SEETHROUGH
 				vMaskValue *= SeethroughOpacity;
 			#endif
@@ -461,10 +459,9 @@ PixelShader =
 			float4 vColor = tex2D( TexPattern, vUV );
 			vColor *= SymbolColor;
 		
-			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
-			vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor, vGlobeNormal );
+			vColor.rgb = CalculateLighting( Input.prepos, Input.vScreenCoord, vNormal, vColor );
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, Input.prepos );
-			vColor.rgb = DayNightWithBlend( vColor.rgb, vGlobeNormal, 0.2f );
+			vColor.rgb = DayNightWithBlend( vColor.rgb, CalcGlobeNormal( Input.prepos.xz ), 0.2f );
 			return vColor;
 		}
 	]]

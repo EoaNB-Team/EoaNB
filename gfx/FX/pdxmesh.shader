@@ -543,8 +543,7 @@ PixelShader =
 			
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
-			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
-			CalculateSunLightGlobe(lightingProperties, fShadowTerm, vGlobalNormal, diffuseLight, specularLight);
+			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 
 			#ifdef PDX_IMPROVED_BLINN_PHONG
@@ -556,10 +555,12 @@ PixelShader =
 			#endif
 
 			#ifdef PDX_SNOW
-			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
+			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
 			#else
-			vColor = ComposeLightMesh(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
+			vColor = ComposeLightMesh(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
 			#endif
+
+			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
 
 			float alpha = 0.0f;
 			#ifdef EMISSIVE
