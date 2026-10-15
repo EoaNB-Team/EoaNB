@@ -9691,3 +9691,175 @@ FRA_royal_return = {
 		}
 	}
 }
+
+#---------------------------------------------------------------------------------------
+#	THE SAINT-SIMONIAN COUNCIL - the quests
+#	Activated one at a time by france.361; 360 days each, 120 days of cooldown after.
+#---------------------------------------------------------------------------------------
+
+FRA_saint_simonian_council_decisions = {
+
+	FRA_ss_quest_infrastructure = {
+		icon = infrastructure
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_infrastructure_tt
+				any_owned_state = {
+					has_state_flag = FRA_ss_quest_target
+					check_variable = { building_level@infrastructure > ROOT.FRA_ss_quest_baseline }
+				}
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_ss_quest_civilian_factory = {
+		icon = generic_construction
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_civilian_factory_tt
+				any_owned_state = {
+					has_state_flag = FRA_ss_quest_target
+					check_variable = { building_level@industrial_complex > ROOT.FRA_ss_quest_baseline }
+				}
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_ss_quest_dockyard = {
+		icon = generic_naval
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_dockyard_tt
+				any_owned_state = {
+					has_state_flag = FRA_ss_quest_target
+					check_variable = { building_level@dockyard > ROOT.FRA_ss_quest_baseline }
+				}
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_ss_quest_machine_parts = {
+		icon = generic_construction
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_machine_parts_tt
+				any_owned_state = {
+					has_state_flag = FRA_ss_quest_target
+					check_variable = { building_level@machine_parts_factory > ROOT.FRA_ss_quest_baseline }
+				}
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+
+	FRA_ss_quest_steel_mill = {
+		icon = generic_construction
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_steel_mill_tt
+				any_owned_state = {
+					has_state_flag = FRA_ss_quest_target
+					check_variable = { building_level@steel_mill > ROOT.FRA_ss_quest_baseline }
+				}
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+
+	# The council names a field of study that is no more advanced than the present day.
+	FRA_ss_quest_research = {
+		icon = generic_research
+		allowed = { original_tag = FRA }
+		activation = { always = no }
+		available = {
+			custom_trigger_tooltip = {
+				tooltip = FRA_ss_quest_research_tt
+				FRA_ss_research_quest_is_done = yes
+			}
+		}
+		days_mission_timeout = 360
+		is_good = yes
+		complete_effect = { country_event = { id = france.362 hours = 6 } }
+		timeout_effect = { country_event = { id = france.363 hours = 6 } }
+		ai_will_do = { base = 100 }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	IMPERIAL WORKSHOPS - one per metropolitan state, all of them at the same time
+#---------------------------------------------------------------------------------------
+
+FRA_imperial_workshops_decisions = {
+
+	FRA_decision_build_an_imperial_workshop = {
+		icon = generic_construction
+		allowed = { original_tag = FRA }
+		state_target = yes
+		on_map_mode = map_and_decisions_view
+		targets = { 1 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 735 814 822 971 972 975 976 1329 }
+		target_root_trigger = { has_country_flag = FRA_imperial_workshops_active }
+		visible = { has_country_flag = FRA_imperial_workshops_active }
+		target_trigger = {
+			FROM = {
+				is_owned_and_controlled_by = ROOT
+				NOT = { has_state_flag = FRA_imperial_workshop_built }
+			}
+		}
+		cost = 35
+		days_remove = 90
+		custom_cost_trigger = {
+			set_temp_variable = { amount_of_money_to_check = 0.15 }
+			has_specific_amount_of_money_with_inflation_included = yes
+		}
+		custom_cost_text = eoanb_money_cost_text
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.15 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			FROM = { set_state_flag = FRA_imperial_workshop_ordered }
+		}
+		remove_effect = {
+			FROM = {
+				clr_state_flag = FRA_imperial_workshop_ordered
+				set_state_flag = FRA_imperial_workshop_built
+				add_dynamic_modifier = { modifier = FRA_imperial_workshop_modifier }
+			}
+			set_temp_variable = { unemployment_value = -0.0003 }
+			add_unemployment_effect = yes
+			FRA_add_an_imperial_workshop = yes
+		}
+		ai_will_do = { base = 100 }
+	}
+}

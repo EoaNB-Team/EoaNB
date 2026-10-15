@@ -1920,3 +1920,345 @@ FRA_henri_victory_effect = {
 	set_politics = { ruling_party = autocracy elections_allowed = no }
 	set_capital = { state = 814 }
 }
+
+FRA_open_the_peoples_empire = {
+	custom_effect_tooltip = FRA_peoples_empire_opens_middle_tree_tt
+	hidden_effect = { set_country_flag = FRA_peoples_empire_path }
+}
+
+FRA_unlock_plon_plon_ministry = {
+	custom_effect_tooltip = FRA_plon_plon_ministry_unlocked_tt
+	hidden_effect = { set_country_flag = FRA_ministry_plon_plon_unlocked }
+}
+
+# The 8th seat of the Imperial Ministry.
+FRA_ministry_appoint_plon_plon = {
+	set_country_flag = FRA_ministry_member_plon_plon
+	add_ideas = FRA_ministry_plon_plon_1
+	hidden_effect = {
+		set_temp_variable = { FRA_ministry_appointee = 8 }
+		FRA_ministry_seat_assign = yes
+	}
+}
+
+FRA_ministry_plon_plon_to_tier_2 = {
+	swap_ideas = { remove_idea = FRA_ministry_plon_plon_1 add_idea = FRA_ministry_plon_plon_2 }
+}
+
+FRA_working_hours_one_step_shorter = {
+	if = { limit = { has_idea = no_limit } swap_ideas = { remove_idea = no_limit add_idea = hours_14 } }
+	else_if = { limit = { has_idea = hours_14 } swap_ideas = { remove_idea = hours_14 add_idea = hours_12 } }
+	else_if = { limit = { has_idea = hours_12 } swap_ideas = { remove_idea = hours_12 add_idea = hours_10 } }
+	else_if = { limit = { has_idea = hours_10 } swap_ideas = { remove_idea = hours_10 add_idea = hours_8 } }
+}
+
+FRA_economic_system_set_laissez_faire = {
+	if = { limit = { has_idea = unorganized_economy } swap_ideas = { remove_idea = unorganized_economy add_idea = laissez_faire_economy } }
+	else_if = { limit = { has_idea = agrarian_economy } swap_ideas = { remove_idea = agrarian_economy add_idea = laissez_faire_economy } }
+	else_if = { limit = { has_idea = interventionist_economy } swap_ideas = { remove_idea = interventionist_economy add_idea = laissez_faire_economy } }
+	else_if = { limit = { has_idea = planned_economy } swap_ideas = { remove_idea = planned_economy add_idea = laissez_faire_economy } }
+}
+
+FRA_health_system_set_public_healthcare = {
+	if = { limit = { has_idea = no_healthcare } swap_ideas = { remove_idea = no_healthcare add_idea = public_healthcare } }
+	else_if = { limit = { has_idea = charitable_healthcare } swap_ideas = { remove_idea = charitable_healthcare add_idea = public_healthcare } }
+	else_if = { limit = { has_idea = private_healthcare } swap_ideas = { remove_idea = private_healthcare add_idea = public_healthcare } }
+}
+
+FRA_distribution_of_power_set_universal_suffrage = {
+	if = { limit = { has_idea = no_elections } swap_ideas = { remove_idea = no_elections add_idea = universal_suffrage } }
+	else_if = { limit = { has_idea = landed_voting } swap_ideas = { remove_idea = landed_voting add_idea = universal_suffrage } }
+	else_if = { limit = { has_idea = weighted_wealth_voting } swap_ideas = { remove_idea = weighted_wealth_voting add_idea = universal_suffrage } }
+	else_if = { limit = { has_idea = universal_male_suffrage } swap_ideas = { remove_idea = universal_male_suffrage add_idea = universal_suffrage } }
+}
+
+FRA_technocratic_economy_begin = {
+	add_ideas = FRA_idea_technocratic_economy_1
+	hidden_effect = { set_variable = { FRA_imperial_workshops_built = 0 } }
+}
+
+FRA_technocratic_economy_to_tier_2 = {
+	swap_ideas = { 
+		remove_idea = FRA_idea_technocratic_economy_1 
+		add_idea = FRA_idea_technocratic_economy_2 
+	}
+}
+
+FRA_technocratic_economy_to_tier_3 = {
+	swap_ideas = { 
+		remove_idea = FRA_idea_technocratic_economy_2 
+		add_idea = FRA_idea_technocratic_economy_3 
+	}
+}
+
+FRA_open_the_imperial_workshops = {
+	custom_effect_tooltip = FRA_imperial_workshops_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_imperial_workshops_active
+		if = {
+			limit = { NOT = { has_variable = FRA_imperial_workshops_built } }
+			set_variable = { FRA_imperial_workshops_built = 0 }
+		}
+	}
+}
+
+# Every finished workshop adds $50k a month to the Technocratic Economy.
+FRA_add_an_imperial_workshop = {
+	add_to_variable = { FRA_imperial_workshops_built = 1 }
+	set_variable = { FRA_imperial_workshop_income = FRA_imperial_workshops_built }
+	multiply_variable = { FRA_imperial_workshop_income = 0.05 }
+	custom_effect_tooltip = FRA_imperial_workshop_income_tt
+	if = {
+		limit = { NOT = { has_dynamic_modifier = { modifier = FRA_imperial_workshops_income_modifier } } }
+		add_dynamic_modifier = { modifier = FRA_imperial_workshops_income_modifier }
+	}
+	else = { force_update_dynamic_modifier = yes }
+}
+
+
+FRA_open_the_saint_simonian_council = {
+	custom_effect_tooltip = FRA_saint_simonian_council_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_saint_simonian_council_active
+		set_variable = { FRA_ss_quest = 0 }
+		set_variable = { FRA_ss_quest_baseline = 0 }
+		set_variable = { FRA_ss_research_quest = 0 }
+		country_event = { id = france.360 days = 7 }
+	}
+}
+
+# Leaves FRA_ss_quest at 0 when the council can find nothing to ask for.
+FRA_ss_pick_a_quest = {
+	set_variable = { FRA_ss_quest = 0 }
+	random_list = {
+		20 = {
+			modifier = { factor = 0 NOT = { FRA_has_room_for_infrastructure = yes } }
+			set_variable = { FRA_ss_quest = 1 }
+			FRA_ss_mark_infrastructure_state = yes
+		}
+		20 = {
+			modifier = { factor = 0 NOT = { FRA_has_room_for_industry = yes } }
+			set_variable = { FRA_ss_quest = 2 }
+			FRA_ss_mark_industry_state = yes
+		}
+		15 = {
+			modifier = { factor = 0 NOT = { FRA_has_room_for_dockyard = yes } }
+			set_variable = { FRA_ss_quest = 3 }
+			FRA_ss_mark_dockyard_state = yes
+		}
+		15 = {
+			modifier = { factor = 0 NOT = { FRA_has_room_for_machine_parts = yes } }
+			set_variable = { FRA_ss_quest = 4 }
+			FRA_ss_mark_machine_parts_state = yes
+		}
+		15 = {
+			modifier = { factor = 0 NOT = { FRA_has_room_for_steel_mill = yes } }
+			set_variable = { FRA_ss_quest = 5 }
+			FRA_ss_mark_steel_mill_state = yes
+		}
+		15 = {
+			modifier = { factor = 0 NOT = { FRA_has_a_researchable_civilian_tech = yes } }
+			set_variable = { FRA_ss_quest = 6 }
+			FRA_ss_pick_a_research_target = yes
+		}
+	}
+}
+
+FRA_ss_clear_the_target_state = {
+	every_owned_state = {
+		limit = { has_state_flag = FRA_ss_quest_target }
+		clr_state_flag = FRA_ss_quest_target
+	}
+}
+
+FRA_ss_mark_infrastructure_state = {
+	FRA_ss_clear_the_target_state = yes
+	random_owned_controlled_state = {
+		limit = {
+			FRA_is_metropolitan_state = yes
+			free_building_slots = { building = infrastructure size > 0 include_locked = yes }
+		}
+		set_state_flag = FRA_ss_quest_target
+		save_global_event_target_as = FRA_ss_quest_state
+		set_variable = { ROOT.FRA_ss_quest_baseline = building_level@infrastructure }
+	}
+}
+
+FRA_ss_mark_industry_state = {
+	FRA_ss_clear_the_target_state = yes
+	random_owned_controlled_state = {
+		limit = {
+			FRA_is_metropolitan_state = yes
+			free_building_slots = { building = industrial_complex size > 0 }
+		}
+		set_state_flag = FRA_ss_quest_target
+		save_global_event_target_as = FRA_ss_quest_state
+		set_variable = { ROOT.FRA_ss_quest_baseline = building_level@industrial_complex }
+	}
+}
+
+FRA_ss_mark_dockyard_state = {
+	FRA_ss_clear_the_target_state = yes
+	random_owned_controlled_state = {
+		limit = {
+			FRA_is_metropolitan_state = yes
+			is_coastal = yes
+			free_building_slots = { building = dockyard size > 0 }
+		}
+		set_state_flag = FRA_ss_quest_target
+		save_global_event_target_as = FRA_ss_quest_state
+		set_variable = { ROOT.FRA_ss_quest_baseline = building_level@dockyard }
+	}
+}
+
+FRA_ss_mark_machine_parts_state = {
+	FRA_ss_clear_the_target_state = yes
+	random_owned_controlled_state = {
+		limit = {
+			FRA_is_metropolitan_state = yes
+			free_building_slots = { building = machine_parts_factory size > 0 }
+		}
+		set_state_flag = FRA_ss_quest_target
+		save_global_event_target_as = FRA_ss_quest_state
+		set_variable = { ROOT.FRA_ss_quest_baseline = building_level@machine_parts_factory }
+	}
+}
+
+FRA_ss_mark_steel_mill_state = {
+	FRA_ss_clear_the_target_state = yes
+	random_owned_controlled_state = {
+		limit = {
+			FRA_is_metropolitan_state = yes
+			free_building_slots = { building = steel_mill size > 0 }
+		}
+		set_state_flag = FRA_ss_quest_target
+		save_global_event_target_as = FRA_ss_quest_state
+		set_variable = { ROOT.FRA_ss_quest_baseline = building_level@steel_mill }
+	}
+}
+
+# Only fields whose day has already come; the council does not ask for miracles.
+FRA_ss_pick_a_research_target = {
+	set_variable = { FRA_ss_research_quest = 0 }
+	random_list = {
+		20 = {
+			modifier = { factor = 0 has_tech = tech_humanities_capitalism }
+			set_variable = { FRA_ss_research_quest = 1 }
+		}
+		20 = {
+			modifier = { factor = 0 has_tech = tech_humanities_sewage_system }
+			set_variable = { FRA_ss_research_quest = 2 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_trade_unions date < 1860.1.1 } }
+			set_variable = { FRA_ss_research_quest = 3 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_neo_kantianism date < 1860.1.1 } }
+			set_variable = { FRA_ss_research_quest = 4 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_asphalt_roads date < 1865.1.1 } }
+			set_variable = { FRA_ss_research_quest = 5 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_colonialism date < 1865.1.1 } }
+			set_variable = { FRA_ss_research_quest = 6 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_socialism date < 1870.1.1 } }
+			set_variable = { FRA_ss_research_quest = 7 }
+		}
+		20 = {
+			modifier = { factor = 0 OR = { has_tech = tech_humanities_impressionism date < 1870.1.1 } }
+			set_variable = { FRA_ss_research_quest = 8 }
+		}
+	}
+}
+
+FRA_ss_activate_the_quest = {
+	hidden_effect = { set_country_flag = FRA_ss_quest_in_progress }
+	if = { limit = { check_variable = { FRA_ss_quest = 1 } } activate_mission = FRA_ss_quest_infrastructure }
+	else_if = { limit = { check_variable = { FRA_ss_quest = 2 } } activate_mission = FRA_ss_quest_civilian_factory }
+	else_if = { limit = { check_variable = { FRA_ss_quest = 3 } } activate_mission = FRA_ss_quest_dockyard }
+	else_if = { limit = { check_variable = { FRA_ss_quest = 4 } } activate_mission = FRA_ss_quest_machine_parts }
+	else_if = { limit = { check_variable = { FRA_ss_quest = 5 } } activate_mission = FRA_ss_quest_steel_mill }
+	else_if = { limit = { check_variable = { FRA_ss_quest = 6 } } activate_mission = FRA_ss_quest_research }
+}
+
+FRA_ss_quest_finished = {
+	clr_country_flag = FRA_ss_quest_in_progress
+	set_variable = { FRA_ss_quest = 0 }
+	FRA_ss_clear_the_target_state = yes
+	country_event = { id = france.360 days = 120 }
+}
+
+FRA_open_the_imperial_elections = {
+	custom_effect_tooltip = FRA_imperial_elections_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_imperial_elections_active
+		country_event = { id = france.364 days = 180 }
+	}
+}
+
+# The Bonapartist vote settles at roughly stability + 10%, give or take three points.
+FRA_hold_the_imperial_election = {
+	set_temp_variable = { FRA_election_target = stability }
+	add_to_temp_variable = { FRA_election_target = 0.1 }
+	set_temp_variable = { FRA_election_noise = random }
+	multiply_temp_variable = { FRA_election_noise = 0.06 }
+	subtract_from_temp_variable = { FRA_election_noise = 0.03 }
+	add_to_temp_variable = { FRA_election_target = FRA_election_noise }
+	clamp_temp_variable = { var = FRA_election_target min = 0.05 max = 0.95 }
+
+	set_variable = { FRA_election_delta = FRA_election_target }
+	subtract_from_variable = { FRA_election_delta = party_popularity@autocracy }
+	add_popularity = { ideology = autocracy popularity = FRA_election_delta }
+
+	set_variable = { FRA_last_election_result = FRA_election_target }
+	multiply_variable = { FRA_last_election_result = 100 }
+	compute_seats = yes
+}
+
+FRA_radicals_take_the_chamber = {
+	custom_effect_tooltip = FRA_radicals_dominate_tt
+	hidden_effect = {
+		set_variable = { FRA_radical_bonapartists_influence = 4 }
+		FRA_refresh_imperial_influence = yes
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE FRUITS OF OUR LABOR
+#---------------------------------------------------------------------------------------
+
+FRA_open_the_fruits_of_our_labor = {
+	custom_effect_tooltip = FRA_fruits_of_our_labor_unlocked_tt
+	hidden_effect = {
+		set_country_flag = FRA_fruits_of_our_labor
+		country_event = { id = france.370 days = 30 random_days = 335 }
+	}
+}
+
+# $400k to $650k, in $50k steps.
+FRA_fruits_investment_return = {
+	random_list = {
+		20 = { set_temp_variable = { money_to_gain = 0.4 } }
+		20 = { set_temp_variable = { money_to_gain = 0.45 } }
+		15 = { set_temp_variable = { money_to_gain = 0.5 } }
+		15 = { set_temp_variable = { money_to_gain = 0.55 } }
+		15 = { set_temp_variable = { money_to_gain = 0.6 } }
+		15 = { set_temp_variable = { money_to_gain = 0.65 } }
+	}
+	add_money_with_inflation_included_with_tooltip_effect = yes
+}
+
+FRA_fruits_research_bonus = {
+	random_list = {
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = humanities_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = mechanical_engineering_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = process_engineering_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = biochemistry_tech } }
+		20 = { add_tech_bonus = { bonus = 0.75 uses = 1 category = electronics_devices_tech } }
+	}
+}

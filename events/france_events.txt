@@ -4568,15 +4568,11 @@ country_event = {
 			base = 40
 			modifier = {
 				factor = 1.5
-				has_equipment = {
-					infantry_equipment < 5000
-				}
+				has_equipment = { infantry_equipment < 5000 }
 			}
 			modifier = {
 				factor = 1.5
-				has_equipment = {
-					cannon_equipment < 50
-				}
+				has_equipment = { cannon_equipment < 50 }
 			}
 		}
 		add_war_support = 0.01
@@ -4606,15 +4602,11 @@ country_event = {
 			base = 60
 			modifier = {
 				factor = 0.5
-				has_equipment = {
-					infantry_equipment < 5000
-				}
+				has_equipment = { infantry_equipment < 5000 }
 			}
 			modifier = {
 				factor = 0.5
-				has_equipment = {
-					cannon_equipment < 50
-				}
+				has_equipment = { cannon_equipment < 50 }
 			}
 		}
 		add_war_support = -0.01
@@ -4828,12 +4820,8 @@ country_event = {
 	option = {
 		name = france.316.b
 		trigger = {
-			has_equipment = {
-				infantry_equipment > 2000
-			}
-			has_equipment = {
-				cannon_equipment > 24
-			}
+			has_equipment = { infantry_equipment > 2000 }
+			has_equipment = { cannon_equipment > 24 }
 		}
 		ai_chance = {
 			base = 5
@@ -4925,15 +4913,11 @@ country_event = {
 			base = 40
 			modifier = {
 				factor = 1.5
-				has_equipment = {
-					infantry_equipment < 5000
-				}
+				has_equipment = { infantry_equipment < 5000 }
 			}
 			modifier = {
 				factor = 1.5
-				has_equipment = {
-					cannon_equipment < 50
-				}
+				has_equipment = { cannon_equipment < 50 }
 			}
 		}
 		add_war_support = 0.01
@@ -4959,15 +4943,11 @@ country_event = {
 			base = 60
 			modifier = {
 				factor = 0.5
-				has_equipment = {
-					infantry_equipment < 5000
-				}
+				has_equipment = { infantry_equipment < 5000 }
 			}
 			modifier = {
 				factor = 0.5
-				has_equipment = {
-					cannon_equipment < 50
-				}
+				has_equipment = { cannon_equipment < 50 }
 			}
 		}
 		add_war_support = -0.01
@@ -5094,9 +5074,7 @@ country_event = {
 		ai_chance = { base = 100 }
 		add_stability = 0.01
 		add_war_support = 0.01
-		hidden_effect = {
-			#
-		}
+		hidden_effect = { }
 	}
 }
 
@@ -5116,9 +5094,7 @@ country_event = {
 			tag = FRA
 			has_global_flag = eoanb_flag_franco_prussian_war_ongoing
 			FRA = { has_country_flag = FRA_national_assembly_bordeaux_flag }
-			NOT = {
-				FRA = { controls_state = 19 }
-			}
+			NOT = { FRA = { controls_state = 19 } }
 		}
 	}
 
@@ -5170,9 +5146,7 @@ country_event = {
 						expire = "1883.1.1"
 						desc = "POLITICS_GENERIC_EOANB_DESC"
 						ideology = liberal_social
-						traits = {
-							#
-						}
+						traits = { }
 					}
 					promote_leader = yes
 				}
@@ -5184,9 +5158,7 @@ country_event = {
 						expire = "1882.1.1"
 						desc = "POLITICS_GENERIC_EOANB_DESC"
 						ideology = ideology_sub_social_liberal
-						traits = {
-							#
-						}
+						traits = { }
 					}
 					promote_leader = yes
 				}
@@ -5238,9 +5210,7 @@ country_event = {
 	option = {
 		# Adolphe Theirs
 		name = france.353.a
-		trigger = {
-			has_country_flag = FRA_1871_Monarchist
-		}
+		trigger = { has_country_flag = FRA_1871_Monarchist }
 		set_politics = {
 			ruling_party = traditional_conservatism
 			elections_allowed = yes
@@ -5253,15 +5223,254 @@ country_event = {
 					expire = "1900.1.1"
 					desc = "POLITICS_TEMP_DESC"
 					ideology = conserv
-					traits = {
-						#
-					}
+					traits = { }
 				}
 			}
-			remove_advisor_role = {
-				slot = political_advisor
+			remove_advisor_role = { slot = political_advisor }
+		}
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE SAINT-SIMONIAN COUNCIL - 360 assigns, 361 announces, 362 pays, 363 scolds
+#---------------------------------------------------------------------------------------
+
+# Assignment. Hidden. Re-entered 120 days after every resolution.
+country_event = {
+	id = france.360
+	title = france.360.t
+	desc = france.360.d
+
+	is_triggered_only = yes
+	hidden = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_saint_simonian_council_active
+		NOT = { has_country_flag = FRA_ss_quest_in_progress }
+	}
+
+	immediate = {
+		FRA_ss_pick_a_quest = yes
+		if = {
+			limit = { check_variable = { FRA_ss_quest > 0 } }
+			country_event = { id = france.361 hours = 6 }
+		}
+		else = {
+			# Nothing the council can ask for right now - try again in four months.
+			country_event = { id = france.360 days = 120 }
+		}
+	}
+
+	option = { name = france.360.a }
+}
+
+# The council states its task.
+country_event = {
+	id = france.361
+	title = france.361.t
+	desc = france.361.d
+	picture = GFX_report_event_generic_factory
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.361.a
+		FRA_ss_activate_the_quest = yes
+	}
+}
+
+# The task is done.
+country_event = {
+	id = france.362
+	title = france.362.t
+	desc = france.362.d
+	picture = GFX_report_event_generic_factory
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.362.a
+		add_stability = 0.02
+		set_temp_variable = { unemployment_value = -0.0005 }
+		add_unemployment_effect = yes
+		set_temp_variable = { money_to_gain = 0.4 }
+		add_money_with_inflation_included_with_tooltip_effect = yes
+		add_popularity = { ideology = autocracy popularity = 0.01 }
+		hidden_effect = { FRA_ss_quest_finished = yes }
+	}
+}
+
+# The task is not done.
+country_event = {
+	id = france.363
+	title = france.363.t
+	desc = france.363.d
+	picture = GFX_report_event_gathering_protest
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.363.a
+		add_political_power = -25
+		add_stability = -0.01
+		hidden_effect = { FRA_ss_quest_finished = yes }
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE SECOND DECEMBER - the imperial elections
+#---------------------------------------------------------------------------------------
+
+# Hidden. Fires 180 days after the focus and then once every legislature (6 years).
+country_event = {
+	id = france.364
+	title = france.364.t
+	desc = france.364.d
+
+	is_triggered_only = yes
+	hidden = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_imperial_elections_active
+		has_civil_war = no
+	}
+
+	immediate = {
+		FRA_hold_the_imperial_election = yes
+		country_event = { id = france.365 hours = 6 }
+		country_event = { id = france.364 days = 2190 }
+	}
+
+	option = { name = france.364.a }
+}
+
+# The returns.
+country_event = {
+	id = france.365
+	title = france.365.t
+	desc = france.365.d
+	picture = GFX_report_event_nap_france_legislative_elections
+
+	is_triggered_only = yes
+
+	option = { # A Bonapartist majority
+		name = france.365.a
+		trigger = { check_variable = { party_popularity@autocracy > 0.5 } }
+		add_political_power = 50
+		increase_legitimacy_by_four = yes
+		if = {
+			limit = {
+				has_country_flag = FRA_imperial_influence_active
+				check_variable = { FRA_radical_bonapartists_influence < 4 }
+			}
+			FRA_radicals_take_the_chamber = yes
+		}
+	}
+
+	option = { # No majority
+		name = france.365.b
+		trigger = { NOT = { check_variable = { party_popularity@autocracy > 0.5 } } }
+		add_political_power = -25
+		add_stability = -0.02
+	}
+}
+
+#---------------------------------------------------------------------------------------
+#	THE FRUITS OF OUR LABOR - one reward a year
+#---------------------------------------------------------------------------------------
+
+# Hidden picker. Re-schedules itself.
+country_event = {
+	id = france.370
+	title = france.370.t
+	desc = france.370.d
+
+	is_triggered_only = yes
+	hidden = yes
+
+	trigger = {
+		tag = FRA
+		has_country_flag = FRA_fruits_of_our_labor
+	}
+
+	immediate = {
+		random_list = {
+			34 = {
+				modifier = {
+					factor = 0
+					NOT = {
+						any_owned_state = {
+							is_controlled_by = ROOT
+							FRA_is_metropolitan_state = yes
+							free_building_slots = { building = infrastructure size > 0 include_locked = yes }
+						}
+					}
+				}
+				random_owned_controlled_state = {
+					limit = {
+						FRA_is_metropolitan_state = yes
+						free_building_slots = { building = infrastructure size > 0 include_locked = yes }
+					}
+					save_global_event_target_as = FRA_fruits_state
+				}
+				country_event = { id = france.371 hours = 6 }
+			}
+			33 = { country_event = { id = france.372 hours = 6 } }
+			33 = { country_event = { id = france.373 hours = 6 } }
+		}
+		country_event = { id = france.370 days = 30 random_days = 335 }
+	}
+
+	option = { name = france.370.a }
+}
+
+country_event = {
+	id = france.371
+	title = france.371.t
+	desc = france.371.d
+	picture = GFX_report_event_generic_railway_opening
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.371.a
+		event_target:FRA_fruits_state = {
+			add_building_construction = {
+				type = infrastructure
+				level = 1
+				instant_build = yes
 			}
 		}
+	}
+}
+
+country_event = {
+	id = france.372
+	title = france.372.t
+	desc = france.372.d
+	picture = GFX_report_event_generic_factory
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.372.a
+		FRA_fruits_investment_return = yes
+	}
+}
+
+country_event = {
+	id = france.373
+	title = france.373.t
+	desc = france.373.d
+	picture = GFX_report_event_generic_research_lab
+
+	is_triggered_only = yes
+
+	option = {
+		name = france.373.a
+		FRA_fruits_research_bonus = yes
 	}
 }
 
