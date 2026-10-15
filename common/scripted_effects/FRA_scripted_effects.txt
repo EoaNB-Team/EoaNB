@@ -1747,3 +1747,176 @@ FRA_enact_loi_niel_effect = {
 	}
 	set_country_flag = FRA_loi_niel_enacted
 }
+
+# Henri V royalist preparations and revolt
+FRA_henri_random_state_roll = {
+	random = {
+		chance = 50
+		random_owned_controlled_state = {
+			limit = {
+				is_core_of = FRA
+				NOT = {
+					OR = {
+						state = 14
+						state = 19
+						state = 20
+						state = 23
+						state = 24
+						state = 25
+						state = 26
+						state = 30
+						state = 814
+					}
+				}
+			}
+			add_core_of = HEN
+			transfer_state_to = HEN
+		}
+	}
+}
+
+FRA_henri_roll_regional_support = {
+	while_loop_effect = {
+		limit = {
+			check_variable = { FRA_henri_rhone_influence > 0 }
+			NOT = { has_country_flag = FRA_henri_rhone_revolts }
+		}
+		random_list = {
+			15 = { set_country_flag = FRA_henri_rhone_revolts }
+			85 = { }
+		}
+		subtract_from_variable = { FRA_henri_rhone_influence = 1 }
+	}
+	while_loop_effect = {
+		limit = {
+			check_variable = { FRA_henri_gascony_influence > 0 }
+			NOT = { has_country_flag = FRA_henri_gascony_revolts }
+		}
+		random_list = {
+			15 = { set_country_flag = FRA_henri_gascony_revolts }
+			85 = { }
+		}
+		subtract_from_variable = { FRA_henri_gascony_influence = 1 }
+	}
+	while_loop_effect = {
+		limit = {
+			check_variable = { FRA_henri_central_influence > 0 }
+			NOT = { has_country_flag = FRA_henri_central_revolts }
+		}
+		random_list = {
+			15 = { set_country_flag = FRA_henri_central_revolts }
+			85 = { }
+		}
+		subtract_from_variable = { FRA_henri_central_influence = 1 }
+	}
+}
+
+FRA_start_henri_revolt = {
+	set_country_flag = FRA_henri_revolt_underway
+
+	14 = { add_core_of = HEN transfer_state_to = HEN }
+	23 = { add_core_of = HEN transfer_state_to = HEN }
+	30 = { add_core_of = HEN transfer_state_to = HEN }
+	if = {
+		limit = { has_country_flag = FRA_henri_rhone_revolts }
+		20 = { add_core_of = HEN transfer_state_to = HEN }
+	}
+	if = {
+		limit = { has_country_flag = FRA_henri_gascony_revolts }
+		19 = { add_core_of = HEN transfer_state_to = HEN }
+		25 = { add_core_of = HEN transfer_state_to = HEN }
+	}
+	if = {
+		limit = { has_country_flag = FRA_henri_central_revolts }
+		24 = { add_core_of = HEN transfer_state_to = HEN }
+		26 = { add_core_of = HEN transfer_state_to = HEN }
+	}
+	clr_country_flag = FRA_henri_rhone_revolts
+	clr_country_flag = FRA_henri_gascony_revolts
+	clr_country_flag = FRA_henri_central_revolts
+
+	HEN = {
+		set_capital = { state = 14 }
+		set_variable = { FRA_henri_italian_generals_bonus = FRA.FRA_henri_italian_generals_stacks }
+		multiply_variable = { FRA_henri_italian_generals_bonus = 0.01 }
+		if = {
+			limit = { check_variable = { FRA_henri_italian_generals_bonus > 0 } }
+			add_dynamic_modifier = { modifier = FRA_henri_italian_generals_modifier days = 360 }
+		}
+		if = {
+			limit = { FRA = { has_completed_focus = FRA_prepare_to_seize_arsenals } }
+			add_timed_idea = { idea = FRA_henri_premeditated_assaults days = 180 }
+		}
+		division_template = {
+			name = "Armée Royale"
+			is_locked = yes
+			regiments = {
+				light_infantry = { x = 0 y = 0 }
+				light_infantry = { x = 0 y = 1 }
+				light_infantry = { x = 1 y = 0 }
+				light_infantry = { x = 1 y = 1 }
+			}
+		}
+	}
+
+	23 = {
+		create_unit = { division = "name = \"Armée de Vendée I\" division_template = \"Armée Royale\" start_experience_factor = 0.15 start_equipment_factor = 1.0" owner = HEN }
+		create_unit = { division = "name = \"Armée de Vendée II\" division_template = \"Armée Royale\" start_experience_factor = 0.15 start_equipment_factor = 1.0" owner = HEN }
+	}
+	30 = {
+		create_unit = { division = "name = \"Armée de Vendée III\" division_template = \"Armée Royale\" start_experience_factor = 0.15 start_equipment_factor = 1.0" owner = HEN }
+	}
+	if = {
+		limit = { has_completed_focus = FRA_raise_breton_royalists }
+		14 = {
+			create_unit = { division = "name = \"Volontaires Bretons I\" division_template = \"Armée Royale\" start_experience_factor = 0.2 start_equipment_factor = 1.0" owner = HEN }
+			create_unit = { division = "name = \"Volontaires Bretons II\" division_template = \"Armée Royale\" start_experience_factor = 0.2 start_equipment_factor = 1.0" owner = HEN }
+			create_unit = { division = "name = \"Volontaires Bretons III\" division_template = \"Armée Royale\" start_experience_factor = 0.2 start_equipment_factor = 1.0" owner = HEN }
+			create_unit = { division = "name = \"Volontaires Bretons IV\" division_template = \"Armée Royale\" start_experience_factor = 0.2 start_equipment_factor = 1.0" owner = HEN }
+		}
+	}
+	while_loop_effect = {
+		limit = { check_variable = { FRA_henri_defecting_divisions > 0 } }
+		14 = { create_unit = { division = "name = \"Ralliés de l'Armée\" division_template = \"Armée Royale\" start_experience_factor = 0.3 start_equipment_factor = 1.0" owner = HEN } }
+		subtract_from_variable = { FRA_henri_defecting_divisions = 1 }
+	}
+	if = {
+		limit = { has_completed_focus = FRA_return_from_rome }
+		PAP = { give_military_access = HEN }
+		2 = {
+			create_unit = { division = "name = \"Corps de Rome I\" division_template = \"Armée Royale\" start_experience_factor = 0.3 start_equipment_factor = 1.0" owner = HEN }
+			create_unit = { division = "name = \"Corps de Rome II\" division_template = \"Armée Royale\" start_experience_factor = 0.3 start_equipment_factor = 1.0" owner = HEN }
+		}
+	}
+
+	while_loop_effect = {
+		limit = { check_variable = { FRA_henri_stored_muskets > 0 } }
+		HEN = { add_equipment_to_stockpile = { type = infantry_equipment_rifle_1 amount = 500 producer = HEN } }
+		subtract_from_variable = { FRA_henri_stored_muskets = 500 }
+	}
+	while_loop_effect = {
+		limit = { check_variable = { FRA_henri_stored_uniforms > 0 } }
+		HEN = { add_equipment_to_stockpile = { type = uniform_equipment_0 amount = 500 producer = HEN } }
+		subtract_from_variable = { FRA_henri_stored_uniforms = 500 }
+	}
+	while_loop_effect = {
+		limit = { check_variable = { FRA_henri_defecting_ships > 0 } }
+		random_list = {
+			50 = { transfer_ship = { type = frigate target = HEN } }
+			50 = { transfer_ship = { type = gunboat target = HEN } }
+		}
+		subtract_from_variable = { FRA_henri_defecting_ships = 1 }
+	}
+
+	HEN = {
+		declare_war_on = { target = FRA type = annex_everything }
+		add_war_support = 0.25
+		add_stability = 0.15
+	}
+}
+
+FRA_henri_victory_effect = {
+	annex_country = { target = FRA transfer_troops = yes }
+	set_politics = { ruling_party = autocracy elections_allowed = no }
+	set_capital = { state = 814 }
+}
