@@ -13,8 +13,8 @@ NMapMode = {
 	FABRICATE_CLAIM_ALREADY_CORE_SECONDARY_COLOR = { 0.5, 0, 0, 1 },
 	CONSTRUCTION_MAP_MODE_BUILDING_DEFAULT_COLOR = { 0.43, 0.22, 0.22, 0.5 }, 			-- Color of states/provinces that can't be built on
 	CONSTRUCTION_MAP_MODE_BUILDING_MAX_LEVEL_COLOR = { 0.05, 0.1, 0.7, 0.8 }, 			-- Color of states/provinces where current building level is maxed out (max is current max level, not final max level) of a building type
-	CONSTRUCTION_MAP_MODE_BUILDING_LEVEL_LOW_COLOR = { 0.2, 0.7, 0.0, 0.1 },
-	CONSTRUCTION_MAP_MODE_BUILDING_LEVEL_HI_COLOR = { 0.4, 0.9, 0.0, 0.8 },
+	CONSTRUCTION_MAP_MODE_BUILDING_LEVEL_LOW_COLOR = { 0.2, 0.7, 0.0, 0.5 },
+	CONSTRUCTION_MAP_MODE_BUILDING_LEVEL_HI_COLOR = { 0.45, 0.98, 0.0, 0.9 },
 	CONSTRUCTION_MAP_MODE_BUILDING_MAX_AMOUNT_QUEUED_COLOR = { 0.0, 0.0, 1.0  }, 	-- Color of states/provinces when building queue is maxed of a building type
 	CONSTRUCTION_MAP_MODE_BUILDING_QUEUED_COLOR = { 1.0, 0.85, 0.0  },				-- Color of states/provinces when building queue contains one or more of a building type.
 	MAP_MODE_MANPOWER_RANGE_MAX = 20000000,											-- When a state has that much manpower, it will be colored with the color MAP_MODE_MANPOWER_RANGE_COLOR_TO. Everything below that will have an interpolated color.
@@ -29,7 +29,7 @@ NMapMode = {
 	PEACE_CONFERENCE_CONTESTED_SECONDARY_COLOR = { 1, 0, 0, 0.25 },
 	PEACE_CONFERENCE_CHANGE_TARGET_TAG_SECONDARY_COLOR =  { 0, 0.8, 0.5, 0.25 },
 	PEACE_CONFERENCE_DIFFERENT_STACKABLE_SECONDARY_COLOR =  { 1, 1, 0, 0.25 },
-	FACTIONS_COLOR_NOT_MEMBER = { 0.6, 0.6, 0.6, 0.25 },
+	FACTIONS_COLOR_NOT_MEMBER = { 0.7, 0.7, 0.7, 0.7 },
 	FACTIONS_MEMBER_TRANSPARENCY = 1.0,
 	PLAYER_MAPMODE_NOT_SELECTED_COUNTRY_TRANSPARENCY = 0.15,						-- How much is the country colors faded out, for countries that are not occupied by the any player.
 	SELECTED_COUNTRY_HIGHLIGHT_THICKNESS_MULT = 1.5,								-- When a country is selected (blinking/highlighted) it's borders becomes a bit thicker, to make stand out even more. 1.0 is default thickness.
@@ -88,7 +88,8 @@ NMapMode = {
 	OCCUPATION_MAP_MODE_COUNTRY_STRIPE_ALPHA = 0.3,									-- alpha of occupied country stripes in occupation map mode
 	OPERATIVE_MAP_MODE_INVALID_COUNTRY_TARGET_TRANSPARENCY = 0.15,							-- alpha of country which cannot be targeted by the selected operative mission
 
-	COASTAL_FACILITY_OFFSET = {-1.5, 0, 1.5},					-- Offset from world position CVector3f (x, y, z). So it does not overlap with a port map icon
+	COASTAL_FACILITY_OFFSET = {-1.5, 0, 1.5},					-- Offset from world position CVector3f (x, y, z). So it does not overlap with a port map icon or naval headquarter
+	NAVAL_HEADQUARTER_OFFSET = {1.5, 0, 1.5},					-- Offset from world position CVector3f (x, y, z). So it does not overlap with a port map icon or facility
 
 	SUPPLY_MAP_MODE_COUNTRY_BORDER_CAMERA_DISTANCE = 1.0,
 	SUPPLY_MAP_MODE_COUNTRY_BORDER_OUTLINE_CUTOFF = 0.973,
@@ -159,6 +160,7 @@ NMapIcons = {
 	DEFAULT_PRIORITY_ADJACENCY_RULE = 3,
 	DEFAULT_PRIORITY_NAVAL_MINES = 13,
 	DEFAULT_PRIORITY_NAVAL_ACCIDENTS = 13,
+	DEFAULT_PRIORITY_NAVAL_ACCIDENTS = 13,
 	DEFAULT_PRIORITY_NAVAL_DOMINANCE = 13,
 	DEFAULT_PRIORITY_STRATEGIC_LOCATION = 10,
 
@@ -206,7 +208,7 @@ NMapIcons = {
 	SUPPLY_AREAS_PRIORITY_SUPPLY = 14,
 	SUPPLY_AREAS_PRIORITY_CAPITAL = 5,
 	SUPPLY_AREAS_PRIORITY_PEACE_COST = 3,
-	SUPPLY_AREAS_PRIORITY_ADJACENCY_RULE = 3,
+	SUPPLY_AREAS_PRIORITY_ADJACENCY_RULE = 2,
 	SUPPLY_AREAS_PRIORITY_NAVAL_MINES = 13,
 	SUPPLY_AREAS_PRIORITY_NAVAL_ACCIDENTS = 13,
 	SUPPLY_AREAS_PRIORITY_NAVAL_DOMINANCE = 13,
@@ -659,6 +661,7 @@ NMapIcons = {
 	OPERATIVES_PRIORITY_ADJACENCY_RULE = 3,
 	OPERATIVES_PRIORITY_NAVAL_MINES = 13,
 	OPERATIVES_PRIORITY_NAVAL_ACCIDENTS = 13,
+	OPERATIVES_PRIORITY_NAVAL_ACCIDENTS = 13,
 	OPERATIVES_PRIORITY_NAVAL_DOMINANCE = 13,
 	OPERATIVES_PRIORITY_STRATEGIC_LOCATION = 10,
 
@@ -685,7 +688,7 @@ NAirGfx = {
 	AIRPLANES_SMOOTH_INTERPOLATION_TURN = 0.12, 	-- How smooth is the turning interpolation.
 	AIRPLANES_BANK_STRENGTH = 210.0, 				-- Multiplier of how much the curve affects the wings banking. (angle limited by the following value)
 	AIRPLANES_BANK_ANGLE_LIMIT = 55.0, 				-- Bank angle limit.
-	AIRPLANES_GROUND_COLLISION_OFFSET_Y = -5.0, 		-- Lets the 3d airplanes disappear after going a bit under the ground.
+	AIRPLANES_GROUND_COLLISION_OFFSET_Y = 0.0, 		-- Set's the height (Y) offset before 3d airplanes disappear after going to the ground.
 	AIRPLANES_GROUND_EXPLOSION_TIME_DELAY = 0.6,	-- Time in seconds to play explosion animation when plane hit ground before the plane entity is deleted
 	AIRPLANES_1_FIGHTER_PATROL_ANIM = 1, 			-- Number of fighters needed for a single instance of this animation
 	AIRPLANES_3_FIGHTER_PATROL_ANIM = 3,			-- Number of fighters needed for a single instance of this animation
@@ -832,8 +835,8 @@ NGraphics = {
 		0.0, 0.4, 0.8, 1.0,   -- 10: construction: valid secondary build target
 		0.8, 0.3, 0.0, 1.0,   -- 11: construction: invalid secondary build target
 		0.7, 0.7, 0.0, 1.0,   -- 12: construction: foreign secondary build target
-		0.0, 0.61, 0.75, 1.0, -- 13: FACTION_THEATER_COLOR_INDEX
-		0.0, 0.61, 0.75, 1.0, -- 14: FACTION_THEATER_HIGHLIGHT_COLOR_INDEX
+		0.2, 0.61, 0.75, 1.0, -- 13: FACTION_THEATER_COLOR_INDEX
+		0.2, 0.61, 0.75, 1.0, -- 14: FACTION_THEATER_HIGHLIGHT_COLOR_INDEX
 	},
 
 
@@ -908,22 +911,14 @@ NGraphics = {
 	STRATEGIC_AIR_COLOR_AVERAGE_WHILE_HIGHLIGHTING_HOLD = {0.8, 0.8, 0, 1},
 	STRATEGIC_AIR_COLOR_NEUTRAL_WHILE_HIGHLIGHTING_HOLD = {140.0/255, 131.0/255, 119.0/255, 1},
 
-	STRATEGIC_NAVY_COLOR_NEUTRAL = {0.2, 0.25, 0.35, 0.5}, 	-- zones without missions
+	STRATEGIC_NAVY_COLOR_NEUTRAL = {0.2, 0.25, 0.35, 0.5}, 	-- zones without dominance
 	STRATEGIC_NAVY_COLOR_NEUTRAL_HIGHLIGHTED = {0.4, 0.5, 0.6, 0.9}, 	-- zones without dominance
 	STRATEGIC_NAVY_COLOR_ON_HOLD = {0.2, 0.5, 0.6, 0.5},	-- zones with only hold mission
 	STRATEGIC_NAVY_COLOR_ON_HOLD_HIGHLIGHTED = {0.2, 0.6, 0.7, 0.5},	-- zones with with only hold missions with taskforces selected
 
-	STRATEGIC_NAVY_COLOR_BAD = {0.8, 0, 0, 1},  -- zones has missions with bad suppremacy
-	STRATEGIC_NAVY_COLOR_GOOD = {0, 0.8, 0, 1}, -- zones has missions with good suppremacy
-	STRATEGIC_NAVY_COLOR_AVERAGE = {0.8, 0.8, 0, 1}, -- zones has missions with average suppremacy
-	STRATEGIC_REGION_COLOR_NAVAL_HEADQUARTER = { 1.0, 0.0, 0.965, 1.0 },
+	STRATEGIC_REGION_COLOR_NAVAL_HEADQUARTER = { 0.4, 0.8, 0, 0.5 },
 
 	STRATEGIC_NAVY_NO_TASKFORCES_ASSIGNED = {0.9, 0.3, 0.3, 1},  -- zones has fleets assigned to them but no no taskforce can reach it or not enough taskforce to cover that region
-
-	STRATEGIC_NAVY_COLOR_BAD_WHILE_HIGHLIGHTING_HOLD = {0.7, 0.0, 0.40, 0.5}, 	-- zones has missions with bad suppremacy on highlighted regions with a hold mission selected
-	STRATEGIC_NAVY_COLOR_GOOD_WHILE_HIGHLIGHTING_HOLD = {0, 0.6, 0.5, 1},		-- zones has missions with good suppremacy on highlighted regions with a hold mission selected
-	STRATEGIC_NAVY_COLOR_AVERAGE_WHILE_HIGHLIGHTING_HOLD = {0.5, 0.5, 0.6, 1},	-- zones has missions with average suppremacy on highlighted regions with a hold mission selected
-
 
 	RESISTANCE_COLOR_NONE = {0.4, 0.4, 0.6, 0.5}, -- rgba
 	RESISTANCE_COLOR_GOOD = {0.8, 0.8, 0, 0.3}, -- rgba
@@ -979,7 +974,7 @@ NGraphics = {
 	DECISION_MAP_ICON_DISTANCE_CUTOFF = 1000,
 	DECISION_MAP_ICON_DEPTH_PRIORITY = 50,
 	NAVAL_MISSION_TASK_FORCES_GROUP_BY_ALLEGIANCE_CUTOFF = 500,
-	NAVAL_MISSION_ICONS_DISTANCE_CUTOFF = 900, --1300,
+	NAVAL_MISSION_ICONS_DISTANCE_CUTOFF = 1600, --1300,
 	NAVAL_MINES_DISTANCE_CUTOFF = 800,
 	CRYPTOLOGY_MAP_ICON_DISTANCE_CUTOFF = 1000,
 	PEACE_CONFERENCE_MAP_ICON_DISTANCE_CUTOFF = 500,
@@ -1004,7 +999,7 @@ NGraphics = {
 	INTEL_LEDGER_CIVILIAN_ICON_STATE_CUTOFF = 250.0,
 	INTEL_LEDGER_CIVILIAN_ICON_REGION_CUTOFF = 700.0,
 
-	RAILWAY_CAMERA_CUTOFF = 200.0, -- railways are cut off above this camera height
+	RAILWAY_CAMERA_CUTOFF = 300.0, -- railways are cut off above this camera height
 	RAILWAY_CAMERA_CUTOFF_SPEED = 3.0, -- railways fade in/out speed
 
 	DIVISION_NAMES_GROUP_MAX_TOOLTIP_ENTRIES = 15,	-- Max entries to display the names in the tooltip, when mouse over the division-names-group in the division template designer.
@@ -1089,7 +1084,7 @@ NGraphics = {
 	TRADE_ROUTE_BAD_EFFICIENCY_ROUTE_COLOR = { 1.0, 0.7, 0.5, 0.75 },
 	TRADE_ROUTE_BAD_EFFICIENCY_HOTSPOT_COLOR = { 1.0, 0.0, 0.0, 0.75 },
 	TRADE_ROUTE_PRODUCTION_TRANSFER_COLOR = { 0.0, 0.5, 1.0, 0.75 },
-	TRADE_ROUTE_SUPPLIES_TRANSFER_COLOR = { 1.0, 1.0, 1.0, 0.75 },
+	TRADE_ROUTE_SUPPLIES_TRANSFER_COLOR = { 1.0, 1.0, 1.0, 0.35 },
 	TRADE_ROUTE_RESOURCE_EXPORT_COLOR = { 0.7, 1.0, 0.5, 0.75 },
 	TRADE_ROUTE_RESOURCE_IMPORT_COLOR = { 0.2, 0.9, 1.0, 0.75 },
 	TRADE_ROUTE_LEND_LEASE_EXPORT_COLOR = { 0.5, 1.0, 0.0, 0.75 },
@@ -1204,7 +1199,7 @@ NGraphics = {
 	NATIONAL_FOCUS_SHINE_DISTANCE_SCALE = 0.03,
 	NATIONAL_FOCUS_PULSE_BASE =	10.0,
 	NATIONAL_FOCUS_PULSE_RANDOM = 10.0,
-	POLITICAL_GRID_SMALL_BOX_LIMIT = 50,              	-- Limit for gridbox in political view before it will be replaced with extended gridbox
+	POLITICAL_GRID_SMALL_BOX_LIMIT = 6,              	-- Limit for gridbox in political view before it will be replaced with extended gridbox
 	SETUP_SPIRIT_GRID_BOX_LIMIT = 3,					-- Limit for gridbox in game setup before it will be replaced with extended gridbox
 	POLITICAL_PULSE_BASE =	10.0,
 	POLITICAL_PULSE_RANDOM = 10.0,
@@ -1311,18 +1306,7 @@ NGraphics = {
 
 	RAID_UNIT_ENTITY_BASE_SCALE = 2.0,              -- Base scale of the raid unit entity used to show the progress of the raid (can be further modifier in raid script)
 	RAID_UNIT_ENTITY_OFFSET = { 0.0, 0.0, 0.0 },    -- Raid entity offset from the arrow spline position
-	RAID_CONVOY_ENTITY_START_OFFSET = 15.0,         -- Offset along the arrow where the convoy entity starts (to avoid being placed on land)
 
-	-- The next two values specify how multi-stage animation works for raid units, which is used, for example, for some nuclear rockets.
-	-- Currently, three-stage animation is supported, in order for it to work, the unit entity must have following animation states:
-	--  "idle"			- idle animation of the first stage (looped)
-	--  "idle2_intro"	- intro animation of the second stage (not looped, goes to "idle2" when done)
-	--  "idle2"			- idle animation of the second stage (looped)
-	--  "idle3_intro"	- intro animation of the third stage (not looped, goes to "idle3" when done)
-	--  "idle3"			- idle animation of the third stage (looped)
-	RAID_UNIT_SECOND_STAGE_PROGRESS = 0.33,			-- Specifies raid progress value on [0,1] where second stage is activated
-	RAID_UNIT_THIRD_STAGE_PROGRESS = 0.66,			-- Specifies raid progress value on [0,1] where third stage is activated
-	
 	DEFAULT_NUDGE_FLOATING_HARBOR_DIST = 7.0,       -- Default distance of floating harbors from the coast in pixels, for nudger
 
 	RAID_MAP_ICON_DRAW_DISTANCE_MIN = 10.0,                      -- Below this distance, raid map icons are hidden
@@ -1334,10 +1318,13 @@ NGraphics = {
 
 	NAVAL_DOMINANCE_ICON_MAX_DRAW_DISTANCE = 1000.0,-- The camera distance at which naval dominance map icons are hidden
 	
-	FACTION_PING_MAP_COLOR = { 1.0, 1.0, 1.0, 0.2 },				-- Selected region color
-	FACTION_PING_MAP_AVAILABLE_COLOR = { 0.0, 1.0, 0.0, 0.1 },		-- Available region color
-	FACTION_PING_MAP_UNAVAILABLE_COLOR = { 1.0, 0.0, 0.0, 0.1 },	-- Unavailable region color
-	FACTION_PING_MAP_GRADIENT = 252,								-- Selected region distance gradient
+	FACTION_PING_MAP_NONE_SELECT_COLOR = { 0.1, 0.1, 0.3, 0.98 },				-- Color when you have non selected
+	FACTION_PING_MAP_AVAILABLE_COLOR = {0.3, 0.3, 0.3, 0.5 },		-- Available region color
+	FACTION_PING_MAP_UNAVAILABLE_COLOR = { 0.1, 0.1, 0.3, 1.0 },	-- Unavailable region color
+	FACTION_PING_MAP_COLOR = { 0.99, 0.99, 0.99, 0.05 },				-- Selected region color
+	FACTION_PING_MAP_ALREADY_ASSIGNED_COLOR = { 0.5, 0.5, 0.75, 0.15 },	-- Already assigned to another theater color
+	
+	FACTION_PING_MAP_GRADIENT = 150,								-- Selected region distance gradient
 },
 
 NInterface = {
@@ -1371,12 +1358,6 @@ NInterface = {
 
 	MINIMAP_TOGGLE_DURATION = 0.5,				-- Delay for minimap toggle
 	MINIMAP_TOGGLE_SHIFT = 270,				-- horizontal shift for minimap to close it
-	FOCUS_MINIMAP_SCALE = 0.035,				-- focus-tree mini-map panel pixels per canvas pixel
-	FOCUS_MINIMAP_MIN_SIZE = 48,				-- focus-tree mini-map minimum panel dimension
-
-	INFO_WINDOW_GAP_X = 20,				-- gap between a clicked focus/technology and the details window it opens
-	INFO_WINDOW_OFFSET_Y = 60,				-- how far above the clicked item a details window starts
-	INFO_WINDOW_CASCADE_OFFSET = 40,			-- diagonal step used when a details window would land on an open one
 
 	TIMED_MESSAGE_TIMEOUT = 0.35,					-- Timeout for timed message
 
@@ -1490,16 +1471,14 @@ NInterface = {
 	EQUIPMENT_DESIGNER_SHOW_MODULE_FORBIDS_BASE_ROLE_ICON = 0, -- If this is set to 0 no icon will be displayed if the main tank role is forbidden. If set to 1 the icon will be displayed as normal.
 	EQUIPMENT_DESIGNER_SHOW_MODULE_FORBIDS_SPECIALIZED_ROLE_ICON = 0, -- If this is set to 0 no icons will be displayed for any forbidden specialized roles. If set to 1 the icons will be displayed as normal.
 
+
 	MIO_CENTRAL_TREE_HORIZONTAL_POSITION = 1, -- Horizontal position for auto-generated MIO traits
 
 	SLOW_INTERFACE_THRESHOLD = 5000, -- Show warning "SLOW INTERFACE" in debug when interface refresh takes more that this (in microseconds)
-
+	
 	FIXED_TOOLTIP_POSITION = {	-- The offset from the bottom right of the screen where a fixed map tooltip will be displayed (if enabled in settings)
 		-90, -12
 	},
-
-	NAVAL_HQ_MAP_ICON_BASE = 1.0,		-- The base scaling factor of naval headquarter map icon
-	NAVAL_HQ_MAP_ICON_SELECTED = 1.5,	-- The selected scaling factor of naval headquarter map icon
 },
 
 
@@ -1557,6 +1536,8 @@ NSound = {
 
 	VOICE_OVER_CATEGORY  = "Voices",
 	VOICE_OVER_COOL_DOWN = 2.8, -- Wait for this many seconds before playing another vo
+
+	ABILITY_GENERIC_SOUND_NAME = "ability_generic", -- Sound played in addition to an ability's own sound effect when the player activates an ability
 },
 
 NFriendGUI = {
