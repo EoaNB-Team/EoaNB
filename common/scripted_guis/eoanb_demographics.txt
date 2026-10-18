@@ -1,322 +1,198 @@
 scripted_gui = {
-	culture_bar = {
-		window_name = "culture_stuff_bar"
+
+	eoanb_demographics_window = {
+		window_name = "eoanb_demographics_window"
 		parent_window_token = politics_tab
 
 		context_type = player_context
 
 		visible = {
-			OR = {
-				is_ai = yes
-				check_variable = { show_demographics_window > 0 }
-			}
+			check_variable = { show_demographics_window > 0 }
 		}
 
 		properties = {
-			national_culture = {
-				image = "[?national_culture_array^i.GetSubcultureLogo]"
-			}
+			top_culture_icon  = { image = "[?demo_top_culture^i.GetSubcultureLogo]" }
+			top_religion_icon = { image = "[?demo_top_religion^i.GetNationalReligion1Icon]" }
 		}
 
 		effects = {
-			national_culture_click = {
-				clear_array = national_culture_array_2
-				clear_array = national_culture_array_2_percentage
-				clear_array = national_culture_array_2_num
-				every_owned_state = {
-					for_each_loop = {
-						array = state_culture_array
-						if = {
-							limit = {
-								NOT = {
-									is_in_array = { ROOT.national_culture_array_2 = v }
-								}
-							}
-						add_to_array = { ROOT.national_culture_array_2 = v }
-						}
-					}
-				}
-				update_culture_pops = yes
-				update_percentage_pop_culture = yes
-				set_temp_variable = { show = 1 }
-				ROOT = {
-					set_temp_variable = { show = 1 }
-					subtract_from_temp_variable = { show = show_national_culture_list }
-					set_variable = { show_national_religion_list = 0 }
-					set_variable = { show_national_culture_list = show }
-				}
-			}
 			close_button_click = {
+				clear_variable = show_demographics_window
+				clear_variable = demographics_tab
+			}
+			refresh_button_click = {
+				eoanb_build_national_demographics = yes
+			}
+		}
+
+		dynamic_lists = {
+			top_culture_grid = {
+				array = demo_top_culture
+				entry_container = eoanb_demo_top_culture
+			}
+			top_religion_grid = {
+				array = demo_top_religion
+				entry_container = eoanb_demo_top_religion
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	#=====================================================================
+	#  CULTURE TAB
+	#=====================================================================
+	eoanb_demographics_cultures = {
+		window_name = "eoanb_demo_culture_panel"
+		parent_window_token = politics_tab
+
+		context_type = player_context
+
+		visible = {
+			check_variable = { show_demographics_window > 0 }
+			NOT = { check_variable = { demographics_tab > 0 } }
+		}
+
+		properties = {
+			culture_icon      = { image = "[?national_culture_array_2^ci.GetSubcultureLogo]" }
+			culture_share_bar = { frame = national_culture_array_2_bar^ci }
+		}
+
+		effects = {
+			c_tab_self_click  = { set_variable = { demographics_tab = 0 } }
+			c_tab_other_click = { set_variable = { demographics_tab = 1 } }
+		}
+
+		dynamic_lists = {
+			culture_rows = {
+				array = national_culture_array_2
+				entry_container = eoanb_demo_culture_row
+				index = ci
+			}
+		}
+
+		triggers = {
+			c_status_primary_visible = {
+				is_in_array = { array = national_culture_array value = national_culture_array_2^ci }
+			}
+			c_status_accepted_visible = {
+				NOT = { is_in_array = { array = national_culture_array value = national_culture_array_2^ci } }
+				is_in_array = { array = accepted_culture_array value = national_culture_array_2^ci }
+			}
+			c_status_marginalised_visible = {
+				NOT = { is_in_array = { array = national_culture_array value = national_culture_array_2^ci } }
+				NOT = { is_in_array = { array = accepted_culture_array value = national_culture_array_2^ci } }
+				is_in_array = { array = marginalised_culture_array value = national_culture_array_2^ci }
+			}
+			c_status_default_visible = {
+				NOT = { is_in_array = { array = national_culture_array value = national_culture_array_2^ci } }
+				NOT = { is_in_array = { array = accepted_culture_array value = national_culture_array_2^ci } }
+				NOT = { is_in_array = { array = marginalised_culture_array value = national_culture_array_2^ci } }
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	#=====================================================================
+	#  RELIGION TAB
+	#=====================================================================
+	eoanb_demographics_religions = {
+		window_name = "eoanb_demo_religion_panel"
+		parent_window_token = politics_tab
+
+		context_type = player_context
+
+		visible = {
+			check_variable = { show_demographics_window > 0 }
+			check_variable = { demographics_tab > 0 }
+		}
+
+		properties = {
+			religion_icon      = { image = "[?national_religion_array_2^ri.GetNationalReligion1Icon]" }
+			religion_share_bar = { frame = national_religion_array_2_bar^ri }
+		}
+
+		effects = {
+			r_tab_self_click  = { set_variable = { demographics_tab = 1 } }
+			r_tab_other_click = { set_variable = { demographics_tab = 0 } }
+		}
+
+		dynamic_lists = {
+			religion_rows = {
+				array = national_religion_array_2
+				entry_container = eoanb_demo_religion_row
+				index = ri
+			}
+		}
+
+		triggers = {
+			r_status_primary_visible = {
+				is_in_array = { array = national_religion_array value = national_religion_array_2^ri }
+			}
+			r_status_accepted_visible = {
+				NOT = { is_in_array = { array = national_religion_array value = national_religion_array_2^ri } }
+				is_in_array = { array = accepted_religion_array value = national_religion_array_2^ri }
+			}
+			r_status_marginalised_visible = {
+				NOT = { is_in_array = { array = national_religion_array value = national_religion_array_2^ri } }
+				NOT = { is_in_array = { array = accepted_religion_array value = national_religion_array_2^ri } }
+				is_in_array = { array = marginalised_religion_array value = national_religion_array_2^ri }
+			}
+			r_status_default_visible = {
+				NOT = { is_in_array = { array = national_religion_array value = national_religion_array_2^ri } }
+				NOT = { is_in_array = { array = accepted_religion_array value = national_religion_array_2^ri } }
+				NOT = { is_in_array = { array = marginalised_religion_array value = national_religion_array_2^ri } }
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	#=====================================================================
+	#  POLITICS TAB BUTTON
+	#=====================================================================
+	show_demographics_window = {
+		context_type = player_context
+
+		window_name = "show_demographics_window"
+		parent_window_token = politics_tab
+
+		visible = { is_ai = no }
+
+		effects = {
+			show_demographics_button_click = {
 				if = {
-					limit = {
-						has_variable = show_demographics_window
-					}
-					clear_variable = show_national_religion_list
-					clear_variable = show_national_culture_list
+					limit = { has_variable = show_demographics_window }
 					clear_variable = show_demographics_window
+					clear_variable = demographics_tab
 				}
 				else = {
 					clear_variable = show_economy_window
 					set_variable = { show_demographics_window = 1 }
+					set_variable = { demographics_tab = 0 }
+					eoanb_build_national_demographics = yes
 				}
 			}
 		}
 
-		dynamic_lists = {
-			show_grid = {
-				array = national_culture_array
-				entry_container = show_entry_5
-			}
-		}
-		triggers = {
-			cultureplaceholder1_visible = {
-				NOT = { check_variable = { national_culture_array^1 > 0 } }
-			}
-			cultureplaceholder2_visible = {
-				NOT = { check_variable = { national_culture_array^1 > 0 } }
-			}
-			religionplaceholder1_visible = {
-				NOT = { check_variable = { national_religion_array^1 > 0 } }
-			}
-		}
-
-		ai_enabled = {
-			always = no
-		}
-	}
-	religion_bar = {
-		window_name = "religion_stuff_bar"
-		parent_window_token = politics_tab
-
-		context_type = player_context
-
-		visible = {
-			OR = {
-				is_ai = yes
-				check_variable = { show_demographics_window > 0 }
-			}
-		}
-
- 		properties = {
-			national_religion = {
-				image = "[?national_religion_array^i.GetNationalReligion1Icon]"
-			}
-		}
-
-		effects = {
-			national_religion_click = {
-				clear_array = national_religion_array_2
-				clear_array = national_religion_array_2_percentage
-				clear_array = national_religion_array_2_num
-				every_owned_state = {
-					for_each_loop = {
-						array = state_religion_array
-						if = {
-							limit = {
-								NOT = {
-									is_in_array = { ROOT.national_religion_array_2 = v }
-								}
-							}
-						add_to_array = { ROOT.national_religion_array_2 = v }
-						}
-					}
-				}
-				update_religion_pops = yes
-				update_percentage_pop_religion = yes
-				
-				ROOT = {
-					set_temp_variable = { show = 1 }
-					subtract_from_temp_variable = { show = show_national_religion_list }
-					set_variable = { show_national_culture_list = 0 }
-					set_variable = { show_national_religion_list = show }
-				}
-			}
-		}
-
-		dynamic_lists = {
-			show_grid = {
-				array = national_religion_array
-				entry_container = show_entry_2525
-			}
-		}
-		triggers = {
-		}
-		ai_enabled = {
-			always = no
-		}
+		ai_enabled = { always = no }
 	}
 
-	culture_list_national = {
-		window_name = "culture_list_national"
-		#parent_window_token = culture_stuff_bar
-
-		context_type = player_context
-
-		visible = {
-			is_ai = no
-			check_variable = {
-				show_national_culture_list > 0
-			}
-		}
-
- 		properties = {
-			culture_icons = {
-				image = "[?ROOT.national_culture_array_2^i.GetSubcultureLogo]"
-			}
-			culture_icons_status = {
-				image = "[?national_culture_array_2^i.GetSubcultureStatus]"
-			}
-		}
-
-		effects = {
-			close_button_click = {
-				set_variable = { show_national_culture_list = 0 }
-			}
-		}
-		dynamic_lists = {
-			show_gridculturelist = {
-				array = national_culture_array_2
-				entry_container = show_entryculturelist
-			}
-		}
-		triggers = {
-			state_culture_default_bg_visible = {
-				OWNER = {
-					NOT = {
-						is_in_array = {
-							array = national_culture_array
-							value = v
-						}
-					}
-				}
-			}
-			state_culture_primary_bg_visible = {
-				OWNER = {
-					is_in_array = {
-						array = national_culture_array
-						value = v
-					}
-				}
-			}
-			state_culture_accepted_bg_visible = {
-				OWNER = {
-					AND = {
-						NOT = {
-							is_in_array = {
-								array = national_culture_array
-								value = v
-							}
-						}
-						is_in_array = {
-							array = accepted_culture_array
-							value = v
-						}
-					}
-				}
-			}
-		}
-		ai_enabled = {
-			always = no
-		}
-	}
-
-	religion_list_national = {
-		window_name = "religion_list_national"
-		#parent_window_token = culture_stuff_bar
-
-		context_type = player_context
-
-		visible = {
-			check_variable = {
-				show_national_religion_list > 0
-			}
-		}
-
- 		properties = {
-			religion_icons = {
-				image = "[?ROOT.national_religion_array_2^i.GetNationalReligion1Icon]"
-			}
-			religion_icons_status = {
-				image = "[GetSubcultureStatus]"
-			}
-		}
-
-		effects = {
-			close_button_click = {
-				set_variable = { show_national_religion_list = 0 }
-			}
-		}
-		dynamic_lists = {
-			show_gridreligionlist = {
-				array = national_religion_array_2
-				entry_container = show_entryreligionlist
-			}
-		}
-		triggers = {
-			state_religion_default_bg_visible = {
-				OWNER = {
-					NOT = {
-						is_in_array = {
-							array = national_religion_array
-							value = v
-						}
-					}
-				}
-			}
-			state_religion_primary_bg_visible = {
-				OWNER = {
-					is_in_array = {
-						array = national_religion_array
-						value = v
-					}
-				}
-			}
-			state_religion_accepted_bg_visible = {
-				OWNER = {
-					AND = {
-						NOT = {
-							is_in_array = {
-								array = national_religion_array
-								value = v
-							}
-						}
-						is_in_array = {
-							array = accepted_religion_array
-							value = v
-						}
-					}
-				}
-			}
-		}
-		ai_enabled = {
-			always = no
-		}
-	}
-
+	#=====================================================================
+	#  FOREIGN COUNTRY SUMMARY (diplomacy / economy panels)
+	#=====================================================================
 	culture_bar_foreign_diplo = {
-	   window_name = "culture_stuff_bar_foreign_diplo"
-	   parent_window_token = selected_country_view_info
+		window_name = "culture_stuff_bar_foreign_diplo"
+		parent_window_token = selected_country_view_info
 
-	   context_type = diplomacy_target_context
+		context_type = diplomacy_target_context
 
-		visible = {
-		}
+		visible = { always = yes }
 
- 		properties = {
-			national_culture2 = {
-				image = "[?This.national_culture_array^i.GetSubcultureLogo]"
-			}
-			national_religion2 = {
-				image = "[?This.national_religion_array^i.GetNationalReligion1Icon]"
-			}
-		}
-
-		effects = {
-			# national_culture_click = {
-				# set_temp_variable = { show = 1 }
-				# subtract_from_temp_variable = { show = show_national_culture_list }
-				# set_variable = { show_national_culture_list = show }
-			# }
+		properties = {
+			national_culture2  = { image = "[?This.national_culture_array^i.GetSubcultureLogo]" }
+			national_religion2 = { image = "[?This.national_religion_array^i.GetNationalReligion1Icon]" }
 		}
 
 		dynamic_lists = {
@@ -329,37 +205,21 @@ scripted_gui = {
 				entry_container = culture_stuff_bar_foreign_diplo2
 			}
 		}
-		triggers = {
-		}
-		ai_enabled = {
-			always = no
-		}
+
+		ai_enabled = { always = no }
 	}
 
 	culture_bar_foreign_diplo_lar = {
-	   window_name = "culture_stuff_bar_foreign_diplo_lar"
-	   parent_window_name = economy_panel
+		window_name = "culture_stuff_bar_foreign_diplo_lar"
+		parent_window_name = economy_panel
 
-	   context_type = diplomacy_target_context
+		context_type = diplomacy_target_context
 
-		visible = {
-		}
+		visible = { always = yes }
 
- 		properties = {
-			national_culture2 = {
-				image = "[?This.national_culture_array^i.GetSubcultureLogo]"
-			}
-			national_religion2 = {
-				image = "[?This.national_religion_array^i.GetNationalReligion1Icon]"
-			}
-		}
-
-		effects = {
-			# national_culture_click = {
-				# set_temp_variable = { show = 1 }
-				# subtract_from_temp_variable = { show = show_national_culture_list }
-				# set_variable = { show_national_culture_list = show }
-			# }
+		properties = {
+			national_culture2  = { image = "[?This.national_culture_array^i.GetSubcultureLogo]" }
+			national_religion2 = { image = "[?This.national_religion_array^i.GetNationalReligion1Icon]" }
 		}
 
 		dynamic_lists = {
@@ -372,45 +232,48 @@ scripted_gui = {
 				entry_container = culture_stuff_bar_foreign_diplo2
 			}
 		}
-		triggers = {
-		}
-		ai_enabled = {
-			always = no
-		}
+
+		ai_enabled = { always = no }
 	}
 
+	#=====================================================================
+	#  STATE VIEW
+	#=====================================================================
 	culture_state_majority = {
-	   window_name = "culture_state_majority"
-	   parent_window_token = selected_state_view
+		window_name = "culture_state_majority"
+		parent_window_token = selected_state_view
 
-	   context_type = selected_state_context
+		context_type = selected_state_context
 
-		visible = {
-		}
+		visible = { always = yes }
 
- 		properties = {
-			state_culture_maj = {
-				image = "[?state_culture_array^i.GetSubcultureLogo]"
-			}
-			state_religion_maj = {
-				image = "[?state_religion_array^i.GetNationalReligion1Icon]"
-			}
+		properties = {
+			state_culture_maj  = { image = "[?state_culture_array^i.GetSubcultureLogo]" }
+			state_religion_maj = { image = "[?state_religion_array^i.GetNationalReligion1Icon]" }
 		}
 
 		effects = {
 			state_culture_maj_click = {
 				clear_array = state_culture_array_pop
+				clear_array = state_culture_array_bar
 				for_each_loop = {
-				 	array = state_culture_array_num
+					array = state_culture_array_num
+					value = v
 
-					set_temp_variable = {
-						state_pop_temp = state_population_k
-					}
+					set_temp_variable = { state_pop_temp = state_population_k }
 					multiply_temp_variable = { state_pop_temp = v }
 					add_to_array = {
 						array = state_culture_array_pop
-						#index = state_culture_array
 						value = state_pop_temp
+					}
+
+					# 0-1 fraction -> 0-100 progress bar frame
+					set_temp_variable = { state_bar_temp = v }
+					multiply_temp_variable = { state_bar_temp = 100 }
+					round_temp_variable = state_bar_temp
+					add_to_array = {
+						array = state_culture_array_bar
+						value = state_bar_temp
 					}
 				}
 
@@ -421,19 +284,27 @@ scripted_gui = {
 					set_variable = { show_state_culture_list = show }
 				}
 			}
+
 			state_religion_maj_click = {
 				clear_array = state_religion_array_pop
+				clear_array = state_religion_array_bar
 				for_each_loop = {
-				 	array = state_religion_array_num
+					array = state_religion_array_num
+					value = v
 
-					set_temp_variable = {
-						state_pop_temp = state_population_k
-					}
+					set_temp_variable = { state_pop_temp = state_population_k }
 					multiply_temp_variable = { state_pop_temp = v }
 					add_to_array = {
 						array = state_religion_array_pop
-						#index = state_religion_array
 						value = state_pop_temp
+					}
+
+					set_temp_variable = { state_bar_temp = v }
+					multiply_temp_variable = { state_bar_temp = 100 }
+					round_temp_variable = state_bar_temp
+					add_to_array = {
+						array = state_religion_array_bar
+						value = state_bar_temp
 					}
 				}
 
@@ -456,15 +327,10 @@ scripted_gui = {
 				entry_container = show_entry_religion_state
 			}
 		}
-		triggers = {
-		}
 
-		ai_enabled = {
-			always = no
-		}
+		ai_enabled = { always = no }
 	}
 
-	# Culture window
 	culture_list_state = {
 		window_name = "culture_list_state"
 		parent_window_token = selected_state_view
@@ -473,62 +339,108 @@ scripted_gui = {
 
 		visible = { ROOT = { check_variable = { show_state_culture_list > 0 } } }
 
- 		properties = { culture_icons = { image = "[?state_culture_array^i.GetSubcultureLogo]" } }
+		properties = {
+			culture_icons           = { image = "[?state_culture_array^sci.GetSubcultureLogo]" }
+			state_culture_share_bar = { frame = state_culture_array_bar^sci }
+		}
 
 		effects = {
-			# national_culture_click = {
-				# set_temp_variable = { show = 1 }
-				# subtract_from_temp_variable = { show = show_national_culture_list }
-				# set_variable = { show_national_culture_list = show }
-			# }
+			close_button_click = {
+				ROOT = { set_variable = { show_state_culture_list = 0 } }
+			}
 		}
 
 		dynamic_lists = {
 			show_gridculturelist = {
 				array = state_culture_array
 				entry_container = show_entryculturelist_state
+				index = sci
 			}
 		}
+
 		triggers = {
-			state_culture_default_bg_visible = {
-				OWNER = {
-					NOT = {
-						is_in_array = {
-							array = national_culture_array
-							value = v
-						}
-					}
-				}
-			}
 			state_culture_primary_bg_visible = {
-				OWNER = {
-					is_in_array = {
-						array = national_culture_array
-						value = v
-					}
-				}
+				OWNER = { is_in_array = { array = national_culture_array value = PREV.state_culture_array^sci } }
 			}
 			state_culture_accepted_bg_visible = {
 				OWNER = {
-					AND = {
-						NOT = {
-							is_in_array = {
-								array = national_culture_array
-								value = v
-							}
-						}
-						is_in_array = {
-							array = accepted_culture_array
-							value = v
-						}
-					}
+					NOT = { is_in_array = { array = national_culture_array value = PREV.state_culture_array^sci } }
+					is_in_array = { array = accepted_culture_array value = PREV.state_culture_array^sci }
+				}
+			}
+			state_culture_marginalised_bg_visible = {
+				OWNER = {
+					NOT = { is_in_array = { array = national_culture_array value = PREV.state_culture_array^sci } }
+					NOT = { is_in_array = { array = accepted_culture_array value = PREV.state_culture_array^sci } }
+					is_in_array = { array = marginalised_culture_array value = PREV.state_culture_array^sci }
+				}
+			}
+			state_culture_default_bg_visible = {
+				OWNER = {
+					NOT = { is_in_array = { array = national_culture_array value = PREV.state_culture_array^sci } }
+					NOT = { is_in_array = { array = accepted_culture_array value = PREV.state_culture_array^sci } }
+					NOT = { is_in_array = { array = marginalised_culture_array value = PREV.state_culture_array^sci } }
 				}
 			}
 		}
 
-		ai_enabled = {
-			always = no
+		ai_enabled = { always = no }
+	}
+
+	religion_list_state = {
+		window_name = "religion_list_state"
+		parent_window_token = selected_state_view
+
+		context_type = selected_state_context
+
+		visible = { ROOT = { check_variable = { show_state_religion_list > 0 } } }
+
+		properties = {
+			religion_icons           = { image = "[?state_religion_array^sri.GetNationalReligion1Icon]" }
+			state_religion_share_bar = { frame = state_religion_array_bar^sri }
 		}
+
+		effects = {
+			close_button_click = {
+				ROOT = { set_variable = { show_state_religion_list = 0 } }
+			}
+		}
+
+		dynamic_lists = {
+			show_gridreligionlist = {
+				array = state_religion_array
+				entry_container = show_entryreligionlist_state
+				index = sri
+			}
+		}
+
+		triggers = {
+			state_religion_primary_bg_visible = {
+				OWNER = { is_in_array = { array = national_religion_array value = PREV.state_religion_array^sri } }
+			}
+			state_religion_accepted_bg_visible = {
+				OWNER = {
+					NOT = { is_in_array = { array = national_religion_array value = PREV.state_religion_array^sri } }
+					is_in_array = { array = accepted_religion_array value = PREV.state_religion_array^sri }
+				}
+			}
+			state_religion_marginalised_bg_visible = {
+				OWNER = {
+					NOT = { is_in_array = { array = national_religion_array value = PREV.state_religion_array^sri } }
+					NOT = { is_in_array = { array = accepted_religion_array value = PREV.state_religion_array^sri } }
+					is_in_array = { array = marginalised_religion_array value = PREV.state_religion_array^sri }
+				}
+			}
+			state_religion_default_bg_visible = {
+				OWNER = {
+					NOT = { is_in_array = { array = national_religion_array value = PREV.state_religion_array^sri } }
+					NOT = { is_in_array = { array = accepted_religion_array value = PREV.state_religion_array^sri } }
+					NOT = { is_in_array = { array = marginalised_religion_array value = PREV.state_religion_array^sri } }
+				}
+			}
+		}
+
+		ai_enabled = { always = no }
 	}
 
 	culture_mapmode_gui = {
@@ -545,71 +457,6 @@ scripted_gui = {
 		ai_enabled = { always = no }
 	}
 
-	# Religion window
-	religion_list_state = {
-		window_name = "religion_list_state"
-		parent_window_token = selected_state_view
-
-		context_type = selected_state_context
-
-		visible = { ROOT = { check_variable = { show_state_religion_list > 0 } } }
-
- 		properties = { religion_icons = { image = "[?FROM.national_religion_array^i.GetNationalReligion1Icon]" } }
-
-		effects = {
-			# national_culture_click = {
-				# set_temp_variable = { show = 1 }
-				# subtract_from_temp_variable = { show = show_national_culture_list }
-				# set_variable = { show_national_culture_list = show }
-			# }
-		}
-
-		dynamic_lists = {
-			show_gridreligionlist = {
-				array = state_religion_array
-				entry_container = show_entryreligionlist_state
-			}
-		}
-		triggers = {
-			state_religion_default_bg_visible = {
-				OWNER = {
-					NOT = {
-						is_in_array = {
-							array = national_religion_array
-							value = v
-						}
-					}
-				}
-			}
-			state_religion_primary_bg_visible = {
-				OWNER = {
-					is_in_array = {
-						array = national_religion_array
-						value = v
-					}
-				}
-			}
-			state_religion_accepted_bg_visible = {
-				OWNER = {
-					AND = {
-						NOT = {
-							is_in_array = {
-								array = national_religion_array
-								value = v
-							}
-						}
-						is_in_array = {
-							array = accepted_religion_array
-							value = v
-						}
-					}
-				}
-			}
-		}
-
-		ai_enabled = { always = no }
-	}
-
 	religion_mapmode_gui = {
 		context_type = country_mapicon
 		mapmode = religion_map_mode
@@ -619,29 +466,5 @@ scripted_gui = {
 		properties = { religion_icons = { image = "GFX_idea_[?THIS.national_religion_array^i.religion_id]" } }
 
 		ai_enabled = { always = no }
-	}
-
-	show_demographics_window = {
-		context_type = player_context
-
-		window_name = "show_demographics_window"
-		parent_window_token = politics_tab
-
-		visible = { is_ai = no }
-
-		effects = {
-			show_demographics_button_click = {
-				if = {
-					limit = { has_variable = show_demographics_window }
-					clear_variable = show_national_religion_list
-					clear_variable = show_national_culture_list
-					clear_variable = show_demographics_window
-				}
-				else = {
-					clear_variable = show_economy_window
-					set_variable = { show_demographics_window = 1 }
-				}
-			}
-		}
 	}
 }

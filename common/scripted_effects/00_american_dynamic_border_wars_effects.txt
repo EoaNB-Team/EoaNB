@@ -509,23 +509,34 @@ set_dynamic_american_state_province_variable_for_defender = {
 }
 
 start_dynamic_american_state_border_war_USA = {
-	
-	start_border_war = {
-		change_state_after_war = no
-		attacker = {
-			state = var:FROM.attacker_state_vs_@ROOT
-			num_provinces = 1
-			on_win = first_nations_tribal_raid.26 #US attacks and wins
-			on_lose = first_nations_tribal_raid.27 #US attacks and loses
-			on_cancel = first_nations_tribal_raid.28 #US attacks but then goes "nah"
+
+	set_temp_variable = { dynamic_border_war_started = 0 }
+	if = {
+		limit = {
+			check_variable = { var = FROM.attacker_state_vs_@ROOT value = 0 compare = greater_than }
+			check_variable = { var = FROM.defender_state_vs_@ROOT value = 0 compare = greater_than }
+			var:FROM.attacker_state_vs_@ROOT = {
+				any_neighbor_state = { state = var:FROM.defender_state_vs_@ROOT }
+			}
 		}
-		
-		defender = {
-			state = var:FROM.defender_state_vs_@ROOT
-			num_provinces = 1
-			on_win = first_nations_tribal_raid.29 #FN defends and wins
-			on_lose = first_nations_tribal_raid.30 #FN defends but loses, F
-			on_cancel = first_nations_tribal_raid.220 #FN defends but then gets confused when the white-man fucks off home
+		set_temp_variable = { dynamic_border_war_started = 1 }
+		start_border_war = {
+			change_state_after_war = no
+			attacker = {
+				state = var:FROM.attacker_state_vs_@ROOT
+				num_provinces = 1
+				on_win = first_nations_tribal_raid.26 #US attacks and wins
+				on_lose = first_nations_tribal_raid.27 #US attacks and loses
+				on_cancel = first_nations_tribal_raid.28 #US attacks but then goes "nah"
+			}
+
+			defender = {
+				state = var:FROM.defender_state_vs_@ROOT
+				num_provinces = 1
+				on_win = first_nations_tribal_raid.29 #FN defends and wins
+				on_lose = first_nations_tribal_raid.30 #FN defends but loses, F
+				on_cancel = first_nations_tribal_raid.220 #FN defends but then gets confused when the white-man fucks off home
+			}
 		}
 	}
 	hidden_effect = {
@@ -550,7 +561,8 @@ start_dynamic_american_state_border_war_USA = {
 			}
 		}
 		if = {
-			limit = { 
+			limit = {
+				check_variable = { dynamic_border_war_started = 1 }
 				ROOT = { owns_state = var:FROM.attacker_state_vs_@ROOT } #Attacker
 				FROM = { owns_state = var:FROM.defender_state_vs_@ROOT } #Defender
 			}
