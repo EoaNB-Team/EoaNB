@@ -621,12 +621,19 @@ NProduction = {
 	RAILWAY_GUN_REPAIR_SPEED = 8.0,			-- Railway gun strength repair speed per factory
 	EFFICIENCY_LOSS_PER_UNUSED_DAY = 1,		-- Daily loss of efficiency for unused factory slots ( efficiency is tracked per factory slot in the production line )
 	RESOURCE_PENALTY_WARNING_CRITICAL_RATIO =  0.8, -- Switch to red progress bar if penalty is over threshold
-	RESOURCE_TO_ENERGY_COEFFICIENT = 10.0,		-- How much energy per coal produces
-	BASE_COUNTRY_ENERGY_PRODUCTION = 10.0, 			-- The base energy production of a country
-	ENERGY_SCALING_COST_BY_FACTORY_COUNT = 0.02, -- Scales energy cost based on the total number of factories
-	BASE_ENERGY_COST = 1.0,						-- How much energy per factory consumes
-	ENERGY_COST_CAP = 6,						-- Maximum energy cost per factory
-	ENERGY_SCALE_PER_TRADE_FACTORY_EXPORT = 0.25, -- Factor of how many of the factories gained from trade is affects the energy cost scaling
+	POWER_PLANT_BASE_OUTPUT = 8.0,					-- Flat power a Power Plant generates before terrain
+	POWER_PLANT_EXTRA_LEVEL_OUTPUT = 8.0,			-- Flat power each Power Plant level beyond the first adds, without terrain/river bonuses
+	POWER_PLANT_DAMAGED_LEVEL_FACTOR = 0.25,		-- Share of normal output a damaged Power Plant level still generates
+	RIVER_PROVINCE_POWER_GENERATION = 0.25,			-- Extra Power Plant output per river province in the state
+	POWER_PLANT_OUTPUT_PER_OIL = 0.2,				-- Extra output per Power Plant level for each unit of the state's own oil (not from buildings)
+	POWER_PLANT_OIL_OUTPUT_CAP = 10.0,				-- Max extra output per Power Plant level from the state's oil, before power_from_oil_factor
+	POWER_PLANT_MAX_COAL = 20,						-- Max coal each Power Plant burns per day to cover a power deficit
+	POWER_PER_COAL = 1.5,							-- Power generated per coal burned
+	POWER_PLANT_MAX_OIL = 4,						-- Max oil each Power Plant burns per day to cover a power deficit
+	POWER_PER_OIL = 2.0,							-- Power generated per oil burned
+	POWER_OIL_BURN_FUEL_RATIO_HALVE = 0.8,			-- Below this fuel reserve ratio, oil burned for power is halved
+	POWER_OIL_BURN_FUEL_RATIO_CUTOFF = 0.4,		-- Below this fuel reserve ratio, oil can no longer be burned for power
+	POWER_SURPLUS_PER_FACTORY_FOR_FULL_BONUS = 1.0,	-- Spare power capacity per civilian, military and naval factory at which power_surplus applies in full
 	BASE_FACTORY_SPEED = 5, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
 	BASE_FACTORY_SPEED_MIL = 5, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
 	BASE_FACTORY_SPEED_NAV = 2.0, 				-- Base factory speed multiplier (how much hoi3 style IC each factory gives).
@@ -773,6 +780,7 @@ NMilitary = {
 
 	CASUALTIES_WS_P_PENALTY_DIVISOR = 200,							--Divisor for casualties WS penalty
 	CASUALTIES_WS_A_PENALTY_DIVISOR = 600,							--Divisor for casualties WS penalty
+	MAX_CASUALTY_TRICKLEBACK = 0.95,								--Upper cap on casualty trickleback so it can't create more troops than die
 	
 	PIERCING_THRESHOLDS = {					-- Our piercing / their armor must be this value to deal damage fraction equal to the index in the array below [higher number = higher penetration]. If armor is 0, 1.00 will be returned.
 		1.00,
@@ -813,6 +821,7 @@ NMilitary = {
 	VPS_FOR_HIGH_HISTORY_ENTRY = 8,				-- VPs required for high-level history entry
 	ENTRIES_TO_CHECK_FOR_DUPLICATE = 2,			-- Max number of history entries to check back to see if we're being awarded the same entry
 	COST_INCREASE_PER_ACTIVE_MEDAL = 0.25,		-- Additional cost factor per active medal
+	MEDAL_AWARD_CONFIRM_PP_THRESHOLD = 200.0,	-- Below this much political power, awarding a medal asks for confirmation; at or above it is granted directly
 	MAX_ENTRY_ELISION_COUNT = 4,				-- If we do the same type of thing consecutively, each entry will stack locations up to this number
 	GENERATE_AI_DIV_COMMAND_HISTORY_ENTRIES = true,	--Should we generate history entries for the AI (may cause savegame bloat)
 	GENERATE_AI_DIV_COMMAND_MEDALS = 0.10,		-- Chance for AI to award a medal when receiving a history entry that allows it. Also gives a chance for AI to gain history entries irrespective of the setting above
@@ -3083,6 +3092,7 @@ NAI = {
 	MAX_AVAILABLE_MANPOWER_RATIO_TO_BUFFER_PEACETIME = 0.2,		-- deployment will try to buffer a ratio of manpower (for reinforcements) during peace time
 
 	MANPOWER_RATIO_REQUIRED_TO_PRIO_MOBILIZATION_LAW = 0.4,		-- percentage of manpower in field is desired to be buffered for AI when it has upcoming wars or already at war. if it has less manpower, it will prio manpower laws
+	MOBILIZATION_RATIO_REQUIRED_TO_RAISE_MOBILIZATION_LAW = 0.50,		-- ratio of its target conscription an AI must already have mobilized before a higher conscription law is treated as urgent. raising the law does not speed up mobilization, so escalating below this only pays the industrial penalty
 	UPGRADES_DEFICIT_LIMIT_DAYS = 50,                           -- Ai will avoid upgrading units in the field to new templates if it takes longer than this to fullfill their equipment need
 
 	GIE_EXILE_AIR_MANPOWER_USAGE_RATIO = 0.2, -- AI will not deploy new exile wings when this percentage of available exile manpower is already used for wing recruitment.
@@ -3192,6 +3202,12 @@ NAI = {
 	CONSTRUCTION_PRIO_FACTOR_REPAIRING = 0.30,                                  -- factor prio with this if building is being repaired
 	-- <end> construction prioritization
 
+	POWER_RATIO_TO_BUILD_POWER_PLANT = 1.0,		-- AI queues a Power Plant when its power ratio drops below this
+	POWER_PLANT_BUILD_WEIGHT = 100,				-- construction queue weight of an AI Power Plant at a total blackout, scaled down by how close to fulfilled the power ratio is
+	POWER_PLANT_URGENT_BUILD_WEIGHT = 100,		-- construction queue weight when a Power Plant pays for itself right away; at or above this a Power Plant also bypasses the parallel construction limit
+	POWER_PLANT_UPGRADE_COAL_SURPLUS = 50,		-- unburnt Coal at which the AI deepens an existing Power Plant instead of spreading a new one
+	POWER_PLANT_MAX_STATES_TO_EVALUATE = 25,	-- max number of buildable states the AI scores by "Power Plant output gain"
+	POWER_PLANT_GENERATION_UTILIZATION_TO_BUILD = 0.9,		-- AI also queues a Power Plant once generation reaches this share of the grid's max output, even without an actual power ratio shortfall
 
 	MAX_FACTORY_TO_SPARE_FOR_MISSION_FUEL_TRADE = 0.12, 						-- amount of factories to spend on oil trade in case of fuel need for missions
 	MAX_FACTORY_TO_SPARE_FOR_CRITICAL_MISSION_FUEL_TRADE = 0.3, 			-- amount of factories to spend on oil trade in case of fuel need for prio missions
@@ -4650,6 +4666,7 @@ NDoctrines = {
         MASTERY_BAR_MAX_ANIMATION_SPEED = 50.0,               -- Max speed of the mastery bar animation
         MASTERY_BANK_CONVERSION_RATE = 0.25,                    -- The rate at which mastery gained when a track is finished or empty is "banked"
         MASTERY_BANK_MAX = 200.0,                               -- The maximum amount of mastery that can be banked
+		SUBDOCTRINE_SWITCH_MASTERY_REFUND_RATE = 0.25,          -- The fraction of mastery that is 'refunded' when switched to a different subdoctrine
         MILITARY_ATTACHE_MASTERY_TRANSFER_FACTOR = 0.1,         -- For each mastery track, military attaches will add this fraction of their visiting country's mastery gain (from units only) in that track
         THEATER_COMMANDER_UNITS_MASTERY_GAIN_FACTOR_PER_SKILL = 0.01,  -- Unit in a theater commander's theater will contribute this fraction of their mastery gain to the theater commander's country, for each skill point they have in attack + defense
 	NAVAL_MISSION_MASTERY_GAIN_FACTORS = {  -- Mastery gain from naval missions is reduced, just like training
