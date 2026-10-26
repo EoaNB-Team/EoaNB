@@ -64,8 +64,6 @@ NDefines.NProduction.MAX_EQUIPMENT_RESOURCES_NEED = 6
 NDefines.NProduction.MIN_POSSIBLE_TRAINING_MANPOWER = 5000
 NDefines.NProduction.CONVERSION_SPEED_BONUS = 2.0
 NDefines.NProduction.BASE_LAND_EQUIPMENT_CONVERSION_IC_COST_FACTOR = 0.2
-NDefines.NProduction.BASE_TECH_COST = 1000
-NDefines.NProduction.MIN_RESEARCH_SPEED = 0.0
 
 -- NPolitics
 NDefines.NPolitics.ARMY_LEADER_MAX_COST = 100
@@ -386,6 +384,10 @@ NDefines.NFocus.FOCUS_POINT_DAYS = 1
 -- NOperatives
 NDefines.NOperatives.TECH_STEAL_EQUIPMENT_FACTOR = 2
 
+-- NTechnology
+NDefines.NTechnology.BASE_TECH_COST = 1000
+NDefines.NTechnology.MIN_RESEARCH_SPEED = 0.0
+
 -- NIntel
 NDefines.NIntel.CIVILIAN_INTEL_NEEDED_TO_SHOW_FOCUS_TREE = 0.7
 NDefines.NIntel.CIVILIAN_INTEL_NEEDED_TO_SHOW_CURRENT_FOCUS = 0.3
@@ -454,7 +456,7 @@ NDefines.NFactions.FACTION_INTELLIGENCE_ALLOWED_ADVISOR_TRAIT = {
 }
 
 
-
+-- NGraphics 
 NDefines_Graphics.NGraphics.POLITICAL_GRID_SMALL_BOX_LIMIT = 50
 NDefines_Graphics.NMapMode.MAP_MODE_MANPOWER_RANGE_MAX = 1000000
 NDefines.NGraphics.MAX_TRAIN_WAGON_COUNT = 2 -- Default 6. Less wagons per train.
