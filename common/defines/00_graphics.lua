@@ -1342,6 +1342,7 @@ NGraphics = {
 
 NInterface = {
 	MAX_NO_FACTION_FILTER_BUTTONS = 40,			-- Max number of faction filter buttons that can be generated in diplomacy view.
+	AUTO_DIPLOMACY_RESPONSE_ITEM_ALPHA = 0.3,	-- Display alpha of diplomacy actions in the Automatic Response list
 
 	LOGISTICS_PAST_WEEK = 7,					-- Number of days from the past (including current day) we want logistics data for (Max 30 days)
 
@@ -1371,6 +1372,12 @@ NInterface = {
 
 	MINIMAP_TOGGLE_DURATION = 0.5,				-- Delay for minimap toggle
 	MINIMAP_TOGGLE_SHIFT = 270,				-- horizontal shift for minimap to close it
+	FOCUS_MINIMAP_SCALE = 0.035,				-- focus-tree mini-map panel pixels per canvas pixel
+	FOCUS_MINIMAP_MIN_SIZE = 48,				-- focus-tree mini-map minimum panel dimension
+
+	INFO_WINDOW_GAP_X = 20,				-- gap between a clicked focus/technology and the details window it opens
+	INFO_WINDOW_OFFSET_Y = 60,				-- how far above the clicked item a details window starts
+	INFO_WINDOW_CASCADE_OFFSET = 40,			-- diagonal step used when a details window would land on an open one
 
 	TIMED_MESSAGE_TIMEOUT = 0.35,					-- Timeout for timed message
 
