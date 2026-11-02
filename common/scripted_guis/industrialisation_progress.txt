@@ -1,22 +1,25 @@
 scripted_gui = {
+	# ------------------------------------------------------------------------
+	#  Topbar chip - Innovative Institutions
+	# ------------------------------------------------------------------------
 	innovation_progress = {
 		window_name = "innovation_progress_container"
 		context_type = player_context
 		parent_window_token = topbar
 		ai_enabled = { always = no }
 
-		dirty = institutions_country_era
-
-		visible = { }
+		visible = { always = yes }
 
 		effects = {
 			innovation_progress_bg_click = {
-				
+				# Both chips now toggle the same panel.
 				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_innovation_progress }
-				set_variable = { show_innovation_progress = show }
+				subtract_from_temp_variable = { show = show_institutions_panel }
+				set_variable = { show_institutions_panel = show }
 
-				# Russia-only sub-window toggle on the same click.
+				# TODO: this Russia toggle is piggybacking on an unrelated button.
+				# It belongs on its own button in RUS_peasant_reform.gui. Kept here
+				# so RUS behaviour is unchanged.
 				if = {
 					limit = { tag = RUS }
 					if = {
@@ -25,44 +28,82 @@ scripted_gui = {
 					}
 					else = { set_country_flag = russian_peasant_reform_gui_flag }
 				}
-
-				# Optional progress-increment variant
-				# add_to_variable = { innovation_progress = 10 }
-				# clamp_variable = { var = innovation_progress min = 0 max = 100 }
 			}
 		}
 
-		triggers = { innovation_progress_bg_click_enabled = { always = yes } }
+		triggers = {
+			innovation_progress_bg_click_enabled = { always = yes }
+			innovation_ready_glow_visible = { has_institution_progress_complete = yes }
+		}
 
-		properties = { innovation_progress_icon = { frame = ROOT.institutions_country_era } }
+		properties = {
+			innovation_progress_icon    = { frame = ROOT.institutions_country_era }
+			innovation_progress_minibar = { frame = ROOT.innovation_progress }
+		}
 	}
 
+	# ------------------------------------------------------------------------
+	#  Topbar chip - Humanitive Institutions
+	# ------------------------------------------------------------------------
 	humanities_progress = {
 		window_name = "humanities_progress_container"
 		context_type = player_context
 		parent_window_token = topbar
 		ai_enabled = { always = no }
 
-		dirty = institutions_country_era
-
-		visible = { }
+		visible = { always = yes }
 
 		effects = {
 			humanities_progress_bg_click = {
-	
 				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_humanities_progress }
-				set_variable = { show_humanities_progress = show }
-
-				# Optional progress-increment variant
-				# add_to_variable = { humanities_progress = 10 }
-				# clamp_variable = { var = humanities_progress min = 0 max = 100 }
+				subtract_from_temp_variable = { show = show_institutions_panel }
+				set_variable = { show_institutions_panel = show }
 			}
 		}
 
-		triggers = { humanities_progress_bg_click_enabled = { always = yes } }
+		triggers = {
+			humanities_progress_bg_click_enabled = { always = yes }
+			humanities_ready_glow_visible = { has_institution_progress_complete = yes }
+		}
 
-		properties = { humanities_progress_icon = { frame = ROOT.institutions_country_era } }
+		properties = {
+			humanities_progress_icon    = { frame = ROOT.institutions_country_era }
+			humanities_progress_minibar = { frame = ROOT.humanities_progress }
+		}
+	}
+
+	institutions_overview = {
+		window_name = "institutions_overview_container"
+		context_type = player_context
+		parent_window_token = topbar
+		ai_enabled = { always = no }
+
+		visible = { check_variable = { show_institutions_panel > 0 } }
+
+		effects = {
+			institutions_close_button_click = {
+				set_variable = { show_institutions_panel = 0 }
+			}
+		}
+
+		triggers = {
+			institutions_close_button_click_enabled = { always = yes }
+
+			institutions_ready_banner_visible = { has_institution_progress_complete = yes }
+			institutions_pending_banner_visible = {
+				NOT = { has_institution_progress_complete = yes }
+			}
+		}
+
+		properties = {
+			institutions_era_icon        = { frame = ROOT.institutions_country_era }
+
+			institutions_innovative_icon = { frame = ROOT.institutions_country_era }
+			institutions_innovative_bar  = { frame = ROOT.innovation_progress }
+
+			institutions_humanitive_icon = { frame = ROOT.institutions_country_era }
+			institutions_humanitive_bar  = { frame = ROOT.humanities_progress }
+		}
 	}
 
 	suez_canal_construction = {
@@ -94,7 +135,6 @@ scripted_gui = {
 		context_type = player_context
 		window_name = "superevents_container"
 		ai_enabled = { always = no }
-
 
 		visible = { check_variable = { super_event_displayed > 0 } }
 
@@ -339,9 +379,6 @@ scripted_gui = {
 
 
 		properties = {
-			### VERIFY ### Bare variable resolves in the current (player) scope.
-			# Fine if only the Taiping nation ever sees this category; otherwise
-			# scope it explicitly, e.g. frame = TAG.tai_li_xiucheng (as suez uses EGY).
 			taiping_princely_influence_li_xiucheng = { frame = tai_li_xiucheng }
 		}
 	}

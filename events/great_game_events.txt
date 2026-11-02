@@ -473,14 +473,27 @@ country_event = { #Qing Agrees
 
   option = {#great
     name = great_game.4.a
-		transfer_state = 945
-		add_state_core = 945
-		transfer_state = 944
-		add_state_core = 944
-		transfer_state = 943
-		add_state_core = 943
-		transfer_state = 946
-		add_state_core = 946
+		# Only the lands the Qing actually hold are ceded
+		if = {
+			limit = { 943 = { is_owned_by = QNG } }
+			transfer_state = 943
+			add_state_core = 943
+		}
+		if = {
+			limit = { 944 = { is_owned_by = QNG } }
+			transfer_state = 944
+			add_state_core = 944
+		}
+		if = {
+			limit = { 945 = { is_owned_by = QNG } }
+			transfer_state = 945
+			add_state_core = 945
+		}
+		if = {
+			limit = { 946 = { is_owned_by = QNG } }
+			transfer_state = 946
+			add_state_core = 946
+		}
 		set_variable = { global.great_game_kazakh = 1}
 	}
 }
@@ -528,7 +541,9 @@ country_event = { #1873 agreement
 			set_variable = { global.great_game_khiva = 2}
 		}
 		set_variable = { global.great_game_afghan = 4}
-		add_to_variable = {global.great_game_stage = 1}
+		set_global_flag = great_game_1873_agreement_signed
+		set_temp_variable = { gg_new_stage = 4 }
+		gg_set_stage = yes
 	}
 	option = {#disagree
     name = great_game.6.b
@@ -578,11 +593,9 @@ country_event = { #russia recives demand to back down
 		}
 		if={
 			limit={
-				has_border_war_between = {
-					attacker = 1361
-					defender = 1360
-				}
+				has_country_flag = gg_RUS_bw_panjdeh
 			}
+			clr_country_flag = gg_RUS_bw_panjdeh
 			cancel_border_war = {
 				dont_fire_events = yes
 				defender = 1360
@@ -614,7 +627,10 @@ country_event = { #the Delimitation Protocol
 		ai_chance = {
 			factor = 100
 		}
-		RUS = { transfer_state = 1362 }
+		if = {
+			limit = { 1360 = { NOT = { is_owned_by = RUS } } }
+			RUS = { transfer_state = 1360 }
+		}
 	}
 	option = {#refuse
     name = great_game.9.b
@@ -678,6 +694,7 @@ country_event = { #world on fire
 
 country_event = { #pandrej incident- afghan victory
   id = great_game.11
+  immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_panjdeh } } }
   title = great_game.11.t
   desc = great_game.11.d
   picture = GFX_report_event_nap_france_lgoc
@@ -695,7 +712,7 @@ country_event = { #pandrej incident- afghan victory
 		set_country_flag = AFG_pandrej_victory
 	}
 	option = {#defeat
-		name = great_game.11.a
+		name = great_game.11.b
 		ai_chance = {
 			factor = 100
 		}
@@ -707,6 +724,7 @@ country_event = { #pandrej incident- afghan victory
 }
 country_event = { #pandrej incident- russian victory
   id = great_game.12
+  immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_panjdeh } } }
   title = great_game.12.t
   desc = great_game.12.d
   picture = GFX_report_event_nap_france_lgoc
@@ -973,19 +991,11 @@ country_event = {	#Siege of Tashkent
 			BUK = { #Join or not join
 				country_event = { id = great_game.32 days = 1 }
 			}
-			RUS={
-				activate_mission = great_game_seige_tashkent_ongoing
-				activate_mission = great_game_seige_tashkent_fails
-			}
 		}
 		option = {	#we can win
-			name = great_game.32.b
+			name = great_game.31.b
 			add_political_power = 100
-
-			RUS = { #Join or not join
-				activate_mission = great_game_seige_tashkent_ongoing
-				activate_mission = great_game_seige_tashkent_fails
-			}
+			add_war_support = 0.05
 		}
 	}
 
@@ -1001,6 +1011,16 @@ country_event = {	#Kokand requests we join the war
 			name = great_game.32.a
 			add_manpower = -1000
 			set_country_flag = BUK_supports_KOK
+			if = {
+				limit = {
+					FROM = { has_war_with = RUS }
+					NOT = { has_war_with = RUS }
+				}
+				add_to_war = {
+					targeted_alliance = FROM
+					enemy = RUS
+				}
+			}
 			KOK = { country_event = { id = great_game.34 days = 1 } } #Notify them of our decision
 		}
 		option = {	#Not join
@@ -1082,7 +1102,7 @@ country_event = {
 
 		option = {
 			name = great_game.36.a
-			activate_mission = great_game_seige_tashkent_ongoing 
+			add_war_support = -0.02
 		}
 	}
 	
@@ -1148,11 +1168,18 @@ country_event = {#russian envoy arrives
 
 	option = {	#reject it
 		name = great_game.41.a
-
+		ai_chance = { factor = 60 }
+		add_opinion_modifier = {
+			target = RUS
+			modifier = small_decrease
+		}
 	}
 	option = {	#accept it
 		name = great_game.41.b
-
+		ai_chance = { factor = 40 }
+		set_country_flag = RUS_influence
+		set_temp_variable = { gg_influence_change = 3 }
+		gg_add_influence_RUS = yes
 	}
 }
 
@@ -1223,10 +1250,10 @@ country_event = {#impose rule over wukhan
 		hidden_effect={
 			1362={
 				add_core_of = AFG
-				remove_core_of = UCT
+				remove_core_of = BDK
 			}
 			1365={
-				remove_core_of = UCT
+				remove_core_of = BDK
 				add_core_of = AFG
 			}
 		}
@@ -1250,17 +1277,45 @@ country_event = {#wukhan question
 
 	is_triggered_only = yes
 
-	option = {	#do it
+	option = {	#press our claims on the Pamirs
 		name = great_game.45.a
 		ai_chance = {
-			factor = 100
+			factor = 30
 		}
+		add_state_claim = 1362
+		1362 = {
+			set_temp_variable = { gg_influence_change = 3 }
+			gg_add_influence = yes
+		}
+		ENG = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = medium_decrease
+			}
+		}
+		set_variable = { global.great_game_wukhan = 1 }
+		set_global_flag = great_game_pamir_settled
 	}
-	option = {	#not worth the effort
+	option = {	#leave the Wakhan as an Afghan buffer (historical)
 		name = great_game.45.b
 		ai_chance = {
-			factor = 0
+			factor = 70
 		}
+		custom_effect_tooltip = historical_option
+		set_temp_variable = { gg_points_to_add = 5 }
+		gg_add_points = yes
+		ENG = {
+			add_opinion_modifier = {
+				target = ROOT
+				modifier = small_increase
+			}
+		}
+		add_opinion_modifier = {
+			target = ENG
+			modifier = small_increase
+		}
+		set_variable = { global.great_game_wukhan = 5 }
+		set_global_flag = great_game_pamir_settled
 	}
 }
 
@@ -1801,14 +1856,24 @@ country_event = {#The Russian Empire makes contact with us
 		ai_chance = {
 			factor = 100
 		}
-		
+		add_opinion_modifier = {
+			target = FROM
+			modifier = small_increase
+		}
+		TIB = {
+			set_temp_variable = { gg_influence_change = 3 }
+			gg_add_influence_RUS = yes
+		}
 	}
 	option = {
 		name = great_game.63.b #Isolate Tibet
 		ai_chance = {
 			factor = 100
 		}
-		
+		add_opinion_modifier = {
+			target = FROM
+			modifier = small_decrease
+		}
 	}
 
 }
@@ -1865,6 +1930,7 @@ country_event = {#The Khazakh scouts' sketch-map
 }
 country_event = {#Russia wins the border-war
 	id = great_game.66
+	immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_kokand } } }
 	title = great_game.66.t
 	desc = great_game.66.d
 	picture = GFX_report_event_krenholm_manufacture
@@ -1880,8 +1946,12 @@ country_event = {#Russia wins the border-war
 			factor = 100
 		}
 		RUS = {
-			transfer_state = 586
+			if = {
+				limit = { NOT = { owns_state = 586 } }
+				transfer_state = 586
+			}
 			add_war_support = 0.05
+			set_country_flag = gg_RUS_has_taken_north_kokand
 		}
 		KOK = {
 			add_war_support = -0.05
@@ -1893,6 +1963,7 @@ country_event = {#Russia wins the border-war
 
 country_event = {#Kokand wins the border-war
 	id = great_game.67
+	immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_kokand } } }
 	title = great_game.67.t
 	desc = great_game.67.d
 	picture = GFX_report_event_krenholm_manufacture
@@ -2356,8 +2427,8 @@ option = {
 	}
 	RUS = {
 		set_country_flag = gg_RUS_gate_to_europe
+		activate_advisor = RUS_advisor_nikolay_girs
 	}
-	activate_advisor = RUS_advisor_nikolay_girs
 }
 }
 
@@ -2377,7 +2448,7 @@ option = {
 	ai_chance = {
 		factor = 100
 	}
-	deactivate_advisor = RUS_advisor_nikolay_girs
+	RUS = { deactivate_advisor = RUS_advisor_nikolay_girs }
 }
 }
 
@@ -2410,7 +2481,7 @@ option = {
 	}
 	RUS = {
 		country_event = {
-			id = great_game.80
+			id = great_game.81
 			days = 10
 		}
 	}
@@ -2420,7 +2491,7 @@ option = {
 country_event = {#Persia refuses
 id = great_game.81
 title = great_game.81.t
-desc = great_game.80.d
+desc = great_game.81.d
 picture = GFX_report_event_krenholm_manufacture
 
 is_triggered_only = yes
@@ -2446,9 +2517,7 @@ picture = GFX_report_event_krenholm_manufacture
 is_triggered_only = yes
 fire_only_once = yes
 trigger = {
-	KHI = {
-		surrender_progress > 0.98
-	}
+	KHI = { exists = yes }
 }
 
 option = {
@@ -2465,7 +2534,7 @@ option = {
 	custom_effect_tooltip = gg_RUS_tt_kazakh_cavalry
 	RUS = {
 		annex_country = {
-			target = BUK
+			target = KHI
 			transfer_troops = no
 		}
 	}
@@ -2502,7 +2571,7 @@ option = {
 	}
 	KHI ={
 		add_ideas = KHI_reparations_to_russia
-		add_ideas = KHI_KHI_slaves_banned 
+		add_ideas = KHI_slaves_banned
 	}
 }
 }
@@ -2644,13 +2713,13 @@ option = {
 		}
 		RUS = {
 			country_event = {
-				id = great_game.84
+				id = great_game.85
 				days = 5
 			}
 		}
 		RUS = {
 			country_event = {
-				id = great_game.85
+				id = great_game.86
 				days = 5
 			}
 		}
@@ -2670,7 +2739,7 @@ option = {
 		}
 		RUS = {
 			country_event = {
-				id = great_game.84
+				id = great_game.85
 				days = 5
 			}
 		}
@@ -2690,7 +2759,7 @@ option = {
 		}
 		RUS = {
 			country_event = {
-				id = great_game.85
+				id = great_game.86
 				days = 5
 			}
 		}
@@ -2784,7 +2853,7 @@ option = {
 		factor = 100
 	}
 	hidden_effect = {
-		KOK = {
+		PKH = { # the rebels field these units below
 			division_template = {
 				name = "Cossack Forces"
 				is_locked = yes
@@ -2931,12 +3000,6 @@ picture = GFX_report_event_krenholm_manufacture
 
 is_triggered_only = yes
 fire_only_once = yes
-trigger = {
-	PKH = {
-		has_capitulated = yes
-	}
-}
-
 option = {
 	name = great_game.89.a #We won't allow another rebellion
 	ai_chance = {
@@ -2946,17 +3009,41 @@ option = {
 	unlock_decision_tooltip = great_game_RUS_prevent_further_rebellions
 	hidden_effect = {
 		RUS = {
-			annex_country = {
-				target = PKH
-				transfer_troops = no
+			every_country = {
+				limit = {
+					original_tag = KOK
+					has_country_flag = KOK_sided_with_the_rebels
+				}
+				ROOT = {
+					annex_country = {
+						target = PREV
+						transfer_troops = no
+					}
+				}
 			}
-			annex_country = {
-				target = BUK
-				transfer_troops = no
+			if = {
+				limit = {
+					BUK = {
+						exists = yes
+						is_subject_of = RUS
+					}
+				}
+				annex_country = {
+					target = BUK
+					transfer_troops = no
+				}
 			}
-			annex_country = {
-				target = KHI
-				transfer_troops = no
+			if = {
+				limit = {
+					KHI = {
+						exists = yes
+						is_subject_of = RUS
+					}
+				}
+				annex_country = {
+					target = KHI
+					transfer_troops = no
+				}
 			}
 		}
 	}
@@ -2965,6 +3052,7 @@ option = {
 
 country_event = {#Russia wins the border-war against Turkmenistan
 id = great_game.90
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.90.t
 desc = great_game.90.d
 picture = GFX_report_event_krenholm_manufacture
@@ -2989,6 +3077,7 @@ option = {
 
 country_event = {#Turkmenistan wins the border-war against Russia
 id = great_game.91
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.91.t
 desc = great_game.91.d
 picture = GFX_report_event_krenholm_manufacture
@@ -3018,6 +3107,7 @@ option = {
 
 country_event = {#Russia Successfuly Invades Geok-Tepe
 id = great_game.92
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.92.t
 desc = great_game.92.d
 picture = GFX_report_event_krenholm_manufacture
@@ -3042,6 +3132,7 @@ option = {
 
 country_event = {#Russia Fails the Invasion
 id = great_game.93
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.93.t
 desc = great_game.93.d
 picture = GFX_report_event_krenholm_manufacture
@@ -3077,6 +3168,7 @@ option = {
 
 country_event = {#The Skobelev Invasion is Successful
 id = great_game.94
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.94.t
 desc = great_game.94.d
 picture = GFX_report_event_krenholm_manufacture
@@ -3100,6 +3192,7 @@ option = {
 
 country_event = {#Skobelev Fails His Task
 id = great_game.95
+immediate = { hidden_effect = { RUS = { clr_country_flag = gg_RUS_bw_turkmen } } }
 title = great_game.95.t
 desc = great_game.95.d
 picture = GFX_report_event_krenholm_manufacture
