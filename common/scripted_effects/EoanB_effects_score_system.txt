@@ -12,6 +12,7 @@ eoanb_score_vars_init = {
 	add_to_variable = { modified_military_score = 0 }
 	add_to_variable = { score_array_position_var = 0 }
 	add_to_variable = { score_array_position_var_real = 0 }
+	add_to_variable = { score_prev_position_var = 0 }
 	add_to_variable = { show_overview_info = 0 }
 }
 
@@ -256,6 +257,7 @@ eoanb_score_system_calc = {
 		add_to_array = { global.score_array_position = eoanb_rank }
 
 		var:global.score_tag_array^eoanb_index = {
+			set_variable = { score_prev_position_var = score_array_position_var }
 			set_variable = { score_array_position_var = eoanb_rank }
 			set_variable = { score_array_position_var_real = eoanb_index }
 		}
@@ -269,6 +271,11 @@ eoanb_ledger_system_calc = {
 	clear_array = global.factories_array
 	clear_array = global.divisions_array
 	clear_array = global.ships_array
+
+	set_temp_variable = { ledger_max_ind = 0.001 }
+	set_temp_variable = { ledger_max_mil = 0.001 }
+	set_temp_variable = { ledger_max_pres = 0.001 }
+	set_temp_variable = { ledger_max_tech = 0.001 }
 
 	for_loop_effect = {
 		start = 0
@@ -298,6 +305,12 @@ eoanb_ledger_system_calc = {
 				set_temp_variable = { eoanb_div   = num_divisions }
 				set_temp_variable = { eoanb_ships = num_ships }
 
+				eoanb_ledger_store_country_stats = yes
+
+				if = { limit = { check_variable = { industrial_score > ledger_max_ind } } set_temp_variable = { ledger_max_ind = industrial_score } }
+				if = { limit = { check_variable = { military_score > ledger_max_mil } } set_temp_variable = { ledger_max_mil = military_score } }
+				if = { limit = { check_variable = { prestige_score > ledger_max_pres } } set_temp_variable = { ledger_max_pres = prestige_score } }
+				if = { limit = { check_variable = { tech_score > ledger_max_tech } } set_temp_variable = { ledger_max_tech = tech_score } }
 			}
 		}
 
@@ -313,6 +326,517 @@ eoanb_ledger_system_calc = {
 		add_to_array = { global.factories_array = eoanb_fac }
 		add_to_array = { global.divisions_array = eoanb_div }
 		add_to_array = { global.ships_array = eoanb_ships }
+	}
+
+	set_temp_variable = { ledger_max_power = 0.001 }
+	if = {
+		limit = { check_variable = { global.score_array^num > 0 } }
+		set_temp_variable = { ledger_max_power = global.score_array^0 }
+	}
+	if = {
+		limit = { check_variable = { ledger_max_power < 0.001 } }
+		set_temp_variable = { ledger_max_power = 0.001 }
+	}
+
+	for_each_scope_loop = {
+		array = global.score_tag_array
+		if = {
+			limit = { exists = yes }
+			eoanb_ledger_store_country_visuals = yes
+		}
+	}
+
+	every_country = {
+		limit = {
+			is_ai = no
+			has_country_flag = eoanb_ledger_initialised
+			check_variable = { show_overview_info > 0 }
+		}
+		eoanb_ledger_build_view = yes
+	}
+}
+
+eoanb_ledger_store_country_stats = {
+	set_variable = { ledger_pop_k = max_manpower_k }
+	set_variable = { ledger_fac = num_of_factories }
+	set_variable = { ledger_civ = num_of_civilian_factories }
+	set_variable = { ledger_mil = num_of_military_factories }
+	set_variable = { ledger_dock = num_of_naval_factories }
+	set_variable = { ledger_div = num_divisions }
+	set_variable = { ledger_ships = num_ships }
+	set_variable = { ledger_mp_k = manpower_k }
+	set_variable = { ledger_stab = has_stability }
+	set_variable = { ledger_ws = has_war_support }
+}
+
+eoanb_ledger_store_country_visuals = {
+	set_variable = { ledger_f_power = overall_score }
+	divide_variable = { ledger_f_power = ledger_max_power }
+	multiply_variable = { ledger_f_power = 100 }
+	round_variable = ledger_f_power
+	clamp_variable = { var = ledger_f_power min = 0 max = 100 }
+
+	set_variable = { ledger_f_ind = industrial_score }
+	divide_variable = { ledger_f_ind = ledger_max_ind }
+	multiply_variable = { ledger_f_ind = 100 }
+	round_variable = ledger_f_ind
+	clamp_variable = { var = ledger_f_ind min = 0 max = 100 }
+
+	set_variable = { ledger_f_mil = military_score }
+	divide_variable = { ledger_f_mil = ledger_max_mil }
+	multiply_variable = { ledger_f_mil = 100 }
+	round_variable = ledger_f_mil
+	clamp_variable = { var = ledger_f_mil min = 0 max = 100 }
+
+	set_variable = { ledger_f_pres = prestige_score }
+	divide_variable = { ledger_f_pres = ledger_max_pres }
+	multiply_variable = { ledger_f_pres = 100 }
+	round_variable = ledger_f_pres
+	clamp_variable = { var = ledger_f_pres min = 0 max = 100 }
+
+	set_variable = { ledger_f_tech = tech_score }
+	divide_variable = { ledger_f_tech = ledger_max_tech }
+	multiply_variable = { ledger_f_tech = 100 }
+	round_variable = ledger_f_tech
+	clamp_variable = { var = ledger_f_tech min = 0 max = 100 }
+
+	if = {
+		limit = { check_variable = { score_array_position_var = 1 } }
+		set_variable = { ledger_f_badge = 1 }
+	}
+	else_if = {
+		limit = { check_variable = { score_array_position_var = 2 } }
+		set_variable = { ledger_f_badge = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { score_array_position_var = 3 } }
+		set_variable = { ledger_f_badge = 3 }
+	}
+	else_if = {
+		limit = { check_variable = { score_array_position_var < 9 } }
+		set_variable = { ledger_f_badge = 4 }
+	}
+	else_if = {
+		limit = { check_variable = { score_array_position_var < 17 } }
+		set_variable = { ledger_f_badge = 5 }
+	}
+	else = {
+		set_variable = { ledger_f_badge = 6 }
+	}
+
+	set_variable = { ledger_move = 0 }
+	if = {
+		limit = { check_variable = { score_prev_position_var > 0 } }
+		set_variable = { ledger_move = score_prev_position_var }
+		subtract_from_variable = { ledger_move = score_array_position_var }
+	}
+	if = {
+		limit = { check_variable = { ledger_move > 0 } }
+		set_variable = { ledger_f_move = 1 }
+		set_variable = { ledger_move_abs = ledger_move }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_move < 0 } }
+		set_variable = { ledger_f_move = 2 }
+		set_variable = { ledger_move_abs = ledger_move }
+		multiply_variable = { ledger_move_abs = -1 }
+	}
+	else = {
+		set_variable = { ledger_f_move = 3 }
+		set_variable = { ledger_move_abs = 0 }
+	}
+}
+
+eoanb_ledger_init = {
+	if = {
+		limit = { NOT = { has_country_flag = eoanb_ledger_initialised } }
+		set_country_flag = eoanb_ledger_initialised
+		set_variable = { ledger_tab = 0 }
+		set_variable = { ledger_sort = 0 }
+		set_variable = { ledger_sort_asc = 0 }
+		set_variable = { ledger_filter = 0 }
+		set_variable = { ledger_dirty = 1 }
+	}
+}
+
+eoanb_ledger_toggle = {
+	if = {
+		limit = {
+			check_variable = { show_overview_info > 0 }
+			has_country_flag = eoanb_ledger_initialised
+		}
+		set_variable = { show_overview_info = 0 }
+	}
+	else = {
+		set_variable = { show_overview_info = 1 }
+		eoanb_ledger_init = yes
+		eoanb_ledger_system_calc = yes
+	}
+}
+
+eoanb_ledger_click_sort = {
+	if = {
+		limit = { check_variable = { ledger_sort = ledger_new_sort } }
+		set_temp_variable = { ledger_t_flip = 1 }
+		subtract_from_temp_variable = { ledger_t_flip = ledger_sort_asc }
+		set_variable = { ledger_sort_asc = ledger_t_flip }
+	}
+	else = {
+		set_variable = { ledger_sort = ledger_new_sort }
+		set_variable = { ledger_sort_asc = 0 }
+	}
+	eoanb_ledger_build_view = yes
+}
+
+eoanb_ledger_set_filter = {
+	set_variable = { ledger_filter = ledger_new_filter }
+	eoanb_ledger_build_view = yes
+}
+
+eoanb_ledger_set_tab = {
+	set_variable = { ledger_tab = ledger_new_tab }
+	set_temp_variable = { ledger_t_ok = 0 }
+	if = {
+		limit = { check_variable = { ledger_sort = 0 } }
+		set_temp_variable = { ledger_t_ok = 1 }
+	}
+	if = {
+		limit = {
+			check_variable = { ledger_tab = 0 }
+			OR = {
+				check_variable = { ledger_sort = 15 }
+				check_variable = { ledger_sort = 1 }
+				check_variable = { ledger_sort = 2 }
+				check_variable = { ledger_sort = 3 }
+				check_variable = { ledger_sort = 4 }
+			}
+		}
+		set_temp_variable = { ledger_t_ok = 1 }
+	}
+	if = {
+		limit = {
+			check_variable = { ledger_tab = 1 }
+			OR = {
+				check_variable = { ledger_sort = 15 }
+				check_variable = { ledger_sort = 5 }
+				check_variable = { ledger_sort = 6 }
+				check_variable = { ledger_sort = 7 }
+				check_variable = { ledger_sort = 8 }
+			}
+		}
+		set_temp_variable = { ledger_t_ok = 1 }
+	}
+	if = {
+		limit = {
+			check_variable = { ledger_tab = 2 }
+			OR = {
+				check_variable = { ledger_sort = 3 }
+				check_variable = { ledger_sort = 4 }
+				check_variable = { ledger_sort = 9 }
+				check_variable = { ledger_sort = 10 }
+				check_variable = { ledger_sort = 11 }
+				check_variable = { ledger_sort = 12 }
+				check_variable = { ledger_sort = 13 }
+				check_variable = { ledger_sort = 14 }
+			}
+		}
+		set_temp_variable = { ledger_t_ok = 1 }
+	}
+	if = {
+		limit = { check_variable = { ledger_t_ok = 0 } }
+		set_variable = { ledger_sort = 0 }
+		set_variable = { ledger_sort_asc = 0 }
+	}
+	eoanb_ledger_build_view = yes
+}
+
+eoanb_ledger_sort_key = {
+	if = {
+		limit = { check_variable = { ledger_t_sort = 15 } }
+		set_temp_variable = { ledger_t_key = overall_score }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 1 } }
+		set_temp_variable = { ledger_t_key = ledger_pop_k }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 2 } }
+		set_temp_variable = { ledger_t_key = ledger_fac }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 3 } }
+		set_temp_variable = { ledger_t_key = ledger_div }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 4 } }
+		set_temp_variable = { ledger_t_key = ledger_ships }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 5 } }
+		set_temp_variable = { ledger_t_key = industrial_score }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 6 } }
+		set_temp_variable = { ledger_t_key = military_score }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 7 } }
+		set_temp_variable = { ledger_t_key = prestige_score }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 8 } }
+		set_temp_variable = { ledger_t_key = tech_score }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 9 } }
+		set_temp_variable = { ledger_t_key = ledger_civ }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 10 } }
+		set_temp_variable = { ledger_t_key = ledger_mil }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 11 } }
+		set_temp_variable = { ledger_t_key = ledger_dock }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 12 } }
+		set_temp_variable = { ledger_t_key = ledger_mp_k }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 13 } }
+		set_temp_variable = { ledger_t_key = ledger_stab }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_t_sort = 14 } }
+		set_temp_variable = { ledger_t_key = ledger_ws }
+	}
+	else = {
+		set_temp_variable = { ledger_t_key = 0 }
+		subtract_from_temp_variable = { ledger_t_key = score_array_position_var }
+	}
+}
+
+eoanb_ledger_build_view = {
+	eoanb_ledger_init = yes
+
+	clear_array = ledger_order
+	clear_array = ledger_rowstyle
+	clear_array = ledger_badge
+	clear_array = ledger_movef
+	clear_array = ledger_moveabs
+	clear_array = ledger_bar_power
+	clear_array = ledger_bar_ind
+	clear_array = ledger_bar_mil
+	clear_array = ledger_bar_pres
+	clear_array = ledger_bar_tech
+	clear_temp_array = ledger_t_keys
+	clear_temp_array = ledger_t_tags
+
+	set_temp_variable = { ledger_t_sort = ledger_sort }
+	set_temp_variable = { ledger_t_filter = ledger_filter }
+
+	for_each_scope_loop = {
+		array = global.score_tag_array
+		if = {
+			limit = {
+				exists = yes
+				OR = {
+					check_variable = { ledger_t_filter = 0 }
+					AND = {
+						check_variable = { ledger_t_filter = 1 }
+						check_variable = { score_array_position_var < 9 }
+					}
+					AND = {
+						check_variable = { ledger_t_filter = 2 }
+						check_variable = { score_array_position_var < 17 }
+					}
+					AND = {
+						check_variable = { ledger_t_filter = 3 }
+						check_variable = { score_array_position_var < 41 }
+					}
+					AND = {
+						check_variable = { ledger_t_filter = 4 }
+						OR = {
+							tag = PREV
+							is_neighbor_of = PREV
+						}
+					}
+				}
+			}
+			eoanb_ledger_sort_key = yes
+			add_to_temp_array = { ledger_t_keys = ledger_t_key }
+			add_to_temp_array = { ledger_t_tags = THIS }
+		}
+	}
+
+	set_temp_variable = { ledger_t_par = 0 }
+	while_loop_effect = {
+		limit = { check_variable = { ledger_t_keys^num > 0 } }
+
+		if = {
+			limit = { check_variable = { ledger_sort_asc > 0 } }
+			find_lowest_in_array = { array = ledger_t_keys value = ledger_t_val index = ledger_t_idx }
+		}
+		else = {
+			find_highest_in_array = { array = ledger_t_keys value = ledger_t_val index = ledger_t_idx }
+		}
+		set_temp_variable = { ledger_t_pick = ledger_t_tags^ledger_t_idx }
+		remove_from_temp_array = { array = ledger_t_keys index = ledger_t_idx }
+		remove_from_temp_array = { array = ledger_t_tags index = ledger_t_idx }
+
+		set_temp_variable = { ledger_t_style = 1 }
+		add_to_temp_variable = { ledger_t_style = ledger_t_par }
+		set_temp_variable = { ledger_t_par2 = 1 }
+		subtract_from_temp_variable = { ledger_t_par2 = ledger_t_par }
+		set_temp_variable = { ledger_t_par = ledger_t_par2 }
+
+		var:ledger_t_pick = {
+			if = {
+				limit = { tag = PREV }
+				set_temp_variable = { ledger_t_style = 3 }
+			}
+			else_if = {
+				limit = { has_war_with = PREV }
+				set_temp_variable = { ledger_t_style = 5 }
+			}
+			else_if = {
+				limit = {
+					OR = {
+						is_in_faction_with = PREV
+						is_subject_of = PREV
+						PREV = { is_subject_of = PREV }
+					}
+				}
+				set_temp_variable = { ledger_t_style = 4 }
+			}
+			set_temp_variable = { ledger_t_badge = ledger_f_badge }
+			set_temp_variable = { ledger_t_movef = ledger_f_move }
+			set_temp_variable = { ledger_t_moveabs = ledger_move_abs }
+			set_temp_variable = { ledger_t_bpow = ledger_f_power }
+			set_temp_variable = { ledger_t_bind = ledger_f_ind }
+			set_temp_variable = { ledger_t_bmil = ledger_f_mil }
+			set_temp_variable = { ledger_t_bpres = ledger_f_pres }
+			set_temp_variable = { ledger_t_btech = ledger_f_tech }
+		}
+
+		add_to_array = { ledger_order = ledger_t_pick }
+		add_to_array = { ledger_rowstyle = ledger_t_style }
+		add_to_array = { ledger_badge = ledger_t_badge }
+		add_to_array = { ledger_movef = ledger_t_movef }
+		add_to_array = { ledger_moveabs = ledger_t_moveabs }
+		add_to_array = { ledger_bar_power = ledger_t_bpow }
+		add_to_array = { ledger_bar_ind = ledger_t_bind }
+		add_to_array = { ledger_bar_mil = ledger_t_bmil }
+		add_to_array = { ledger_bar_pres = ledger_t_bpres }
+		add_to_array = { ledger_bar_tech = ledger_t_btech }
+	}
+	set_variable = { ledger_count = ledger_order^num }
+
+	eoanb_ledger_update_controls = yes
+	add_to_variable = { ledger_dirty = 1 }
+}
+
+eoanb_ledger_update_controls = {
+	set_variable = { ledger_tab_f0 = 1 }
+	set_variable = { ledger_tab_f1 = 1 }
+	set_variable = { ledger_tab_f2 = 1 }
+	if = {
+		limit = { check_variable = { ledger_tab = 1 } }
+		set_variable = { ledger_tab_f1 = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_tab = 2 } }
+		set_variable = { ledger_tab_f2 = 2 }
+	}
+	else = {
+		set_variable = { ledger_tab_f0 = 2 }
+	}
+
+	set_variable = { ledger_filter_f0 = 1 }
+	set_variable = { ledger_filter_f1 = 1 }
+	set_variable = { ledger_filter_f2 = 1 }
+	set_variable = { ledger_filter_f3 = 1 }
+	set_variable = { ledger_filter_f4 = 1 }
+	if = {
+		limit = { check_variable = { ledger_filter = 1 } }
+		set_variable = { ledger_filter_f1 = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_filter = 2 } }
+		set_variable = { ledger_filter_f2 = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_filter = 3 } }
+		set_variable = { ledger_filter_f3 = 2 }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_filter = 4 } }
+		set_variable = { ledger_filter_f4 = 2 }
+	}
+	else = {
+		set_variable = { ledger_filter_f0 = 2 }
+	}
+
+	set_variable = { ledger_ind_f = 1 }
+	if = {
+		limit = { check_variable = { ledger_sort_asc > 0 } }
+		set_variable = { ledger_ind_f = 2 }
+	}
+	set_variable = { ledger_ind_y = 28 }
+	set_variable = { ledger_ind_x = 15 }
+	if = {
+		limit = { check_variable = { ledger_tab = 0 } }
+		if = { limit = { check_variable = { ledger_sort = 15 } } set_variable = { ledger_ind_x = 705 } }
+		if = { limit = { check_variable = { ledger_sort = 1 } } set_variable = { ledger_ind_x = 848 } }
+		if = { limit = { check_variable = { ledger_sort = 2 } } set_variable = { ledger_ind_x = 945 } }
+		if = { limit = { check_variable = { ledger_sort = 3 } } set_variable = { ledger_ind_x = 1035 } }
+		if = { limit = { check_variable = { ledger_sort = 4 } } set_variable = { ledger_ind_x = 1125 } }
+	}
+	else_if = {
+		limit = { check_variable = { ledger_tab = 1 } }
+		if = { limit = { check_variable = { ledger_sort = 15 } } set_variable = { ledger_ind_x = 365 } }
+		if = { limit = { check_variable = { ledger_sort = 5 } } set_variable = { ledger_ind_x = 518 } }
+		if = { limit = { check_variable = { ledger_sort = 6 } } set_variable = { ledger_ind_x = 703 } }
+		if = { limit = { check_variable = { ledger_sort = 7 } } set_variable = { ledger_ind_x = 888 } }
+		if = { limit = { check_variable = { ledger_sort = 8 } } set_variable = { ledger_ind_x = 1073 } }
+	}
+	else = {
+		if = { limit = { check_variable = { ledger_sort = 9 } } set_variable = { ledger_ind_x = 359 } }
+		if = { limit = { check_variable = { ledger_sort = 10 } } set_variable = { ledger_ind_x = 467 } }
+		if = { limit = { check_variable = { ledger_sort = 11 } } set_variable = { ledger_ind_x = 575 } }
+		if = { limit = { check_variable = { ledger_sort = 3 } } set_variable = { ledger_ind_x = 683 } }
+		if = { limit = { check_variable = { ledger_sort = 4 } } set_variable = { ledger_ind_x = 791 } }
+		if = { limit = { check_variable = { ledger_sort = 12 } } set_variable = { ledger_ind_x = 899 } }
+		if = { limit = { check_variable = { ledger_sort = 13 } } set_variable = { ledger_ind_x = 1007 } }
+		if = { limit = { check_variable = { ledger_sort = 14 } } set_variable = { ledger_ind_x = 1115 } }
+	}
+
+	set_variable = { ledger_my_badge = 6 }
+	if = {
+		limit = { has_variable = ledger_f_badge }
+		set_variable = { ledger_my_badge = ledger_f_badge }
+	}
+	clear_variable = ledger_rival
+	set_variable = { ledger_gap = 0 }
+	set_variable = { ledger_rival_rank = 0 }
+	if = {
+		limit = { check_variable = { score_array_position_var > 1 } }
+		set_temp_variable = { ledger_t_up = score_array_position_var_real }
+		subtract_from_temp_variable = { ledger_t_up = 1 }
+		set_variable = { ledger_rival = global.score_tag_array^ledger_t_up }
+		set_variable = { ledger_rival_rank = global.score_array_position^ledger_t_up }
+		set_variable = { ledger_gap = global.score_array^ledger_t_up }
+		subtract_from_variable = { ledger_gap = overall_score }
+	}
+	else_if = {
+		limit = {
+			check_variable = { score_array_position_var = 1 }
+			check_variable = { global.score_tag_array^num > 1 }
+		}
+		set_variable = { ledger_rival = global.score_tag_array^1 }
+		set_variable = { ledger_gap = overall_score }
+		subtract_from_variable = { ledger_gap = global.score_array^1 }
 	}
 }
 

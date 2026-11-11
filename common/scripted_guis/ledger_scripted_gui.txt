@@ -17,36 +17,245 @@ scripted_gui = {
 	show_button = {
 		context_type = player_context
 		window_name = "show_button_container"
+
 		effects = {
 			button_click = {
-				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_overview_info }
-				set_variable = { show_overview_info = show }
-				eoanb_ledger_system_calc = yes 
+				eoanb_ledger_toggle = yes
 			}
 		}
+
+		ai_enabled = { always = no }
 	}
+
 	show_list = {
 		context_type = player_context
 		window_name = "show_list_container"
+		dirty = ledger_dirty
 
 		visible = {
 			check_variable = { show_overview_info > 0 }
-			is_ai = no  			
+			has_country_flag = eoanb_ledger_initialised
+			is_ai = no
 		}
-		dynamic_lists = {
-			show_grid = {
-				array = global.score_tag_array
-				entry_container = show_entry
-			} 
+
+		properties = {
+			ledger_tab_ov = { frame = ledger_tab_f0 }
+			ledger_tab_pw = { frame = ledger_tab_f1 }
+			ledger_tab_fo = { frame = ledger_tab_f2 }
+
+			ledger_filter_all = { frame = ledger_filter_f0 }
+			ledger_filter_great = { frame = ledger_filter_f1 }
+			ledger_filter_top16 = { frame = ledger_filter_f2 }
+			ledger_filter_top40 = { frame = ledger_filter_f3 }
+			ledger_filter_neighbours = { frame = ledger_filter_f4 }
+
+			ft_flag = { image = "[ROOT.GetFlag]" }
+			ft_badge = { frame = ledger_my_badge }
 		}
-		properties = { flag = { image = "[?global.score_tag_array^i.GetFlag]" } }
+
 		effects = {
 			closebutton_click = {
-				set_temp_variable = { show = 1 }
-				subtract_from_temp_variable = { show = show_overview_info }
-				set_variable = { show_overview_info = show }
+				set_variable = { show_overview_info = 0 }
+			}
+
+			ledger_tab_ov_click = {
+				set_temp_variable = { ledger_new_tab = 0 }
+				eoanb_ledger_set_tab = yes
+			}
+			ledger_tab_pw_click = {
+				set_temp_variable = { ledger_new_tab = 1 }
+				eoanb_ledger_set_tab = yes
+			}
+			ledger_tab_fo_click = {
+				set_temp_variable = { ledger_new_tab = 2 }
+				eoanb_ledger_set_tab = yes
+			}
+
+			ledger_filter_all_click = {
+				set_temp_variable = { ledger_new_filter = 0 }
+				eoanb_ledger_set_filter = yes
+			}
+			ledger_filter_great_click = {
+				set_temp_variable = { ledger_new_filter = 1 }
+				eoanb_ledger_set_filter = yes
+			}
+			ledger_filter_top16_click = {
+				set_temp_variable = { ledger_new_filter = 2 }
+				eoanb_ledger_set_filter = yes
+			}
+			ledger_filter_top40_click = {
+				set_temp_variable = { ledger_new_filter = 3 }
+				eoanb_ledger_set_filter = yes
+			}
+			ledger_filter_neighbours_click = {
+				set_temp_variable = { ledger_new_filter = 4 }
+				eoanb_ledger_set_filter = yes
+			}
+
+			ft_refresh_click = {
+				eoanb_ledger_system_calc = yes
 			}
 		}
+
+		triggers = {
+			ft_badge_visible = { check_variable = { score_array_position_var > 0 } }
+			ft_rank_visible = { check_variable = { score_array_position_var > 0 } }
+			ft_status_visible = { check_variable = { score_array_position_var > 0 } }
+			ft_power_visible = { check_variable = { score_array_position_var > 0 } }
+			ft_unranked_visible = { check_variable = { score_array_position_var < 1 } }
+			ft_gap_lead_visible = {
+				check_variable = { score_array_position_var = 1 }
+				has_variable = ledger_rival
+			}
+			ft_gap_chase_visible = {
+				check_variable = { score_array_position_var > 1 }
+				has_variable = ledger_rival
+			}
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	ledger_ov_panel = {
+		context_type = player_context
+		window_name = "ledger_ov_panel"
+		parent_window_name = "show_list_container"
+		dirty = ledger_dirty
+
+		visible = {
+			check_variable = { show_overview_info > 0 }
+			has_country_flag = eoanb_ledger_initialised
+			check_variable = { ledger_tab < 1 }
+			is_ai = no
+		}
+
+		dynamic_lists = {
+			ledger_ov_grid = {
+				array = ledger_order
+				entry_container = "ledger_ov_entry"
+			}
+		}
+
+		properties = {
+			ov_sort_ind = { x = ledger_ind_x y = ledger_ind_y frame = ledger_ind_f }
+			ov_row_bg = { frame = ledger_rowstyle^i }
+			ov_badge = { frame = ledger_badge^i }
+			ov_move = { frame = ledger_movef^i }
+			ov_flag = { image = "[?ledger_order^i.GetFlag]" }
+			ov_power_bar = { frame = ledger_bar_power^i }
+		}
+
+		triggers = {
+			ov_move_up_visible = { check_variable = { ledger_movef^i = 1 } }
+			ov_move_down_visible = { check_variable = { ledger_movef^i = 2 } }
+		}
+
+		effects = {
+			ov_hdr_rank_click = { set_temp_variable = { ledger_new_sort = 0 } eoanb_ledger_click_sort = yes }
+			ov_hdr_power_click = { set_temp_variable = { ledger_new_sort = 15 } eoanb_ledger_click_sort = yes }
+			ov_hdr_pop_click = { set_temp_variable = { ledger_new_sort = 1 } eoanb_ledger_click_sort = yes }
+			ov_hdr_fac_click = { set_temp_variable = { ledger_new_sort = 2 } eoanb_ledger_click_sort = yes }
+			ov_hdr_div_click = { set_temp_variable = { ledger_new_sort = 3 } eoanb_ledger_click_sort = yes }
+			ov_hdr_ships_click = { set_temp_variable = { ledger_new_sort = 4 } eoanb_ledger_click_sort = yes }
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	ledger_pw_panel = {
+		context_type = player_context
+		window_name = "ledger_pw_panel"
+		parent_window_name = "show_list_container"
+		dirty = ledger_dirty
+
+		visible = {
+			check_variable = { show_overview_info > 0 }
+			has_country_flag = eoanb_ledger_initialised
+			check_variable = { ledger_tab = 1 }
+			is_ai = no
+		}
+
+		dynamic_lists = {
+			ledger_pw_grid = {
+				array = ledger_order
+				entry_container = "ledger_pw_entry"
+			}
+		}
+
+		properties = {
+			pw_sort_ind = { x = ledger_ind_x y = ledger_ind_y frame = ledger_ind_f }
+			pw_row_bg = { frame = ledger_rowstyle^i }
+			pw_badge = { frame = ledger_badge^i }
+			pw_move = { frame = ledger_movef^i }
+			pw_flag = { image = "[?ledger_order^i.GetFlag]" }
+			pw_ind_bar = { frame = ledger_bar_ind^i }
+			pw_mil_bar = { frame = ledger_bar_mil^i }
+			pw_pres_bar = { frame = ledger_bar_pres^i }
+			pw_tech_bar = { frame = ledger_bar_tech^i }
+		}
+
+		triggers = {
+			pw_move_up_visible = { check_variable = { ledger_movef^i = 1 } }
+			pw_move_down_visible = { check_variable = { ledger_movef^i = 2 } }
+		}
+
+		effects = {
+			pw_hdr_rank_click = { set_temp_variable = { ledger_new_sort = 0 } eoanb_ledger_click_sort = yes }
+			pw_hdr_power_click = { set_temp_variable = { ledger_new_sort = 15 } eoanb_ledger_click_sort = yes }
+			pw_hdr_ind_click = { set_temp_variable = { ledger_new_sort = 5 } eoanb_ledger_click_sort = yes }
+			pw_hdr_mil_click = { set_temp_variable = { ledger_new_sort = 6 } eoanb_ledger_click_sort = yes }
+			pw_hdr_pres_click = { set_temp_variable = { ledger_new_sort = 7 } eoanb_ledger_click_sort = yes }
+			pw_hdr_tech_click = { set_temp_variable = { ledger_new_sort = 8 } eoanb_ledger_click_sort = yes }
+		}
+
+		ai_enabled = { always = no }
+	}
+
+	ledger_fo_panel = {
+		context_type = player_context
+		window_name = "ledger_fo_panel"
+		parent_window_name = "show_list_container"
+		dirty = ledger_dirty
+
+		visible = {
+			check_variable = { show_overview_info > 0 }
+			has_country_flag = eoanb_ledger_initialised
+			check_variable = { ledger_tab = 2 }
+			is_ai = no
+		}
+
+		dynamic_lists = {
+			ledger_fo_grid = {
+				array = ledger_order
+				entry_container = "ledger_fo_entry"
+			}
+		}
+
+		properties = {
+			fo_sort_ind = { x = ledger_ind_x y = ledger_ind_y frame = ledger_ind_f }
+			fo_row_bg = { frame = ledger_rowstyle^i }
+			fo_badge = { frame = ledger_badge^i }
+			fo_move = { frame = ledger_movef^i }
+			fo_flag = { image = "[?ledger_order^i.GetFlag]" }
+		}
+
+		triggers = {
+			fo_move_up_visible = { check_variable = { ledger_movef^i = 1 } }
+			fo_move_down_visible = { check_variable = { ledger_movef^i = 2 } }
+		}
+
+		effects = {
+			fo_hdr_rank_click = { set_temp_variable = { ledger_new_sort = 0 } eoanb_ledger_click_sort = yes }
+			fo_hdr_civ_click = { set_temp_variable = { ledger_new_sort = 9 } eoanb_ledger_click_sort = yes }
+			fo_hdr_mil_click = { set_temp_variable = { ledger_new_sort = 10 } eoanb_ledger_click_sort = yes }
+			fo_hdr_dock_click = { set_temp_variable = { ledger_new_sort = 11 } eoanb_ledger_click_sort = yes }
+			fo_hdr_div_click = { set_temp_variable = { ledger_new_sort = 3 } eoanb_ledger_click_sort = yes }
+			fo_hdr_ships_click = { set_temp_variable = { ledger_new_sort = 4 } eoanb_ledger_click_sort = yes }
+			fo_hdr_mp_click = { set_temp_variable = { ledger_new_sort = 12 } eoanb_ledger_click_sort = yes }
+			fo_hdr_stab_click = { set_temp_variable = { ledger_new_sort = 13 } eoanb_ledger_click_sort = yes }
+			fo_hdr_ws_click = { set_temp_variable = { ledger_new_sort = 14 } eoanb_ledger_click_sort = yes }
+		}
+
+		ai_enabled = { always = no }
 	}
 }
