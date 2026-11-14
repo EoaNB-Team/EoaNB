@@ -2282,30 +2282,31 @@ BAV_decision_category_military = {
 		
 		available = {
 			custom_trigger_tooltip = {
-				tooltip = BAV_mission_army_reform_trigger_tt
-				custom_trigger_tooltip = {
-					tooltip = BAV_mission_army_reform_equipment_trigger_tt
-					has_country_flag = BAV_decision_establish_weapons_commission
-					OR = {
-						has_country_flag = XYZ_flag
-						has_country_flag = XYZ_flag
-					}
-				}
-				custom_trigger_tooltip = {
-					tooltip = BAV_mission_army_reform_leadership_trigger_tt
-					has_country_flag = BAV_decision_introduce_military_music_flag
-					OR = {
-						has_country_flag = BAV_decision_establish_artillery_and_engineers_course_flag
-						has_country_flag = XYZ_flag
-					}
-				}
-				custom_trigger_tooltip = {
-					tooltip = BAV_mission_army_reform_infrastructure_and_logistics_trigger_tt
+				tooltip = BAV_mission_army_reform_equipment_trigger_tt
+				has_country_flag = BAV_decision_establish_weapons_commission
+				OR = {
 					has_country_flag = XYZ_flag
-					OR = {
-						has_country_flag = XYZ_flag
-						has_country_flag = XYZ_flag
-					}
+					has_country_flag = XYZ_flag
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_leadership_trigger_tt
+				has_country_flag = BAV_decision_introduce_military_music_flag
+				OR = {
+					has_country_flag = BAV_decision_establish_artillery_and_engineers_course_flag
+					has_country_flag = BAV_decision_found_artillery_and_engineers_school_flag
+				}
+				OR = {
+					has_country_flag = BAV_decision_expand_brigade_level_maneuvers_flag
+					has_country_flag = BAV_decision_establish_great_maneuvers_flag
+				}
+			}
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_infrastructure_and_logistics_trigger_tt
+				has_country_flag = BAV_decision_order_construction_of_grain_silos_flag
+				OR = {
+					has_country_flag = XYZ_flag
+					has_country_flag = XYZ_flag
 				}
 			}
 		}
@@ -2741,66 +2742,362 @@ BAV_decision_category_military = {
 		}
 	}
 
-	#Yearly Army Manoeuvre
-	BAV_decision_yearly_army_manoeuvre = {
+	#Expand Brigade Level Maneuvers
+	BAV_decision_expand_brigade_level_maneuvers = {
 
 		icon = generic_military
 
 		#allowed = { tag = BAV }
 		
 		available = {
-			OR = {
-				has_completed_focus = BAV_focus_generals_and_leadership_qualities
-				NOT = { has_idea = BAV_idea_landtag_obstruction }
+			has_completed_focus = BAV_focus_army_maneuvers_debate
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_cost_200k_trigger_tt
+				hidden_trigger = {
+					check_variable = {
+						var = BAV_army_budget_var
+						value = 0.2
+						compare = greater_than_or_equals
+					}
+				}
 			}
-			has_stability > 0.4
-			PS_pol_positive_null = yes
 		}
 
 		visible = {
-			has_war = no
+			OR = {
+				has_active_mission = BAV_mission_army_adjustments
+				has_active_mission = BAV_mission_army_improvements
+				has_active_mission = BAV_mission_army_expansion
+			}
 		}
+
+		fire_only_once = yes
 
 		custom_cost_trigger = {
 			has_political_power > 19.9
 			command_power > 49.99
 		}
 		custom_cost_text = eoanb_political_power_20_command_power_50
+		
+		days_remove = 180
+		
+		complete_effect = {
+			custom_effect_tooltip = BAV_mission_army_reform_cost_200k_effect_tt
+			add_political_power = -20
+			add_command_power = -50
+			hidden_effect = {
+				subtract_from_variable = { var = BAV_army_budget_var value = 0.2 }
+			}
+		}
+
+		remove_effect = {
+			unlock_decision_tooltip = BAV_decision_yearly_brigades_maneuver
+			custom_effect_tooltip = dynmod_BAV_army_effect_tt
+			add_to_variable = { BAV_army_cpg = 0.05 tooltip = command_power_gain_tooltip }
+			add_to_variable = { BAV_army_egaf = 0.05 tooltip = experience_gain_army_tooltip }
+			add_to_variable = { BAV_army_amf = 0.02 tooltip = army_morale_factor_tooltip }
+			add_to_variable = { BAV_army_aof = 0.02 tooltip = army_org_factor_tooltip }
+			add_to_variable = { BAV_army_ps = 0.05 tooltip = planning_speed_tooltip }
+			add_to_variable = { BAV_army_mpf = 0.05 tooltip = max_planning_tooltip }
+			add_to_variable = { BAV_army_ttaf = -0.05 tooltip = training_time_factor_tooltip }
+			add_to_variable = { BAV_army_elf = -0.05 tooltip = experience_loss_factor_tooltip }
+			add_to_variable = { BAV_army_cdf = 0.02 tooltip = army_core_defence_factor_tooltip }
+			add_to_variable = { BAV_army_ascf = 0.05 tooltip = army_spending_cost_factor_tooltip }
+			hidden_effect = {
+				set_country_flag = BAV_decision_expand_brigade_level_maneuvers_flag
+				set_variable = { var = BAV_training_our_generals value = 0 }
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Establish Great Maneuvers
+	BAV_decision_establish_great_maneuvers = {
+
+		icon = generic_military
+
+		#allowed = { tag = BAV }
+		
+		available = {
+			has_completed_focus = BAV_focus_army_maneuvers_debate
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_cost_200k_trigger_tt
+				hidden_trigger = {
+					check_variable = {
+						var = BAV_army_budget_var
+						value = 0.4
+						compare = greater_than_or_equals
+					}
+				}
+			}
+		}
+
+		visible = {
+			OR = {
+				has_active_mission = BAV_mission_army_adjustments
+				has_active_mission = BAV_mission_army_improvements
+				has_active_mission = BAV_mission_army_expansion
+			}
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_20_command_power_50
+		
+		days_remove = 180
+		
+		complete_effect = {
+			custom_effect_tooltip = BAV_mission_army_reform_cost_200k_effect_tt
+			add_political_power = -20
+			add_command_power = -50
+			hidden_effect = {
+				subtract_from_variable = { var = BAV_army_budget_var value = 0.4 }
+			}
+		}
+
+		remove_effect = {
+			unlock_decision_tooltip = BAV_decision_yearly_great_maneuver
+			custom_effect_tooltip = dynmod_BAV_army_effect_tt
+			add_to_variable = { BAV_army_cpg = 0.1 tooltip = command_power_gain_tooltip }
+			add_to_variable = { BAV_army_egaf = 0.1 tooltip = experience_gain_army_tooltip }
+			add_to_variable = { BAV_army_amf = 0.04 tooltip = army_morale_factor_tooltip }
+			add_to_variable = { BAV_army_aof = 0.04 tooltip = army_org_factor_tooltip }
+			add_to_variable = { BAV_army_ps = -0.05 tooltip = planning_speed_tooltip }
+			add_to_variable = { BAV_army_mpf = 0.15 tooltip = max_planning_tooltip }
+			add_to_variable = { BAV_army_ttaf = -0.15 tooltip = training_time_factor_tooltip }
+			add_to_variable = { BAV_army_elf = -0.15 tooltip = experience_loss_factor_tooltip }
+			add_to_variable = { BAV_army_cdf = 0.05 tooltip = army_core_defence_factor_tooltip }
+			add_to_variable = { BAV_army_ascf = 0.1 tooltip = army_spending_cost_factor_tooltip }
+			add_tech_bonus = { bonus = 0.5 uses = 1 category = artillery }
+			add_tech_bonus = { ahead_reduction = 0.5 uses = 1 category = artillery }
+			hidden_effect = {
+				set_country_flag = BAV_decision_establish_great_maneuvers_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Yearly Brigades Maneuver
+	BAV_decision_yearly_brigades_maneuver = {
+
+		icon = generic_military
+
+		#allowed = { tag = BAV }
+		
+		available = {
+			#
+		}
+
+		visible = {
+			has_country_flag = BAV_decision_expand_brigade_level_maneuvers_flag
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.05
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_money_and_political_power_20_and_command_power_50
 
 		days_remove = 7
 		
 		days_re_enable = 358
 
 		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.05 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
 			add_political_power = -20
 			add_command_power = -50
 		}
 		
 		remove_effect = {
-			army_experience = 10
-			add_war_support = 0.02
+			custom_effect_tooltip = BAV_decision_yearly_brigades_maneuver_effect_tt
+			hidden_effect = {
+				add_to_variable = { var = BAV_training_our_generals value = 1 }
+			}
+			army_experience = 5
+			if = {
+				limit = {
+					has_doctrine = grand_doctrine_napoleonic_era
+				}
+				add_mastery = { amount = 5 folder = land grand_doctrine = grand_doctrine_napoleonic_era }
+			}
+			else = {
+				add_mastery = { amount = 5 folder = land grand_doctrine = grand_doctrine_victorian_era }
+			}
 			random_list = {
-				50 = {
+				70 = {
 					#nothing happens
 				}
-				25 = {
+				10 = {
 					random_unit_leader = {
-						gain_xp = 300
+						gain_xp = 400
 					}
 				}
-				25 = {
+				10 = {
 					random_unit_leader = {
-						gain_xp = 150
+						gain_xp = 200
+					}
+				}
+				10 = {
+					random_unit_leader = {
+						gain_xp = 100
 					}
 				}
 			}
-			hidden_effect = {
-				add_to_variable = { BAV_training_our_generals = 1 }
-				if = {
-					limit = {
-						check_variable = { var = BAV_training_our_generals value = 5 compare = greater_than_or_equals }
+			if = {
+				limit = {
+					has_idea = BAV_idea_decently_experienced_generals
+					check_variable = { var = BAV_training_our_generals value = 8 compare = greater_than_or_equals }
+				}
+				swap_ideas = { remove_idea = BAV_idea_decently_experienced_generals add_idea = BAV_idea_experienced_generals }
+				hidden_effect = {
+					clear_variable = BAV_training_our_generals
+				}
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_lack_of_experienced_generals
+					check_variable = { var = BAV_training_our_generals value = 6 compare = greater_than_or_equals }
+				}
+				swap_ideas = { remove_idea = BAV_idea_lack_of_experienced_generals add_idea = BAV_idea_decently_experienced_generals }
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_somewhat_inexperienced_generals
+					check_variable = { var = BAV_training_our_generals value = 4 compare = greater_than_or_equals }
+				}
+				swap_ideas = { remove_idea = BAV_idea_somewhat_inexperienced_generals add_idea = BAV_idea_lack_of_experienced_generals }
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_inexperienced_generals
+					check_variable = { var = BAV_training_our_generals value = 2 compare = greater_than_or_equals }
+				}
+				swap_ideas = { remove_idea = BAV_idea_inexperienced_generals add_idea = BAV_idea_somewhat_inexperienced_generals }
+			}
+			else = {
+				add_war_support = 0.01
+				random_unit_leader = {
+					gain_xp = 100
+				}
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
+	#Yearly Great Maneuver
+	BAV_decision_yearly_great_maneuver = {
+
+		icon = generic_military
+
+		#allowed = { tag = BAV }
+		
+		available = {
+			#
+		}
+
+		visible = {
+			has_country_flag = BAV_decision_establish_great_maneuvers_flag
+		}
+
+		custom_cost_trigger = {
+			set_temp_variable = {
+				amount_of_money_to_check = 0.1
+			}
+			has_specific_amount_of_money_with_inflation_included = yes
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_money_and_political_power_20_and_command_power_50
+
+		days_remove = 7
+		
+		days_re_enable = 358
+
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -0.1 }
+			add_money_with_inflation_included_with_tooltip_effect = yes
+			add_political_power = -20
+			add_command_power = -50
+		}
+		
+		remove_effect = {
+			custom_effect_tooltip = BAV_decision_yearly_great_maneuver_effect_tt
+			army_experience = 15
+			if = {
+				limit = {
+					has_doctrine = grand_doctrine_napoleonic_era
+				}
+				add_mastery = { amount = 10 folder = land grand_doctrine = grand_doctrine_napoleonic_era }
+			}
+			else = {
+				add_mastery = { amount = 10 folder = land grand_doctrine = grand_doctrine_victorian_era }
+			}
+			random_list = {
+				40 = {
+					#nothing happens
+				}
+				20 = {
+					random_unit_leader = {
+						gain_xp = 400
 					}
-					# country_event remove NS + clear variable
+				}
+				20 = {
+					random_unit_leader = {
+						gain_xp = 200
+					}
+				}
+				20 = {
+					random_unit_leader = {
+						gain_xp = 100
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_idea = BAV_idea_decently_experienced_generals
+				}
+				swap_ideas = { remove_idea = BAV_idea_decently_experienced_generals add_idea = BAV_idea_experienced_generals }
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_lack_of_experienced_generals
+				}
+				swap_ideas = { remove_idea = BAV_idea_lack_of_experienced_generals add_idea = BAV_idea_decently_experienced_generals }
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_somewhat_inexperienced_generals
+				}
+				swap_ideas = { remove_idea = BAV_idea_somewhat_inexperienced_generals add_idea = BAV_idea_lack_of_experienced_generals }
+			}
+			else_if = {
+				limit = {
+					has_idea = BAV_idea_inexperienced_generals
+				}
+				swap_ideas = { remove_idea = BAV_idea_inexperienced_generals add_idea = BAV_idea_somewhat_inexperienced_generals }
+			}
+			else = {
+				add_war_support = 0.03
+				random_unit_leader = {
+					gain_xp = 200
 				}
 			}
 		}
@@ -3033,6 +3330,71 @@ BAV_decision_category_military = {
 		}
 	}
 
+	#Order Construction of Grain Silos
+	BAV_decision_order_construction_of_grain_silos = {
+
+		icon = grain
+
+		#allowed = { tag = BAV }
+		
+		available = {
+			has_completed_focus = BAV_focus_military_infrastructure_and_logistics
+			has_war = no
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_cost_200k_trigger_tt
+				hidden_trigger = {
+					check_variable = {
+						var = BAV_army_budget_var
+						value = 0.2
+						compare = greater_than_or_equals
+					}
+				}
+			}
+		}
+
+		visible = {
+			OR = {
+				has_active_mission = BAV_mission_army_adjustments
+				has_active_mission = BAV_mission_army_improvements
+				has_active_mission = BAV_mission_army_expansion
+			}
+		}
+
+		fire_only_once = yes
+
+		custom_cost_trigger = {
+			has_political_power > 19.9
+			command_power > 49.99
+		}
+		custom_cost_text = eoanb_political_power_20_command_power_50
+		
+		days_remove = 180
+		
+		complete_effect = {
+			custom_effect_tooltip = BAV_mission_army_reform_cost_200k_effect_tt
+			add_political_power = -20
+			add_command_power = -50
+			hidden_effect = {
+				subtract_from_variable = { var = BAV_army_budget_var value = 0.2 }
+			}
+		}
+
+		remove_effect = {
+			add_stability = 0.03
+			add_war_support = 0.03
+			custom_effect_tooltip = dynmod_BAV_army_effect_tt
+			add_to_variable = { BAV_army_scf = -0.02 tooltip = supply_consumption_factor_tooltip }
+			add_to_variable = { BAV_army_cdf = 0.03 tooltip = army_core_defence_factor_tooltip }
+			hidden_effect = {
+				set_country_flag = BAV_decision_order_construction_of_grain_silos_flag
+			}
+		}
+
+		ai_will_do = {
+			base = 100
+		}
+	}
+
 	#Build the Maximilian-II-Kaserne
 	BAV_decision_build_maximilian_ii_kaserne = {
 
@@ -3043,6 +3405,19 @@ BAV_decision_category_military = {
 		available = {
 			has_completed_focus = BAV_focus_build_maximilian_ii_kaserne
 			has_war = no
+			OR = {
+				custom_trigger_tooltip = {
+					tooltip = BAV_mission_army_reform_cost_400k_trigger_tt
+					hidden_trigger = {
+						check_variable = {
+							var = BAV_army_budget_var
+							value = 0.4
+							compare = greater_than_or_equals
+						}
+					}
+				}
+				
+			}
 		}
 
 		visible = {
@@ -3098,6 +3473,16 @@ BAV_decision_category_military = {
 		available = {
 			has_completed_focus = BAV_focus_renovate_the_isarkaserne
 			has_war = no
+			custom_trigger_tooltip = {
+				tooltip = BAV_mission_army_reform_cost_400k_trigger_tt
+				hidden_trigger = {
+					check_variable = {
+						var = BAV_army_budget_var
+						value = 0.4
+						compare = greater_than_or_equals
+					}
+				}
+			}
 		}
 
 		visible = {
@@ -3138,70 +3523,6 @@ BAV_decision_category_military = {
 			eoanb_change_prestige_score = yes
 		}
 		
-		ai_will_do = {
-			base = 100
-		}
-	}
-
-	#Order Construction of Grain Silos
-	BAV_decision_order_construction_of_grain_silos = {
-
-		icon = grain
-
-		#allowed = { tag = BAV }
-		
-		available = {
-			has_completed_focus = BAV_focus_military_infrastructure_and_logistics
-			custom_trigger_tooltip = {
-				tooltip = BAV_mission_army_reform_cost_200k_trigger_tt
-				hidden_trigger = {
-					check_variable = {
-						var = BAV_army_budget_var
-						value = 0.2
-						compare = greater_than_or_equals
-					}
-				}
-			}
-		}
-
-		visible = {
-			OR = {
-				has_active_mission = BAV_mission_army_adjustments
-				has_active_mission = BAV_mission_army_improvements
-				has_active_mission = BAV_mission_army_expansion
-			}
-		}
-
-		fire_only_once = yes
-
-		custom_cost_trigger = {
-			has_political_power > 19.9
-			command_power > 49.99
-		}
-		custom_cost_text = eoanb_political_power_20_command_power_50
-		
-		days_remove = 180
-		
-		complete_effect = {
-			custom_effect_tooltip = BAV_mission_army_reform_cost_200k_effect_tt
-			add_political_power = -20
-			add_command_power = -50
-			hidden_effect = {
-				subtract_from_variable = { var = BAV_army_budget_var value = 0.2 }
-			}
-		}
-
-		remove_effect = {
-			add_stability = 0.03
-			add_war_support = 0.03
-			custom_effect_tooltip = dynmod_BAV_army_effect_tt
-			add_to_variable = { BAV_army_scf = -0.02 tooltip = supply_consumption_factor_tooltip }
-			add_to_variable = { BAV_army_cdf = 0.03 tooltip = army_core_defence_factor_tooltip }
-			hidden_effect = {
-				set_country_flag = BAV_decision_order_construction_of_grain_silos_flag
-			}
-		}
-
 		ai_will_do = {
 			base = 100
 		}
