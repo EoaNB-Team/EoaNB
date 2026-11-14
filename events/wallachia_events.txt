@@ -1763,12 +1763,13 @@ add_namespace = rom_wallachia
 			name = wallachian_union.23.a #Accept
 			ai_chance = { 
 				factor = 200
-				modifier = {
-					factor = 5
+				modifier = { # Austria was the most hostile guarantor to the union
+					factor = 0.2
 					tag = AUS
 				}
 			}
-			add_to_variable = {Union_cuza_approved = 1}
+			# The approval count lives on Romania: the focus sets it there and the Ottoman ultimatum reads it from there
+			ROM = { add_to_variable = { Union_cuza_approved = 1 } }
 			add_opinion_modifier = {
 				target = ROM
 				modifier = large_increase
@@ -1779,7 +1780,13 @@ add_namespace = rom_wallachia
 		}
 		option = { 
 			name = wallachian_union.23.b #Deny
-			ai_chance = { factor = 60 }
+			ai_chance = {
+				factor = 60
+				modifier = { # Historically every guarantor ended up recognising the union (Constantinople conference, 1861)
+					factor = 0
+					is_historical_focus_on = yes
+				}
+			}
 			add_opinion_modifier = {
 				target = ROM
 				modifier = medium_decrease
@@ -1840,6 +1847,11 @@ add_namespace = rom_wallachia
 			add_stability = -0.05
 			unlock_decision_tooltip = OTO_grant_romanian_union
 			activate_mission = OTO_embargo_timer
+			hidden_effect = {
+				# Lets the AI hold out for the historical date but give in before the 300-day ultimatum runs out
+				set_country_flag = OTO_romanian_ultimatum_issued
+				set_country_flag = { flag = OTO_romanian_ultimatum_grace days = 250 }
+			}
 		}
 	}
 	###Ottoman Less Diplo Pressure
@@ -1857,6 +1869,17 @@ add_namespace = rom_wallachia
 				factor = 200
 			}
 			unlock_decision_tooltip = OTO_grant_romanian_union
+			# Without a deadline the Porte could ignore the question forever and Romania's tree would be stuck at
+			# ROM_move_away_from_Ottomans, so the appeasement path gets the same ultimatum with 180 extra days
+			activate_mission = OTO_embargo_timer
+			add_days_mission_timeout = {
+				mission = OTO_embargo_timer
+				days = 180
+			}
+			hidden_effect = {
+				set_country_flag = OTO_romanian_ultimatum_issued
+				set_country_flag = { flag = OTO_romanian_ultimatum_grace days = 430 }
+			}
 		}
 	}
 	###Ottoman Accepts Romanian Union
@@ -1925,6 +1948,15 @@ add_namespace = rom_wallachia
 					remove_core_of = MOL
 				}
 				set_cosmetic_tag = ROM_united_principalities
+				# Same culture setup as the peaceful ROM_form_romanian_union decision
+				if = {
+					limit = { NOT = { AND = {
+						is_in_array = { national_culture_array = 100 }
+						is_in_array = { national_culture_array = 101 }
+					} } }
+					add_to_array = { national_culture_array = 100 } #Moldovans
+					add_to_array = { national_culture_array = 101 } #Transylvanian Romanians
+				}
 			}
 		}
 		#option = { #Diplomatic Unification TODO
