@@ -173,7 +173,6 @@ VertexStruct VS_OUTPUT_PDXMESHSTANDARD
 	float3 vTangent		: TEXCOORD1;
 	float3 vBitangent	: TEXCOORD2;
 	float2 vUV0			: TEXCOORD3;
-	float2 vUV1			: TEXCOORD4;
 	float4 vPos_Height	: TEXCOORD5;
 };
 
@@ -222,10 +221,9 @@ ConstantBuffer( 1, 28 )
 	float vUVAnimSpeed;
 };
 
-#// this const buffer is only valid for trains
 ConstantBuffer( 1, 28 )
 {
-	float4x4 WorldMatrix2; // an alias of WorldMatrix. i have to put a matrix here to shift train user data by 4x4 matrix since WorldMatrix is actually valud and being used
+	float4x4 WorldMatrix2;
 	float4 TrainColor;
 	float2 TrainAlphaStart;
 	float2 TrainAlphaDir;
@@ -233,7 +231,7 @@ ConstantBuffer( 1, 28 )
 
 ConstantBuffer( 2, 41 )
 {
-	float4x4 matBones[50]; // : Bones :register( c41 ); // 50 * 4 registers 41 - 241 
+	float4x4 matBones[50];
 };
 
 
@@ -266,11 +264,6 @@ VertexShader =
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
 			
 			Out.vUV0 = v.vUV0;
-#ifdef PDX_MESH_UV1
-			Out.vUV1 = v.vUV1;
-#else
-			Out.vUV1 = v.vUV0;
-#endif
 		
 			return Out;
 		}
@@ -291,6 +284,21 @@ VertexShader =
 		
 			float4 vWeight = float4( v.vBoneWeight.xyz, 1.0f - v.vBoneWeight.x - v.vBoneWeight.y - v.vBoneWeight.z );
 		
+		#if OPT_SKIN_BLEND_MATRIX
+			int nBone0 = int( v.vBoneIndex[0] );
+			int nBone1 = int( v.vBoneIndex[1] );
+			int nBone2 = int( v.vBoneIndex[2] );
+			int nBone3 = int( v.vBoneIndex[3] );
+			float4x4 matBlend = matBones[nBone0] * vWeight.x;
+			matBlend += matBones[nBone1] * vWeight.y;
+			matBlend += matBones[nBone2] * vWeight.z;
+			matBlend += matBones[nBone3] * vWeight.w;
+
+			vSkinnedPosition = mul( matBlend, vPosition );
+			vSkinnedNormal = mul( CastTo3x3( matBlend ), v.vNormal );
+			vSkinnedTangent = mul( CastTo3x3( matBlend ), v.vTangent.xyz );
+			vSkinnedBitangent = mul( CastTo3x3( matBlend ), cross( v.vNormal, v.vTangent.xyz ) * v.vTangent.w );
+		#else
 			for( int i = 0; i < PDXMESH_MAX_INFLUENCE; ++i )
 		    {
 				int nIndex = int( v.vBoneIndex[i] );
@@ -305,6 +313,7 @@ VertexShader =
 				vSkinnedTangent += vTangent * vWeight[i];
 				vSkinnedBitangent += vBitangent * vWeight[i];
 			}
+		#endif
 		
 			Out.vPosition = mul( WorldMatrix, vSkinnedPosition );
 			Out.vPos_Height.xyz = Out.vPosition.xyz;
@@ -312,16 +321,11 @@ VertexShader =
 			Out.vPos_Height /= WorldMatrix[3][3];
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
 		
-			Out.vNormal = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedNormal ) ) );
-			Out.vTangent = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedTangent ) ) );
-			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), normalize( vSkinnedBitangent ) ) );
+			Out.vNormal = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedNormal ) );
+			Out.vTangent = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedTangent ) );
+			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedBitangent ) );
 		
 			Out.vUV0 = v.vUV0;
-#ifdef PDX_MESH_UV1
-			Out.vUV1 = v.vUV1;
-#else
-			Out.vUV1 = v.vUV0;
-#endif			
 			return Out;
 		}
 	]]
@@ -433,9 +437,6 @@ PixelShader =
 			vColor = lerp( vColor, SNOW_COLOR, vSnowFade * vOpacity );
 			vSnowAlpha = saturate( vIsSnow * 1.5f ) * vOpacity;
 			
-			//vNormal.y += 0.5f * vSnowFade;
-			//vNormal = normalize( vNormal );
-			
 			return vColor;
 		}
 
@@ -531,7 +532,11 @@ PixelShader =
 			
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
-			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
+			// The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the
+			// night pass, so it is worked out once here and passed on.
+			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
+			float3 vSunDirection = CalculateSunDirectionGN( vPos, vGlobalNormal );
+			CalculateSunLightGN( lightingProperties, fShadowTerm, vSunDirection, vGlobalNormal, diffuseLight, specularLight );
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 		
 		#ifdef PDX_IMPROVED_BLINN_PHONG
@@ -544,12 +549,10 @@ PixelShader =
 		#endif
 		
 		#ifdef PDX_SNOW
-			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
+			vColor = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
 		#else
-			vColor = ComposeLightMesh(lightingProperties, diffuseLight, specularLight, vSnowAlpha);
+			vColor = ComposeLightMeshGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
 		#endif
-
-			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
 
 			float alpha = 0.0f;
 		#ifdef EMISSIVE
@@ -566,15 +569,7 @@ PixelShader =
 			vColor = ApplyFOW( vColor, FogColorFactor, min( FogAlphaFactor, NegFogMultiplier ) );
 
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
-			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
-
-/*		#ifdef RIM_LIGHT
-			float vRim = smoothstep( RIM_START, RIM_END, 1.0f - dot( vInNormal, lightingProperties._ToCameraDir ) );
-			vColor.rgb = lerp( vColor.rgb, RIM_COLOR.rgb, vRim );
-		#endif	
-*/			
-
-			DebugReturn(vColor, lightingProperties, fShadowTerm);
+			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );		
 			
 		#ifdef TRAIN
 			alpha = TrainColor.a;
@@ -648,7 +643,7 @@ PixelShader =
 			DayAmbientColors[4] = AmbientPosZ;
 			DayAmbientColors[5] = AmbientNegZ;
 		
-			float3 vAmbientColor = AmbientLight(lightingProperties._Normal, 0.0, DayAmbientColors, DayAmbientColors);
+			float3 vAmbientColor = AmbientLightDayOnly(lightingProperties._Normal, DayAmbientColors);
 			float3 diffuse = ((vAmbientColor + diffuseLight) * lightingProperties._Diffuse) * HdrRange;
 			vColor = diffuse + specularLight;
 

@@ -393,8 +393,6 @@ PixelShader =
 		#endif
 			
 			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
-			
-			DebugReturn(vOut, lightingProperties, fShadowTerm);
 
 		#ifdef LOW_END_GFX
 			return float4( vOut, vNightFactor * CITY_LIGHTS_BLOOM_FACTOR );

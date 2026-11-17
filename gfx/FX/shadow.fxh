@@ -39,11 +39,22 @@ PixelShader =
 	float GetShadowScaled( float fScaler, in float4 vBlurTexCoord, in sampler2DShadow ShadowSample )
 	{
 		fScaler = saturate( fScaler );
-		float vShadowValue = tex2Dproj( ShadowSample, vBlurTexCoord ).r;
-		
-		//Hide shadow after a certain distance
-		vShadowValue += (1.0 - ShadowFadeFactor);
-		vShadowValue = saturate( vShadowValue );
+
+		// Once the shadows have faded out completely ( ShadowFadeFactor <= 0 ) the value below is saturated
+		// to 1 whatever the lookup returns, so the lookup is not needed. The condition is a constant-buffer
+		// value, so the whole draw takes the same path and the lookup can sit inside the branch.
+		float vShadowValue = 1.0f;
+	#if OPT_SKIP_UNUSED_LAYERS
+		OPT_BRANCH
+		if ( ShadowFadeFactor > 0.0f )
+	#endif
+		{
+			vShadowValue = tex2Dproj( ShadowSample, vBlurTexCoord ).r;
+
+			//Hide shadow after a certain distance
+			vShadowValue += (1.0 - ShadowFadeFactor);
+			vShadowValue = saturate( vShadowValue );
+		}
 		
 		return ( 1.0 - fScaler ) + fScaler * vShadowValue;
 	}

@@ -206,7 +206,6 @@ VertexShader =
 		
 			vTmpPos = mul( ViewProjectionMatrix, vTmpPos );
 			
-			// move z value slightly closer to camera to avoid intersections with terrain
 			float vNewZ = dot( vDistortedPos, float4( GetMatrixData( ViewProjectionMatrix, 2, 0 ), GetMatrixData( ViewProjectionMatrix, 2, 1 ), GetMatrixData( ViewProjectionMatrix, 2, 2 ), GetMatrixData( ViewProjectionMatrix, 2, 3 ) ) );
 			Out.vPosition = float4( vTmpPos.xy, vNewZ, vTmpPos.w );
 			
@@ -216,7 +215,6 @@ VertexShader =
 			Out.vTangent = v.vUV_Tangent.zw;
 			Out.vPrePos_Fade.w = saturate( 1.0f - v.vUV_Tangent.y );
 		
-			// Output the screen-space texture coordinates
 			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 );
 			Out.vScreenCoord.y = ( Out.vPosition.w * 0.5 - Out.vPosition.y * 0.5 );
 		#ifdef PDX_OPENGL
@@ -249,9 +247,7 @@ PixelShader =
 			vOpacity = SNOW_OPACITY_MIN + vOpacity * ( SNOW_OPACITY_MAX - SNOW_OPACITY_MIN );
 
 			float vSnowAlpha = smoothstep( 0.0f, 1.0f, saturate( vIsSnow * vOpacity * 1.7 ) );
-			vColor = lerp( vColor, 
-			               lerp( saturate(SNOW_WATER_COLOR * vReflectColor), SNOW_COLOR, smoothstep(0.4, 0.75, saturate(vNoiseColor + waterSideAlpha))), 
-			               vSnowAlpha );
+			vColor = lerp( vColor, lerp( saturate(SNOW_WATER_COLOR * vReflectColor), SNOW_COLOR, smoothstep(0.4, 0.75, saturate(vNoiseColor + waterSideAlpha))), vSnowAlpha );
 
 			vNormal.y += lerp(20.0f, 1.0f, waterSideAlpha) * vSnowAlpha;
 			vNormal = normalize( vNormal );
@@ -313,7 +309,6 @@ PixelShader =
 		#else
 			float3 SunDirWater = CalculateSunDirectionWater( Input.vPrePos_Fade.xyz );
 		#endif
-			// one normalize for the three places that need the pixel-to-camera direction
 			float3 vToCameraDir = normalize( vCamPos - Input.vPrePos_Fade.xyz );
 			float3 H = normalize( vToCameraDir.xzy + -SunDirWater.xzy );
 			float2 HWave = H.xy/H.z - B;
@@ -326,13 +321,9 @@ PixelShader =
 		#ifdef LOW_END_GFX
 			float3 normal = waterNormal;
 		#else
-			//float3 vHeightNormal = normalize( tex2D( HeightNormal, Input.vWorldUV ).rbg - 0.5f );
 			float3 vCanalNormal = normalize( tex2D( NormalMap, float2( vNewUV.x, 1.0f - vNewUV.y ) ).rbg - 0.5f );
 			vCanalNormal.z *= vFlip;
-			
-			// The tangent lies in the XZ plane and the bitangent is the same vector turned by 90
-			// degrees, so both have the same length (one normalize instead of three) and their
-			// cross product is always straight up.
+
 			float2 vTangentDir = normalize( Input.vTangent );
 			float3 vTangent = float3( vTangentDir.x, 0.0f, vTangentDir.y );
 			float3 vBitangent = float3( vTangentDir.y, 0.0f, -vTangentDir.x );
@@ -341,13 +332,11 @@ PixelShader =
 			float3 vSideNormal = normalize( mul( vCanalNormal, TNB ) );
 			float3 normal = normalize( lerp( waterNormal, vSideNormal, waterSideAlpha.x ) );
 		#endif
-		
-			// Gradient Borders
+
 			float gradientBorderFactor = 1.0f - gradient_border_camera_distance();
 
 			float vBloomAlpha = 0.0f;	
 		#ifndef LOW_END_GFX
-			// both colours sit at the same map position: evaluate the borders once, blend twice
 			float3 gradientBorderWaterColor = waterColor;
 			gradient_border_apply2( diffuseColor.rgb, gradientBorderWaterColor, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
 			waterColor = lerp( waterColor, gradientBorderWaterColor, gradientBorderFactor );
@@ -407,12 +396,8 @@ PixelShader =
 			float vFastFade = vFadeValue * vFadeValue * vFadeValue * vFadeValue;
 			vFastFade = vFastFade * vFastFade;
 		
-			// fade slower if water, faster if land(help river crossings)
 			float vDesiredFade = (lerp( vFadeValue * 2.0f, 0.0f, saturate( waterSideAlpha.x * 4.0f ) ));
 			float vAlphaMultiplier = saturate(lerp( vDesiredFade, 1.0f, vFastFade ));
-			
-
-			DebugReturn(vOut, lightingProperties, fShadowTerm);
 
 			return float4( vOut, waterSideAlpha.y * vAlphaMultiplier * Input.vTransp );
 		}
