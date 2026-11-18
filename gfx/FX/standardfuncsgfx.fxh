@@ -430,7 +430,7 @@ PixelShader =
 	float3 DayNightWithBlend( float3 vDayColor, float3 vGlobeNormal, float vBlend )
 	{	
 		#ifdef NO_NIGHT
-			return vDayColor;
+		return vDayColor;
 		#endif
 
 		return lerp( vDayColor, NightifyColor(vDayColor, vBlend), DayNightFactor( vGlobeNormal ) * NIGHT_OPACITY );
@@ -444,7 +444,7 @@ PixelShader =
 	float3 DayNightCityMask( float3 vDayColor, float3 vGlobeNormal, float vCityLightMask, float vFogFactor )
 	{
 		#ifdef NO_NIGHT
-			return vDayColor;
+		return vDayColor;
 		#endif
 
 		float vNightFactor = DayNightFactor( vGlobeNormal );
@@ -674,6 +674,11 @@ PixelShader =
 	float3 CalculateSunDirectionWater( float3 vWorldPos )
 	{
 		return CalculateSunDirection( vWorldPos, vVirtualSunPos.xwz, vSecondVirtualSunPos.xwz, vVirtualMoonPos.xwz, vSecondVirtualMoonPos.xwz );
+	}
+
+	float3 CalculateSunDirectionWaterGN( float3 vWorldPos, float3 vGlobeNormal )
+	{
+		return CalculateSunDirectionFromSelected( vWorldPos, DayNightFactor( vGlobeNormal, 0.0f, 0.0001f ), vVirtualSunPos.xwz, vSecondVirtualSunPos.xwz, vVirtualMoonPos.xwz, vSecondVirtualMoonPos.xwz );
 	}
 
 	void CalculateSunLightGN(LightingProperties aProperties, float aShadowTerm, float3 vLightSourceDirection, float3 vGlobeNormal, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
@@ -1267,6 +1272,46 @@ PixelShader =
 		float3 M;
 		SampleWater( uv, vTime, B, M, normal, Lean1, Lean2 );
 	}	
+
+	#ifndef PDX_OPENGL
+		void SampleLEANGrad( float2 uv, float2 vDX, float2 vDY, out float2 Bout, in sampler2D LeanTexture2Sampler )
+		{
+			float4 lean2 = tex2Dgrad( LeanTexture2Sampler, uv, vDX, vDY );
+			float vScale = 1.7f;
+			Bout = ( 2*lean2.xy - 1 ) * vScale;
+		}
+
+		void SampleWaterGrad( float2 uv, float2 vDX, float2 vDY, float vTime, out float3 normal, in sampler2D Lean2 )
+		{
+			float2 vUVMultipliers[4];
+			vUVMultipliers[0] = 1000.0f * float2( 0.9f, 1.0f );
+			vUVMultipliers[1] = 700.0f * float2( 0.95f, 1.05f );
+			vUVMultipliers[2] = 534.0f * float2( 1.05f, 0.95f );
+			vUVMultipliers[3] = 300.0f * float2( 1.0f, 1.0f );
+
+			float2 vTimeMultipliers[4];
+			vTimeMultipliers[0] = float2( 1.0f, 0.1f );
+			vTimeMultipliers[1] = float2( 0.1f, 2.0f );
+			vTimeMultipliers[2] = float2( -0.2f, -2.0f );
+			vTimeMultipliers[3] = float2( -1.0f, -0.1f );
+
+			vTime *= WATER_TIME_SCALE;
+
+			float2 Ba, Bb, Bc, Bd;
+			SampleLEANGrad( uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0], vDX * vUVMultipliers[0], vDY * vUVMultipliers[0], Ba, Lean2 );
+			SampleLEANGrad( uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1], vDX * vUVMultipliers[1], vDY * vUVMultipliers[1], Bb, Lean2 );
+			SampleLEANGrad( uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2], vDX * vUVMultipliers[2], vDY * vUVMultipliers[2], Bc, Lean2 );
+			SampleLEANGrad( uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3], vDX * vUVMultipliers[3], vDY * vUVMultipliers[3], Bd, Lean2 );
+
+			float2 B1 = Ba * 0.5f + Bb * 0.5f;
+			float2 B2 = Bc * 0.5f + Bd * 0.5f;
+			float2 B = B1 * 0.5f + B2 * 0.5f;
+
+			normal = float3( B.x, 1.0f, B.y );
+			float vMultiplier = 1.0f / sqrt( normal.x * normal.x + normal.y * normal.y + normal.z * normal.z );
+			normal *= vMultiplier;
+		}
+	#endif
 	]]
 
 }
