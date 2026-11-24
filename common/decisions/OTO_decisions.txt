@@ -3126,12 +3126,40 @@ eoanb_category_diplomatic_actions={
 			}
 		}
 		ai_will_do = {
-			factor = 250
-			modifier = {#not before historical date
-				factor = 0
-				AND = {
-					date > 1861.12.23
+			base = 0
+			# The more great powers back the union, the more willing the Porte is to give in
+			modifier = {
+				add = 5
+				check_variable = { ROM.Union_cuza_approved > 2 }
+			}
+			modifier = {
+				add = 20
+				check_variable = { ROM.Union_cuza_approved > 4 }
+			}
+			# Historical: the Porte recognised the union in December 1861
+			modifier = {
+				add = 250
+				is_historical_focus_on = yes
+				date > 1861.12.1
+			}
+			# Give in before the ultimatum runs out, if enough great powers back Romania to make resisting costly
+			modifier = {
+				add = 250
+				has_country_flag = OTO_romanian_ultimatum_issued
+				NOT = { has_country_flag = OTO_romanian_ultimatum_grace }
+				OR = {
 					is_historical_focus_on = yes
+					check_variable = { ROM.Union_cuza_approved > 2 }
+				}
+			}
+			# Historical: not before the historical date, unless the ultimatum is about to run out
+			modifier = {
+				factor = 0
+				is_historical_focus_on = yes
+				date < 1861.12.2
+				OR = {
+					NOT = { has_country_flag = OTO_romanian_ultimatum_issued }
+					has_country_flag = OTO_romanian_ultimatum_grace
 				}
 			}
 		}
@@ -3145,8 +3173,10 @@ eoanb_category_diplomatic_actions={
 			tag = OTO
 		}
 		cancel_trigger = {
-			ROM = {
-				has_country_flag = ROM_union_allowed
+			OR = {
+				ROM = { has_country_flag = ROM_union_allowed }
+				ROM = { exists = no }
+				MOL = { exists = no } # Union already happened some other way
 			}
 		}
 		
@@ -3167,23 +3197,24 @@ eoanb_category_diplomatic_actions={
 				country_event = {id = wallachian_union.29 days = 1}
 				#set_country_flag = ROM_union_rejected
 			}
+			# Union_cuza_approved is stored on Romania, not on the Ottomans
 			if = {
-				limit = {check_variable = {Union_cuza_approved = 6}}
+				limit = { check_variable = { ROM.Union_cuza_approved > 5 } }
 				add_political_power = -400
 				add_stability = -0.2
 			}
 			else_if = {
-				limit = {check_variable = {Union_cuza_approved = 5}}
+				limit = { check_variable = { ROM.Union_cuza_approved > 4 } }
 				add_political_power = -300
 				add_stability = -0.15
 			}
 			else_if = {
-				limit = {check_variable = {Union_cuza_approved = 4}}
+				limit = { check_variable = { ROM.Union_cuza_approved > 3 } }
 				add_political_power = -200
 				add_stability = -0.1
 			}
 			else_if = {
-				limit = {check_variable = {Union_cuza_approved = 3}}
+				limit = { check_variable = { ROM.Union_cuza_approved > 2 } }
 				add_political_power = -100
 				add_stability = -0.05
 			}
@@ -5072,6 +5103,44 @@ eoanb_category_economic = {
 					}
 				}
 			}
+		}
+	}
+	OTO_buildout_stara_planina_west = {
+		icon = generic_construction
+		allowed = { tag = OTO }
+		visible = { has_completed_focus = OTO_focus_stara_planina_region_buildout }
+		fire_only_once = yes
+		days_remove = 100
+		highlight_states = {
+			highlight_state_targets = { state = 48 } 
+		}
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -2.2 }
+			add_money_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			48 = { add_extra_state_shared_building_slots = 1 }
+			add_resource = { type = coal amount = 1 state = 48 }
+		}
+	}
+	OTO_buildout_stara_planina_east = {
+		icon = generic_construction
+		allowed = { tag = OTO }
+		visible = { has_completed_focus = OTO_focus_stara_planina_region_buildout }
+		fire_only_once = yes
+		days_remove = 120
+		highlight_states = {
+			highlight_state_targets = { state = 211 } 
+		}
+		complete_effect = {
+			set_temp_variable = { money_to_gain = -3 }
+			add_money_with_tooltip_effect = yes
+		}
+		
+		remove_effect = {
+			211 = { add_extra_state_shared_building_slots = 1 }
+			add_resource = { type = iron amount = 2 state = 211 }
 		}
 	}
 }

@@ -854,21 +854,22 @@ eoanb_category_economic = {
 	can_become_bankrupt_mission = {
 		icon = decision_envelope
 		
+		# Only total income is compared, so calculate_money_income replaces the full
+		# calculate_money_balance (which also walks every owned state twice more for
+		# expenses). Loan interest is expenses_from_loans * -1 = current_loans_sum / 100.
 		activation = {
 			NOT = { has_idea = bankruptcy }
 			has_taken_a_loan = yes
-			calculate_money_balance = yes
-			set_temp_variable = { required_income = expenses_from_loans }
-			multiply_temp_variable = { required_income = -1 }
-			NOT = {
-				check_variable = { total_income_temp > required_income }
-			}
+			calculate_money_income = yes
+			set_temp_variable = { required_income = current_loans_sum }
+			divide_temp_variable = { required_income = 100 }
+			NOT = { check_variable = { total_income_temp > required_income } }
 		}
-		
+
 		available = {
-			calculate_money_balance = yes
-			set_temp_variable = { required_income = expenses_from_loans }
-			multiply_temp_variable = { required_income = -1 }
+			calculate_money_income = yes
+			set_temp_variable = { required_income = current_loans_sum }
+			divide_temp_variable = { required_income = 100 }
 			OR = {
 				custom_trigger_tooltip = {
 					tooltip = HAS_MORE_INCOME_THAN_LOAN_EXPENSES

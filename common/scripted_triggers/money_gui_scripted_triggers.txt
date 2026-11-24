@@ -42,3 +42,79 @@ slider_button_can_be_clicked = {
 		has_political_power > 49.9
 	}
 }
+
+# Topbar budget values (topbar_money_info_window).
+# A scripted GUI's visible block runs every frame even when the GUI has a dirty
+# variable, so the old version recalculated the whole budget (three all_owned_state
+# passes plus 20 SI conversions) ~60 times a second. The breakdown is now cached
+# once a day by eoanb_money_topbar_refresh and only copied into the temp variables
+# the existing localisation already reads. The money figure itself stays live.
+# Falls back to the full live calculation when there is no cache yet (new game,
+# tag switch) and while the economy window is open, so slider changes show at once.
+# AI-controlled countries (observe mode, the `ai` console command) never get a
+# cache, so they take their own cheap branch: the old code never calculated a
+# budget for AI either (is_ai guard in calculate_balance_indicator_frame), so
+# income/expenses were always 0 and only money was meaningful.
+eoanb_money_topbar_values = {
+	if = {
+		limit = { is_ai = yes }
+		# Same output the old path produced for AI: 0 shown as 0.00M, neutral icon frame
+		set_temp_variable = { balance_indicator_icon_frame = 3 }
+		set_temp_variable = { si_income = 0 }
+		set_temp_variable = { si_income_tier = 1 }
+		set_temp_variable = { si_income_dec = 2 }
+		set_temp_variable = { si_expenses = 0 }
+		set_temp_variable = { si_expenses_tier = 1 }
+		set_temp_variable = { si_expenses_dec = 2 }
+
+		set_temp_variable = { si_in = money }
+		format_money_si = yes
+		set_temp_variable = { si_money = si_out }
+		set_temp_variable = { si_money_tier = si_tier }
+		set_temp_variable = { si_money_dec = si_dec }
+	}
+	else_if = {
+		limit = {
+			OR = {
+				NOT = { has_variable = eoanb_mtc_cached }
+				check_variable = { show_economy_window > 0 }
+			}
+		}
+		calculate_balance_indicator_frame = yes
+		calculate_money_si = yes
+	}
+	else = {
+		set_temp_variable = { balance_indicator_icon_frame = eoanb_mtc_balance_indicator_icon_frame }
+		set_temp_variable = { total_balance_temp = eoanb_mtc_total_balance_temp }
+		set_temp_variable = { total_income_temp = eoanb_mtc_total_income_temp }
+		set_temp_variable = { total_expenses_temp = eoanb_mtc_total_expenses_temp }
+		set_temp_variable = { income_modifier = eoanb_mtc_income_modifier }
+		set_temp_variable = { expenses_modifier = eoanb_mtc_expenses_modifier }
+		set_temp_variable = { income_from_our_taxes = eoanb_mtc_income_from_our_taxes }
+		set_temp_variable = { income_from_our_consumer_goods_factories = eoanb_mtc_income_from_our_consumer_goods_factories }
+		set_temp_variable = { income_from_our_free_civilian_factories = eoanb_mtc_income_from_our_free_civilian_factories }
+		set_temp_variable = { income_from_other_sources = eoanb_mtc_income_from_other_sources }
+		set_temp_variable = { expenses_from_our_social_spending = eoanb_mtc_expenses_from_our_social_spending }
+		set_temp_variable = { expenses_from_our_law_spending = eoanb_mtc_expenses_from_our_law_spending }
+		set_temp_variable = { expenses_from_our_road_spending = eoanb_mtc_expenses_from_our_road_spending }
+		set_temp_variable = { expenses_from_our_navy_spending = eoanb_mtc_expenses_from_our_navy_spending }
+		set_temp_variable = { expenses_from_our_research_spending = eoanb_mtc_expenses_from_our_research_spending }
+		set_temp_variable = { expenses_from_our_army_spending = eoanb_mtc_expenses_from_our_army_spending }
+		set_temp_variable = { expenses_from_our_used_mil_factories = eoanb_mtc_expenses_from_our_used_mil_factories }
+		set_temp_variable = { expenses_from_loans = eoanb_mtc_expenses_from_loans }
+		set_temp_variable = { expenses_from_other_sources = eoanb_mtc_expenses_from_other_sources }
+		set_temp_variable = { si_income = eoanb_mtc_si_income }
+		set_temp_variable = { si_income_tier = eoanb_mtc_si_income_tier }
+		set_temp_variable = { si_income_dec = eoanb_mtc_si_income_dec }
+		set_temp_variable = { si_expenses = eoanb_mtc_si_expenses }
+		set_temp_variable = { si_expenses_tier = eoanb_mtc_si_expenses_tier }
+		set_temp_variable = { si_expenses_dec = eoanb_mtc_si_expenses_dec }
+
+		# Live: money changes on clicks and on the monthly tick
+		set_temp_variable = { si_in = money }
+		format_money_si = yes
+		set_temp_variable = { si_money = si_out }
+		set_temp_variable = { si_money_tier = si_tier }
+		set_temp_variable = { si_money_dec = si_dec }
+	}
+}

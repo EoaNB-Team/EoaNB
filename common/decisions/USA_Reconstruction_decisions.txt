@@ -8,6 +8,30 @@ USA_readmission_decisions = {
             }
         }
         state_target = yes
+        # Without these, every state on the map is a target and the visible block
+        # below is evaluated per state. Only run when a seceded zone subject exists,
+        # and pre-filter states daily with the cheap parts of visible.
+        target_root_trigger = {
+            any_subject_country = {
+                OR = {
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_1
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_2
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_3
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_4
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_5
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_6
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_7
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_8
+                    has_cosmetic_tag = USA_unintegrated_seceded_zone_9
+                }
+            }
+        }
+        target_trigger = {
+            FROM = {
+                NOT = { has_state_flag = NA_B_Disregardable_State }
+                OWNER = { is_subject_of = ROOT }
+            }
+        }
         available = {
             has_capitulated = no
             NOT = { has_country_flag = USAROD_Reconstruction_Decision_Taken }
@@ -70,9 +94,7 @@ USA_readmission_decisions = {
             hidden_effect = {
                 if = {
                     limit = { check_variable = { FROM.reconstruction_integration_progress > 0.99 } }
-                    FROM = {
-                        USAROD_reconstruction_progress_admit = yes
-                    }
+                    FROM = { USAROD_reconstruction_progress_admit = yes }
                 }
                 else = {
                     FROM = { state_event = { id = acw_reconstruction.15 } }
@@ -82,9 +104,7 @@ USA_readmission_decisions = {
         remove_effect = {
             if = {
                 limit = {
-                    FROM = {
-                        has_variable = reconstruction_integration_progress
-                    }
+                    FROM = { has_variable = reconstruction_integration_progress }
                 }
                 FROM = {
                     clamp_variable = {
