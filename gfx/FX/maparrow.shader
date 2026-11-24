@@ -159,7 +159,7 @@ ConstantBuffer( 3, 32 ) # For arrow shader
 	float4 vOfsX_vOfsTex_vOfsFx;
 	float vBodyUvScale;
 	float vSecondaryBodyUvScale;
-	float vTextureVariantScale;
+	float vTextureVariantScale; // 1.0f / (number of variants)
 	float fCullingOffset;
 	float vShadowFactor;
 	float vNormalMapFactor;
@@ -187,18 +187,18 @@ VertexShader =
 			VertexOut.prepos = vPos;
 			VertexOut.position = mul( ViewProjectionMatrix, float4( vPos, 1.0f ) );
 			VertexOut.uv_isHead_variant = VertexIn.uv_isHead_variant;
-		#ifdef ANIM_TEXTURE
-			VertexOut.uv_isHead_variant.x -= vTime_IsSelected_FadeInOut.x * vOfsX_vOfsTex_vOfsFx.y;
-		#endif
+			#ifdef ANIM_TEXTURE
+				VertexOut.uv_isHead_variant.x -= vTime_IsSelected_FadeInOut.x * vOfsX_vOfsTex_vOfsFx.y;
+			#endif
 			VertexOut.uv_isHead_variant.y = fCullingOffset > 0 ? fCullingOffset - VertexOut.uv_isHead_variant.y : VertexOut.uv_isHead_variant.y;
 			static const float2 MAP_SIZE_RCP = float2( 1.0f / MAP_SIZE_X, 1.0f / MAP_SIZE_Y );
 			VertexOut.uv_terrain_id  = ( float2( vPos.x, vPos.z ) + 0.5f ) * MAP_SIZE_RCP;
 			VertexOut.uv_terrain     = float2( VertexOut.uv_terrain_id.x * MAP_POW2_X, ( 1.0f - VertexOut.uv_terrain_id.y ) * MAP_POW2_Y );
 			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
 			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
-		#ifdef PDX_OPENGL
-			VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
-		#endif	
+			#ifdef PDX_OPENGL
+				VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
+			#endif
 			VertexOut.vScreenCoord.z = VertexOut.position.w;
 			VertexOut.vScreenCoord.w = VertexOut.position.w;
 			return VertexOut;
@@ -224,9 +224,9 @@ VertexShader =
 			VertexOut.uv_terrain.xy *= float2( MAP_POW2_X, MAP_POW2_Y );
 			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
 			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
-		#ifdef PDX_OPENGL
-			VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
-		#endif	
+			#ifdef PDX_OPENGL
+				VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
+			#endif
 			VertexOut.vScreenCoord.z = VertexOut.position.w;
 			VertexOut.vScreenCoord.w = VertexOut.position.w;
 			return VertexOut;
@@ -254,9 +254,9 @@ PixelShader =
 	{
 		vWaterValue = 0;
 
-		float3 normal = normalize( tex2D( HeightNormal, vUvTerrain ).rbg - 0.5f );
+		float3 normal = normalize( tex2D( HeightNormal, vUvTerrain ).rbg - 0.5f ); // Calculate heightmap normal
 
-		float vUseFarFastPath = step( 0.7f, cam_distance( 600.0f, 1400.0f ) );
+		float vUseFarFastPath = step( 0.7f, cam_distance( 600.0f, 1400.0f ) ); // Fast path for far camera distances: keep only topology/water blending and skip expensive terrain-tile normal reconstruction.
 		OPT_BRANCH
 		if ( vUseFarFastPath > 0.5f )
 		{
@@ -267,60 +267,56 @@ PixelShader =
 		#ifdef NO_SHADER_TEXTURE_LOD
 			return normal;
 		#else
-		vWaterValue = calculate_water_or_land( vUvTerrain );
-		float2 vTileRepeat = vUvTerrain * TERRAIN_TILE_FREQ;
-		vTileRepeat.x *= MAP_SIZE_X/MAP_SIZE_Y;
-		float lod = clamp( trunc( mipmapLevel( vTileRepeat ) - 0.5f ), 0.0f, 6.0f );
-		float vMipTexels = exp2( ATLAS_TEXEL_POW2_EXPONENT - lod );
+			vWaterValue = calculate_water_or_land( vUvTerrain ); // Calculate terrain tile normal
+			float2 vTileRepeat = vUvTerrain * TERRAIN_TILE_FREQ;
+			vTileRepeat.x *= MAP_SIZE_X/MAP_SIZE_Y;
+			float lod = clamp( trunc( mipmapLevel( vTileRepeat ) - 0.5f ), 0.0f, 6.0f ); // mipmapLevel() uses screen-space derivatives, so it stays outside the branch below
+			float vMipTexels = exp2( ATLAS_TEXEL_POW2_EXPONENT - lod );
 
-		float3 terrain_normal = vec3( 0.0f );
-		#if OPT_SKIP_UNUSED_LAYERS
+			float3 terrain_normal = vec3( 0.0f ); // Over open water ( vWaterValue == 1 ) the tile normal is blended away completely further down ( lerp( tile, water, 1 ) is the water normal ), so those pixels skip the tile lookups.
 			OPT_BRANCH
 			if ( vWaterValue < 1.0f )
-		#endif
-		{
-			float vAllSame;
-			float4 IndexU;
-			float4 IndexV;
-			float2 vTerrainUV = vUvTerrainId + float2( -0.5f / MAP_SIZE_X, -0.5f / MAP_SIZE_Y );
-			#if OPT_SKIP_UNUSED_LAYERS
-				calculate_map_tex_index( tex2Dlod0( TerrainIDMap, vTerrainUV ), IndexU, IndexV, vAllSame );
+			{
+				float vAllSame;
+				float4 IndexU;
+				float4 IndexV;
+				float2 vTerrainUV = vUvTerrainId + float2( -0.5f / MAP_SIZE_X, -0.5f / MAP_SIZE_Y );
+				calculate_map_tex_index( tex2Dlod0( TerrainIDMap, vTerrainUV ), IndexU, IndexV, vAllSame ); // point sampled, no mips: mip 0 is exactly what tex2D picks, and this form needs no derivatives
+				terrain_normal = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
+				if( vAllSame < 1.0f )
+				{
+					float3 terrain_normalRD = tex2Dlod( TerrainNormal, sample_terrain( IndexU.x, IndexV.x, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
+					float3 terrain_normalLU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
+					float3 terrain_normalRU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.z, IndexV.z, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
+					terrain_normal += terrain_normalRD + terrain_normalLU + terrain_normalRU;
+					terrain_normal *= 0.25f;
+				}
+			}
+
+			float3 water_normal = vec3( 0.0f );
+			#if defined( PDX_OPENGL )
+				SampleWater( vUvTerrain, vTime, water_normal, LeanTexture1, LeanTexture2 );
 			#else
-				calculate_map_tex_index( tex2D( TerrainIDMap, vTerrainUV ), IndexU, IndexV, vAllSame );
+				float2 vWaterDX = ddx( vUvTerrain ); // Direct3D 11: the water normal only matters where there is water ( vWaterValue > 0, see the lerp below, which takes the tile normal as it is at 0 ). The gradients are taken here, outside the branch.
+				float2 vWaterDY = ddy( vUvTerrain );
+				OPT_BRANCH
+				if ( vWaterValue > 0.0f )
+				{
+					SampleWaterGrad( vUvTerrain, vWaterDX, vWaterDY, vTime, water_normal, LeanTexture2 );
+				}
 			#endif
-			terrain_normal = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
-			if( vAllSame < 1.0f )
-			{
-				float3 terrain_normalRD = tex2Dlod( TerrainNormal, sample_terrain( IndexU.x, IndexV.x, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
-				float3 terrain_normalLU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
-				float3 terrain_normalRU = tex2Dlod( TerrainNormal, sample_terrain( IndexU.z, IndexV.z, vTileRepeat, vMipTexels, lod ) ).rbg - 0.5f;
-				terrain_normal += terrain_normalRD + terrain_normalLU + terrain_normalRU;
-				terrain_normal *= 0.25f;
-			}
-		}
 
-		float3 water_normal = vec3( 0.0f );
-		#if defined( PDX_OPENGL ) || !OPT_SKIP_UNUSED_LAYERS
-			SampleWater( vUvTerrain, vTime, water_normal, LeanTexture1, LeanTexture2 );
-		#else
-			float2 vWaterDX = ddx( vUvTerrain );
-			float2 vWaterDY = ddy( vUvTerrain );
-			OPT_BRANCH
-			if ( vWaterValue > 0.0f )
-			{
-				SampleWaterGrad( vUvTerrain, vWaterDX, vWaterDY, vTime, water_normal, LeanTexture2 );
-			}
-		#endif
+			normal = lerp( normal, float3( 0, 1, 0 ), vWaterValue ); // Ignore topology normal when over the water
 
-			normal = lerp( normal, float3( 0, 1, 0 ), vWaterValue );
-
+			// Interpolate between water and land normal
 			terrain_normal = lerp( terrain_normal, water_normal, vWaterValue );
 			terrain_normal = normalize( terrain_normal );
 
-			float3 zaxis = normal;
-			float3 xaxis = cross( zaxis, float3( 0, 0, 1 ) );
+			// Blend normals
+			float3 zaxis = normal; //normal
+			float3 xaxis = cross( zaxis, float3( 0, 0, 1 ) ); //tangent
 			xaxis = normalize( xaxis );
-			float3 yaxis = cross( xaxis, zaxis );
+			float3 yaxis = cross( xaxis, zaxis ); //bitangent
 			yaxis = normalize( yaxis );
 			normal = xaxis * terrain_normal.x + zaxis * terrain_normal.y + yaxis * terrain_normal.z;
 			return normal;
@@ -348,12 +344,10 @@ PixelShader =
 
 	float FxMask( in float2 vUV, in float vIsHead )
 	{
-		#if OPT_SKIP_UNUSED_LAYERS
-			if ( vOfsX_vOfsTex_vOfsFx.z == 0.0f )
-			{
-				return 1.0f;
-			}
-		#endif
+		if ( vOfsX_vOfsTex_vOfsFx.z == 0.0f ) // With the effect strength at 0 the result is 1 whatever the stripes look like, so skip the cos / smoothstep
+		{
+			return 1.0f;
+		}
 		float v = vUV.y > 0.5f ? 1.0f - vUV.y: vUV.y;
 		float u = 1.0f - ( vUV.x * 5.0f - vTime_IsSelected_FadeInOut.x * vOfsX_vOfsTex_vOfsFx.y * 5.0f );
 		static const float PI_OVER_4  = 3.14159f * 0.25f;
@@ -374,14 +368,14 @@ PixelShader =
 		float4 main( VS_OUTPUT_MAPARROW Input ) : PDX_COLOR
 		{
 			float vIsHead         = step( 0.5f, Input.uv_isHead_variant.z );
-			float vTextureVariant = step( 0.001f, Input.uv_isHead_variant.w );
+			float vTextureVariant = step( 0.001f, Input.uv_isHead_variant.w ); // or keep 1-step(w,0) if w can be negative
 			
 			float vVariantBodyUvScale = lerp( vBodyUvScale, vSecondaryBodyUvScale, vTextureVariant );
 
 			float2 vUV;
 			vUV.x = Input.uv_isHead_variant.x * 0.5f + ( vIsHead * 0.5f );
 			float vHeadV = Input.uv_isHead_variant.y;
-			float vBodyV = ( ( Input.uv_isHead_variant.y - 0.5f ) * vVariantBodyUvScale + 0.5f + vTextureVariant ) * vTextureVariantScale;
+			float vBodyV = ( ( Input.uv_isHead_variant.y - 0.5f ) * vVariantBodyUvScale + 0.5f + vTextureVariant ) * vTextureVariantScale; // Adjust UV vertically to select the correct packed texture variant.
 			vUV.y = lerp( vBodyV, vHeadV, vIsHead );
 
 			float vWaterValue = 0;
@@ -405,9 +399,9 @@ PixelShader =
 
 			float4 vArrowColor = lerp( ArrowColor, ArrowSecondaryColor, vTextureVariant );
 			vArrowColor.rgb = RGBtoHSV(vArrowColor.rgb);
-			vArrowColor.r = mod( vArrowColor.r, 6.0 );
-			vArrowColor.g *= 1.5;
-			vArrowColor.rgb = HSVtoRGBPostFast(vArrowColor.rgb);
+			vArrowColor.r = mod( vArrowColor.r, 6.0 ); //H
+			vArrowColor.g *= 1.5; //S bump up the saturation and light
+			vArrowColor.rgb = HSVtoRGBPostFast(vArrowColor.rgb); // H was wrapped into [0,6) above
 
 			float4 vColor = saturate( vPattern * vArrowColor );
 			float3 vGlobalNormal = CalcGlobeNormal( Input.prepos.xz );
@@ -429,7 +423,7 @@ PixelShader =
 			
 			float vVariantBodyUvScale = lerp( vBodyUvScale, vSecondaryBodyUvScale, vTextureVariant );
 			float2 vUV = Input.uv_isHead_variant.xy;
-			vUV.y = ( ( vUV.y - 0.5f ) * vVariantBodyUvScale + 0.5f + vTextureVariant ) * vTextureVariantScale;
+			vUV.y = ( ( vUV.y - 0.5f ) * vVariantBodyUvScale + 0.5f + vTextureVariant ) * vTextureVariantScale; // Adjust UV vertically to select the correct packed texture variant.
 
 			float vWaterValue = 0;
 			float3 vNormal = vNormalMapFactor * CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_FadeInOut.x );
@@ -448,10 +442,10 @@ PixelShader =
 
 			float4 vArrowColor = lerp( ArrowColor, ArrowSecondaryColor, vTextureVariant );
 			vArrowColor.rgb = RGBtoHSV(vArrowColor.rgb);
-			vArrowColor.r = mod( vArrowColor.r, 6.0 );
-			vArrowColor.g *= 2.0;
-			vArrowColor.b *= 1.5;
-			vArrowColor.rgb = HSVtoRGBPostFast(vArrowColor.rgb);
+			vArrowColor.r = mod( vArrowColor.r, 6.0 ); //H
+			vArrowColor.g *= 2.0; //S bump up the saturation and light
+			vArrowColor.b *= 1.5; //V
+			vArrowColor.rgb = HSVtoRGBPostFast(vArrowColor.rgb); // H was wrapped into [0,6) above
 
 			float4 vColor = saturate( vPattern * vArrowColor );
 			float3 vGlobalNormal = CalcGlobeNormal( Input.prepos.xz );
@@ -473,12 +467,14 @@ PixelShader =
 		float4 main( VS_OUTPUT_MAPSYMBOL Input ) : PDX_COLOR
 		{
 		
+			// Calculate terrain/water normal
 			float2 vUV = Input.uv;
 			float vWaterValue = 0;
 			float3 vNormal = CalculateTerrainNormal( Input.uv_terrain, Input.uv_terrain_id, vWaterValue, vTime_IsSelected_IsIntersect_Rot.x );
 			vUV += vNormal.xz * ( vNormal.y * MAP_ARROW_NORMALS_STR_TERR );
 			vUV -= vNormal.xz * ( vWaterValue * MAP_ARROW_NORMALS_STR_WATER );
 		
+			// Grab texture color
 			float4 vColor = tex2D( TexPattern, vUV );
 			vColor *= SymbolColor;
 		

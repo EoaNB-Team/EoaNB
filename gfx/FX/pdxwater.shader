@@ -160,7 +160,6 @@ PixelShader =
 	}
 }
 
-
 VertexStruct VS_INPUT_WATER
 {
     int2 position			: POSITION;
@@ -178,13 +177,10 @@ VertexStruct VS_OUTPUT_WATER
 	float2 uv_ice			: TEXCOORD6;	
 };
 
-
 ConstantBuffer( 3, 48 )
 {
 	float3 vTime_HalfPixelOffset;
 };
-
-
 
 VertexShader =
 {
@@ -201,25 +197,23 @@ VertexShader =
 			VertexOut.uv *= float2( MAP_POW2_X, MAP_POW2_Y ); //POW2
 			VertexOut.uv_ice = VertexOut.uv * float2( MAP_SIZE_X, MAP_SIZE_Y ) * 0.1f;
 			VertexOut.uv_ice *= float2( FOW_POW2_X, FOW_POW2_Y ); //POW2
-		
+
 			float vAnimTime = vTime_HalfPixelOffset.x * 0.01f;
 			VertexOut.cubeRotation = normalize( float3( sin( vAnimTime ) * 0.5f, sin( vAnimTime ), cos( vAnimTime ) * 0.3f ) );
-			
+
 			VertexOut.vShadowProj = mul( ShadowMapTextureMatrix, float4( VertexOut.pos, 1.0f ) );	
-			
+
+			// Output the screen-space texture coordinates
 			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
 			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
 			#ifdef PDX_OPENGL
 				VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
-			#endif			
+			#endif
 			VertexOut.vScreenCoord.z = VertexOut.position.w;
 			VertexOut.vScreenCoord.w = VertexOut.position.w;	
 			
 			return VertexOut;
 		}
-		
-		
-		
 	]]
 }
 
@@ -232,9 +226,10 @@ PixelShader =
 			float vSnow = saturate( GetSnow( vMudSnowColor ) - 0.0f );
 			float vOpacity = 1 - cam_distance( ICE_CAM_MIN, ICE_CAM_MAX );
 
-			// Code below will remove ice from certain parts of the world
-			float vMapLimitFade = saturate( saturate( (vPos.y/MAP_SIZE_Y) - 0.74f )*800.0f );
+			float vMapLimitFade = saturate( saturate( (vPos.y/MAP_SIZE_Y) - 0.74f )*800.0f ); // Remove ice from certain parts of the world
 
+			// The ice fade is saturate( ( vSnow * 8 * noise * vOpacity * vMapLimitFade - 0.3 ) * 10 ) and the noise is never above 1. 
+			//So unless everything but the noise already reaches 0.3 the fade is zero: no ice, colour and normal stay as they are, and both ice textures can be left alone. That covers all open water outside the frozen north in winter.
 			vIceFade = 0.0f;
 
 			#if OPT_SAMPLE_IN_BRANCH
@@ -247,15 +242,13 @@ PixelShader =
 				float vIceNoise = tex2D( IceNoise, ( vPos + 0.5f ) * ICE_NOISE_TILING ).r;
 			#endif
 
-			#if OPT_SKIP_UNUSED_LAYERS
-				OPT_BRANCH
-				if ( vSnow * 8.0f * vOpacity * vMapLimitFade > 0.3f )
-			#endif
-				{
-			#if OPT_SAMPLE_IN_BRANCH
+			OPT_BRANCH
+			if ( vSnow * 8.0f * vOpacity * vMapLimitFade > 0.3f )
+			{
+				#if OPT_SAMPLE_IN_BRANCH
 					float4 vIceDiffuse = tex2Dgrad( IceDiffuse, vIceUV, vDXIce, vDYIce );
 					float vIceNoise = tex2Dgrad( IceNoise, ( vPos + 0.5f ) * ICE_NOISE_TILING, vDXPos * ICE_NOISE_TILING, vDYPos * ICE_NOISE_TILING ).r;
-			#endif
+				#endif
 				vIceFade = vSnow*8.0f;
 				vIceFade *= vIceNoise;
 				vIceFade *= vOpacity;
@@ -276,12 +269,28 @@ PixelShader =
 				return tex2D( TexCh, vUV ).x;
 			#else
 				#if OPT_GB_FAST_MULTISAMPLE
-					float2 vOffset = float2( 0.40825f / MAP_SIZE_X, 0.40825f / MAP_SIZE_Y );
+					#if OPT_FAR_WATER // Far away a single ( bilinear ) lookup is enough for the shore fade; the 4-tap blur fades out between WATER_FAR_START and WATER_FAR_END. The camera height is a constant, so every pixel takes the same path.
+						float vFarShore = saturate( ( vCamPos.y - WATER_FAR_START ) * ( 1.0f / ( WATER_FAR_END - WATER_FAR_START ) ) );
+						if ( vFarShore >= 1.0f )
+						{
+							return tex2D( TexCh, vUV ).x;
+						}
+					#endif
+					float2 vOffset = float2( 0.40825f / MAP_SIZE_X, 0.40825f / MAP_SIZE_Y ); // same 4-tap replacement for the 3x3 blur as gradient_border_sample in standardfuncsgfx.fxh
 					float vResult = tex2D( TexCh, vUV + float2( -vOffset.x, -vOffset.y ) ).x;
 					vResult += tex2D( TexCh, vUV + float2(  vOffset.x, -vOffset.y ) ).x;
 					vResult += tex2D( TexCh, vUV + float2(  vOffset.x,  vOffset.y ) ).x;
 					vResult += tex2D( TexCh, vUV + float2( -vOffset.x,  vOffset.y ) ).x;
-					return vResult * 0.25f;
+					#if OPT_FAR_WATER
+						vResult *= 0.25f;
+						if ( vFarShore > 0.0f )
+						{
+							vResult = lerp( vResult, tex2D( TexCh, vUV ).x, vFarShore );
+						}
+						return vResult;
+					#else
+						return vResult * 0.25f;
+					#endif
 				#else
 					float vOffsetX = -0.5f / MAP_SIZE_X;
 					float vOffsetY = -0.5f / MAP_SIZE_Y;
@@ -319,13 +328,13 @@ PixelShader =
 			B *= vFlatten;
 			M *= vFlatten * vFlatten;
 		
-			float3 vGlobeNormal = CalcGlobeNormal( Input.pos.xz );
+			float3 vGlobeNormal = CalcGlobeNormal( Input.pos.xz ); // The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
 			#ifdef LOW_END_GFX
 				float3 SunDirWater = float3( 0, -1, 0 );
 			#else
 				float3 SunDirWater = CalculateSunDirectionWaterGN( Input.pos, vGlobeNormal );
 			#endif
-			float3 vToCameraDir = normalize( vCamPos - Input.pos );
+			float3 vToCameraDir = normalize( vCamPos - Input.pos ); // one normalize for the three places that need the pixel-to-camera direction
 			float3 H = normalize( vToCameraDir.xzy + -SunDirWater.xzy );
 			float2 HWave = H.xy/H.z - B;
 		
@@ -355,17 +364,16 @@ PixelShader =
 				float3 refractiveColor = tex2D( WaterRefraction, refractiveUV.xy - vRefractionDistortion ).rgb;
 			#endif
 
-			float fresnelBias = 0.5f;
+			float fresnelBias = 0.5f; // CUBEMAP INTENSITY
 			float fresnel = saturate( dot( -vEyeDir, normal ) ) * 0.5f;
 			fresnel = saturate( fresnelBias + ( 1.0f - fresnelBias ) * Pow10( 1.0f - fresnel ) );
 			refractiveColor = refractiveColor * ( 1.0f - fresnel ) + reflectiveColor * fresnel;
 			
 			float vIceFade = 0.0f;
 			#ifndef LOW_END_GFX
-				#if OPT_SKIP_UNUSED_LAYERS
-					OPT_BRANCH
-					if ( cam_distance( ICE_CAM_MIN, ICE_CAM_MAX ) < 1.0f )
-				#endif
+				// With the camera at or above ICE_CAM_MAX ApplyIce has an opacity of 0, so vIceFade stays 0 and nothing below changes: no snow lookup and no ice at all. cam_distance is a camera constant, so every pixel of the draw takes the same path and the lookups can sit inside the branch.
+				OPT_BRANCH
+				if ( cam_distance( ICE_CAM_MIN, ICE_CAM_MAX ) < 1.0f )
 				{
 					float4 vMudSnowColor = GetMudSnowColor( Input.pos, SnowMudTexture );
 					refractiveColor = ApplyIce( refractiveColor, Input.pos.xz, normal, vMudSnowColor, Input.uv_ice, vIceFade );
@@ -380,7 +388,7 @@ PixelShader =
 
 			gradient_border_apply( refractiveColor, normal, Input.uv + vRefractionDistortion * 0.0075f, GradientBorderChannel1, GradientBorderChannel2, 0.0f, vGBCamDistOverride_GBOutlineCutoff.zw * GB_OUTLINE_CUTOFF_SEA, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
 			
-			float3 Darkness = float3(0,0,0); 
+			float3 Darkness = float3(0,0,0); // darkness offset -- summary: when we fixed an old bug in the gradient border code, it made most mapmodes brighter. Players don't like that. Therefore we offset the water a bit to make it more like what they're used to.
 			refractiveColor = lerp(refractiveColor, Darkness, 0.2f);
 			
 			secondary_color_mask( refractiveColor, normal, Input.uv - vRefractionDistortion * 0.001, ProvinceSecondaryColorMap, vBloomAlpha );
@@ -393,8 +401,8 @@ PixelShader =
 			lightingProperties._Glossiness = vGlossiness;
 			lightingProperties._SpecularColor = vec3(vSpecularIntensity);
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vGlossiness);
-			
-			#ifdef LOW_END_GFX
+
+			#ifdef LOW_END_GFX // Grab the shadow term
 				float3 diffuseLight = vec3(1.0f);
 				float3 specularLight = vec3(0.002f);
 			#else

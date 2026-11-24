@@ -217,9 +217,9 @@ VertexShader =
 		
 			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 );
 			Out.vScreenCoord.y = ( Out.vPosition.w * 0.5 - Out.vPosition.y * 0.5 );
-		#ifdef PDX_OPENGL
-			Out.vScreenCoord.y = -Out.vScreenCoord.y;
-		#endif			
+			#ifdef PDX_OPENGL
+				Out.vScreenCoord.y = -Out.vScreenCoord.y;
+			#endif			
 			Out.vScreenCoord.z = Out.vPosition.w;
 			Out.vScreenCoord.w = Out.vPosition.w;
 		
@@ -237,9 +237,8 @@ PixelShader =
 {
 	MainCode PixelShader
 	[[
-		float3 ApplyRiverSnow( float3 vColor, float3 vReflectColor, float3 vPos, inout float3 vNormal, float4 vMudSnowColor, in sampler2D SnowNoise, in float waterSideAlpha, out float vOutSpecGloss )
+		float3 ApplyRiverSnow( float3 vColor, float3 vReflectColor, float3 vPos, inout float3 vNormal, float4 vMudSnowColor, in float vNoiseColor, in float waterSideAlpha, out float vOutSpecGloss )
 		{
-			float vNoiseColor = tex2D( SnowNoise, vPos.xz * SNOW_ICE_NOISE_TILING ).a;
 		
 			float vIsSnow = GetSnow( vMudSnowColor );
 
@@ -271,18 +270,22 @@ PixelShader =
 			vNewUV.y = saturate(vNewUV.y * 4 - 3);
 		
 			float3 waterColor = tex2D( WaterColor, Input.vWorldUV ).rgb;
-		#ifdef LOW_END_GFX
-			float4 diffuseColor = float4( waterColor, 1.0f );
-			float2 waterSideAlpha = float2( 0, ( 1.0f - vNewUV.y ) * 0.8f );
-		#else
-			float4 diffuseColor = tex2D( Diffuse, float2( vNewUV.x, 1.0f - vNewUV.y ) );
-			float2 waterSideAlpha = tex2D( RiverData, vNewUV ).br;
-			if ( abs( Input.vUV.y - 0.5f ) <= 0.25f )
-			{
-				waterSideAlpha.x = 0.0f;
-				waterSideAlpha.y = 1.0f; 
-			}
-		#endif
+			#ifdef LOW_END_GFX
+				float4 diffuseColor = float4( waterColor, 1.0f );
+				float2 waterSideAlpha = float2( 0, ( 1.0f - vNewUV.y ) * 0.8f );
+			#else
+				#if defined( PDX_OPENGL )
+					float4 diffuseColor = tex2D( Diffuse, float2( vNewUV.x, 1.0f - vNewUV.y ) );
+				#else
+					float4 diffuseColor = float4( 0.0f, 0.0f, 0.0f, 0.0f ); // read further down, only where there is bank
+				#endif
+				float2 waterSideAlpha = tex2D( RiverData, vNewUV ).br;
+				if ( abs( Input.vUV.y - 0.5f ) <= 0.25f )
+				{
+					waterSideAlpha.x = 0.0f;
+					waterSideAlpha.y = 1.0f; 
+				}
+			#endif
 				
 			float2 B;
 			float3 M;
@@ -304,11 +307,13 @@ PixelShader =
 		
 			SampleWater( Input.vUV, vUVMultipliers, vTimeDirectionSeasonLerp.x * vTimeDirectionSeasonLerp.y * 0.05f, vTimeMultipliers, B, M, waterNormal, LeanTexture1, LeanTexture2 );
 			
-		#ifdef LOW_END_GFX
-			float3 SunDirWater = float3( 0, 1, 0 );
-		#else
-			float3 SunDirWater = CalculateSunDirectionWater( Input.vPrePos_Fade.xyz );
-		#endif
+			// The globe normal (sin, cos, normalize) feeds the sun directions, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
+			float3 vGlobeNormal = CalcGlobeNormal( Input.vPrePos_Fade.xz );
+			#ifdef LOW_END_GFX
+				float3 SunDirWater = float3( 0, 1, 0 );
+			#else
+				float3 SunDirWater = CalculateSunDirectionWaterGN( Input.vPrePos_Fade.xyz, vGlobeNormal );
+			#endif
 			float3 vToCameraDir = normalize( vCamPos - Input.vPrePos_Fade.xyz );
 			float3 H = normalize( vToCameraDir.xzy + -SunDirWater.xzy );
 			float2 HWave = H.xy/H.z - B;
@@ -316,31 +321,55 @@ PixelShader =
 			float3 sigma = M - float3( B*B, B.x*B.y);
 			float det = sigma.x*sigma.y - sigma.z*sigma.z;
 			float e = HWave.x*HWave.x*sigma.y + HWave.y*HWave.y*sigma.x - 2*HWave.x*HWave.y*sigma.z;
-			float spec = (det <= 0) ? 0.0f : exp( -0.5f*e/det ) / sqrt(det);
+			float spec = (det <= 0) ? 0.0f : exp( -0.5f*e/det ) * ( 1.0f / sqrt( det ) );
 		
-		#ifdef LOW_END_GFX
-			float3 normal = waterNormal;
-		#else
-			float3 vCanalNormal = normalize( tex2D( NormalMap, float2( vNewUV.x, 1.0f - vNewUV.y ) ).rbg - 0.5f );
-			vCanalNormal.z *= vFlip;
+			#ifdef LOW_END_GFX
+				float3 normal = waterNormal;
+			#else
+				#if defined( PDX_OPENGL )
+					float3 vCanalNormal = normalize( tex2D( NormalMap, float2( vNewUV.x, 1.0f - vNewUV.y ) ).rbg - 0.5f );
+					vCanalNormal.z *= vFlip;
 
-			float2 vTangentDir = normalize( Input.vTangent );
-			float3 vTangent = float3( vTangentDir.x, 0.0f, vTangentDir.y );
-			float3 vBitangent = float3( vTangentDir.y, 0.0f, -vTangentDir.x );
-			float3 vTmpNormal = float3( 0.0f, 1.0f, 0.0f );
-			float3x3 TNB = Create3x3( vTangent, vTmpNormal, vBitangent );
-			float3 vSideNormal = normalize( mul( vCanalNormal, TNB ) );
-			float3 normal = normalize( lerp( waterNormal, vSideNormal, waterSideAlpha.x ) );
-		#endif
+					float2 vTangentDir = normalize( Input.vTangent );
+					float3 vTangent = float3( vTangentDir.x, 0.0f, vTangentDir.y );
+					float3 vBitangent = float3( vTangentDir.y, 0.0f, -vTangentDir.x );
+					float3 vTmpNormal = float3( 0.0f, 1.0f, 0.0f );
+					float3x3 TNB = Create3x3( vTangent, vTmpNormal, vBitangent );
+					float3 vSideNormal = normalize( mul( vCanalNormal, TNB ) );
+					float3 normal = normalize( lerp( waterNormal, vSideNormal, waterSideAlpha.x ) );
+				#else
+					// Direct3D 11: with waterSideAlpha.x == 0 ( the middle of the river, and plain water ) the canal normal and the bank diffuse are blended away completely ( lerp( a, b, 0 ) is a ), so they are only read where there is bank. The gradients are taken here, outside the branch.
+					float2 vBankUV = float2( vNewUV.x, 1.0f - vNewUV.y );
+					float2 vBankDX = ddx( vBankUV );
+					float2 vBankDY = ddy( vBankUV );
+					float3 normal = normalize( waterNormal );
+					OPT_BRANCH
+					if ( waterSideAlpha.x > 0.0f )
+					{
+						diffuseColor = tex2Dgrad( Diffuse, vBankUV, vBankDX, vBankDY );
+
+						float3 vCanalNormal = normalize( tex2Dgrad( NormalMap, vBankUV, vBankDX, vBankDY ).rbg - 0.5f );
+						vCanalNormal.z *= vFlip;
+
+						float2 vTangentDir = normalize( Input.vTangent );
+						float3 vTangent = float3( vTangentDir.x, 0.0f, vTangentDir.y );
+						float3 vBitangent = float3( vTangentDir.y, 0.0f, -vTangentDir.x );
+						float3 vTmpNormal = float3( 0.0f, 1.0f, 0.0f );
+						float3x3 TNB = Create3x3( vTangent, vTmpNormal, vBitangent );
+						float3 vSideNormal = normalize( mul( vCanalNormal, TNB ) );
+						normal = normalize( lerp( waterNormal, vSideNormal, waterSideAlpha.x ) );
+					}
+				#endif
+			#endif
 
 			float gradientBorderFactor = 1.0f - gradient_border_camera_distance();
 
 			float vBloomAlpha = 0.0f;	
-		#ifndef LOW_END_GFX
-			float3 gradientBorderWaterColor = waterColor;
-			gradient_border_apply2( diffuseColor.rgb, gradientBorderWaterColor, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
-			waterColor = lerp( waterColor, gradientBorderWaterColor, gradientBorderFactor );
-		#endif
+			#ifndef LOW_END_GFX
+				float3 gradientBorderWaterColor = waterColor;
+				gradient_border_apply2( diffuseColor.rgb, gradientBorderWaterColor, normal, Input.vWorldUV, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
+				waterColor = lerp( waterColor, gradientBorderWaterColor, gradientBorderFactor );
+			#endif
 			
 			float3 vEyeDir = -vToCameraDir;
 			float3 reflection = reflect( vEyeDir, normal );
@@ -354,10 +383,24 @@ PixelShader =
 			float3 diffuse = lerp( waterColor, diffuseColor.rgb, waterSideAlpha.x );
 			
 			float vSnowSpecGloss = 0;
-		#ifndef LOW_END_GFX
-			float4 vMudSnow = GetMudSnowColor( Input.vPrePos_Fade.xyz, SnowMudTexture );
-			diffuse = ApplyRiverSnow( diffuse.rgb, reflectiveColor, Input.vPrePos_Fade.xyz, normal, vMudSnow, CityLightsAndSnowNoise, waterSideAlpha.x, vSnowSpecGloss );
-		#endif
+			#ifndef LOW_END_GFX
+				float4 vMudSnow = GetMudSnowColor( Input.vPrePos_Fade.xyz, SnowMudTexture );
+				#if defined( PDX_OPENGL )
+					float vSnowNoise = tex2D( CityLightsAndSnowNoise, Input.vPrePos_Fade.xz * SNOW_ICE_NOISE_TILING ).a;
+					diffuse = ApplyRiverSnow( diffuse.rgb, reflectiveColor, Input.vPrePos_Fade.xyz, normal, vMudSnow, vSnowNoise, waterSideAlpha.x, vSnowSpecGloss );
+				#else
+					// Direct3D 11: with no snow here ( GetSnow <= 0 ) ApplyRiverSnow changes nothing ( its snow alpha is 0 ), so the noise lookup and the rest are skipped. The gradients are taken outside the branch.
+					float2 vSnowNoiseUV = Input.vPrePos_Fade.xz * SNOW_ICE_NOISE_TILING;
+					float2 vSnowNoiseDX = ddx( vSnowNoiseUV );
+					float2 vSnowNoiseDY = ddy( vSnowNoiseUV );
+					OPT_BRANCH
+					if ( GetSnow( vMudSnow ) > 0.0f )
+					{
+						float vSnowNoise = tex2Dgrad( CityLightsAndSnowNoise, vSnowNoiseUV, vSnowNoiseDX, vSnowNoiseDY ).a;
+						diffuse = ApplyRiverSnow( diffuse.rgb, reflectiveColor, Input.vPrePos_Fade.xyz, normal, vMudSnow, vSnowNoise, waterSideAlpha.x, vSnowSpecGloss );
+					}
+				#endif
+			#endif
 			
 			float vSpecularIntensity = lerp(.085, 0.051, vSnowSpecGloss);
 			vSpecularIntensity = lerp( vSpecularIntensity, diffuseColor.a, waterSideAlpha.x ) * ( 1.0f - gradientBorderFactor*0.5 );
@@ -377,19 +420,20 @@ PixelShader =
 		
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_RIVER, Input.vScreenCoord, ShadowMap );
 		
-			CalculateSunLight( lightingProperties, fShadowTerm, diffuseLight, specularLight );
+			float3 vSunDirection = CalculateSunDirectionGN( Input.vPrePos_Fade.xyz, vGlobeNormal );
+			CalculateSunLightGN( lightingProperties, fShadowTerm, vSunDirection, vGlobeNormal, diffuseLight, specularLight );
 
-		#ifndef LOW_END_GFX
-			CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		#endif
+			#ifndef LOW_END_GFX
+				CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
+			#endif
 
-			float3 vOut = ComposeLight(lightingProperties, diffuseLight, specularLight);
+			float3 vOut = ComposeLightGN(lightingProperties, diffuseLight, specularLight, vGlobeNormal);
 			
 			vOut = ApplyFOW( vOut, ShadowMap, Input.vScreenCoord );
-		#ifndef LOW_END_GFX
-			vOut = ApplyDistanceFog( vOut, Input.vPrePos_Fade.xyz );
-		#endif
-			vOut = DayNightWithBlend( vOut, CalcGlobeNormal( Input.vPrePos_Fade.xz ), lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
+			#ifndef LOW_END_GFX
+				vOut = ApplyDistanceFog( vOut, Input.vPrePos_Fade.xyz );
+			#endif
+			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
 				
 			float vFadeValue = ( 1.0f - Input.vPrePos_Fade.w );
 		

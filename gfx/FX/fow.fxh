@@ -66,6 +66,8 @@ PixelShader =
 	}
 	
 	#ifndef PDX_OPENGL
+		// Direct3D 11 only: the same lookups as GetFOWTransparency / GetFOWColor / GetExtraFogFactor, with the UV gradients handed over explicitly so that they may sit inside a per-pixel branch. 
+		// vDX / vDY are ddx / ddy of WorldPosition.xz ( for the extra map: of GetExtraFogUV ), taken outside the branch. The derivative of the linear UV maps below is the base derivative times the tiling; the time offset is the same for every pixel.
 		float GetFOWTransparencyGrad( float3 WorldPosition, float2 vDX, float2 vDY, in sampler2D NoiseTex )
 		{
 			float Time = vFoWOpacity_FoWTime_SnowMudFade_MaxGameSpeed.y;
@@ -96,7 +98,7 @@ PixelShader =
 		float FogHeightFactor = GetHeightFogFactor( WorldPosition + float3(0.0, ExtraHeight, 0.0) );		
 		float IntelFactor = GetIntelFactor( WorldPosition, IntelMapSampler );
 
-		#if defined( PDX_OPENGL ) || !OPT_SKIP_UNUSED_LAYERS
+		#if defined( PDX_OPENGL )
 			float FOWTransparency = GetFOWTransparency( WorldPosition, NoiseTex );
 			float FOWTransparencyRemapped = lerp(FOW_TRANSPARENCY_MIN, FOW_TRANSPARENCY_MAX, FOWTransparency);
 			float FOWExtra = GetExtraFogFactor( WorldPosition, ExtraFOW );
@@ -106,6 +108,8 @@ PixelShader =
 			FogColorFactor = FOWColor * FOWTransparencyRemapped;
 			FogAlphaFactor = saturate(ToGamma(saturate(FogHeightFactor * FOWTransparencyRemapped)) + FOWExtra) * IntelFactor * FOWFadeFactor;
 		#else
+			// Direct3D 11. The alpha factor is a product with IntelFactor * FOWFadeFactor, so where that is 0 the alpha factor is 0 and ApplyFOW does nothing whatever the colour factor is: the noise and extra lookups ( 5 of the 6 ) and the pow() calls are not needed there. 
+			//The colour factor is left at 0 in that case; it only ever matters together with a non-zero alpha factor. The derivatives are taken here, outside the branch.
 			float2 vDX = ddx( WorldPosition.xz );
 			float2 vDY = ddy( WorldPosition.xz );
 			float2 vExtraUV = GetExtraFogUV( WorldPosition );
@@ -129,19 +133,18 @@ PixelShader =
 		#endif
 	}
 	
+	// GetFogFactors for the passes that write the fog-of-war buffer (terrainunlit / treeunlit).
+	// When the fog of war is completely faded out the alpha factor is zero for every pixel, which makes ApplyFOW a no-op whatever the colour factor is, so the six noise / intel lookups and the two pow() calls can be skipped. 
+	// The test is on a shader constant, so it goes the same way for the whole screen.
 	void GetFogFactorsForBuffer( out float FogColorFactor, out float FogAlphaFactor, float3 WorldPosition, float ExtraHeight, in sampler2D NoiseTex, in sampler2D ExtraFOW, in sampler2D IntelMapSampler )
 	{
-		#if OPT_SKIP_UNUSED_LAYERS
-			FogColorFactor = 0.0;
-			FogAlphaFactor = 0.0;
-			OPT_BRANCH
-			if ( FOWFadeFactor > 0.0 )
-			{
-				GetFogFactors( FogColorFactor, FogAlphaFactor, WorldPosition, ExtraHeight, NoiseTex, ExtraFOW, IntelMapSampler );
-			}
-		#else
+		FogColorFactor = 0.0;
+		FogAlphaFactor = 0.0;
+		OPT_BRANCH
+		if ( FOWFadeFactor > 0.0 )
+		{
 			GetFogFactors( FogColorFactor, FogAlphaFactor, WorldPosition, ExtraHeight, NoiseTex, ExtraFOW, IntelMapSampler );
-		#endif
+		}
 	}
 
 	float3 ApplyFOW( float3 Color, float FogColorFactor, float FogAlphaFactor )

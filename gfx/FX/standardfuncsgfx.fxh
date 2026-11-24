@@ -1,4 +1,3 @@
-
 ConstantBuffer( 0, 0 )
 {
 	float4x4	ViewProjectionMatrix;
@@ -32,7 +31,6 @@ ConstantBuffer( 0, 0 )
 	float		SunSpecularIntensity;
 };
 
-
 Code
 [[
 	float ToGamma(float aLinear)
@@ -55,7 +53,7 @@ Code
 		return float4(pow(aGamma.rgb, vec3(2.2)), aGamma.a);
 	}
 
-	float Pow5( float x )
+	float Pow5( float x ) // Small integer powers as multiplies. pow() with these exponents costs a log + exp per pixel (the D3D compiler only unrolls it up to the 5th power, GLSL compilers usually not at all).
 	{
 		float x2 = x * x;
 		return x2 * x2 * x;
@@ -68,11 +66,13 @@ Code
 		return x4 * x4 * x2;
 	}
 
+	// NOTE: v1 has to be normalized (every caller passes a normalized normal).
 	float3 RotateVectorByVector( float3 v1, float3 v2 )
 	{
-		float3 zaxis = v1;
-		float3 xaxis = normalize( float3( v1.y, -v1.x, 0.0f ) );
-		float3 yaxis = cross( xaxis, zaxis );
+		float3 zaxis = v1; //normal
+		float3 xaxis = normalize( float3( v1.y, -v1.x, 0.0f ) ); //tangent
+		// xaxis and zaxis are unit length and perpendicular, so the cross product already is unit length and the second normalize of the original was redundant
+		float3 yaxis = cross( xaxis, zaxis ); //bitangent
 		return xaxis * v2.x + zaxis * v2.y + yaxis * v2.z;
 	}
 
@@ -85,7 +85,6 @@ Code
 		v.y = ( v.y * vCos ) + ( oldX * vSin );
 		return v;
 	}
-
 ]]
 
 PixelShader = 
@@ -123,13 +122,13 @@ PixelShader =
 		float Cmax = max( RGB.r, max( RGB.g, RGB.b ) );
 		float Cmin = min( RGB.r, min( RGB.g, RGB.b ) );
 		float diff = Cmax - Cmin;
-		
+
 		float H = 0.0;
 		float S = 0.0;
 		if (diff != 0.0)
 		{
 			S = diff / Cmax;
-			
+
 			if (Cmax == RGB.r)
 				H = (RGB.g - RGB.b) / diff + 6.0;
 			else if (Cmax == RGB.g)
@@ -141,7 +140,6 @@ PixelShader =
 		return float3(H, S, Cmax);
 	}
 
-
 	float3 Hue(float H)
 	{
 	    float R = abs(H * 6 - 3) - 1;
@@ -150,14 +148,14 @@ PixelShader =
 	    return saturate(float3(R,G,B));
 	}
 
-	float3 HSVtoRGBPostFast( in float3 aHSV )
+	float3 HSVtoRGBPostFast( in float3 aHSV ) // Same result as HSVtoRGBPost for H in [0, 6], without the six-way branch (and with S == 0 needing no special case, as C is then 0 and the result is just V). Callers have to wrap H into [0, 6) first, e.g. with mod( H, 6.0 ); for larger H stay with HSVtoRGBPost.
 	{
 		float3 vHue = saturate( float3( abs( aHSV.x - 3.0f ) - 1.0f, 2.0f - abs( aHSV.x - 2.0f ), 2.0f - abs( aHSV.x - 4.0f ) ) );
 		float C = aHSV.y * aHSV.z;
 		return saturate( vHue * C + ( aHSV.z - C ) );
 	}
 
-	float3 HSVtoRGB(float H, float S, float V)
+	float3 HSVtoRGB(float H, float S, float V) // used for manual input, converts to linear
 	{
 		float3 hue = Hue(H);
 		float3 val = (hue - vec3(1)) * S + vec3(1);
@@ -173,23 +171,23 @@ PixelShader =
 
 	float3 GetOverlay( float3 vColor, float3 vOverlay, float vOverlayPercent )
 	{
-	#if OPT_FAST_OVERLAY_GAMMA
-		float3 vColorGamma = sqrt( vColor );
-		float3 vOverlayGamma = sqrt( vOverlay );
-	#else
-		float3 vColorGamma = ToGamma(vColor);
-		float3 vOverlayGamma = ToGamma(vOverlay);
-	#endif
+		#if OPT_FAST_OVERLAY_GAMMA // gamma 2.0: one sqrt per colour in, one multiply out, instead of three pow() calls
+			float3 vColorGamma = sqrt( vColor );
+			float3 vOverlayGamma = sqrt( vOverlay );
+		#else
+			float3 vColorGamma = ToGamma(vColor);
+			float3 vOverlayGamma = ToGamma(vOverlay);
+		#endif
 
 		float3 res;
 		res.r = vOverlayGamma.r < .5 ? (2 * vOverlayGamma.r * vColorGamma.r) : (1 - 2 * (1 - vOverlayGamma.r) * (1 - vColorGamma.r));
 		res.g = vOverlayGamma.g < .5 ? (2 * vOverlayGamma.g * vColorGamma.g) : (1 - 2 * (1 - vOverlayGamma.g) * (1 - vColorGamma.g));
 		res.b = vOverlayGamma.b < .5 ? (2 * vOverlayGamma.b * vColorGamma.b) : (1 - 2 * (1 - vOverlayGamma.b) * (1 - vColorGamma.b));
-	#if OPT_FAST_OVERLAY_GAMMA
-		res = res * res;
-	#else
-		res = ToLinear(res);
-	#endif
+		#if OPT_FAST_OVERLAY_GAMMA
+			res = res * res;
+		#else
+			res = ToLinear(res);
+		#endif
 		return lerp( vColor, res, vOverlayPercent );
 	}
 
@@ -221,15 +219,15 @@ PixelShader =
 	{
 		float3 vDiff = vCamPos - vPos;
 		float vSqDistance = dot( vDiff, vDiff );
-		float vFogFactor = 1.0f - abs( vDiff.y * ( 1.0f / sqrt( vSqDistance ) ) );
+		float vFogFactor = 1.0f - abs( vDiff.y * ( 1.0f / sqrt( vSqDistance ) ) ); // abs b/c of reflections
 
 		float vBegin = FOG_BEGIN;
 		float vEnd = FOG_END;
 		vBegin *= vBegin;
 		vEnd *= vEnd;
-		
+
 		float vMaxFog = FOG_MAX;
-		
+
 		float vMin = min( ( vSqDistance - vBegin ) / ( vEnd - vBegin ), vMaxFog );
 
 		return saturate( vMin ) * vFogFactor;
@@ -244,40 +242,38 @@ PixelShader =
 	{
 		return ApplyDistanceFog( vColor, CalculateDistanceFogFactor(vPos) );
 	}
-	
+
 	float4 GetMudSnowColor( float3 vPos, in sampler2D MudSnowTexture)
 	{
 		return tex2D( MudSnowTexture, float2( ( ( vPos.x + 0.5f ) / MAP_SIZE_X ) * FOW_POW2_X, ( (vPos.z + 0.5f ) / MAP_SIZE_Y) ) * FOW_POW2_Y );
 	}
 
-	
 	float3 GetMudColor( in float3 vResult, in float4 vMudSnowColor, in float3 vPos, inout float3 vNormal, inout float vGlossiness, inout float vSpec, in sampler2D MudDiffuseGlossSampler, in sampler2D MudNormalSpecSampler, in float3 TerrainColor, in sampler2D SnowNoise )
 	{
-		float vMudRaw = lerp( vMudSnowColor.r, vMudSnowColor.a, vFoWOpacity_FoWTime_SnowMudFade_MaxGameSpeed.z );
+		float vMudRaw = lerp( vMudSnowColor.r, vMudSnowColor.a, vFoWOpacity_FoWTime_SnowMudFade_MaxGameSpeed.z ); // How much mud the weather map asks for at this pixel. If this is zero every blend has a weight of zero, so the whole function can be skipped.
 
-	#if OPT_SAMPLE_IN_BRANCH
-		float2 vDX = ddx( vPos.xz );
-		float2 vDY = ddy( vPos.xz );
-	#else
-		float vNoiseSample = tex2D( SnowNoise, vPos.xz * 0.01f ).a;
-		float4 vMudDiffuseGloss = tex2D( MudDiffuseGlossSampler, vPos.xz * MUD_TILING );
-		float4 vMudNormalSpec = tex2D( MudNormalSpecSampler, vPos.xz * MUD_TILING );
-	#endif
+		#if OPT_SAMPLE_IN_BRANCH
+			float2 vDX = ddx( vPos.xz );
+			float2 vDY = ddy( vPos.xz );
+		#else
+			float vNoiseSample = tex2D( SnowNoise, vPos.xz * 0.01f ).a;
+			float4 vMudDiffuseGloss = tex2D( MudDiffuseGlossSampler, vPos.xz * MUD_TILING );
+			float4 vMudNormalSpec = tex2D( MudNormalSpecSampler, vPos.xz * MUD_TILING );
+		#endif
 
-	#if OPT_SKIP_UNUSED_LAYERS
 		OPT_BRANCH
 		if ( vMudRaw > 0.0f )
-	#endif
 		{
-	#if OPT_SAMPLE_IN_BRANCH
-			float vNoiseSample = tex2Dgrad( SnowNoise, vPos.xz * 0.01f, vDX * 0.01f, vDY * 0.01f ).a;
-			float4 vMudDiffuseGloss = tex2Dgrad( MudDiffuseGlossSampler, vPos.xz * MUD_TILING, vDX * MUD_TILING, vDY * MUD_TILING );
-			float4 vMudNormalSpec = tex2Dgrad( MudNormalSpecSampler, vPos.xz * MUD_TILING, vDX * MUD_TILING, vDY * MUD_TILING );
-	#endif
+			#if OPT_SAMPLE_IN_BRANCH
+				float vNoiseSample = tex2Dgrad( SnowNoise, vPos.xz * 0.01f, vDX * 0.01f, vDY * 0.01f ).a;
+				float4 vMudDiffuseGloss = tex2Dgrad( MudDiffuseGlossSampler, vPos.xz * MUD_TILING, vDX * MUD_TILING, vDY * MUD_TILING );
+				float4 vMudNormalSpec = tex2Dgrad( MudNormalSpecSampler, vPos.xz * MUD_TILING, vDX * MUD_TILING, vDY * MUD_TILING );
+			#endif
 			float vOpacity = cam_distance( MUD_CAM_MIN, MUD_CAM_MAX );
 			float vNoise = lerp( 1.0, (0.5 + vNoiseSample) * 0.5, vOpacity);
 
 			float vMudCurrent = vMudRaw;
+			// vNormal.y is never above 1, so with MUD_NORMAL_CUTOFF >= 1 (it is 10.982 in constants.fxh) the inner saturate() is always 0 and this fade does nothing. The test is on a compile-time constant, so the compiler drops the line; lowering the cutoff below 1 brings it back.
 			if ( MUD_NORMAL_CUTOFF < 1.0f )
 			{
 				vMudCurrent *= 1.0 - saturate( saturate( vNormal.y - MUD_NORMAL_CUTOFF ) * ( ( 1.0 - MUD_NORMAL_CUTOFF ) * 1000.0 ) );
@@ -305,29 +301,27 @@ PixelShader =
 	{
 		float vIsSnow = GetSnow( vMudSnowColor );
 
-		float vSnowAlpha = 0.0f;
+		float vSnowAlpha = 0.0f; // With no snow in the weather map every term below ends up multiplied by zero (colour, normal and gloss stay as they are and the snow alpha comes out as 0), so those pixels skip the function.
 
-	#if OPT_SAMPLE_IN_BRANCH
-		float2 vDX = ddx( vPos.xz );
-		float2 vDY = ddy( vPos.xz );
-	#else
-		float4 vSnowTexture = tex2D( SnowTextureSampler, vPos.xz * SNOW_TILING );
-		float vNoise = tex2D( SnowNoise, vPos.xz * SNOW_NOISE_TILING ).a;
-	#endif
+		#if OPT_SAMPLE_IN_BRANCH
+			float2 vDX = ddx( vPos.xz );
+			float2 vDY = ddy( vPos.xz );
+		#else
+			float4 vSnowTexture = tex2D( SnowTextureSampler, vPos.xz * SNOW_TILING );
+			float vNoise = tex2D( SnowNoise, vPos.xz * SNOW_NOISE_TILING ).a;
+		#endif
 
-	#if OPT_SKIP_UNUSED_LAYERS
 		OPT_BRANCH
 		if ( vIsSnow > 0.0f )
-	#endif
 		{
-	#if OPT_SAMPLE_IN_BRANCH
-			float4 vSnowTexture = tex2Dgrad( SnowTextureSampler, vPos.xz * SNOW_TILING, vDX * SNOW_TILING, vDY * SNOW_TILING );
-			float vNoise = tex2Dgrad( SnowNoise, vPos.xz * SNOW_NOISE_TILING, vDX * SNOW_NOISE_TILING, vDY * SNOW_NOISE_TILING ).a;
-	#endif
+			#if OPT_SAMPLE_IN_BRANCH
+				float4 vSnowTexture = tex2Dgrad( SnowTextureSampler, vPos.xz * SNOW_TILING, vDX * SNOW_TILING, vDY * SNOW_TILING );
+				float vNoise = tex2Dgrad( SnowNoise, vPos.xz * SNOW_NOISE_TILING, vDX * SNOW_NOISE_TILING, vDY * SNOW_NOISE_TILING ).a;
+			#endif
 			float vSnowFade = saturate( vPos.y - SNOW_START_HEIGHT );
 			float vNormalFade = saturate( saturate( vNormal.y - SNOW_NORMAL_START ) * SNOW_CLIFFS );
 
-			float vTransp = vNoise;
+			float vTransp = vNoise; //Increase snow on ridges
 			vTransp += saturate( vPos.y - SNOW_RIDGE_START_HEIGHT )*( saturate( (vNormal.y-0.9f) * 1000.0f )*vIsSnow );
 			vTransp = saturate( vTransp );
 
@@ -339,7 +333,7 @@ PixelShader =
 
 			vSnowAlpha = saturate( ( saturate( vSnow + vFrost ) * vSnowFade * vNormalFade * saturate(vIsSnow * 2.25) * vOpacity ) );
 			float vMinSnow = smoothstep( 0.0f, 1.0f, vIsSnow );
-			vColor = lerp( vColor, vSnowTexture.a * SNOW_COLOR, vSnowAlphaOut * saturate( vSnowAlpha + ( SNOW_FROST_MIN_EFFECT * vMinSnow ) ) );	
+			vColor = lerp( vColor, vSnowTexture.a * SNOW_COLOR, vSnowAlphaOut * saturate( vSnowAlpha + ( SNOW_FROST_MIN_EFFECT * vMinSnow ) ) );
 
 			float3 vSnowNormal = normalize( vSnowTexture.rbg - 0.5f );
 			vSnowNormal = normalize( RotateVectorByVector( vSnowNormal, vNormal ) );
@@ -347,7 +341,6 @@ PixelShader =
 
 			vGlossiness += vSnowTexture.a * vSnowAlpha * SNOW_SPEC_GLOSS_MULT;
 		}
-
 		vSnowAlphaOut = vSnowAlpha;
 		return vColor;
 	}
@@ -358,7 +351,6 @@ PixelShader =
 		vNormalSample.g = -vNormalSample.g;
 		return vNormalSample;
 	}
-
 
 	float3 UnpackRRxGNormal(float4 NormalMapSample)
 	{
@@ -419,7 +411,7 @@ PixelShader =
 
 		float vDesaturation = 0.8f * vBlend * vBlend * vBlend;
 
-		float Grey = dot( vDayColor.rgb, float3( 0.4f, 0.3f, 0.05f ) );
+		float Grey = dot( vDayColor.rgb, float3( 0.4f, 0.3f, 0.05f ) ); // == lerp( Grey, Grey * float3( 0.2, 0.7, 1.2 ), 0.25 ), with the constants folded by hand
 		float3 vNightColor = saturate( Grey * float3( 0.8f, 0.925f, 1.05f ) );
 
 		float3 vColor = lerp(vDayColor, vNightColor, vec3(vDesaturation));
@@ -430,13 +422,13 @@ PixelShader =
 	float3 DayNightWithBlend( float3 vDayColor, float3 vGlobeNormal, float vBlend )
 	{	
 		#ifdef NO_NIGHT
-		return vDayColor;
+			return vDayColor;
 		#endif
 
-		return lerp( vDayColor, NightifyColor(vDayColor, vBlend), DayNightFactor( vGlobeNormal ) * NIGHT_OPACITY );
+		return lerp( vDayColor, NightifyColor(vDayColor, vBlend), DayNightFactor( vGlobeNormal ) * NIGHT_OPACITY ); // lerp between day and night
 	}
 
-	float3 DayNight( float3 vDayColor, float3 vGlobeNormal )
+	float3 DayNight( float3 vDayColor, float3 vGlobeNormal ) // Darken the color by the night opacity
 	{	
 		return DayNightWithBlend(vDayColor, vGlobeNormal, 1.0f);
 	}
@@ -449,7 +441,7 @@ PixelShader =
 
 		float vNightFactor = DayNightFactor( vGlobeNormal );
 
-		float3 Result = lerp( vDayColor, NightifyColor(vDayColor , 0.0f), vNightFactor * NIGHT_OPACITY );
+		float3 Result = lerp( vDayColor, NightifyColor(vDayColor , 0.0f), vNightFactor * NIGHT_OPACITY ); // lerp between day and night
 
 		Result += vCityLightMask * float3(2.0f, 2.0f, 0.3f) * vNightFactor * (1.0f - vFogFactor * vFogFactor);
 
@@ -488,13 +480,14 @@ PixelShader =
 
 	float3 AmbientLight( float3 WorldNormal, float vDayFactor, float3 DayAmbientColors_[6], float3 NightAmbientColors_[6] ) 
 	{	
-		WorldNormal = lerp( WorldNormal, normalize(WorldNormal - smoothstep(-0.6, 0.5, dot(WorldNormal, float3(0, -1, 0))) * float3(0, 0.9, 0)), NegFogMultiplier );
+		WorldNormal = lerp( WorldNormal, normalize(WorldNormal - smoothstep(-0.6, 0.5, dot(WorldNormal, float3(0, -1, 0))) * float3(0, 0.9, 0)), NegFogMultiplier ); // add more of bottom ambient below objects
 
 		float3 Squared = WorldNormal * WorldNormal; 
 
-		float3 vDayX   = ( WorldNormal.x < 0.0f ) ? DayAmbientColors_[1] : DayAmbientColors_[0];
+		float3 vDayX   = ( WorldNormal.x < 0.0f ) ? DayAmbientColors_[1] : DayAmbientColors_[0]; // Pick the +axis or -axis colour with a select. The original indexed the two arrays with a value computed per pixel, which makes the compiler copy all 12 colours into an indexable temp array for every pixel just to read 6 of them back.
 		float3 vDayY   = ( WorldNormal.y < 0.0f ) ? DayAmbientColors_[3] : DayAmbientColors_[2];
 		float3 vDayZ   = ( WorldNormal.z < 0.0f ) ? DayAmbientColors_[5] : DayAmbientColors_[4];
+		// NOTE: the night colours and NIGHT_AMBIENT_BOOST are all static const, so saturate( boost * colour ) is folded at compile time and only the select is left. Do not move the boost after the select.
 		float3 vNightX = ( WorldNormal.x < 0.0f ) ? saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[1] ) : saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[0] );
 		float3 vNightY = ( WorldNormal.y < 0.0f ) ? saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[3] ) : saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[2] );
 		float3 vNightZ = ( WorldNormal.z < 0.0f ) ? saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[5] ) : saturate( NIGHT_AMBIENT_BOOST * NightAmbientColors_[4] );
@@ -522,11 +515,10 @@ PixelShader =
 		NightAmbientColors[4] = NightAmbientMapPosZ;
 		NightAmbientColors[5] = NightAmbientMapNegZ;
 
-
 		return AmbientLight(WorldNormal, vDayFactor, DayAmbientColors, NightAmbientColors);
 	}
 
-	float3 AmbientLightDayOnly( float3 WorldNormal, float3 DayAmbientColors_[6] )
+	float3 AmbientLightDayOnly( float3 WorldNormal, float3 DayAmbientColors_[6] ) // AmbientLight( N, 0.0, Day, Night ) without the night colours: lerp( day, night, 0 ) is the day colour, so the night colours (and the boost + saturate on them) are not needed when the day factor is a constant 0.
 	{
 		WorldNormal = lerp( WorldNormal, normalize(WorldNormal - smoothstep(-0.6, 0.5, dot(WorldNormal, float3(0, -1, 0))) * float3(0, 0.9, 0)), NegFogMultiplier );
 		float3 Squared = WorldNormal * WorldNormal;
@@ -536,12 +528,12 @@ PixelShader =
 		return Squared.x * vDayX + Squared.y * vDayY + Squared.z * vDayZ;
 	}
 
-	float3 FresnelSchlick(float3 SpecularColor, float3 E, float3 H)
+	float3 FresnelSchlick(float3 SpecularColor, float3 E, float3 H) // Direct lighting
 	{
 		return SpecularColor + (vec3(1.0f) - SpecularColor) * Pow5(1.0 - saturate(dot(E, H)));
 	}
 
-	float3 FresnelGlossy(float3 SpecularColor, float3 E, float3 N, float Smoothness)
+	float3 FresnelGlossy(float3 SpecularColor, float3 E, float3 N, float Smoothness) // Indirect lighting
 	{
 		return SpecularColor + (max(vec3(Smoothness), SpecularColor) - SpecularColor) * Pow5(1.0 - saturate(dot(E, N)));
 	}
@@ -556,11 +548,14 @@ PixelShader =
 		return lerp(vec3(Spec), DiffuseValue, Metalness);
 	}
 
+	//------------------------------
+	// Phong -----------------------
+	//------------------------------
 	float3 CalculatePBRSpecularPower( float3 vPos, float3 vNormal, float3 vMaterialSpecularColor, float vSpecularPower, float3 vLightColor, float3 vLightDirIn )
-	{	
+	{
 		float3 H = normalize( normalize( vCamPos - vPos ) + -vLightDirIn );
 		float NdotH = saturate( dot( H, vNormal ) );
-		float NdotL = saturate( dot( -vLightDirIn, vNormal ) );
+		float NdotL = saturate( dot( -vLightDirIn, vNormal ) ); // (the first version of this term was overwritten right away, so it is gone)
 		float3 vSpecularColor = FresnelSchlick( vMaterialSpecularColor * SPECULAR_MULTIPLIER, -vLightDirIn, H) * ((vSpecularPower + 2) / 8 ) * saturate( pow( NdotH, vSpecularPower ) ) * NdotL * vLightColor;
 		return vSpecularColor;
 	}
@@ -586,9 +581,12 @@ PixelShader =
 		}
 	}
 
+	//------------------------------
+	// Blinn-Phong -----------------
+	//------------------------------
 	float GetNonLinearGlossiness(float aGlossiness)
 	{
-		return exp2(11.0 * aGlossiness);
+		return exp2(11.0 * aGlossiness); //exp2(GlossScale * Gloss + GlossBias)
 	}
 
 	float GetEnvmapMipLevel(float aGlossiness)
@@ -626,7 +624,7 @@ PixelShader =
 		}
 	}
 
-	float3 CalculateSunDirectionFromSelected( float3 vWorldPos, float vSelected, float3 SunPos, float3 SecondSunPos, float3 MoonPos, float3 SecondMoonPos )
+	float3 CalculateSunDirectionFromSelected( float3 vWorldPos, float vSelected, float3 SunPos, float3 SecondSunPos, float3 MoonPos, float3 SecondMoonPos ) // vSelected is DayNightFactor( CalcGlobeNormal( vWorldPos.xz ), 0.0f, 0.0001f )
 	{
 		float3 vSourcePos = lerp( SunPos, MoonPos, vSelected );
 		float3 vSecondSourcePos = lerp( SecondSunPos, SecondMoonPos, vSelected );
@@ -639,7 +637,7 @@ PixelShader =
 		{
 			vSourcePos.x -= MAP_SIZE_X;
 		}
-		
+
 		if ( vWorldPos.x - vSecondSourcePos.x > MAP_SIZE_X * 0.5 )
 		{
 			vSecondSourcePos.x += MAP_SIZE_X;
@@ -648,7 +646,7 @@ PixelShader =
 		{
 			vSecondSourcePos.x -= MAP_SIZE_X;
 		}
-		
+
 		float lerpFactor = abs( vWorldPos.x - vSourcePos.x ) / (MAP_SIZE_X * 0.5);
 		lerpFactor = smoothstep(0.5, 1.0, lerpFactor);
 		vSourcePos = lerp( vSourcePos, vSecondSourcePos, lerpFactor );
@@ -661,6 +659,7 @@ PixelShader =
 		return CalculateSunDirectionFromSelected( vWorldPos, DayNightFactor( CalcGlobeNormal( vWorldPos.xz ), 0.0f, 0.0001f ), SunPos, SecondSunPos, MoonPos, SecondMoonPos );
 	}
 
+	// The *GN functions are the same as the ones without the suffix, for a pixel shader that already has vGlobeNormal = CalcGlobeNormal( vWorldPos.xz ). That value (sin, cos, normalize) is needed by the sun direction, the sun light, the ambient and the night pass, so such a shader computes it once and passes it in.
 	float3 CalculateSunDirectionGN( float3 vWorldPos, float3 vGlobeNormal )
 	{
 		return CalculateSunDirectionFromSelected( vWorldPos, DayNightFactor( vGlobeNormal, 0.0f, 0.0001f ), vVirtualSunPos.xyz, vSecondVirtualSunPos.xyz, vVirtualMoonPos.xyz, vSecondVirtualMoonPos.xyz );
@@ -676,11 +675,14 @@ PixelShader =
 		return CalculateSunDirection( vWorldPos, vVirtualSunPos.xwz, vSecondVirtualSunPos.xwz, vVirtualMoonPos.xwz, vSecondVirtualMoonPos.xwz );
 	}
 
-	float3 CalculateSunDirectionWaterGN( float3 vWorldPos, float3 vGlobeNormal )
+	float3 CalculateSunDirectionWaterGN( float3 vWorldPos, float3 vGlobeNormal ) // as CalculateSunDirectionWater, for a caller that already has vGlobeNormal = CalcGlobeNormal( vWorldPos.xz )
 	{
 		return CalculateSunDirectionFromSelected( vWorldPos, DayNightFactor( vGlobeNormal, 0.0f, 0.0001f ), vVirtualSunPos.xwz, vSecondVirtualSunPos.xwz, vVirtualMoonPos.xwz, vSecondVirtualMoonPos.xwz );
 	}
 
+	//-------------------------------
+	// Common lighting functions ----
+	//-------------------------------
 	void CalculateSunLightGN(LightingProperties aProperties, float aShadowTerm, float3 vLightSourceDirection, float3 vGlobeNormal, out float3 aDiffuseLightOut, out float3 aSpecularLightOut )
 	{
 		float vDayFactor = 1.0f - DayNightFactor( vGlobeNormal );
@@ -690,13 +692,12 @@ PixelShader =
 
 		float3 sunIntensity = SunDiffuseIntensity.rgb * SunDiffuseIntensity.a * aShadowTerm * vDayFactor + MoonDiffuseIntensity.rgb * MoonDiffuseIntensity.a * aShadowTerm * vNightFactor;
 
-
-	#ifdef PDX_IMPROVED_BLINN_PHONG
-		ImprovedBlinnPhong(sunIntensity, -vLightSourceDirection, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#else
-		aDiffuseLightOut = CalculateLight(aProperties._Normal, vLightSourceDirection, sunIntensity);
-		aSpecularLightOut = CalculatePBRSpecularPower(aProperties._WorldSpacePos, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
-	#endif
+		#ifdef PDX_IMPROVED_BLINN_PHONG
+			ImprovedBlinnPhong(sunIntensity, -vLightSourceDirection, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#else
+			aDiffuseLightOut = CalculateLight(aProperties._Normal, vLightSourceDirection, sunIntensity);
+			aSpecularLightOut = CalculatePBRSpecularPower(aProperties._WorldSpacePos, aProperties._Normal, aProperties._SpecularColor, aProperties._Glossiness, sunIntensity, vLightSourceDirection);
+		#endif
 		aSpecularLightOut *= SunSpecularIntensity;
 	}
 
@@ -713,11 +714,11 @@ PixelShader =
 
 	void CalculatePointLight(PointLight aPointlight, LightingProperties aProperties, inout float3 aDiffuseLightOut, inout float3 aSpecularLightOut)
 	{
-	#ifdef PDX_IMPROVED_BLINN_PHONG
-		ImprovedBlinnPhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#else
-		PhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
-	#endif
+		#ifdef PDX_IMPROVED_BLINN_PHONG
+			ImprovedBlinnPhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#else
+			PhongPointLight(aPointlight, aProperties, aDiffuseLightOut, aSpecularLightOut);
+		#endif
 	}
 
 	float3 ComposeLightGN(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float3 vGlobeNormal )
@@ -738,7 +739,6 @@ PixelShader =
 
 	float3 CalcSnowAmbient( float3 aDiffuseLight, float vSnowFactor )
 	{
-		//float vAmbientIntensity = 1 - saturate(dot(aDiffuseLight, float3(1,1,1)));
 		return float3(0.2, 0.7, 1) * 0.07 * smoothstep(0.0, 0.1, vSnowFactor );
 	}
 
@@ -746,12 +746,12 @@ PixelShader =
 	{
 		float vDayNight = DayNightFactor( vGlobeNormal );
 		float3 vAmbientColor = AmbientLight(aProperties._Normal, vDayNight);
-	#ifdef LOW_END_GFX
-		return (((vAmbientColor + aDiffuseLight) * aProperties._Diffuse) * HdrRange) + aSpecularLight;
-	#else
-		float3 SnowAmbient = CalcSnowAmbient(aDiffuseLight, vSnowFactor);
-		return (((SnowAmbient + vAmbientColor + aDiffuseLight) * aProperties._Diffuse) * HdrRange) + aSpecularLight;
-	#endif
+		#ifdef LOW_END_GFX
+			return (((vAmbientColor + aDiffuseLight) * aProperties._Diffuse) * HdrRange) + aSpecularLight;
+		#else
+			float3 SnowAmbient = CalcSnowAmbient(aDiffuseLight, vSnowFactor);
+			return (((SnowAmbient + vAmbientColor + aDiffuseLight) * aProperties._Diffuse) * HdrRange) + aSpecularLight;
+		#endif
 	}
 
 	float3 ComposeLightSnow(LightingProperties aProperties, float3 aDiffuseLight, float3 aSpecularLight, float vSnowFactor )
@@ -795,35 +795,33 @@ PixelShader =
 
 	float4 gradient_border_sample( in sampler2D TexCh, in float2 vUV, in float2 vDX, in float2 vDY )
 	{
-	#ifdef LOW_END_GFX
-		return OPT_TEX2D( TexCh, vUV, vDX, vDY );
-	#else
-	#if OPT_GB_FAST_MULTISAMPLE
-		// The stock filter is a 3x3 grid of bilinear taps spaced half a map pixel apart. Four taps
-		// on the diagonals at sqrt(2/3) of that spacing give a blur of the same width (identical
-		// 2nd and 4th moments), for 4 texture reads instead of 9.
-		float2 vOffset = float2( 0.40825f / MAP_SIZE_X, 0.40825f / MAP_SIZE_Y );
-		float4 vResult = OPT_TEX2D( TexCh, vUV + float2( -vOffset.x, -vOffset.y ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffset.x, -vOffset.y ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffset.x,  vOffset.y ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffset.x,  vOffset.y ), vDX, vDY );
-		return vResult * 0.25f;
-	#else
-		float vOffsetX = -0.5f / MAP_SIZE_X;
-		float vOffsetY = -0.5f / MAP_SIZE_Y;
-		float4 vResult = OPT_TEX2D( TexCh, vUV, vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX, 0 ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( 0, -vOffsetY ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( vOffsetX, 0 ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( 0, vOffsetY ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX, -vOffsetY ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffsetX, -vOffsetY ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffsetX,  vOffsetY ), vDX, vDY );
-		vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX,  vOffsetY ), vDX, vDY );
-		vResult /= 9;
-		return vResult;
-	#endif
-	#endif
+		#ifdef LOW_END_GFX
+			return OPT_TEX2D( TexCh, vUV, vDX, vDY );
+		#else
+			#if OPT_GB_FAST_MULTISAMPLE
+				// The stock filter is a 3x3 grid of bilinear taps spaced half a map pixel apart. Four taps on the diagonals at sqrt(2/3) of that spacing give a blur of the same width (identical 2nd and 4th moments), for 4 texture reads instead of 9.
+				float2 vOffset = float2( 0.40825f / MAP_SIZE_X, 0.40825f / MAP_SIZE_Y );
+				float4 vResult = OPT_TEX2D( TexCh, vUV + float2( -vOffset.x, -vOffset.y ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffset.x, -vOffset.y ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffset.x,  vOffset.y ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffset.x,  vOffset.y ), vDX, vDY );
+				return vResult * 0.25f;
+			#else
+				float vOffsetX = -0.5f / MAP_SIZE_X;
+				float vOffsetY = -0.5f / MAP_SIZE_Y;
+				float4 vResult = OPT_TEX2D( TexCh, vUV, vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX, 0 ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( 0, -vOffsetY ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( vOffsetX, 0 ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( 0, vOffsetY ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX, -vOffsetY ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffsetX, -vOffsetY ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2(  vOffsetX,  vOffsetY ), vDX, vDY );
+				vResult += OPT_TEX2D( TexCh, vUV + float2( -vOffsetX,  vOffsetY ), vDX, vDY );
+				vResult /= 9;
+				return vResult;
+			#endif
+		#endif
 	}
 
 	float gradient_border_camera_distance()
@@ -840,10 +838,9 @@ PixelShader =
 
 	float CalculateBorderStripes( in float2 uv )
 	{
-		// diagonal
-		float t = 3.14159 * 2 / 3;	    
-		float w = BORDER_MAP_TILE;
-		
+		float t = 3.14159 * 2 / 3; // diagonal
+		float w = BORDER_MAP_TILE; // larger value gives smaller width
+
 		float stripeVal = cos( ( uv.x * cos( t ) * w ) + ( uv.y * sin( t ) * w ) ); 
 		float camDist = cam_distance( 100.0, 200.0 );
 		stripeVal += .75f + camDist;
@@ -852,14 +849,15 @@ PixelShader =
 		stripeVal = lerp ( lerp( -.03, .01, stripeVal ), 0.f, camDist );
 		return stripeVal;
 	}	
-	
+
+	// One gradient border layer evaluated at one pixel: everything gradient_border_blend needs to put the layer on top of a colour. Evaluating and blending are separate steps so that a shader with two colours at the same spot (river.shader) only reads the border textures once.
 	struct GradientBorderLayer
 	{
-		float3 _Color;
-		float _Mix;
-		float _Thick;		
-		float _Opacity;
-		float _Alpha;
+		float3 _Color;		// border colour
+		float _Mix;			// how much of the border colour goes into the layer
+		float _Thick;		// dark outline edge
+		float _Opacity;		// how much of the finished layer goes over the input colour
+		float _Alpha;		// coverage, used for the bloom / season overlay mask
 	};
 
 	GradientBorderLayer gradient_border_eval_channel( float vCamDist, float2 uv, float2 vDX, float2 vDY, in sampler2D gbTex, in sampler2D gbTex2, float vOutlineMult, float vOutlineCutoff, float vStrength, float vPulse, float vOpacity )
@@ -873,29 +871,30 @@ PixelShader =
 
 		float2 FX_Alpha = tex2D( gbTex2, uv ).bg;
 
-	#if OPT_SAMPLE_IN_BRANCH
-		OPT_BRANCH
-		if ( FX_Alpha.g > 0.0f )
-	#endif
+		// FX_Alpha.g is the transparency of the layer. Where it is zero the layer is blended in with a weight of zero and reports zero coverage, so the blurred border lookup and the maths that goes with it are not needed for that pixel.
+		#if OPT_SAMPLE_IN_BRANCH
+			OPT_BRANCH
+			if ( FX_Alpha.g > 0.0f )
+		#endif
 		{
 			vStrength *= lerp( lerp( 0.45f, 1.0f, 1.0f - FX_Alpha.r ), 1.0f, vPulse );
 
-			float vFullWidth = 5.25f / 255.0f;//lerp( 5.25f, 0.01f, FX_Alpha.r ) / 255.f;
-			float vGradientWidth = 0.5f / 255.0f;//lerp( 0.5f, 0.1f, FX_Alpha.r ) / 255.f;
+			float vFullWidth = 5.25f / 255.0f; //lerp( 5.25f, 0.01f, FX_Alpha.r ) / 255.f;
+			float vGradientWidth = 0.5f / 255.0f; //lerp( 0.5f, 0.1f, FX_Alpha.r ) / 255.f;
 
-			float4 vGBDist = gradient_border_sample( gbTex, uv, vDX, vDY );
+			float4 vGBDist = gradient_border_sample( gbTex, uv, vDX, vDY ); // Grab multisampled border color
 
 			float Alpha = vGBDist.a;
 
-			float vColorOpacity = Levels( Alpha, 0.0f, vOutlineCutoff );
+			float vColorOpacity = Levels( Alpha, 0.0f, vOutlineCutoff ); // Check how much color and how much outline there is
 			float vOutline = 1.0f - Levels( Alpha, vOutlineCutoff, 1.0f );
 			float vOldOutline = vOutline;
 			vOutline *= floor(vColorOpacity);
 			vOutline *= vOutlineMult;
 
-			vColorOpacity = gradient_border_distance_to_alpha( vColorOpacity, vCamDist );
+			vColorOpacity = gradient_border_distance_to_alpha( vColorOpacity, vCamDist ); // Convert "heightmap" to "fill" regarding camera distance (the whole magic in this function)
 
-			vColorOpacity *= floor(vOldOutline);
+			vColorOpacity *= floor(vOldOutline); // Now when vOutline > 0 then vColorOpacity = 0, and other way around. Never both values will be > 0.
 
 			float vThick = smoothstep( 0.f, 1.f, Levels( Alpha, vOutlineCutoff - vFullWidth, vOutlineCutoff - vFullWidth + vGradientWidth ) ) ;
 
@@ -917,38 +916,35 @@ PixelShader =
 	{
 		float3 vCh = lerp( vColor, Layer._Color, Layer._Mix );
 
-		vCh = lerp( vCh, vCh * .5, Layer._Thick );
+		vCh = lerp( vCh, vCh * .5, Layer._Thick ); // Make the outline edge darker
 
-		return lerp( vColor, vCh, Layer._Opacity );
+		return lerp( vColor, vCh, Layer._Opacity ); // Now mix the result with the background
 	}
 
 	void gradient_border_eval( float2 vUV, in sampler2D TexCh1, in sampler2D TexCh2, float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, out GradientBorderLayer Layer1, out GradientBorderLayer Layer2 )
 	{
-		float vGBCamDist = gradient_border_camera_distance();
+		float vGBCamDist = gradient_border_camera_distance(); // Check the distance of camera (value 0-1)
 
-		// Handle camera distance overriding (unique for each channel)
-		float vGBCamDistCh1 = saturate( ( vGBCamDist * int( 1.0f - vCamDistOverride.x ) ) + vCamDistOverride.x );
+		float vGBCamDistCh1 = saturate( ( vGBCamDist * int( 1.0f - vCamDistOverride.x ) ) + vCamDistOverride.x ); // Handle camera distance overriding (unique for each channel)
 		float vGBCamDistCh2 = saturate( ( vGBCamDist * int( 1.0f - vCamDistOverride.y ) ) + vCamDistOverride.y );
 
-		// Split UV to correct offset in height, as 1st channel is the top half part of the texture, and 2nd channel is bottom half
-		float HalfPix = 0.5f / GB_TextureHeight;
+		float HalfPix = 0.5f / GB_TextureHeight; // Split UV to correct offset in height, as 1st channel is the top half part of the texture, and 2nd channel is bottom half
 		vUV.y *= 0.5f - HalfPix;
 		float2 vUV2 = float2( vUV.x, vUV.y + 0.5f );
 
-	#if OPT_SAMPLE_IN_BRANCH
-		// the two halves only differ by a constant offset, so they share their derivatives
-		float2 vDX = ddx( vUV );
-		float2 vDY = ddy( vUV );
-	#else
-		float2 vDX = vec2( 0.0f );
-		float2 vDY = vec2( 0.0f );
-	#endif
+		#if OPT_SAMPLE_IN_BRANCH // the two halves only differ by a constant offset, so they share their derivatives
+			float2 vDX = ddx( vUV );
+			float2 vDY = ddy( vUV );
+		#else
+			float2 vDX = vec2( 0.0f );
+			float2 vDY = vec2( 0.0f );
+		#endif
 
-		const float PulseSpeedMult = 3.5f;
+		const float PulseSpeedMult = 3.5f; // These two only depend on shader constants, so work them out once for both layers
 		float vPulse = ( sin( vGlobalTime * PulseSpeedMult ) + 1.0f ) / 2;
 		float vOpacity = GB_OPACITY_NEAR + ( 1.0f - vGBCamDist ) * ( GB_OPACITY_FAR - GB_OPACITY_NEAR );
 
-		Layer1 = gradient_border_eval_channel( vGBCamDistCh1, vUV, vDX, vDY, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.x, GB_STRENGTH_CH1, vPulse, vOpacity );
+		Layer1 = gradient_border_eval_channel( vGBCamDistCh1, vUV, vDX, vDY, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.x, GB_STRENGTH_CH1, vPulse, vOpacity ); // Calculate color and transparency of both channels
 		Layer2 = gradient_border_eval_channel( vGBCamDistCh2, vUV2, vDX, vDY, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff.y, (1.0 - Layer1._Alpha * GB_STRENGTH_CH1 * GB_FIRST_LAYER_PRIORITY) * GB_STRENGTH_CH2, vPulse, vOpacity );
 	}
 
@@ -956,44 +952,42 @@ PixelShader =
 		in sampler2D TexCh1, in sampler2D TexCh2, 
 		float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, inout float vBloomAlpha )
 	{
-	#ifndef GRADIENT_BORDERS
-		vBloomAlpha = 1.0f;
-	#else
-		GradientBorderLayer Layer1;
-		GradientBorderLayer Layer2;
-		gradient_border_eval( vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff, vCamDistOverride, Layer1, Layer2 );
+		#ifndef GRADIENT_BORDERS
+			vBloomAlpha = 1.0f;
+		#else
+			GradientBorderLayer Layer1;
+			GradientBorderLayer Layer2;
+			gradient_border_eval( vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff, vCamDistOverride, Layer1, Layer2 );
 
-		vColor = gradient_border_blend( vColor, Layer1 );
-		vColor = gradient_border_blend( vColor, Layer2 );
+			vColor = gradient_border_blend( vColor, Layer1 );
+			vColor = gradient_border_blend( vColor, Layer2 );
 
-		vBloomAlpha = 1.0f - max( Layer1._Alpha, Layer2._Alpha );
-	#endif
+			vBloomAlpha = 1.0f - max( Layer1._Alpha, Layer2._Alpha ); // Return some alpha, so the postprocess will ignore gradient borders when applying season coloring overlay (we don't want to affect the colors especially when camera is zoomed out, and everything is 100% filled)
+		#endif
 	}
 
-	void gradient_border_apply2( inout float3 vColorA, inout float3 vColorB, float3 vNormal, float2 vUV, 
-		in sampler2D TexCh1, in sampler2D TexCh2, 
-		float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, inout float vBloomAlpha )
+	void gradient_border_apply2( inout float3 vColorA, inout float3 vColorB, float3 vNormal, float2 vUV, in sampler2D TexCh1, in sampler2D TexCh2, float vOutlineMult, float2 vOutlineCutoff, float2 vCamDistOverride, inout float vBloomAlpha ) // gradient_border_apply for two colours at the same map position (one read of the border textures)
 	{
-	#ifndef GRADIENT_BORDERS
-		vBloomAlpha = 1.0f;
-	#else
-		GradientBorderLayer Layer1;
-		GradientBorderLayer Layer2;
-		gradient_border_eval( vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff, vCamDistOverride, Layer1, Layer2 );
+		#ifndef GRADIENT_BORDERS
+			vBloomAlpha = 1.0f;
+		#else
+			GradientBorderLayer Layer1;
+			GradientBorderLayer Layer2;
+			gradient_border_eval( vUV, TexCh1, TexCh2, vOutlineMult, vOutlineCutoff, vCamDistOverride, Layer1, Layer2 );
 
-		vColorA = gradient_border_blend( vColorA, Layer1 );
-		vColorA = gradient_border_blend( vColorA, Layer2 );
-		vColorB = gradient_border_blend( vColorB, Layer1 );
-		vColorB = gradient_border_blend( vColorB, Layer2 );
+			vColorA = gradient_border_blend( vColorA, Layer1 );
+			vColorA = gradient_border_blend( vColorA, Layer2 );
+			vColorB = gradient_border_blend( vColorB, Layer1 );
+			vColorB = gradient_border_blend( vColorB, Layer2 );
 
-		vBloomAlpha = 1.0f - max( Layer1._Alpha, Layer2._Alpha );
-	#endif
+			vBloomAlpha = 1.0f - max( Layer1._Alpha, Layer2._Alpha );
+		#endif
 	}
 	
 	float CalculateOccupationMask( in float2 uv )
 	{
-		float t = 3.14159 / 8.0;	    
-		float w = SEC_MAP_TILE;
+		float t = 3.14159 / 8.0; // diagonal  
+		float w = SEC_MAP_TILE; // larger value gives smaller width
 		
 		float stripeVal = cos( ( uv.x * cos( t ) * w ) + ( uv.y * sin( t ) * w ) ); 
 		float camDist = cam_distance( 300.0, 1200.0 );
@@ -1013,14 +1007,14 @@ PixelShader =
 		vColor = lerp( vColor, vColorMask.rgb, vOccupationMask );
 	}
 	
-	float3 dominance_fx_blend( float3 Color, float Control, float ContestedBy, float3 EnemyColor, float3 FriendlyColor, float Alpha, float2 OutlineCutoff, float2 CameraDistOverride, float OutlineMult )
+	float3 dominance_fx_blend( float3 Color, float Control, float ContestedBy, float3 EnemyColor, float3 FriendlyColor, float Alpha, float2 OutlineCutoff, float2 CameraDistOverride, float OutlineMult ) // The part of dominance_fx_apply that runs after the textures have been read
 	{
-		const float FadeSpeed = 1.5f;
+		const float FadeSpeed = 1.5f; // Some constants, defining them here probably isn't best practice,  but they only impact this function, and it seems excessive to try to send any of these except potentially TexSize through the constant buffer.
 		const float ContestedPulseSpeed = 2.5f;
 		const float MinFade = 0.2;
 		const float MaxFade = 0.23;
 
-		float Opacity = lerp( MinFade, MaxFade, ( sin( vGlobalTime * FadeSpeed ) + 1 ) * 0.5);
+		float Opacity = lerp( MinFade, MaxFade, ( sin( vGlobalTime * FadeSpeed ) + 1 ) * 0.5); // Calculate the pulsating effect, very simple sine function with some parameters.
 		float ContestedIntensity = lerp( 0.8f, 1.5f, ( sin( vGlobalTime * FadeSpeed*2 ) + 1 ) * 0.5);
 
 		float3 OverlayColor = abs(Control)*lerp(EnemyColor, FriendlyColor, (Control + 1)/2);
@@ -1055,46 +1049,48 @@ PixelShader =
 			OuterFade = saturate(OuterFade * 2);
 		}
 
-		return lerp( Color, OverlayColor, Opacity * OuterFade);
+		return lerp( Color, OverlayColor, Opacity * OuterFade); // Finally, we apply it to the input color by interpolating our resulting color, using our numerous alphas as the t value. Most of them are either 1 or 0, which essentially filters out the effect for regions that shouldn't be affected by it
 	}
 
 	void dominance_fx_apply(inout float3 Color, float3 Normal, float2 UV, in sampler2D Texture1, in sampler2D Texture2, in sampler2D Texture3, float2 OutlineCutoff, float2 CameraDistOverride, float OutlineMult)
 	{
 
-		float HalfPix = 0.5f / GB_TextureHeight;
+		float HalfPix = 0.5f / GB_TextureHeight; // Since the gradient border texture is divided in two vertically, we need to map the UV to the expected part
 		float2 GBUV = float2(UV.x, UV.y * 0.5f - HalfPix);
 		
 		float4 Sample = tex2D( Texture2, GBUV );
-		float ColorMaskR = ToGamma( Sample.r );
+		float ColorMaskR = ToGamma( Sample.r ); // only the red channel is used, so only one pow() instead of three
 
+		// Mapped direction is whether the dominance is increasing or decreasing, where 1 is increasing, -1 is decreasing, and 0 is neither. ColorMask.a will be in 0-1 space, where 0-0.49999... will be neither. 
+		// values of 0.5 - 1.0 will be mapped to -1 and 1. We do a bit of math magic to transpose it to the desired values. Control of the region is the same, but with the red channel instead of the alpha
 		float ContestedBy = round(Sample.a) * ( Sample.a * 4.f - 3.f );
 		float Control = round(ColorMaskR) * ( ColorMaskR * 4.f - 3.f );
 
-	#if OPT_SAMPLE_IN_BRANCH
-		float2 vDX = ddx( GBUV );
-		float2 vDY = ddy( GBUV );
-		OPT_BRANCH
-		if ( saturate( abs( Control ) + abs( ContestedBy ) ) >= 0.99f )
-		{
-			// a constant UV has no gradient, so mip 0 is exactly what tex2D picks here
-			float3 EnemyColor = tex2Dlod0( Texture3, float2(0,0) ).rgb;
-			float3 FriendlyColor = tex2Dlod0( Texture3, float2(1,0) ).rgb;
+		#if OPT_SAMPLE_IN_BRANCH
+			// A region only gets the overlay when it is controlled or contested, and that is already known from the lookup above. Test it before paying for the two colour lookups and the blurred border lookup, which the original did for every water pixel.
+			float2 vDX = ddx( GBUV );
+			float2 vDY = ddy( GBUV );
+			OPT_BRANCH
+			if ( saturate( abs( Control ) + abs( ContestedBy ) ) >= 0.99f )
+			{
+				float3 EnemyColor = tex2Dlod0( Texture3, float2(0,0) ).rgb; // a constant UV has no gradient, so mip 0 is exactly what tex2D picks here
+				float3 FriendlyColor = tex2Dlod0( Texture3, float2(1,0) ).rgb;
 
-			float4 GBDist = gradient_border_sample( Texture1, GBUV, vDX, vDY );
+				float4 GBDist = gradient_border_sample( Texture1, GBUV, vDX, vDY ); // It calculates the actual border gradient, and we use it for the alpha
+
+				Color = dominance_fx_blend( Color, Control, ContestedBy, EnemyColor, FriendlyColor, GBDist.a, OutlineCutoff, CameraDistOverride, OutlineMult );
+			}
+		#else
+			float3 EnemyColor = tex2D(Texture3, float2(0,0)).rgb;
+			float3 FriendlyColor = tex2D(Texture3, float2(1,0)).rgb;
+
+			float4 GBDist = gradient_border_sample( Texture1, GBUV, vec2( 0.0f ), vec2( 0.0f ) ); // It calculates the actual border gradient, and we use it for the alpha
 
 			Color = dominance_fx_blend( Color, Control, ContestedBy, EnemyColor, FriendlyColor, GBDist.a, OutlineCutoff, CameraDistOverride, OutlineMult );
-		}
-	#else
-		float3 EnemyColor = tex2D(Texture3, float2(0,0)).rgb;
-		float3 FriendlyColor = tex2D(Texture3, float2(1,0)).rgb;
-
-		float4 GBDist = gradient_border_sample( Texture1, GBUV, vec2( 0.0f ), vec2( 0.0f ) );
-
-		Color = dominance_fx_blend( Color, Control, ContestedBy, EnemyColor, FriendlyColor, GBDist.a, OutlineCutoff, CameraDistOverride, OutlineMult );
-	#endif
+		#endif
 	}
 
-	void calculate_map_tex_index( float4 IDs, out float4 IndexU, out float4 IndexV, out float vAllSame )
+	void calculate_map_tex_index( float4 IDs, out float4 IndexU, out float4 IndexV, out float vAllSame ) // Taken out from pdxmap.lua so other shaders can have access to it
 	{
 		IDs *= 255.0f;
 		vAllSame = saturate( IDs.z - 98.0f ); // we've added 100 to first if all IDs are same
@@ -1106,38 +1102,34 @@ PixelShader =
 
 	float mipmapLevel( float2 uv )
 	{
-	#ifdef PDX_OPENGL
-
-	#ifdef NO_SHADER_TEXTURE_LOD
-		return 1.0f;
-	#else
-
-	#ifdef	PIXEL_SHADER
-		float dx = fwidth( uv.x * TEXELS_PER_TILE );
-		float dy = fwidth( uv.y * TEXELS_PER_TILE );
-	    float d = max( dot(dx, dx), dot(dy, dy) );
-		return 0.5 * log2( d );
-	#else
-		return 3.0f;
-	#endif
-
-	#endif
-
-	#else
-	    float2 dx = ddx( uv * TEXELS_PER_TILE );
-	    float2 dy = ddy( uv * TEXELS_PER_TILE );
-	    float d = max( dot(dx, dx), dot(dy, dy) );
-	    return 0.5f * log2( d );
-	#endif
+		#ifdef PDX_OPENGL
+			#ifdef NO_SHADER_TEXTURE_LOD
+				return 1.0f;
+			#else
+				#ifdef	PIXEL_SHADER
+					float dx = fwidth( uv.x * TEXELS_PER_TILE );
+					float dy = fwidth( uv.y * TEXELS_PER_TILE );
+					float d = max( dot(dx, dx), dot(dy, dy) );
+					return 0.5 * log2( d );
+				#else
+					return 3.0f;
+				#endif
+			#endif
+		#else
+			float2 dx = ddx( uv * TEXELS_PER_TILE );
+			float2 dy = ddy( uv * TEXELS_PER_TILE );
+			float d = max( dot(dx, dx), dot(dy, dy) );
+			return 0.5f * log2( d );
+		#endif
 	}
 
 	float4 sample_terrain( float IndexU, float IndexV, float2 vTileRepeat, float vMipTexels, float lod )
 	{
 		vTileRepeat = frac( vTileRepeat );
-	#ifdef NO_SHADER_TEXTURE_LOD
-		vTileRepeat *= 0.96;
-		vTileRepeat += 0.02;
-	#endif
+		#ifdef NO_SHADER_TEXTURE_LOD
+			vTileRepeat *= 0.96;
+			vTileRepeat += 0.02;
+		#endif
 		
 		float vTexelsPerTile = vMipTexels / MAP_NUM_TILES;
 
@@ -1149,7 +1141,7 @@ PixelShader =
 	{
 		float2 time1 = vSpeed * float2( 0.3f, 0.7f ) * 2.0f;
 		float2 uv1 = uv * 250.f;
-		
+
 		float2 time2 = vSpeed * float2( -0.6f, 0.45f ) * 2.0f;
 		float2 uv2 = uv * 190.f;
 
@@ -1159,24 +1151,21 @@ PixelShader =
 		float2 time4 = vSpeed * float2( -0.2f, 0.5f ) * 3.75f;
 		float2 uv4 = uv * 160.f;
 
+		// The blend weight only depends on the camera height (a constant), so every pixel of a draw agrees on it. When it is 0 or 1 one of the two pairs gets weight 0 and is not read at all; lerp( a, b, 0 ) == a and lerp( a, b, 1 ) == b exactly, so the result does not change.
 		float vBlend = saturate( vCamPos.y / 500.0f );
 		float3 vNoiseNear = vec3( 0.0f );
 		float3 vNoiseFar = vec3( 0.0f );
 
-	#if OPT_SKIP_UNUSED_LAYERS
 		OPT_BRANCH
 		if ( vBlend < 1.0f )
-	#endif
 		{
 			float3 noiseNormal1 = normalize( tex2D( NoiseSampler, uv1 + time1 ).rbg - 0.5f );
 			float3 noiseNormal2 = normalize( tex2D( NoiseSampler, uv2 + time2 ).rbg - 0.5f );
 			vNoiseNear = noiseNormal1 + noiseNormal2;
 		}
 
-	#if OPT_SKIP_UNUSED_LAYERS
 		OPT_BRANCH
 		if ( vBlend > 0.0f )
-	#endif
 		{
 			float3 noiseNormal3 = normalize( ( tex2D( NoiseSampler, uv3 + time3 ).rbg - 0.5f ) * float3( 1, 4, 1 ) );
 			float3 noiseNormal4 = normalize( ( tex2D( NoiseSampler, uv4 + time4 ).rbg - 0.5f ) * float3( 1, 4, 1 ) );
@@ -1184,7 +1173,6 @@ PixelShader =
 		}
 
 		float3 normalNoise = lerp( vNoiseNear, vNoiseFar, vBlend );
-		//normalNoise = noiseNormal4;
 		return normalize( normalNoise );
 	}
 
@@ -1226,26 +1214,35 @@ PixelShader =
 
 	void SampleWater( float2 uv, float2 vUVMultipliers[4], float vTime, float2 vTimeMultipliers[4], out float2 B, out float3 M, out float3 normal, in sampler2D Lean1, in sampler2D Lean2 )
 	{
-		float2 B1;
+		float2 B1 = float2( 0.0f, 0.0f );
 		float2 B2;
-		float3 M1;
+		float3 M1 = float3( 0.0f, 0.0f, 0.0f );
 		float3 M2;
 
-		SampleBlendLEAN( 0.5f,
-			uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0],
-			uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1],
-			B1, M1, Lean1, Lean2 );
+		#if OPT_FAR_WATER
+			// Far away the two finest wave layers ( 0 and 1 ) are faded out: they are blended in with weight 0.5 * ( 1 - vFarWater ), reaching 0 at WATER_FAR_END, where their 4 lookups are skipped. The camera height is a constant, so every pixel of a draw takes the same path.
+			float vFarWater = saturate( ( vCamPos.y - WATER_FAR_START ) * ( 1.0f / ( WATER_FAR_END - WATER_FAR_START ) ) );
 
-		SampleBlendLEAN( 0.5f, 
-			uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2],
-			uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3],
-			B2, M2, Lean1, Lean2 );
+			OPT_BRANCH
+			if ( vFarWater < 1.0f )
+			{
+				SampleBlendLEAN( 0.5f, uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0], uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1], B1, M1, Lean1, Lean2 );
+			}
+		#else
+			SampleBlendLEAN( 0.5f, uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0], uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1], B1, M1, Lean1, Lean2 );
+		#endif
 
-		BlendLEAN( 0.5f, B1, M1, B2, M2, B, M );
+		SampleBlendLEAN( 0.5f, uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2], uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3], B2, M2, Lean1, Lean2 );
+
+		#if OPT_FAR_WATER
+			BlendLEAN( 0.5f + 0.5f * vFarWater, B1, M1, B2, M2, B, M ); // BlendLEAN's first argument is the weight of the second set: 0.5 normally, 1.0 once only layers 2 and 3 are left
+		#else
+			BlendLEAN( 0.5f, B1, M1, B2, M2, B, M );
+		#endif
 
 		normal = float3( B.x, 1.0f, B.y );
 
-		float vMultiplier = 1.0f / sqrt( normal.x * normal.x + normal.y * normal.y + normal.z * normal.z );
+		float vMultiplier = 1.0f / sqrt( normal.x * normal.x + normal.y * normal.y + normal.z * normal.z ); // because sometimes, normalize() crashes the compiler(and with sometimes, I mean always)
 		normal *= vMultiplier;
 	}
 
@@ -1274,6 +1271,8 @@ PixelShader =
 	}	
 
 	#ifndef PDX_OPENGL
+		// Direct3D 11 only. Same normal as SampleWater( uv, vTime, normal, Lean1, Lean2 ), but the UV gradients are handed over explicitly ( vDX = ddx( uv ), vDY = ddy( uv ) of the BASE uv, taken outside any branch ), so the lookups may sit inside a per-pixel branch. 
+		// Only the normal is wanted, which needs nothing but the second LEAN texture.
 		void SampleLEANGrad( float2 uv, float2 vDX, float2 vDY, out float2 Bout, in sampler2D LeanTexture2Sampler )
 		{
 			float4 lean2 = tex2Dgrad( LeanTexture2Sampler, uv, vDX, vDY );
@@ -1283,7 +1282,7 @@ PixelShader =
 
 		void SampleWaterGrad( float2 uv, float2 vDX, float2 vDY, float vTime, out float3 normal, in sampler2D Lean2 )
 		{
-			float2 vUVMultipliers[4];
+			float2 vUVMultipliers[4]; // same tables as SampleWater( uv, vTime, ... ), including the time scale
 			vUVMultipliers[0] = 1000.0f * float2( 0.9f, 1.0f );
 			vUVMultipliers[1] = 700.0f * float2( 0.95f, 1.05f );
 			vUVMultipliers[2] = 534.0f * float2( 1.05f, 0.95f );
@@ -1297,13 +1296,13 @@ PixelShader =
 
 			vTime *= WATER_TIME_SCALE;
 
-			float2 Ba, Bb, Bc, Bd;
+			float2 Ba, Bb, Bc, Bd; // the derivative of ( uv * m + vTime * t ) is ( ddx( uv ) * m ), the time part is constant
 			SampleLEANGrad( uv * vUVMultipliers[0] + vTime * vTimeMultipliers[0], vDX * vUVMultipliers[0], vDY * vUVMultipliers[0], Ba, Lean2 );
 			SampleLEANGrad( uv * vUVMultipliers[1] + vTime * vTimeMultipliers[1], vDX * vUVMultipliers[1], vDY * vUVMultipliers[1], Bb, Lean2 );
 			SampleLEANGrad( uv * vUVMultipliers[2] + vTime * vTimeMultipliers[2], vDX * vUVMultipliers[2], vDY * vUVMultipliers[2], Bc, Lean2 );
 			SampleLEANGrad( uv * vUVMultipliers[3] + vTime * vTimeMultipliers[3], vDX * vUVMultipliers[3], vDY * vUVMultipliers[3], Bd, Lean2 );
 
-			float2 B1 = Ba * 0.5f + Bb * 0.5f;
+			float2 B1 = Ba * 0.5f + Bb * 0.5f; // BlendLEAN( 0.5, ... ) on the B part, twice, and then once more on the two results
 			float2 B2 = Bc * 0.5f + Bd * 0.5f;
 			float2 B = B1 * 0.5f + B2 * 0.5f;
 

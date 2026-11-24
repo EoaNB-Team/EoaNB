@@ -141,16 +141,15 @@ PixelShader =
 	}
 }
 
-
 VertexStruct VS_INPUT_PDXMESHSTANDARD
 {
     float3 vPosition		: POSITION;
 	float3 vNormal      	: TEXCOORD0;
 	float4 vTangent			: TEXCOORD1;
 	float2 vUV0				: TEXCOORD2;
-@ifdef PDX_MESH_UV1
-	float2 vUV1				: TEXCOORD3;
-@endif
+	@ifdef PDX_MESH_UV1
+		float2 vUV1				: TEXCOORD3;
+	@endif
 };
 
 VertexStruct VS_INPUT_PDXMESHSTANDARD_SKINNED
@@ -159,9 +158,9 @@ VertexStruct VS_INPUT_PDXMESHSTANDARD_SKINNED
 	float3 vNormal      	: TEXCOORD0;
 	float4 vTangent			: TEXCOORD1;
 	float2 vUV0				: TEXCOORD2;
-@ifdef PDX_MESH_UV1
-	float2 vUV1				: TEXCOORD3;
-@endif
+	@ifdef PDX_MESH_UV1
+		float2 vUV1				: TEXCOORD3;
+	@endif
 	uint4 vBoneIndex 		: TEXCOORD4;
 	float3 vBoneWeight		: TEXCOORD5;
 };
@@ -211,12 +210,10 @@ VertexStruct VS_OUTPUT_DEBUGNORMAL
 	float  vOffset	 : TEXCOORD1;
 };
 
-
 ConstantBuffer( 1, 28 )
 {
 	float4x4 WorldMatrix;
 
-	#// CMeshUserData
 	float4 AtlasCoordinate;
 	float vUVAnimSpeed;
 };
@@ -234,97 +231,96 @@ ConstantBuffer( 2, 41 )
 	float4x4 matBones[50];
 };
 
-
 Code
 [[
-
-static const int PDXMESH_MAX_INFLUENCE = 4;
-
+	static const int PDXMESH_MAX_INFLUENCE = 4;
 ]]
-
 
 VertexShader =
 {
 	MainCode VertexPdxMeshStandard
 	[[
-		
 		VS_OUTPUT_PDXMESHSTANDARD main( const VS_INPUT_PDXMESHSTANDARD v )
 		{
 		  	VS_OUTPUT_PDXMESHSTANDARD Out;
-					
+
 			float4 vPosition = float4( v.vPosition.xyz, 1.0f );
 			Out.vNormal = normalize( mul( CastTo3x3( WorldMatrix ), v.vNormal ) );
 			Out.vTangent = normalize( mul( CastTo3x3( WorldMatrix ), v.vTangent.xyz ) );
 			Out.vBitangent = normalize( cross( Out.vNormal, Out.vTangent ) * v.vTangent.w );
-		
+
 			Out.vPosition = mul( WorldMatrix, vPosition );
 			Out.vPos_Height.xyz = Out.vPosition.xyz;
 			Out.vPos_Height.w = v.vPosition.y;
 			Out.vPos_Height /= WorldMatrix[3][3];
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
-			
+
 			Out.vUV0 = v.vUV0;
-		
+
 			return Out;
 		}
 	]]
 
 	MainCode VertexPdxMeshStandardSkinned
 	[[
-		
+
 		VS_OUTPUT_PDXMESHSTANDARD main( const VS_INPUT_PDXMESHSTANDARD_SKINNED v )
 		{
 		  	VS_OUTPUT_PDXMESHSTANDARD Out;
-					
+
 			float4 vPosition = float4( v.vPosition.xyz, 1.0 );
 			float4 vSkinnedPosition = float4( 0, 0, 0, 0 );
 			float3 vSkinnedNormal = float3( 0, 0, 0 );
 			float3 vSkinnedTangent = float3( 0, 0, 0 );
 			float3 vSkinnedBitangent = float3( 0, 0, 0 );
-		
-			float4 vWeight = float4( v.vBoneWeight.xyz, 1.0f - v.vBoneWeight.x - v.vBoneWeight.y - v.vBoneWeight.z );
-		
-		#if OPT_SKIN_BLEND_MATRIX
-			int nBone0 = int( v.vBoneIndex[0] );
-			int nBone1 = int( v.vBoneIndex[1] );
-			int nBone2 = int( v.vBoneIndex[2] );
-			int nBone3 = int( v.vBoneIndex[3] );
-			float4x4 matBlend = matBones[nBone0] * vWeight.x;
-			matBlend += matBones[nBone1] * vWeight.y;
-			matBlend += matBones[nBone2] * vWeight.z;
-			matBlend += matBones[nBone3] * vWeight.w;
 
-			vSkinnedPosition = mul( matBlend, vPosition );
-			vSkinnedNormal = mul( CastTo3x3( matBlend ), v.vNormal );
-			vSkinnedTangent = mul( CastTo3x3( matBlend ), v.vTangent.xyz );
-			vSkinnedBitangent = mul( CastTo3x3( matBlend ), cross( v.vNormal, v.vTangent.xyz ) * v.vTangent.w );
-		#else
-			for( int i = 0; i < PDXMESH_MAX_INFLUENCE; ++i )
-		    {
-				int nIndex = int( v.vBoneIndex[i] );
-				float4x4 mat = matBones[nIndex];
-				vSkinnedPosition += mul( mat, vPosition ) * vWeight[i];
-		
-				float3 vNormal = mul( CastTo3x3(mat), v.vNormal );
-				float3 vTangent = mul( CastTo3x3(mat), v.vTangent.xyz );
-				float3 vBitangent = cross( vNormal, vTangent ) * v.vTangent.w;
-		
-				vSkinnedNormal += vNormal * vWeight[i];
-				vSkinnedTangent += vTangent * vWeight[i];
-				vSkinnedBitangent += vBitangent * vWeight[i];
-			}
-		#endif
-		
+			float4 vWeight = float4( v.vBoneWeight.xyz, 1.0f - v.vBoneWeight.x - v.vBoneWeight.y - v.vBoneWeight.z );
+
+			#if OPT_SKIN_BLEND_MATRIX
+				// Blend the bone matrices once, then transform with the blended matrix. Everything below is linear in the matrix, so position, normal and tangent come out the same as with the per-bone loop. 
+				// The skinned bitangent of the loop is sum( w * cross( M n, M t ) ) which, for rigid bones, is M * cross( n, t ). 
+				// (the index goes into a plain variable first: the engine rewrites indexing of the bone array into a function call and cannot handle a second pair of square brackets inside the index)
+				int nBone0 = int( v.vBoneIndex[0] );
+				int nBone1 = int( v.vBoneIndex[1] );
+				int nBone2 = int( v.vBoneIndex[2] );
+				int nBone3 = int( v.vBoneIndex[3] );
+				float4x4 matBlend = matBones[nBone0] * vWeight.x;
+				matBlend += matBones[nBone1] * vWeight.y;
+				matBlend += matBones[nBone2] * vWeight.z;
+				matBlend += matBones[nBone3] * vWeight.w;
+
+				vSkinnedPosition = mul( matBlend, vPosition );
+				vSkinnedNormal = mul( CastTo3x3( matBlend ), v.vNormal );
+				vSkinnedTangent = mul( CastTo3x3( matBlend ), v.vTangent.xyz );
+				vSkinnedBitangent = mul( CastTo3x3( matBlend ), cross( v.vNormal, v.vTangent.xyz ) * v.vTangent.w );
+			#else
+				for( int i = 0; i < PDXMESH_MAX_INFLUENCE; ++i )
+				{
+					int nIndex = int( v.vBoneIndex[i] );
+					float4x4 mat = matBones[nIndex];
+					vSkinnedPosition += mul( mat, vPosition ) * vWeight[i];
+
+					float3 vNormal = mul( CastTo3x3(mat), v.vNormal );
+					float3 vTangent = mul( CastTo3x3(mat), v.vTangent.xyz );
+					float3 vBitangent = cross( vNormal, vTangent ) * v.vTangent.w;
+
+					vSkinnedNormal += vNormal * vWeight[i];
+					vSkinnedTangent += vTangent * vWeight[i];
+					vSkinnedBitangent += vBitangent * vWeight[i];
+				}
+			#endif
+
 			Out.vPosition = mul( WorldMatrix, vSkinnedPosition );
 			Out.vPos_Height.xyz = Out.vPosition.xyz;
 			Out.vPos_Height.w = vSkinnedPosition.y;
 			Out.vPos_Height /= WorldMatrix[3][3];
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
-		
+
+			// (no normalize before the matrix: normalize( M * normalize( a ) ) is the same as normalize( M * a ))
 			Out.vNormal = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedNormal ) );
 			Out.vTangent = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedTangent ) );
 			Out.vBitangent = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedBitangent ) );
-		
+
 			Out.vUV0 = v.vUV0;
 			return Out;
 		}
@@ -332,7 +328,6 @@ VertexShader =
 
 	MainCode VertexPdxMeshStandardShadow
 	[[
-		
 		VS_OUTPUT_PDXMESHSHADOW main( const VS_INPUT_PDXMESHSTANDARD v )
 		{
 		  	VS_OUTPUT_PDXMESHSHADOW Out;
@@ -346,23 +341,22 @@ VertexShader =
 
 	MainCode VertexPdxMeshStandardSkinnedShadow
 	[[
-	
 		VS_OUTPUT_PDXMESHSHADOW main( const VS_INPUT_PDXMESHSTANDARD_SKINNED v )
 		{
 		  	VS_OUTPUT_PDXMESHSHADOW Out;
-					
+
 			float4 vPosition = float4( v.vPosition.xyz, 1.0 );
 			float4 vSkinnedPosition = float4( 0, 0, 0, 0 );
-		
+
 			float4 vWeight = float4( v.vBoneWeight.xyz, 1.0f - v.vBoneWeight.x - v.vBoneWeight.y - v.vBoneWeight.z );
-		
+
 			for( int i = 0; i < PDXMESH_MAX_INFLUENCE; ++i )
 		    {
 				int nIndex = int( v.vBoneIndex[i] );
 				float4x4 mat = matBones[nIndex];
 				vSkinnedPosition += mul( mat, vPosition ) * vWeight[i];
 			}
-		
+
 			Out.vPosition = mul( WorldMatrix, vSkinnedPosition );
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );
 			Out.vDepthUV0 = float4( Out.vPosition.zw, v.vUV0 );
@@ -372,7 +366,6 @@ VertexShader =
 
 	MainCode VertexDebugNormal
 	[[
-		
 		VS_OUTPUT_DEBUGNORMAL main( const VS_INPUT_DEBUGNORMAL v )
 		{
 		  	VS_OUTPUT_DEBUGNORMAL Out;
@@ -390,17 +383,16 @@ VertexShader =
 
 	MainCode VertexDebugNormalSkinned
 	[[
-		
 		VS_OUTPUT_DEBUGNORMAL main( const VS_INPUT_DEBUGNORMAL_SKINNED v )
 		{
 		  	VS_OUTPUT_DEBUGNORMAL Out;
-					
+
 			float4 vPosition = float4( v.vPosition.xyz, 1.0 );
 			float4 vSkinnedPosition = float4( 0, 0, 0, 0 );
 			float3 vSkinnedNormal = float3( 0, 0, 0 );
-		
+
 			float4 vWeight = float4( v.vBoneWeight.xyz, 1.0f - v.vBoneWeight.x - v.vBoneWeight.y - v.vBoneWeight.z );
-		
+
 			for( int i = 0; i < PDXMESH_MAX_INFLUENCE; ++i )
 		    {
 				int nIndex = int( v.vBoneIndex[i] );
@@ -408,12 +400,12 @@ VertexShader =
 				vSkinnedPosition += mul( mat, vPosition ) * vWeight[i];	
 				vSkinnedNormal += mul( CastTo3x3(mat), v.vNormal ) * vWeight[i];
 			}
-		
+
 			Out.vPosition = mul( WorldMatrix, vSkinnedPosition );
 			vSkinnedNormal = normalize( mul( CastTo3x3(WorldMatrix), vSkinnedNormal ) );
 			Out.vPosition.xyz += vSkinnedNormal * v.vOffset * 0.3f * WorldMatrix[ 3 ][ 3 ];
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );	
-		
+
 			Out.vUV0 = v.vUV0;
 			Out.vOffset = v.vOffset; 
 			return Out;
@@ -423,20 +415,19 @@ VertexShader =
 
 PixelShader =
 {
-
 	MainCode PixelPdxMeshStandard
 	[[
 		float3 ApplySnowMesh( float3 vColor, float3 vPos, inout float3 vNormal, float4 vFoWColor, out float vSnowAlpha )
 		{
 			float vIsSnow = GetSnow( vFoWColor );
 			float vSnowFade = saturate( saturate( vNormal.y - saturate( 1.0f - vIsSnow ) )*vIsSnow*5.5f*saturate( ( vNormal.y - 0.5f ) * 1000.0f ) );
-						
+
 			float vOpacity = cam_distance( SNOW_CAM_MIN, SNOW_CAM_MAX );
 			vOpacity = SNOW_OPACITY_MIN + vOpacity * ( SNOW_OPACITY_MAX - SNOW_OPACITY_MIN );
-			
+
 			vColor = lerp( vColor, SNOW_COLOR, vSnowFade * vOpacity );
 			vSnowAlpha = saturate( vIsSnow * 1.5f ) * vOpacity;
-			
+
 			return vColor;
 		}
 
@@ -444,173 +435,183 @@ PixelShader =
 		{
 			float2 vUV0 = In.vUV0;
 
-		#ifdef UV_ANIM
-			const float SPEED_SCALE = 2.0f;
-			float t = frac(vGlobalTime * vUVAnimSpeed * SPEED_SCALE);
-			vUV0.y += t;
-		#endif
-		
-		#ifdef ATLAS
-			float4 vDiffuse = tex2D( DiffuseMap, (vUV0 + AtlasCoordinate.xy) / AtlasCoordinate.zw );
-		#else
-			float4 vDiffuse = tex2D( DiffuseMap, vUV0 );
-		#endif	
+			#ifdef UV_ANIM
+				const float SPEED_SCALE = 2.0f;
+				float t = frac(vGlobalTime * vUVAnimSpeed * SPEED_SCALE);
+				vUV0.y += t;
+			#endif
 
-		#ifdef ALPHA_TEST
-			clip(vDiffuse.a - 1.0);
-		#endif
-		
+			#ifdef ATLAS
+				float4 vDiffuse = tex2D( DiffuseMap, (vUV0 + AtlasCoordinate.xy) / AtlasCoordinate.zw );
+			#else
+				float4 vDiffuse = tex2D( DiffuseMap, vUV0 );
+			#endif	
+
+			#ifdef ALPHA_TEST
+				clip(vDiffuse.a - 1.0);
+			#endif
+
 			float3 vPos = In.vPos_Height.xyz;
-		
+
 			float3 vColor = vDiffuse.rgb;
 			float3 vInNormal = normalize( In.vNormal );
 			float4 vProperties = tex2D( SpecularMap, vUV0 );
-			
+
 			LightingProperties lightingProperties;
-			
-		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float4 vNormalMap = tex2D( NormalMap, vUV0 );
-			
-			#ifdef EMISSIVE
-				float vEmissive = vNormalMap.b;
-			#endif
-			float3 vNormalSample =  UnpackRRxGNormal(vNormalMap);
-			
-			lightingProperties._Glossiness = vProperties.a;
-		#else
-			#ifdef EMISSIVE
-				float vEmissive = vProperties.b;
-			#endif
-			float3 vNormalSample = UnpackNormal( NormalMap, vUV0 );
-			
-			lightingProperties._SpecularColor = vec3(vProperties.a);
-			#ifdef GLOSSINESS
-				lightingProperties._Glossiness = vProperties.g * 2048.0 * vProperties.g + 0.00001; // Small epsilon to avoid 0^0
+
+			#ifdef PDX_IMPROVED_BLINN_PHONG
+				#if OPT_FAR_MESH_NORMALS && !defined( EMISSIVE ) // the normal map is read further down, and not at all once the camera is far enough away
+					#define MESH_FAR_NORMALS 1
+				#endif
+				#ifndef MESH_FAR_NORMALS
+					float4 vNormalMap = tex2D( NormalMap, vUV0 );
+
+					#ifdef EMISSIVE
+						float vEmissive = vNormalMap.b;
+					#endif
+					float3 vNormalSample =  UnpackRRxGNormal(vNormalMap);
+				#endif
+
+				lightingProperties._Glossiness = vProperties.a;
 			#else
-				lightingProperties._Glossiness = SPECULAR_WIDTH;
+				#ifdef EMISSIVE
+					float vEmissive = vProperties.b;
+				#endif
+				float3 vNormalSample = UnpackNormal( NormalMap, vUV0 );
+
+				lightingProperties._SpecularColor = vec3(vProperties.a);
+				#ifdef GLOSSINESS
+					lightingProperties._Glossiness = vProperties.g * 2048.0 * vProperties.g + 0.00001; // Small epsilon to avoid 0^0
+				#else
+					lightingProperties._Glossiness = SPECULAR_WIDTH;
+				#endif
 			#endif
-		#endif
-		
+
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(lightingProperties._Glossiness);
-		
-			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
-			float3 vNormal = normalize(mul( vNormalSample, TBN ));
-			
-			// self shadowing
-			float fShadowTerm = 1.0f;//CalculateShadowCascaded(vPos, ShadowMap);
-			//fShadowTerm = (1.0f - SHADOW_WEIGHT_MESH) + SHADOW_WEIGHT_MESH * fShadowTerm;
+
+			#ifdef MESH_FAR_NORMALS
+				// Far away the normal map is faded out ( weight 1 - vFarMesh ) and, from MESH_NORMAL_FAR_END up, replaced by the vertex normal: no lookup and no tangent frame. The camera height is a constant, so every pixel takes the same path.
+				float vFarMesh = saturate( ( vCamPos.y - MESH_NORMAL_FAR_START ) * ( 1.0f / ( MESH_NORMAL_FAR_END - MESH_NORMAL_FAR_START ) ) );
+				float3 vNormal = vInNormal;
+				OPT_BRANCH
+				if ( vFarMesh < 1.0f )
+				{
+					float3 vNormalSample = UnpackRRxGNormal( tex2D( NormalMap, vUV0 ) );
+					float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
+					vNormal = normalize( lerp( normalize( mul( vNormalSample, TBN ) ), vInNormal, vFarMesh ) );
+				}
+			#else
+				float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
+				float3 vNormal = normalize(mul( vNormalSample, TBN ));
+			#endif
+
+			float fShadowTerm = 1.0f;//CalculateShadowCascaded(vPos, ShadowMap); // self shadowing
 
 			float vSnowAlpha = 0;
-		#ifdef PDX_SNOW
-			float4 vFoWColor = GetMudSnowColor( vPos, SnowMudData );
-			vColor = ApplySnowMesh( vColor, vPos, vNormal, vFoWColor, vSnowAlpha );	
-		#endif
+			#ifdef PDX_SNOW
+				float4 vFoWColor = GetMudSnowColor( vPos, SnowMudData );
+				vColor = ApplySnowMesh( vColor, vPos, vNormal, vFoWColor, vSnowAlpha );	
+			#endif
 
-		#ifdef PDX_GRADIENT_BORDERS
-			// Gradient Borders
-			float2 map_uv = float2( ( ( vPos.x+0.5f ) / MAP_SIZE_X ), ( ( vPos.z+0.5f-MAP_SIZE_Y ) / -MAP_SIZE_Y ));
-			
-			float vBloomAlpha = 0.0f;
-			gradient_border_apply( vColor.rgb, vNormal, map_uv, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
+			#ifdef PDX_GRADIENT_BORDERS
+				float2 map_uv = float2( ( ( vPos.x+0.5f ) / MAP_SIZE_X ), ( ( vPos.z+0.5f-MAP_SIZE_Y ) / -MAP_SIZE_Y )); // Gradient Borders
 
-			// Secondary color mask
-			secondary_color_mask( vColor.rgb, vNormal, map_uv, ProvinceSecondaryColorMap, vBloomAlpha );	
-		#endif
-		
+				float vBloomAlpha = 0.0f;
+				gradient_border_apply( vColor.rgb, vNormal, map_uv, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
+
+				secondary_color_mask( vColor.rgb, vNormal, map_uv, ProvinceSecondaryColorMap, vBloomAlpha ); // Secondary color mask
+			#endif
+
 			lightingProperties._WorldSpacePos = vPos;
 			lightingProperties._ToCameraDir = normalize(vCamPos - vPos);
 			lightingProperties._Normal = vNormal;
 
-		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float SpecRemapped = vProperties.g * vProperties.g * 0.4;
-			float MetalnessRemapped = 1.0 - (1.0 - vProperties.b) * (1.0 - vProperties.b);
-			lightingProperties._Diffuse = MetalnessToDiffuse(MetalnessRemapped, vColor);
-			lightingProperties._SpecularColor = MetalnessToSpec(MetalnessRemapped, vColor, SpecRemapped);
-		#else
-			lightingProperties._Diffuse = vColor;
-		#endif
-			
+			#ifdef PDX_IMPROVED_BLINN_PHONG
+				float SpecRemapped = vProperties.g * vProperties.g * 0.4;
+				float MetalnessRemapped = 1.0 - (1.0 - vProperties.b) * (1.0 - vProperties.b);
+				lightingProperties._Diffuse = MetalnessToDiffuse(MetalnessRemapped, vColor);
+				lightingProperties._SpecularColor = MetalnessToSpec(MetalnessRemapped, vColor, SpecRemapped);
+			#else
+				lightingProperties._Diffuse = vColor;
+			#endif
+
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
-			// The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the
-			// night pass, so it is worked out once here and passed on.
-			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
+			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz ); // The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
 			float3 vSunDirection = CalculateSunDirectionGN( vPos, vGlobalNormal );
 			CalculateSunLightGN( lightingProperties, fShadowTerm, vSunDirection, vGlobalNormal, diffuseLight, specularLight );
 			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
-		
-		#ifdef PDX_IMPROVED_BLINN_PHONG
-			float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
-			float3 reflection = reflect( vEyeDir, vNormal );
-			float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-			
-			float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
-		#endif
-		
-		#ifdef PDX_SNOW
-			vColor = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
-		#else
-			vColor = ComposeLightMeshGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
-		#endif
+
+			#ifdef PDX_IMPROVED_BLINN_PHONG
+				float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
+				float3 reflection = reflect( vEyeDir, vNormal );
+				float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
+
+				float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
+				specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
+			#endif
+
+			#ifdef PDX_SNOW
+				vColor = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
+			#else
+				vColor = ComposeLightMeshGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal);
+			#endif
 
 			float alpha = 0.0f;
-		#ifdef EMISSIVE
-			float vDayNightFactor = DayNightFactor( vGlobalNormal );
-			vEmissive = vEmissive * vDayNightFactor;
-			//vColor = lerp( vColor, float3(1,0.7,0), vEmissive * vDayNightFactor );	
-			vColor = lerp( vColor, vDiffuse.rgb, vEmissive );
-			alpha = vEmissive;
-		#endif
-		
+			#ifdef EMISSIVE
+				float vDayNightFactor = DayNightFactor( vGlobalNormal );
+				vEmissive = vEmissive * vDayNightFactor;
+				vColor = lerp( vColor, vDiffuse.rgb, vEmissive );
+				alpha = vEmissive;
+			#endif
+
 			float FogColorFactor = 0.0;
 			float FogAlphaFactor = 0.0;
 			GetFogFactors( FogColorFactor, FogAlphaFactor, vPos, 0.0 /*In.vPos_Height.w * 1.0 + 2.5*/, FOWNoise, FOWHeight, IntelMap);
 			vColor = ApplyFOW( vColor, FogColorFactor, min( FogAlphaFactor, NegFogMultiplier ) );
 
 			vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
-			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );		
-			
-		#ifdef TRAIN
-			alpha = TrainColor.a;
-			vColor *= TrainColor.rgb;
-			float2 toPos = vPos.xz - TrainAlphaStart;
-			float cosPos2d = dot( normalize( toPos ), TrainAlphaDir );
-			float clipalpha = step( 0.0f, cosPos2d );
-			float smoothalpha = smoothstep( 0.0f, 2.5f, length( toPos ) );
+			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
 
-			alpha *= clipalpha * smoothalpha;
+			#ifdef TRAIN
+				alpha = TrainColor.a;
+				vColor *= TrainColor.rgb;
+				float2 toPos = vPos.xz - TrainAlphaStart;
+				float cosPos2d = dot( normalize( toPos ), TrainAlphaDir );
+				float clipalpha = step( 0.0f, cosPos2d );
+				float smoothalpha = smoothstep( 0.0f, 2.5f, length( toPos ) );
 
-			return float4(vColor, alpha);
-		#else
-			return float4(vColor, max(alpha, MinMeshAlpha));
-		#endif
+				alpha *= clipalpha * smoothalpha;
+
+				return float4(vColor, alpha);
+			#else
+				return float4(vColor, max(alpha, MinMeshAlpha));
+			#endif
 		}
 	]]
-	
+
 	MainCode PixelPdxMeshBorder
 	[[
-	
 		float4 main( VS_OUTPUT_PDXMESHSTANDARD In ) : PDX_COLOR
 		{
 			float4 vDiffuse = tex2D( DiffuseMap, In.vUV0 );
-			
-		#ifdef ALPHA_TEST
-			clip(vDiffuse.a - 1.0);
-		#endif
-			
+
+			#ifdef ALPHA_TEST
+				clip(vDiffuse.a - 1.0);
+			#endif
+
 			float3 vPos = In.vPos_Height.xyz;
-		
+
 			float3 vColor = vDiffuse.rgb;
 			float4 vProperties = tex2D( SpecularMap, In.vUV0 );
-			
+
 			float4 vNormalMap = tex2D( NormalMap, In.vUV0 );
 			float3 vNormalSample = UnpackRRxGNormal(vNormalMap);
-			
+
 			LightingProperties lightingProperties;
 			lightingProperties._Glossiness = vProperties.a;
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(lightingProperties._Glossiness);
-		
+
 			float3 vInNormal = normalize( In.vNormal );
 			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vInNormal );
 			float3 vNormal = normalize( mul( vNormalSample, TBN ) );
@@ -623,18 +624,11 @@ PixelShader =
 			float MetalnessRemapped = 1.0 - (1.0 - vProperties.b) * (1.0 - vProperties.b);
 			lightingProperties._Diffuse = MetalnessToDiffuse(MetalnessRemapped, vColor);
 			lightingProperties._SpecularColor = MetalnessToSpec(MetalnessRemapped, vColor, SpecRemapped);
-			
+
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
 			ImprovedBlinnPhong(BORDER_SUN_INTENSITY, normalize(BORDER_SUN_DIRECTION), lightingProperties, diffuseLight, specularLight);
-		
-			//float3 vEyeDir = normalize( vPos - vCamPos.xyz );
-			//float3 reflection = reflect( vEyeDir, vNormal );
-			//float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-			
-			//float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-			//specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
-		
+
 			float3 DayAmbientColors[6];
 			DayAmbientColors[0] = AmbientPosX;
 			DayAmbientColors[1] = AmbientNegX;
@@ -642,20 +636,17 @@ PixelShader =
 			DayAmbientColors[3] = AmbientNegY;
 			DayAmbientColors[4] = AmbientPosZ;
 			DayAmbientColors[5] = AmbientNegZ;
-		
+
 			float3 vAmbientColor = AmbientLightDayOnly(lightingProperties._Normal, DayAmbientColors);
 			float3 diffuse = ((vAmbientColor + diffuseLight) * lightingProperties._Diffuse) * HdrRange;
-			vColor = diffuse + specularLight;
+			vColor = diffuse + specularLight;			
 
-			//vColor.rgb = ApplyDistanceFog( vColor.rgb, vPos );			
-			
 			return float4( vColor, 0 );
 		}
 	]]
 
 	MainCode PixelPdxMeshStandardShadow
-	[[
-			
+	[[	
 		float4 main( VS_OUTPUT_PDXMESHSHADOW In ) : PDX_COLOR
 		{
 			return float4( In.vDepthUV0.xxx / In.vDepthUV0.y, 1.0f );
@@ -664,7 +655,6 @@ PixelShader =
 
 	MainCode PixelPdxMeshNoShadow
 	[[
-			
 		float4 main( VS_OUTPUT_PDXMESHSHADOW In ) : PDX_COLOR
 		{
 			clip( -1.f );
@@ -674,7 +664,6 @@ PixelShader =
 
 	MainCode PixelPdxMeshAlphaBlendShadow
 	[[
-			
 		float4 main( VS_OUTPUT_PDXMESHSHADOW In ) : PDX_COLOR
 		{
 			float4 vColor = tex2D( DiffuseMap, In.vDepthUV0.zw );
@@ -685,7 +674,6 @@ PixelShader =
 
 	MainCode PixelDebugNormal
 	[[
-			
 		float4 main( VS_OUTPUT_DEBUGNORMAL In ) : PDX_COLOR
 		{
 			float4 vColor = float4( 1.0f - In.vOffset, In.vOffset, 0.0f,  1.0f );
@@ -693,7 +681,6 @@ PixelShader =
 		}
 	]]
 }
-
 
 BlendState BlendState
 {
@@ -765,7 +752,6 @@ Effect PdxMeshStandardSkinnedShadow
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
 
-
 Effect PdxMeshStandardSnow
 {
 	VertexShader = "VertexPdxMeshStandard"
@@ -777,7 +763,6 @@ Effect PdxMeshStandardSnowShadow
 	VertexShader = "VertexPdxMeshStandardShadow"
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
-
 
 Effect PdxMeshAdvanced
 {
@@ -807,7 +792,6 @@ Effect PdxMeshAdvancedSkinnedShadow
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
 
-
 Effect PdxMeshAdvancedSnow
 {
 	VertexShader = "VertexPdxMeshStandard"
@@ -835,7 +819,6 @@ Effect PdxMeshAdvancedSnowSkinnedShadow
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
 
-
 Effect PdxMeshAdvancedSkinnedAlphaTest
 {
 	VertexShader = "VertexPdxMeshStandardSkinned"
@@ -850,7 +833,6 @@ Effect PdxMeshAdvancedSkinnedAlphaTestShadow
 	Defines = { "ALPHA_TEST" }
 }
 
-
 Effect PdxMeshAdvancedAnimSkinned
 {
 	VertexShader = "VertexPdxMeshStandardSkinned"
@@ -863,7 +845,6 @@ Effect PdxMeshAdvancedAnimSkinnedShadow
 	VertexShader = "VertexPdxMeshStandardSkinnedShadow"
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
-
 
 Effect PdxMeshAlphaBlend
 {
@@ -891,7 +872,6 @@ Effect PdxMeshAlphaBlendSkinnedShadow
 	PixelShader = "PixelPdxMeshAlphaBlendShadow"
 }
 
-
 Effect PdxMeshSnow
 {
 	VertexShader = "VertexPdxMeshStandard"
@@ -918,7 +898,6 @@ Effect PdxMeshSnowSkinnedShadow
 	PixelShader = "PixelPdxMeshStandardShadow"
 }
 
-
 Effect PdxMeshBorder
 {
 	VertexShader = "VertexPdxMeshStandard"
@@ -931,7 +910,6 @@ Effect PdxMeshBorderShadow
 	VertexShader = "VertexPdxMeshStandardShadow"
 	PixelShader = "PixelPdxMeshNoShadow"
 }
-
 
 Effect DebugNormal
 {

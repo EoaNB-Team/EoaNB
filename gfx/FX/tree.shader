@@ -212,9 +212,7 @@ VertexShader =
 			float randSin = sin( v.vPos_YRot.w );
 			float randCos = cos( v.vPos_YRot.w );
 		
-			Out.vPosition.xz = float2( 
-				Out.vPosition.x * randCos - Out.vPosition.z * randSin, 
-				Out.vPosition.x * randSin + Out.vPosition.z * randCos );
+			Out.vPosition.xz = float2( Out.vPosition.x * randCos - Out.vPosition.z * randSin, Out.vPosition.x * randSin + Out.vPosition.z * randCos );
 		
 			Out.vPosition.y += Out.vPosition.x * v.vSlopes.x + Out.vPosition.z * v.vSlopes.y;
 			Out.vPosition.xyz += v.vPos_YRot.xyz;
@@ -226,27 +224,26 @@ VertexShader =
 			Out.vTexCoord0_TintUV.xy = v.vUV0;
 		
 			Out.vNormal = v.vNormal;
-			Out.vNormal.xz = float2( 
-				Out.vNormal.x * randCos - Out.vNormal.z * randSin, 
-				Out.vNormal.x * randSin + Out.vNormal.z * randCos );
+			Out.vNormal.xz = float2( Out.vNormal.x * randCos - Out.vNormal.z * randSin, Out.vNormal.x * randSin + Out.vNormal.z * randCos );
 			
 			Out.vTangent = v.vTangent.xyz;
-			Out.vTangent.xz = float2( 
-				Out.vTangent.x * randCos - Out.vTangent.z * randSin, 
-				Out.vTangent.x * randSin + Out.vTangent.z * randCos );
+			Out.vTangent.xz = float2( Out.vTangent.x * randCos - Out.vTangent.z * randSin, Out.vTangent.x * randSin + Out.vTangent.z * randCos );
 		
 			Out.vBitangent = cross( Out.vTangent, Out.vNormal ) * v.vTangent.w;
 			
 			Out.vTexCoord0_TintUV.zw = float2( vRandom, 0.0f ) + v.vUV1;
 			
-			Out.vShadowProj = mul( ShadowMapTextureMatrix, float4( Out.vPos, 1.0f ) );	
+			#ifdef NEEDS_SHADOW_PROJ
+				Out.vShadowProj = mul( ShadowMapTextureMatrix, float4( Out.vPos, 1.0f ) );
+			#else
+				Out.vShadowProj = float4( 0.0f, 0.0f, 0.0f, 0.0f ); // only PixelShaderUnlit reads this, the lit passes can skip the matrix multiply ( once per vertex of every tree )
+			#endif
 			
-			// Output the screen-space texture coordinates
-			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 );
+			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 ); // Output the screen-space texture coordinates
 			Out.vScreenCoord.y = ( Out.vPosition.w * 0.5 - Out.vPosition.y * 0.5 );
-		#ifdef PDX_OPENGL
-			Out.vScreenCoord.y = -Out.vScreenCoord.y;
-		#endif			
+			#ifdef PDX_OPENGL
+				Out.vScreenCoord.y = -Out.vScreenCoord.y;
+			#endif			
 			Out.vScreenCoord.z = Out.vPosition.w;
 			Out.vScreenCoord.w = Out.vPosition.w;
 			
@@ -276,9 +273,7 @@ VertexShader =
 			float randSin = sin( v.vPos_YRot.w );
 			float randCos = cos( v.vPos_YRot.w );
 		
-			Out.vPosition.xz = float2( 
-				Out.vPosition.x * randCos - Out.vPosition.z * randSin, 
-				Out.vPosition.x * randSin + Out.vPosition.z * randCos );
+			Out.vPosition.xz = float2( Out.vPosition.x * randCos - Out.vPosition.z * randSin, Out.vPosition.x * randSin + Out.vPosition.z * randCos );
 		
 			Out.vPosition.y += Out.vPosition.x * v.vSlopes.x + Out.vPosition.z * v.vSlopes.y;
 			Out.vPosition.xyz += v.vPos_YRot.xyz;
@@ -312,7 +307,6 @@ PixelShader =
 		float3 ApplySnowTree( float3 vColor, float3 vPos, inout float3 vNormal, float4 vFoWColor, out float vSnowAlpha )
 		{
 			float vIsSnow = GetSnow( vFoWColor );
-			//float vSnowFade = saturate( saturate( vNormal.y - saturate( 1.0f - vIsSnow ) )*vIsSnow*5.5f*saturate( ( vNormal.y - 0.8f ) * 1000.0f ) );
 			float vSnowFade = saturate( vIsSnow * 1.5f );
 			
 			float vOpacity = cam_distance( SNOW_CAM_MIN, SNOW_CAM_MAX );
@@ -320,8 +314,6 @@ PixelShader =
 			
 			vColor = lerp( vColor, SNOW_COLOR, vSnowFade * vOpacity );
 			
-			//vNormal.y += 1.0f * vSnowFade;
-			//vNormal = normalize( vNormal );
 			vSnowAlpha = vSnowFade * vOpacity;
 			
 			return vColor;
@@ -334,34 +326,62 @@ PixelShader =
 				clip( vDiffuseColor.a - 0.5f );
 			
 			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
+
+			OPT_BRANCH // Fully faded out: the alpha written is 0, which leaves the colour buffer as it is. The clips above have already run, so what ends up in the depth buffer is the same as before.
+			if ( vTreeFade <= 0.0f )
+			{
+				return float4( 0.0f, 0.0f, 0.0f, 0.0f );
+			}
 			
 			float2 uv = float2( ( ( In.vPos.x+0.5f ) / MAP_SIZE_X ), ( ( In.vPos.z+0.5f-MAP_SIZE_Y ) / -MAP_SIZE_Y )); 
 			
 			float3 vColor = GetOverlay( vDiffuseColor.rgb, tex2D( TintMap, In.vTexCoord0_TintUV.zw ).rgb, 0.5f );	
 			
-			float3 vSeasonColorMap = lerp( tex2D( ColorMap, uv), tex2D( ColorMapSecond, uv), vSeasonLerp ).rgb;	
+			float3 vSeasonColorMap;
+			OPT_BRANCH // vSeasonLerp is a constant: at 0 or 1 only one of the two maps counts ( lerp( a, b, 0 ) is a, lerp( a, b, 1 ) is b )
+			if ( vSeasonLerp <= 0.0f )
+			{
+				vSeasonColorMap = tex2D( ColorMap, uv ).rgb;
+			}
+			else if ( vSeasonLerp >= 1.0f )
+			{
+				vSeasonColorMap = tex2D( ColorMapSecond, uv ).rgb;
+			}
+			else
+			{
+				vSeasonColorMap = lerp( tex2D( ColorMap, uv), tex2D( ColorMapSecond, uv), vSeasonLerp ).rgb;
+			}
 		
 			vColor = GetOverlay( vColor, vSeasonColorMap, 0.25f );
 			
 			float vSeasonTreeFade = saturate( saturate( (In.vPos.z/MAP_SIZE_Y) - TREE_SEASON_MIN )*TREE_SEASON_FADE_TWEAK );
-			vColor += saturate( tex2D( SeasonMap, float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ) ).rgb-0.5f ) * vSeasonTreeFade;
+			#if defined( PDX_OPENGL )
+				vColor += saturate( tex2D( SeasonMap, float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ) ).rgb-0.5f ) * vSeasonTreeFade;
+			#else
+				float2 vSeasonUV = float2( In.vPrePos_vSeasonColumn.w, In.vTexCoord0_TintUV.w ); // Direct3D 11: vSeasonTreeFade is 0 for the whole southern half of the map, and then this adds nothing
+				float2 vSeasonDX = ddx( vSeasonUV );
+				float2 vSeasonDY = ddy( vSeasonUV );
+				OPT_BRANCH
+				if ( vSeasonTreeFade > 0.0f )
+				{
+					vColor += saturate( tex2Dgrad( SeasonMap, vSeasonUV, vSeasonDX, vSeasonDY ).rgb-0.5f ) * vSeasonTreeFade;
+				}
+			#endif
 		
 			float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
 			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), normalize( In.vNormal ) );
 			float3 vNormal = mul( vNormalSample, TBN );	
 			
 			float vSnowAlpha = 0;
-		#ifndef LOW_END_GFX
-			float4 vFoWColor = GetMudSnowColor( In.vPos, SnowMudData );
-			vColor = ApplySnowTree( vColor, In.vPos, vNormal, vFoWColor, vSnowAlpha );	
-		#endif
+			#ifndef LOW_END_GFX
+				float4 vFoWColor = GetMudSnowColor( In.vPos, SnowMudData );
+				vColor = ApplySnowTree( vColor, In.vPos, vNormal, vFoWColor, vSnowAlpha );	
+			#endif
 
-			// Gradient Borders
-			float vBloomAlpha = 0.0f;
+			float vBloomAlpha = 0.0f; // Gradient Borders
 			gradient_border_apply( vColor.rgb, vNormal, uv, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
 
-			// Secondary color mask
-			secondary_color_mask( vColor.rgb, vNormal, uv, ProvinceSecondaryColorMap, vBloomAlpha );			
+			secondary_color_mask( vColor.rgb, vNormal, uv, ProvinceSecondaryColorMap, vBloomAlpha ); // Secondary color mask		
 
 			float vSpecular 	= TREE_SPECULAR;
 			float vRoughness 	= TREE_ROUGHNESS;
@@ -379,27 +399,27 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 		
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TREE, In.vScreenCoord, ShadowMap );	
-			CalculateSunLight(lightingProperties, fShadowTerm, diffuseLight, specularLight);
+			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz ); // The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
+			float3 vSunDirection = CalculateSunDirectionGN( vPos, vGlobalNormal );
+			CalculateSunLightGN(lightingProperties, fShadowTerm, vSunDirection, vGlobalNormal, diffuseLight, specularLight);
 
-		#ifndef LOW_END_GFX
-			CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
+			#ifndef LOW_END_GFX
+				CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 
-			float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
-			float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
-			float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
-		
-			diffuseLight += reflectiveColor * vSpecular;
-		#endif
+				float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
+				float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
+				float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
 			
-			vColor = ComposeLightSnow(lightingProperties, diffuseLight, specularLight, vSnowAlpha );
-
-			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz );
+				diffuseLight += reflectiveColor * vSpecular;
+			#endif
+			
+			vColor = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal );
 		
 			float3 vFOWColor = ApplyFOW( vColor, ShadowMap, In.vScreenCoord );
 			vColor = lerp( vFOWColor, vColor, BORDER_FOW_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
-		#ifndef LOW_END_GFX
-			vColor = ApplyDistanceFog( vColor, vPos );
-		#endif
+			#ifndef LOW_END_GFX
+				vColor = ApplyDistanceFog( vColor, vPos );
+			#endif
 			vColor.rgb = DayNight( vColor.rgb, vGlobalNormal );
 
 			return float4( vColor, vTreeFade );
@@ -429,8 +449,7 @@ PixelShader =
 			
 			clip( 0.17 - GetTreeMask( TreeMaskTexture, In.vPos ) );
 		
-			// Grab the shadow term
-			float fShadowTerm = CalculateShadow( In.vShadowProj, ShadowMap);
+			float fShadowTerm = CalculateShadow( In.vShadowProj, ShadowMap); // Grab the shadow term
 			
 			float FogColorFactor = 0.0;
 			float FogAlphaFactor = 0.0;
@@ -477,5 +496,6 @@ Effect treeunlit
 {
 	VertexShader = "VertexShader"
 	PixelShader = "PixelShaderUnlit"
+	Defines = { "NEEDS_SHADOW_PROJ" }
 }
 
