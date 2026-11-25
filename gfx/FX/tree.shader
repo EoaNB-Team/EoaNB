@@ -150,7 +150,6 @@ PixelShader =
 	}
 }
 
-
 VertexStruct VS_INPUT_INSTANCE
 {
     float3 vPosition	: POSITION;
@@ -191,7 +190,6 @@ ConstantBuffer( 1, 32 )
 	float		vSeasonColumn;
 	float		vTreeFade;
 };
-
 
 VertexShader =
 {
@@ -238,7 +236,7 @@ VertexShader =
 			#else
 				Out.vShadowProj = float4( 0.0f, 0.0f, 0.0f, 0.0f ); // only PixelShaderUnlit reads this, the lit passes can skip the matrix multiply ( once per vertex of every tree )
 			#endif
-			
+
 			Out.vScreenCoord.x = ( Out.vPosition.x * 0.5 + Out.vPosition.w * 0.5 ); // Output the screen-space texture coordinates
 			Out.vScreenCoord.y = ( Out.vPosition.w * 0.5 - Out.vPosition.y * 0.5 );
 			#ifdef PDX_OPENGL
@@ -368,9 +366,23 @@ PixelShader =
 				}
 			#endif
 		
-			float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
-			float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), normalize( In.vNormal ) );
-			float3 vNormal = mul( vNormalSample, TBN );	
+			#if OPT_FAR_MESH_NORMALS || OPT_FAR_MESH_REFLECTIONS // 0 up to MESH_NORMAL_FAR_START, 1 from MESH_NORMAL_FAR_END up: how far the far-away simplifications have faded in
+				float vFarMesh = saturate( ( vCamPos.y - MESH_NORMAL_FAR_START ) * ( 1.0f / ( MESH_NORMAL_FAR_END - MESH_NORMAL_FAR_START ) ) );
+			#endif
+			#if OPT_FAR_MESH_NORMALS // Far away the normal map is faded out ( weight 1 - vFarMesh ) and, from MESH_NORMAL_FAR_END up, replaced by the vertex normal: no lookup and no tangent frame. The camera height is a constant, so every pixel takes the same path.
+				float3 vNormal = normalize( In.vNormal );
+				OPT_BRANCH
+				if ( vFarMesh < 1.0f )
+				{
+					float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
+					float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), vNormal );
+					vNormal = lerp( mul( vNormalSample, TBN ), vNormal, vFarMesh );
+				}
+			#else
+				float3 vNormalSample = normalize( tex2D( NormalMap, In.vTexCoord0_TintUV.xy  ).rgb - 0.5f );
+				float3x3 TBN = Create3x3( normalize( In.vTangent ), normalize( In.vBitangent ), normalize( In.vNormal ) );
+				float3 vNormal = mul( vNormalSample, TBN );	
+			#endif
 			
 			float vSnowAlpha = 0;
 			#ifndef LOW_END_GFX
@@ -397,7 +409,7 @@ PixelShader =
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vSpecular);
 			float3 diffuseLight = vec3(0.0);
 			float3 specularLight = vec3(0.0);
-		
+
 			float fShadowTerm = GetShadowScaled( SHADOW_WEIGHT_TREE, In.vScreenCoord, ShadowMap );	
 			float3 vGlobalNormal = CalcGlobeNormal( vPos.xz ); // The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
 			float3 vSunDirection = CalculateSunDirectionGN( vPos, vGlobalNormal );
@@ -407,12 +419,22 @@ PixelShader =
 				CalculatePointLights(lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 
 				float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
-				float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
-				float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
-			
-				diffuseLight += reflectiveColor * vSpecular;
+				#if OPT_FAR_MESH_REFLECTIONS // Far away the reflection is faded out ( weight 1 - vFarMesh ) and not looked up at all from MESH_NORMAL_FAR_END up.
+					OPT_BRANCH
+					if ( vFarMesh < 1.0f )
+					{
+						float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
+						float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
+						diffuseLight += reflectiveColor * ( vSpecular * ( 1.0f - vFarMesh ) );
+					}
+				#else
+					float4 reflection = float4( reflect( vEyeDir, vNormal ), 3 - vRoughness * 3 );
+					float3 reflectiveColor = texCUBEbias( EnvironmentMap, reflection ).rgb;
+
+					diffuseLight += reflectiveColor * vSpecular;
+				#endif
 			#endif
-			
+
 			vColor = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobalNormal );
 		
 			float3 vFOWColor = ApplyFOW( vColor, ShadowMap, In.vScreenCoord );
@@ -461,7 +483,6 @@ PixelShader =
 	]]
 }
 
-
 BlendState BlendState
 {
 	BlendEnable = yes
@@ -471,7 +492,6 @@ BlendState BlendState
 	SourceBlend = "SRC_ALPHA"
 	DestBlend = "INV_SRC_ALPHA"
 }
-
 
 Effect tree_low_gfx
 {
@@ -498,4 +518,3 @@ Effect treeunlit
 	PixelShader = "PixelShaderUnlit"
 	Defines = { "NEEDS_SHADOW_PROJ" }
 }
-

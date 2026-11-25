@@ -16,8 +16,13 @@ Code
 
 	// These are NOT exact. They trade a little detail at large camera heights ( vCamPos.y ) for fewer lookups. Each one fades in smoothly between its START and END height ( constants further down ) so nothing pops, and is fully on above END. Set a switch to 0 to get the original look back.
 	#define OPT_FAR_WATER				1	// water: 2 of the 4 LEAN wave layers instead of 4, and a 1-tap shore height lookup
-	#define OPT_FAR_MESH_NORMALS		1	// meshes: vertex normal instead of the normal map ( skips the lookup and the tangent frame )
+	#define OPT_FAR_MESH_NORMALS		1	// meshes and trees: vertex normal instead of the normal map ( skips the lookup and the tangent frame )
+	#define OPT_FAR_MESH_REFLECTIONS	1	// meshes and trees: the environment reflection fades out and is skipped
+	#define OPT_FAR_TERRAIN_TILES		1	// terrain: no blending between neighbouring terrain types far away ( 6 lookups saved on tile edges )
 	#define OPT_FAR_POINTLIGHTS			1	// point lights fade out and are skipped
+
+	// 1 = the bloom blur merges pairs of neighbouring taps into one bilinear tap ( 9 taps -> 5 ) when its offsets are whole texels one apart ( 1,2 and 3,4 ). The result is the same up to the filter's own rounding; with any other offsets the shader falls back to the 9 separate taps by itself.
+	#define OPT_BLOOM_MERGE_TAPS		1
 
 	// Direct3D 11 can keep a texture lookup inside a real branch as long as the UV gradients are handed to it explicitly. OpenGL (legacy GLSL) has no portable way to do that, so there the lookups stay in front of the branch and only the maths is skipped.
 	#ifndef OPT_SAMPLE_IN_BRANCH
@@ -175,6 +180,7 @@ Code
 	static const float WATER_FAR_END			= 1000.0f;
 	static const float MESH_NORMAL_FAR_START	= 600.0f;
 	static const float MESH_NORMAL_FAR_END		= 1000.0f;
+	static const float TERRAIN_TILE_BLEND_FAR	= 1200.0f; // no fade: the blend is about one map texel wide, so about a pixel or less up here
 	static const float POINTLIGHT_FAR_START		= 800.0f;
 	static const float POINTLIGHT_FAR_END		= 1200.0f;
 	static const float GB_STRENGTH_CH1 = 1.0; // Opacity of bottom layer

@@ -263,7 +263,6 @@ VertexShader =
 
 	MainCode VertexPdxMeshStandardSkinned
 	[[
-
 		VS_OUTPUT_PDXMESHSTANDARD main( const VS_INPUT_PDXMESHSTANDARD_SKINNED v )
 		{
 		  	VS_OUTPUT_PDXMESHSTANDARD Out;
@@ -369,14 +368,14 @@ VertexShader =
 		VS_OUTPUT_DEBUGNORMAL main( const VS_INPUT_DEBUGNORMAL v )
 		{
 		  	VS_OUTPUT_DEBUGNORMAL Out;
-		
+
 			Out.vPosition = mul( WorldMatrix, float4( v.vPosition.xyz, 1.0 ) );
 			Out.vPosition.xyz += mul( CastTo3x3(WorldMatrix), v.vNormal ) * v.vOffset * 0.3f;
 			Out.vPosition = mul( ViewProjectionMatrix, Out.vPosition );	
-		
+
 			Out.vUV0 = v.vUV0;
 			Out.vOffset = v.vOffset; 
-		
+
 			return Out;
 		}
 	]]
@@ -445,7 +444,7 @@ PixelShader =
 				float4 vDiffuse = tex2D( DiffuseMap, (vUV0 + AtlasCoordinate.xy) / AtlasCoordinate.zw );
 			#else
 				float4 vDiffuse = tex2D( DiffuseMap, vUV0 );
-			#endif	
+			#endif
 
 			#ifdef ALPHA_TEST
 				clip(vDiffuse.a - 1.0);
@@ -460,6 +459,9 @@ PixelShader =
 			LightingProperties lightingProperties;
 
 			#ifdef PDX_IMPROVED_BLINN_PHONG
+				#if OPT_FAR_MESH_NORMALS || OPT_FAR_MESH_REFLECTIONS // 0 up to MESH_NORMAL_FAR_START, 1 from MESH_NORMAL_FAR_END up: how far the far-away simplifications have faded in
+					float vFarMesh = saturate( ( vCamPos.y - MESH_NORMAL_FAR_START ) * ( 1.0f / ( MESH_NORMAL_FAR_END - MESH_NORMAL_FAR_START ) ) );
+				#endif
 				#if OPT_FAR_MESH_NORMALS && !defined( EMISSIVE ) // the normal map is read further down, and not at all once the camera is far enough away
 					#define MESH_FAR_NORMALS 1
 				#endif
@@ -489,8 +491,7 @@ PixelShader =
 
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(lightingProperties._Glossiness);
 
-			#ifdef MESH_FAR_NORMALS
-				// Far away the normal map is faded out ( weight 1 - vFarMesh ) and, from MESH_NORMAL_FAR_END up, replaced by the vertex normal: no lookup and no tangent frame. The camera height is a constant, so every pixel takes the same path.
+			#ifdef MESH_FAR_NORMALS // Far away the normal map is faded out ( weight 1 - vFarMesh ) and, from MESH_NORMAL_FAR_END up, replaced by the vertex normal: no lookup and no tangent frame. The camera height is a constant, so every pixel takes the same path.
 				float vFarMesh = saturate( ( vCamPos.y - MESH_NORMAL_FAR_START ) * ( 1.0f / ( MESH_NORMAL_FAR_END - MESH_NORMAL_FAR_START ) ) );
 				float3 vNormal = vInNormal;
 				OPT_BRANCH
@@ -544,11 +545,20 @@ PixelShader =
 
 			#ifdef PDX_IMPROVED_BLINN_PHONG
 				float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( vPos - vCamPos )
-				float3 reflection = reflect( vEyeDir, vNormal );
-				float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness); 
-
-				float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
-				specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
+				#if OPT_FAR_MESH_REFLECTIONS
+					OPT_BRANCH // Far away the environment reflection is faded out ( weight 1 - vFarMesh ) and not looked up at all from MESH_NORMAL_FAR_END up. The camera height is a constant, so every pixel of a draw takes the same path.
+					if ( vFarMesh < 1.0f )
+				#endif
+				{
+					float3 reflection = reflect( vEyeDir, vNormal );
+					float MipmapIndex = GetEnvmapMipLevel(lightingProperties._Glossiness);
+					float3 reflectiveColor = texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
+					float3 vReflectionSpecular = reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
+					#if OPT_FAR_MESH_REFLECTIONS
+						vReflectionSpecular *= 1.0f - vFarMesh;
+					#endif
+					specularLight += vReflectionSpecular;
+				}
 			#endif
 
 			#ifdef PDX_SNOW
@@ -639,14 +649,14 @@ PixelShader =
 
 			float3 vAmbientColor = AmbientLightDayOnly(lightingProperties._Normal, DayAmbientColors);
 			float3 diffuse = ((vAmbientColor + diffuseLight) * lightingProperties._Diffuse) * HdrRange;
-			vColor = diffuse + specularLight;			
+			vColor = diffuse + specularLight;
 
 			return float4( vColor, 0 );
 		}
 	]]
 
 	MainCode PixelPdxMeshStandardShadow
-	[[	
+	[[
 		float4 main( VS_OUTPUT_PDXMESHSHADOW In ) : PDX_COLOR
 		{
 			return float4( In.vDepthUV0.xxx / In.vDepthUV0.y, 1.0f );

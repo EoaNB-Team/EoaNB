@@ -159,7 +159,6 @@ PixelShader =
 	}
 }
 
-
 VertexStruct VS_INPUT_TERRAIN_NOTEXTURE
 {
     int4 position			: POSITION;
@@ -175,8 +174,6 @@ VertexStruct VS_OUTPUT_TERRAIN
 	float4 vShadowProj		: TEXCOORD3;
 	float4 vScreenCoord		: TEXCOORD4;
 };
-
-
 
 VertexShader =
 {
@@ -209,10 +206,9 @@ VertexShader =
 			#else
 				VertexOut.vShadowProj = float4( 0.0f, 0.0f, 0.0f, 0.0f ); // only PixelShaderTerrainUnlit reads this, the other passes can skip the matrix multiply
 			#endif
-			
-			// Output the screen-space texture coordinates
-			VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
-			VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
+				// Output the screen-space texture coordinates
+				VertexOut.vScreenCoord.x = ( VertexOut.position.x * 0.5 + VertexOut.position.w * 0.5 );
+				VertexOut.vScreenCoord.y = ( VertexOut.position.w * 0.5 - VertexOut.position.y * 0.5 );
 			#ifdef PDX_OPENGL
 				VertexOut.vScreenCoord.y = -VertexOut.vScreenCoord.y;
 			#endif
@@ -230,7 +226,6 @@ PixelShader =
 	[[		
 		float4 main( VS_OUTPUT_TERRAIN Input ) : PDX_COLOR
 		{
-		
 			float2 vOffsets = float2( -0.5f / MAP_SIZE_X, -0.5f / MAP_SIZE_Y );
 			
 			float vAllSame;
@@ -259,7 +254,11 @@ PixelShader =
 				float4 terrain_normalRaw = tex2Dlod( TerrainNormal, sample_terrain( IndexU.w, IndexV.w, vTileRepeat, vMipTexels, lod ) );
 			#endif
 			
-			if ( vAllSame < 1.0f )
+			#if OPT_FAR_TERRAIN_TILES // far away the blend between neighbouring terrain types ( about one map texel wide ) is skipped
+				if ( vAllSame < 1.0f && vCamPos.y < TERRAIN_TILE_BLEND_FAR )
+			#else
+				if ( vAllSame < 1.0f )
+			#endif
 			{
 				float4 ColorRD = tex2Dlod( TerrainDiffuse, sample_terrain( IndexU.x, IndexV.x, vTileRepeat, vMipTexels, lod ) ).rgba;
 				float4 ColorLU = tex2Dlod( TerrainDiffuse, sample_terrain( IndexU.y, IndexV.y, vTileRepeat, vMipTexels, lod ) ).rgba;
@@ -296,30 +295,30 @@ PixelShader =
 				terrain_normal = normalize( terrain_normal );
 				normal = RotateVectorByVector( normal, terrain_normal ); //Calculate terrain normal, normal and terrain_normal are both unit length, so the rotated vector is too: no normalize needed
 			#endif
-			
+
 			float4 TerrainColor = tex2D( TerrainColorTint, Input.uv2 );
 
 			#ifndef LOW_END_GFX
 				float CityLightsMask = TerrainColor.a;
 			#endif
-	
+
 			float vSnowAlpha = 1-vSpec;
 			diffuse.rgb = GetOverlay( diffuse.rgb, TerrainColor.rgb, COLORMAP_OVERLAY_STRENGTH );
 
 			float4 vMudSnow = GetMudSnowColor( Input.prepos, SnowMudData );	
 			diffuse.rgb = ApplySnow( diffuse.rgb, Input.prepos, normal, vMudSnow, SnowTexture, CityLightsAndSnowNoise, vGlossiness, vSnowAlpha );
 			diffuse.rgb = GetMudColor( diffuse.rgb, vMudSnow, Input.prepos, normal, vGlossiness, vSpec, MudDiffuseGloss, MudNormalSpec, TerrainColor.rgb, CityLightsAndSnowNoise );
-							
+			
 			float vBloomAlpha = 0.0f; // Gradient Borders
 			gradient_border_apply( diffuse.rgb, normal, Input.uv2, GradientBorderChannel1, GradientBorderChannel2, 1.0f, vGBCamDistOverride_GBOutlineCutoff.zw, vGBCamDistOverride_GBOutlineCutoff.xy, vBloomAlpha );
-					
+
 			secondary_color_mask( diffuse.rgb, normal, Input.uv2, ProvinceSecondaryColorMap, vBloomAlpha ); // Secondary color mask
 
 			LightingProperties lightingProperties;
 			lightingProperties._WorldSpacePos = Input.prepos;
 			lightingProperties._ToCameraDir = normalize(vCamPos - Input.prepos);
 			lightingProperties._Normal = normal;
-			
+
 			#ifdef PDX_IMPROVED_BLINN_PHONG
 
 				#ifdef NO_SHADER_TEXTURE_LOD
@@ -345,27 +344,26 @@ PixelShader =
 			float3 specularLight = vec3(0.0);
 
 			float fShadowTerm = max(GetShadowScaled( SHADOW_WEIGHT_TERRAIN, Input.vScreenCoord, ShadowMap ), 0.1f );
-		
-			// The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
-			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz );
+
+			float3 vGlobeNormal = CalcGlobeNormal( Input.prepos.xz ); // The globe normal (sin, cos, normalize) feeds the sun direction, the sun light, the ambient and the night pass, so it is worked out once here and passed on.
 			float3 vSunDirection = CalculateSunDirectionGN( Input.prepos, vGlobeNormal );
 			CalculateSunLightGN( lightingProperties, fShadowTerm, vSunDirection, vGlobeNormal, diffuseLight, specularLight );
 
 			#ifndef LOW_END_GFX
 				CalculatePointLights( lightingProperties, LightDataMap, LightIndexMap, diffuseLight, specularLight);
 			#endif
-			
+
 			#ifdef PDX_IMPROVED_BLINN_PHONG
 				float3 vEyeDir = -lightingProperties._ToCameraDir; // was a second normalize of ( prepos - vCamPos )
 				
 				float3 reflectiveColor = FAKE_CUBEMAP_COLOR; //texCUBElod( EnvironmentMap, float4(reflection, MipmapIndex) ).rgb * CubemapIntensity;
 				specularLight += reflectiveColor * FresnelGlossy(lightingProperties._SpecularColor, -vEyeDir, lightingProperties._Normal, lightingProperties._Glossiness);
 			#endif
-			
+
 			float3 vOut = ComposeLightSnowGN(lightingProperties, diffuseLight, specularLight, vSnowAlpha, vGlobeNormal);
-		
+
 			vOut = lerp( vOut, diffuse.rgb, BORDER_LIGHT_REMOVAL_FACTOR * ( 1 - vBloomAlpha ) );
-				
+
 			float vNightFactor = DayNightFactor( vGlobeNormal );
 
 			#ifndef LOW_END_GFX
@@ -373,8 +371,7 @@ PixelShader =
 					float3 CityLights = tex2D( CityLightsAndSnowNoise, Input.prepos.xz * CITY_LIGHTS_TILING ).rgb;
 					vOut += CityLights * CITY_LIGHTS_INTENSITY * CityLightsMask * vNightFactor;
 				#else
-					// Direct3D 11: on the day side vNightFactor is exactly 0 and so is this whole term, so skip the lookup there
-					float2 vCityDX = ddx( Input.prepos.xz ) * CITY_LIGHTS_TILING;
+					float2 vCityDX = ddx( Input.prepos.xz ) * CITY_LIGHTS_TILING; // Direct3D 11: on the day side vNightFactor is exactly 0 and so is this whole term, so skip the lookup there
 					float2 vCityDY = ddy( Input.prepos.xz ) * CITY_LIGHTS_TILING;
 					OPT_BRANCH
 					if ( vNightFactor > 0.0f )
@@ -391,7 +388,7 @@ PixelShader =
 			#ifndef LOW_END_GFX
 				vOut = ApplyDistanceFog( vOut, Input.prepos );
 			#endif
-			
+
 			vOut = DayNightWithBlend( vOut, vGlobeNormal, lerp(BORDER_NIGHT_DESATURATION_MAX, 1.0f, vBloomAlpha) );
 
 			#ifdef LOW_END_GFX
@@ -399,7 +396,7 @@ PixelShader =
 			#else
 				return float4( vOut, saturate(CityLightsMask * vNightFactor * CITY_LIGHTS_BLOOM_FACTOR) );
 			#endif
-		}		
+		}
 	]]
 
 	MainCode PixelShaderUnderwater
@@ -407,20 +404,20 @@ PixelShader =
 		float4 main( VS_OUTPUT_TERRAIN Input ) : PDX_COLOR
 		{
 			clip( WATER_HEIGHT - Input.prepos.y + TERRAIN_WATER_CLIP_HEIGHT );
-		
+
 			float3 normal = normalize( tex2D( HeightNormal,Input.uv2 ).rbg - 0.5f );
 			float3 diffuse = tex2D( TerrainDiffuse, Input.uv2 * float2(( MAP_SIZE_X / 32.0f ), ( MAP_SIZE_Y / 32.0f ) ) ).rgb;
-			
+
 			float3 waterColorTint = tex2D( TerrainColorTint, Input.uv2 /*+ offset.xy * WATER_RIPPLE_EFFECT*/ ).rgb;		
 			waterColorTint *= WATER_COLOR_LIGHTNESS;
-			
+
 			float vMin = 5.3f; //5.3f; Depthfog ish for bottom
 			float vMax = 13.0f; //30.0f; 
 
 			float vWaterAlpha = saturate(( Input.prepos.y - vMin ) / ( vMax - vMin ) );
-		
+
 			float vGlossiness = MAP_SPECULAR_WIDTH;
-		
+
 			LightingProperties lightingProperties;
 			lightingProperties._WorldSpacePos = Input.prepos;
 			lightingProperties._ToCameraDir = normalize(vCamPos - Input.prepos);
@@ -430,7 +427,7 @@ PixelShader =
 			lightingProperties._Glossiness = vGlossiness;
 			lightingProperties._SpecularColor = SunDiffuseIntensity.rgb * 0.1f;
 			lightingProperties._NonLinearGlossiness = GetNonLinearGlossiness(vGlossiness);
-			
+
 			float3 vOut = waterColorTint; // vMin ( vWaterAlpha == 0 ) the lit colour is blended away completely: lerp( tint, lit, 0 ) is the tint. OpenGL skips the lighting there with a real branch. ( Direct3D 11 would have to flatten it anyway, because the shadow lookup needs derivatives, so it keeps the straight-line code. )
 			#ifdef PDX_OPENGL
 				if ( vWaterAlpha > 0.0f )
@@ -458,7 +455,7 @@ PixelShader =
 		float4 main( VS_OUTPUT_TERRAIN Input ) : PDX_COLOR
 		{	
 			float fShadowTerm = CalculateShadow( Input.vShadowProj, ShadowMap); // Grab the shadow term
-			
+
 			float FogColorFactor = 0.0;
 			float FogAlphaFactor = 0.0;
 			GetFogFactorsForBuffer( FogColorFactor, FogAlphaFactor, Input.prepos, 0.0, TerrainDiffuse, HeightNormal, TerrainColorTint);
@@ -467,14 +464,12 @@ PixelShader =
 	]]
 }
 
-
 BlendState BlendState
 {
 	BlendEnable = no
 	AlphaTest = no
 	WriteMask = "RED|GREEN|BLUE|ALPHA"
 }
-
 
 Effect terrain_low_gfx
 {
@@ -502,4 +497,3 @@ Effect terrainunlit
 	PixelShader = "PixelShaderTerrainUnlit"
 	Defines = { "NEEDS_SHADOW_PROJ" }
 }
-
