@@ -211,8 +211,15 @@ eoanb_score_system_calc = {
 			max = 1000000
 		}
 
-		add_to_temp_array = { eoanb_sort_scores = overall_score }
-		add_to_temp_array = { eoanb_sort_tags = THIS }
+		if = {
+			limit = { has_country_flag = rebel_uprisisng }
+			add_to_temp_array = { eoanb_sort_scores_rebel = overall_score }
+			add_to_temp_array = { eoanb_sort_tags_rebel = THIS }
+		}
+		else = {
+			add_to_temp_array = { eoanb_sort_scores = overall_score }
+			add_to_temp_array = { eoanb_sort_tags = THIS }
+		}
 	}
 
 	while_loop_effect = {
@@ -228,6 +235,20 @@ eoanb_score_system_calc = {
 		remove_from_temp_array = { array = eoanb_sort_tags index = eoanb_top_index }
 	}
 
+	# Rebel movements are not recognised states: rank them after every real country
+	while_loop_effect = {
+		limit = { check_variable = { eoanb_sort_scores_rebel^num > 0 } }
+		find_highest_in_array = {
+			array = eoanb_sort_scores_rebel
+			value = eoanb_top_value
+			index = eoanb_top_index
+		}
+		add_to_array = { global.score_array = eoanb_top_value }
+		add_to_array = { global.score_tag_array = eoanb_sort_tags_rebel^eoanb_top_index }
+		remove_from_temp_array = { array = eoanb_sort_scores_rebel index = eoanb_top_index }
+		remove_from_temp_array = { array = eoanb_sort_tags_rebel index = eoanb_top_index }
+	}
+
 	for_loop_effect = {
 		start = 0
 		end = global.score_tag_array^num
@@ -238,7 +259,6 @@ eoanb_score_system_calc = {
 		add_to_array = { global.score_array_position = eoanb_rank }
 
 		var:global.score_tag_array^eoanb_index = {
-			set_variable = { score_prev_position_var = score_array_position_var }
 			set_variable = { score_array_position_var = eoanb_rank }
 			set_variable = { score_array_position_var_real = eoanb_index }
 		}
